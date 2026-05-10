@@ -24,6 +24,12 @@ type LoadOptions struct {
 	RopeFreqScale    float64          `json:"rope_freq_scale"` // RoPE frequency scale
 	MemoryFraction   float64          `json:"memory_fraction"` // Fraction of memory to use
 	ProgressCallback ProgressCallback `json:"-"`               // Callback for loading progress
+	ContextSize      int              `json:"context_size"`    // Context window size
+	Seed             int              `json:"seed"`            // Random seed
+	MainGPU          int              `json:"main_gpu"`        // Main GPU device
+	TensorSplit      string           `json:"tensor_split"`    // Tensor split for multi-GPU
+	EmbeddingMode    bool             `json:"embedding_mode"`  // Embedding mode
+	NumGQA           int              `json:"num_gqa"`         // Number of GQA groups
 }
 
 // InferenceOptions represents options for text generation

@@ -17,10 +17,10 @@ type App struct {
 }
 
 // NewApp creates a new instance of the App struct
-// Initializes backend services with stub client for testing
+// Initializes backend services with actual llama client
 func NewApp() *App {
-	// Create stub llama client for testing (will be replaced with actual implementation)
-	client := llama.NewStubClient()
+	// Create actual llama client implementation
+	client := llama.NewLlamaClient()
 
 	// Create model manager
 	manager := model.NewManager(client)
