@@ -151,17 +151,23 @@ function continueMessage(button) {
 }
 
 // Handle send button
-document.querySelector('.send-button').addEventListener('click', () => {
+document.querySelector('.send-button').addEventListener('click', async () => {
     const input = document.querySelector('.input-field');
     const message = input.value.trim();
     if (message) {
         addUserMessage(message);
         input.value = '';
         
-        // Simulate AI response with streaming
-        setTimeout(() => {
-            streamAssistantResponse("Knight", "I understand your request. Let me assist you with that matter.");
-        }, 500);
+        try {
+            // Call backend to send message
+            const response = await window.go.main.App.SendMessage(message);
+            if (response) {
+                addAssistantMessage("AI", response);
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            addAssistantMessage("AI", "Error: Failed to get response from backend.");
+        }
     }
 });
 
@@ -178,13 +184,18 @@ function loadModel() {
     input.type = 'file';
     input.accept = '.gguf,.bin,.safetensors';
     
-    input.onchange = (e) => {
+    input.onchange = async (e) => {
         const file = e.target.files[0];
         if (file) {
             console.log('Loading model:', file.name);
-            // TODO: Backend integration for model loading
-            // This will be implemented when backend is ready
-            alert(`Model selected: ${file.name}\n\nBackend integration pending.`);
+            try {
+                await window.go.main.App.LoadModel(file.path);
+                updateModelDisplay(file.name);
+                alert(`Model loaded successfully: ${file.name}`);
+            } catch (error) {
+                console.error('Error loading model:', error);
+                alert(`Failed to load model: ${error}`);
+            }
         }
     };
     
@@ -192,17 +203,25 @@ function loadModel() {
 }
 
 // Unload Model - aggressively unloads current model
-function unloadModel() {
+async function unloadModel() {
     if (confirm('⚠️ AGGRESSIVE UNLOAD ⚠️\n\nThis will forcefully unload the current model from memory.\nAll unsaved context will be lost.\n\nAre you sure you want to proceed?')) {
         console.log('AGGRESSIVE UNLOAD initiated');
-        // TODO: Backend integration for aggressive model unloading
-        // This will implement:
-        // - Force memory cleanup
-        // - Clear GPU cache
-        // - Terminate model process
-        // - Reset all model state
-        // - Clear conversation context
-        alert('🔴 MODEL AGGRESSIVELY UNLOADED\n\nGPU cache cleared.\nMemory freed.\nModel process terminated.\n\nBackend integration pending.');
+        try {
+            await window.go.main.App.UnloadModel();
+            updateModelDisplay("No model loaded");
+            alert('🔴 MODEL AGGRESSIVELY UNLOADED\n\nGPU cache cleared.\nMemory freed.\nModel process terminated.');
+        } catch (error) {
+            console.error('Error unloading model:', error);
+            alert(`Failed to unload model: ${error}`);
+        }
+    }
+}
+
+// Update model name display
+function updateModelDisplay(modelName) {
+    const display = document.getElementById('model-name-display');
+    if (display) {
+        display.textContent = modelName;
     }
 }
 
