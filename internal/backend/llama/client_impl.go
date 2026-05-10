@@ -44,18 +44,10 @@ func (c *LlamaClient) LoadModel(modelPath string, options *LoadOptions) error {
 
 	// Configure llama.cpp options
 	llamaOptions := []llama.ModelOption{
-		llama.SetContextSize(options.ContextSize),
-		llama.SetSeed(options.Seed),
-		llama.SetRMSNormEPS(options.RMSNormEPS),
-		llama.SetNGPULayers(options.GPULayers),
-		llama.SetMainGPU(options.MainGPU),
-		llama.SetTensorSplit(options.TensorSplit),
-		llama.SetUseMMap(options.UseMMap),
-		llama.SetUseMlock(options.UseMlock),
-		llama.SetEmbeddingMode(options.EmbeddingMode),
-		llama.SetRoPEFreqBase(options.RopeFreqBase),
-		llama.SetRoPEFreqScale(options.RopeFreqScale),
-		llama.SetNumGQA(options.NumGQA),
+		llama.SetContext(options.ContextSize),
+		llama.SetModelSeed(options.Seed),
+		llama.SetGPULayers(options.GPULayers),
+		llama.SetMMap(options.UseMMap),
 	}
 
 	// Load the model
@@ -129,22 +121,15 @@ func (c *LlamaClient) Generate(prompt string, options *InferenceOptions) (string
 
 	// Configure generation options
 	llamaOptions := []llama.PredictOption{
-		llama.SetTemperature(options.Temperature),
-		llama.SetTopP(options.TopP),
+		llama.SetTemperature(float32(options.Temperature)),
+		llama.SetTopP(float32(options.TopP)),
 		llama.SetTopK(options.TopK),
-		llama.SetMinP(options.MinP),
-		llama.SetRepeatPenalty(options.RepeatPenalty),
-		llama.SetFrequencyPenalty(options.FrequencyPenalty),
-		llama.SetPresencePenalty(options.PresencePenalty),
-		llama.SetTFS(options.TFS),
-		llama.SetTypicalP(options.TypicalP),
-		llama.SetMirostat(options.Mirostat),
-		llama.SetMirostatTau(options.MirostatTau),
-		llama.SetMirostatETA(options.MirostatETA),
+		llama.SetRepeatPenalty(float32(options.RepeatPenalty)),
+		llama.SetFrequencyPenalty(float32(options.FrequencyPenalty)),
+		llama.SetPresencePenalty(float32(options.PresencePenalty)),
 		llama.SetSeed(options.Seed),
-		llama.SetNPredict(options.NPredict),
-		llama.SetNKeep(options.NKeep),
-		llama.SetStop(options.StopStrings...),
+		llama.SetTokens(options.NPredict),
+		llama.SetStopWords(options.StopStrings...),
 	}
 
 	// Generate response
@@ -171,22 +156,15 @@ func (c *LlamaClient) GenerateStream(prompt string, options *InferenceOptions, c
 
 	// Configure generation options
 	llamaOptions := []llama.PredictOption{
-		llama.SetTemperature(options.Temperature),
-		llama.SetTopP(options.TopP),
+		llama.SetTemperature(float32(options.Temperature)),
+		llama.SetTopP(float32(options.TopP)),
 		llama.SetTopK(options.TopK),
-		llama.SetMinP(options.MinP),
-		llama.SetRepeatPenalty(options.RepeatPenalty),
-		llama.SetFrequencyPenalty(options.FrequencyPenalty),
-		llama.SetPresencePenalty(options.PresencePenalty),
-		llama.SetTFS(options.TFS),
-		llama.SetTypicalP(options.TypicalP),
-		llama.SetMirostat(options.Mirostat),
-		llama.SetMirostatTau(options.MirostatTau),
-		llama.SetMirostatETA(options.MirostatETA),
+		llama.SetRepeatPenalty(float32(options.RepeatPenalty)),
+		llama.SetFrequencyPenalty(float32(options.FrequencyPenalty)),
+		llama.SetPresencePenalty(float32(options.PresencePenalty)),
 		llama.SetSeed(options.Seed),
-		llama.SetNPredict(options.NPredict),
-		llama.SetNKeep(options.NKeep),
-		llama.SetStop(options.StopStrings...),
+		llama.SetTokens(options.NPredict),
+		llama.SetStopWords(options.StopStrings...),
 	}
 
 	// Generate with streaming
