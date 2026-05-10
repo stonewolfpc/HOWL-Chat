@@ -2,9 +2,9 @@ module howl-chat
 
 go 1.23.8
 
-require (
-	github.com/wailsapp/wails/v2 v2.12.0
-)
+require github.com/wailsapp/wails/v2 v2.12.0
+
+replace github.com/go-skynet/go-llama.cpp => github.com/go-skynet/go-llama.cpp v0.0.0-20240314183750-6a8041ef6b46
 
 require (
 	git.sr.ht/~jackmordaunt/go-toast/v2 v2.0.3 // indirect
