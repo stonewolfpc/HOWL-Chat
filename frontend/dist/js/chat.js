@@ -7,6 +7,23 @@
  * @module chat
  */
 
+// Wait for Wails runtime to be ready
+let wailsReady = false;
+
+// Check if Wails runtime is available
+function checkWailsReady() {
+    if (window.wails && window.wails._bindings) {
+        wailsReady = true;
+        console.log('Wails runtime is ready');
+    } else {
+        console.log('Waiting for Wails runtime...');
+        setTimeout(checkWailsReady, 100);
+    }
+}
+
+// Start checking for Wails runtime
+checkWailsReady();
+
 // Add user message to chat
 function addUserMessage(text) {
     const chatHistory = document.querySelector('.chat-messages');
@@ -158,6 +175,13 @@ document.querySelector('.send-button').addEventListener('click', async () => {
         addUserMessage(message);
         input.value = '';
         
+        // Check if Wails runtime is available
+        if (!window.go || !window.go.main || !window.go.main.App) {
+            console.error('Wails runtime not available');
+            addAssistantMessage("AI", "Error: Backend not available. Please run this application through Wails (wails dev) to enable backend functionality.");
+            return;
+        }
+        
         try {
             // Call backend to send message
             const response = await window.go.main.App.SendMessage(message);
@@ -166,7 +190,7 @@ document.querySelector('.send-button').addEventListener('click', async () => {
             }
         } catch (error) {
             console.error('Error sending message:', error);
-            addAssistantMessage("AI", "Error: Failed to get response from backend.");
+            addAssistantMessage("AI", "Error: Failed to get response from backend. " + (error.message || error));
         }
     }
 });
@@ -188,13 +212,25 @@ function loadModel() {
         const file = e.target.files[0];
         if (file) {
             console.log('Loading model:', file.name);
+            
+            // Check if Wails runtime is available
+            if (!window.go || !window.go.main || !window.go.main.App) {
+                console.error('Wails runtime not available');
+                alert('Error: Backend not available.\n\nPlease run this application using "wails dev" to enable backend functionality.\nThe Wails runtime is required for model loading.');
+                return;
+            }
+            
             try {
-                await window.go.main.App.LoadModel(file.path);
+                // In browser environment, file.path might not be available
+                // We need to use the file object differently or use a different approach
+                const modelPath = file.path || file.name;
+                
+                await window.go.main.App.LoadModel(modelPath);
                 updateModelDisplay(file.name);
                 alert(`Model loaded successfully: ${file.name}`);
             } catch (error) {
                 console.error('Error loading model:', error);
-                alert(`Failed to load model: ${error}`);
+                alert(`Failed to load model: ${error.message || error}\n\nMake sure you are running the app through "wails dev"`);
             }
         }
     };
