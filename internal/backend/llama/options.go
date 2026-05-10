@@ -13,50 +13,80 @@ import "fmt"
 
 // LoadOptions represents options for loading a model
 type LoadOptions struct {
-	ModelPath        string           `json:"model_path"`      // Path to the model file
-	GPULayers        int              `json:"gpu_layers"`      // Number of layers to offload to GPU
-	Threads          int              `json:"threads"`         // Number of CPU threads
-	UseMMap          bool             `json:"use_mmap"`        // Whether to use memory mapping
-	UseMlock         bool             `json:"use_mlock"`       // Whether to use mlock for pinned memory
-	VocabOnly        bool             `json:"vocab_only"`      // Whether to load only vocabulary
-	RMSNormEPS       float64          `json:"rms_norm_eps"`    // RMS normalization epsilon
-	RopeFreqBase     float64          `json:"rope_freq_base"`  // RoPE frequency base
-	RopeFreqScale    float64          `json:"rope_freq_scale"` // RoPE frequency scale
-	MemoryFraction   float64          `json:"memory_fraction"` // Fraction of memory to use
-	ProgressCallback ProgressCallback `json:"-"`               // Callback for loading progress
-	ContextSize      int              `json:"context_size"`    // Context window size
-	Seed             int              `json:"seed"`            // Random seed
-	MainGPU          int              `json:"main_gpu"`        // Main GPU device
-	TensorSplit      string           `json:"tensor_split"`    // Tensor split for multi-GPU
-	EmbeddingMode    bool             `json:"embedding_mode"`  // Embedding mode
-	NumGQA           int              `json:"num_gqa"`         // Number of GQA groups
+	ModelPath        string           `json:"model_path"`        // Path to the model file
+	GPULayers        int              `json:"gpu_layers"`        // Number of layers to offload to GPU
+	Threads          int              `json:"threads"`           // Number of CPU threads
+	UseMMap          bool             `json:"use_mmap"`          // Whether to use memory mapping
+	UseMlock         bool             `json:"use_mlock"`         // Whether to use mlock for pinned memory
+	VocabOnly        bool             `json:"vocab_only"`        // Whether to load only vocabulary
+	RMSNormEPS       float64          `json:"rms_norm_eps"`      // RMS normalization epsilon
+	RopeFreqBase     float64          `json:"rope_freq_base"`    // RoPE frequency base
+	RopeFreqScale    float64          `json:"rope_freq_scale"`   // RoPE frequency scale
+	MemoryFraction   float64          `json:"memory_fraction"`   // Fraction of memory to use
+	ProgressCallback ProgressCallback `json:"-"`                 // Callback for loading progress
+	ContextSize      int              `json:"context_size"`      // Context window size
+	Seed             int              `json:"seed"`              // Random seed
+	MainGPU          int              `json:"main_gpu"`          // Main GPU device
+	TensorSplit      string           `json:"tensor_split"`      // Tensor split for multi-GPU
+	SplitMode        int              `json:"split_mode"`        // Split mode for multi-GPU
+	EmbeddingMode    bool             `json:"embedding_mode"`    // Embedding mode
+	NumGQA           int              `json:"num_gqa"`           // Number of GQA groups
+	RopeScalingType  int              `json:"rope_scaling_type"` // RoPE scaling type
+	YarnExtFactor    float64          `json:"yarn_ext_factor"`   // YARN extension factor
+	YarnAttnFactor   float64          `json:"yarn_attn_factor"`  // YARN attention factor
+	YarnBetaFast     float64          `json:"yarn_beta_fast"`    // YARN beta fast
+	YarnBetaSlow     float64          `json:"yarn_beta_slow"`    // YARN beta slow
+	YarnOrigCtx      int              `json:"yarn_orig_ctx"`     // YARN original context
 }
 
 // InferenceOptions represents options for text generation
 type InferenceOptions struct {
-	Temperature      float64  `json:"temperature"`       // Sampling temperature (0.0 = deterministic)
-	TopP             float64  `json:"top_p"`             // Nucleus sampling parameter
-	TopK             int      `json:"top_k"`             // Top-K sampling parameter
-	MinP             float64  `json:"min_p"`             // Minimum probability threshold
-	RepeatPenalty    float64  `json:"repeat_penalty"`    // Repetition penalty
-	FrequencyPenalty float64  `json:"frequency_penalty"` // Frequency penalty
-	PresencePenalty  float64  `json:"presence_penalty"`  // Presence penalty
-	TFS              float64  `json:"tfs"`               // Tail Free Sampling parameter
-	TypicalP         float64  `json:"typical_p"`         // Typical sampling parameter
-	Mirostat         int      `json:"mirostat"`          // Mirostat sampling mode (0=disabled, 1=mirostat, 2=mirostat_v2)
-	MirostatTau      float64  `json:"mirostat_tau"`      // Mirostat target entropy
-	MirostatETA      float64  `json:"mirostat_eta"`      // Mirostat learning rate
-	Seed             int      `json:"seed"`              // Random seed for generation
-	NPredict         int      `json:"n_predict"`         // Maximum tokens to generate
-	NKeep            int      `json:"n_keep"`            // Number of tokens to keep from prompt
-	StopStrings      []string `json:"stop_strings"`      // Strings that stop generation
+	Temperature             float64  `json:"temperature"`                // Sampling temperature (0.0 = deterministic)
+	TopPEnabled             bool     `json:"top_p_enabled"`              // Whether Top-P sampling is enabled
+	TopP                    float64  `json:"top_p"`                      // Nucleus sampling parameter
+	TopK                    int      `json:"top_k"`                      // Top-K sampling parameter
+	MinP                    float64  `json:"min_p"`                      // Minimum probability threshold
+	RepeatPenalty           float64  `json:"repeat_penalty"`             // Repetition penalty
+	RepeatLastN             int      `json:"repeat_last_n"`              // How many recent tokens repeat penalty applies to
+	FrequencyPenaltyEnabled bool     `json:"frequency_penalty_enabled"`  // Whether frequency penalty is enabled
+	FrequencyPenalty        float64  `json:"frequency_penalty"`          // Frequency penalty
+	PresencePenaltyEnabled  bool     `json:"presence_penalty_enabled"`   // Whether presence penalty is enabled
+	PresencePenalty         float64  `json:"presence_penalty"`           // Presence penalty
+	TFS                     float64  `json:"tfs"`                        // Tail Free Sampling parameter
+	TypicalPEnabled         bool     `json:"typical_p_enabled"`          // Whether Typical-P sampling is enabled
+	TypicalP                float64  `json:"typical_p"`                  // Typical sampling parameter
+	MirostatEnabled         bool     `json:"mirostat_enabled"`           // Whether Mirostat sampling is enabled
+	Mirostat                int      `json:"mirostat"`                   // Mirostat sampling mode (0=disabled, 1=mirostat, 2=mirostat_v2)
+	MirostatTau             float64  `json:"mirostat_tau"`               // Mirostat target entropy
+	MirostatETA             float64  `json:"mirostat_eta"`               // Mirostat learning rate
+	DynamicTempRangeEnabled bool     `json:"dynamic_temp_range_enabled"` // Whether dynamic temperature is enabled
+	DynamicTempRange        float64  `json:"dynamic_temp_range"`         // Dynamic temperature range
+	DynamicTempExponent     float64  `json:"dynamic_temp_exponent"`      // Dynamic temperature exponent
+	DRYMultiplier           float64  `json:"dry_multiplier"`             // DRY multiplier
+	DRYAllowedLength        int      `json:"dry_allowed_length"`         // DRY allowed length
+	DRYBase                 float64  `json:"dry_base"`                   // DRY base penalty
+	SmoothingFactor         float64  `json:"smoothing_factor"`           // Smoothing factor
+	SmoothingCurve          float64  `json:"smoothing_curve"`            // Smoothing curve
+	TopAEnabled             bool     `json:"top_a_enabled"`              // Whether Top-A sampling is enabled
+	TopA                    float64  `json:"top_a"`                      // Top-A sampling parameter
+	EpsilonCutoff           float64  `json:"epsilon_cutoff"`             // Epsilon cutoff
+	EtaCutoff               float64  `json:"eta_cutoff"`                 // Eta cutoff
+	EncoderRepeatPenalty    float64  `json:"encoder_repeat_penalty"`     // Encoder repetition penalty
+	NoRepeatNGramSize       int      `json:"no_repeat_ngram_size"`       // No-repeat n-gram size
+	Seed                    int      `json:"seed"`                       // Random seed for generation
+	NPredict                int      `json:"n_predict"`                  // Maximum tokens to generate
+	NKeep                   int      `json:"n_keep"`                     // Number of tokens to keep from prompt
+	StopStrings             []string `json:"stop_strings"`               // Strings that stop generation
 }
 
 // ContextOptions represents options for context management
 type ContextOptions struct {
-	ContextSize    int  `json:"context_size"`    // Context window size
-	BatchSize      int  `json:"batch_size"`      // Batch size for processing
-	FlashAttention bool `json:"flash_attention"` // Whether to use flash attention
+	ContextSize     int  `json:"context_size"`      // Context window size
+	BatchSize       int  `json:"batch_size"`        // Batch size for processing
+	FlashAttention  bool `json:"flash_attention"`   // Whether to use flash attention
+	ThreadsBatch    int  `json:"threads_batch"`     // Batch processing threads
+	OffloadKv       bool `json:"offload_kv"`        // Whether to offload KV cache to GPU
+	RopeScalingType int  `json:"rope_scaling_type"` // RoPE scaling type
 }
 
 // TokenizerOptions represents options for tokenization
@@ -80,28 +110,50 @@ func NewLoadOptions(modelPath string) *LoadOptions {
 		RopeFreqScale:    1.0,
 		MemoryFraction:   0.9,
 		ProgressCallback: nil,
+		MainGPU:          -1, // -1 means no specific GPU (CPU-only safe)
+		SplitMode:        -1, // -1 means no split mode (CPU-only safe)
 	}
 }
 
 // NewInferenceOptions creates default inference options
 func NewInferenceOptions() *InferenceOptions {
 	return &InferenceOptions{
-		Temperature:      0.7,
-		TopP:             0.9,
-		TopK:             40,
-		MinP:             0.05,
-		RepeatPenalty:    1.1,
-		FrequencyPenalty: 0.0,
-		PresencePenalty:  0.0,
-		TFS:              1.0,
-		TypicalP:         1.0,
-		Mirostat:         0,
-		MirostatTau:      5.0,
-		MirostatETA:      0.1,
-		Seed:             -1,
-		NPredict:         512,
-		NKeep:            0,
-		StopStrings:      []string{},
+		Temperature:             0.7,
+		TopPEnabled:             true,
+		TopP:                    0.9,
+		TopK:                    40,
+		MinP:                    0.05,
+		RepeatPenalty:           1.1,
+		RepeatLastN:             64,
+		FrequencyPenaltyEnabled: true,
+		FrequencyPenalty:        0.0,
+		PresencePenaltyEnabled:  true,
+		PresencePenalty:         0.0,
+		TFS:                     1.0,
+		TypicalPEnabled:         true,
+		TypicalP:                1.0,
+		MirostatEnabled:         true,
+		Mirostat:                0,
+		MirostatTau:             5.0,
+		MirostatETA:             0.1,
+		DynamicTempRangeEnabled: true,
+		DynamicTempRange:        0.0,
+		DynamicTempExponent:     1.0,
+		DRYMultiplier:           0.0,
+		DRYAllowedLength:        2,
+		DRYBase:                 1.0,
+		SmoothingFactor:         0.0,
+		SmoothingCurve:          1.0,
+		TopAEnabled:             true,
+		TopA:                    0.0,
+		EpsilonCutoff:           0.0,
+		EtaCutoff:               0.0,
+		EncoderRepeatPenalty:    1.0,
+		NoRepeatNGramSize:       0,
+		Seed:                    -1,
+		NPredict:                512,
+		NKeep:                   0,
+		StopStrings:             []string{},
 	}
 }
 

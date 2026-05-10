@@ -24,6 +24,23 @@ function toggleMenu(menuId) {
     }
 }
 
+// Flyout toggling
+function toggleFlyout(flyoutId) {
+    const flyout = document.getElementById(flyoutId);
+    const overlay = document.getElementById('flyout-overlay');
+    
+    if (flyout && overlay) {
+        flyout.classList.toggle('show');
+        overlay.classList.toggle('show');
+    }
+    
+    // Close all dropdown menus when opening flyout
+    const allMenus = document.querySelectorAll('.dropdown');
+    allMenus.forEach(menu => {
+        menu.classList.remove('show');
+    });
+}
+
 // Close menus when clicking outside
 document.addEventListener('click', function(event) {
     if (!event.target.closest('.menu-item')) {
@@ -40,3 +57,19 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
         console.log('Menu item clicked:', item.textContent);
     });
 });
+
+// Exit application - unload model and quit
+async function exitApp() {
+    // Unload the model first to free memory
+    if (window.go && window.go.main && window.go.main.App) {
+        try {
+            await window.go.main.App.UnloadModel();
+        } catch (e) {
+            console.error('Error unloading model:', e);
+        }
+    }
+    // Quit the application
+    if (window.runtime) {
+        window.runtime.Quit();
+    }
+}

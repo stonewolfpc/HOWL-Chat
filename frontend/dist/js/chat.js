@@ -1,11 +1,22 @@
 /**
  * Chat Module
- * 
+ *
  * This module handles chat message interactions, including adding messages,
- * streaming responses, and message actions (copy, edit, regenerate, continue).
- * 
+ * streaming responses, and message actions (copy, edit, delete, regenerate, continue, navigation).
+ *
  * @module chat
  */
+
+// SVG Icons for chat bubble buttons
+const ICONS = {
+    copy: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`,
+    edit: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
+    delete: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`,
+    regenerate: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>`,
+    previous: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>`,
+    next: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`,
+    continue: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`
+};
 
 // Wait for Wails runtime to be ready
 let wailsReady = false;
@@ -34,8 +45,9 @@ function addUserMessage(text) {
             <div class="chat-sender">You</div>
             <div class="chat-text">${text}</div>
             <div class="chat-bubble-buttons">
-                <button class="bubble-button" onclick="copyMessage(this)">Copy</button>
-                <button class="bubble-button" onclick="editMessage(this)">Edit</button>
+                <button class="bubble-button icon-button" onclick="copyMessage(this)" title="Copy">${ICONS.copy}</button>
+                <button class="bubble-button icon-button" onclick="editMessage(this)" title="Edit">${ICONS.edit}</button>
+                <button class="bubble-button icon-button" onclick="deleteMessage(this)" title="Delete">${ICONS.delete}</button>
             </div>
         </div>
     `;
@@ -53,14 +65,19 @@ function addAssistantMessage(sender, text) {
             <div class="chat-sender">${sender}</div>
             <div class="chat-text">${text}</div>
             <div class="chat-bubble-buttons">
-                <button class="bubble-button" onclick="copyMessage(this)">Copy</button>
-                <button class="bubble-button" onclick="regenerateMessage(this)">Regenerate</button>
-                <button class="bubble-button" onclick="continueMessage(this)">Continue</button>
+                <button class="bubble-button icon-button" onclick="regenerateMessage(this)" title="Regenerate">${ICONS.regenerate}</button>
+                <button class="bubble-button icon-button" onclick="previousMessage(this)" title="Previous" id="prev-btn">${ICONS.previous}</button>
+                <button class="bubble-button icon-button" onclick="nextMessage(this)" title="Next" id="next-btn">${ICONS.next}</button>
+                <button class="bubble-button icon-button" onclick="continueMessage(this)" title="Continue">${ICONS.continue}</button>
+                <button class="bubble-button icon-button" onclick="editMessage(this)" title="Edit">${ICONS.edit}</button>
+                <button class="bubble-button icon-button" onclick="copyMessage(this)" title="Copy">${ICONS.copy}</button>
+                <button class="bubble-button icon-button" onclick="deleteMessage(this)" title="Delete">${ICONS.delete}</button>
             </div>
         </div>
     `;
     chatHistory.appendChild(messageDiv);
     chatHistory.scrollTop = chatHistory.scrollHeight;
+    updateNavigationButtons();
 }
 
 // Stream assistant response (simulated)
@@ -68,25 +85,29 @@ function streamAssistantResponse(sender, fullText) {
     const chatHistory = document.querySelector('.chat-messages');
     const messageDiv = document.createElement('div');
     messageDiv.className = 'chat-message assistant';
-    
+
     const bubble = document.createElement('div');
     bubble.className = 'chat-bubble';
     bubble.innerHTML = `
-        <div class="chat-sender"><span class="streaming-indicator"></span>${sender}</div>
+        <div class="chat-sender">${sender}</div>
         <div class="chat-text"></div>
         <div class="chat-bubble-buttons">
-            <button class="bubble-button" onclick="copyMessage(this)">Copy</button>
-            <button class="bubble-button" onclick="regenerateMessage(this)">Regenerate</button>
-            <button class="bubble-button" onclick="continueMessage(this)">Continue</button>
+            <button class="bubble-button icon-button" onclick="regenerateMessage(this)" title="Regenerate">${ICONS.regenerate}</button>
+            <button class="bubble-button icon-button" onclick="previousMessage(this)" title="Previous" id="prev-btn">${ICONS.previous}</button>
+            <button class="bubble-button icon-button" onclick="nextMessage(this)" title="Next" id="next-btn">${ICONS.next}</button>
+            <button class="bubble-button icon-button" onclick="continueMessage(this)" title="Continue">${ICONS.continue}</button>
+            <button class="bubble-button icon-button" onclick="editMessage(this)" title="Edit">${ICONS.edit}</button>
+            <button class="bubble-button icon-button" onclick="copyMessage(this)" title="Copy">${ICONS.copy}</button>
+            <button class="bubble-button icon-button" onclick="deleteMessage(this)" title="Delete">${ICONS.delete}</button>
         </div>
     `;
-    
+
     messageDiv.appendChild(bubble);
     chatHistory.appendChild(messageDiv);
-    
+
     const textElement = bubble.querySelector('.chat-text');
     let currentIndex = 0;
-    
+
     // Simulate streaming by adding characters one at a time
     const streamInterval = setInterval(() => {
         if (currentIndex < fullText.length) {
@@ -95,13 +116,145 @@ function streamAssistantResponse(sender, fullText) {
             chatHistory.scrollTop = chatHistory.scrollHeight;
         } else {
             clearInterval(streamInterval);
-            // Remove streaming indicator
-            const indicator = bubble.querySelector('.streaming-indicator');
-            if (indicator) {
-                indicator.remove();
-            }
+            updateNavigationButtons();
         }
     }, 30); // 30ms per character for smooth streaming
+}
+
+// Stream assistant response from backend with real token streaming
+let currentStreamingBubble = null;
+
+function streamAssistantResponseFromBackend(message) {
+    const chatHistory = document.querySelector('.chat-messages');
+
+    // Create assistant message bubble with typing indicator
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'chat-message assistant streaming';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble';
+    bubble.innerHTML = `
+        <div class="chat-sender">AI<span class="typing-indicator"><span></span><span></span><span></span></span></div>
+        <div class="chat-text"></div>
+        <div class="chat-bubble-buttons">
+            <button class="bubble-button icon-button" onclick="regenerateMessage(this)" title="Regenerate">${ICONS.regenerate}</button>
+            <button class="bubble-button icon-button" onclick="previousMessage(this)" title="Previous" id="prev-btn">${ICONS.previous}</button>
+            <button class="bubble-button icon-button" onclick="nextMessage(this)" title="Next" id="next-btn">${ICONS.next}</button>
+            <button class="bubble-button icon-button" onclick="continueMessage(this)" title="Continue">${ICONS.continue}</button>
+            <button class="bubble-button icon-button" onclick="editMessage(this)" title="Edit">${ICONS.edit}</button>
+            <button class="bubble-button icon-button" onclick="copyMessage(this)" title="Copy">${ICONS.copy}</button>
+            <button class="bubble-button icon-button" onclick="deleteMessage(this)" title="Delete">${ICONS.delete}</button>
+        </div>
+    `;
+
+    messageDiv.appendChild(bubble);
+    chatHistory.appendChild(messageDiv);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+
+    currentStreamingBubble = bubble;
+    const onStart = () => {
+        console.log('Stream started');
+        // Switch send button to abort
+        const sendButton = document.querySelector('.send-button');
+        if (sendButton) {
+            sendButton.textContent = 'Abort';
+            sendButton.dataset.isAbort = 'true';
+        }
+    };
+
+    const onChunk = (chunk) => {
+        if (currentStreamingBubble) {
+            const textElement = currentStreamingBubble.querySelector('.chat-text');
+            textElement.textContent += chunk;
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+    };
+
+    const onComplete = () => {
+        // Remove typing indicator
+        const indicator = bubble.querySelector('.typing-indicator');
+        if (indicator) {
+            indicator.remove();
+        }
+        messageDiv.classList.remove('streaming');
+
+        // Switch abort button back to send
+        const sendButton = document.querySelector('.send-button');
+        if (sendButton) {
+            sendButton.textContent = 'Send';
+            sendButton.dataset.isAbort = 'false';
+        }
+
+        // Clean up listeners
+        if (window.runtime) {
+            window.runtime.EventsOff('chat:chunk');
+            window.runtime.EventsOff('chat:complete');
+            window.runtime.EventsOff('chat:error');
+            window.runtime.EventsOff('chat:aborted');
+        }
+        currentStreamingBubble = null;
+        updateNavigationButtons();
+    };
+
+    const onError = (err) => {
+        const textElement = bubble.querySelector('.chat-text');
+        textElement.textContent += '\n[Error: ' + err + ']';
+        const indicator = bubble.querySelector('.typing-indicator');
+        if (indicator) {
+            indicator.remove();
+        }
+        messageDiv.classList.remove('streaming');
+
+        // Switch abort button back to send
+        const sendButton = document.querySelector('.send-button');
+        if (sendButton) {
+            sendButton.textContent = 'Send';
+            sendButton.dataset.isAbort = 'false';
+        }
+
+        currentStreamingBubble = null;
+    };
+
+    const onAborted = () => {
+        console.log('Stream aborted');
+        // Remove typing indicator
+        const indicator = bubble.querySelector('.typing-indicator');
+        if (indicator) {
+            indicator.remove();
+        }
+        messageDiv.classList.remove('streaming');
+
+        // Switch abort button back to send
+        const sendButton = document.querySelector('.send-button');
+        if (sendButton) {
+            sendButton.textContent = 'Send';
+            sendButton.dataset.isAbort = 'false';
+        }
+
+        // Clean up listeners
+        if (window.runtime) {
+            window.runtime.EventsOff('chat:chunk');
+            window.runtime.EventsOff('chat:complete');
+            window.runtime.EventsOff('chat:error');
+            window.runtime.EventsOff('chat:aborted');
+        }
+        currentStreamingBubble = null;
+    };
+
+    // Subscribe to events
+    if (window.runtime) {
+        window.runtime.EventsOn('chat:start', onStart);
+        window.runtime.EventsOn('chat:chunk', onChunk);
+        window.runtime.EventsOn('chat:complete', onComplete);
+        window.runtime.EventsOn('chat:error', onError);
+        window.runtime.EventsOn('chat:aborted', onAborted);
+    }
+
+    // Call backend to start streaming
+    window.go.main.App.SendMessageStream(message).catch((err) => {
+        console.error('Error starting stream:', err);
+        onError(err.message || err);
+    });
 }
 
 // Copy message text
@@ -168,74 +321,96 @@ function continueMessage(button) {
 }
 
 // Handle send button
-document.querySelector('.send-button').addEventListener('click', async () => {
-    const input = document.querySelector('.input-field');
-    const message = input.value.trim();
-    if (message) {
-        addUserMessage(message);
-        input.value = '';
-        
-        // Check if Wails runtime is available
-        if (!window.go || !window.go.main || !window.go.main.App) {
-            console.error('Wails runtime not available');
-            addAssistantMessage("AI", "Error: Backend not available. Please run this application through Wails (wails dev) to enable backend functionality.");
-            return;
-        }
-        
-        try {
-            // Call backend to send message
-            const response = await window.go.main.App.SendMessage(message);
-            if (response) {
-                addAssistantMessage("AI", response);
+document.addEventListener('DOMContentLoaded', () => {
+    const sendButton = document.querySelector('.send-button');
+    if (sendButton) {
+        sendButton.addEventListener('click', async () => {
+            // Check if button is in abort mode
+            if (sendButton.dataset.isAbort === 'true') {
+                // Abort the current stream
+                if (window.go && window.go.main && window.go.main.App) {
+                    try {
+                        await window.go.main.App.AbortStream();
+                    } catch (error) {
+                        console.error('Error aborting stream:', error);
+                    }
+                }
+                return;
             }
-        } catch (error) {
-            console.error('Error sending message:', error);
-            addAssistantMessage("AI", "Error: Failed to get response from backend. " + (error.message || error));
-        }
+
+            // Normal send mode
+            const input = document.querySelector('.input-field');
+            const message = input.value.trim();
+            if (message) {
+                addUserMessage(message);
+                input.value = '';
+
+                // Check if Wails runtime is available
+                if (!window.go || !window.go.main || !window.go.main.App) {
+                    console.error('Wails runtime not available');
+                    addAssistantMessage("AI", "Error: Backend not available. Please run this application through Wails (wails dev) to enable backend functionality.");
+                    return;
+                }
+
+                // Start streaming response
+                streamAssistantResponseFromBackend(message);
+            }
+        });
     }
 });
 
 // Handle Enter key in input field
-document.querySelector('.input-field').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        document.querySelector('.send-button').click();
+document.addEventListener('DOMContentLoaded', () => {
+    const inputField = document.querySelector('.input-field');
+    if (inputField) {
+        inputField.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const sendButton = document.querySelector('.send-button');
+                if (sendButton) {
+                    sendButton.click();
+                }
+            }
+        });
     }
 });
 
-// Load Model - opens file picker
-function loadModel() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.gguf,.bin,.safetensors';
-    
-    input.onchange = async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            console.log('Loading model:', file.name);
-            
-            // Check if Wails runtime is available
-            if (!window.go || !window.go.main || !window.go.main.App) {
-                console.error('Wails runtime not available');
-                alert('Error: Backend not available.\n\nPlease run this application using "wails dev" to enable backend functionality.\nThe Wails runtime is required for model loading.');
-                return;
-            }
-            
-            try {
-                // In browser environment, file.path might not be available
-                // We need to use the file object differently or use a different approach
-                const modelPath = file.path || file.name;
-                
-                await window.go.main.App.LoadModel(modelPath);
-                updateModelDisplay(file.name);
-                alert(`Model loaded successfully: ${file.name}`);
-            } catch (error) {
-                console.error('Error loading model:', error);
-                alert(`Failed to load model: ${error.message || error}\n\nMake sure you are running the app through "wails dev"`);
-            }
+// Check model status on page load
+document.addEventListener('DOMContentLoaded', () => {
+    checkModelStatus();
+});
+
+// Load Model - opens native OS file dialog via Wails
+async function loadModel() {
+    if (!window.go || !window.go.main || !window.go.main.App) {
+        console.error('Wails runtime not available');
+        alert('Error: Backend not available. Please run through Wails.');
+        return;
+    }
+
+    try {
+        // Use native OS file dialog via Wails backend binding
+        const modelPath = await window.go.main.App.OpenModelFilePicker();
+        if (!modelPath) {
+            return; // user cancelled
         }
-    };
-    
-    input.click();
+
+        console.log('Loading model:', modelPath);
+        updateModelDisplay('Loading...');
+
+        try {
+            await window.go.main.App.LoadModel(modelPath);
+            const modelName = modelPath.split(/[\\/]/).pop();
+            updateModelDisplay(modelName);
+            console.log('Model loaded successfully:', modelName);
+        } catch (error) {
+            console.error('Error loading model:', error);
+            updateModelDisplay('Load failed');
+            alert('Failed to load model: ' + (error.message || error));
+        }
+    } catch (error) {
+        console.error('Error opening file picker:', error);
+        alert('Failed to open file dialog: ' + (error.message || error));
+    }
 }
 
 // Unload Model - aggressively unloads current model
@@ -261,28 +436,276 @@ function updateModelDisplay(modelName) {
     }
 }
 
-// Placeholder functions for new button handlers
-function undoMessage(button) {
+// Check and update model display on page load
+async function checkModelStatus() {
+    if (!window.go || !window.go.main || !window.go.main.App) {
+        console.log('Wails runtime not available, skipping model status check');
+        return;
+    }
+
+    try {
+        const isLoaded = await window.go.main.App.IsModelLoaded();
+        if (isLoaded) {
+            const modelName = await window.go.main.App.GetLoadedModelName();
+            updateModelDisplay(modelName);
+        } else {
+            updateModelDisplay("No model loaded");
+        }
+    } catch (error) {
+        console.error('Error checking model status:', error);
+        updateModelDisplay("No model loaded");
+    }
+}
+
+// Regenerate AI response - removes last AI message and generates new one
+async function regenerateMessage(button) {
+    const messageDiv = button.closest('.chat-message');
+    const chatHistory = document.querySelector('.chat-messages');
+
+    // Find all assistant messages
+    const assistantMessages = Array.from(chatHistory.querySelectorAll('.chat-message.assistant'));
+
+    if (assistantMessages.length === 0) {
+        console.log('No AI messages to regenerate');
+        return;
+    }
+
+    // Remove the last assistant message
+    const lastAssistant = assistantMessages[assistantMessages.length - 1];
+    lastAssistant.remove();
+
+    // Re-stream the response using the last user message
+    const userMessages = Array.from(chatHistory.querySelectorAll('.chat-message.user'));
+    if (userMessages.length > 0) {
+        const lastUserMessage = userMessages[userMessages.length - 1];
+        const userText = lastUserMessage.querySelector('.chat-text').textContent;
+        streamAssistantResponseFromBackend(userText);
+    }
+
+    updateNavigationButtons();
+}
+
+// Previous AI message - navigate to previous assistant message
+function previousMessage(button) {
+    const chatHistory = document.querySelector('.chat-messages');
+    const assistantMessages = Array.from(chatHistory.querySelectorAll('.chat-message.assistant'));
+    const currentIndex = assistantMessages.findIndex(msg => msg.contains(button.closest('.chat-bubble')));
+
+    if (currentIndex > 0) {
+        const previous = assistantMessages[currentIndex - 1];
+        chatHistory.scrollTop = previous.offsetTop - chatHistory.offsetTop;
+    }
+}
+
+// Next AI message - navigate to next assistant message
+function nextMessage(button) {
+    const chatHistory = document.querySelector('.chat-messages');
+    const assistantMessages = Array.from(chatHistory.querySelectorAll('.chat-message.assistant'));
+    const currentIndex = assistantMessages.findIndex(msg => msg.contains(button.closest('.chat-bubble')));
+
+    if (currentIndex < assistantMessages.length - 1) {
+        const next = assistantMessages[currentIndex + 1];
+        chatHistory.scrollTop = next.offsetTop - chatHistory.offsetTop;
+    }
+}
+
+// Continue from last AI response
+async function continueMessage(button) {
+    const chatHistory = document.querySelector('.chat-messages');
+    const assistantMessages = Array.from(chatHistory.querySelectorAll('.chat-message.assistant'));
+
+    if (assistantMessages.length === 0) {
+        console.log('No AI messages to continue from');
+        return;
+    }
+
+    const lastAssistant = assistantMessages[assistantMessages.length - 1];
+    const lastText = lastAssistant.querySelector('.chat-text').textContent;
+
+    // Stream continuation by appending to the last message
+    streamAssistantResponseFromBackend(lastText);
+}
+
+// Edit message (works for both user and AI messages) - edits in-place within the bubble
+function editMessage(button) {
     const bubble = button.closest('.chat-bubble');
     const messageDiv = button.closest('.chat-message');
-    messageDiv.remove();
-    console.log('Message undone');
+    const textElement = bubble.querySelector('.chat-text');
+    const currentText = textElement.textContent;
+    const isUserMessage = messageDiv.classList.contains('user');
+
+    console.log('editMessage called, isUserMessage:', isUserMessage);
+
+    // Replace text element with textarea for editing
+    const textarea = document.createElement('textarea');
+    textarea.className = 'chat-text chat-text-edit';
+    textarea.value = currentText;
+    textarea.rows = 4;
+
+    // Replace the text element with textarea
+    textElement.replaceWith(textarea);
+    textarea.focus();
+
+    // Add save/cancel buttons
+    const buttonsContainer = bubble.querySelector('.chat-bubble-buttons');
+    const originalButtons = buttonsContainer.innerHTML;
+
+    // Create edit controls
+    const editControls = document.createElement('div');
+    editControls.className = 'chat-edit-controls';
+
+    const saveButton = document.createElement('button');
+    saveButton.className = 'bubble-button';
+    saveButton.textContent = isUserMessage ? 'Confirm' : 'Save';
+    saveButton.onclick = () => saveEdit(saveButton, isUserMessage);
+
+    const cancelButton = document.createElement('button');
+    cancelButton.className = 'bubble-button';
+    cancelButton.textContent = 'Cancel';
+    cancelButton.onclick = () => cancelEdit(cancelButton);
+
+    editControls.appendChild(saveButton);
+    editControls.appendChild(cancelButton);
+
+    buttonsContainer.innerHTML = '';
+    buttonsContainer.appendChild(editControls);
+
+    // Store original buttons for cancel
+    buttonsContainer.dataset.originalButtons = originalButtons;
 }
 
-function previousMessage(button) {
-    console.log('Previous message');
-    // TODO: Implement message history navigation
+// Save the edited message
+async function saveEdit(button, isUserMessage) {
+    const bubble = button.closest('.chat-bubble');
+    const messageDiv = button.closest('.chat-message');
+    const textarea = bubble.querySelector('.chat-text-edit');
+    const editedText = textarea.value;
+
+    console.log('saveEdit called, isUserMessage:', isUserMessage, 'editedText:', editedText);
+
+    if (isUserMessage) {
+        // For user messages: keep the edited message, remove only messages AFTER it
+        const chatHistory = document.querySelector('.chat-messages');
+        const messages = Array.from(chatHistory.querySelectorAll('.chat-message'));
+        const messageIndex = messages.indexOf(messageDiv);
+
+        console.log('User message edit, messageIndex:', messageIndex, 'total messages:', messages.length);
+
+        // Update the text of the message being edited
+        const newTextElement = document.createElement('div');
+        newTextElement.className = 'chat-text';
+        newTextElement.textContent = editedText;
+        textarea.replaceWith(newTextElement);
+
+        // Remove only messages AFTER the edited message (from end to start to avoid index issues)
+        for (let i = messages.length - 1; i > messageIndex; i--) {
+            messages[i].remove();
+        }
+
+        // Clear the input field to prevent old text from being sent with new messages
+        const input = document.querySelector('.input-field');
+        input.value = '';
+
+        // Clear backend chat history to match frontend state
+        if (window.go && window.go.main && window.go.main.App) {
+            try {
+                await window.go.main.App.ClearChatHistory();
+                console.log('Backend chat history cleared');
+            } catch (error) {
+                console.error('Error clearing chat history:', error);
+            }
+        }
+
+        // Send the edited message to generate new response
+        streamAssistantResponseFromBackend(editedText);
+    } else {
+        // For AI messages: just update the text in place
+        const newTextElement = document.createElement('div');
+        newTextElement.className = 'chat-text';
+        newTextElement.textContent = editedText;
+        textarea.replaceWith(newTextElement);
+    }
+
+    // Restore original buttons
+    const buttonsContainer = bubble.querySelector('.chat-bubble-buttons');
+    buttonsContainer.innerHTML = buttonsContainer.dataset.originalButtons;
+
+    updateNavigationButtons();
 }
 
-function nextMessage(button) {
-    console.log('Next message');
-    // TODO: Implement message history navigation
+// Cancel editing and restore original
+function cancelEdit(button) {
+    const bubble = button.closest('.chat-bubble');
+    const textarea = bubble.querySelector('.chat-text-edit');
+    const originalText = textarea.dataset.originalText || textarea.value;
+
+    // Replace textarea with original text element
+    const newTextElement = document.createElement('div');
+    newTextElement.className = 'chat-text';
+    newTextElement.textContent = originalText;
+    textarea.replaceWith(newTextElement);
+
+    // Restore original buttons
+    const buttonsContainer = bubble.querySelector('.chat-bubble-buttons');
+    buttonsContainer.innerHTML = buttonsContainer.dataset.originalButtons;
 }
 
+// Delete message and show banner if AI message
 function deleteMessage(button) {
     const messageDiv = button.closest('.chat-message');
+    const isAssistant = messageDiv.classList.contains('assistant');
+
     messageDiv.remove();
-    console.log('Message deleted');
+
+    if (isAssistant) {
+        showGenerateBanner();
+    }
+
+    updateNavigationButtons();
+}
+
+// Update navigation buttons (gray out prev/next when no messages exist)
+function updateNavigationButtons() {
+    const chatHistory = document.querySelector('.chat-messages');
+    const assistantMessages = Array.from(chatHistory.querySelectorAll('.chat-message.assistant'));
+
+    const prevButtons = chatHistory.querySelectorAll('#prev-btn');
+    const nextButtons = chatHistory.querySelectorAll('#next-btn');
+
+    const hasPrevious = assistantMessages.length > 1;
+    const hasNext = false; // Simplified - could implement full history navigation
+
+    prevButtons.forEach(btn => {
+        btn.classList.toggle('disabled', !hasPrevious);
+    });
+
+    nextButtons.forEach(btn => {
+        btn.classList.toggle('disabled', !hasNext);
+    });
+}
+
+// Show "generate ai response" banner at bottom of chat
+function showGenerateBanner() {
+    const chatPanel = document.querySelector('.chat-panel');
+    let banner = document.getElementById('generate-banner');
+
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'generate-banner';
+        banner.className = 'generate-banner';
+        banner.innerHTML = 'Generate AI Response';
+        banner.onclick = () => {
+            const input = document.querySelector('.input-field');
+            const userMessages = Array.from(document.querySelectorAll('.chat-message.user'));
+            if (userMessages.length > 0) {
+                const lastUserMessage = userMessages[userMessages.length - 1];
+                const userText = lastUserMessage.querySelector('.chat-text').textContent;
+                streamAssistantResponseFromBackend(userText);
+            }
+            banner.remove();
+        };
+        chatPanel.appendChild(banner);
+    }
 }
 
 function addImage() {

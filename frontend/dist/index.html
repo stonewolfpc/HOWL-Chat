@@ -33,6 +33,17 @@
     <link rel="stylesheet" href="css/chat-session-modal.css">
     <link rel="stylesheet" href="css/nav-icon-images.css">
     <link rel="stylesheet" href="css/loading-progress.css">
+    <link rel="stylesheet" href="css/sampler-settings.css">
+    <link rel="stylesheet" href="css/model-settings.css">
+    <script src="js/menu.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/chat-session.js"></script>
+    <script src="js/world.js"></script>
+    <script src="js/loading-progress.js"></script>
+    <script src="js/sampler-settings.js"></script>
+    <script src="js/model-settings.js"></script>
 </head>
 <body>
     <!-- Ambient Background Effects (from Artherius) -->
@@ -61,7 +72,7 @@
                     <div class="dropdown-separator"></div>
                     <div class="dropdown-item">Settings</div>
                     <div class="dropdown-separator"></div>
-                    <div class="dropdown-item">Exit</div>
+                    <div class="dropdown-item" onclick="exitApp()">Exit</div>
                 </div>
             </div>
             <div class="menu-item">
@@ -103,8 +114,8 @@
             <div class="menu-item">
                 <button class="menu-button" onclick="toggleMenu('settings-menu')">Settings</button>
                 <div class="dropdown" id="settings-menu">
-                    <div class="dropdown-item">Sampler Settings</div>
-                    <div class="dropdown-item">Model Settings</div>
+                    <div class="dropdown-item" onclick="toggleFlyout('sampler-settings-flyout')">Sampler Settings</div>
+                    <div class="dropdown-item" onclick="toggleModelSettingsFlyout()">Model Settings</div>
                     <div class="dropdown-item">Story Tools</div>
                     <div class="dropdown-separator"></div>
                     <div class="dropdown-item">Advanced / Experimental</div>
@@ -114,22 +125,643 @@
                     <div class="dropdown-item">TTS Settings</div>
                 </div>
             </div>
-            <div class="menu-item">
-                <button class="menu-button" onclick="toggleMenu('help-menu')">Help</button>
-                <div class="dropdown" id="help-menu">
-                    <div class="dropdown-item">Documentation</div>
-                    <div class="dropdown-item">Sampler Guide</div>
-                    <div class="dropdown-item">Lorebook System Guide</div>
-                    <div class="dropdown-item">Character System Guide</div>
-                    <div class="dropdown-item">World/Scenario Guide</div>
-                    <div class="dropdown-separator"></div>
-                    <div class="dropdown-item">Check for Updates</div>
-                    <div class="dropdown-item">Changelog</div>
-                    <div class="dropdown-separator"></div>
-                    <div class="dropdown-item">Report a Bug</div>
-                    <div class="dropdown-item">Feature Request</div>
-                    <div class="dropdown-separator"></div>
-                    <div class="dropdown-item">About HOWL Chat</div>
+            
+            <!-- Sampler Settings Flyout Overlay -->
+            <div class="flyout-overlay" id="flyout-overlay" onclick="toggleFlyout('sampler-settings-flyout')"></div>
+            
+            <!-- Sampler Settings Flyout Panel -->
+            <div class="flyout" id="sampler-settings-flyout">
+                <div class="flyout-header">
+                    <h2>Sampler Settings</h2>
+                    <button class="flyout-close" onclick="toggleFlyout('sampler-settings-flyout')">✕</button>
+                </div>
+                <div class="flyout-content">
+                    <!-- Category 1: Core Settings -->
+                    <div class="category-header">Core Settings</div>
+                    <div class="settings-grid">
+                        <!-- Temperature -->
+                        <div class="setting-card">
+                            <div class="setting-label">🔥 Temperature</div>
+                            <div class="setting-description">Controls creativity. Higher = more random.</div>
+                            <div class="setting-details">
+                                <div class="setting-detail"><strong>Good for:</strong> Storytelling, brainstorming, character dialogue.</div>
+                                <div class="setting-detail"><em>Example:</em> Higher temp → "The dragon laughs and offers tea."</div>
+                                <div class="setting-detail"><strong>Warning:</strong> None.</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="temperature" min="0.0" max="2.0" step="0.01" value="0.7">
+                                <input type="number" class="setting-value" id="temperature-value" min="0.0" max="2.0" step="0.01" value="0.7">
+                            </div>
+                            <button class="setting-reset" data-setting="temperature" data-default="0.7">Default</button>
+                        </div>
+                        
+                        <!-- Top-P -->
+                        <div class="setting-card" id="top-p-card">
+                            <div class="setting-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="top-p-enabled" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Enabled</span>
+                            </div>
+                            <div class="setting-label">
+                                🎯 Top‑P
+                                <span class="warning-icon">
+                                    <span class="tooltip">Conflicts with Min‑P, Typical‑P, Top‑A</span>
+                                </span>
+                            </div>
+                            <div class="setting-description">Filters tokens by cumulative probability.</div>
+                            <div class="setting-details">
+                                <div class="setting-detail"><strong>Good for:</strong> Focused output.</div>
+                                <div class="setting-detail"><em>Example:</em> 0.9 → 90% probability mass.</div>
+                                <div class="setting-detail warning"><strong>Warning:</strong> Conflicts with Min‑P, Typical‑P, Top‑A.</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="top-p" min="0.0" max="1.0" step="0.01" value="0.9">
+                                <input type="number" class="setting-value" id="top-p-value" min="0.0" max="1.0" step="0.01" value="0.9">
+                            </div>
+                            <button class="setting-reset" data-setting="top-p" data-default="0.9">Default</button>
+                        </div>
+                        
+                        <!-- Top-K -->
+                        <div class="setting-card">
+                            <div class="setting-label">🔢 Top‑K</div>
+                            <div class="setting-description">Only allows the top K most likely tokens.</div>
+                            <div class="setting-details">
+                                <div class="setting-detail"><strong>Good for:</strong> More deterministic output.</div>
+                                <div class="setting-detail"><em>Example:</em> K=40 → stable but flexible.</div>
+                                <div class="setting-detail"><strong>Warning:</strong> None.</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="top-k" min="1" max="100" step="1" value="40">
+                                <input type="number" class="setting-value" id="top-k-value" min="1" max="100" step="1" value="40">
+                            </div>
+                            <button class="setting-reset" data-setting="top-k" data-default="40">Default</button>
+                        </div>
+                        
+                        <!-- Repeat Penalty -->
+                        <div class="setting-card">
+                            <div class="setting-label">🧠 Repeat Penalty</div>
+                            <div class="setting-description">Penalizes repeated tokens.</div>
+                            <div class="setting-details">
+                                <div class="setting-detail"><strong>Good for:</strong> Preventing loops.</div>
+                                <div class="setting-detail"><em>Example:</em> Stops "Hello hello hello…"</div>
+                                <div class="setting-detail warning"><strong>Warning:</strong> Too high makes writing weird.</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="repeat-penalty" min="1.0" max="2.0" step="0.01" value="1.1">
+                                <input type="number" class="setting-value" id="repeat-penalty-value" min="1.0" max="2.0" step="0.01" value="1.1">
+                            </div>
+                            <button class="setting-reset" data-setting="repeat-penalty" data-default="1.1">Default</button>
+                        </div>
+                        
+                        <!-- Repeat Last-N -->
+                        <div class="setting-card">
+                            <div class="setting-label">🔁 Repeat Last‑N</div>
+                            <div class="setting-description">How far back repetition is checked.</div>
+                            <div class="setting-details">
+                                <div class="setting-detail"><strong>Good for:</strong> Long‑form writing.</div>
+                                <div class="setting-detail"><em>Example:</em> 64 → good for chat.</div>
+                                <div class="setting-detail warning"><strong>Warning:</strong> Very high values slow generation.</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="repeat-last-n" min="0" max="2048" step="1" value="64">
+                                <input type="number" class="setting-value" id="repeat-last-n-value" min="0" max="2048" step="1" value="64">
+                            </div>
+                            <button class="setting-reset" data-setting="repeat-last-n" data-default="64">Default</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Category 2: Intermediate Controls -->
+                    <div class="category-header">Intermediate Controls</div>
+                    <div class="settings-grid">
+                        <!-- Presence Penalty -->
+                        <div class="setting-card" id="presence-penalty-card">
+                            <div class="setting-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="presence-penalty-enabled" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Enabled</span>
+                            </div>
+                            <div class="setting-label">
+                                ⚖️ Presence Penalty
+                                <span class="warning-icon">
+                                    <span class="tooltip">Conflicts with Frequency Penalty</span>
+                                </span>
+                            </div>
+                            <div class="setting-description">Penalizes new topics (reduces topic drift).</div>
+                            <div class="setting-details">
+                                <div class="setting-detail"><strong>Good for:</strong> Staying on topic.</div>
+                                <div class="setting-detail"><em>Example:</em> 0.3 → stay focused.</div>
+                                <div class="setting-detail warning"><strong>Warning:</strong> Conflicts with Frequency Penalty.</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="presence-penalty" min="0.0" max="2.0" step="0.1" value="0.0">
+                                <input type="number" class="setting-value" id="presence-penalty-value" min="0.0" max="2.0" step="0.1" value="0.0">
+                            </div>
+                            <button class="setting-reset" data-setting="presence-penalty" data-default="0.0">Default</button>
+                        </div>
+                        
+                        <!-- Frequency Penalty -->
+                        <div class="setting-card" id="frequency-penalty-card">
+                            <div class="setting-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="frequency-penalty-enabled" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Enabled</span>
+                            </div>
+                            <div class="setting-label">
+                                📊 Frequency Penalty
+                                <span class="warning-icon">
+                                    <span class="tooltip">Conflicts with Presence Penalty</span>
+                                </span>
+                            </div>
+                            <div class="setting-description">Penalizes tokens based on frequency.</div>
+                            <div class="setting-details">
+                                <div class="setting-detail"><strong>Good for:</strong> Avoiding repeated words.</div>
+                                <div class="setting-detail"><em>Example:</em> Stops "very very very."</div>
+                                <div class="setting-detail warning"><strong>Warning:</strong> Conflicts with Presence Penalty.</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="frequency-penalty" min="0.0" max="2.0" step="0.1" value="0.0">
+                                <input type="number" class="setting-value" id="frequency-penalty-value" min="0.0" max="2.0" step="0.1" value="0.0">
+                            </div>
+                            <button class="setting-reset" data-setting="frequency-penalty" data-default="0.0">Default</button>
+                        </div>
+                        
+                        <!-- No-Repeat N-Gram Size -->
+                        <div class="setting-card">
+                            <div class="setting-label">🚫 No‑Repeat N‑Gram Size</div>
+                            <div class="setting-description">Prevents repeating any N‑gram.</div>
+                            <div class="setting-details">
+                                <div class="setting-detail"><strong>Good for:</strong> Killing loops dead.</div>
+                                <div class="setting-detail"><em>Example:</em> N=3 → no repeated 3‑word phrases.</div>
+                                <div class="setting-detail warning"><strong>Warning:</strong> Can break poetry or dialogue.</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="no-repeat-ngram" min="0" max="10" step="1" value="0">
+                                <input type="number" class="setting-value" id="no-repeat-ngram-value" min="0" max="10" step="1" value="0">
+                            </div>
+                            <button class="setting-reset" data-setting="no-repeat-ngram" data-default="0">Default</button>
+                        </div>
+                        
+                        <!-- Typical-P -->
+                        <div class="setting-card" id="typical-p-card">
+                            <div class="setting-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="typical-p-enabled" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Enabled</span>
+                            </div>
+                            <div class="setting-label">
+                                🎲 Typical‑P
+                                <span class="warning-icon">
+                                    <span class="tooltip">Conflicts with Top‑P</span>
+                                </span>
+                            </div>
+                            <div class="setting-description">Filters tokens by typical probability.</div>
+                            <div class="setting-details">
+                                <div class="setting-detail"><strong>Good for:</strong> Natural‑sounding text.</div>
+                                <div class="setting-detail"><em>Example:</em> 1.0 = no filtering.</div>
+                                <div class="setting-detail warning"><strong>Warning:</strong> Conflicts with Top‑P.</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="typical-p" min="0.0" max="1.0" step="0.01" value="1.0">
+                                <input type="number" class="setting-value" id="typical-p-value" min="0.0" max="1.0" step="0.01" value="1.0">
+                            </div>
+                            <button class="setting-reset" data-setting="typical-p" data-default="1.0">Default</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Category 3: Advanced Controls -->
+                    <div class="category-header">Advanced Controls</div>
+                        <!-- Mirostat Mode -->
+                        <div class="setting-card" id="mirostat-mode-card">
+                            <div class="setting-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="mirostat-enabled" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Enabled</span>
+                            </div>
+                            <div class="setting-label">
+                                ⚙️ Mirostat Mode
+                                <span class="warning-icon">
+                                    <span class="tooltip">Overrides Temperature, Top‑P, Typical‑P</span>
+                                </span>
+                            </div>
+                            <div class="setting-description">Auto‑tunes sampling parameters.</div>
+                            <div class="setting-details">
+                                <div class="setting-detail"><strong>Good for:</strong> Consistent perplexity.</div>
+                                <div class="setting-detail"><em>Example:</em> Mode 2 for stable long‑form.</div>
+                                <div class="setting-detail warning"><strong>Warning:</strong> Overrides Temperature, Top‑P, Typical‑P.</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="mirostat-mode" min="0" max="2" step="1" value="0">
+                                <input type="number" class="setting-value" id="mirostat-mode-value" min="0" max="2" step="1" value="0">
+                            </div>
+                            <button class="setting-reset" data-setting="mirostat-mode" data-default="0">Default</button>
+                        </div>
+                        
+                        <!-- Temperature -->
+                        <div class="setting-card">
+                            <div class="setting-label">🌡️ Temperature</div>
+                            <div class="setting-description">Controls randomness in responses.</div>
+                            <div class="setting-details">
+                                <div class="setting-detail"><strong>Good for:</strong> Adjusting creativity.</div>
+                                <div class="setting-detail"><em>Example:</em> 0.7 = balanced.</div>
+                                <div class="setting-detail warning"><strong>Warning:</strong> Overridden by Mirostat.</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="temperature" min="0.0" max="2.0" step="0.1" value="0.7">
+                                <input type="number" class="setting-value" id="temperature-value" min="0.0" max="2.0" step="0.1" value="0.7">
+                            </div>
+                            <button class="setting-reset" data-setting="temperature" data-default="0.7">Default</button>
+                        </div>
+                        
+                        <!-- Dynamic Temperature Range -->
+                        <div class="setting-card" id="dyn-temp-range-card">
+                            <div class="setting-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="dyn-temp-range-enabled" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Enabled</span>
+                            </div>
+                            <div class="setting-label">
+                                🌡️ Dynamic Temperature Range
+                                <span class="warning-icon">
+                                    <span class="tooltip">Can conflict with Mirostat</span>
+                                </span>
+                            </div>
+                            <div class="setting-description">Adjusts temperature based on token probability.</div>
+                            <div class="setting-details">
+                                <div class="setting-detail"><strong>Good for:</strong> Adaptive creativity.</div>
+                                <div class="setting-detail"><em>Example:</em> More varied on low‑prob tokens.</div>
+                                <div class="setting-detail warning"><strong>Warning:</strong> Can conflict with Mirostat.</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="dyn-temp-range" min="0.0" max="5.0" step="0.1" value="0.0">
+                                <input type="number" class="setting-value" id="dyn-temp-range-value" min="0.0" max="5.0" step="0.1" value="0.0">
+                            </div>
+                            <button class="setting-reset" data-setting="dyn-temp-range" data-default="0.0">Default</button>
+                        </div>
+                        
+                        <!-- Eta Cutoff -->
+                        <div class="setting-card">
+                            <div class="setting-label">✂️ Eta Cutoff</div>
+                            <div class="setting-description">Removes tokens based on relative probability.</div>
+                            <div class="setting-details">
+                                <div class="setting-detail"><strong>Good for:</strong> Outlier control.</div>
+                                <div class="setting-detail"><em>Example:</em> Smooths output.</div>
+                                <div class="setting-detail"><strong>Warning:</strong> None.</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="eta-cutoff" min="0.0" max="1.0" step="0.01" value="0.0">
+                                <input type="number" class="setting-value" id="eta-cutoff-value" min="0.0" max="1.0" step="0.01" value="0.0">
+                            </div>
+                            <button class="setting-reset" data-setting="eta-cutoff" data-default="0.0">Default</button>
+                        </div>
+                        
+                        <!-- Encoder Repetition Penalty -->
+                        <div class="setting-card">
+                            <div class="setting-label">� Encoder Repetition Penalty</div>
+                            <div class="setting-description">Penalizes repetition in the prompt.</div>
+                            <div class="setting-details">
+                                <div class="setting-detail"><strong>Good for:</strong> Preventing echoing.</div>
+                                <div class="setting-detail"><em>Example:</em> Stops "You said: You said:"</div>
+                                <div class="setting-detail warning"><strong>Warning:</strong> Too high breaks instruction following.</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="encoder-repeat-penalty" min="1.0" max="2.0" step="0.01" value="1.0">
+                                <input type="number" class="setting-value" id="encoder-repeat-penalty-value" min="1.0" max="2.0" step="0.01" value="1.0">
+                            </div>
+                            <button class="setting-reset" data-setting="encoder-repeat-penalty" data-default="1.0">Default</button>
+                        </div>
+                        
+                        <!-- Seed -->
+                        <div class="setting-card">
+                            <div class="setting-label">🧱 Seed</div>
+                            <div class="setting-description">Controls randomness.</div>
+                            <div class="setting-details">
+                                <div class="setting-detail"><strong>Good for:</strong> Reproducible outputs.</div>
+                                <div class="setting-detail"><em>Example:</em> Same seed = same story.</div>
+                                <div class="setting-detail"><strong>Warning:</strong> -1 = random.</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="number" class="setting-value" id="seed" min="0" max="4294967295" step="1" value="0">
+                            </div>
+                            <button class="setting-reset" data-setting="seed" data-default="0">Default</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Settings Flyout Overlay -->
+    <div class="model-settings-overlay" id="model-settings-overlay" onclick="toggleModelSettingsFlyout()"></div>
+    
+    <!-- Model Settings Flyout Panel -->
+    <div class="model-settings-flyout" id="model-settings-flyout">
+        <div class="flyout-header">
+            <h2>Model Settings</h2>
+            <button class="close-button" onclick="toggleModelSettingsFlyout()">✕</button>
+        </div>
+        <div class="flyout-content">
+            <!-- Category 1: Core Model Settings -->
+            <div class="category-header">Core Model Settings</div>
+            <div class="settings-grid">
+                <!-- Model Family -->
+                <div class="setting-card">
+                    <div class="setting-label">🧠 Model Family</div>
+                    <div class="setting-description">Auto-detected from GGUF metadata</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Purpose:</strong> Determines default template, tokenizer, context behavior</div>
+                    </div>
+                    <select class="setting-select" id="model-family">
+                        <option value="auto">Auto</option>
+                        <option value="llama">LLaMA</option>
+                        <option value="mistral">Mistral</option>
+                        <option value="phi">Phi</option>
+                        <option value="qwen">Qwen</option>
+                        <option value="lfm">LFM</option>
+                        <option value="gemma">Gemma</option>
+                    </select>
+                </div>
+
+                <!-- Model Variant -->
+                <div class="setting-card">
+                    <div class="setting-label">🧩 Model Variant</div>
+                    <div class="setting-description">Auto-detected from GGUF metadata</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Purpose:</strong> Helps set safe defaults for KV cache, threads, batch size</div>
+                    </div>
+                    <select class="setting-select" id="model-variant">
+                        <option value="auto">Auto</option>
+                        <option value="1.2b">1.2B</option>
+                        <option value="3b">3B</option>
+                        <option value="7b">7B</option>
+                        <option value="13b">13B</option>
+                        <option value="70b">70B</option>
+                    </select>
+                </div>
+
+                <!-- Thread Count -->
+                <div class="setting-card">
+                    <div class="setting-label">⚙️ Thread Count</div>
+                    <div class="setting-description">CPU parallelism</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Default:</strong> num_cores - 1</div>
+                        <div class="setting-detail"><em>Example:</em> 12-core CPU → 11 threads</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" class="setting-slider" id="thread-count" min="1" max="32" step="1" value="11">
+                        <input type="number" class="setting-value" id="thread-count-value" min="1" max="32" step="1" value="11">
+                    </div>
+                </div>
+
+                <!-- Batch Size -->
+                <div class="setting-card">
+                    <div class="setting-label">🚀 Batch Size</div>
+                    <div class="setting-description">Tokens processed per step</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Default:</strong> Auto (based on RAM/VRAM)</div>
+                        <div class="setting-detail"><em>Note:</em> Higher = faster but more RAM</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" class="setting-slider" id="batch-size" min="1" max="4096" step="1" value="512">
+                        <input type="number" class="setting-value" id="batch-size-value" min="1" max="4096" step="1" value="512">
+                    </div>
+                </div>
+
+                <!-- GPU Offload Layers -->
+                <div class="setting-card">
+                    <div class="setting-label">🧮 GPU Offload Layers</div>
+                    <div class="setting-description">Moves layers to GPU for speed</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Default:</strong> Auto (gollama decides)</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" class="setting-slider" id="gpu-layers" min="0" max="100" step="1" value="0">
+                        <input type="number" class="setting-value" id="gpu-layers-value" min="0" max="100" step="1" value="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category 2: Performance Settings -->
+            <div class="category-header">Performance Settings</div>
+            <div class="settings-grid">
+                <!-- KV Cache Size -->
+                <div class="setting-card">
+                    <div class="setting-label">⚡ KV Cache Size</div>
+                    <div class="setting-description">Tokens stored before eviction</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Default:</strong> Auto (model default)</div>
+                        <div class="setting-detail"><em>Range:</em> 512 → model_max_context</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" class="setting-slider" id="kv-cache-size" min="512" max="32768" step="512" value="4096">
+                        <input type="number" class="setting-value" id="kv-cache-size-value" min="512" max="32768" step="512" value="4096">
+                    </div>
+                </div>
+
+                <!-- KV Cache Type -->
+                <div class="setting-card">
+                    <div class="setting-label">🧊 KV Cache Type</div>
+                    <div class="setting-description">How KV cache is stored/managed</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Default:</strong> Standard</div>
+                    </div>
+                    <select class="setting-select" id="kv-cache-type">
+                        <option value="standard">Standard</option>
+                        <option value="flash-attention">Flash-Attention</option>
+                        <option value="paged">Paged</option>
+                    </select>
+                </div>
+
+                <!-- Rope Scaling Mode -->
+                <div class="setting-card">
+                    <div class="setting-label">🧱 Rope Scaling Mode</div>
+                    <div class="setting-description">Extends usable context window</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Auto:</strong> Detected from metadata</div>
+                        <div class="setting-detail"><em>LLaMA 3:</em> Dynamic</div>
+                        <div class="setting-detail"><em>LFM:</em> Linear</div>
+                    </div>
+                    <select class="setting-select" id="rope-scaling-mode">
+                        <option value="auto">Auto</option>
+                        <option value="none">None</option>
+                        <option value="linear">Linear</option>
+                        <option value="dynamic">Dynamic</option>
+                        <option value="yarn">YARN</option>
+                    </select>
+                </div>
+
+                <!-- Rope Factor -->
+                <div class="setting-card">
+                    <div class="setting-label">📏 Rope Factor</div>
+                    <div class="setting-description">How aggressively to scale positional embeddings</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Default:</strong> Auto</div>
+                        <div class="setting-detail"><em>Range:</em> 1.0 → 8.0</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" class="setting-slider" id="rope-factor" min="1.0" max="8.0" step="0.1" value="1.0">
+                        <input type="number" class="setting-value" id="rope-factor-value" min="1.0" max="8.0" step="0.1" value="1.0">
+                    </div>
+                </div>
+
+                <!-- Tensor Split -->
+                <div class="setting-card">
+                    <div class="setting-label">🧮 Tensor Split</div>
+                    <div class="setting-description">Multi-GPU partitioning</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Default:</strong> Auto</div>
+                        <div class="setting-detail"><em>Range:</em> 0 → 100%</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" class="setting-slider" id="tensor-split" min="0" max="100" step="1" value="0">
+                        <input type="number" class="setting-value" id="tensor-split-value" min="0" max="100" step="1" value="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category 3: Memory & Context Settings -->
+            <div class="category-header">Memory & Context Settings</div>
+            <div class="settings-grid">
+                <!-- Max Context Window -->
+                <div class="setting-card">
+                    <div class="setting-label">🧠 Max Context Window</div>
+                    <div class="setting-description">Auto-detected from GGUF metadata</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Slider:</strong> 1k → 256k</div>
+                        <div class="setting-detail"><em>Usable:</em> max_context - safety_margin</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" class="setting-slider" id="max-context" min="1024" max="262144" step="1024" value="4096">
+                        <input type="number" class="setting-value" id="max-context-value" min="1024" max="262144" step="1024" value="4096">
+                    </div>
+                </div>
+
+                <!-- Context Rollover Mode -->
+                <div class="setting-card">
+                    <div class="setting-label">🔁 Context Rollover Mode</div>
+                    <div class="setting-description">How context is trimmed</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Default:</strong> Memory-Guided (HOWL default)</div>
+                    </div>
+                    <select class="setting-select" id="context-rollover-mode">
+                        <option value="memory-guided">Memory-Guided</option>
+                        <option value="standard">Standard (evict oldest)</option>
+                        <option value="sliding-window">Sliding Window</option>
+                    </select>
+                </div>
+
+                <!-- Memory Integration -->
+                <div class="setting-card">
+                    <div class="setting-label">🧩 Memory Integration</div>
+                    <div class="setting-description">Enables memory system to guide post-rollover</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Default:</strong> On</div>
+                    </div>
+                    <div class="setting-toggle">
+                        <div class="toggle-switch active" id="memory-integration-toggle" onclick="toggleMemoryIntegration()"></div>
+                        <span class="toggle-label">Enabled</span>
+                    </div>
+                </div>
+
+                <!-- System Prompt Cache -->
+                <div class="setting-card">
+                    <div class="setting-label">🧠 System Prompt Cache</div>
+                    <div class="setting-description">Keeps system prompt pinned in KV cache</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Default:</strong> On</div>
+                    </div>
+                    <div class="setting-toggle">
+                        <div class="toggle-switch active" id="system-prompt-cache-toggle" onclick="toggleSystemPromptCache()"></div>
+                        <span class="toggle-label">Enabled</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category 4: Prompt & Template Settings -->
+            <div class="category-header">Prompt & Template Settings</div>
+            <div class="settings-grid">
+                <!-- Prompt Template -->
+                <div class="setting-card">
+                    <div class="setting-label">🧾 Prompt Template</div>
+                    <div class="setting-description">Auto-detected from GGUF metadata</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Examples:</strong> chat_template, mistral.chat_template</div>
+                    </div>
+                    <select class="setting-select" id="prompt-template">
+                        <option value="auto">Auto</option>
+                        <option value="llama">LLaMA</option>
+                        <option value="mistral">Mistral</option>
+                        <option value="chatml">ChatML</option>
+                        <option value="alpaca">Alpaca</option>
+                        <option value="vicuna">Vicuna</option>
+                        <option value="lfm">LFM</option>
+                        <option value="custom-jinja">Custom (Jinja)</option>
+                    </select>
+                </div>
+
+                <!-- Custom Jinja Template -->
+                <div class="setting-card" style="grid-column: span 2;">
+                    <div class="setting-label">🧩 Custom Jinja Template</div>
+                    <div class="setting-description">Full manual override</div>
+                    <textarea class="setting-textarea" id="custom-jinja-template" placeholder="Enter custom Jinja template..."></textarea>
+                </div>
+
+                <!-- System Prompt Override -->
+                <div class="setting-card" style="grid-column: span 3;">
+                    <div class="setting-label">🧱 System Prompt Override</div>
+                    <div class="setting-description">Replaces the model's default system prompt</div>
+                    <textarea class="setting-textarea" id="system-prompt-override" placeholder="Enter system prompt override..." style="min-height: 100px;"></textarea>
+                </div>
+
+                <!-- User Prompt Prefix -->
+                <div class="setting-card">
+                    <div class="setting-label">🧬 User Prompt Prefix</div>
+                    <div class="setting-description">Adds a prefix to every user message</div>
+                    <input type="text" class="setting-text-input" id="user-prompt-prefix" placeholder="Enter prefix...">
+                </div>
+
+                <!-- Assistant Prompt Prefix -->
+                <div class="setting-card">
+                    <div class="setting-label">🧬 Assistant Prompt Prefix</div>
+                    <div class="setting-description">Adds a prefix to every assistant message</div>
+                    <input type="text" class="setting-text-input" id="assistant-prompt-prefix" placeholder="Enter prefix...">
+                </div>
+
+                <!-- Stop Sequences -->
+                <div class="setting-card">
+                    <div class="setting-label">🧩 Stop Sequences</div>
+                    <div class="setting-description">Controls where generation halts</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Default:</strong> Auto</div>
+                        <div class="setting-detail"><em>Format:</em> Comma-separated list</div>
+                    </div>
+                    <input type="text" class="setting-text-input" id="stop-sequences" placeholder="e.g. </s>, <|end|>">
+                </div>
+
+                <!-- Tokenizer Override -->
+                <div class="setting-card">
+                    <div class="setting-label">🧮 Tokenizer Override</div>
+                    <div class="setting-description">For models with mismatched tokenizers</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Auto:</strong> Detected from metadata</div>
+                    </div>
+                    <select class="setting-select" id="tokenizer-override">
+                        <option value="auto">Auto</option>
+                        <option value="sentencepiece">SentencePiece</option>
+                        <option value="tiktoken">TikToken</option>
+                        <option value="custom">Custom</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -184,12 +816,6 @@
         <div class="chat-panel">
             <div class="chat-messages" id="chat-messages">
                 <!-- Messages will be dynamically added here -->
-            </div>
-            <!-- Streaming Indicator -->
-            <div class="streaming-indicator" id="streaming-indicator">
-                <div class="streaming-dot"></div>
-                <div class="streaming-dot"></div>
-                <div class="streaming-dot"></div>
             </div>
         </div>
 
@@ -290,12 +916,5 @@
             </div>
         </div>
     </div>
-
-    <script src="js/theme.js"></script>
-    <script src="js/menu.js"></script>
-    <script src="js/chat.js"></script>
-    <script src="js/navigation.js"></script>
-    <script src="js/chat-session.js"></script>
-    <script src="js/loading-progress.js"></script>
 </body>
 </html>

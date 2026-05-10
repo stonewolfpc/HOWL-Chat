@@ -137,6 +137,17 @@ func (m *Manager) IsModelLoaded() bool {
 	return m.currentModel != nil && m.currentModel.IsLoaded()
 }
 
+// GetLoadedModelName returns the name of the currently loaded model
+func (m *Manager) GetLoadedModelName() string {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	if m.currentModel == nil {
+		return "No model loaded"
+	}
+	return m.currentModel.Name
+}
+
 // GetLoadingProgress returns the current loading progress
 func (m *Manager) GetLoadingProgress() float64 {
 	return m.progressTracker.GetTotalProgress()

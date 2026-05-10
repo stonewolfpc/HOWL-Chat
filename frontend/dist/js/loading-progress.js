@@ -90,4 +90,40 @@ function setLoadingStatus(status, state = 'default') {
 // Initialize loading progress bar on page load
 document.addEventListener('DOMContentLoaded', () => {
     createLoadingProgressBar();
+    initModelEventListeners();
 });
+
+// Listen for Wails backend events
+function initModelEventListeners() {
+    if (window.runtime) {
+        // Model loading started
+        window.runtime.EventsOn('model:loading', () => {
+            updateLoadingProgress(0);
+            setLoadingStatus('Loading...', 'loading');
+        });
+
+        // Progress updates (0-100)
+        window.runtime.EventsOn('model:progress', (progress) => {
+            updateLoadingProgress(progress);
+        });
+
+        // Model ready
+        window.runtime.EventsOn('model:loaded', () => {
+            updateLoadingProgress(100);
+            setLoadingStatus('Ready', 'completed');
+        });
+
+        // Model unloaded
+        window.runtime.EventsOn('model:unloaded', () => {
+            updateLoadingProgress(0);
+            setLoadingStatus('no model loaded', 'default');
+        });
+
+        // Error during loading
+        window.runtime.EventsOn('model:error', (err) => {
+            updateLoadingProgress(0);
+            setLoadingStatus('Error', 'error');
+            console.error('Model loading error:', err);
+        });
+    }
+}
