@@ -1,0 +1,41 @@
+/**
+ * Theme Variables and Root Definitions
+ * 
+ * This file contains all CSS custom properties (variables) for the HOWL Chat application.
+ * Theme colors, glow effects, and transitions are defined here.
+ * 
+ * @module theme
+ */
+
+:root {
+    /* Artherius Theme Colors */
+    --theme-color: #14b8a6;
+    --theme-glow: rgba(20, 184, 166, 0.5);
+    --theme-border: rgba(20, 184, 166, 0.3);
+    --theme-text-glow: rgba(20, 184, 166, 0.4);
+    --theme-secondary: #06b6d4;
+    
+    /* Static Colors */
+    --static-text: #d4d4d4;
+    
+    /* Theme Transitions */
+    transition: --theme-color 4s ease-in-out,
+                --theme-glow 4s ease-in-out,
+                --theme-text-glow 4s ease-in-out,
+                --theme-secondary 4s ease-in-out;
+}
+
+* {
+    transition: background-color 4s ease-in-out;
+}
+
+/* Theme-aware transitions for major layout elements */
+.menu-bar,
+.nav-sidebar,
+.character-sidebar,
+.chat-panel,
+.world-sidebar,
+.panel,
+.dropdown {
+    transition: background-color 4s ease-in-out;
+}

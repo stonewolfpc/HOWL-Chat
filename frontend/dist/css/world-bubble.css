@@ -1,0 +1,126 @@
+/**
+ * World Bubble Component Styles
+ * 
+ * This file contains the world bubble styles including the 92x92
+ * thumbnail container, image, action icons, and hover effects.
+ * 
+ * @module world-bubble
+ */
+
+/* World Bubble Container */
+.world-bubble {
+    width: 92px;
+    height: 92px;
+    background: rgba(21, 21, 31, 0.9);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.world-bubble:hover {
+    background: var(--theme-glow);
+    border-color: rgba(100, 100, 100, 0.5);
+    box-shadow: 0 0 12px var(--theme-glow);
+}
+
+/* World Bubble Image */
+.world-bubble-image {
+    width: 92px;
+    height: 92px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* World Bubble Placeholder */
+.world-bubble-placeholder {
+    width: 92px;
+    height: 92px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(30, 30, 35, 0.8);
+    border-radius: 8px;
+}
+
+.world-bubble-placeholder-icon {
+    font-size: 32px;
+    color: rgba(212, 212, 212, 0.5);
+}
+
+/* World Bubble Actions Overlay */
+.world-bubble-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10, 10, 15, 0.9);
+    padding: 8px;
+    display: flex;
+    justify-content: space-around;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.world-bubble:hover .world-bubble-actions {
+    opacity: 1;
+}
+
+/* World Bubble Action Icons */
+.world-bubble-action {
+    background: transparent;
+    border: none;
+    color: var(--static-text);
+    padding: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.world-bubble-action:hover {
+    color: var(--theme-color);
+    transform: scale(1.2);
+}
+
+/* World Bubble Name Tooltip */
+.world-bubble-name {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10, 10, 15, 0.95);
+    padding: 4px 8px;
+    font-size: 11px;
+    color: var(--static-text);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-top: 1px solid rgba(100, 100, 100, 0.3);
+}
+
+.world-bubble:hover .world-bubble-name {
+    display: none;
+}
+
+/* Active World Indicator */
+.world-bubble.active {
+    border-color: var(--theme-color);
+    box-shadow: 0 0 15px var(--theme-glow);
+}
+
+.world-bubble.active::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 8px;
+    height: 8px;
+    background: var(--theme-color);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--theme-glow);
+}

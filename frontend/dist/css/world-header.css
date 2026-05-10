@@ -1,0 +1,43 @@
+/**
+ * World Header Component Styles
+ * 
+ * This file contains the World Creation Menu header styles.
+ * Centered header with theme color highlighting.
+ * 
+ * @module world-header
+ */
+
+/* World Page Header */
+.world-page-header {
+    text-align: center;
+    padding: 24px 16px;
+    background: rgba(15, 21, 31, 0.95);
+    border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+}
+
+.world-page-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--theme-color);
+    text-shadow: 0 0 10px var(--theme-glow);
+}
+
+/* Create New World Button */
+.create-world-button {
+    background: var(--theme-glow);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    margin-top: 16px;
+}
+
+.create-world-button:hover {
+    background: var(--theme-glow);
+    border-color: var(--theme-color);
+    box-shadow: 0 0 8px var(--theme-glow);
+}

@@ -1,0 +1,218 @@
+/**
+ * World Form Component Styles
+ * 
+ * This file contains the world creation form styles including
+ * form fields, image picker, text areas, and dropdown containers.
+ * 
+ * @module world-form
+ */
+
+/* Form Group */
+.world-form-group {
+    margin-bottom: 20px;
+}
+
+.world-form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--static-text);
+    margin-bottom: 8px;
+}
+
+/* Title Input */
+.world-title-input {
+    width: 100%;
+    background: rgba(21, 21, 31, 0.95);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 12px 16px;
+    font-size: 14px;
+    border-radius: 6px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.world-title-input:focus {
+    border-color: var(--theme-color);
+    box-shadow: 0 0 10px var(--theme-glow);
+}
+
+/* Image Picker Area */
+.world-image-picker {
+    width: 100%;
+    height: 200px;
+    background: rgba(21, 21, 31, 0.6);
+    border: 2px dashed rgba(100, 100, 100, 0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.world-image-picker:hover {
+    background: var(--theme-glow);
+    border-color: rgba(100, 100, 100, 0.5);
+}
+
+.world-image-picker-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: rgba(212, 212, 212, 0.5);
+}
+
+.world-image-picker-icon {
+    font-size: 32px;
+}
+
+.world-image-picker-text {
+    font-size: 12px;
+}
+
+.world-image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.world-image-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(10, 10, 15, 0.9);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.world-image-remove:hover {
+    background: rgba(255, 100, 100, 0.3);
+    border-color: rgba(255, 100, 100, 0.5);
+}
+
+/* World Details Text Area */
+.world-details-textarea {
+    width: 100%;
+    min-height: 120px;
+    background: rgba(21, 21, 31, 0.95);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 12px 16px;
+    font-size: 14px;
+    border-radius: 6px;
+    outline: none;
+    resize: vertical;
+    transition: all 0.2s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.5;
+}
+
+.world-details-textarea:focus {
+    border-color: var(--theme-color);
+    box-shadow: 0 0 10px var(--theme-glow);
+}
+
+/* Dropdown Container */
+.world-dropdown-container {
+    position: relative;
+}
+
+.world-dropdown-trigger {
+    width: 100%;
+    background: rgba(21, 21, 31, 0.95);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 12px 16px;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.world-dropdown-trigger:hover {
+    border-color: rgba(100, 100, 100, 0.5);
+}
+
+.world-dropdown-trigger:focus {
+    border-color: var(--theme-color);
+    box-shadow: 0 0 10px var(--theme-glow);
+}
+
+.world-dropdown-arrow {
+    font-size: 12px;
+    transition: transform 0.2s ease;
+}
+
+.world-dropdown-container.open .world-dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+.world-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(20, 20, 25, 0.98);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 6px;
+    margin-top: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 100;
+    display: none;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.world-dropdown-container.open .world-dropdown-menu {
+    display: block;
+}
+
+/* Selected Items Display */
+.world-selected-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.world-selected-item {
+    background: var(--theme-glow);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.world-selected-item-remove {
+    background: transparent;
+    border: none;
+    color: var(--static-text);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+}
+
+.world-selected-item-remove:hover {
+    color: var(--theme-color);
+}

@@ -1,0 +1,15 @@
+{
+  "name": "howl-chat",
+  "outputfilename": "howl-chat",
+  "author": {
+    "name": "HOWL Chat",
+    "email": "howl@example.com"
+  },
+  "info": {
+    "companyName": "HOWL",
+    "productName": "HOWL Chat",
+    "productVersion": "1.0.0",
+    "copyright": "",
+    "comments": "Tron-inspired AI RP Chat System"
+  }
+}

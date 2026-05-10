@@ -1,0 +1,88 @@
+/**
+ * Input Component Styles
+ * 
+ * This file contains all input-related component styles including
+ * the input field and send button.
+ * 
+ * @module input-components
+ */
+
+/* Input Field */
+.input-field {
+    flex: 1;
+    background: rgba(21, 21, 31, 0.95);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 12px 16px;
+    font-size: 14px;
+    border-radius: 6px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.input-field:focus {
+    border-color: var(--theme-color);
+    box-shadow: 0 0 15px var(--theme-glow);
+}
+
+.input-field::placeholder {
+    color: rgba(100, 100, 100, 0.5);
+}
+
+/* Send Button */
+.send-button {
+    background: var(--theme-glow);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.send-button:hover {
+    background: var(--theme-glow);
+    border-color: var(--theme-color);
+    box-shadow: 0 0 8px var(--theme-glow);
+}
+
+/* Input Icons */
+.input-icons {
+    display: flex;
+    gap: 8px;
+    padding-right: 12px;
+    border-right: 1px solid rgba(100, 100, 100, 0.3);
+}
+
+.input-icon {
+    background: rgba(21, 21, 31, 0.8);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 8px;
+    font-size: 0;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-icon svg {
+    stroke: var(--static-text);
+    transition: stroke 0.2s ease;
+}
+
+.input-icon:hover {
+    background: var(--theme-glow);
+    border-color: rgba(100, 100, 100, 0.5);
+    box-shadow: 0 0 8px var(--theme-glow);
+}
+
+.input-icon:hover svg {
+    stroke: var(--theme-color);
+}

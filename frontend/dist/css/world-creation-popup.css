@@ -1,0 +1,117 @@
+/**
+ * World Creation Popup Component Styles
+ * 
+ * This file contains the world creation popup styles including
+ * the modal container, header, and overall popup layout.
+ * 
+ * @module world-creation-popup
+ */
+
+/* World Creation Popup Overlay */
+.world-creation-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+}
+
+.world-creation-overlay.show {
+    display: flex;
+}
+
+/* World Creation Popup Container */
+.world-creation-popup {
+    background: rgba(21, 21, 31, 0.98);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 12px;
+    width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+/* Popup Header */
+.world-creation-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+    background: rgba(10, 10, 15, 0.5);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.world-creation-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--theme-color);
+    text-shadow: 0 0 10px var(--theme-glow);
+}
+
+.world-creation-close {
+    background: transparent;
+    border: none;
+    color: var(--static-text);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+    transition: all 0.2s ease;
+}
+
+.world-creation-close:hover {
+    color: var(--theme-color);
+    transform: scale(1.1);
+}
+
+/* Popup Content */
+.world-creation-content {
+    padding: 24px;
+}
+
+/* Popup Footer */
+.world-creation-footer {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(100, 100, 100, 0.3);
+    background: rgba(10, 10, 15, 0.5);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.world-creation-cancel {
+    background: rgba(21, 21, 31, 0.9);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.world-creation-cancel:hover {
+    background: rgba(100, 100, 100, 0.3);
+    border-color: rgba(100, 100, 100, 0.5);
+}
+
+.world-creation-save {
+    background: var(--theme-glow);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 10px 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.world-creation-save:hover {
+    background: var(--theme-glow);
+    border-color: var(--theme-color);
+    box-shadow: 0 0 8px var(--theme-glow);
+}

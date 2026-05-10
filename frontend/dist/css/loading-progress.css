@@ -1,0 +1,133 @@
+/**
+ * Loading Progress Bar Component Styles
+ * 
+ * This file contains the loading progress bar styles for the model loading
+ * indicator in the top menu. Features neon electric blue styling and animations.
+ * 
+ * @module loading-progress
+ */
+
+/* Loading Progress Container */
+.loading-progress-container {
+    position: absolute;
+    right: 16px;
+    top: 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    z-index: 1000;
+}
+
+/* Loading Progress Bar */
+.loading-progress-bar {
+    width: 120px;
+    height: 15px;
+    background: rgba(10, 10, 15, 0.9);
+    border: 1px solid rgba(0, 150, 255, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 8px rgba(0, 150, 255, 0.2);
+}
+
+/* Loading Progress Fill */
+.loading-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #0066ff, #00ccff, #00ffff);
+    border-radius: 8px;
+    box-shadow: 0 0 12px #00ccff, 0 0 24px #0066ff;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+.loading-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmer 2s infinite;
+}
+
+/* Loading Status Text */
+.loading-status {
+    font-size: 10px;
+    font-weight: 600;
+    color: #00ccff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px #0066ff;
+}
+
+/* Loading Animation */
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Active Loading State */
+.loading-progress-bar.loading {
+    border-color: rgba(0, 150, 255, 0.6);
+    box-shadow: 0 0 16px rgba(0, 150, 255, 0.4);
+}
+
+.loading-progress-bar.loading .loading-progress-fill {
+    animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 12px #00ccff, 0 0 24px #0066ff;
+    }
+    50% {
+        box-shadow: 0 0 20px #00ccff, 0 0 40px #0066ff, 0 0 60px #00ffff;
+    }
+}
+
+/* Completed State */
+.loading-progress-bar.completed {
+    border-color: rgba(0, 255, 100, 0.6);
+    box-shadow: 0 0 16px rgba(0, 255, 100, 0.4);
+}
+
+.loading-progress-bar.completed .loading-progress-fill {
+    background: linear-gradient(90deg, #00ff66, #00ccff);
+    box-shadow: 0 0 12px #00ff66, 0 0 24px #00ccff;
+}
+
+.loading-progress-bar.completed .loading-progress-fill::after {
+    animation: none;
+}
+
+.loading-status.completed {
+    color: #00ff66;
+    text-shadow: 0 0 8px #00ff66;
+}
+
+/* Error State */
+.loading-progress-bar.error {
+    border-color: rgba(255, 50, 50, 0.6);
+    box-shadow: 0 0 16px rgba(255, 50, 50, 0.4);
+}
+
+.loading-progress-bar.error .loading-progress-fill {
+    background: linear-gradient(90deg, #ff3333, #ff6666);
+    box-shadow: 0 0 12px #ff3333, 0 0 24px #ff6666;
+}
+
+.loading-progress-bar.error .loading-progress-fill::after {
+    animation: none;
+}
+
+.loading-status.error {
+    color: #ff3333;
+    text-shadow: 0 0 8px #ff3333;
+}

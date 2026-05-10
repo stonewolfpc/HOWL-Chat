@@ -1,0 +1,50 @@
+/**
+ * Animation Styles
+ * 
+ * This file contains all keyframe animations and transition effects
+ * for the HOWL Chat application.
+ * 
+ * @module animations
+ */
+
+/* Menu Pulse Animation */
+@keyframes menubar-pulse {
+    0%, 100% {
+        box-shadow: 0 0 5px var(--theme-glow);
+    }
+    50% {
+        box-shadow: 0 0 8px var(--theme-glow);
+    }
+}
+
+/* Navbar Pulse Animation */
+@keyframes navbar-pulse {
+    0%, 100% {
+        box-shadow: 0 0 5px var(--theme-glow);
+    }
+    50% {
+        box-shadow: 0 0 8px var(--theme-glow);
+    }
+}
+
+/* Panel Pulse Animation */
+@keyframes panel-pulse {
+    0%, 100% {
+        box-shadow: 0 0 5px var(--theme-glow);
+    }
+    50% {
+        box-shadow: 0 0 8px var(--theme-glow);
+    }
+}
+
+/* Pulse Animation for Streaming Indicator */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        box-shadow: 0 0 8px var(--theme-glow);
+    }
+    50% {
+        opacity: 0.3;
+        box-shadow: 0 0 4px var(--theme-glow);
+    }
+}

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+    HOWL Chat - Artherius Edition
+    
+    Main HTML structure for the HOWL Chat application.
+    This file defines the UI layout including:
+    - Ambient background effects
+    - Top menu bar with dropdown menus
+    - Main content area with 4-column layout
+    - Chat interface with message handling
+    - Input bar for user interactions
+    
+    @module main
+    @version 1.0.0
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOWL Chat - Artherius Edition</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/menu-components.css">
+    <link rel="stylesheet" href="css/nav-components.css">
+    <link rel="stylesheet" href="css/panel-components.css">
+    <link rel="stylesheet" href="css/character-components.css">
+    <link rel="stylesheet" href="css/chat-components.css">
+    <link rel="stylesheet" href="css/input-components.css">
+    <link rel="stylesheet" href="css/world-components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/ambient.css">
+    <link rel="stylesheet" href="css/chat-session-list.css">
+    <link rel="stylesheet" href="css/chat-session-modal.css">
+    <link rel="stylesheet" href="css/nav-icon-images.css">
+    <link rel="stylesheet" href="css/loading-progress.css">
+</head>
+<body>
+    <!-- Ambient Background Effects (from Artherius) -->
+    <div class="ambient-bg">
+        <div class="ambient-orb-1"></div>
+        <div class="ambient-orb-2"></div>
+        <div class="hexagon-grid"></div>
+    </div>
+
+    <!-- Top Menu (from D:\HOWL layout) -->
+    <div class="top-menu">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="assets/HOWL.png" alt="HOWL Chat" style="width: 44px; height: 44px;">
+            <div class="app-title">HOWL Chat</div>
+        </div>
+        <div class="menu-bar">
+            <div class="menu-item">
+                <button class="menu-button">File</button>
+                <div class="dropdown" id="file-dropdown">
+                    <div class="dropdown-item" onclick="saveChatSession()">Save</div>
+                    <div class="dropdown-item" onclick="saveChatSessionAs()">Save As</div>
+                    <div class="dropdown-item" onclick="loadChatSession()">Load</div>
+                    <div class="dropdown-item" onclick="deleteChatSession()">Delete</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">New Chat</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Settings</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Exit</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button" onclick="toggleMenu('edit-menu')">Edit</button>
+                <div class="dropdown" id="edit-menu">
+                    <div class="dropdown-item">Undo</div>
+                    <div class="dropdown-item">Redo</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Cut</div>
+                    <div class="dropdown-item">Copy</div>
+                    <div class="dropdown-item">Paste</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Select All</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Find</div>
+                    <div class="dropdown-item">Replace</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button" onclick="toggleMenu('view-menu')">View</button>
+                <div class="dropdown" id="view-menu">
+                    <div class="dropdown-item">Colorblind Mode</div>
+                    <div class="dropdown-item">High Contrast Mode</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Light Theme</div>
+                    <div class="dropdown-item">Dark Theme</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Increase UI Scale</div>
+                    <div class="dropdown-item">Decrease UI Scale</div>
+                    <div class="dropdown-item">Reset UI Scale</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Toggle Sidebar</div>
+                    <div class="dropdown-item">Toggle Character Panel</div>
+                    <div class="dropdown-item">Toggle World Panel</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Fullscreen</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button" onclick="toggleMenu('settings-menu')">Settings</button>
+                <div class="dropdown" id="settings-menu">
+                    <div class="dropdown-item">Sampler Settings</div>
+                    <div class="dropdown-item">Model Settings</div>
+                    <div class="dropdown-item">Story Tools</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Advanced / Experimental</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Keyboard Shortcuts</div>
+                    <div class="dropdown-item">Audio Settings</div>
+                    <div class="dropdown-item">TTS Settings</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button" onclick="toggleMenu('help-menu')">Help</button>
+                <div class="dropdown" id="help-menu">
+                    <div class="dropdown-item">Documentation</div>
+                    <div class="dropdown-item">Sampler Guide</div>
+                    <div class="dropdown-item">Lorebook System Guide</div>
+                    <div class="dropdown-item">Character System Guide</div>
+                    <div class="dropdown-item">World/Scenario Guide</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Check for Updates</div>
+                    <div class="dropdown-item">Changelog</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Report a Bug</div>
+                    <div class="dropdown-item">Feature Request</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">About HOWL Chat</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content (4-column layout from D:\HOWL) -->
+    <div class="main-content">
+        <!-- Navigation Sidebar -->
+        <div class="nav-sidebar">
+            <div class="nav-item active" onclick="navigateTo('index.html')">
+                <img src="assets/quill.png" alt="Chat" class="nav-icon-img">
+            </div>
+            <div class="nav-item" onclick="navigateTo('world.html')">
+                <img src="assets/globe.png" alt="World" class="nav-icon-img">
+            </div>
+            <div class="nav-item">
+                <img src="assets/Character.png" alt="Characters" class="nav-icon-img">
+            </div>
+            <div class="nav-item">
+                <img src="assets/scroll.png" alt="Scenarios" class="nav-icon-img">
+            </div>
+            <div class="nav-item">
+                <img src="assets/spellbook.png" alt="Lorebooks" class="nav-icon-img">
+            </div>
+            <div class="nav-item">
+                <img src="assets/brush.png" alt="Image Generator" class="nav-icon-img">
+            </div>
+        </div>
+
+        <!-- Character Sidebar (from D:\HOWL) -->
+        <div class="character-sidebar">
+            <div class="panel-header">Characters</div>
+            <div class="character-list">
+                <div class="character-item">
+                    <div class="character-avatar">🤖</div>
+                    <div class="character-info">
+                        <div class="character-name">AI Assistant</div>
+                        <div class="character-status">Online</div>
+                    </div>
+                </div>
+                <div class="character-item">
+                    <div class="character-avatar">🧙</div>
+                    <div class="character-info">
+                        <div class="character-name">Dungeon Master</div>
+                        <div class="character-status">Ready</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Panel (main area, flexed) -->
+        <div class="chat-panel">
+            <div class="chat-messages">
+                <div class="chat-message user">
+                    <div class="chat-bubble">
+                        <div class="chat-sender">You:</div>
+                        <div class="chat-text">Hello! This is a test message.</div>
+                        <div class="chat-buttons">
+                            <button class="bubble-button icon-button" onclick="copyMessage(this)" title="Copy">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                            <button class="bubble-button icon-button" onclick="editMessage(this)" title="Edit">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                            <button class="bubble-button icon-button" onclick="undoMessage(this)" title="Undo">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-message assistant">
+                    <div class="chat-bubble">
+                        <div class="chat-sender">AI:</div>
+                        <div class="chat-text">Welcome to HOWL Chat! I'm your AI assistant, ready to help with anything you need.</div>
+                        <div class="chat-buttons">
+                            <button class="bubble-button icon-button" onclick="regenerateMessage(this)" title="Regenerate">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                            </button>
+                            <button class="bubble-button icon-button disabled" onclick="previousMessage(this)" title="Previous">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                            </button>
+                            <button class="bubble-button icon-button disabled" onclick="nextMessage(this)" title="Next">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+                            <button class="bubble-button icon-button" onclick="copyMessage(this)" title="Copy">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                            <button class="bubble-button icon-button" onclick="editMessage(this)" title="Edit">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                            <button class="bubble-button icon-button" onclick="deleteMessage(this)" title="Delete">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Streaming Indicator -->
+            <div class="streaming-indicator" id="streaming-indicator">
+                <div class="streaming-dot"></div>
+                <div class="streaming-dot"></div>
+                <div class="streaming-dot"></div>
+            </div>
+        </div>
+
+        <!-- Chat Session Sidebar -->
+        <div class="world-sidebar">
+            <div class="panel-header">Chats</div>
+            <div class="world-info">
+                <div class="info-item">
+                    <span class="info-icon">💬</span>
+                    <span class="info-text">Current: New Chat</span>
+                </div>
+                <div class="info-separator"></div>
+                <div class="info-item">
+                    <span class="info-icon">🌍</span>
+                    <span class="info-text">World: None</span>
+                </div>
+                <div class="info-separator"></div>
+                <div class="info-item">
+                    <span class="info-icon">📜</span>
+                    <span class="info-text">Scenario: None</span>
+                </div>
+                <div class="info-separator"></div>
+                <div class="info-item">
+                    <span class="info-icon">📚</span>
+                    <span class="info-text">Lorebooks: None</span>
+                </div>
+            </div>
+            <div class="model-controls">
+                <div class="model-name-display" id="model-name-display">No model loaded</div>
+                <button class="model-button load-button" onclick="loadModel()">Load Model</button>
+                <button class="model-button unload-button" onclick="unloadModel()">Unload</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Bar (from D:\HOWL) -->
+    <div class="input-bar">
+        <div class="input-icons">
+            <button class="input-icon" onclick="addImage()" title="Vision">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+            <button class="input-icon" onclick="addAudio()" title="Audio Input">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </button>
+            <button class="input-icon" onclick="textToSpeech()" title="Text to Speech">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            </button>
+            <button class="input-icon" onclick="addFile()" title="Document">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            </button>
+        </div>
+        <input type="text" class="input-field" placeholder="Type your message...">
+        <button class="send-button">Send</button>
+    </div>
+
+    <!-- Session List Modal -->
+    <div class="session-list-overlay" id="session-list-overlay">
+        <div class="session-list-container">
+            <div class="session-list-header">
+                <h2 class="session-list-title">Load Chat Session</h2>
+                <button class="session-list-close" onclick="closeSessionList()">×</button>
+            </div>
+            <div class="session-list-search">
+                <input type="text" class="session-list-search-input" placeholder="Search sessions...">
+            </div>
+            <div class="session-list-content">
+                <div class="session-list-grid" id="session-list-grid">
+                    <!-- Session items will be dynamically added here -->
+                </div>
+            </div>
+            <div class="session-list-footer">
+                <div class="session-list-info">Select a session to load</div>
+                <button class="session-list-load" onclick="loadSelectedSession()" disabled>Load</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save As Modal -->
+    <div class="session-modal-overlay" id="session-modal-overlay">
+        <div class="session-modal-container">
+            <div class="session-modal-header">
+                <h2 class="session-modal-title">Save Chat Session As</h2>
+                <button class="session-modal-close" onclick="closeSessionModal()">×</button>
+            </div>
+            <div class="session-modal-content">
+                <div class="session-modal-form-group">
+                    <label class="session-modal-label">Session Name</label>
+                    <input type="text" class="session-modal-input" id="session-name-input" placeholder="Enter session name...">
+                </div>
+                <div class="session-modal-form-group">
+                    <label class="session-modal-label">Description (Optional)</label>
+                    <textarea class="session-modal-textarea" id="session-desc-input" placeholder="Enter session description..."></textarea>
+                </div>
+            </div>
+            <div class="session-modal-footer">
+                <button class="session-modal-cancel" onclick="closeSessionModal()">Cancel</button>
+                <button class="session-modal-save" onclick="confirmSaveAs()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/theme.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/chat-session.js"></script>
+    <script src="js/loading-progress.js"></script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+    HOWL Chat - World Page
+    
+    World management page for creating, editing, and organizing worlds.
+    Features world creation with image picker, scenario/character attachments,
+    and hotswap capability for seamless world switching in chat.
+    
+    @module world
+    @version 1.0.0
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Creation - HOWL Chat</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/menu-components.css">
+    <link rel="stylesheet" href="css/nav-components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/ambient.css">
+    <link rel="stylesheet" href="css/world-header.css">
+    <link rel="stylesheet" href="css/world-grid.css">
+    <link rel="stylesheet" href="css/world-bubble.css">
+    <link rel="stylesheet" href="css/world-creation-popup.css">
+    <link rel="stylesheet" href="css/world-form.css">
+    <link rel="stylesheet" href="css/world-dropdown-item.css">
+    <link rel="stylesheet" href="css/nav-icon-images.css">
+</head>
+<body>
+    <!-- Ambient Background Effects -->
+    <div class="ambient-bg">
+        <div class="ambient-orb-1"></div>
+        <div class="ambient-orb-2"></div>
+        <div class="hexagon-grid"></div>
+    </div>
+
+    <!-- Top Menu -->
+    <div class="top-menu">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="assets/HOWL.png" alt="HOWL Chat" style="width: 44px; height: 44px;">
+            <div class="app-title">HOWL Chat</div>
+        </div>
+        <div class="menu-bar">
+            <div class="menu-item">
+                <button class="menu-button">File</button>
+                <div class="dropdown" id="file-dropdown">
+                    <div class="dropdown-item">New Chat</div>
+                    <div class="dropdown-item">Load Chat</div>
+                    <div class="dropdown-item">Save Chat</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Settings</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Exit</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button">Edit</button>
+                <div class="dropdown" id="edit-dropdown">
+                    <div class="dropdown-item">Undo</div>
+                    <div class="dropdown-item">Redo</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Copy</div>
+                    <div class="dropdown-item">Paste</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button">View</button>
+                <div class="dropdown" id="view-dropdown">
+                    <div class="dropdown-item">World</div>
+                    <div class="dropdown-item">Characters</div>
+                    <div class="dropdown-item">Scenarios</div>
+                    <div class="dropdown-item">Lorebooks</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button">Help</button>
+                <div class="dropdown" id="help-dropdown">
+                    <div class="dropdown-item">Documentation</div>
+                    <div class="dropdown-item">About</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navigation Sidebar -->
+        <div class="nav-sidebar">
+            <div class="nav-item" onclick="navigateTo('index.html')">
+                <img src="assets/quill.png" alt="Chat" class="nav-icon-img">
+            </div>
+            <div class="nav-item active" onclick="navigateTo('world.html')">
+                <img src="assets/globe.png" alt="World" class="nav-icon-img">
+            </div>
+            <div class="nav-item">
+                <img src="assets/Character.png" alt="Characters" class="nav-icon-img">
+            </div>
+            <div class="nav-item">
+                <img src="assets/scroll.png" alt="Scenarios" class="nav-icon-img">
+            </div>
+            <div class="nav-item">
+                <img src="assets/spellbook.png" alt="Lorebooks" class="nav-icon-img">
+            </div>
+            <div class="nav-item">
+                <img src="assets/brush.png" alt="Image Generator" class="nav-icon-img">
+            </div>
+        </div>
+
+        <!-- World Content Area -->
+        <div class="world-content">
+            <!-- World Page Header -->
+            <div class="world-page-header">
+                <h1 class="world-page-title">World Creation Menu</h1>
+                <button class="create-world-button" onclick="openWorldCreationPopup()">Create New World</button>
+            </div>
+
+            <!-- World Grid -->
+            <div class="world-grid" id="world-grid">
+                <!-- World bubbles will be dynamically added here -->
+                <div class="world-grid-empty">
+                    <div class="world-grid-empty-icon">🌍</div>
+                    <div class="world-grid-empty-text">No worlds created yet</div>
+                    <div class="world-grid-empty-subtext">Click "Create New World" to get started</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- World Creation Popup -->
+    <div class="world-creation-overlay" id="world-creation-overlay">
+        <div class="world-creation-popup">
+            <div class="world-creation-header">
+                <h2 class="world-creation-title">Create New World</h2>
+                <button class="world-creation-close" onclick="closeWorldCreationPopup()">×</button>
+            </div>
+            <div class="world-creation-content">
+                <div class="world-form-group">
+                    <label class="world-form-label">Title</label>
+                    <input type="text" class="world-title-input" id="world-title" placeholder="Enter world title...">
+                </div>
+                <div class="world-form-group">
+                    <label class="world-form-label">World Image</label>
+                    <div class="world-image-picker" id="world-image-picker" onclick="document.getElementById('world-image-input').click()">
+                        <div class="world-image-picker-placeholder" id="world-image-placeholder">
+                            <div class="world-image-picker-icon">📷</div>
+                            <div class="world-image-picker-text">Click to select image</div>
+                        </div>
+                        <img class="world-image-preview" id="world-image-preview" style="display: none;">
+                        <button class="world-image-remove" id="world-image-remove" style="display: none;" onclick="removeWorldImage(event)">×</button>
+                        <input type="file" id="world-image-input" accept="image/*" style="display: none;" onchange="handleWorldImageSelect(event)">
+                    </div>
+                </div>
+                <div class="world-form-group">
+                    <label class="world-form-label">World Details</label>
+                    <textarea class="world-details-textarea" id="world-details" placeholder="Describe your world..."></textarea>
+                </div>
+                <div class="world-form-group">
+                    <label class="world-form-label">Scenarios</label>
+                    <div class="world-dropdown-container" id="scenario-dropdown">
+                        <div class="world-dropdown-trigger" onclick="toggleDropdown('scenario-dropdown')">
+                            <span id="scenario-dropdown-text">Select scenarios...</span>
+                            <span class="world-dropdown-arrow">▼</span>
+                        </div>
+                        <div class="world-dropdown-menu">
+                            <div class="world-dropdown-search">
+                                <input type="text" class="world-dropdown-search-input" placeholder="Search scenarios...">
+                            </div>
+                            <div id="scenario-dropdown-items">
+                                <!-- Scenario items will be dynamically added here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="world-selected-items" id="scenario-selected-items"></div>
+                </div>
+                <div class="world-form-group">
+                    <label class="world-form-label">Characters</label>
+                    <div class="world-dropdown-container" id="character-dropdown">
+                        <div class="world-dropdown-trigger" onclick="toggleDropdown('character-dropdown')">
+                            <span id="character-dropdown-text">Select characters...</span>
+                            <span class="world-dropdown-arrow">▼</span>
+                        </div>
+                        <div class="world-dropdown-menu">
+                            <div class="world-dropdown-search">
+                                <input type="text" class="world-dropdown-search-input" placeholder="Search characters...">
+                            </div>
+                            <div id="character-dropdown-items">
+                                <!-- Character items will be dynamically added here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="world-selected-items" id="character-selected-items"></div>
+                </div>
+            </div>
+            <div class="world-creation-footer">
+                <button class="world-creation-cancel" onclick="closeWorldCreationPopup()">Cancel</button>
+                <button class="world-creation-save" onclick="saveWorld()">Save World</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/theme.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/world.js"></script>
+    <script src="js/navigation.js"></script>
+</body>
+</html>
