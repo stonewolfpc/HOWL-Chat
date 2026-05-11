@@ -106,12 +106,9 @@ func (r *Recognizer) Transcribe(ctx context.Context, audioPath string, callback 
 		callback(5, "Loading audio...")
 	}
 
-	// Ensure compatible format (whisper needs 16kHz mono WAV)
-	compatiblePath, err := r.ensureWAVFormat(ctx, audioPath)
-	if err != nil {
-		return nil, err
-	}
-	defer r.cleanupTempFile(compatiblePath)
+	// Skip audio conversion for now - whisper-cli handles MP3 directly
+	// This avoids temp directory path issues
+	compatiblePath := audioPath
 
 	// Report progress - processing
 	if callback != nil {
@@ -233,12 +230,11 @@ func (r *Recognizer) ensureWAVFormat(ctx context.Context, inputPath string) (str
 
 // runWhisperCLI executes the whisper-cli command and returns output JSON path
 func (r *Recognizer) runWhisperCLI(ctx context.Context, audioPath string, callback types.ProgressCallback) (string, error) {
-	// whisper-cli saves output to input file's directory
-	// Calculate expected output path
+	// whisper-cli appends .json to the full filename (including original extension)
+	// e.g., input.mp3 becomes input.mp3.json
 	inputDir := filepath.Dir(audioPath)
 	inputBase := filepath.Base(audioPath)
-	inputBaseNoExt := inputBase[:len(inputBase)-len(filepath.Ext(inputBase))]
-	expectedOutput := filepath.Join(inputDir, inputBaseNoExt+".json")
+	expectedOutput := filepath.Join(inputDir, inputBase+".json")
 
 	// Build command arguments - let whisper-cli handle audio format
 	args := []string{
@@ -270,21 +266,17 @@ func (r *Recognizer) runWhisperCLI(ctx context.Context, audioPath string, callba
 	// Execute command with context support
 	cmd := execCommand(r.whisperCliPath, args...)
 
-	fmt.Printf("DEBUG: Running command: %s %v\n", r.whisperCliPath, args)
-
 	// Run command with context cancellation support
 	type result struct {
-		output []byte
-		err    error
+		err error
 	}
 
 	resultChan := make(chan result, 1)
 	go func() {
-		output, err := cmd.CombinedOutput()
-		resultChan <- result{output, err}
+		_, err := cmd.CombinedOutput()
+		resultChan <- result{err}
 	}()
 
-	var output []byte
 	var err error
 
 	select {
@@ -299,19 +291,13 @@ func (r *Recognizer) runWhisperCLI(ctx context.Context, audioPath string, callba
 			ctx.Err(),
 		)
 	case res := <-resultChan:
-		output = res.output
 		err = res.err
-	}
-
-	fmt.Printf("DEBUG: whisper-cli output length: %d\n", len(output))
-	if len(output) > 0 && len(output) < 500 {
-		fmt.Printf("DEBUG: whisper-cli output: %s\n", string(output))
 	}
 
 	if err != nil {
 		return "", types.NewAudioError(
 			types.ErrCodeModelLoadFailed,
-			fmt.Sprintf("whisper-cli failed: %v\nOutput: %s", err, string(output)),
+			fmt.Sprintf("whisper-cli failed: %v", err),
 			err,
 		)
 	}
