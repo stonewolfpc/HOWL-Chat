@@ -13,6 +13,9 @@ type ChainConfig struct {
 	// Recognizers in priority order (highest priority first)
 	Recognizers []types.ASRRecognizer
 
+	// Model-to-recognizer mapping for hardware-based selection
+	RecognizerMap map[types.ASRModelType]types.ASRRecognizer
+
 	// Max attempts per recognizer before falling back
 	MaxAttempts int
 
@@ -143,11 +146,26 @@ func (c *FallbackChain) selectRecognizers() []types.ASRRecognizer {
 		recommendedModels = FilterModelsByTier(recommendedModels, c.config.MinMemoryTier)
 	}
 
-	// Map model types to recognizers
-	// This requires the chain to be configured with all possible recognizers
-	// For now, return all recognizers
-	// TODO: Implement proper model-to-recognizer mapping
-	return c.config.Recognizers
+	// Map model types to recognizers using the recognizer map
+	var selectedRecognizers []types.ASRRecognizer
+	seen := make(map[types.ASRRecognizer]bool)
+
+	for _, modelType := range recommendedModels {
+		if recognizer, ok := c.config.RecognizerMap[modelType]; ok {
+			// Avoid duplicates
+			if !seen[recognizer] {
+				selectedRecognizers = append(selectedRecognizers, recognizer)
+				seen[recognizer] = true
+			}
+		}
+	}
+
+	// If no recognizers selected, fall back to default list
+	if len(selectedRecognizers) == 0 {
+		return c.config.Recognizers
+	}
+
+	return selectedRecognizers
 }
 
 // isRetryableError checks if an error is worth retrying
