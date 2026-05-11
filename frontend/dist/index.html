@@ -44,8 +44,25 @@
     <script src="js/loading-progress.js"></script>
     <script src="js/sampler-settings.js"></script>
     <script src="js/model-settings.js"></script>
+    <script>
+        // Play startup sound on page load
+        window.addEventListener('load', function() {
+            const startupSound = document.getElementById('startupSound');
+            if (startupSound) {
+                startupSound.volume = 0.5; // Set volume to 50%
+                startupSound.play().catch(err => {
+                    console.log('Could not play startup sound:', err);
+                });
+            }
+        });
+    </script>
 </head>
 <body>
+    <!-- Startup Sound -->
+    <audio id="startupSound" preload="auto">
+        <source src="../assets/startup.mp3" type="audio/mpeg">
+    </audio>
+
     <!-- Ambient Background Effects (from Artherius) -->
     <div class="ambient-bg">
         <div class="ambient-orb-1"></div>
