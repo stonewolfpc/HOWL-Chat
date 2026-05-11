@@ -15,6 +15,9 @@ const (
 	ErrCodeEmptyResult
 	ErrCodeLanguageNotSupported
 	ErrCodeModelIncompatible
+	ErrCodeInvalidConfig
+	ErrCodeAPIError
+	ErrCodeFormatNotSupported
 )
 
 // NewModelNotLoadedError creates error when model hasn't been initialized
