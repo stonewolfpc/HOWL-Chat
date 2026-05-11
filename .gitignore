@@ -1,10 +1,9 @@
-# Audio models (too large for Git)
+# Audio models and binaries (large files)
 models/*.bin
 models/*.gguf
-
-# Audio binaries (user downloads)
 bin/*.exe
 bin/*.dll
+bin/*.zip
 
 # Build artifacts
 *.exe~

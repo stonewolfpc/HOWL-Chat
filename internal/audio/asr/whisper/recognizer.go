@@ -233,15 +233,18 @@ func (r *Recognizer) ensureWAVFormat(ctx context.Context, inputPath string) (str
 
 // runWhisperCLI executes the whisper-cli command and returns output JSON path
 func (r *Recognizer) runWhisperCLI(ctx context.Context, audioPath string, callback types.ProgressCallback) (string, error) {
-	// Generate output path
-	outputPath := filepath.Join(r.tempDir, fmt.Sprintf("whisper_output_%d.json", time.Now().Unix()))
+	// whisper-cli saves output to input file's directory
+	// Calculate expected output path
+	inputDir := filepath.Dir(audioPath)
+	inputBase := filepath.Base(audioPath)
+	inputBaseNoExt := inputBase[:len(inputBase)-len(filepath.Ext(inputBase))]
+	expectedOutput := filepath.Join(inputDir, inputBaseNoExt+".json")
 
-	// Build command arguments
+	// Build command arguments - let whisper-cli handle audio format
 	args := []string{
 		"--model", r.modelPath,
 		"--file", audioPath,
 		"--output-json",
-		"--output-file", outputPath,
 	}
 
 	// Add language if specified (not auto)
@@ -257,9 +260,6 @@ func (r *Recognizer) runWhisperCLI(ctx context.Context, audioPath string, callba
 	if config.BestOf > 0 {
 		args = append(args, "--best-of", fmt.Sprintf("%d", config.BestOf))
 	}
-	if config.Temperature > 0 {
-		args = append(args, "--temperature", fmt.Sprintf("%.2f", config.Temperature))
-	}
 	if config.NumThreads > 0 {
 		args = append(args, "--threads", fmt.Sprintf("%d", config.NumThreads))
 	}
@@ -269,6 +269,8 @@ func (r *Recognizer) runWhisperCLI(ctx context.Context, audioPath string, callba
 
 	// Execute command with context support
 	cmd := execCommand(r.whisperCliPath, args...)
+
+	fmt.Printf("DEBUG: Running command: %s %v\n", r.whisperCliPath, args)
 
 	// Run command with context cancellation support
 	type result struct {
@@ -301,6 +303,11 @@ func (r *Recognizer) runWhisperCLI(ctx context.Context, audioPath string, callba
 		err = res.err
 	}
 
+	fmt.Printf("DEBUG: whisper-cli output length: %d\n", len(output))
+	if len(output) > 0 && len(output) < 500 {
+		fmt.Printf("DEBUG: whisper-cli output: %s\n", string(output))
+	}
+
 	if err != nil {
 		return "", types.NewAudioError(
 			types.ErrCodeModelLoadFailed,
@@ -310,15 +317,15 @@ func (r *Recognizer) runWhisperCLI(ctx context.Context, audioPath string, callba
 	}
 
 	// Verify output file was created
-	if _, err := os.Stat(outputPath); err != nil {
+	if _, err := os.Stat(expectedOutput); err != nil {
 		return "", types.NewAudioError(
 			types.ErrCodeModelLoadFailed,
-			"whisper-cli did not produce output file",
+			fmt.Sprintf("whisper-cli did not produce output file at %s", expectedOutput),
 			err,
 		)
 	}
 
-	return outputPath, nil
+	return expectedOutput, nil
 }
 
 // cleanupTempFile removes a temporary file if it's in our temp directory
@@ -330,6 +337,15 @@ func (r *Recognizer) cleanupTempFile(path string) {
 	if filepath.Dir(path) == r.tempDir {
 		os.Remove(path)
 	}
+}
+
+// copyFile copies a file from src to dst
+func copyFile(src, dst string) error {
+	input, err := os.ReadFile(src)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(dst, input, 0644)
 }
 
 // execCommand is a helper to create exec.Command for testing purposes
