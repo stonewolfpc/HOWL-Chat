@@ -234,3 +234,89 @@
     border-color: rgba(20, 184, 166, 0.6);
     box-shadow: 0 0 15px rgba(20, 184, 166, 0.3);
 }
+
+/* Think Area */
+.chat-think {
+    margin-top: 8px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.thinking-toggle {
+    font-size: 12px;
+    opacity: 0.7;
+    cursor: pointer;
+    margin-top: 6px;
+    color: var(--theme-color);
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.thinking-toggle:hover {
+    opacity: 1;
+    background: rgba(100, 100, 100, 0.15);
+}
+
+.thinking-block {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+    background: rgba(21, 21, 31, 0.5);
+    border-left: 2px solid var(--theme-color);
+    margin-top: 6px;
+    padding: 0 10px;
+    border-radius: 4px;
+}
+
+.thinking-block.open {
+    max-height: 500px;
+    padding: 10px;
+}
+
+.thinking-block pre {
+    margin: 0;
+    font-size: 12px;
+    color: var(--static-text);
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+/* Image Preview */
+.image-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    background: rgba(21, 21, 31, 0.5);
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.image-preview img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.remove-image {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: var(--static-text);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.remove-image:hover {
+    background: rgba(255, 100, 100, 0.3);
+}

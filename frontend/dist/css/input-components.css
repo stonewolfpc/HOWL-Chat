@@ -86,3 +86,27 @@
 .input-icon:hover svg {
     stroke: var(--theme-color);
 }
+
+/* TTS Icon - Distinct styling for Text-to-Speech */
+.input-icon.tts-icon {
+    border-color: rgba(100, 100, 100, 0.3);
+}
+
+.input-icon.tts-icon:hover {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.3);
+}
+
+.input-icon.tts-icon:hover svg {
+    stroke: #8b5cf6;
+}
+
+.input-icon.tts-icon.active {
+    background: rgba(139, 92, 246, 0.3);
+    border-color: #8b5cf6;
+}
+
+.input-icon.tts-icon.active svg {
+    stroke: #8b5cf6;
+}

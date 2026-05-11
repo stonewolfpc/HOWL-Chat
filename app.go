@@ -2,16 +2,16 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
+	"howl-chat/internal/backend/gguf"
+	"howl-chat/internal/backend/llama"
+	"howl-chat/internal/backend/types"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
-
-	"howl-chat/internal/backend/gguf"
-	"howl-chat/internal/backend/llama"
-	"howl-chat/internal/backend/types"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -80,6 +80,15 @@ func spawnLlamaServerWithModel(modelPath string, settings map[string]interface{}
 		"-ngl", intSetting(settings, "gpu_layers", 0),
 	}
 
+	// Auto-detect and add mmproj file for vision models
+	mmprojPath := findMMProj(modelPath)
+	if mmprojPath != "" {
+		args = append(args, "--mmproj", mmprojPath)
+		fmt.Printf("INFO: Auto-detected mmproj file: %s\n", mmprojPath)
+	} else {
+		fmt.Printf("INFO: No mmproj file found for model: %s\n", modelPath)
+	}
+
 	// Optional: rope scaling
 	if rs := strSetting(settings, "rope_mode", ""); rs != "" {
 		args = append(args, "--rope-scaling", rs)
@@ -116,6 +125,42 @@ func spawnLlamaServerWithModel(modelPath string, settings map[string]interface{}
 	}
 	fmt.Printf("INFO: llama-server started (pid %d) with model %s\n", cmd.Process.Pid, modelPath)
 	return cmd, nil
+}
+
+// findMMProj searches for an mmproj file in the same directory as the model
+// Per llama.cpp docs: mmproj file name must start with "mmproj" (e.g., mmproj-F16.gguf)
+func findMMProj(modelPath string) string {
+	dir := filepath.Dir(modelPath)
+	baseName := filepath.Base(modelPath)
+
+	// Remove extension from model name
+	modelName := strings.TrimSuffix(baseName, filepath.Ext(baseName))
+
+	// Try common mmproj naming patterns
+	// llama.cpp convention: file name must start with "mmproj"
+	patterns := []string{
+		filepath.Join(dir, "mmproj-F16.gguf"),
+		filepath.Join(dir, "mmproj-Q4_0.gguf"),
+		filepath.Join(dir, "mmproj-Q4_K_M.gguf"),
+		filepath.Join(dir, "mmproj-Q8_0.gguf"),
+		filepath.Join(dir, "mmproj-f16.gguf"),
+		filepath.Join(dir, "mmproj-q4_0.gguf"),
+		filepath.Join(dir, "mmproj-q4_k_m.gguf"),
+		filepath.Join(dir, "mmproj-q8_0.gguf"),
+		filepath.Join(dir, "mmproj.gguf"),
+		filepath.Join(dir, modelName+"-mmproj.gguf"),
+		filepath.Join(dir, modelName+".mmproj.gguf"),
+	}
+
+	for _, pattern := range patterns {
+		if _, err := os.Stat(pattern); err == nil {
+			return pattern
+		}
+	}
+
+	// No mmproj file found - do NOT scan directory
+	// This prevents picking up unrelated files like tokenizer.gguf
+	return ""
 }
 
 // NewApp creates a new instance of the App struct
@@ -311,8 +356,23 @@ func (a *App) SendMessage(message string) (string, error) {
 // SendMessageStream sends a message and streams the response via Wails events
 // Emits: chat:start, chat:chunk (for each token), chat:complete, chat:error
 func (a *App) SendMessageStream(message string) error {
+	return a.SendMessageStreamWithImage(message, "")
+}
+
+// SendMessageStreamWithImage sends a message with optional image and streams the response
+func (a *App) SendMessageStreamWithImage(message string, imageData string) error {
 	if a.httpClient == nil {
 		return fmt.Errorf("llama client not initialized")
+	}
+
+	// Decode base64 image data if provided
+	var imageBytes []byte
+	var err error
+	if imageData != "" {
+		imageBytes, err = base64.StdEncoding.DecodeString(imageData)
+		if err != nil {
+			return fmt.Errorf("failed to decode image data: %w", err)
+		}
 	}
 
 	// Add user message to history first
@@ -359,26 +419,11 @@ func (a *App) SendMessageStream(message string) error {
 		if v, ok := s["repeat_last_n"].(float64); ok {
 			opts.RepeatLastN = int(v)
 		}
-		if v, ok := s["frequency_penalty_enabled"].(bool); ok {
-			opts.FrequencyPenaltyEnabled = v
-		}
-		if v, ok := s["frequency_penalty"].(float64); ok {
-			opts.FrequencyPenalty = v
-		}
-		if v, ok := s["presence_penalty_enabled"].(bool); ok {
-			opts.PresencePenaltyEnabled = v
-		}
-		if v, ok := s["presence_penalty"].(float64); ok {
-			opts.PresencePenalty = v
-		}
 		if v, ok := s["mirostat"].(float64); ok {
 			opts.Mirostat = int(v)
 		}
 		if v, ok := s["mirostat_tau"].(float64); ok {
 			opts.MirostatTau = v
-		}
-		if v, ok := s["mirostat_eta"].(float64); ok {
-			opts.MirostatETA = v
 		}
 		if v, ok := s["dynamic_temp_range"].(float64); ok {
 			opts.DynamicTempRange = v
@@ -427,25 +472,56 @@ func (a *App) SendMessageStream(message string) error {
 
 	var response strings.Builder
 
-	// Stream the response
-	err := a.httpClient.GenerateStream(prompt, opts, func(chunk string, done bool) {
-		select {
-		case <-streamCtx.Done():
-			// Stream was cancelled
-			return
-		default:
-			response.WriteString(chunk)
-			runtime.EventsEmit(a.ctx, "chat:chunk", chunk)
+	// Stream the response with or without image
+	chunkCount := 0
+	if len(imageBytes) > 0 {
+		fmt.Printf("DEBUG: Starting image stream with prompt len=%d, image size=%d bytes\n", len(prompt), len(imageBytes))
+		err := a.httpClient.GenerateStreamWithImage(prompt, imageBytes, opts, func(chunk string, done bool) {
+			select {
+			case <-streamCtx.Done():
+				// Stream was cancelled
+				fmt.Printf("DEBUG: Stream cancelled by context\n")
+				return
+			default:
+				if done {
+					fmt.Printf("DEBUG: Image stream completed, total chunks emitted=%d, response len=%d\n", chunkCount, response.Len())
+					return
+				}
+				response.WriteString(chunk)
+				runtime.EventsEmit(a.ctx, "chat:chunk", chunk)
+				chunkCount++
+				if chunkCount <= 5 || chunkCount%50 == 0 {
+					fmt.Printf("DEBUG: Emitting chat:chunk #%d, len=%d: %q\n", chunkCount, len(chunk), chunk[:min(50, len(chunk))])
+				}
+			}
+		})
+		if err != nil {
+			fmt.Printf("DEBUG: Image stream error: %v\n", err)
+			runtime.EventsEmit(a.ctx, "chat:error", err.Error())
+			return err
 		}
-	})
+		fmt.Printf("DEBUG: Image stream finished successfully, chunks=%d, response len=%d\n", chunkCount, response.Len())
+	} else {
+		err := a.httpClient.GenerateStream(prompt, opts, func(chunk string, done bool) {
+			select {
+			case <-streamCtx.Done():
+				return
+			default:
+				if done {
+					return
+				}
+				response.WriteString(chunk)
+				runtime.EventsEmit(a.ctx, "chat:chunk", chunk)
+			}
+		})
+		if err != nil {
+			runtime.EventsEmit(a.ctx, "chat:error", err.Error())
+			return err
+		}
+	}
 
 	// Clear the cancel function when done
 	a.streamCancel = nil
-
-	if err != nil {
-		runtime.EventsEmit(a.ctx, "chat:error", err.Error())
-		return err
-	}
 
 	// Add assistant message to history
 	a.chatMessages = append(a.chatMessages, map[string]interface{}{
@@ -500,26 +576,46 @@ func (a *App) LoadModel(modelPath string) error {
 		return fmt.Errorf("model path cannot be empty")
 	}
 
-	// Kill existing server if running
+	// Stop any existing llama-server
 	if a.serverProc != nil && a.serverProc.Process != nil {
 		_ = a.serverProc.Process.Kill()
 		_ = a.serverProc.Wait()
-		a.serverProc = nil
-		time.Sleep(500 * time.Millisecond)
+		fmt.Printf("INFO: stopped existing llama-server (pid %d)\n", a.serverProc.Process.Pid)
 	}
 
-	// Emit loading started
-	runtime.EventsEmit(a.ctx, "model:loading", modelPath)
+	// Extract GGUF metadata to get chat template
+	fmt.Printf("INFO: Reading GGUF metadata from: %s\n", modelPath)
+	profile, err := gguf.ExtractModelProfile(modelPath)
+	if err != nil {
+		fmt.Printf("WARN: Failed to extract GGUF metadata: %v\n", err)
+	} else {
+		template := profile.Template
+		// For Gemma 4 models, use known-good Jinja2 template
+		// Handlebars templates from GGUF don't work well with llama.cpp
+		if strings.Contains(template, "{{#each") || strings.Contains(profile.Family, "gemma4") {
+			template = "{%- for message in messages %}{{ message.role }}: {{ message.content }}\n{% endfor %}assistant:\n"
+			fmt.Printf("INFO: Using built-in Gemma 4 Jinja2 template\n")
+		}
+		fmt.Printf("INFO: Extracted model profile - Family: %s\n", profile.Family)
+		// If we have a chat template and user hasn't set a custom one, use it
+		if template != "" {
+			if a.modelSettings == nil {
+				a.modelSettings = make(map[string]interface{})
+			}
+			// Only set if not already configured by user
+			if _, exists := a.modelSettings["custom_jinja_template"]; !exists {
+				a.modelSettings["custom_jinja_template"] = template
+				fmt.Printf("INFO: Using chat template\n")
+			}
+		}
+	}
 
-	// Spawn new server with this model and current settings
+	// Spawn new llama-server process with current settings
 	cmd, err := spawnLlamaServerWithModel(modelPath, a.modelSettings)
 	if err != nil {
-		runtime.EventsEmit(a.ctx, "model:error", err.Error())
-		return fmt.Errorf("failed to start llama-server: %w", err)
+		return fmt.Errorf("failed to spawn llama-server: %w", err)
 	}
 	a.serverProc = cmd
-
-	// Wait in background; emit progress events so the UI can animate smoothly
 	go func() {
 		for i := 0; i < 120; i++ {
 			time.Sleep(500 * time.Millisecond)
@@ -727,4 +823,11 @@ func (a *App) UpdatePromptSettings(settings *types.PromptSettings) error {
 	a.modelSettings["stop_sequences"] = settings.StopSequences
 
 	return nil
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }

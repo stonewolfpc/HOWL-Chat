@@ -3,11 +3,14 @@ package llama
 import (
 	"bufio"
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"howl-chat/internal/backend/types"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -30,7 +33,7 @@ func NewHTTPClient(host string, port int, enabled bool) *HTTPClient {
 	return &HTTPClient{
 		baseURL: fmt.Sprintf("http://%s:%d", host, port),
 		httpClient: &http.Client{
-			Timeout: 60 * time.Second,
+			Timeout: 300 * time.Second, // 5 minutes for vision/image processing
 		},
 		enabled: true,
 	}
@@ -164,6 +167,8 @@ func (c *HTTPClient) GenerateChatCompletionStreaming(req *ChatCompletionRequest,
 
 	// Handle streaming response
 	scanner := bufio.NewScanner(resp.Body)
+	chunkCount := 0
+	totalContent := 0
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" || line == "[DONE]" {
@@ -172,6 +177,7 @@ func (c *HTTPClient) GenerateChatCompletionStreaming(req *ChatCompletionRequest,
 		if strings.HasPrefix(line, "data: ") {
 			jsonStr := strings.TrimPrefix(line, "data: ")
 			if jsonStr == "[DONE]" {
+				fmt.Printf("DEBUG: Stream received [DONE] signal, chunks=%d, totalContent=%d\n", chunkCount, totalContent)
 				break
 			}
 			var chunk struct {
@@ -188,19 +194,36 @@ func (c *HTTPClient) GenerateChatCompletionStreaming(req *ChatCompletionRequest,
 					reasoning := chunk.Choices[0].Delta.ReasoningContent
 					if content != "" {
 						callback(content)
+						chunkCount++
+						totalContent += len(content)
+						if chunkCount <= 5 || chunkCount%50 == 0 {
+							fmt.Printf("DEBUG: Stream chunk %d, content len=%d: %q\n", chunkCount, len(content), content[:min(50, len(content))])
+						}
 					}
 					if reasoning != "" {
 						callback(reasoning)
+						chunkCount++
+						totalContent += len(reasoning)
 					}
 				}
+			} else {
+				fmt.Printf("DEBUG: Failed to unmarshal chunk: %v\n", err)
 			}
 		}
 	}
 	if err := scanner.Err(); err != nil {
 		return fmt.Errorf("scanner error: %w", err)
 	}
+	fmt.Printf("DEBUG: Stream completed, total chunks=%d, total content=%d bytes\n", chunkCount, totalContent)
 
 	return nil
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 // LoadModel loads a model into llama.cpp (implements Client interface)
@@ -216,10 +239,21 @@ func (c *HTTPClient) LoadModel(modelPath string, options *LoadOptions) error {
 		"model": modelPath, // full absolute path
 	}
 
+	// Auto-detect mmproj file in the same directory
+	mmprojPath := findMMProj(modelPath)
+	if mmprojPath != "" {
+		requestBody["mmproj"] = mmprojPath
+		fmt.Printf("INFO: Auto-detected mmproj file: %s\n", mmprojPath)
+	} else {
+		fmt.Printf("INFO: No mmproj file found for model: %s\n", modelPath)
+	}
+
 	jsonBody, err := json.Marshal(requestBody)
 	if err != nil {
 		return fmt.Errorf("failed to marshal load request: %w", err)
 	}
+
+	fmt.Printf("DEBUG: Load request body: %s\n", string(jsonBody))
 
 	resp, err := c.httpClient.Post(loadURL, "application/json", bytes.NewBuffer(jsonBody))
 	if err != nil {
@@ -233,6 +267,50 @@ func (c *HTTPClient) LoadModel(modelPath string, options *LoadOptions) error {
 	}
 
 	return nil
+}
+
+// findMMProj searches for an mmproj file in the same directory as the model
+// Per llama.cpp docs: mmproj file name must start with "mmproj" (e.g., mmproj-F16.gguf)
+func findMMProj(modelPath string) string {
+	dir := filepath.Dir(modelPath)
+	baseName := filepath.Base(modelPath)
+
+	// Remove extension from model name
+	modelName := strings.TrimSuffix(baseName, filepath.Ext(baseName))
+
+	// Try common mmproj naming patterns
+	// llama.cpp convention: file name must start with "mmproj"
+	patterns := []string{
+		filepath.Join(dir, "mmproj-F16.gguf"),
+		filepath.Join(dir, "mmproj-Q4_0.gguf"),
+		filepath.Join(dir, "mmproj-Q4_K_M.gguf"),
+		filepath.Join(dir, "mmproj-Q8_0.gguf"),
+		filepath.Join(dir, "mmproj-f16.gguf"),
+		filepath.Join(dir, "mmproj-q4_0.gguf"),
+		filepath.Join(dir, "mmproj-q4_k_m.gguf"),
+		filepath.Join(dir, "mmproj-q8_0.gguf"),
+		filepath.Join(dir, "mmproj.gguf"),
+		filepath.Join(dir, modelName+"-mmproj.gguf"),
+		filepath.Join(dir, modelName+".mmproj.gguf"),
+	}
+
+	for _, pattern := range patterns {
+		if _, err := os.Stat(pattern); err == nil {
+			return pattern
+		}
+	}
+
+	// If no specific pattern matches, look for any file starting with "mmproj"
+	entries, err := os.ReadDir(dir)
+	if err == nil {
+		for _, entry := range entries {
+			if !entry.IsDir() && strings.HasPrefix(strings.ToLower(entry.Name()), "mmproj") && strings.HasSuffix(strings.ToLower(entry.Name()), ".gguf") {
+				return filepath.Join(dir, entry.Name())
+			}
+		}
+	}
+
+	return ""
 }
 
 // LoadModelWithMMProj loads a model with optional mmproj file for vision models
@@ -333,9 +411,28 @@ func (c *HTTPClient) Generate(prompt string, options *InferenceOptions) (string,
 
 // buildRequest constructs a ChatCompletionRequest from InferenceOptions
 func buildRequest(model string, prompt string, options *InferenceOptions, stream bool) *ChatCompletionRequest {
+	return buildRequestWithImage(model, prompt, options, stream, nil)
+}
+
+// buildRequestWithImage constructs a ChatCompletionRequest with optional image data
+func buildRequestWithImage(model string, prompt string, options *InferenceOptions, stream bool, imageData []byte) *ChatCompletionRequest {
+	var content interface{}
+	if imageData != nil {
+		// OpenAI vision format with image
+		content = []ImageContent{
+			{Type: "text", Text: prompt},
+			{Type: "image_url", ImageURL: &ImageURL{
+				URL:    fmt.Sprintf("data:image/jpeg;base64,%s", base64Encode(imageData)),
+				Detail: "auto",
+			}},
+		}
+	} else {
+		content = prompt
+	}
+
 	req := &ChatCompletionRequest{
 		Model:    model,
-		Messages: []ChatMessage{{Role: "user", Content: prompt}},
+		Messages: []ChatMessage{{Role: "user", Content: content}},
 		Stream:   stream,
 
 		MaxTokens:         options.NPredict,
@@ -384,12 +481,37 @@ func buildRequest(model string, prompt string, options *InferenceOptions, stream
 	return req
 }
 
+// base64Encode encodes bytes to base64 string
+func base64Encode(data []byte) string {
+	return base64.StdEncoding.EncodeToString(data)
+}
+
+// GenerateStreamWithImage generates text completion with streaming output and optional image
+func (c *HTTPClient) GenerateStreamWithImage(prompt string, imageData []byte, options *InferenceOptions, callback TokenCallback) error {
+	req := buildRequestWithImage("model", prompt, options, true, imageData)
+	err := c.GenerateChatCompletionStreaming(req, func(chunk string) {
+		callback(chunk, false)
+	})
+	if err != nil {
+		return err
+	}
+	// Signal completion
+	callback("", true)
+	return nil
+}
+
 // GenerateStream generates text completion with streaming output (implements Client interface)
 func (c *HTTPClient) GenerateStream(prompt string, options *InferenceOptions, callback TokenCallback) error {
 	req := buildRequest("model", prompt, options, true)
-	return c.GenerateChatCompletionStreaming(req, func(chunk string) {
+	err := c.GenerateChatCompletionStreaming(req, func(chunk string) {
 		callback(chunk, false)
 	})
+	if err != nil {
+		return err
+	}
+	// Signal completion
+	callback("", true)
+	return nil
 }
 
 // Tokenize converts text to token IDs (implements Client interface)

@@ -123,6 +123,15 @@ function streamAssistantResponse(sender, fullText) {
 
 // Stream assistant response from backend with real token streaming
 let currentStreamingBubble = null;
+let thinkStartTime = null;
+let thinkContent = '';
+let mainContent = '';
+let isInThinkMode = false;
+
+// Regex patterns for think block detection
+// Gemma 4 uses special tokens: <|channel>thought for start, <channel|> for end
+const THINK_START_REGEX = /<\|channel>thought/i;
+const THINK_END_REGEX = /<channel\|>/i;
 
 function streamAssistantResponseFromBackend(message) {
     const chatHistory = document.querySelector('.chat-messages');
@@ -136,6 +145,7 @@ function streamAssistantResponseFromBackend(message) {
     bubble.innerHTML = `
         <div class="chat-sender">AI<span class="typing-indicator"><span></span><span></span><span></span></span></div>
         <div class="chat-text"></div>
+        <div class="chat-think"></div>
         <div class="chat-bubble-buttons">
             <button class="bubble-button icon-button" onclick="regenerateMessage(this)" title="Regenerate">${ICONS.regenerate}</button>
             <button class="bubble-button icon-button" onclick="previousMessage(this)" title="Previous" id="prev-btn">${ICONS.previous}</button>
@@ -151,7 +161,18 @@ function streamAssistantResponseFromBackend(message) {
     chatHistory.appendChild(messageDiv);
     chatHistory.scrollTop = chatHistory.scrollHeight;
 
+    // Set current streaming bubble reference so onChunk can find the elements
     currentStreamingBubble = bubble;
+
+    const textElement = bubble.querySelector('.chat-text');
+    const thinkArea = bubble.querySelector('.chat-think');
+
+    // Reset think state
+    thinkContent = '';
+    mainContent = '';
+    isInThinkMode = false;
+    thinkStartTime = null;
+
     const onStart = () => {
         console.log('Stream started');
         // Switch send button to abort
@@ -164,8 +185,30 @@ function streamAssistantResponseFromBackend(message) {
 
     const onChunk = (chunk) => {
         if (currentStreamingBubble) {
-            const textElement = currentStreamingBubble.querySelector('.chat-text');
-            textElement.textContent += chunk;
+            // Check for start marker
+            if (THINK_START_REGEX.test(chunk)) {
+                isInThinkMode = true;
+                thinkStartTime = Date.now();
+                chunk = chunk.replace(THINK_START_REGEX, '');
+            }
+
+            // Check for end marker
+            if (THINK_END_REGEX.test(chunk)) {
+                isInThinkMode = false;
+                chunk = chunk.replace(THINK_END_REGEX, '');
+                // Update think area when done
+                if (thinkContent) {
+                    updateThinkArea(thinkArea, thinkContent, thinkStartTime);
+                }
+            }
+
+            // Route tokens to separate fields
+            if (isInThinkMode) {
+                thinkContent += chunk;
+            } else {
+                mainContent += chunk;
+                textElement.textContent = mainContent;
+            }
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
     };
@@ -177,6 +220,11 @@ function streamAssistantResponseFromBackend(message) {
             indicator.remove();
         }
         messageDiv.classList.remove('streaming');
+
+        // If there's think content, create collapsible area
+        if (thinkContent) {
+            updateThinkArea(thinkArea, thinkContent, thinkStartTime);
+        }
 
         // Switch abort button back to send
         const sendButton = document.querySelector('.send-button');
@@ -197,7 +245,6 @@ function streamAssistantResponseFromBackend(message) {
     };
 
     const onError = (err) => {
-        const textElement = bubble.querySelector('.chat-text');
         textElement.textContent += '\n[Error: ' + err + ']';
         const indicator = bubble.querySelector('.typing-indicator');
         if (indicator) {
@@ -257,7 +304,205 @@ function streamAssistantResponseFromBackend(message) {
     });
 }
 
-// Copy message text
+// Update think area with content and timer (collapsible, hidden by default)
+function updateThinkArea(thinkArea, content, startTime) {
+    if (!content) {
+        thinkArea.innerHTML = '';
+        thinkArea.style.display = 'none';
+        return;
+    }
+
+    const elapsed = startTime ? Date.now() - startTime : 0;
+    const elapsedSeconds = (elapsed / 1000).toFixed(1);
+
+    thinkArea.style.display = 'block';
+    thinkArea.innerHTML = `
+        <div class="thinking-toggle" onclick="toggleThink(this)">
+            <span>Show reasoning (${elapsedSeconds}s)</span>
+        </div>
+        <div class="thinking-block">
+            <pre>${content}</pre>
+        </div>
+    `;
+}
+
+// Toggle think area expansion
+function toggleThink(toggleElement) {
+    const thinkArea = toggleElement.closest('.chat-think');
+    const block = thinkArea.querySelector('.thinking-block');
+    const toggleText = toggleElement.querySelector('span');
+
+    if (block.classList.contains('open')) {
+        block.classList.remove('open');
+        toggleText.textContent = toggleText.textContent.replace('Hide', 'Show');
+    } else {
+        block.classList.add('open');
+        toggleText.textContent = toggleText.textContent.replace('Show', 'Hide');
+    }
+}
+
+// Stream assistant response from backend with image
+function streamAssistantResponseFromBackendWithImage(message, imageData) {
+    const chatHistory = document.querySelector('.chat-messages');
+
+    // Create assistant message bubble with typing indicator
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'chat-message assistant streaming';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble';
+    bubble.innerHTML = `
+        <div class="chat-sender">AI<span class="typing-indicator"><span></span><span></span><span></span></span></div>
+        <div class="chat-text"></div>
+        <div class="chat-think"></div>
+        <div class="chat-bubble-buttons">
+            <button class="bubble-button icon-button" onclick="regenerateMessage(this)" title="Regenerate">${ICONS.regenerate}</button>
+            <button class="bubble-button icon-button" onclick="previousMessage(this)" title="Previous" id="prev-btn">${ICONS.previous}</button>
+            <button class="bubble-button icon-button" onclick="nextMessage(this)" title="Next" id="next-btn">${ICONS.next}</button>
+            <button class="bubble-button icon-button" onclick="continueMessage(this)" title="Continue">${ICONS.continue}</button>
+            <button class="bubble-button icon-button" onclick="editMessage(this)" title="Edit">${ICONS.edit}</button>
+            <button class="bubble-button icon-button" onclick="copyMessage(this)" title="Copy">${ICONS.copy}</button>
+            <button class="bubble-button icon-button" onclick="deleteMessage(this)" title="Delete">${ICONS.delete}</button>
+        </div>
+    `;
+
+    messageDiv.appendChild(bubble);
+    chatHistory.appendChild(messageDiv);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+
+    // Set current streaming bubble reference so onChunk can find the elements
+    currentStreamingBubble = bubble;
+
+    const textElement = bubble.querySelector('.chat-text');
+    const thinkArea = bubble.querySelector('.chat-think');
+
+    // Reset think state
+    thinkContent = '';
+    mainContent = '';
+    isInThinkMode = false;
+    thinkStartTime = null;
+
+    const onStart = () => {
+        console.log('Stream started with image');
+        const sendButton = document.querySelector('.send-button');
+        if (sendButton) {
+            sendButton.textContent = 'Abort';
+            sendButton.dataset.isAbort = 'true';
+        }
+    };
+
+    const onChunk = (chunk) => {
+        if (currentStreamingBubble) {
+            // Check for start marker
+            if (THINK_START_REGEX.test(chunk)) {
+                isInThinkMode = true;
+                thinkStartTime = Date.now();
+                chunk = chunk.replace(THINK_START_REGEX, '');
+            }
+
+            // Check for end marker
+            if (THINK_END_REGEX.test(chunk)) {
+                isInThinkMode = false;
+                chunk = chunk.replace(THINK_END_REGEX, '');
+                if (thinkContent) {
+                    updateThinkArea(thinkArea, thinkContent, thinkStartTime);
+                }
+            }
+
+            // Route tokens to separate fields
+            if (isInThinkMode) {
+                thinkContent += chunk;
+            } else {
+                mainContent += chunk;
+                textElement.textContent = mainContent;
+            }
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+    };
+
+    const onComplete = () => {
+        const indicator = bubble.querySelector('.typing-indicator');
+        if (indicator) {
+            indicator.remove();
+        }
+        messageDiv.classList.remove('streaming');
+
+        if (thinkContent) {
+            updateThinkArea(thinkArea, thinkContent, thinkStartTime);
+        }
+
+        const sendButton = document.querySelector('.send-button');
+        if (sendButton) {
+            sendButton.textContent = 'Send';
+            sendButton.dataset.isAbort = 'false';
+        }
+
+        if (window.runtime) {
+            window.runtime.EventsOff('chat:chunk');
+            window.runtime.EventsOff('chat:complete');
+            window.runtime.EventsOff('chat:error');
+            window.runtime.EventsOff('chat:aborted');
+        }
+        currentStreamingBubble = null;
+        updateNavigationButtons();
+    };
+
+    const onError = (err) => {
+        textElement.textContent += '\n[Error: ' + err + ']';
+        const indicator = bubble.querySelector('.typing-indicator');
+        if (indicator) {
+            indicator.remove();
+        }
+        messageDiv.classList.remove('streaming');
+
+        const sendButton = document.querySelector('.send-button');
+        if (sendButton) {
+            sendButton.textContent = 'Send';
+            sendButton.dataset.isAbort = 'false';
+        }
+
+        currentStreamingBubble = null;
+    };
+
+    const onAborted = () => {
+        console.log('Stream aborted');
+        const indicator = bubble.querySelector('.typing-indicator');
+        if (indicator) {
+            indicator.remove();
+        }
+        messageDiv.classList.remove('streaming');
+
+        const sendButton = document.querySelector('.send-button');
+        if (sendButton) {
+            sendButton.textContent = 'Send';
+            sendButton.dataset.isAbort = 'false';
+        }
+
+        if (window.runtime) {
+            window.runtime.EventsOff('chat:chunk');
+            window.runtime.EventsOff('chat:complete');
+            window.runtime.EventsOff('chat:error');
+            window.runtime.EventsOff('chat:aborted');
+        }
+        currentStreamingBubble = null;
+    };
+
+    if (window.runtime) {
+        window.runtime.EventsOn('chat:start', onStart);
+        window.runtime.EventsOn('chat:chunk', onChunk);
+        window.runtime.EventsOn('chat:complete', onComplete);
+        window.runtime.EventsOn('chat:error', onError);
+        window.runtime.EventsOn('chat:aborted', onAborted);
+    }
+
+    // Call backend with image data
+    if (window.go && window.go.main && window.go.main.App) {
+        window.go.main.App.SendMessageStreamWithImage(message, imageData).catch((err) => {
+            console.error('Error starting stream with image:', err);
+            onError(err.message || err);
+        });
+    }
+}
 function copyMessage(button) {
     const bubble = button.closest('.chat-bubble');
     const text = bubble.querySelector('.chat-text').textContent;
@@ -345,6 +590,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 addUserMessage(message);
                 input.value = '';
 
+                // Get image data if present
+                let imageData = "";
+                if (currentImage) {
+                    // Extract base64 data from data URL (remove the data:image/...;base64, prefix)
+                    imageData = currentImage.split(',')[1];
+                    removeImage(); // Clear image after sending
+                }
+
                 // Check if Wails runtime is available
                 if (!window.go || !window.go.main || !window.go.main.App) {
                     console.error('Wails runtime not available');
@@ -352,8 +605,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // Start streaming response
-                streamAssistantResponseFromBackend(message);
+                // Start streaming response with or without image
+                if (imageData) {
+                    streamAssistantResponseFromBackendWithImage(message, imageData);
+                } else {
+                    streamAssistantResponseFromBackend(message);
+                }
             }
         });
     }
@@ -708,9 +965,88 @@ function showGenerateBanner() {
     }
 }
 
+// New chat - clears all messages and history
+async function newChat() {
+    // Clear frontend chat messages
+    const chatHistory = document.querySelector('.chat-messages');
+    chatHistory.innerHTML = '';
+
+    // Clear input field
+    const input = document.querySelector('.input-field');
+    if (input) {
+        input.value = '';
+    }
+
+    // Remove generate banner if present
+    const banner = document.getElementById('generate-banner');
+    if (banner) {
+        banner.remove();
+    }
+
+    // Clear backend chat history
+    if (window.go && window.go.main && window.go.main.App) {
+        try {
+            await window.go.main.App.ClearChatHistory();
+            console.log('Backend chat history cleared for new chat');
+        } catch (error) {
+            console.error('Error clearing chat history:', error);
+        }
+    }
+}
+
+let currentImage = null; // Store current image data
+
 function addImage() {
-    console.log('Add image');
-    // TODO: Implement image upload
+    // Create hidden file input
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.style.display = 'none';
+    document.body.appendChild(input);
+
+    input.onchange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentImage = e.target.result; // Store base64 data
+                // Show image preview in input bar
+                showImagePreview(currentImage);
+            };
+            reader.readAsDataURL(file);
+        }
+        document.body.removeChild(input);
+    };
+
+    input.click();
+}
+
+function showImagePreview(imageData) {
+    // Remove existing preview if any
+    const existingPreview = document.querySelector('.image-preview');
+    if (existingPreview) {
+        existingPreview.remove();
+    }
+
+    // Create preview element
+    const preview = document.createElement('div');
+    preview.className = 'image-preview';
+    preview.innerHTML = `
+        <img src="${imageData}" alt="Preview">
+        <button class="remove-image" onclick="removeImage()">×</button>
+    `;
+
+    // Insert before input bar
+    const inputBar = document.querySelector('.input-bar');
+    inputBar.parentNode.insertBefore(preview, inputBar);
+}
+
+function removeImage() {
+    currentImage = null;
+    const preview = document.querySelector('.image-preview');
+    if (preview) {
+        preview.remove();
+    }
 }
 
 function addAudio() {
@@ -718,9 +1054,62 @@ function addAudio() {
     // TODO: Implement audio recording
 }
 
+let ttsAudio = null;
+
 function textToSpeech() {
-    console.log('Text to speech');
-    // TODO: Implement TTS
+    // Create a file input for audio files
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'audio/*';
+    fileInput.style.display = 'none';
+    
+    fileInput.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        // Create object URL and play
+        const audioUrl = URL.createObjectURL(file);
+        
+        // Stop any currently playing TTS audio
+        if (ttsAudio) {
+            ttsAudio.pause();
+            ttsAudio = null;
+        }
+        
+        ttsAudio = new Audio(audioUrl);
+        
+        // Visual feedback
+        const ttsButton = document.querySelector('.tts-icon');
+        if (ttsButton) {
+            ttsButton.classList.add('active');
+        }
+        
+        ttsAudio.onended = function() {
+            URL.revokeObjectURL(audioUrl);
+            if (ttsButton) {
+                ttsButton.classList.remove('active');
+            }
+        };
+        
+        ttsAudio.onerror = function() {
+            console.error('Error playing TTS audio');
+            URL.revokeObjectURL(audioUrl);
+            if (ttsButton) {
+                ttsButton.classList.remove('active');
+            }
+        };
+        
+        ttsAudio.play().catch(err => {
+            console.error('Failed to play TTS audio:', err);
+            if (ttsButton) {
+                ttsButton.classList.remove('active');
+            }
+        });
+    };
+    
+    document.body.appendChild(fileInput);
+    fileInput.click();
+    document.body.removeChild(fileInput);
 }
 
 function addFile() {
