@@ -1,0 +1,20 @@
+# Audio models (too large for Git)
+models/*.bin
+models/*.gguf
+
+# Audio binaries (user downloads)
+bin/*.exe
+bin/*.dll
+
+# Build artifacts
+*.exe~
+*.dll
+howl-chat.exe
+llama-server.exe
+
+# Server logs
+server-test*.log
+
+# Temporary files
+*.tmp
+*.temp

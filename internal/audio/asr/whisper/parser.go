@@ -1,0 +1,164 @@
+package whisper
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"strings"
+
+	"howl-chat/internal/audio/types"
+)
+
+// whisperJSONOutput represents the JSON structure from whisper-cli --output-json
+type whisperJSONOutput struct {
+	Text       string              `json:"text"`
+	Language   string              `json:"language"`
+	Duration   float64             `json:"duration"`
+	Timestamps whisperTimestamps   `json:"timestamps"`
+	Segments   []whisperSegment    `json:"segments"`
+}
+
+// whisperTimestamps contains timing information
+type whisperTimestamps struct {
+	From float64 `json:"from"`
+	To   float64 `json:"to"`
+}
+
+// whisperSegment represents a single utterance segment
+type whisperSegment struct {
+	ID        int     `json:"id"`
+	Seek      int     `json:"seek"`
+	Start     float64 `json:"start"`
+	End       float64 `json:"end"`
+	Text      string  `json:"text"`
+	Tokens    []int   `json:"tokens"`
+	Temper    float64 `json:"temperature"`
+	AvgLogProb float64 `json:"avg_logprob"`
+	CompressionRatio float64 `json:"compression_ratio"`
+	NoSpeechProb float64 `json:"no_speech_prob"`
+}
+
+// parseWhisperOutput reads and parses the JSON output from whisper-cli
+func parseWhisperOutput(outputPath string) (*types.RecognitionResult, error) {
+	// Read JSON file
+	data, err := os.ReadFile(outputPath)
+	if err != nil {
+		return nil, types.NewAudioError(
+			types.ErrCodeModelLoadFailed,
+			fmt.Sprintf("Failed to read whisper output: %s", outputPath),
+			err,
+		)
+	}
+	
+	// Parse JSON
+	var output whisperJSONOutput
+	if err := json.Unmarshal(data, &output); err != nil {
+		return nil, types.NewAudioError(
+			types.ErrCodeModelLoadFailed,
+			"Failed to parse whisper JSON output",
+			err,
+		)
+	}
+	
+	// Build result
+	result := &types.RecognitionResult{
+		Text:     cleanText(output.Text),
+		Language: output.Language,
+		Duration: output.Duration,
+	}
+	
+	// Calculate confidence from average log probabilities
+	if len(output.Segments) > 0 {
+		var totalProb float64
+		for _, seg := range output.Segments {
+			totalProb += seg.AvgLogProb
+		}
+		avgProb := totalProb / float64(len(output.Segments))
+		// Convert log probability to confidence (0-1 range approximation)
+		result.Confidence = probabilityToConfidence(avgProb)
+		
+		// Convert segments
+		for _, seg := range output.Segments {
+			segment := types.Segment{
+				StartTime:  seg.Start,
+				EndTime:    seg.End,
+				Text:       cleanText(seg.Text),
+				Confidence: probabilityToConfidence(seg.AvgLogProb),
+			}
+			result.Segments = append(result.Segments, segment)
+		}
+	} else {
+		// No segments - use overall text
+		result.Confidence = 0.8 // Default confidence for simple output
+	}
+	
+	return result, nil
+}
+
+// cleanText removes leading/trailing whitespace and normalizes
+func cleanText(text string) string {
+	// Remove leading/trailing whitespace
+	text = strings.TrimSpace(text)
+	
+	// Remove leading "0" that whisper sometimes adds
+	text = strings.TrimPrefix(text, "0")
+	text = strings.TrimSpace(text)
+	
+	// Remove duplicate spaces
+	text = strings.Join(strings.Fields(text), " ")
+	
+	return text
+}
+
+// probabilityToConfidence converts log probability to 0-1 confidence score
+func probabilityToConfidence(logProb float64) float64 {
+	// Whisper log probabilities are typically in range [-2, 0]
+	// Map to 0-1 range with sigmoid-like behavior
+	
+	// Typical log probs:
+	// -0.1 = very confident (~95%)
+	// -0.5 = confident (~80%)
+	// -1.0 = moderate (~60%)
+	// -2.0 = uncertain (~40%)
+	
+	if logProb > -0.1 {
+		return 0.98
+	}
+	if logProb > -0.3 {
+		return 0.9
+	}
+	if logProb > -0.6 {
+		return 0.8
+	}
+	if logProb > -1.0 {
+		return 0.7
+	}
+	if logProb > -1.5 {
+		return 0.6
+	}
+	if logProb > -2.0 {
+		return 0.5
+	}
+	return 0.4
+}
+
+// calculateAverageConfidence computes overall confidence from segments
+func calculateAverageConfidence(segments []types.Segment) float64 {
+	if len(segments) == 0 {
+		return 0.8
+	}
+	
+	var total float64
+	for _, seg := range segments {
+		total += seg.Confidence
+	}
+	
+	return total / float64(len(segments))
+}
+
+// extractDominantLanguage determines the primary language from segments
+func extractDominantLanguage(segments []whisperSegment) string {
+	// This would analyze language tokens if available
+	// For now, return empty (use output.Language from whisper)
+	return ""
+}
