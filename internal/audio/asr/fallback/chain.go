@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"howl-chat/internal/audio/asr"
+	"howl-chat/internal/audio/hw"
 	"howl-chat/internal/audio/types"
 )
 
@@ -136,14 +137,14 @@ func (c *FallbackChain) selectRecognizers() []types.ASRRecognizer {
 	}
 
 	// Detect hardware capabilities
-	hardwareInfo := DetectHardware()
+	hardwareInfo := hw.DetectHardware()
 
 	// Select models based on hardware
-	recommendedModels := SelectModelsForHardware(hardwareInfo)
+	recommendedModels := hw.SelectModelsForHardware(hardwareInfo)
 
 	// Filter by minimum memory tier if specified
 	if c.config.MinMemoryTier != "" && c.config.MinMemoryTier != types.TierAuto {
-		recommendedModels = FilterModelsByTier(recommendedModels, c.config.MinMemoryTier)
+		recommendedModels = hw.FilterModelsByTier(recommendedModels, c.config.MinMemoryTier)
 	}
 
 	// Map model types to recognizers using the recognizer map

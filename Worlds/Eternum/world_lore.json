@@ -1,0 +1,11 @@
+{
+  "entries": [
+    {
+      "id": "mana_flow",
+      "title": "Mana Flow",
+      "content": "Magic flows through ley lines...",
+      "tags": ["magic"],
+      "priority": 1
+    }
+  ]
+}

@@ -128,12 +128,32 @@ let thinkContent = '';
 let mainContent = '';
 let isInThinkMode = false;
 
+async function syncLorebooksToBackend() {
+    if (!window.go || !window.go.main || !window.go.main.App || !window.go.main.App.SetLorebooks) {
+        return;
+    }
+
+    try {
+        let lorebooks = [];
+        if (window.howlLorebooks?.exportLorebooksForBackend) {
+            lorebooks = window.howlLorebooks.exportLorebooksForBackend();
+        } else {
+            lorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+        }
+        await window.go.main.App.SetLorebooks(Array.isArray(lorebooks) ? lorebooks : []);
+    } catch (error) {
+        console.error('Failed to sync lorebooks:', error);
+    }
+}
+
 // Regex patterns for think block detection
 // Gemma 4 uses special tokens: <|channel>thought for start, <channel|> for end
 const THINK_START_REGEX = /<\|channel>thought/i;
 const THINK_END_REGEX = /<channel\|>/i;
 
-function streamAssistantResponseFromBackend(message) {
+async function streamAssistantResponseFromBackend(message) {
+    await syncLorebooksToBackend();
+
     const chatHistory = document.querySelector('.chat-messages');
 
     // Create assistant message bubble with typing indicator
@@ -342,7 +362,9 @@ function toggleThink(toggleElement) {
 }
 
 // Stream assistant response from backend with image
-function streamAssistantResponseFromBackendWithImage(message, imageData) {
+async function streamAssistantResponseFromBackendWithImage(message, imageData) {
+    await syncLorebooksToBackend();
+
     const chatHistory = document.querySelector('.chat-messages');
 
     // Create assistant message bubble with typing indicator

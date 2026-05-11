@@ -168,3 +168,32 @@ func (m *Model) IsLoading() bool {
 func (m *Model) HasError() bool {
 	return m.Status == ModelStatusError
 }
+
+// GenerateImagePayload represents the payload for image generation from the UI
+type GenerateImagePayload struct {
+	Prompt       string  `json:"prompt"`
+	NegativePrompt string  `json:"negative_prompt"`
+	Model        string  `json:"model"`
+	Seed         int     `json:"seed"`
+	Width        int     `json:"width"`
+	Height       int     `json:"height"`
+	Steps        int     `json:"steps"`
+	Cfg          float32 `json:"cfg"`
+	Style        string  `json:"style"`
+	Character    string  `json:"character"`
+	World        string  `json:"world"`
+	Scenario     string  `json:"scenario"`
+}
+
+// ImageMetadata represents the metadata for a generated image
+type ImageMetadata struct {
+	File        string    `json:"file"`
+	Seed        int       `json:"seed"`
+	Prompt      string    `json:"prompt"`
+	NegativePrompt string    `json:"negative_prompt"`
+	Model       string    `json:"model"`
+	Character   string    `json:"character"`
+	World       string    `json:"world"`
+	Scenario    string    `json:"scenario"`
+	Timestamp   time.Time `json:"timestamp"`
+}

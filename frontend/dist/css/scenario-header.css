@@ -1,0 +1,195 @@
+/**
+ * Scenario Header Component Styles
+ * 
+ * This file contains the Scenario Creation Menu header styles.
+ * Centered header with theme color highlighting and character dropdown functionality.
+ * 
+ * @module scenario-header
+ */
+
+/* Scenario Page Header */
+.scenario-page-header {
+    text-align: center;
+    padding: 24px 16px;
+    background: rgba(15, 21, 31, 0.95);
+    border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+}
+
+.scenario-page-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--theme-color);
+    text-shadow: 0 0 10px var(--theme-glow);
+}
+
+/* Create New Scenario Button */
+.create-scenario-button {
+    background: var(--theme-glow);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    margin-top: 16px;
+}
+
+.create-scenario-button:hover {
+    background: var(--theme-glow);
+    border-color: var(--theme-color);
+    box-shadow: 0 0 8px var(--theme-glow);
+}
+
+/* Scenario Content Area */
+.scenario-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: rgba(15, 21, 31, 0.95);
+}
+
+/* Scenario Grid */
+.scenario-grid {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    align-content: start;
+}
+
+/* Scenario Grid Empty State */
+.scenario-grid-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.scenario-grid-empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+}
+
+.scenario-grid-empty-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--static-text);
+    margin-bottom: 8px;
+}
+
+.scenario-grid-empty-subtext {
+    font-size: 14px;
+    color: rgba(212, 212, 212, 0.7);
+}
+
+/* Scenario Creation Popup */
+.scenario-creation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.scenario-creation-popup {
+    background: rgba(15, 21, 31, 0.95);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 0 20px var(--theme-glow);
+}
+
+.scenario-creation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+}
+
+.scenario-creation-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--theme-color);
+    text-shadow: 0 0 10px var(--theme-glow);
+    margin: 0;
+}
+
+.scenario-creation-close {
+    background: none;
+    border: none;
+    color: var(--static-text);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.scenario-creation-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.scenario-creation-content {
+    padding: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.scenario-creation-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px;
+    border-top: 1px solid rgba(100, 100, 100, 0.3);
+}
+
+.scenario-creation-cancel,
+.scenario-creation-save {
+    padding: 10px 20px;
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.scenario-creation-cancel {
+    background: rgba(100, 100, 100, 0.2);
+    color: var(--static-text);
+}
+
+.scenario-creation-save {
+    background: var(--theme-glow);
+    color: var(--static-text);
+    border-color: var(--theme-color);
+}
+
+.scenario-creation-cancel:hover,
+.scenario-creation-save:hover {
+    box-shadow: 0 0 8px var(--theme-glow);
+}

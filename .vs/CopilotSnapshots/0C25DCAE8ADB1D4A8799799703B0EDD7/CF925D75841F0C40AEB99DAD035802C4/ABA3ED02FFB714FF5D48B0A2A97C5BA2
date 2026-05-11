@@ -1,0 +1,403 @@
+﻿package lorebook
+
+import (
+	"regexp"
+	"sort"
+	"strings"
+	"time"
+)
+
+type Scope string
+
+const (
+	ScopeWorld     Scope = "world"
+	ScopeScenario  Scope = "scenario"
+	ScopeCharacter Scope = "character"
+)
+
+type TriggerMode string
+
+const (
+	TriggerLoose    TriggerMode = "loose"
+	TriggerExact    TriggerMode = "exact"
+	TriggerSemantic TriggerMode = "semantic"
+)
+
+type TriggerDirection string
+
+const (
+	TriggerUser      TriggerDirection = "user"
+	TriggerCharacter TriggerDirection = "character"
+	TriggerBoth      TriggerDirection = "both"
+)
+
+type TriggerFrequency string
+
+const (
+	FrequencyAlways         TriggerFrequency = "always"
+	FrequencyOncePerChat    TriggerFrequency = "once_per_chat"
+	FrequencyOncePerScene   TriggerFrequency = "once_per_scene"
+	FrequencyOncePerMessage TriggerFrequency = "once_per_message"
+)
+
+type Entry struct {
+	ID                string           `json:"id"`
+	Title             string           `json:"title"`
+	Content           string           `json:"content"`
+	Tags              []string         `json:"tags"`
+	Scope             Scope            `json:"scope"`
+	Type              Scope            `json:"type"`
+	OwnerID           string           `json:"ownerId,omitempty"`
+	Enabled           bool             `json:"enabled"`
+	TriggerPhrases    []string         `json:"triggerPhrases"`
+	SecondaryTriggers []string         `json:"secondaryTriggers"`
+	TriggerMode       TriggerMode      `json:"triggerMode"`
+	TriggerDirection  TriggerDirection `json:"triggerDirection"`
+	TriggerFrequency  TriggerFrequency `json:"triggerFrequency"`
+	PriorityLevel     int              `json:"priorityLevel"`
+	ConflictRule      string           `json:"conflictRule"`
+	Visibility        string           `json:"visibility"`
+	RevealCondition   string           `json:"revealCondition"`
+	InjectionStyle    string           `json:"injectionStyle"`
+	InjectionPosition string           `json:"injectionPosition"`
+	MaxLength         string           `json:"maxLength"`
+	ContextBudget     int              `json:"contextBudget"`
+	ScanWindow        int              `json:"scanWindow"`
+	Recursion         string           `json:"recursion"`
+	LinkedCharacters  []string         `json:"linkedCharacters"`
+	LinkedLoreEntries []string         `json:"linkedLoreEntries"`
+	Inheritance       string           `json:"inheritance"`
+	Automated         bool             `json:"automated"`
+	MemoryType        string           `json:"memoryType"`
+	TriggerConfidence string           `json:"triggerConfidence"`
+	DecayRate         string           `json:"decayRate"`
+	CreatedAt         string           `json:"createdAt"`
+	UpdatedAt         string           `json:"updatedAt"`
+}
+
+type ResolveRequest struct {
+	Message         string
+	History         []Message
+	ActiveWorld     string
+	ActiveScenario  string
+	ActiveCharacter string
+	Actor           TriggerDirection
+	Triggered       map[string]bool
+	MaxEntries      int
+	MaxCharacters   int
+}
+
+type Message struct {
+	Role    string
+	Content string
+}
+
+type ResolvedEntry struct {
+	Entry
+	MatchedPhrase string
+	Score         int
+}
+
+func Resolve(entries []Entry, req ResolveRequest) []ResolvedEntry {
+	if req.Actor == "" {
+		req.Actor = TriggerUser
+	}
+	if req.MaxEntries <= 0 {
+		req.MaxEntries = 8
+	}
+	if req.MaxCharacters <= 0 {
+		req.MaxCharacters = 2400
+	}
+
+	scanText := buildScanText(req.Message, req.History)
+	resolved := make([]ResolvedEntry, 0, len(entries))
+
+	for _, entry := range entries {
+		entry = withDefaults(entry)
+		if !canConsider(entry, req) {
+			continue
+		}
+
+		matched, phrase, score := matchesEntry(entry, scanText)
+		if !matched {
+			continue
+		}
+
+		entry.Content = trimContent(entry.Content, entry.MaxLength, entry.ContextBudget)
+		if strings.TrimSpace(entry.Content) == "" {
+			continue
+		}
+
+		resolved = append(resolved, ResolvedEntry{
+			Entry:         entry,
+			MatchedPhrase: phrase,
+			Score:         score,
+		})
+	}
+
+	sort.SliceStable(resolved, func(i, j int) bool {
+		if resolved[i].Score != resolved[j].Score {
+			return resolved[i].Score > resolved[j].Score
+		}
+		if scopeRank(resolved[i].Scope) != scopeRank(resolved[j].Scope) {
+			return scopeRank(resolved[i].Scope) > scopeRank(resolved[j].Scope)
+		}
+		if resolved[i].PriorityLevel != resolved[j].PriorityLevel {
+			return resolved[i].PriorityLevel < resolved[j].PriorityLevel
+		}
+		return resolved[i].UpdatedAt > resolved[j].UpdatedAt
+	})
+
+	// Apply conflict resolution
+	resolved = ResolveConflicts(resolved, ConflictHighestPriority)
+
+	return applyBudget(resolved, req.MaxEntries, req.MaxCharacters)
+}
+
+func BuildPromptBlock(entries []ResolvedEntry) string {
+	if len(entries) == 0 {
+		return ""
+	}
+
+	var b strings.Builder
+	b.WriteString("Relevant lore for this response:\n")
+	for _, item := range entries {
+		b.WriteString("- [")
+		b.WriteString(string(item.Scope))
+		b.WriteString(" / priority ")
+		b.WriteString(strings.TrimSpace(intToString(item.PriorityLevel)))
+		b.WriteString("] ")
+		b.WriteString(item.Title)
+		b.WriteString(": ")
+		b.WriteString(strings.TrimSpace(item.Content))
+		b.WriteString("\n")
+	}
+	return b.String()
+}
+
+func withDefaults(entry Entry) Entry {
+	if entry.Scope == "" {
+		entry.Scope = entry.Type
+	}
+	if entry.Scope == "" {
+		entry.Scope = ScopeWorld
+	}
+	if entry.Type == "" {
+		entry.Type = entry.Scope
+	}
+	if entry.TriggerMode == "" {
+		entry.TriggerMode = TriggerExact
+	}
+	if entry.TriggerDirection == "" {
+		entry.TriggerDirection = TriggerBoth
+	}
+	if entry.TriggerFrequency == "" {
+		entry.TriggerFrequency = FrequencyAlways
+	}
+	if entry.PriorityLevel <= 0 {
+		entry.PriorityLevel = 3
+	}
+	if entry.ContextBudget <= 0 {
+		entry.ContextBudget = 160
+	}
+	if entry.MaxLength == "" {
+		entry.MaxLength = "medium"
+	}
+	if entry.UpdatedAt == "" {
+		entry.UpdatedAt = time.Now().Format(time.RFC3339)
+	}
+	return entry
+}
+
+func canConsider(entry Entry, req ResolveRequest) bool {
+	if !entry.Enabled {
+		return false
+	}
+	if entry.TriggerDirection != TriggerBoth && entry.TriggerDirection != req.Actor {
+		return false
+	}
+	if req.Triggered != nil && entry.TriggerFrequency != FrequencyAlways && req.Triggered[entry.ID] {
+		return false
+	}
+	return true
+}
+
+func buildScanText(message string, history []Message) string {
+	var parts []string
+	for _, msg := range history {
+		parts = append(parts, msg.Content)
+	}
+	parts = append(parts, message)
+	return strings.ToLower(strings.Join(parts, "\n"))
+}
+
+func matchesEntry(entry Entry, scanText string) (bool, string, int) {
+	phrases := append([]string{}, entry.TriggerPhrases...)
+	phrases = append(phrases, entry.SecondaryTriggers...)
+
+	if len(phrases) == 0 {
+		return false, "", 0
+	}
+
+	for _, phrase := range phrases {
+		clean := strings.ToLower(strings.TrimSpace(phrase))
+		if clean == "" {
+			continue
+		}
+
+		switch entry.TriggerMode {
+		case TriggerSemantic:
+			if matched, score := semanticMatch(scanText, clean); matched {
+				return true, phrase, score
+			}
+		case TriggerLoose:
+			if strings.Contains(scanText, clean) {
+				return true, phrase, 80 + keywordWeight(clean)
+			}
+			for _, token := range strings.Fields(clean) {
+				if len(token) > 3 && strings.Contains(scanText, token) {
+					return true, phrase, 55 + keywordWeight(token)
+				}
+			}
+		default:
+			if wholePhraseMatch(scanText, clean) {
+				return true, phrase, 100 + keywordWeight(clean)
+			}
+		}
+	}
+
+	return false, "", 0
+}
+
+// semanticMatch uses vector embeddings to find semantic similarities
+// Returns (matched, score) where score is 1-100
+func semanticMatch(text, phrase string) (bool, int) {
+	textEmbedding := NewEmbedding(text)
+	phraseEmbedding := NewEmbedding(phrase)
+
+	similarity := textEmbedding.CosineSimilarity(phraseEmbedding)
+
+	// Threshold at 40% similarity for semantic matching
+	return similarity >= 40, 70 + (similarity / 2)
+}
+
+func wholePhraseMatch(text, phrase string) bool {
+	pattern := `(?i)(^|[^a-zA-Z0-9_])` + regexp.QuoteMeta(phrase) + `([^a-zA-Z0-9_]|$)`
+	return regexp.MustCompile(pattern).FindStringIndex(text) != nil
+}
+
+func keywordWeight(value string) int {
+	if len(value) > 24 {
+		return 12
+	}
+	if len(value) > 10 {
+		return 8
+	}
+	return 4
+}
+
+func scopeRank(scope Scope) int {
+	switch scope {
+	case ScopeCharacter:
+		return 3
+	case ScopeScenario:
+		return 2
+	default:
+		return 1
+	}
+}
+
+func trimContent(content, maxLength string, budget int) string {
+	content = strings.TrimSpace(content)
+	if content == "" {
+		return ""
+	}
+
+	limit := budget
+	switch maxLength {
+	case "short":
+		if limit <= 0 || limit > 220 {
+			limit = 220
+		}
+	case "full":
+		if limit <= 0 {
+			return content
+		}
+	default:
+		if limit <= 0 || limit > 700 {
+			limit = 700
+		}
+	}
+
+	if len(content) <= limit {
+		return content
+	}
+	return strings.TrimSpace(content[:limit]) + "..."
+}
+
+func applyBudget(entries []ResolvedEntry, maxEntries, maxCharacters int) []ResolvedEntry {
+	result := make([]ResolvedEntry, 0, maxEntries)
+	used := 0
+
+	// If budget is 0 or negative, don't include anything (safe failure)
+	if maxCharacters <= 0 {
+		return result
+	}
+
+	for _, entry := range entries {
+		if len(result) >= maxEntries {
+			break
+		}
+		// Skip entries that exceed the remaining budget
+		if used+len(entry.Content) > maxCharacters {
+			continue
+		}
+		used += len(entry.Content)
+		result = append(result, entry)
+	}
+
+	return result
+}
+
+func applyBudgetWithEdgeCase(entries []ResolvedEntry, maxEntries, maxCharacters int) []ResolvedEntry {
+	// If budget is legitimately zero or negative, return empty safely
+	if maxCharacters <= 0 {
+		return make([]ResolvedEntry, 0)
+	}
+
+	result := make([]ResolvedEntry, 0, maxEntries)
+	used := 0
+
+	for _, entry := range entries {
+		if len(result) >= maxEntries {
+			break
+		}
+		contentLen := len(entry.Content)
+
+		// Check if adding this entry would exceed budget
+		if used+contentLen > maxCharacters {
+			// Skip, but continue checking other entries
+			continue
+		}
+
+		used += contentLen
+		result = append(result, entry)
+	}
+
+	return result
+}
+
+func intToString(value int) string {
+	if value == 0 {
+		return "0"
+	}
+	var digits [20]byte
+	i := len(digits)
+	n := value
+	for n > 0 {
+		i--
+		digits[i] = byte('0' + n%10)
+		n /= 10
+	}
+	return string(digits[i:])
+}

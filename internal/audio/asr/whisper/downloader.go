@@ -2,12 +2,12 @@ package whisper
 
 import (
 	"archive/zip"
+	"context"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 )
 
@@ -30,100 +30,10 @@ func NewBinaryDownloader(targetDir string) *BinaryDownloader {
 	}
 }
 
-// DownloadLatest downloads the latest prebuilt binaries for Windows
-// Note: For production use, you should bundle these with your installer
+// DownloadLatest installs whisper-cli: official Windows ZIP from GitHub releases;
+// UNIX-like systems build whisper-cli via git plus cmake plus a toolchain.
 func (d *BinaryDownloader) DownloadLatest() (*WhisperBinaries, error) {
-	// Create target directory
-	if err := os.MkdirAll(d.targetDir, 0755); err != nil {
-		return nil, fmt.Errorf("failed to create target directory: %w", err)
-	}
-
-	// For Windows, download from SourceForge mirror
-	if runtime.GOOS == "windows" {
-		return d.downloadWindowsBinaries()
-	}
-
-	// For Linux/Mac, user needs to build from source
-	return nil, fmt.Errorf("automatic download only supported on Windows. Please build from source on %s", runtime.GOOS)
-}
-
-// downloadWindowsBinaries downloads Windows prebuilt binaries
-func (d *BinaryDownloader) downloadWindowsBinaries() (*WhisperBinaries, error) {
-	// SourceForge mirror download URL
-	downloadURL := "https://sourceforge.net/projects/whisper-cpp.mirror/files/latest/download"
-
-	zipPath := filepath.Join(d.targetDir, "whisper-temp.zip")
-
-	// Download ZIP
-	fmt.Printf("Downloading whisper.cpp binaries from %s...\n", downloadURL)
-	if err := downloadFile(downloadURL, zipPath); err != nil {
-		return nil, fmt.Errorf("failed to download: %w", err)
-	}
-	defer os.Remove(zipPath)
-
-	// Extract ZIP
-	if err := extractZip(zipPath, d.targetDir); err != nil {
-		return nil, fmt.Errorf("failed to extract: %w", err)
-	}
-
-	// Find the executables
-	binaries := &WhisperBinaries{
-		ModelDir: filepath.Join(d.targetDir, "models"),
-	}
-
-	// Search for whisper-cli.exe
-	cliPath := filepath.Join(d.targetDir, "whisper-cli.exe")
-	if _, err := os.Stat(cliPath); os.IsNotExist(err) {
-		// Try in subdirectories
-		err := filepath.Walk(d.targetDir, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if info.Name() == "whisper-cli.exe" {
-				binaries.CliPath = path
-			}
-			if filepath.Ext(path) == ".dll" {
-				binaries.DllPaths = append(binaries.DllPaths, path)
-			}
-			return nil
-		})
-		if err != nil {
-			return nil, fmt.Errorf("failed to find whisper-cli.exe: %w", err)
-		}
-	} else {
-		binaries.CliPath = cliPath
-	}
-
-	if binaries.CliPath == "" {
-		return nil, fmt.Errorf("whisper-cli.exe not found in downloaded archive")
-	}
-
-	// Create models directory
-	os.MkdirAll(binaries.ModelDir, 0755)
-
-	return binaries, nil
-}
-
-// downloadFile downloads a file from URL to local path
-func downloadFile(url, filepath string) error {
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("download failed: %s", resp.Status)
-	}
-
-	out, err := os.Create(filepath)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, resp.Body)
-	return err
+	return d.Acquire(context.Background())
 }
 
 // extractZip extracts a ZIP file to the target directory
@@ -180,13 +90,15 @@ func GetInstallationInstructions() string {
 WHISPER.CPP INSTALLATION GUIDE
 ==============================
 
-Option 1: Prebuilt Binaries (Windows)
--------------------------------------
-1. Download from: https://sourceforge.net/projects/whisper-cpp.mirror/files/latest/download
-2. Extract to: C:\Program Files\whisper\ or your app directory
-3. Add to PATH or place in: bin/ subdirectory of your app
+Option 1: Automatic install (recommended)
+------------------------------------------
+Windows installs the official whisper-bin ZIP from ggml-org/whisper.cpp GitHub Releases.
+Darwin/Linux clone the same release tag and build whisper-cli with git plus cmake plus clang/gcc.
 
-Option 2: Build from Source
+Environment:
+- HOWL_WHISPER_HOME  optional install root (defaults to ./bin/whisper under the working directory)
+
+Option 2: Manual build from Source
 ---------------------------
 Requirements:
 - CMake 3.18+
@@ -247,8 +159,7 @@ func CheckInstallation(cliPath string) error {
 		return fmt.Errorf("whisper-cli not found at: %s", cliPath)
 	}
 
-	// Try to run --help to verify it works
-	cmd := execCommand(cliPath, "--help")
+	cmd := exec.Command(cliPath, "--help")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("whisper-cli failed to execute: %w\nOutput: %s", err, string(output))

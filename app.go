@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"howl-chat/internal/backend/gguf"
 	"howl-chat/internal/backend/llama"
+	"howl-chat/internal/backend/lorebook"
 	"howl-chat/internal/backend/types"
 	"os"
 	"os/exec"
@@ -25,6 +26,8 @@ type App struct {
 	samplerSettings map[string]interface{}
 	modelSettings   map[string]interface{}
 	chatMessages    []map[string]interface{}
+	lorebooks       []lorebook.Entry
+	triggeredLore   map[string]bool
 	streamCancel    context.CancelFunc
 }
 
@@ -235,9 +238,14 @@ func (a *App) SendMessage(message string) (string, error) {
 		return "", fmt.Errorf("llama client not initialized")
 	}
 
-	// Build prompt from chat messages
+	a.chatMessages = append(a.chatMessages, map[string]interface{}{
+		"role":      "user",
+		"content":   message,
+		"timestamp": time.Now().Unix(),
+	})
+
+	// Build prompt from chat messages and triggered lore
 	prompt := a.buildPrompt()
-	prompt += message
 
 	// Convert sampler settings to InferenceOptions
 	opts := llama.NewInferenceOptions()
@@ -338,12 +346,6 @@ func (a *App) SendMessage(message string) (string, error) {
 		return "", err
 	}
 
-	// Add messages to chat history
-	a.chatMessages = append(a.chatMessages, map[string]interface{}{
-		"role":      "user",
-		"content":   message,
-		"timestamp": time.Now().Unix(),
-	})
 	a.chatMessages = append(a.chatMessages, map[string]interface{}{
 		"role":      "assistant",
 		"content":   response,
@@ -538,6 +540,9 @@ func (a *App) SendMessageStreamWithImage(message string, imageData string) error
 // buildPrompt builds a prompt from the chat history
 func (a *App) buildPrompt() string {
 	var prompt string
+	if loreBlock := a.resolveLorePromptBlock(); loreBlock != "" {
+		prompt += "System: " + loreBlock + "\n"
+	}
 	for _, msg := range a.chatMessages {
 		role, _ := msg["role"].(string)
 		content, _ := msg["content"].(string)
@@ -551,10 +556,71 @@ func (a *App) buildPrompt() string {
 	return prompt
 }
 
+func (a *App) resolveLorePromptBlock() string {
+	if len(a.lorebooks) == 0 || len(a.chatMessages) == 0 {
+		return ""
+	}
+
+	lastMessage := ""
+	history := make([]lorebook.Message, 0, min(len(a.chatMessages), 6))
+	start := len(a.chatMessages) - 6
+	if start < 0 {
+		start = 0
+	}
+
+	for i, msg := range a.chatMessages[start:] {
+		role, _ := msg["role"].(string)
+		content, _ := msg["content"].(string)
+		if strings.TrimSpace(content) == "" {
+			continue
+		}
+		if start+i == len(a.chatMessages)-1 && role == "user" {
+			lastMessage = content
+		} else {
+			history = append(history, lorebook.Message{Role: role, Content: content})
+		}
+	}
+
+	if lastMessage == "" {
+		return ""
+	}
+
+	resolved := lorebook.Resolve(a.lorebooks, lorebook.ResolveRequest{
+		Message:       lastMessage,
+		History:       history,
+		Actor:         lorebook.TriggerUser,
+		Triggered:     a.triggeredLore,
+		MaxEntries:    8,
+		MaxCharacters: 2400,
+	})
+
+	if len(resolved) == 0 {
+		return ""
+	}
+
+	if a.triggeredLore == nil {
+		a.triggeredLore = map[string]bool{}
+	}
+	for _, entry := range resolved {
+		if entry.TriggerFrequency != lorebook.FrequencyAlways {
+			a.triggeredLore[entry.ID] = true
+		}
+	}
+
+	return lorebook.BuildPromptBlock(resolved)
+}
+
 // ClearChatHistory clears the backend chat history
 // This is a Wails binding that can be called from the frontend
 func (a *App) ClearChatHistory() error {
 	a.chatMessages = []map[string]interface{}{}
+	a.triggeredLore = map[string]bool{}
+	return nil
+}
+
+// SetLorebooks updates the active lorebook entries used by the prompt resolver.
+func (a *App) SetLorebooks(entries []lorebook.Entry) error {
+	a.lorebooks = entries
 	return nil
 }
 
@@ -704,6 +770,7 @@ func (a *App) GetChatMessages() []map[string]interface{} {
 // This is a Wails binding that can be called from the frontend
 func (a *App) ClearChat() error {
 	a.chatMessages = []map[string]interface{}{}
+	a.triggeredLore = map[string]bool{}
 	return nil
 }
 

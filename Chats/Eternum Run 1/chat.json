@@ -1,0 +1,8 @@
+{
+  "chat_name": "Eternum Run 1",
+  "seed": 987654321,
+  "world": "Eternum",
+  "scenario": "Temple of Whispers",
+  "characters": ["Aria", "Doren"],
+  "version": 1
+}

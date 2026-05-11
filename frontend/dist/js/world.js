@@ -15,6 +15,7 @@
 let worlds = [];
 let selectedScenarios = [];
 let selectedCharacters = [];
+let selectedLorebooks = [];
 let editingWorldId = null;
 
 // Open world creation popup
@@ -39,8 +40,10 @@ function openWorldCreationPopup(worldId = null) {
             
             selectedScenarios = world.scenarios || [];
             selectedCharacters = world.characters || [];
+            selectedLorebooks = world.howl?.lorebooks || [];
             updateSelectedItemsDisplay('scenario');
             updateSelectedItemsDisplay('character');
+            updateWorldSelectedLorebooksList();
         }
     } else {
         // Create mode - clear form
@@ -158,7 +161,13 @@ function saveWorld() {
         scenarios: selectedScenarios,
         characters: selectedCharacters,
         createdAt: editingWorldId ? worlds.find(w => w.id === editingWorldId)?.createdAt : new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
+        howl: {
+            lorebooks: selectedLorebooks.map(lorebook => ({
+                name: lorebook.name,
+                description: lorebook.description
+            }))
+        }
     };
     
     if (editingWorldId) {
@@ -221,36 +230,123 @@ function editWorld(worldId) {
 function copyWorld(worldId) {
     const world = worlds.find(w => w.id === worldId);
     if (world) {
-        const newWorld = {
-            ...world,
-            id: Date.now().toString(),
-            title: `${world.title} (Copy)`,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        };
-        worlds.push(newWorld);
-        renderWorldGrid();
-        console.log('World copied:', newWorld);
+    }
+    
+    dropdownItems.innerHTML = lorebooks
+        .filter(lorebook => !selectedLorebooks.find(selected => selected.name === lorebook.name))
+        .map(lorebook => `
+            <div class="world-dropdown-item" onclick="addLorebookToWorld('${lorebook.name}')">
+                <div class="dropdown-item-content">
+                    <div class="dropdown-item-title">${lorebook.name}</div>
+                    <div class="dropdown-item-subtitle">${lorebook.description}</div>
+                </div>
+            </div>
+        `).join('');
+}
+
+function searchWorldLorebooks(searchTerm) {
+    const mockLorebooks = [
+        { name: 'Main Lore', description: 'Core world knowledge' },
+        { name: 'Magic System', description: 'Rules and mechanics of magic' },
+        { name: 'Character Backstories', description: 'Detailed character histories' },
+        { name: 'World History', description: 'Timeline of major events' }
+    ];
+    
+    const filtered = mockLorebooks.filter(lorebook => 
+        !selectedLorebooks.find(selected => selected.name === lorebook.name) &&
+        (lorebook.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+         lorebook.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+    
+    const dropdownItems = document.getElementById('world-lorebook-dropdown-items');
+    
+    if (filtered.length === 0) {
+        dropdownItems.innerHTML = '<div class="world-dropdown-item">No lorebooks found</div>';
+        return;
+    }
+    
+    dropdownItems.innerHTML = filtered.map(lorebook => `
+        <div class="world-dropdown-item" onclick="addLorebookToWorld('${lorebook.name}')">
+            <div class="dropdown-item-content">
+                <div class="dropdown-item-title">${lorebook.name}</div>
+                <div class="dropdown-item-subtitle">${lorebook.description}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function addLorebookToWorld(lorebookName) {
+    const mockLorebooks = [
+        { name: 'Main Lore', description: 'Core world knowledge' },
+        { name: 'Magic System', description: 'Rules and mechanics of magic' },
+        { name: 'Character Backstories', description: 'Detailed character histories' },
+        { name: 'World History', description: 'Timeline of major events' }
+    ];
+    
+    const lorebook = mockLorebooks.find(l => l.name === lorebookName);
+    if (lorebook && !selectedLorebooks.find(l => l.name === lorebookName)) {
+        selectedLorebooks.push(lorebook);
+        updateWorldSelectedLorebooksList();
+        updateWorldLorebookDropdown();
     }
 }
 
-// Delete world
-function deleteWorld(worldId) {
-    if (confirm('Are you sure you want to delete this world?')) {
-        worlds = worlds.filter(w => w.id !== worldId);
-        renderWorldGrid();
-        console.log('World deleted:', worldId);
-    }
+function removeLorebookFromWorld(lorebookName) {
+    selectedLorebooks = selectedLorebooks.filter(l => l.name !== lorebookName);
+    updateWorldSelectedLorebooksList();
+    updateWorldLorebookDropdown();
 }
 
-// Close dropdowns when clicking outside
-document.addEventListener('click', function(event) {
-    if (!event.target.closest('.world-dropdown-container')) {
-        document.querySelectorAll('.world-dropdown-container').forEach(d => {
-            d.classList.remove('open');
-        });
+function updateWorldSelectedLorebooksList() {
+    const selectedItems = document.getElementById('world-lorebook-selected-items');
+    
+    if (selectedLorebooks.length === 0) {
+        selectedItems.innerHTML = '';
+        return;
     }
+    
+    selectedItems.innerHTML = selectedLorebooks.map(lorebook => `
+        <div class="world-selected-item">
+            <span class="selected-item-name">${lorebook.name}</span>
+            <button class="selected-item-remove" onclick="removeLorebookFromWorld('${lorebook.name}')">×</button>
+        </div>
+    `).join('');
+}
+
+// Initialize world page when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    loadWorlds();
+    loadAvailableScenarios();
+    loadAvailableCharacters();
+    loadAvailableLorebooks();
+    
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', function(event) {
+        // Escape key closes popup
+        if (event.key === 'Escape') {
+            closeWorldCreationPopup();
+        }
+        
+        // Ctrl+N for new world
+        if (event.ctrlKey && event.key === 'n') {
+            event.preventDefault();
+            openWorldCreationPopup();
+        }
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.world-dropdown-container')) {
+            document.querySelectorAll('.world-dropdown-menu').forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+        }
+    });
+    
+    // Close popup when clicking outside
+    document.getElementById('world-creation-overlay').addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeWorldCreationPopup();
+        }
+    });
 });
-
-// Initialize page
-console.log('World page initialized');

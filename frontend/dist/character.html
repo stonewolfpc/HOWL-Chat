@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+    HOWL Chat - Character Page
+    
+    Character creation and management page for creating, editing, and organizing characters.
+    Features character creation with character sheets and user details management.
+    
+    @module character
+    @version 1.0.0
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Creator - HOWL Chat</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/menu-components.css">
+    <link rel="stylesheet" href="css/nav-components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/ambient.css">
+    <link rel="stylesheet" href="css/character-components.css">
+    <link rel="stylesheet" href="css/character-header.css">
+    <link rel="stylesheet" href="css/nav-icon-images.css">
+</head>
+<body>
+    <!-- Ambient Background Effects -->
+    <div class="ambient-bg">
+        <div class="ambient-orb-1"></div>
+        <div class="ambient-orb-2"></div>
+        <div class="hexagon-grid"></div>
+    </div>
+
+    <!-- Top Menu -->
+    <div class="top-menu">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="assets/HOWL.png" alt="HOWL Chat" style="width: 44px; height: 44px;">
+            <div class="app-title">HOWL Chat</div>
+        </div>
+        <div class="menu-bar">
+            <div class="menu-item">
+                <button class="menu-button">File</button>
+                <div class="dropdown" id="file-dropdown">
+                    <div class="dropdown-item">New Chat</div>
+                    <div class="dropdown-item">Load Chat</div>
+                    <div class="dropdown-item">Save Chat</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Settings</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Exit</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button">Edit</button>
+                <div class="dropdown" id="edit-dropdown">
+                    <div class="dropdown-item">Undo</div>
+                    <div class="dropdown-item">Redo</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Copy</div>
+                    <div class="dropdown-item">Paste</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button">View</button>
+                <div class="dropdown" id="view-dropdown">
+                    <div class="dropdown-item">World</div>
+                    <div class="dropdown-item">Characters</div>
+                    <div class="dropdown-item">Scenarios</div>
+                    <div class="dropdown-item">Lorebooks</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button">Help</button>
+                <div class="dropdown" id="help-dropdown">
+                    <div class="dropdown-item">Documentation</div>
+                    <div class="dropdown-item">About</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navigation Sidebar -->
+        <div class="nav-sidebar">
+            <div class="nav-item" onclick="navigateTo('index.html')">
+                <img src="assets/quill.png" alt="Chat" class="nav-icon-img">
+            </div>
+            <div class="nav-item" onclick="navigateTo('world.html')">
+                <img src="assets/globe.png" alt="World" class="nav-icon-img">
+            </div>
+            <div class="nav-item active" onclick="navigateTo('character.html')">
+                <img src="assets/Character.png" alt="Characters" class="nav-icon-img">
+            </div>
+            <div class="nav-item" onclick="navigateTo('scenario.html')">
+                <img src="assets/scroll.png" alt="Scenarios" class="nav-icon-img">
+            </div>
+            <div class="nav-item" onclick="navigateTo('lorebooks.html')">
+                <img src="assets/spellbook.png" alt="Lorebooks" class="nav-icon-img">
+            </div>
+            <div class="nav-item">
+                <img src="assets/spellbook.png" alt="Lorebooks" class="nav-icon-img">
+            </div>
+            <div class="nav-item" onclick="navigateTo('image-generator.html')">
+                <img src="assets/brush.png" alt="Image Generator" class="nav-icon-img">
+            </div>
+        </div>
+
+        <!-- Character Content Area -->
+        <div class="character-content">
+            <!-- Character Page Header -->
+            <div class="character-page-header">
+                <button class="create-character-button" onclick="openCharacterCreationPopup()">Create New</button>
+                <h1 class="character-page-title">Character Creator</h1>
+                <button class="user-details-button" onclick="openUserDetailsPopup()">User Details</button>
+            </div>
+
+            <!-- Character Grid -->
+            <div class="character-grid" id="character-grid">
+                <!-- Character bubbles will be dynamically added here -->
+                <div class="character-grid-empty">
+                    <div class="character-grid-empty-icon">👥</div>
+                    <div class="character-grid-empty-text">No characters created yet</div>
+                    <div class="character-grid-empty-subtext">Click "Create New" to get started</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Character Creation Popup -->
+    <div class="character-creation-overlay" id="character-creation-overlay" style="display: none;">
+        <div class="character-creation-popup">
+            <div class="character-creation-header">
+                <h2 class="character-creation-title">Create New Character</h2>
+                <button class="character-creation-close" onclick="closeCharacterCreationPopup()">×</button>
+            </div>
+            <div class="character-creation-content">
+                <div class="character-sheet-container">
+                    <!-- Image Attachment Area -->
+                    <div class="character-images-section">
+                        <div class="character-images-header">
+                            <h3>Character Images</h3>
+                            <div class="image-upload-button" onclick="document.getElementById('character-image-input').click()">
+                                <span class="upload-icon">📷</span>
+                                <span class="upload-text">Add Image</span>
+                            </div>
+                            <input type="file" id="character-image-input" accept="image/*" multiple style="display: none;" onchange="handleCharacterImageSelect(event)">
+                        </div>
+                        <div class="character-images-list" id="character-images-list">
+                            <!-- Images will be dynamically added here -->
+                            <div class="no-images-placeholder">
+                                <span class="no-images-icon">🖼️</span>
+                                <span class="no-images-text">No images added yet</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Character Sheet Form -->
+                    <div class="character-form-section">
+                        <div class="character-form-group">
+                            <label class="character-form-label" for="character-name">Name</label>
+                            <input type="text" class="character-form-input" id="character-name" placeholder="Enter character name...">
+                        </div>
+
+                        <div class="character-form-group">
+                            <label class="character-form-label" for="character-age">Age</label>
+                            <input type="text" class="character-form-input" id="character-age" placeholder="Enter character age...">
+                        </div>
+
+                        <div class="character-form-group">
+                            <label class="character-form-label" for="character-role">Role/Occupation/Relationship</label>
+                            <input type="text" class="character-form-input" id="character-role" placeholder="Enter character role, occupation, or relationship...">
+                        </div>
+
+                        <div class="character-form-group">
+                            <label class="character-form-label" for="character-description">Physical Description</label>
+                            <textarea class="character-form-textarea" id="character-description" placeholder="Describe the character's physical appearance..." rows="4"></textarea>
+                        </div>
+
+                        <div class="character-form-group">
+                            <label class="character-form-label" for="character-personality">Personality</label>
+                            <textarea class="character-form-textarea" id="character-personality" placeholder="Describe the character's personality traits, quirks, and behavior..." rows="4"></textarea>
+                        </div>
+
+                        <div class="character-form-group">
+                            <label class="character-form-label" for="character-background">Background</label>
+                            <textarea class="character-form-textarea" id="character-background" placeholder="Describe the character's history, background, and life story..." rows="6"></textarea>
+                        </div>
+
+                        <div class="character-form-group">
+                            <label class="character-form-label" for="character-intro">Intro Dialogue</label>
+                            <textarea class="character-form-textarea" id="character-intro" placeholder="Write the character's opening message or introduction..." rows="3"></textarea>
+                        </div>
+
+                        <div class="character-form-group">
+                            <label class="character-form-label" for="character-dialogue-examples">Dialogue Examples</label>
+                            <textarea class="character-form-textarea" id="character-dialogue-examples" placeholder="Write example dialogue to show the character's speech patterns and mannerisms..." rows="6"></textarea>
+                        </div>
+                        <div class="character-form-group">
+                            <label class="character-form-label">Lorebooks</label>
+                            <div class="world-dropdown-container" id="character-lorebook-dropdown">
+                                <div class="world-dropdown-trigger" onclick="toggleDropdown('character-lorebook-dropdown')">
+                                    <span id="character-lorebook-dropdown-text">Select lorebooks...</span>
+                                    <span class="world-dropdown-arrow">▼</span>
+                                </div>
+                                <div class="world-dropdown-menu">
+                                    <div class="world-dropdown-search">
+                                        <input type="text" class="world-dropdown-search-input" placeholder="Search lorebooks..." oninput="searchCharacterLorebooks(this.value)">
+                                    </div>
+                                    <div id="character-lorebook-dropdown-items">
+                                        <!-- Lorebook items will be dynamically added here -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="world-selected-items" id="character-lorebook-selected-items"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="character-creation-footer">
+                <button class="character-creation-cancel" onclick="closeCharacterCreationPopup()">Cancel</button>
+                <button class="character-creation-save" onclick="saveCharacter()">Save Character</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Details Popup -->
+    <div class="user-details-overlay" id="user-details-overlay" style="display: none;">
+        <div class="user-details-popup">
+            <div class="user-details-header">
+                <h2 class="user-details-title">User Details</h2>
+                <button class="user-details-close" onclick="closeUserDetailsPopup()">×</button>
+            </div>
+            <div class="user-details-content">
+                <div class="user-details-form">
+                    <div class="form-group">
+                        <label class="form-label">User Name</label>
+                        <input type="text" class="form-input" id="user-name" placeholder="Enter your name...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">User Description</label>
+                        <textarea class="form-textarea" id="user-description" placeholder="Describe your character/persona for the AI..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Additional Notes</label>
+                        <textarea class="form-textarea" id="user-notes" placeholder="Any additional details or preferences..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="user-details-footer">
+                <button class="user-details-cancel" onclick="closeUserDetailsPopup()">Cancel</button>
+                <button class="user-details-save" onclick="saveUserDetails()">Save Details</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/theme.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/character.js"></script>
+    <script src="js/navigation.js"></script>
+</body>
+</html>

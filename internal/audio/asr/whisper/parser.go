@@ -216,9 +216,3 @@ func calculateAverageConfidence(segments []types.Segment) float64 {
 	return total / float64(len(segments))
 }
 
-// extractDominantLanguage determines the primary language from segments
-func extractDominantLanguage(segments []whisperSegment) string {
-	// This would analyze language tokens if available
-	// For now, return empty (use output.Language from whisper)
-	return ""
-}

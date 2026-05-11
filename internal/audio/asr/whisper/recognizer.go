@@ -55,8 +55,7 @@ func (r *Recognizer) Initialize(ctx context.Context, config types.ASRConfig) err
 
 	r.modelPath = config.ModelPath
 
-	// Find or download whisper-cli binary
-	cliPath, err := r.findOrDownloadWhisperCLI(ctx)
+	cliPath, err := r.findOrInstallWhisperCLI(ctx)
 	if err != nil {
 		return err
 	}
@@ -172,8 +171,15 @@ func (r *Recognizer) Release() error {
 	return nil
 }
 
-// findOrDownloadWhisperCLI locates the whisper-cli binary or downloads it
-func (r *Recognizer) findOrDownloadWhisperCLI(ctx context.Context) (string, error) {
+func whisperInstallDir() string {
+	if v := os.Getenv("HOWL_WHISPER_HOME"); v != "" {
+		return filepath.Clean(v)
+	}
+	return filepath.Join("bin", "whisper")
+}
+
+// findOrInstallWhisperCLI locates whisper-cli or builds or downloads official binaries.
+func (r *Recognizer) findOrInstallWhisperCLI(ctx context.Context) (string, error) {
 	// Search in standard locations
 	searchPaths := []string{
 		"whisper-cli.exe",                       // Current directory (Windows)
@@ -193,14 +199,19 @@ func (r *Recognizer) findOrDownloadWhisperCLI(ctx context.Context) (string, erro
 		}
 	}
 
-	// TODO: Implement download logic
-	// For now, return error with instructions
-	return "", types.NewAudioError(
-		types.ErrCodeModelNotFound,
-		"whisper-cli binary not found. Please download from https://github.com/ggerganov/whisper.cpp/releases "+
-			"and place in PATH or bin/ directory",
-		nil,
-	)
+	dl := NewBinaryDownloader(whisperInstallDir())
+	bins, err := dl.Acquire(ctx)
+	if err != nil {
+		return "", types.NewAudioError(
+			types.ErrCodeModelNotFound,
+			fmt.Sprintf("%s\n%s", err.Error(), GetInstallationInstructions()),
+			err,
+		)
+	}
+	if bins == nil || bins.CliPath == "" {
+		return "", types.NewAudioError(types.ErrCodeModelNotFound, "whisper-cli acquisition returned no binary", nil)
+	}
+	return bins.CliPath, nil
 }
 
 // ensureWAVFormat converts audio to 16kHz mono WAV if needed

@@ -305,24 +305,45 @@ func ListModelsByTier(tier MemoryTier) []string {
 
 	// ASR models
 	for t, profile := range ASRModelRegistry {
-		if profile.MinMemoryTier <= tier {
+		if tierSupports(profile.MinMemoryTier, tier) {
 			models = append(models, string(t))
 		}
 	}
 
 	// TTS models
 	for t, profile := range ModelRegistry.TTSModels {
-		if profile.MinMemoryTier <= tier {
+		if tierSupports(profile.MinMemoryTier, tier) {
 			models = append(models, string(t))
 		}
 	}
 
 	// Multimodal models
 	for t, profile := range ModelRegistry.MultimodalModels {
-		if profile.MinMemoryTier <= tier {
+		if tierSupports(profile.MinMemoryTier, tier) {
 			models = append(models, string(t))
 		}
 	}
 
 	return models
+}
+
+func tierSupports(required MemoryTier, available MemoryTier) bool {
+	return tierRank(required) <= tierRank(available)
+}
+
+func tierRank(tier MemoryTier) int {
+	switch tier {
+	case TierTiny:
+		return 0
+	case TierSmall:
+		return 1
+	case TierMedium:
+		return 2
+	case TierLarge:
+		return 3
+	case TierAuto:
+		return 3
+	default:
+		return -1
+	}
 }

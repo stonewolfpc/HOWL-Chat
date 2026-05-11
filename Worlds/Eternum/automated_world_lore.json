@@ -1,0 +1,14 @@
+{
+  "entries": [
+    {
+      "id": "eternum_solar_flare",
+      "scope": "world",
+      "trigger": "solar flare",
+      "priority": 2,
+      "content": "The great solar flare disrupted magic across Eternum.",
+      "created_at": "2026-05-11T10:34:00Z",
+      "last_triggered_at": null,
+      "frequency": "once_per_chat"
+    }
+  ]
+}

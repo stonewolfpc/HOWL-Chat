@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lorebooks - HOWL Chat</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/menu-components.css">
+    <link rel="stylesheet" href="css/nav-components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/ambient.css">
+    <link rel="stylesheet" href="css/character-header.css">
+    <link rel="stylesheet" href="css/lorebooks.css">
+    <link rel="stylesheet" href="css/nav-icon-images.css">
+</head>
+<body>
+    <div class="ambient-bg">
+        <div class="ambient-orb-1"></div>
+        <div class="ambient-orb-2"></div>
+        <div class="hexagon-grid"></div>
+    </div>
+
+    <div class="top-menu">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="assets/HOWL.png" alt="HOWL Chat" style="width: 44px; height: 44px;">
+            <div class="app-title">HOWL Chat</div>
+        </div>
+        <div class="menu-bar">
+            <div class="menu-item">
+                <button class="menu-button">File</button>
+                <div class="dropdown" id="file-dropdown">
+                    <div class="dropdown-item">New Chat</div>
+                    <div class="dropdown-item">Load Chat</div>
+                    <div class="dropdown-item">Save Chat</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Settings</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Exit</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button">Edit</button>
+                <div class="dropdown" id="edit-dropdown">
+                    <div class="dropdown-item">Undo</div>
+                    <div class="dropdown-item">Redo</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Copy</div>
+                    <div class="dropdown-item">Paste</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button">View</button>
+                <div class="dropdown" id="view-dropdown">
+                    <div class="dropdown-item">World</div>
+                    <div class="dropdown-item">Characters</div>
+                    <div class="dropdown-item">Scenarios</div>
+                    <div class="dropdown-item">Lorebooks</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button">Help</button>
+                <div class="dropdown" id="help-dropdown">
+                    <div class="dropdown-item">Documentation</div>
+                    <div class="dropdown-item">About</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="nav-sidebar">
+            <div class="nav-item" onclick="navigateTo('index.html')">
+                <img src="assets/quill.png" alt="Chat" class="nav-icon-img">
+            </div>
+            <div class="nav-item" onclick="navigateTo('world.html')">
+                <img src="assets/globe.png" alt="World" class="nav-icon-img">
+            </div>
+            <div class="nav-item" onclick="navigateTo('character.html')">
+                <img src="assets/Character.png" alt="Characters" class="nav-icon-img">
+            </div>
+            <div class="nav-item" onclick="navigateTo('scenario.html')">
+                <img src="assets/scroll.png" alt="Scenarios" class="nav-icon-img">
+            </div>
+            <div class="nav-item active" onclick="navigateTo('lorebooks.html')">
+                <img src="assets/spellbook.png" alt="Lorebooks" class="nav-icon-img">
+            </div>
+            <div class="nav-item" onclick="navigateTo('image-generator.html')">
+                <img src="assets/brush.png" alt="Image Generator" class="nav-icon-img">
+            </div>
+        </div>
+
+        <div class="character-content lorebook-page">
+            <div class="character-page-header">
+                <div>
+                    <h1 class="character-page-title">Lorebooks</h1>
+                    <div class="lorebook-page-subtitle">World, scenario, and character memory rules for immersive roleplay.</div>
+                </div>
+                <button class="create-character-button" onclick="openLorebookCreationPopup()">Create Entry</button>
+            </div>
+
+            <div class="lorebook-scope-strip">
+                <div class="lorebook-scope-note">World lore frames reality. Scenario lore frames the scene. Character lore belongs to a specific AI but can still be called when visibility allows.</div>
+            </div>
+
+            <div class="world-grid lorebooks-grid" id="lorebooks-grid">
+                <div class="world-grid-empty">
+                    <div class="world-grid-empty-icon">BOOK</div>
+                    <div class="world-grid-empty-text">No lorebook entries yet</div>
+                    <div class="world-grid-empty-subtext">Create the first memory rule for your world, scenario, or character.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="character-creation-overlay lorebook-editor-overlay" id="lorebook-creation-overlay" style="display: none;">
+            <div class="character-creation-popup lorebook-editor-popup">
+                <div class="character-creation-header">
+                    <div>
+                        <h2 class="character-creation-title" id="lorebook-editor-title">Create Lorebook Entry</h2>
+                        <div class="lorebook-editor-subtitle">Fast triggers, controlled context, clean memory behavior.</div>
+                    </div>
+                    <button class="character-creation-close" onclick="closeLorebookCreationPopup()">x</button>
+                </div>
+
+                <div class="character-creation-content lorebook-editor-content">
+                    <div class="lorebook-editor-layout">
+                        <aside class="lorebook-editor-sidebar">
+                            <div class="lorebook-editor-section compact">
+                                <div class="lorebook-section-title">Scope</div>
+                                <div class="character-images-list lorebook-type-list" id="lorebook-type-selector">
+                                    <button type="button" class="character-image-item lorebook-type-item" data-scope="world" onclick="selectLorebookType('world')">
+                                        <span class="lorebook-type-name">World</span>
+                                        <span class="lorebook-type-desc">Global truths</span>
+                                    </button>
+                                    <button type="button" class="character-image-item lorebook-type-item" data-scope="scenario" onclick="selectLorebookType('scenario')">
+                                        <span class="lorebook-type-name">Scenario</span>
+                                        <span class="lorebook-type-desc">Scene rules</span>
+                                    </button>
+                                    <button type="button" class="character-image-item lorebook-type-item" data-scope="character" onclick="selectLorebookType('character')">
+                                        <span class="lorebook-type-name">Character</span>
+                                        <span class="lorebook-type-desc">Personal memory</span>
+                                    </button>
+                                </div>
+                                <input type="hidden" id="lorebook-scope" value="world">
+                                <div class="lorebook-helper" id="lorebook-scope-helper"></div>
+                            </div>
+
+                            <div class="lorebook-editor-section compact">
+                                <label class="lorebook-toggle">
+                                    <input type="checkbox" id="lorebook-enabled" checked>
+                                    <span>Entry Enabled</span>
+                                </label>
+                            </div>
+                        </aside>
+
+                        <section class="lorebook-form-panel">
+                            <div class="lorebook-editor-section">
+                                <div class="lorebook-section-title">Basic</div>
+                                <div class="character-form-group">
+                                    <label class="character-form-label" for="lorebook-title">Title</label>
+                                    <input type="text" class="character-form-input" id="lorebook-title" placeholder="Mana Flow">
+                                </div>
+                                <div class="character-form-group">
+                                    <label class="character-form-label" for="lorebook-content">Content</label>
+                                    <textarea class="character-form-textarea" id="lorebook-content" placeholder="Magic flows through ley lines beneath the continent..." rows="8"></textarea>
+                                </div>
+                                <div class="character-form-group">
+                                    <label class="character-form-label" for="lorebook-tags">Tags</label>
+                                    <input type="text" class="character-form-input" id="lorebook-tags" placeholder="magic, geography, politics">
+                                </div>
+                            </div>
+
+                            <div class="lorebook-editor-section">
+                                <div class="lorebook-section-title">Activation</div>
+                                <div class="lorebook-grid-two">
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-trigger-phrases">Trigger Phrases</label>
+                                        <textarea class="character-form-textarea small" id="lorebook-trigger-phrases" placeholder="ley lines, mana, magic flow" rows="3"></textarea>
+                                    </div>
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-secondary-triggers">Secondary Triggers</label>
+                                        <textarea class="character-form-textarea small" id="lorebook-secondary-triggers" placeholder="academy, ritual, spellcraft" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="lorebook-grid-four">
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-trigger-mode">Trigger Mode</label>
+                                        <select class="character-form-input" id="lorebook-trigger-mode">
+                                            <option value="exact">Exact Match</option>
+                                            <option value="loose">Loose Match</option>
+                                            <option value="semantic">Semantic Match</option>
+                                        </select>
+                                    </div>
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-trigger-direction">Trigger Direction</label>
+                                        <select class="character-form-input" id="lorebook-trigger-direction">
+                                            <option value="both">Both</option>
+                                            <option value="user">User Only</option>
+                                            <option value="character">Characters Only</option>
+                                        </select>
+                                    </div>
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-trigger-frequency">Trigger Frequency</label>
+                                        <select class="character-form-input" id="lorebook-trigger-frequency">
+                                            <option value="always">Always</option>
+                                            <option value="once_per_chat">Once Per Chat</option>
+                                            <option value="once_per_scene">Once Per Scene</option>
+                                            <option value="once_per_message">Once Per Message</option>
+                                        </select>
+                                    </div>
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-scan-window">Scan Window</label>
+                                        <input type="number" class="character-form-input" id="lorebook-scan-window" min="1" max="12" value="4">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lorebook-editor-section">
+                                <div class="lorebook-section-title">Priority</div>
+                                <div class="lorebook-grid-two">
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-priority-level">Priority Level</label>
+                                        <select class="character-form-input" id="lorebook-priority-level">
+                                            <option value="1">1 - Critical</option>
+                                            <option value="2">2 - High</option>
+                                            <option value="3" selected>3 - Normal</option>
+                                            <option value="4">4 - Low</option>
+                                            <option value="5">5 - Flavor</option>
+                                        </select>
+                                    </div>
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-conflict-rule">Conflict Rule</label>
+                                        <select class="character-form-input" id="lorebook-conflict-rule">
+                                            <option value="higher_priority">Use Higher Priority</option>
+                                            <option value="newer_entry">Use Newer Entry</option>
+                                            <option value="use_both">Use Both</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lorebook-editor-section">
+                                <div class="lorebook-section-title">Visibility</div>
+                                <div class="lorebook-grid-two">
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-visibility">Visibility</label>
+                                        <select class="character-form-input" id="lorebook-visibility">
+                                            <option value="public">Public</option>
+                                            <option value="private">Private</option>
+                                            <option value="hidden">Hidden</option>
+                                        </select>
+                                    </div>
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-reveal-condition">Reveal Condition</label>
+                                        <select class="character-form-input" id="lorebook-reveal-condition">
+                                            <option value="never">Never Reveal</option>
+                                            <option value="character_says">Character Says It</option>
+                                            <option value="user_reveals">User Reveals It</option>
+                                            <option value="scenario_reveals">Scenario Reveals It</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lorebook-editor-section">
+                                <div class="lorebook-section-title">Injection</div>
+                                <div class="lorebook-grid-four">
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-injection-style">Injection Style</label>
+                                        <select class="character-form-input" id="lorebook-injection-style">
+                                            <option value="summary">Summary</option>
+                                            <option value="inline">Inline</option>
+                                            <option value="memory">Memory</option>
+                                            <option value="background">Background</option>
+                                        </select>
+                                    </div>
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-injection-position">Injection Position</label>
+                                        <select class="character-form-input" id="lorebook-injection-position">
+                                            <option value="system_summary_only">System Summary Only</option>
+                                            <option value="before_message">Before Message</option>
+                                            <option value="after_message">After Message</option>
+                                            <option value="hidden">Hidden</option>
+                                        </select>
+                                    </div>
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-max-length">Max Length</label>
+                                        <select class="character-form-input" id="lorebook-max-length">
+                                            <option value="short">Short</option>
+                                            <option value="medium" selected>Medium</option>
+                                            <option value="full">Full Entry</option>
+                                        </select>
+                                    </div>
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-context-budget">Context Budget</label>
+                                        <input type="number" class="character-form-input" id="lorebook-context-budget" min="40" max="1200" step="20" value="160">
+                                    </div>
+                                </div>
+                                <div class="character-form-group">
+                                    <label class="character-form-label" for="lorebook-recursion">Related Lore Triggering</label>
+                                    <select class="character-form-input" id="lorebook-recursion">
+                                        <option value="limited">Limited</option>
+                                        <option value="off">Off</option>
+                                        <option value="full">Full</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="lorebook-editor-section">
+                                <div class="lorebook-section-title">Relationships</div>
+                                <div class="lorebook-grid-two">
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-linked-characters">Linked Characters</label>
+                                        <input type="text" class="character-form-input" id="lorebook-linked-characters" placeholder="Aria, Doren">
+                                    </div>
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-linked-entries">Linked Lore Entries</label>
+                                        <input type="text" class="character-form-input" id="lorebook-linked-entries" placeholder="Mana Flow, Ley Lines">
+                                    </div>
+                                </div>
+                                <div class="character-form-group">
+                                    <label class="character-form-label" for="lorebook-inheritance">Inheritance</label>
+                                    <select class="character-form-input" id="lorebook-inheritance">
+                                        <option value="none">Do Not Inherit</option>
+                                        <option value="child_scenarios">Inherit to Child Scenarios</option>
+                                        <option value="child_worlds">Inherit to Child Worlds</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="lorebook-editor-section" id="automated-lore-settings">
+                                <div class="lorebook-section-title">Automated Memory</div>
+                                <label class="lorebook-toggle">
+                                    <input type="checkbox" id="lorebook-automated">
+                                    <span>System Generated Entry</span>
+                                </label>
+                                <div class="lorebook-grid-three">
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-memory-type">Memory Type</label>
+                                        <select class="character-form-input" id="lorebook-memory-type">
+                                            <option value="world">World Memory</option>
+                                            <option value="scenario">Scenario Memory</option>
+                                            <option value="character">Character Memory</option>
+                                        </select>
+                                    </div>
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-trigger-confidence">Trigger Confidence</label>
+                                        <select class="character-form-input" id="lorebook-trigger-confidence">
+                                            <option value="low">Low</option>
+                                            <option value="medium" selected>Medium</option>
+                                            <option value="high">High</option>
+                                        </select>
+                                    </div>
+                                    <div class="character-form-group">
+                                        <label class="character-form-label" for="lorebook-decay-rate">Decay Rate</label>
+                                        <select class="character-form-input" id="lorebook-decay-rate">
+                                            <option value="never">Never Decays</option>
+                                            <option value="slow">Slow Decay</option>
+                                            <option value="fast">Fast Decay</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <div class="character-creation-footer">
+                    <button class="character-creation-cancel" onclick="closeLorebookCreationPopup()">Cancel</button>
+                    <button class="character-creation-save" onclick="saveLorebook()">Save Entry</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/theme.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/lorebooks.js"></script>
+    <script src="js/navigation.js"></script>
+</body>
+</html>

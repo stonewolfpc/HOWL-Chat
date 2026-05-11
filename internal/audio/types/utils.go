@@ -1,6 +1,8 @@
 package types
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"os/exec"
@@ -263,15 +265,8 @@ func CheckHardwareCompatibility(modelType string, availableRAM int64) (bool, err
 
 // GenerateCacheKey creates a deterministic cache key for TTS
 func GenerateCacheKey(text string, voice string, speed float64) string {
-	// Simple hash: could be improved with proper hashing
-	return fmt.Sprintf("%s_%s_%.1f", voice, text[:min(len(text), 50)], speed)
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
+	sum := sha256.Sum256([]byte(fmt.Sprintf("%s|%s|%.6f", voice, text, speed)))
+	return hex.EncodeToString(sum[:])
 }
 
 // FormatDuration converts seconds to human-readable string

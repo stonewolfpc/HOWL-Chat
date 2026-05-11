@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Generator - HOWL Chat</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/menu-components.css">
+    <link rel="stylesheet" href="css/nav-components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/ambient.css">
+    <link rel="stylesheet" href="css/character-header.css">
+    <link rel="stylesheet" href="css/image-generator.css">
+    <link rel="stylesheet" href="css/nav-icon-images.css">
+</head>
+<body>
+    <!-- Ambient Background Effects -->
+    <div class="ambient-bg">
+        <div class="ambient-orb-1"></div>
+        <div class="ambient-orb-2"></div>
+        <div class="hexagon-grid"></div>
+    </div>
+
+    <!-- Top Menu -->
+    <div class="top-menu">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="assets/HOWL.png" alt="HOWL Chat" style="width: 44px; height: 44px;">
+            <div class="app-title">HOWL Chat</div>
+        </div>
+        <div class="menu-bar">
+            <div class="menu-item">
+                <button class="menu-button">File</button>
+                <div class="dropdown" id="file-dropdown">
+                    <div class="dropdown-item">New Chat</div>
+                    <div class="dropdown-item">Load Chat</div>
+                    <div class="dropdown-item">Save Chat</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Settings</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Exit</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button">Edit</button>
+                <div class="dropdown" id="edit-dropdown">
+                    <div class="dropdown-item">Undo</div>
+                    <div class="dropdown-item">Redo</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item">Copy</div>
+                    <div class="dropdown-item">Paste</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button">View</button>
+                <div class="dropdown" id="view-dropdown">
+                    <div class="dropdown-item">World</div>
+                    <div class="dropdown-item">Characters</div>
+                    <div class="dropdown-item">Scenarios</div>
+                    <div class="dropdown-item">Lorebooks</div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <button class="menu-button">Help</button>
+                <div class="dropdown" id="help-dropdown">
+                    <div class="dropdown-item">Documentation</div>
+                    <div class="dropdown-item">About</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navigation Sidebar -->
+        <div class="nav-sidebar">
+            <div class="nav-item" onclick="navigateTo('index.html')">
+                <img src="assets/quill.png" alt="Chat" class="nav-icon-img">
+            </div>
+            <div class="nav-item" onclick="navigateTo('world.html')">
+                <img src="assets/globe.png" alt="World" class="nav-icon-img">
+            </div>
+            <div class="nav-item" onclick="navigateTo('character.html')">
+                <img src="assets/Character.png" alt="Characters" class="nav-icon-img">
+            </div>
+            <div class="nav-item" onclick="navigateTo('scenario.html')">
+                <img src="assets/scroll.png" alt="Scenarios" class="nav-icon-img">
+            </div>
+            <div class="nav-item" onclick="navigateTo('lorebooks.html')">
+                <img src="assets/spellbook.png" alt="Lorebooks" class="nav-icon-img">
+            </div>
+            <div class="nav-item active" onclick="navigateTo('image-generator.html')">
+                <img src="assets/brush.png" alt="Image Generator" class="nav-icon-img">
+            </div>
+        </div>
+
+        <!-- Image Generator Content Area -->
+        <div class="character-content">
+            <div class="character-page-header">
+                <h1 class="character-page-title">Image Generator</h1>
+            </div>
+            
+            <!-- Coming Soon Content -->
+            <div class="coming-soon-container">
+                <div class="coming-soon-icon">🎨</div>
+                <h2 class="coming-soon-title">Coming Soon</h2>
+                <p class="coming-soon-text">Advanced AI image generation for your HOWL Chat experience</p>
+                <div class="coming-soon-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">✨</span>
+                        <span class="feature-text">Character avatar generation</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🌍</span>
+                        <span class="feature-text">World scene creation</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🎭</span>
+                        <span class="feature-text">Scenario visualization</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/theme.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/navigation.js"></script>
+</body>
+</html>

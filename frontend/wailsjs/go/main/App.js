@@ -74,6 +74,10 @@ export function SendMessageStreamWithImage(arg1, arg2) {
   return window['go']['main']['App']['SendMessageStreamWithImage'](arg1, arg2);
 }
 
+export function SetLorebooks(arg1) {
+  return window['go']['main']['App']['SetLorebooks'](arg1);
+}
+
 export function SetModelOptions(arg1) {
   return window['go']['main']['App']['SetModelOptions'](arg1);
 }

@@ -3,8 +3,11 @@ package asr
 import (
 	"context"
 	"fmt"
-	"runtime"
+	"os"
+	"path/filepath"
+	"time"
 
+	"howl-chat/internal/audio/hw"
 	"howl-chat/internal/audio/types"
 )
 
@@ -61,6 +64,19 @@ func (b *BaseRecognizer) GetConfig() types.ASRConfig {
 // GetModelInfo returns model capabilities
 func (b *BaseRecognizer) GetModelInfo() types.ASRModelInfo {
 	return b.info
+}
+
+// SupportsLanguage checks if the recognizer can process a language code.
+func (b *BaseRecognizer) SupportsLanguage(lang string) bool {
+	if lang == "" || lang == "auto" {
+		return true
+	}
+	for _, supported := range b.info.Languages {
+		if supported == lang {
+			return true
+		}
+	}
+	return false
 }
 
 // CheckInitialized verifies recognizer is ready for use
@@ -131,16 +147,52 @@ func (b *BaseRecognizer) EnsureCompatibleFormat(ctx context.Context, inputPath s
 		return inputPath, nil // Already compatible
 	}
 
-	// Need to convert - for now return error (implementation will do actual conversion)
-	return "", NewTranscodingError(metadata.Format, targetFormat.Format,
-		fmt.Errorf("format conversion not yet implemented"))
+	dir := os.TempDir()
+	if err := os.MkdirAll(filepath.Join(dir, "howl-asr"), 0o755); err != nil {
+		return "", NewTranscodingError(metadata.Format, targetFormat.Format, err)
+	}
+	outPath := filepath.Join(dir, "howl-asr", fmt.Sprintf("compat_%d.wav", time.Now().UnixNano()))
+	if err := types.ConvertAudioFormat(inputPath, targetFormat.Format, outPath); err != nil {
+		return "", NewTranscodingError(metadata.Format, targetFormat.Format, err)
+	}
+	return outPath, nil
 }
 
 // CheckHardwareCompatibility verifies sufficient resources
 func (b *BaseRecognizer) CheckHardwareCompatibility() error {
-	// TODO: Implement proper system RAM detection
-	// runtime.ReadMemStats only reflects Go's allocated memory, not system RAM
-	// For now, skip this check - users should have sufficient RAM for typical use
+	profile, ok := types.GetASRProfile(b.modelType)
+	if !ok {
+		return nil
+	}
+	h := hw.DetectHardware()
+	minRAM := profile.RAMBytes + profile.ModelSizeBytes
+	if profile.VRAMBytes > 0 && !h.HasGPU {
+		return types.NewAudioError(types.ErrCodeHardwareInsufficient,
+			fmt.Sprintf("model %s requires a GPU (%d bytes VRAM profile); none detected",
+				b.modelType, profile.VRAMBytes),
+			h.Error)
+	}
+	if profile.VRAMBytes > 0 && h.GPUMemoryBytes > 0 && h.GPUMemoryBytes < profile.VRAMBytes {
+		return types.NewAudioError(types.ErrCodeHardwareInsufficient,
+			fmt.Sprintf("model %s needs about %s VRAM but reported usable GPU memory is about %s",
+				b.modelType, types.FormatBytes(profile.VRAMBytes), types.FormatBytes(h.GPUMemoryBytes)),
+			nil)
+	}
+	if minRAM <= 0 {
+		return nil
+	}
+	available := h.AvailableRAMBytes
+	const headroomMul = float64(1.15)
+	need := float64(minRAM) * headroomMul
+	if float64(available) < need {
+		return types.NewAudioError(types.ErrCodeHardwareInsufficient,
+			fmt.Sprintf("insufficient RAM for %s (need approximately %s free, ~%s with headroom; have ~%s free)",
+				b.modelType,
+				types.FormatBytes(minRAM),
+				types.FormatBytes(int64(need)),
+				types.FormatBytes(available)),
+			h.Error)
+	}
 	return nil
 }
 
@@ -197,32 +249,17 @@ func (f *RecognizerFactory) Create(modelType types.ASRModelType) (types.ASRRecog
 
 // ListAvailable returns all registered model types
 func (f *RecognizerFactory) ListAvailable() []types.ASRModelType {
-	var types []types.ASRModelType
+	var out []types.ASRModelType
 	for t := range f.registry {
-		types = append(types, t)
+		out = append(out, t)
 	}
-	return types
+	return out
 }
 
 // RecommendForHardware suggests best model for current hardware
 func RecommendForHardware(preferredLang string) types.ASRModelType {
-	tier := types.TierSmall // Default assumption
-
-	// Detect actual tier
-	var m runtime.MemStats
-	runtime.ReadMemStats(&m)
-	totalRAM := m.Sys
-
-	switch {
-	case totalRAM < 2*1024*1024*1024:
-		tier = types.TierTiny
-	case totalRAM < 8*1024*1024*1024:
-		tier = types.TierSmall
-	case totalRAM < 16*1024*1024*1024:
-		tier = types.TierMedium
-	default:
-		tier = types.TierLarge
-	}
+	h := hw.DetectHardware()
+	tier := h.MemoryTier
 
 	langs := []string{}
 	if preferredLang != "" && preferredLang != "auto" {

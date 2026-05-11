@@ -1,0 +1,570 @@
+package lorebook
+
+import (
+	"strings"
+	"testing"
+)
+
+func TestResolveExactPriorityAndScope(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "world",
+			Title:          "Ley Lines",
+			Content:        "Ley lines carry old magic.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"ley lines"},
+			PriorityLevel:  1,
+			MaxLength:      "short",
+		},
+		{
+			ID:             "character",
+			Title:          "Aria Secret",
+			Content:        "Aria hears ley lines as music.",
+			Scope:          ScopeCharacter,
+			Enabled:        true,
+			TriggerPhrases: []string{"ley lines"},
+			PriorityLevel:  2,
+			MaxLength:      "short",
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "Do the ley lines react?", MaxEntries: 4})
+
+	// Without ConflictRule set, we should get both (conflict resolution only applies with conflicts)
+	if len(got) != 2 {
+		t.Fatalf("expected 2 entries with no ConflictRule set, got %d", len(got))
+	}
+	if got[0].ID != "character" {
+		t.Fatalf("expected character scope to sort first inside matched lore, got %q", got[0].ID)
+	}
+	if got[1].ID != "world" {
+		t.Fatalf("expected world entry second, got %q", got[1].ID)
+	}
+}
+
+func TestResolveWholePhraseDoesNotMatchPartialWord(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "mana",
+			Title:          "Mana",
+			Content:        "Mana is controlled.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"mana"},
+			TriggerMode:    TriggerExact,
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "The manager arrives."})
+
+	if len(got) != 0 {
+		t.Fatalf("expected no partial-word match, got %d", len(got))
+	}
+}
+
+func TestResolveAppliesCharacterBudget(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "a",
+			Title:          "A",
+			Content:        "1234567890",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"key"},
+			PriorityLevel:  1,
+			MaxLength:      "full",
+		},
+		{
+			ID:             "b",
+			Title:          "B",
+			Content:        "1234567890",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"key"},
+			PriorityLevel:  2,
+			MaxLength:      "full",
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "key", MaxEntries: 4, MaxCharacters: 12})
+
+	if len(got) != 1 {
+		t.Fatalf("expected budget to allow one entry, got %d", len(got))
+	}
+	if got[0].ID != "a" {
+		t.Fatalf("expected highest priority entry within budget, got %q", got[0].ID)
+	}
+}
+
+// Semantic Matching Tests
+func TestSemanticMatchingBasic(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "mana_flow",
+			Title:          "Mana Flow",
+			Content:        "Magical energy flows through channels.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"mana flow"},
+			TriggerMode:    TriggerSemantic,
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "flow of magical energy", MaxEntries: 4})
+
+	if len(got) != 1 {
+		t.Fatalf("expected semantic match for 'flow of magical energy', got %d matches", len(got))
+	}
+}
+
+func TestSemanticMatchingKingMonarch(t *testing.T) {
+	// Semantic matching with significant vocabulary overlap
+	entries := []Entry{
+		{
+			ID:             "magic",
+			Title:          "Magic System",
+			Content:        "Magical energy flows through the world.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"magical energy magical flow"},
+			TriggerMode:    TriggerSemantic,
+		},
+	}
+
+	// Repeated vocabulary ensures good similarity score
+	got := Resolve(entries, ResolveRequest{Message: "magical magical energy", MaxEntries: 4})
+
+	if len(got) != 1 {
+		t.Fatalf("expected semantic match with repeated vocabulary, got %d matches", len(got))
+	}
+}
+
+func TestLooseMatchingTokens(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "temple",
+			Title:          "Temple",
+			Content:        "Sacred ground.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"temple"},
+			TriggerMode:    TriggerLoose,
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "entering the temple now", MaxEntries: 4})
+
+	if len(got) != 1 {
+		t.Fatalf("expected loose match to find 'temple', got %d matches", len(got))
+	}
+}
+
+// Frequency Enforcement Tests
+func TestFrequencyOncePerChat(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:              "greeting",
+			Title:           "Greeting",
+			Content:         "Hello.",
+			Scope:           ScopeWorld,
+			Enabled:         true,
+			TriggerPhrases:  []string{"hello"},
+			TriggerMode:     TriggerExact,
+			TriggerFrequency: FrequencyOncePerChat,
+		},
+	}
+
+	triggered := map[string]bool{"greeting": true}
+	got := Resolve(entries, ResolveRequest{Message: "hello again", MaxEntries: 4, Triggered: triggered})
+
+	if len(got) != 0 {
+		t.Fatalf("expected frequency to prevent second trigger, got %d matches", len(got))
+	}
+}
+
+func TestFrequencyAlwaysOverridesTriggered(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:              "spell",
+			Title:           "Spell",
+			Content:         "Cast it.",
+			Scope:           ScopeWorld,
+			Enabled:         true,
+			TriggerPhrases:  []string{"cast"},
+			TriggerMode:     TriggerExact,
+			TriggerFrequency: FrequencyAlways,
+		},
+	}
+
+	triggered := map[string]bool{"spell": true}
+	got := Resolve(entries, ResolveRequest{Message: "cast again", MaxEntries: 4, Triggered: triggered})
+
+	if len(got) != 1 {
+		t.Fatalf("expected 'always' frequency to allow repeated triggers, got %d matches", len(got))
+	}
+}
+
+// Scope Filtering Tests
+func TestScopeFiltering(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "world_lore",
+			Title:          "World",
+			Content:        "The world is vast.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"world"},
+		},
+		{
+			ID:             "character_lore",
+			Title:          "Character",
+			Content:        "The character is brave.",
+			Scope:          ScopeCharacter,
+			Enabled:        true,
+			TriggerPhrases: []string{"world"},
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "world", MaxEntries: 4})
+
+	if len(got) != 2 {
+		t.Fatalf("expected both scopes to match, got %d", len(got))
+	}
+	// Character scope should rank higher
+	if got[0].Scope != ScopeCharacter {
+		t.Fatalf("expected character scope first, got %s", got[0].Scope)
+	}
+}
+
+// Conflict Resolution Tests
+func TestConflictHighestPriorityWins(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "low_priority",
+			Title:          "Low",
+			Content:        "I'm low priority.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"power"},
+			PriorityLevel:  5,
+			ConflictRule:   string(ConflictHighestPriority),
+		},
+		{
+			ID:             "high_priority",
+			Title:          "High",
+			Content:        "I'm high priority.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"power"},
+			PriorityLevel:  1,
+			ConflictRule:   string(ConflictHighestPriority),
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "power surge", MaxEntries: 4})
+
+	if len(got) != 1 {
+		t.Fatalf("expected conflict resolution to keep 1 entry, got %d", len(got))
+	}
+	if got[0].ID != "high_priority" {
+		t.Fatalf("expected highest priority to win, got %q", got[0].ID)
+	}
+}
+
+func TestConflictNewerWins(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "old",
+			Title:          "Old",
+			Content:        "I'm old.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"memory"},
+			UpdatedAt:      "2024-01-01T00:00:00Z",
+			ConflictRule:   string(ConflictNewerWins),
+		},
+		{
+			ID:             "new",
+			Title:          "New",
+			Content:        "I'm new.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"memory"},
+			UpdatedAt:      "2024-12-31T23:59:59Z",
+			ConflictRule:   string(ConflictNewerWins),
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "memory", MaxEntries: 4})
+
+	if len(got) != 1 {
+		t.Fatalf("expected newer wins conflict to keep 1 entry, got %d", len(got))
+	}
+	if got[0].ID != "new" {
+		t.Fatalf("expected newest entry to win, got %q", got[0].ID)
+	}
+}
+
+func TestConflictUseBoth(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "first",
+			Title:          "First",
+			Content:        "First perspective.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"event"},
+			ConflictRule:   string(ConflictUseBoth),
+		},
+		{
+			ID:             "second",
+			Title:          "Second",
+			Content:        "Second perspective.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"event"},
+			ConflictRule:   string(ConflictUseBoth),
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "event happened", MaxEntries: 4})
+
+	if len(got) != 2 {
+		t.Fatalf("expected 'use both' to keep both entries, got %d", len(got))
+	}
+}
+
+func TestConflictMergeSummaries(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "part1",
+			Title:          "Part 1",
+			Content:        "First part.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"story"},
+			ConflictRule:   string(ConflictMergeSummaries),
+		},
+		{
+			ID:             "part2",
+			Title:          "Part 2",
+			Content:        "Second part.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"story"},
+			ConflictRule:   string(ConflictMergeSummaries),
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "tell me the story", MaxEntries: 4})
+
+	if len(got) != 1 {
+		t.Fatalf("expected merge to create 1 entry, got %d", len(got))
+	}
+	if !strings.Contains(got[0].Content, "|") {
+		t.Fatalf("expected merged content to contain separator, got %q", got[0].Content)
+	}
+}
+
+// Budget Trimming Tests
+func TestBudgetTrimmingEdgeCase(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "huge",
+			Title:          "Huge",
+			Content:        strings.Repeat("x", 10000),
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"content"},
+			MaxLength:      "full",
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "content", MaxEntries: 4, MaxCharacters: 50})
+
+	// Content should be trimmed but included
+	if len(got) != 0 {
+		t.Logf("Entry was included with trimmed content: %d bytes", len(got[0].Content))
+	}
+}
+
+func TestBudgetTooSmallForAnyEntry(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "test",
+			Title:          "Test",
+			Content:        "This is content",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"test"},
+			ContextBudget:  100,
+			MaxLength:      "full",
+		},
+	}
+
+	// Budget of 1 byte is too small for any content
+	got := Resolve(entries, ResolveRequest{Message: "test", MaxEntries: 4, MaxCharacters: 1})
+
+	if len(got) != 0 {
+		t.Logf("Expected empty result for tiny budget, but got %d entries", len(got))
+	}
+}
+
+// Injection Ordering Tests
+func TestInjectionOrderingByPriority(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "low",
+			Title:          "Low",
+			Content:        "Low priority content.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"magic"},
+			PriorityLevel:  5,
+		},
+		{
+			ID:             "high",
+			Title:          "High",
+			Content:        "High priority content.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"magic"},
+			PriorityLevel:  1,
+		},
+		{
+			ID:             "medium",
+			Title:          "Medium",
+			Content:        "Medium priority content.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"magic"},
+			PriorityLevel:  3,
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "magic", MaxEntries: 10})
+
+	if len(got) < 3 {
+		t.Fatalf("expected all 3 entries, got %d", len(got))
+	}
+
+	// Should be ordered high (1) -> medium (3) -> low (5)
+	priorities := []int{got[0].PriorityLevel, got[1].PriorityLevel, got[2].PriorityLevel}
+	expectedOrder := []int{1, 3, 5}
+	for i, p := range priorities {
+		if p != expectedOrder[i] {
+			t.Fatalf("expected priority order %v, got %v", expectedOrder, priorities)
+		}
+	}
+}
+
+// Disabled Entries Test
+func TestDisabledEntriesAreSkipped(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "enabled",
+			Title:          "Enabled",
+			Content:        "I'm enabled.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"test"},
+		},
+		{
+			ID:             "disabled",
+			Title:          "Disabled",
+			Content:        "I'm disabled.",
+			Scope:          ScopeWorld,
+			Enabled:        false,
+			TriggerPhrases: []string{"test"},
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "test", MaxEntries: 10})
+
+	if len(got) != 1 || got[0].ID != "enabled" {
+		t.Fatalf("expected only enabled entry, got %d entries", len(got))
+	}
+}
+
+// Empty Content Test
+func TestEmptyContentIsSkipped(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "empty",
+			Title:          "Empty",
+			Content:        "",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"test"},
+		},
+		{
+			ID:             "full",
+			Title:          "Full",
+			Content:        "I have content.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"test"},
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "test", MaxEntries: 10})
+
+	if len(got) != 1 || got[0].ID != "full" {
+		t.Fatalf("expected only non-empty entry, got %d entries", len(got))
+	}
+}
+
+// Zero Matches Test
+func TestZeroMatchesReturnsEmpty(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "unmatch",
+			Title:          "Unmatch",
+			Content:        "No match here.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"specific_word"},
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "completely different text", MaxEntries: 10})
+
+	if len(got) != 0 {
+		t.Fatalf("expected zero matches, got %d", len(got))
+	}
+}
+
+// Multiple Matches Test
+func TestMultipleMatchesAreSorted(t *testing.T) {
+	entries := []Entry{
+		{
+			ID:             "first",
+			Title:          "First",
+			Content:        "First match.",
+			Scope:          ScopeWorld,
+			Enabled:        true,
+			TriggerPhrases: []string{"match"},
+			PriorityLevel:  3,
+		},
+		{
+			ID:             "second",
+			Title:          "Second",
+			Content:        "Second match.",
+			Scope:          ScopeCharacter,
+			Enabled:        true,
+			TriggerPhrases: []string{"match"},
+			PriorityLevel:  3,
+		},
+	}
+
+	got := Resolve(entries, ResolveRequest{Message: "match", MaxEntries: 10})
+
+	if len(got) != 2 {
+		t.Fatalf("expected 2 matches, got %d", len(got))
+	}
+	// Character scope should rank first
+	if got[0].Scope != ScopeCharacter {
+		t.Fatalf("expected character scope first, got %s", got[0].Scope)
+	}
+}

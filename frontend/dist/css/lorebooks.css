@@ -1,0 +1,635 @@
+/**
+ * Lorebooks Page Component Styles
+ * 
+ * This file contains all lorebook-related styles including
+ * the lorebook type selector, entry editor, and management interfaces.
+ * 
+ * @module lorebooks
+ */
+
+/* Lorebooks Page Header */
+.lorebooks-page-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--theme-color);
+    text-shadow: 0 0 10px var(--theme-glow);
+}
+
+/* Create New Lorebook Button */
+.create-lorebook-button {
+    background: var(--theme-glow);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    margin-top: 16px;
+}
+
+.create-lorebook-button:hover {
+    background: var(--theme-glow);
+    border-color: var(--theme-color);
+    box-shadow: 0 0 8px var(--theme-glow);
+}
+
+/* Lorebooks Content Area */
+.lorebooks-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: rgba(15, 21, 31, 0.95);
+}
+
+#lorebook-creation-overlay {
+    display: none;
+}
+
+.lorebook-page {
+    min-width: 0;
+}
+
+.lorebook-page-subtitle,
+.lorebook-editor-subtitle,
+.lorebook-helper,
+.lorebook-scope-note {
+    color: rgba(212, 212, 212, 0.72);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.lorebook-scope-strip {
+    padding: 0 20px 12px;
+}
+
+.lorebook-scope-note {
+    border: 1px solid rgba(100, 100, 100, 0.25);
+    background: rgba(21, 21, 31, 0.5);
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.lorebook-editor-overlay {
+    z-index: 2200;
+}
+
+.lorebook-editor-popup {
+    width: min(1180px, calc(100vw - 28px));
+    max-width: 1180px;
+    max-height: calc(100vh - 28px);
+}
+
+.lorebook-editor-content {
+    max-height: calc(100vh - 190px);
+    padding: 0;
+}
+
+.lorebook-editor-layout {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 0;
+    min-height: 540px;
+}
+
+.lorebook-editor-sidebar {
+    border-right: 1px solid rgba(100, 100, 100, 0.3);
+    background: rgba(10, 10, 15, 0.35);
+    padding: 18px;
+}
+
+.lorebook-form-panel {
+    padding: 18px;
+    overflow-y: auto;
+}
+
+.lorebook-editor-section {
+    border: 1px solid rgba(100, 100, 100, 0.26);
+    background: rgba(15, 21, 31, 0.52);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 14px;
+}
+
+.lorebook-editor-section.compact {
+    padding: 12px;
+}
+
+.lorebook-editor-section.is-muted {
+    opacity: 0.72;
+}
+
+.lorebook-section-title {
+    color: var(--theme-color);
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+.lorebook-grid-two,
+.lorebook-grid-three,
+.lorebook-grid-four {
+    display: grid;
+    gap: 12px;
+}
+
+.lorebook-grid-two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lorebook-grid-three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.lorebook-grid-four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.lorebook-type-list {
+    gap: 10px;
+}
+
+.lorebook-type-item {
+    width: 100%;
+    text-align: left;
+}
+
+.lorebook-type-name,
+.lorebook-type-desc {
+    display: block;
+}
+
+.lorebook-type-name {
+    color: var(--static-text);
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.lorebook-type-desc {
+    color: rgba(212, 212, 212, 0.68);
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+.lorebook-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--static-text);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.lorebook-toggle input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--theme-color);
+}
+
+.character-form-textarea.small {
+    min-height: 72px;
+}
+
+.lorebook-card {
+    align-items: flex-start;
+    min-height: 180px;
+}
+
+.lorebook-card.is-disabled {
+    opacity: 0.58;
+}
+
+.lorebook-card-content {
+    color: rgba(212, 212, 212, 0.82);
+    font-size: 12px;
+    line-height: 1.45;
+    margin: 8px 0 12px;
+    white-space: pre-wrap;
+}
+
+.lorebook-card-meta {
+    flex-wrap: wrap;
+}
+
+.lorebook-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.lorebook-chip {
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: rgba(20, 184, 166, 0.14);
+    color: var(--static-text);
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-size: 11px;
+}
+
+.lorebook-chip.muted {
+    background: rgba(100, 100, 100, 0.15);
+    color: rgba(212, 212, 212, 0.72);
+}
+
+/* Lorebooks Grid */
+.lorebooks-grid {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    align-content: start;
+}
+
+/* Lorebook Grid Empty State */
+.lorebooks-grid-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.lorebooks-grid-empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+}
+
+.lorebooks-grid-empty-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--static-text);
+    margin-bottom: 8px;
+}
+
+.lorebooks-grid-empty-subtext {
+    font-size: 14px;
+    color: rgba(212, 212, 212, 0.7);
+}
+
+/* Lorebook Type Selector */
+.lorebook-type-selector {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: rgba(21, 21, 31, 0.6);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 8px;
+}
+
+.lorebook-type-selector h3 {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--theme-color);
+    text-shadow: 0 0 8px var(--theme-glow);
+    margin: 0;
+}
+
+/* Lorebook Type Items */
+.lorebook-type-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(15, 21, 31, 0.8);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.lorebook-type-item:hover {
+    background: var(--theme-glow);
+    border-color: var(--theme-color);
+    box-shadow: 0 0 8px var(--theme-glow);
+    transform: translateY(-2px);
+}
+
+.lorebook-type-item.selected {
+    border-color: var(--theme-color);
+    box-shadow: 0 0 12px var(--theme-glow);
+    background: rgba(20, 184, 166, 0.2);
+}
+
+.lorebook-type-item .character-image-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.lorebook-type-item .character-image-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--static-text);
+}
+
+.lorebook-type-item .character-image-size {
+    font-size: 12px;
+    color: rgba(212, 212, 212, 0.7);
+}
+
+/* Lorebook Form Section */
+.lorebook-form-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+}
+
+/* Lorebook Entry Preview */
+.lorebook-entry-preview {
+    background: rgba(21, 21, 31, 0.6);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 16px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.lorebook-entry-preview h4 {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--theme-color);
+    text-shadow: 0 0 8px var(--theme-glow);
+    margin: 0 0 16px 0;
+}
+
+.lorebook-entry-preview-content {
+    color: var(--static-text);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+}
+
+.lorebook-entry-preview-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(100, 100, 100, 0.3);
+}
+
+.lorebook-entry-meta-item {
+    background: rgba(100, 100, 100, 0.2);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--static-text);
+}
+
+.lorebook-entry-meta-label {
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+/* Lorebook Entry List */
+.lorebook-entry-list {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 8px;
+    background: rgba(21, 21, 31, 0.6);
+}
+
+.lorebook-entry-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px;
+    border-bottom: 1px solid rgba(100, 100, 100, 0.2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 16px;
+}
+
+.lorebook-entry-item:hover {
+    background: rgba(20, 184, 166, 0.2);
+}
+
+.lorebook-entry-item.selected {
+    background: rgba(20, 184, 166, 0.3);
+    border-left: 3px solid var(--theme-color);
+}
+
+.lorebook-entry-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.lorebook-entry-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--theme-color);
+    margin-bottom: 4px;
+}
+
+.lorebook-entry-excerpt {
+    font-size: 14px;
+    color: var(--static-text);
+    opacity: 0.8;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.lorebook-entry-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.lorebook-entry-tags {
+    display: flex;
+    gap: 4px;
+}
+
+.lorebook-entry-tag {
+    background: rgba(100, 100, 100, 0.2);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    color: var(--static-text);
+}
+
+.lorebook-entry-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.lorebook-edit-btn,
+.lorebook-delete-btn {
+    background: none;
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.lorebook-edit-btn:hover {
+    background: rgba(100, 100, 100, 0.2);
+}
+
+.lorebook-delete-btn:hover {
+    background: rgba(255, 67, 54, 0.2);
+}
+
+/* Lorebook Creation Popup */
+.lorebook-creation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.lorebook-creation-popup {
+    background: rgba(15, 21, 31, 0.95);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 0 20px var(--theme-glow);
+}
+
+.lorebook-creation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+}
+
+.lorebook-creation-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--theme-color);
+    text-shadow: 0 0 10px var(--theme-glow);
+    margin: 0;
+}
+
+.lorebook-creation-close {
+    background: none;
+    border: none;
+    color: var(--static-text);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.lorebook-creation-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.lorebook-creation-content {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.lorebook-creation-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px;
+    border-top: 1px solid rgba(100, 100, 100, 0.3);
+}
+
+.lorebook-creation-cancel,
+.lorebook-creation-save {
+    padding: 10px 20px;
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.lorebook-creation-cancel {
+    background: rgba(100, 100, 100, 0.2);
+    color: var(--static-text);
+}
+
+.lorebook-creation-save {
+    background: var(--theme-glow);
+    color: var(--static-text);
+    border-color: var(--theme-color);
+}
+
+.lorebook-creation-cancel:hover,
+.lorebook-creation-save:hover {
+    box-shadow: 0 0 8px var(--theme-glow);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .lorebook-editor-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .lorebook-editor-sidebar {
+        border-right: 0;
+        border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+    }
+
+    .lorebook-grid-two,
+    .lorebook-grid-three,
+    .lorebook-grid-four {
+        grid-template-columns: 1fr;
+    }
+
+    .lorebook-type-selector {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .lorebook-type-item {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: center;
+        gap: 8px;
+    }
+    
+    .lorebook-entry-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .lorebook-entry-actions {
+        margin-top: 12px;
+        justify-content: center;
+    }
+}
