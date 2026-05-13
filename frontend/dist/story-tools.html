@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+    HOWL Chat - Story Tools Page
+    
+    This page provides memory management functionality for viewing,
+    editing, and managing automated lorebook entries that are
+    captured during chat sessions. Features include search,
+    filtering, export/import, and real-time updates.
+    
+    @module story-tools
+    @version 1.0.0
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Tools - HOWL Chat</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/menu-components.css">
+    <link rel="stylesheet" href="css/nav-components.css">
+    <link rel="stylesheet" href="css/panel-components.css">
+    <link rel="stylesheet" href="css/character-components.css">
+    <link rel="stylesheet" href="css/chat-components.css">
+    <link rel="stylesheet" href="css/input-components.css">
+    <link rel="stylesheet" href="css/world-components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/ambient.css">
+    <link rel="stylesheet" href="css/chat-session-list.css">
+    <link rel="stylesheet" href="css/chat-session-modal.css">
+    <link rel="stylesheet" href="css/nav-icon-images.css">
+    <link rel="stylesheet" href="css/loading-progress.css">
+    <link rel="stylesheet" href="css/sampler-settings.css">
+    <link rel="stylesheet" href="css/model-settings.css">
+    <link rel="stylesheet" href="css/sidebar-panels.css">
+    <link rel="stylesheet" href="css/story-tools.css">
+    <script src="js/menu.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/storage-manager.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/chat-session.js"></script>
+    <script src="js/world.js"></script>
+    <script src="js/loading-progress.js"></script>
+    <script src="js/sampler-settings.js"></script>
+    <script src="js/model-settings.js"></script>
+    <script src="js/menu-functions.js"></script>
+    <script src="js/sidebar-panels.js"></script>
+    <script src="js/story-tools.js"></script>
+</head>
+<body>
+    <!-- Top Menu Bar -->
+    <header class="top-menu">
+        <div class="menu-left">
+            <button class="menu-button" onclick="navigateTo('index.html')">Chat</button>
+            <button class="menu-button" onclick="navigateTo('world.html')">World</button>
+            <button class="menu-button" onclick="navigateTo('scenario.html')">Scenario</button>
+            <button class="menu-button" onclick="navigateTo('character.html')">Characters</button>
+            <button class="menu-button" onclick="navigateTo('lorebooks.html')">Lorebooks</button>
+            <button class="menu-button active" onclick="navigateTo('story-tools.html')">Story Tools</button>
+        </div>
+        <div class="menu-right">
+            <button class="menu-button" onclick="toggleMenu('settings-menu')">Settings</button>
+            <div class="dropdown" id="settings-menu">
+                <div class="dropdown-item" onclick="toggleFlyout('sampler-settings-flyout')">Sampler Settings</div>
+                <div class="dropdown-item" onclick="toggleModelSettingsFlyout()">Model Settings</div>
+                <div class="dropdown-item" onclick="openStoryTools()">Story Tools</div>
+                <div class="dropdown-separator"></div>
+                <div class="dropdown-item" onclick="openAdvancedSettings()">Advanced / Experimental</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content (2-column grid) -->
+    <main class="main-content story-tools-grid">
+        <!-- Left Column - Empty for now -->
+        <div class="story-tools-left">
+            <!-- Reserved for future expansion -->
+        </div>
+
+        <!-- Center Column - Story Tools Header -->
+        <div class="story-tools-center">
+            <div class="story-tools-header" id="story-tools-title">
+                <h1>Story Tools</h1>
+                <p>Manage memories and automated lorebook entries captured during chat sessions</p>
+            </div>
+        </div>
+
+        <!-- Right Column - Memories Box -->
+        <div class="story-tools-right">
+            <!-- Memories Box -->
+            <div class="memories-box" id="memories-box">
+                <div class="memories-header">
+                    <span class="memories-title">Memories</span>
+                    <button class="memories-expand" id="memories-expand" onclick="toggleMemoriesFlyout()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 12 5 6 5"></polyline>
+                            <polyline points="9 6 21 6"></polyline>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Recent Memories List -->
+                <div class="memories-recent" id="memories-recent">
+                    <div class="memories-empty">No memories loaded</div>
+                </div>
+
+                <!-- Expand Control -->
+                <div class="memories-controls">
+                    <button class="memories-manage-btn" onclick="toggleMemoriesFlyout()">
+                        Manage All Memories
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Memories Flyout Overlay -->
+    <div class="flyout-overlay" id="memories-flyout-overlay" onclick="toggleMemoriesFlyout()"></div>
+
+    <!-- Memories Flyout Panel -->
+    <div class="flyout" id="memories-flyout">
+        <div class="flyout-header">
+            <h2>Story Tools - Memories</h2>
+            <button class="flyout-close" onclick="toggleMemoriesFlyout()">✕</button>
+        </div>
+        <div class="flyout-content">
+            <!-- Memory List Section -->
+            <div class="category-header">Memory Management</div>
+            <div class="settings-grid">
+                <!-- Memory Search Card -->
+                <div class="setting-card">
+                    <div class="setting-label">🔍 Search Memories</div>
+                    <div class="setting-description">Search through all stored memories</div>
+                    <div class="setting-control">
+                        <input type="text" class="memories-search" id="memories-search" placeholder="Search memories...">
+                        <select class="memories-filter" id="memories-filter-scope">
+                            <option value="all">All</option>
+                            <option value="world">World</option>
+                            <option value="scenario">Scenario</option>
+                            <option value="character">Character</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Memory Tabs Card -->
+                <div class="setting-card">
+                    <div class="setting-label">📑 Memory Categories</div>
+                    <div class="setting-description">Filter memories by type</div>
+                    <div class="setting-control">
+                        <div class="memories-tabs">
+                            <button class="memories-tab active" id="memories-tab-all" onclick="switchMemoriesTab('all')">All</button>
+                            <button class="memories-tab" id="memories-tab-pinned" onclick="switchMemoriesTab('pinned')">Pinned</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Memory List Card -->
+                <div class="setting-card" style="grid-column: 1 / -1;">
+                    <div class="setting-label">📚 Memory List</div>
+                    <div class="setting-description">Browse and manage memories</div>
+                    <div class="setting-control">
+                        <div class="memories-list" id="memories-list">
+                            <div class="memories-loading">Loading memories...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Memory Editor Card -->
+                <div class="setting-card" style="grid-column: 1 / -1;">
+                    <div class="setting-label">✏️ Memory Editor</div>
+                    <div class="setting-description">Edit selected memory details</div>
+                    <div class="setting-control">
+                        <!-- Memory Preview -->
+                        <div class="memories-preview" id="memories-preview">
+                            <div class="preview-empty">Select a memory to view details</div>
+                        </div>
+                        
+                        <!-- Memory Editor Form -->
+                        <div class="memories-editor" id="memories-editor">
+                            <div class="editor-field">
+                                <label class="editor-label" for="mem-title">Title</label>
+                                <input type="text" class="editor-input" id="mem-title" placeholder="Memory title...">
+                            </div>
+                            <div class="editor-field">
+                                <label class="editor-label" for="mem-summary">Summary</label>
+                                <textarea class="editor-textarea" id="mem-summary" placeholder="Brief summary..." rows="3"></textarea>
+                            </div>
+                            <div class="editor-field">
+                                <label class="editor-label" for="mem-tags">Tags</label>
+                                <input type="text" class="editor-input" id="mem-tags" placeholder="comma-separated tags...">
+                            </div>
+                            <div class="editor-field">
+                                <label class="editor-field">
+                                    <input type="checkbox" class="editor-checkbox" id="mem-pinned">
+                                    <span class="editor-checkbox-label">Pinned to Context</span>
+                                </label>
+                            </div>
+                            
+                            <!-- Trigger Info -->
+                            <div class="editor-field">
+                                <div class="editor-label">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="System trigger - not editable">
+                                        <rect x="3" y="11" width="18" height="10" rx="2" ry="2"></rect>
+                                        <circle cx="12" cy="16" r="1"></circle>
+                                    </svg>
+                                    Trigger Information
+                                </div>
+                                <div class="trigger-info" id="mem-trigger-info">
+                                    <span class="trigger-type">System trigger - not editable</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="editor-actions">
+                                <button class="editor-btn editor-btn-primary" id="mem-save" onclick="saveMemory()">Save</button>
+                                <button class="editor-btn editor-btn-danger" id="mem-delete" onclick="deleteMemory()">Delete</button>
+                                <button class="editor-btn editor-btn-secondary" id="mem-export" onclick="exportMemories()">Export</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Processing...</div>
+    </div>
+</body>
+</html>

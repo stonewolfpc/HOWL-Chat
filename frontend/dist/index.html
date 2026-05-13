@@ -35,15 +35,21 @@
     <link rel="stylesheet" href="css/loading-progress.css">
     <link rel="stylesheet" href="css/sampler-settings.css">
     <link rel="stylesheet" href="css/model-settings.css">
+    <link rel="stylesheet" href="css/story-tools.css">
+    <link rel="stylesheet" href="css/sidebar-panels.css">
     <script src="js/menu.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/theme.js"></script>
+    <script src="js/storage-manager.js"></script>
     <script src="js/chat.js"></script>
     <script src="js/chat-session.js"></script>
     <script src="js/world.js"></script>
     <script src="js/loading-progress.js"></script>
     <script src="js/sampler-settings.js"></script>
     <script src="js/model-settings.js"></script>
+    <script src="js/story-tools.js"></script>
+    <script src="js/menu-functions.js"></script>
+    <script src="js/sidebar-panels.js"></script>
     <script>
         // Play startup sound on page load
         window.addEventListener('load', function() {
@@ -78,7 +84,7 @@
         </div>
         <div class="menu-bar">
             <div class="menu-item">
-                <button class="menu-button">File</button>
+                <button class="menu-button" onclick="toggleMenu('file-dropdown')">File</button>
                 <div class="dropdown" id="file-dropdown">
                     <div class="dropdown-item" onclick="saveChatSession()">Save</div>
                     <div class="dropdown-item" onclick="saveChatSessionAs()">Save As</div>
@@ -87,7 +93,7 @@
                     <div class="dropdown-separator"></div>
                     <div class="dropdown-item" onclick="newChat()">New Chat</div>
                     <div class="dropdown-separator"></div>
-                    <div class="dropdown-item">Settings</div>
+                    <div class="dropdown-item" onclick="toggleFlyout('sampler-settings-flyout')">Settings</div>
                     <div class="dropdown-separator"></div>
                     <div class="dropdown-item" onclick="exitApp()">Exit</div>
                 </div>
@@ -95,37 +101,37 @@
             <div class="menu-item">
                 <button class="menu-button" onclick="toggleMenu('edit-menu')">Edit</button>
                 <div class="dropdown" id="edit-menu">
-                    <div class="dropdown-item">Undo</div>
-                    <div class="dropdown-item">Redo</div>
+                    <div class="dropdown-item" onclick="editUndo()">Undo</div>
+                    <div class="dropdown-item" onclick="editRedo()">Redo</div>
                     <div class="dropdown-separator"></div>
-                    <div class="dropdown-item">Cut</div>
-                    <div class="dropdown-item">Copy</div>
-                    <div class="dropdown-item">Paste</div>
+                    <div class="dropdown-item" onclick="editCut()">Cut</div>
+                    <div class="dropdown-item" onclick="editCopy()">Copy</div>
+                    <div class="dropdown-item" onclick="editPaste()">Paste</div>
                     <div class="dropdown-separator"></div>
-                    <div class="dropdown-item">Select All</div>
+                    <div class="dropdown-item" onclick="editSelectAll()">Select All</div>
                     <div class="dropdown-separator"></div>
-                    <div class="dropdown-item">Find</div>
-                    <div class="dropdown-item">Replace</div>
+                    <div class="dropdown-item" onclick="editFind()">Find</div>
+                    <div class="dropdown-item" onclick="editReplace()">Replace</div>
                 </div>
             </div>
             <div class="menu-item">
                 <button class="menu-button" onclick="toggleMenu('view-menu')">View</button>
                 <div class="dropdown" id="view-menu">
-                    <div class="dropdown-item">Colorblind Mode</div>
-                    <div class="dropdown-item">High Contrast Mode</div>
+                    <div class="dropdown-item" onclick="toggleColorblindMode()">Colorblind Mode</div>
+                    <div class="dropdown-item" onclick="toggleHighContrastMode()">High Contrast Mode</div>
                     <div class="dropdown-separator"></div>
-                    <div class="dropdown-item">Light Theme</div>
-                    <div class="dropdown-item">Dark Theme</div>
+                    <div class="dropdown-item" onclick="setTheme('light')">Light Theme</div>
+                    <div class="dropdown-item" onclick="setTheme('dark')">Dark Theme</div>
                     <div class="dropdown-separator"></div>
-                    <div class="dropdown-item">Increase UI Scale</div>
-                    <div class="dropdown-item">Decrease UI Scale</div>
-                    <div class="dropdown-item">Reset UI Scale</div>
+                    <div class="dropdown-item" onclick="increaseUIScale()">Increase UI Scale</div>
+                    <div class="dropdown-item" onclick="decreaseUIScale()">Decrease UI Scale</div>
+                    <div class="dropdown-item" onclick="resetUIScale()">Reset UI Scale</div>
                     <div class="dropdown-separator"></div>
-                    <div class="dropdown-item">Toggle Sidebar</div>
-                    <div class="dropdown-item">Toggle Character Panel</div>
-                    <div class="dropdown-item">Toggle World Panel</div>
+                    <div class="dropdown-item" onclick="toggleSidebar()">Toggle Sidebar</div>
+                    <div class="dropdown-item" onclick="toggleCharacterPanel()">Toggle Character Panel</div>
+                    <div class="dropdown-item" onclick="toggleWorldPanel()">Toggle World Panel</div>
                     <div class="dropdown-separator"></div>
-                    <div class="dropdown-item">Fullscreen</div>
+                    <div class="dropdown-item" onclick="toggleFullscreen()">Fullscreen</div>
                 </div>
             </div>
             <div class="menu-item">
@@ -133,13 +139,13 @@
                 <div class="dropdown" id="settings-menu">
                     <div class="dropdown-item" onclick="toggleFlyout('sampler-settings-flyout')">Sampler Settings</div>
                     <div class="dropdown-item" onclick="toggleModelSettingsFlyout()">Model Settings</div>
-                    <div class="dropdown-item">Story Tools</div>
+                    <div class="dropdown-item" onclick="openStoryTools()">Story Tools</div>
                     <div class="dropdown-separator"></div>
-                    <div class="dropdown-item">Advanced / Experimental</div>
+                    <div class="dropdown-item" onclick="openAdvancedSettings()">Advanced / Experimental</div>
                     <div class="dropdown-separator"></div>
-                    <div class="dropdown-item">Keyboard Shortcuts</div>
-                    <div class="dropdown-item">Audio Settings</div>
-                    <div class="dropdown-item">TTS Settings</div>
+                    <div class="dropdown-item" onclick="showKeyboardShortcuts()">Keyboard Shortcuts</div>
+                    <div class="dropdown-item" onclick="openAudioSettings()">Audio Settings</div>
+                    <div class="dropdown-item" onclick="openTTSSettings()">TTS Settings</div>
                 </div>
             </div>
             
@@ -166,8 +172,8 @@
                                 <div class="setting-detail"><strong>Warning:</strong> None.</div>
                             </div>
                             <div class="setting-control">
-                                <input type="range" class="setting-slider" id="temperature" min="0.0" max="2.0" step="0.01" value="0.7">
-                                <input type="number" class="setting-value" id="temperature-value" min="0.0" max="2.0" step="0.01" value="0.7">
+                                <input type="range" class="setting-slider" id="temperature-core" min="0.0" max="2.0" step="0.01" value="0.7">
+                                <input type="number" class="setting-value" id="temperature-core-value" min="0.0" max="2.0" step="0.01" value="0.7">
                             </div>
                             <button class="setting-reset" data-setting="temperature" data-default="0.7">Default</button>
                         </div>
@@ -393,8 +399,8 @@
                                 <div class="setting-detail warning"><strong>Warning:</strong> Overridden by Mirostat.</div>
                             </div>
                             <div class="setting-control">
-                                <input type="range" class="setting-slider" id="temperature" min="0.0" max="2.0" step="0.1" value="0.7">
-                                <input type="number" class="setting-value" id="temperature-value" min="0.0" max="2.0" step="0.1" value="0.7">
+                                <input type="range" class="setting-slider" id="temperature-advanced" min="0.0" max="2.0" step="0.1" value="0.7">
+                                <input type="number" class="setting-value" id="temperature-advanced-value" min="0.0" max="2.0" step="0.1" value="0.7">
                             </div>
                             <button class="setting-reset" data-setting="temperature" data-default="0.7">Default</button>
                         </div>
@@ -784,6 +790,68 @@
         </div>
     </div>
 
+    <!-- Story Tools Flyout Panel -->
+    <div class="flyout" id="story-tools-flyout">
+        <div class="flyout-header">
+            <h2>Story Tools</h2>
+            <button class="flyout-close" onclick="toggleFlyout('story-tools-flyout')">✕</button>
+        </div>
+        <div class="flyout-content">
+            <div class="category-header">Recent Memories</div>
+            <div class="settings-grid">
+                <!-- Recent Memories Card -->
+                <div class="setting-card" style="grid-column: span 2;">
+                    <div class="setting-label">
+                        <img src="assets/spellbook.png" alt="Memory Management" class="setting-icon">
+                        Memory Management
+                    </div>
+                    <div class="setting-description">Last 3 captured memories</div>
+                    <div class="setting-control">
+                        <div id="recent-memories">
+                            <div class="memory-loading">Loading memories...</div>
+                        </div>
+                        <button class="setting-button" onclick="toggleMemoryList()">Expand</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Memory List Flyout (right side) -->
+    <div class="memory-list-flyout" id="memory-list-flyout">
+        <div class="memory-list-header">
+            <h3>All Memories</h3>
+            <button class="flyout-close" onclick="toggleMemoryList()">✕</button>
+        </div>
+        <div class="memory-list-content">
+            <div id="full-memory-list">
+                <div class="memory-loading">Loading memories...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Memory Edit Flyout (centered) -->
+    <div class="memory-edit-flyout" id="memory-edit-flyout">
+        <div class="memory-edit-header">
+            <h3>Edit Memory</h3>
+            <button class="flyout-close" onclick="closeMemoryEdit()">✕</button>
+        </div>
+        <div class="memory-edit-content">
+            <div class="memory-edit-field">
+                <label for="memory-title">Title</label>
+                <input type="text" id="memory-title" placeholder="Enter title...">
+            </div>
+            <div class="memory-edit-field">
+                <label for="memory-content">Content</label>
+                <textarea id="memory-content" placeholder="Enter memory content..." rows="10"></textarea>
+            </div>
+            <div class="memory-edit-actions">
+                <button class="setting-button" onclick="saveMemoryEdit()">Save</button>
+                <button class="setting-button secondary" onclick="closeMemoryEdit()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content (4-column layout from D:\HOWL) -->
     <div class="main-content">
         <!-- Navigation Sidebar -->
@@ -811,21 +879,8 @@
         <!-- Character Sidebar (from D:\HOWL) -->
         <div class="character-sidebar">
             <div class="panel-header">Characters</div>
-            <div class="character-list">
-                <div class="character-item">
-                    <div class="character-avatar">🤖</div>
-                    <div class="character-info">
-                        <div class="character-name">AI Assistant</div>
-                        <div class="character-status">Online</div>
-                    </div>
-                </div>
-                <div class="character-item">
-                    <div class="character-avatar">🧙</div>
-                    <div class="character-info">
-                        <div class="character-name">Dungeon Master</div>
-                        <div class="character-status">Ready</div>
-                    </div>
-                </div>
+            <div class="character-list" id="character-list">
+                <!-- Characters will be dynamically populated here -->
             </div>
         </div>
 
@@ -836,30 +891,94 @@
             </div>
         </div>
 
-        <!-- Chat Session Sidebar -->
+        <!-- Chat Session Sidebar (Right Panel) -->
         <div class="world-sidebar">
-            <div class="panel-header">Chats</div>
-            <div class="world-info">
-                <div class="info-item">
-                    <span class="info-icon">💬</span>
-                    <span class="info-text">Current: New Chat</span>
+            <div class="panel-header">Chat Context</div>
+            
+            <!-- ==================== WORLD SECTION ==================== -->
+            <div class="context-section">
+                <div class="context-section-header">
+                    <span class="context-icon">🌍</span>
+                    <span class="context-title">World</span>
                 </div>
-                <div class="info-separator"></div>
-                <div class="info-item">
-                    <span class="info-icon">🌍</span>
-                    <span class="info-text">World: None</span>
-                </div>
-                <div class="info-separator"></div>
-                <div class="info-item">
-                    <span class="info-icon">📜</span>
-                    <span class="info-text">Scenario: None</span>
-                </div>
-                <div class="info-separator"></div>
-                <div class="info-item">
-                    <span class="info-icon">📚</span>
-                    <span class="info-text">Lorebooks: None</span>
+                <div class="context-section-content">
+                    <!-- World Display -->
+                    <div class="context-display-block">
+                        <div class="context-thumbnail" id="world-thumbnail">
+                            <img id="world-image" src="" alt="World" style="display:none;">
+                            <span class="thumbnail-placeholder">No World</span>
+                        </div>
+                        <div class="context-info">
+                            <div class="context-name" id="world-name-display">No World Selected</div>
+                        </div>
+                    </div>
+                    
+                    <!-- World Controls -->
+                    <div class="context-controls">
+                        <button class="context-btn" onclick="openWorldSelector()">Change World</button>
+                    </div>
+                    
+                    <!-- Auto-Switch Option -->
+                    <div class="context-option">
+                        <label class="option-toggle">
+                            <input type="checkbox" id="world-auto-switch" onchange="toggleWorldAutoSwitch()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="option-label">Auto-load scenario & characters</span>
+                    </div>
                 </div>
             </div>
+
+            <!-- ==================== SCENARIO SECTION ==================== -->
+            <div class="context-section">
+                <div class="context-section-header">
+                    <span class="context-icon">📜</span>
+                    <span class="context-title">Scenario</span>
+                </div>
+                <div class="context-section-content">
+                    <!-- Scenario Display -->
+                    <div class="context-display-block">
+                        <div class="context-thumbnail" id="scenario-thumbnail">
+                            <img id="scenario-image" src="" alt="Scenario" style="display:none;">
+                            <span class="thumbnail-placeholder">No Scenario</span>
+                        </div>
+                        <div class="context-info">
+                            <div class="context-name" id="scenario-name-display">No Scenario Selected</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Scenario Controls -->
+                    <div class="context-controls">
+                        <button class="context-btn" onclick="openScenarioSelector()">Change Scenario</button>
+                    </div>
+                    
+                    <!-- Auto-Switch Option -->
+                    <div class="context-option">
+                        <label class="option-toggle">
+                            <input type="checkbox" id="scenario-auto-switch" onchange="toggleScenarioAutoSwitch()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="option-label">Auto-load characters & lore</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== LOREBOOKS SECTION ==================== -->
+            <div class="context-section">
+                <div class="context-section-header">
+                    <span class="context-icon">📚</span>
+                    <span class="context-title">Lorebooks</span>
+                </div>
+                <div class="context-section-content">
+                    <!-- Lorebook List -->
+                    <div class="lorebook-list" id="lorebook-list">
+                        <div class="no-lorebooks">No lorebooks loaded</div>
+                    </div>
+                    
+                                    </div>
+            </div>
+
+            <!-- ==================== MODEL CONTROLS ==================== -->
             <div class="model-controls">
                 <div class="model-name-display" id="model-name-display">No model loaded</div>
                 <button class="model-button load-button" onclick="loadModel()">Load Model</button>
@@ -884,7 +1003,7 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
             </button>
         </div>
-        <input type="text" class="input-field" placeholder="Type your message...">
+        <input type="text" class="input-field" id="message-input" placeholder="Type your message...">
         <button class="send-button">Send</button>
     </div>
 
@@ -896,7 +1015,7 @@
                 <button class="session-list-close" onclick="closeSessionList()">×</button>
             </div>
             <div class="session-list-search">
-                <input type="text" class="session-list-search-input" placeholder="Search sessions...">
+                <input type="text" class="session-list-search-input" id="session-search-input" placeholder="Search sessions...">
             </div>
             <div class="session-list-content">
                 <div class="session-list-grid" id="session-list-grid">
@@ -919,11 +1038,11 @@
             </div>
             <div class="session-modal-content">
                 <div class="session-modal-form-group">
-                    <label class="session-modal-label">Session Name</label>
+                    <label class="session-modal-label" for="session-name-input">Session Name</label>
                     <input type="text" class="session-modal-input" id="session-name-input" placeholder="Enter session name...">
                 </div>
                 <div class="session-modal-form-group">
-                    <label class="session-modal-label">Description (Optional)</label>
+                    <label class="session-modal-label" for="session-desc-input">Description (Optional)</label>
                     <textarea class="session-modal-textarea" id="session-desc-input" placeholder="Enter session description..."></textarea>
                 </div>
             </div>
