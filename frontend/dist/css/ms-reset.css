@@ -1,0 +1,77 @@
+/**
+ * Model Settings — Reset & Tooltips
+ * Warning icons, tooltips, and default reset buttons.
+ */
+
+/* Warning Icons */
+.model-settings-flyout .warning-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
+    color: #ff6b6b;
+    cursor: help;
+    position: relative;
+}
+
+.model-settings-flyout .warning-icon::before {
+    content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff6b6b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'/%3E%3Cline x1='12' y1='9' x2='12' y2='13'/%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'/%3E%3C/svg%3E");
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+}
+
+.model-settings-flyout .warning-icon .tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: #ffffff;
+    font-size: 10px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    pointer-events: none;
+}
+
+.model-settings-flyout .warning-icon:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Default Reset Buttons */
+.model-settings-flyout .setting-reset {
+    margin-top: 8px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: auto;
+    align-self: flex-end;
+}
+
+.model-settings-flyout .setting-reset:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.model-settings-flyout .setting-reset:active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.model-settings-flyout .setting-card.disabled .setting-reset {
+    opacity: 0.5;
+    pointer-events: none;
+}

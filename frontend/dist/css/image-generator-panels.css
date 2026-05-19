@@ -1,0 +1,21 @@
+/**
+ * Image Generator Panels — Modular Architecture
+ * Layout, workflow, panels, buttons, tools,
+ * info, history, and theming.
+ *
+ * This file aggregates all image generator panel CSS modules.
+ * Each module handles a single, well-defined concern.
+ * Do NOT add rules here; use the appropriate module.
+ *
+ * @module image-generator-panels
+ * @version 5.0.0
+ */
+
+@import url('igp-layout.css');
+@import url('igp-workflow.css');
+@import url('igp-panels.css');
+@import url('igp-buttons.css');
+@import url('igp-tools.css');
+@import url('igp-info.css');
+@import url('igp-history.css');
+@import url('igp-light-theme.css');

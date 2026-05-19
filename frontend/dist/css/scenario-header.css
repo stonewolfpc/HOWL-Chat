@@ -91,6 +91,24 @@
     color: rgba(212, 212, 212, 0.7);
 }
 
+/* ==================== LIGHT THEME OVERRIDES ==================== */
+
+body.theme-light .scenario-grid {
+    background: var(--surface-secondary);
+}
+
+body.theme-light .scenario-grid-empty-icon {
+    opacity: 0.6;
+}
+
+body.theme-light .scenario-grid-empty-text {
+    color: var(--text-primary);
+}
+
+body.theme-light .scenario-grid-empty-subtext {
+    color: var(--text-secondary);
+}
+
 /* Scenario Creation Popup */
 .scenario-creation-overlay {
     position: fixed;
@@ -157,6 +175,25 @@
     padding: 20px;
     max-height: 60vh;
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.scenario-creation-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scenario-creation-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scenario-creation-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.scenario-creation-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .scenario-creation-footer {
@@ -192,4 +229,89 @@
 .scenario-creation-cancel:hover,
 .scenario-creation-save:hover {
     box-shadow: 0 0 8px var(--theme-glow);
+}
+
+/* ==================== LIGHT THEME OVERRIDES ==================== */
+
+body.theme-light .scenario-page-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .scenario-page-title {
+    color: var(--accent-primary);
+}
+
+body.theme-light .scenario-content {
+    background: var(--surface-secondary);
+}
+
+body.theme-light .create-scenario-button {
+    background: var(--button-primary-bg);
+    border-color: var(--button-primary-bg);
+    color: #FFFFFF;
+}
+
+body.theme-light .create-scenario-button:hover {
+    background: var(--accent-primary-hover);
+    border-color: var(--accent-primary);
+}
+
+body.theme-light .scenario-grid-empty-text {
+    color: var(--text-primary);
+}
+
+body.theme-light .scenario-grid-empty-subtext {
+    color: var(--text-secondary);
+}
+
+body.theme-light .scenario-creation-popup {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .scenario-creation-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .scenario-creation-title {
+    color: var(--accent-primary);
+}
+
+body.theme-light .scenario-creation-close {
+    color: var(--text-secondary);
+}
+
+body.theme-light .scenario-creation-close:hover {
+    background: var(--surface-hover);
+}
+
+body.theme-light .scenario-creation-content::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+}
+
+body.theme-light .scenario-creation-content::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+body.theme-light .scenario-creation-footer {
+    border-top-color: var(--border-primary);
+}
+
+body.theme-light .scenario-creation-cancel {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .scenario-creation-save {
+    background: var(--button-primary-bg);
+    color: #FFFFFF;
+    border-color: var(--button-primary-bg);
+}
+
+body.theme-light .scenario-creation-save:hover {
+    background: var(--accent-primary-hover);
+    border-color: var(--accent-primary);
 }

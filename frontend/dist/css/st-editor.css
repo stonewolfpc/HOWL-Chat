@@ -1,0 +1,185 @@
+/**
+ * Story Tools — Memory Editor
+ * Editor panel, preview, form fields, checkboxes,
+ * trigger info, and action buttons.
+ */
+
+/* Editor Container */
+.memories-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Editor Header */
+.memories-editor-header {
+    margin-bottom: 16px;
+}
+
+.memories-editor-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Preview */
+.memories-preview {
+    background: var(--surface-tertiary);
+    border: 1px solid var(--border-secondary);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+    min-height: 80px;
+}
+
+.preview-empty {
+    color: var(--text-secondary);
+    text-align: center;
+    font-style: italic;
+}
+
+/* Form Fields */
+.editor-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.editor-label {
+    display: block;
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+}
+
+.editor-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    background: var(--surface-secondary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.editor-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    background: var(--surface-secondary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    resize: vertical;
+    font-family: inherit;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.editor-textarea::-webkit-scrollbar {
+    width: 8px;
+}
+
+.editor-textarea::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.editor-textarea::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.editor-textarea::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Checkbox */
+.editor-checkbox {
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent-primary);
+}
+
+.editor-checkbox-label {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Trigger Info */
+.trigger-info {
+    flex: 1;
+    padding: 8px 12px;
+    background: var(--surface-tertiary);
+    border: 1px solid var(--border-secondary);
+    border-radius: 6px;
+    border-left: 3px solid var(--warning-color);
+}
+
+.trigger-type {
+    font-size: 0.8rem;
+    color: var(--warning-color);
+    font-weight: 500;
+    font-style: italic;
+}
+
+/* Editor Actions */
+.editor-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.editor-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.editor-btn:hover {
+    opacity: 0.8;
+}
+
+.editor-btn-primary {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.editor-btn-primary:hover {
+    background: var(--accent-primary-hover);
+    transform: translateY(-1px);
+    opacity: 1;
+}
+
+.editor-btn-danger {
+    background: var(--danger-color);
+    color: white;
+}
+
+.editor-btn-danger:hover {
+    background: var(--danger-color-hover);
+    transform: translateY(-1px);
+    opacity: 1;
+}
+
+.editor-btn-secondary {
+    background: var(--surface-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
+}
+
+.editor-btn-secondary:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent-secondary);
+    opacity: 1;
+}

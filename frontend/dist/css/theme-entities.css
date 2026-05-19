@@ -1,0 +1,190 @@
+/**
+ * Theme — Entities (Characters, Worlds, Scenarios, Lorebooks)
+ * Entity management pages and forms for light mode.
+ */
+
+/* --- Character / World / Scenario forms --- */
+body.theme-light .character-form,
+body.theme-light .world-form,
+body.theme-light .scenario-form,
+body.theme-light .lorebook-form {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+/* --- Character Header / Page --- */
+body.theme-light .character-page-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .character-page-title {
+    color: var(--accent-primary);
+}
+
+body.theme-light .character-page-content {
+    background: var(--surface-secondary);
+}
+
+body.theme-light .character-grid-empty-subtext {
+    color: var(--text-secondary);
+}
+
+body.theme-light .character-bubble {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .character-bubble:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent-primary);
+}
+
+body.theme-light .character-bubble .character-age,
+body.theme-light .character-bubble .character-role {
+    background: var(--surface-hover);
+    color: var(--text-secondary);
+}
+
+body.theme-light .character-image-item {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .character-images-container {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .character-creation-popup {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .character-creation-title {
+    color: var(--accent-primary);
+}
+
+body.theme-light .character-form-input,
+body.theme-light .character-form-textarea {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .character-form-input:focus,
+body.theme-light .character-form-textarea:focus {
+    background: var(--surface-primary);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-primary-hover);
+}
+
+/* --- Lorebooks --- */
+body.theme-light .lorebooks-page {
+    background: var(--surface-secondary);
+}
+
+body.theme-light .lorebook-creation-popup {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .lorebook-editor-sidebar {
+    background: var(--surface-tertiary);
+    border-right-color: var(--border-primary);
+}
+
+body.theme-light .lorebook-editor-section {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .lorebook-type-selector {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .lorebook-type-item {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .lorebook-type-item:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent-primary);
+}
+
+body.theme-light .lorebook-type-item.selected {
+    background: var(--surface-hover);
+    border-color: var(--accent-primary);
+}
+
+body.theme-light .lorebook-entry-preview {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .lorebook-entry-list {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .lorebook-entry-item {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .lorebook-entry-item:hover {
+    background: var(--surface-hover);
+}
+
+body.theme-light .lorebook-entry-item.selected {
+    background: var(--surface-hover);
+    border-left-color: var(--accent-primary);
+}
+
+body.theme-light .lorebook-card-content-wrap {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .lorebook-chip {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+}
+
+body.theme-light .lorebook-chip.muted {
+    background: var(--surface-hover);
+    color: var(--text-secondary);
+}
+
+/* --- World Form --- */
+body.theme-light .world-form-popup {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .world-form-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .world-form-section {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .world-form-input,
+body.theme-light .world-form-textarea {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+/* --- Character Context Menu --- */
+body.theme-light .character-context-menu {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-modal);
+}

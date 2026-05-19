@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"strings"
 
+	"howl-chat/internal/backend/gguf"
 	"howl-chat/internal/backend/types"
 )
 
@@ -83,13 +84,16 @@ func (b *Builder) BuildPrompt(messages []ChatMessage, memory string) (string, []
 
 // resolveTemplate determines which template to use
 func (b *Builder) resolveTemplate() string {
+	var template string
 	if b.promptSettings != nil && b.promptSettings.PromptTemplate != "" {
-		return b.promptSettings.PromptTemplate
+		template = b.promptSettings.PromptTemplate
+	} else if b.profile != nil && b.profile.Template != "" {
+		template = b.profile.Template
+	} else {
+		template = "{{#each messages}}{{ role }}: {{ content }}\n{{/each}}assistant:"
 	}
-	if b.profile != nil && b.profile.Template != "" {
-		return b.profile.Template
-	}
-	return "{{#each messages}}{{ role }}: {{ content }}\n{{/each}}assistant:"
+	// Convert Handlebars to Jinja2 if needed
+	return gguf.ConvertHandlebarsToJinja(template)
 }
 
 // buildSystemPrompt constructs the system prompt with memory injection
@@ -150,12 +154,12 @@ func (b *Builder) renderTemplate(template string, system string, messages []map[
 	if strings.Contains(result, "{{#each messages}}") {
 		startIdx := strings.Index(result, "{{#each messages}}")
 		endIdx := strings.Index(result, "{{/each}}")
-		
+
 		if startIdx != -1 && endIdx != -1 {
 			prefix := result[:startIdx]
 			suffix := result[endIdx+len("{{/each}}"):]
 			templateBody := result[startIdx+len("{{#each messages}}") : endIdx]
-			
+
 			var messagesStr strings.Builder
 			for _, msg := range messages {
 				msgBody := templateBody
@@ -163,7 +167,7 @@ func (b *Builder) renderTemplate(template string, system string, messages []map[
 				msgBody = strings.ReplaceAll(msgBody, "{{ content }}", msg["content"])
 				messagesStr.WriteString(msgBody)
 			}
-			
+
 			result = prefix + messagesStr.String() + suffix
 		}
 	}

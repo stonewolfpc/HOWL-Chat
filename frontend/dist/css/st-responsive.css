@@ -1,0 +1,36 @@
+/**
+ * Story Tools — Responsive Breakpoints
+ * Mobile adjustments for grid and flyout panels.
+ */
+
+@media (max-width: 768px) {
+    .story-tools-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 16px;
+    }
+
+    .story-tools-center {
+        order: -1;
+        margin-bottom: 16px;
+    }
+
+    .memories-flyout {
+        width: 100vw;
+        right: -100vw;
+    }
+
+    .memories-flyout.show {
+        right: 0;
+    }
+
+    .memories-flyout-content {
+        flex-direction: column;
+    }
+
+    .memories-flyout-left,
+    .memories-flyout-right {
+        border-right: none;
+        border-bottom: 1px solid var(--border-secondary);
+    }
+}

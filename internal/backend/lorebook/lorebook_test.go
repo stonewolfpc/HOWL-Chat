@@ -164,13 +164,13 @@ func TestLooseMatchingTokens(t *testing.T) {
 func TestFrequencyOncePerChat(t *testing.T) {
 	entries := []Entry{
 		{
-			ID:              "greeting",
-			Title:           "Greeting",
-			Content:         "Hello.",
-			Scope:           ScopeWorld,
-			Enabled:         true,
-			TriggerPhrases:  []string{"hello"},
-			TriggerMode:     TriggerExact,
+			ID:               "greeting",
+			Title:            "Greeting",
+			Content:          "Hello.",
+			Scope:            ScopeWorld,
+			Enabled:          true,
+			TriggerPhrases:   []string{"hello"},
+			TriggerMode:      TriggerExact,
 			TriggerFrequency: FrequencyOncePerChat,
 		},
 	}
@@ -186,13 +186,13 @@ func TestFrequencyOncePerChat(t *testing.T) {
 func TestFrequencyAlwaysOverridesTriggered(t *testing.T) {
 	entries := []Entry{
 		{
-			ID:              "spell",
-			Title:           "Spell",
-			Content:         "Cast it.",
-			Scope:           ScopeWorld,
-			Enabled:         true,
-			TriggerPhrases:  []string{"cast"},
-			TriggerMode:     TriggerExact,
+			ID:               "spell",
+			Title:            "Spell",
+			Content:          "Cast it.",
+			Scope:            ScopeWorld,
+			Enabled:          true,
+			TriggerPhrases:   []string{"cast"},
+			TriggerMode:      TriggerExact,
 			TriggerFrequency: FrequencyAlways,
 		},
 	}
@@ -566,5 +566,174 @@ func TestMultipleMatchesAreSorted(t *testing.T) {
 	// Character scope should rank first
 	if got[0].Scope != ScopeCharacter {
 		t.Fatalf("expected character scope first, got %s", got[0].Scope)
+	}
+}
+
+// ParseLorebookEntryFromMap Tests
+// ---------------------------------------------------------------------------
+
+func TestParseLorebookEntryFromMapParsesAllFields(t *testing.T) {
+	m := map[string]interface{}{
+		"id":                "test-id",
+		"name":              "Test Name",
+		"title":             "Test Title",
+		"description":       "A test description.",
+		"content":           "Test content.",
+		"tags":              []interface{}{"tag1", "tag2"},
+		"scope":             "character",
+		"type":              "character",
+		"ownerId":           "owner-1",
+		"enabled":           true,
+		"triggerPhrases":    []interface{}{"trigger1", "trigger2"},
+		"secondaryTriggers": []interface{}{"secondary1"},
+		"triggerMode":       "loose",
+		"triggerDirection":  "user",
+		"triggerFrequency":  "once_per_chat",
+		"priorityLevel":     5,
+		"maxLength":         "long",
+		"contextBudget":     320,
+		"scanWindow":        8,
+		"automated":         true,
+	}
+
+	entry, err := ParseLorebookEntryFromMap(m)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if entry.ID != "test-id" {
+		t.Errorf("expected ID 'test-id', got %s", entry.ID)
+	}
+	if entry.Name != "Test Name" {
+		t.Errorf("expected Name 'Test Name', got %s", entry.Name)
+	}
+	if entry.Title != "Test Title" {
+		t.Errorf("expected Title 'Test Title', got %s", entry.Title)
+	}
+	if entry.Description != "A test description." {
+		t.Errorf("expected Description 'A test description.', got %s", entry.Description)
+	}
+	if entry.Content != "Test content." {
+		t.Errorf("expected Content 'Test content.', got %s", entry.Content)
+	}
+	if len(entry.Tags) != 2 || entry.Tags[0] != "tag1" || entry.Tags[1] != "tag2" {
+		t.Errorf("expected tags [tag1 tag2], got %v", entry.Tags)
+	}
+	if entry.Scope != ScopeCharacter {
+		t.Errorf("expected Scope character, got %s", entry.Scope)
+	}
+	if !entry.Enabled {
+		t.Errorf("expected Enabled true, got false")
+	}
+	if len(entry.TriggerPhrases) != 2 || entry.TriggerPhrases[0] != "trigger1" {
+		t.Errorf("expected trigger phrases [trigger1 trigger2], got %v", entry.TriggerPhrases)
+	}
+	if entry.TriggerMode != TriggerLoose {
+		t.Errorf("expected TriggerMode loose, got %s", entry.TriggerMode)
+	}
+	if entry.TriggerDirection != TriggerUser {
+		t.Errorf("expected TriggerDirection user, got %s", entry.TriggerDirection)
+	}
+	if entry.PriorityLevel != 5 {
+		t.Errorf("expected PriorityLevel 5, got %d", entry.PriorityLevel)
+	}
+}
+
+func TestParseLorebookEntryFromMapDefaultsEnabledToTrue(t *testing.T) {
+	m := map[string]interface{}{
+		"id":      "test-id",
+		"title":   "Test Title",
+		"content": "Test content.",
+	}
+
+	entry, err := ParseLorebookEntryFromMap(m)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !entry.Enabled {
+		t.Errorf("expected Enabled to default to true when missing, got false")
+	}
+}
+
+func TestParseLorebookEntryFromMapRespectsExplicitEnabledFalse(t *testing.T) {
+	m := map[string]interface{}{
+		"id":      "test-id",
+		"title":   "Test Title",
+		"content": "Test content.",
+		"enabled": false,
+	}
+
+	entry, err := ParseLorebookEntryFromMap(m)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if entry.Enabled {
+		t.Errorf("expected Enabled false when explicitly set, got true")
+	}
+}
+
+func TestParseLorebookEntryFromMapHoistsNameToTitle(t *testing.T) {
+	m := map[string]interface{}{
+		"id":      "test-id",
+		"name":    "Name Only",
+		"content": "content",
+	}
+
+	entry, err := ParseLorebookEntryFromMap(m)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if entry.Title != "Name Only" {
+		t.Errorf("expected Title 'Name Only' (hoisted from name), got %s", entry.Title)
+	}
+}
+
+// BuildPromptBlock Tests
+// ---------------------------------------------------------------------------
+
+func TestBuildPromptBlockIncludesDescription(t *testing.T) {
+	entries := []ResolvedEntry{
+		{
+			Entry: Entry{
+				ID:            "test",
+				Title:         "Mana Flow",
+				Description:   "Magic flows through ley lines.",
+				Content:       "Ley lines connect ancient sites.",
+				Scope:         ScopeWorld,
+				PriorityLevel: 3,
+			},
+		},
+	}
+
+	block := BuildPromptBlock(entries)
+	if !strings.Contains(block, "Mana Flow") {
+		t.Errorf("expected block to contain title, got: %s", block)
+	}
+	if !strings.Contains(block, "Magic flows through ley lines.") {
+		t.Errorf("expected block to contain description, got: %s", block)
+	}
+	if !strings.Contains(block, "Ley lines connect ancient sites.") {
+		t.Errorf("expected block to contain content, got: %s", block)
+	}
+}
+
+func TestBuildPromptBlockOmitsDescriptionWhenEmpty(t *testing.T) {
+	entries := []ResolvedEntry{
+		{
+			Entry: Entry{
+				ID:            "test",
+				Title:         "Mana Flow",
+				Description:   "",
+				Content:       "Ley lines connect ancient sites.",
+				Scope:         ScopeWorld,
+				PriorityLevel: 3,
+			},
+		},
+	}
+
+	block := BuildPromptBlock(entries)
+	expected := "- [world / priority 3] Mana Flow: Ley lines connect ancient sites."
+	if !strings.Contains(block, expected) {
+		t.Errorf("expected block to omit empty description, got: %s", block)
 	}
 }

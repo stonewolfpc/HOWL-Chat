@@ -1,0 +1,170 @@
+/**
+ * Chat Components — Characters Display
+ * Character sender info, chat character cards,
+ * avatars, status, descriptions, actions, and remove button.
+ */
+
+/* Character Sender Info in Assistant Bubbles */
+.character-sender-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.character-avatar-small {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: contain;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.character-avatar-placeholder {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.character-name {
+    color: var(--static-text);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Chat Characters Display Area */
+.chat-characters {
+    background: rgba(30, 30, 40, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    padding: 12px;
+}
+
+.chat-characters-header {
+    color: var(--static-text);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    opacity: 0.8;
+}
+
+.chat-character-cards {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.chat-character-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 200px;
+    max-width: 300px;
+    transition: all 0.2s ease;
+}
+
+.chat-character-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.chat-character-avatar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.chat-character-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.chat-character-avatar .avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 20px;
+}
+
+.chat-character-avatar .status-indicator {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid rgba(30, 30, 40, 0.8);
+}
+
+.chat-character-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.chat-character-name {
+    color: var(--static-text);
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.chat-character-status {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    margin-bottom: 2px;
+}
+
+.chat-character-description {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.chat-character-actions { flex-shrink: 0; }
+
+.chat-character-remove {
+    background: rgba(255, 100, 100, 0.2);
+    border: 1px solid rgba(255, 100, 100, 0.3);
+    color: #fff;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.chat-character-remove:hover {
+    background: rgba(255, 100, 100, 0.4);
+    border-color: rgba(255, 100, 100, 0.5);
+}
+
+.chat-characters-empty {
+    color: rgba(255, 255, 255, 0.4);
+    font-style: italic;
+    padding: 8px;
+    text-align: center;
+}

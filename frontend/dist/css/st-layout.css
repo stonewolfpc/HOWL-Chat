@@ -1,0 +1,54 @@
+/**
+ * Story Tools — Page Layout
+ * Main three-column grid and page header.
+ */
+
+/* Main Grid Layout */
+.story-tools-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 20px;
+    padding: 20px;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.story-tools-left {
+    flex: 1;
+    padding: 20px;
+}
+
+.story-tools-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.story-tools-right {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Story Tools Header */
+.story-tools-header {
+    text-align: center;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+}
+
+.story-tools-header h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: var(--accent-primary);
+}
+
+.story-tools-header p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+    max-width: 400px;
+    line-height: 1.4;
+}

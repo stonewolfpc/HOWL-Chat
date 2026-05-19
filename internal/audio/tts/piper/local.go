@@ -187,7 +187,25 @@ func resolvePiperBinary() (string, error) {
 	if p, err := exec.LookPath("piper"); err == nil {
 		return p, nil
 	}
-	return exec.LookPath("piper.exe")
+	if p, err := exec.LookPath("piper.exe"); err == nil {
+		return p, nil
+	}
+	// Fallback: check project bin/ directory (common in dev builds)
+	candidates := []string{
+		"bin/piper.exe",
+		"../bin/piper.exe",
+		"../../bin/piper.exe",
+		"bin/piper",
+		"../bin/piper",
+		"../../bin/piper",
+	}
+	for _, c := range candidates {
+		if _, err := os.Stat(c); err == nil {
+			abs, _ := filepath.Abs(c)
+			return abs, nil
+		}
+	}
+	return "", fmt.Errorf("piper binary not found in PATH or project bin/ directory")
 }
 
 func clampSpeed(speed float64) float64 {

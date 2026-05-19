@@ -1,0 +1,432 @@
+/**
+ * Theme — Light Mode Comprehensive Overrides
+ * Safety-net rules that ensure no hardcoded colors leak through in light mode.
+ */
+
+/* ==========================================================================
+   LIGHT THEME — Comprehensive Color Overrides
+   Ensures all elements are visible by overriding hardcoded colors
+   ========================================================================== */
+
+/* --- Global inherited text color for all major containers --- */
+body.theme-light .character-sidebar,
+body.theme-light .world-sidebar,
+body.theme-light .nav-sidebar,
+body.theme-light .chat-panel,
+body.theme-light .main-content,
+body.theme-light .panel,
+body.theme-light .dropdown,
+body.theme-light .flyout,
+body.theme-light .flyout-content,
+body.theme-light .card,
+body.theme-light .context-menu,
+body.theme-light .character-content,
+body.theme-light .world-content,
+body.theme-light .scenario-content,
+body.theme-light .lorebook-content,
+body.theme-light .story-tools-content,
+body.theme-light .image-gen-content,
+body.theme-light .model-settings-panel,
+body.theme-light .sampler-settings-panel,
+body.theme-light .character-creation-content,
+body.theme-light .world-form-content,
+body.theme-light .scenario-form-content,
+body.theme-light .user-details-content,
+body.theme-light .lorebook-manager,
+body.theme-light .session-list,
+body.theme-light .chat-messages,
+body.theme-light .chat-input-area,
+body.theme-light .toolbar,
+body.theme-light .sub-panel,
+body.theme-light .sidebar-panel,
+body.theme-light .settings-panel,
+body.theme-light .settings-modal,
+body.theme-light .real-settings-container,
+body.theme-light .audio-settings-overlay,
+body.theme-light .image-generator-panel,
+body.theme-light .story-tools-panel {
+    color: var(--text-primary);
+}
+
+/* --- Override explicit white/light text colors --- */
+body.theme-light .character-name,
+body.theme-light .world-name,
+body.theme-light .scenario-name,
+body.theme-light .lorebook-name,
+body.theme-light .context-name,
+body.theme-light .session-item-name,
+body.theme-light .panel-title,
+body.theme-light .sidebar-header,
+body.theme-light .section-title,
+body.theme-light .setting-label,
+body.theme-light .menu-item,
+body.theme-light .dropdown-item,
+body.theme-light .tab,
+body.theme-light .tab-btn,
+body.theme-light .btn,
+body.theme-light .button,
+body.theme-light .model-button,
+body.theme-light .add-character-btn,
+body.theme-light .add-world-btn,
+body.theme-light .add-scenario-btn,
+body.theme-light .add-lorebook-btn,
+body.theme-light .stepout-mode-btn,
+body.theme-light .character-menu-btn,
+body.theme-light .lorebook-menu-btn,
+body.theme-light .context-btn,
+body.theme-light .setting-btn,
+body.theme-light .icon-btn,
+body.theme-light .nav-btn,
+body.theme-light .sidebar-btn,
+body.theme-light .action-btn,
+body.theme-light .primary-btn,
+body.theme-light .secondary-btn,
+body.theme-light .chat-btn,
+body.theme-light .send-btn,
+body.theme-light .load-button,
+body.theme-light .unload-button,
+body.theme-light .refresh-button,
+body.theme-light .model-info,
+body.theme-light .character-role,
+body.theme-light .context-description,
+body.theme-light .lorebook-description,
+body.theme-light .setting-description,
+body.theme-light .setting-detail,
+body.theme-light .session-item-meta,
+body.theme-light .session-item-date,
+body.theme-light .empty-text,
+body.theme-light .empty-icon,
+body.theme-light .character-empty,
+body.theme-light .no-lorebooks,
+body.theme-light .thumbnail-placeholder,
+body.theme-light .option-label,
+body.theme-light .info-text,
+body.theme-light .status-text,
+body.theme-light .label,
+body.theme-light .value,
+body.theme-light .detail,
+body.theme-light .meta,
+body.theme-light .timestamp,
+body.theme-light .placeholder,
+body.theme-light .hint,
+body.theme-light .tooltip,
+body.theme-light .badge,
+body.theme-light .tag,
+body.theme-light .pill,
+body.theme-light .chip,
+body.theme-light .avatar-label,
+body.theme-light .nav-label,
+body.theme-light .sidebar-label,
+body.theme-light .menu-label,
+body.theme-light .footer-text,
+body.theme-light .header-text,
+body.theme-light .title,
+body.theme-light .subtitle,
+body.theme-light .heading,
+body.theme-light .subheading,
+body.theme-light .caption,
+body.theme-light .overline,
+body.theme-light .breadcrumb,
+body.theme-light .link,
+body.theme-light .nav-link,
+body.theme-light .sidebar-link {
+    color: var(--text-primary);
+}
+
+/* Secondary / muted text */
+body.theme-light .character-role,
+body.theme-light .context-description,
+body.theme-light .lorebook-description,
+body.theme-light .setting-description,
+body.theme-light .setting-detail,
+body.theme-light .session-item-meta,
+body.theme-light .session-item-date,
+body.theme-light .option-label,
+body.theme-light .info-text,
+body.theme-light .status-text,
+body.theme-light .detail,
+body.theme-light .meta,
+body.theme-light .timestamp,
+body.theme-light .placeholder,
+body.theme-light .hint,
+body.theme-light .caption,
+body.theme-light .overline,
+body.theme-light .breadcrumb,
+body.theme-light .thumbnail-placeholder,
+body.theme-light .no-lorebooks,
+body.theme-light .empty-text,
+body.theme-light .settings-info,
+body.theme-light .lorebook-group-header {
+    color: var(--text-secondary);
+}
+
+/* Disabled / very muted text */
+body.theme-light .character-inactive .character-name,
+body.theme-light .disabled,
+body.theme-light [disabled],
+body.theme-light .lorebook-item.disabled .lorebook-name {
+    color: var(--text-tertiary);
+}
+
+/* --- Override borders that use white rgba --- */
+body.theme-light .character-item,
+body.theme-light .world-item,
+body.theme-light .scenario-item,
+body.theme-light .lorebook-item,
+body.theme-light .session-list-item,
+body.theme-light .card,
+body.theme-light .panel,
+body.theme-light .dropdown,
+body.theme-light .flyout,
+body.theme-light .context-menu,
+body.theme-light .message-bubble,
+body.theme-light .chat-input-area,
+body.theme-light .tab,
+body.theme-light .tab-btn,
+body.theme-light .btn,
+body.theme-light .button,
+body.theme-light .model-button,
+body.theme-light .add-character-btn,
+body.theme-light .add-world-btn,
+body.theme-light .add-scenario-btn,
+body.theme-light .add-lorebook-btn,
+body.theme-light .stepout-mode-btn,
+body.theme-light .character-menu-btn,
+body.theme-light .lorebook-menu-btn,
+body.theme-light .context-btn,
+body.theme-light .setting-btn,
+body.theme-light .icon-btn,
+body.theme-light .nav-btn,
+body.theme-light .sidebar-btn,
+body.theme-light .action-btn,
+body.theme-light .primary-btn,
+body.theme-light .secondary-btn,
+body.theme-light .chat-btn,
+body.theme-light .send-btn,
+body.theme-light .load-button,
+body.theme-light .unload-button,
+body.theme-light .refresh-button,
+body.theme-light .character-avatar,
+body.theme-light .world-avatar,
+body.theme-light .scenario-avatar,
+body.theme-light .context-option,
+body.theme-light .option-toggle,
+body.theme-light .toggle-slider,
+body.theme-light .menu-separator,
+body.theme-light .lorebook-group-header,
+body.theme-light .character-sidebar,
+body.theme-light .world-sidebar,
+body.theme-light .nav-sidebar,
+body.theme-light .chat-panel,
+body.theme-light .main-content,
+body.theme-light .panel,
+body.theme-light .toolbar,
+body.theme-light .sub-panel,
+body.theme-light .sidebar-panel,
+body.theme-light .settings-panel,
+body.theme-light .real-settings-container,
+body.theme-light .real-settings-header,
+body.theme-light .setting-card,
+body.theme-light .menu-bar,
+body.theme-light .audio-tab-group,
+body.theme-light .audio-tab,
+body.theme-light .image-gen-content,
+body.theme-light .image-generator-panel {
+    border-color: var(--border-primary);
+}
+
+/* Hover border */
+body.theme-light .character-item:hover,
+body.theme-light .world-item:hover,
+body.theme-light .scenario-item:hover,
+body.theme-light .lorebook-item:hover,
+body.theme-light .session-list-item:hover,
+body.theme-light .card:hover,
+body.theme-light .panel:hover,
+body.theme-light .dropdown:hover,
+body.theme-light .flyout:hover,
+body.theme-light .message-bubble:hover,
+body.theme-light .tab:hover,
+body.theme-light .tab-btn:hover,
+body.theme-light .btn:hover,
+body.theme-light .button:hover,
+body.theme-light .model-button:hover,
+body.theme-light .add-character-btn:hover,
+body.theme-light .add-world-btn:hover,
+body.theme-light .add-scenario-btn:hover,
+body.theme-light .add-lorebook-btn:hover,
+body.theme-light .stepout-mode-btn:hover,
+body.theme-light .character-menu-btn:hover,
+body.theme-light .lorebook-menu-btn:hover,
+body.theme-light .context-btn:hover,
+body.theme-light .setting-btn:hover,
+body.theme-light .icon-btn:hover,
+body.theme-light .nav-btn:hover,
+body.theme-light .sidebar-btn:hover,
+body.theme-light .action-btn:hover,
+body.theme-light .primary-btn:hover,
+body.theme-light .secondary-btn:hover,
+body.theme-light .chat-btn:hover,
+body.theme-light .send-btn:hover,
+body.theme-light .load-button:hover,
+body.theme-light .unload-button:hover,
+body.theme-light .refresh-button:hover,
+body.theme-light .character-avatar:hover,
+body.theme-light .context-option:hover,
+body.theme-light .option-toggle:hover {
+    border-color: var(--border-secondary);
+}
+
+/* --- Override white-tinted backgrounds --- */
+body.theme-light .character-item,
+body.theme-light .world-item,
+body.theme-light .scenario-item,
+body.theme-light .lorebook-item,
+body.theme-light .session-list-item,
+body.theme-light .card,
+body.theme-light .message-bubble,
+body.theme-light .character-avatar,
+body.theme-light .world-avatar,
+body.theme-light .scenario-avatar,
+body.theme-light .thumbnail-placeholder,
+body.theme-light .add-character-btn,
+body.theme-light .add-world-btn,
+body.theme-light .add-scenario-btn,
+body.theme-light .add-lorebook-btn,
+body.theme-light .stepout-mode-btn,
+body.theme-light .character-menu-btn,
+body.theme-light .lorebook-menu-btn,
+body.theme-light .context-btn,
+body.theme-light .setting-btn,
+body.theme-light .icon-btn,
+body.theme-light .nav-btn,
+body.theme-light .sidebar-btn,
+body.theme-light .action-btn,
+body.theme-light .chat-btn,
+body.theme-light .model-button,
+body.theme-light .model-info,
+body.theme-light .context-option,
+body.theme-light .option-toggle,
+body.theme-light .toggle-slider,
+body.theme-light .menu-separator,
+body.theme-light .lorebook-group-header,
+body.theme-light .empty-icon,
+body.theme-light .character-empty,
+body.theme-light .no-lorebooks {
+    background: var(--surface-primary);
+}
+
+/* Slightly stronger tinted backgrounds */
+body.theme-light .character-item:hover,
+body.theme-light .world-item:hover,
+body.theme-light .scenario-item:hover,
+body.theme-light .lorebook-item:hover,
+body.theme-light .session-list-item:hover,
+body.theme-light .card:hover,
+body.theme-light .message-bubble:hover,
+body.theme-light .add-character-btn:hover,
+body.theme-light .add-world-btn:hover,
+body.theme-light .add-scenario-btn:hover,
+body.theme-light .add-lorebook-btn:hover,
+body.theme-light .stepout-mode-btn:hover,
+body.theme-light .character-menu-btn:hover,
+body.theme-light .lorebook-menu-btn:hover,
+body.theme-light .context-btn:hover,
+body.theme-light .setting-btn:hover,
+body.theme-light .icon-btn:hover,
+body.theme-light .nav-btn:hover,
+body.theme-light .sidebar-btn:hover,
+body.theme-light .action-btn:hover,
+body.theme-light .chat-btn:hover,
+body.theme-light .model-button:hover,
+body.theme-light .context-option:hover,
+body.theme-light .option-toggle:hover {
+    background: var(--surface-hover);
+}
+
+/* Active / selected item backgrounds */
+body.theme-light .character-item.selected,
+body.theme-light .world-item.selected,
+body.theme-light .scenario-item.selected,
+body.theme-light .lorebook-item.selected,
+body.theme-light .session-list-item.selected,
+body.theme-light .tab.active,
+body.theme-light .tab-btn.active,
+body.theme-light .stepout-mode-btn.active {
+    background: var(--accent-primary-hover);
+    border-color: var(--accent-primary);
+}
+
+/* --- Sidebar section headers --- */
+body.theme-light .sidebar-header,
+body.theme-light .panel-header,
+body.theme-light .section-header,
+body.theme-light .character-sidebar-header,
+body.theme-light .world-sidebar-header,
+body.theme-light .chat-context-header,
+body.theme-light .lorebook-header,
+body.theme-light .scenario-header,
+body.theme-light .settings-header,
+body.theme-light .real-settings-header {
+    background: var(--surface-tertiary);
+    color: var(--text-primary);
+    border-bottom-color: var(--border-primary);
+}
+
+/* --- Icons --- */
+body.theme-light .icon,
+body.theme-light .sidebar-icon,
+body.theme-light .nav-icon,
+body.theme-light .menu-icon,
+body.theme-light .character-icon,
+body.theme-light .world-icon,
+body.theme-light .scenario-icon,
+body.theme-light .lorebook-icon,
+body.theme-light .action-icon,
+body.theme-light .settings-icon,
+body.theme-light .chat-icon,
+body.theme-light .send-icon,
+body.theme-light .btn-icon,
+body.theme-light .panel-icon,
+body.theme-light .tab-icon,
+body.theme-light .status-icon,
+body.theme-light .empty-icon,
+body.theme-light .placeholder-icon,
+body.theme-light .info-icon,
+body.theme-light .warning-icon,
+body.theme-light .error-icon,
+body.theme-light .success-icon {
+    color: var(--text-secondary);
+    fill: var(--text-secondary);
+}
+
+/* Icon on hover */
+body.theme-light .icon:hover,
+body.theme-light .sidebar-icon:hover,
+body.theme-light .nav-icon:hover,
+body.theme-light .menu-icon:hover,
+body.theme-light .action-icon:hover,
+body.theme-light .settings-icon:hover,
+body.theme-light .btn-icon:hover,
+body.theme-light .character-menu-btn:hover,
+body.theme-light .lorebook-menu-btn:hover {
+    color: var(--accent-primary);
+    fill: var(--accent-primary);
+}
+
+/* --- Placeholder text --- */
+body.theme-light input::placeholder,
+body.theme-light textarea::placeholder {
+    color: var(--input-placeholder);
+}
+
+/* --- Separator lines --- */
+body.theme-light .menu-separator,
+body.theme-light .divider,
+body.theme-light .separator,
+body.theme-light .hr-line,
+body.theme-light .section-divider,
+body.theme-light .panel-divider {
+    background: var(--border-primary);
+    border-color: var(--border-primary);
+}

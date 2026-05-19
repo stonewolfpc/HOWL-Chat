@@ -51,6 +51,13 @@
     font-size: 20px;
 }
 
+.nav-icon-img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    pointer-events: none;
+}
+
 .nav-label {
     font-size: 9px;
     text-align: center;

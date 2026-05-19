@@ -1,0 +1,58 @@
+/**
+ * Theme — Light Mode Layout & Surfaces
+ * Global surface colors and layout element theming for light mode.
+ */
+
+/* --- Global Surfaces --- */
+body.theme-light .main-content,
+body.theme-light .nav-sidebar,
+body.theme-light .character-sidebar,
+body.theme-light .chat-panel,
+body.theme-light .world-sidebar,
+body.theme-light .character-content,
+body.theme-light .world-content,
+body.theme-light .scenario-content,
+body.theme-light .lorebook-content,
+body.theme-light .story-tools-content,
+body.theme-light .image-gen-content {
+    background: var(--surface-secondary);
+    color: var(--text-primary);
+}
+
+/* Secondary surfaces: sidebars, toolbars, sub-panels */
+body.theme-light .nav-sidebar,
+body.theme-light .character-sidebar,
+body.theme-light .world-sidebar,
+body.theme-light .toolbar,
+body.theme-light .sub-panel,
+body.theme-light .sidebar-panel,
+body.theme-light .flyout-header,
+body.theme-light .real-settings-header,
+body.theme-light .sidebar-header,
+body.theme-light .panel-header,
+body.theme-light .section-header {
+    background: var(--surface-tertiary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+/* --- Layout --- */
+body.theme-light .input-bar {
+    background: var(--surface-primary);
+    border-top-color: var(--border-primary);
+}
+
+/* --- Ensure dark theme text doesn't leak in light mode --- */
+body.theme-light .character-sidebar,
+body.theme-light .world-sidebar,
+body.theme-light .nav-sidebar,
+body.theme-light .chat-panel,
+body.theme-light .main-content,
+body.theme-light .panel,
+body.theme-light .dropdown,
+body.theme-light .flyout,
+body.theme-light .flyout-content,
+body.theme-light .card,
+body.theme-light .context-menu {
+    --static-text: var(--text-secondary);
+}

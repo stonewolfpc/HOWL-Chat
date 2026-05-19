@@ -1,0 +1,63 @@
+/**
+ * Tutorials — Responsive Breakpoints
+ * Mobile adjustments for overlay, nav, content, and typography.
+ */
+
+@media (max-width: 768px) {
+    .tutorials-overlay {
+        padding: 0;
+    }
+
+    .tutorials-container {
+        border-radius: 0;
+        max-width: none;
+        height: 100vh;
+    }
+
+    .tutorials-header {
+        padding: 10px 14px;
+    }
+
+    .tutorials-search {
+        display: none;
+    }
+
+    .tutorials-nav {
+        width: 200px;
+        min-width: 180px;
+    }
+
+    .tutorials-content {
+        padding: 16px 20px;
+    }
+
+    .tutorials-content h1 {
+        font-size: 22px;
+    }
+
+    .tutorials-content h2 {
+        font-size: 17px;
+    }
+}
+
+@media (max-width: 560px) {
+    .tutorials-nav {
+        position: absolute;
+        left: 0;
+        top: 53px;
+        bottom: 0;
+        width: 80%;
+        max-width: 280px;
+        z-index: 2;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+    }
+
+    .tutorials-nav.show {
+        transform: translateX(0);
+    }
+
+    .tutorials-nav-toggle {
+        display: flex;
+    }
+}

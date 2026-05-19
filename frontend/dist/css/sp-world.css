@@ -1,0 +1,32 @@
+/**
+ * Sidebar Panels — World Sidebar
+ * Right sidebar container with custom scrollbars.
+ */
+
+.world-sidebar {
+    background: rgba(20, 20, 30, 0.95);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    display: flex;
+    flex-direction: column;
+}
+
+.world-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.world-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.world-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.world-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}

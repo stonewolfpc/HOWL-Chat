@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"howl-chat/internal/backend/lorebook"
+	"howl-chat/internal/backend/memory"
 	"howl-chat/internal/backend/types"
-	entities "howl-chat/internal/backend/types/entities"
 )
 
 // loadEntriesFromFile loads lorebook entries from a given JSON file path.
@@ -27,6 +27,11 @@ func loadEntriesFromFile(filePath string) ([]lorebook.Entry, error) {
 
 	if err := json.Unmarshal(data, &lb); err != nil {
 		return nil, types.WrapError(types.ErrorCodeInternal, "failed to unmarshal lorebook JSON", err)
+	}
+
+	// JSON lore files don't contain an "enabled" field; default all entries to enabled.
+	for i := range lb.Entries {
+		lb.Entries[i].Enabled = true
 	}
 
 	return lb.Entries, nil
@@ -64,7 +69,7 @@ func loadMemoriesSnapshot(filePath string) ([]lorebook.Entry, error) {
 }
 
 // loadWorldData loads world data from a given JSON file path.
-func loadWorldData(filePath string) (*entities.World, error) {
+func loadWorldData(filePath string) (*WorldContext, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -73,15 +78,15 @@ func loadWorldData(filePath string) (*entities.World, error) {
 		return nil, types.WrapError(types.ErrorCodeInternal, "failed to read world file", err)
 	}
 
-	var world entities.World
-	if err := json.Unmarshal(data, &world); err != nil {
+	world, err := decodeWorldContext(data)
+	if err != nil {
 		return nil, types.WrapError(types.ErrorCodeInternal, "failed to unmarshal world JSON", err)
 	}
-	return &world, nil
+	return world, nil
 }
 
 // loadScenarioData loads scenario data from a given JSON file path.
-func loadScenarioData(filePath string) (*entities.Scenario, error) {
+func loadScenarioData(filePath string) (*ScenarioContext, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -90,15 +95,15 @@ func loadScenarioData(filePath string) (*entities.Scenario, error) {
 		return nil, types.WrapError(types.ErrorCodeInternal, "failed to read scenario file", err)
 	}
 
-	var scenario entities.Scenario
-	if err := json.Unmarshal(data, &scenario); err != nil {
+	scenario, err := decodeScenarioContext(data)
+	if err != nil {
 		return nil, types.WrapError(types.ErrorCodeInternal, "failed to unmarshal scenario JSON", err)
 	}
-	return &scenario, nil
+	return scenario, nil
 }
 
 // loadCharacterData loads character data from a given JSON file path.
-func loadCharacterData(filePath string) (*entities.Character, error) {
+func loadCharacterData(filePath string) (*CharacterContext, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -107,9 +112,47 @@ func loadCharacterData(filePath string) (*entities.Character, error) {
 		return nil, types.WrapError(types.ErrorCodeInternal, "failed to read character file", err)
 	}
 
-	var character entities.Character
-	if err := json.Unmarshal(data, &character); err != nil {
+	character, err := decodeCharacterContext(data)
+	if err != nil {
 		return nil, types.WrapError(types.ErrorCodeInternal, "failed to unmarshal character JSON", err)
 	}
-	return &character, nil
+	return character, nil
+}
+
+// loadMemoriesFromService loads user-created memories via the memory service
+// and converts them to lorebook.Entry format for resolution
+func loadMemoriesFromService(memService *memory.Service, worldName, scenarioName string, characterNames []string) ([]lorebook.Entry, error) {
+	// Get all memories from service
+	filter := types.MemoryFilter{Status: "active"}
+	records, err := memService.GetMemories(filter)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert to lorebook entries
+	entries := memory.ToLorebookEntries(records)
+
+	// Filter to only include memories relevant to current context
+	var filtered []lorebook.Entry
+	for _, entry := range entries {
+		switch entry.Scope {
+		case lorebook.ScopeWorld:
+			if entry.OwnerID == "" || entry.OwnerID == worldName {
+				filtered = append(filtered, entry)
+			}
+		case lorebook.ScopeScenario:
+			if entry.OwnerID == "" || entry.OwnerID == scenarioName {
+				filtered = append(filtered, entry)
+			}
+		case lorebook.ScopeCharacter:
+			if contains(characterNames, entry.OwnerID) {
+				filtered = append(filtered, entry)
+			}
+		default:
+			// Global scope - include all
+			filtered = append(filtered, entry)
+		}
+	}
+
+	return filtered, nil
 }

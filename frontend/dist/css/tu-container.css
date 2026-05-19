@@ -1,0 +1,118 @@
+/**
+ * Tutorials — Container & Header
+ * Full-screen overlay, centered container, header bar,
+ * search input, and close button.
+ */
+
+/* Overlay */
+.tutorials-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.tutorials-overlay.show {
+    display: flex;
+}
+
+/* Container */
+.tutorials-container {
+    background: rgba(21, 21, 31, 0.98);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 1200px;
+    height: min(85vh, 800px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: tutorialsFadeIn 0.2s ease;
+}
+
+@keyframes tutorialsFadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.tutorials-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(100, 100, 100, 0.2);
+    background: rgba(10, 10, 15, 0.5);
+    flex-shrink: 0;
+}
+
+.tutorials-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--static-text, #e0e0e0);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tutorials-title .icon {
+    font-size: 20px;
+    color: var(--theme-color, #14b8a6);
+}
+
+/* Search */
+.tutorials-search {
+    flex: 1;
+    max-width: 320px;
+    margin: 0 16px;
+}
+
+.tutorials-search input {
+    width: 100%;
+    background: rgba(21, 21, 31, 0.8);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: var(--static-text, #e0e0e0);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.tutorials-search input:focus {
+    border-color: var(--theme-color, #14b8a6);
+    box-shadow: 0 0 0 2px var(--theme-glow, rgba(20, 184, 166, 0.15));
+}
+
+.tutorials-search input::placeholder {
+    color: rgba(212, 212, 212, 0.4);
+}
+
+/* Close Button */
+.tutorials-close {
+    background: rgba(100, 100, 100, 0.15);
+    border: 1px solid rgba(100, 100, 100, 0.25);
+    color: var(--text-secondary, #a0a0b0);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.tutorials-close:hover {
+    background: rgba(220, 50, 50, 0.2);
+    border-color: rgba(220, 50, 50, 0.4);
+    color: #f87171;
+}
+

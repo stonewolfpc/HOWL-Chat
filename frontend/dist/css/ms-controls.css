@@ -1,0 +1,289 @@
+/**
+ * Model Settings — Form Controls
+ * Labels, descriptions, details, sliders, number inputs,
+ * dropdown selects, toggles, textareas, and text inputs.
+ */
+
+/* Labels & Descriptions */
+.model-settings-flyout .setting-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #ffffff;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.model-settings-flyout .setting-description {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.model-settings-flyout .setting-details {
+    margin-bottom: 12px;
+}
+
+.model-settings-flyout .setting-detail {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+.model-settings-flyout .setting-detail.warning {
+    color: #ff6b6b;
+}
+
+.model-settings-flyout .setting-detail strong {
+    font-weight: 600;
+}
+
+.model-settings-flyout .setting-detail em {
+    font-style: italic;
+}
+
+/* Control Wrapper */
+.model-settings-flyout .setting-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Sliders */
+.model-settings-flyout .setting-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+
+.model-settings-flyout .setting-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #ffffff;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.model-settings-flyout .setting-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+.model-settings-flyout .setting-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #ffffff;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s ease;
+}
+
+.model-settings-flyout .setting-slider::-moz-range-thumb:hover {
+    transform: scale(1.1);
+}
+
+/* Number Inputs */
+.model-settings-flyout .setting-value {
+    width: 70px;
+    padding: 6px 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 500;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.model-settings-flyout .setting-value:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.model-settings-flyout .setting-value::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Dropdown Selects */
+.model-settings-flyout .setting-select {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(255,255,255,0.5)' d='M6 8L2 4h8L6 8z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+
+.model-settings-flyout .setting-select:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.model-settings-flyout .setting-select option {
+    background: #1a1a1f;
+    color: #ffffff;
+}
+
+/* Toggle Switches (scoped) */
+.model-settings-flyout .setting-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.model-settings-flyout .toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.model-settings-flyout .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.model-settings-flyout .toggle-switch.active {
+    background: rgba(100, 150, 255, 0.3);
+}
+
+.model-settings-flyout .toggle-switch.active::after {
+    left: 22px;
+    background: #ffffff;
+}
+
+/* Unscoped toggle-switch for topbar toggles outside the flyout */
+div.toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+div.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+div.toggle-switch.active {
+    background: rgba(100, 150, 255, 0.3);
+}
+
+div.toggle-switch.active::after {
+    left: 22px;
+    background: #ffffff;
+}
+
+.model-settings-flyout .toggle-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Text Areas */
+.model-settings-flyout .setting-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 400;
+    outline: none;
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.model-settings-flyout .setting-textarea:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.model-settings-flyout .setting-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.model-settings-flyout .setting-textarea::-webkit-scrollbar {
+    width: 8px;
+}
+
+.model-settings-flyout .setting-textarea::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.model-settings-flyout .setting-textarea::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.model-settings-flyout .setting-textarea::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Text Inputs */
+.model-settings-flyout .setting-text-input {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 400;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.model-settings-flyout .setting-text-input:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.model-settings-flyout .setting-text-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}

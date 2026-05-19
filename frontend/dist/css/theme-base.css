@@ -1,0 +1,185 @@
+/**
+ * Theme — Base & Global Styles
+ * Global transitions and dark-theme scrollbar defaults.
+ */
+
+* {
+    transition: background-color calc(4s * var(--animation-speed)) ease-in-out;
+}
+
+/* Theme-aware transitions for major layout elements */
+.menu-bar,
+.nav-sidebar,
+.character-sidebar,
+.chat-panel,
+.world-sidebar,
+.panel,
+.dropdown {
+    transition: background-color calc(4s * var(--animation-speed)) ease-in-out;
+}
+
+/* Global Scrollbar Styling - Dark Theme */
+body,
+textarea,
+input[type="text"],
+input[type="number"],
+select,
+.main-content,
+.character-content,
+.chat-messages,
+.character-list,
+.world-list,
+.scenario-list,
+.lorebook-list,
+.sidebar-content,
+.panel-content,
+.character-creation-content,
+.user-details-content,
+.world-form-content,
+.scenario-form-content,
+.story-tools-content,
+.character-images-list,
+.world-images-list,
+.scenario-images-list,
+.dropdown,
+.flyout-content {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+body::-webkit-scrollbar,
+textarea::-webkit-scrollbar,
+input[type="text"]::-webkit-scrollbar,
+input[type="number"]::-webkit-scrollbar,
+select::-webkit-scrollbar,
+.main-content::-webkit-scrollbar,
+.character-content::-webkit-scrollbar,
+.chat-messages::-webkit-scrollbar,
+.character-list::-webkit-scrollbar,
+.world-list::-webkit-scrollbar,
+.scenario-list::-webkit-scrollbar,
+.lorebook-list::-webkit-scrollbar,
+.sidebar-content::-webkit-scrollbar,
+.panel-content::-webkit-scrollbar,
+.character-creation-content::-webkit-scrollbar,
+.user-details-content::-webkit-scrollbar,
+.world-form-content::-webkit-scrollbar,
+.scenario-form-content::-webkit-scrollbar,
+.story-tools-content::-webkit-scrollbar,
+.character-images-list::-webkit-scrollbar,
+.world-images-list::-webkit-scrollbar,
+.scenario-images-list::-webkit-scrollbar,
+.dropdown::-webkit-scrollbar,
+.flyout-content::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+body::-webkit-scrollbar-track,
+textarea::-webkit-scrollbar-track,
+input[type="text"]::-webkit-scrollbar-track,
+input[type="number"]::-webkit-scrollbar-track,
+select::-webkit-scrollbar-track,
+.main-content::-webkit-scrollbar-track,
+.character-content::-webkit-scrollbar-track,
+.chat-messages::-webkit-scrollbar-track,
+.character-list::-webkit-scrollbar-track,
+.world-list::-webkit-scrollbar-track,
+.scenario-list::-webkit-scrollbar-track,
+.lorebook-list::-webkit-scrollbar-track,
+.sidebar-content::-webkit-scrollbar-track,
+.panel-content::-webkit-scrollbar-track,
+.character-creation-content::-webkit-scrollbar-track,
+.user-details-content::-webkit-scrollbar-track,
+.world-form-content::-webkit-scrollbar-track,
+.scenario-form-content::-webkit-scrollbar-track,
+.story-tools-content::-webkit-scrollbar-track,
+.character-images-list::-webkit-scrollbar-track,
+.world-images-list::-webkit-scrollbar-track,
+.scenario-images-list::-webkit-scrollbar-track,
+.dropdown::-webkit-scrollbar-track,
+.flyout-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+body::-webkit-scrollbar-thumb,
+textarea::-webkit-scrollbar-thumb,
+input[type="text"]::-webkit-scrollbar-thumb,
+input[type="number"]::-webkit-scrollbar-thumb,
+select::-webkit-scrollbar-thumb,
+.main-content::-webkit-scrollbar-thumb,
+.character-content::-webkit-scrollbar-thumb,
+.chat-messages::-webkit-scrollbar-thumb,
+.character-list::-webkit-scrollbar-thumb,
+.world-list::-webkit-scrollbar-thumb,
+.scenario-list::-webkit-scrollbar-thumb,
+.lorebook-list::-webkit-scrollbar-thumb,
+.sidebar-content::-webkit-scrollbar-thumb,
+.panel-content::-webkit-scrollbar-thumb,
+.character-creation-content::-webkit-scrollbar-thumb,
+.user-details-content::-webkit-scrollbar-thumb,
+.world-form-content::-webkit-scrollbar-thumb,
+.scenario-form-content::-webkit-scrollbar-thumb,
+.story-tools-content::-webkit-scrollbar-thumb,
+.character-images-list::-webkit-scrollbar-thumb,
+.world-images-list::-webkit-scrollbar-thumb,
+.scenario-images-list::-webkit-scrollbar-thumb,
+.dropdown::-webkit-scrollbar-thumb,
+.flyout-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+body::-webkit-scrollbar-thumb:hover,
+textarea::-webkit-scrollbar-thumb:hover,
+input[type="text"]::-webkit-scrollbar-thumb:hover,
+input[type="number"]::-webkit-scrollbar-thumb:hover,
+select::-webkit-scrollbar-thumb:hover,
+.main-content::-webkit-scrollbar-thumb:hover,
+.character-content::-webkit-scrollbar-thumb:hover,
+.chat-messages::-webkit-scrollbar-thumb:hover,
+.character-list::-webkit-scrollbar-thumb:hover,
+.world-list::-webkit-scrollbar-thumb:hover,
+.scenario-list::-webkit-scrollbar-thumb:hover,
+.lorebook-list::-webkit-scrollbar-thumb:hover,
+.sidebar-content::-webkit-scrollbar-thumb:hover,
+.panel-content::-webkit-scrollbar-thumb:hover,
+.character-creation-content::-webkit-scrollbar-thumb:hover,
+.user-details-content::-webkit-scrollbar-thumb:hover,
+.world-form-content::-webkit-scrollbar-thumb:hover,
+.scenario-form-content::-webkit-scrollbar-thumb:hover,
+.story-tools-content::-webkit-scrollbar-thumb:hover,
+.character-images-list::-webkit-scrollbar-thumb:hover,
+.world-images-list::-webkit-scrollbar-thumb:hover,
+.scenario-images-list::-webkit-scrollbar-thumb:hover,
+.dropdown::-webkit-scrollbar-thumb:hover,
+.flyout-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+body::-webkit-scrollbar-corner,
+textarea::-webkit-scrollbar-corner,
+input[type="text"]::-webkit-scrollbar-corner,
+input[type="number"]::-webkit-scrollbar-corner,
+select::-webkit-scrollbar-corner,
+.main-content::-webkit-scrollbar-corner,
+.character-content::-webkit-scrollbar-corner,
+.chat-messages::-webkit-scrollbar-corner,
+.character-list::-webkit-scrollbar-corner,
+.world-list::-webkit-scrollbar-corner,
+.scenario-list::-webkit-scrollbar-corner,
+.lorebook-list::-webkit-scrollbar-corner,
+.sidebar-content::-webkit-scrollbar-corner,
+.panel-content::-webkit-scrollbar-corner,
+.character-creation-content::-webkit-scrollbar-corner,
+.user-details-content::-webkit-scrollbar-corner,
+.world-form-content::-webkit-scrollbar-corner,
+.scenario-form-content::-webkit-scrollbar-corner,
+.story-tools-content::-webkit-scrollbar-corner,
+.character-images-list::-webkit-scrollbar-corner,
+.world-images-list::-webkit-scrollbar-corner,
+.scenario-images-list::-webkit-scrollbar-corner,
+.dropdown::-webkit-scrollbar-corner,
+.flyout-content::-webkit-scrollbar-corner {
+    background: transparent;
+}

@@ -1,0 +1,173 @@
+/**
+ * Image Generator Panels — Light Theme Overrides
+ * All body.theme-light rules for image generator panel components.
+ */
+
+body.theme-light .ig-panel {
+    background: var(--surface-secondary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .ig-panel-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-secondary);
+}
+
+body.theme-light .ig-panel-header:hover {
+    background: var(--surface-hover);
+}
+
+body.theme-light .ig-panel-title {
+    color: var(--text-primary);
+}
+
+body.theme-light .ig-panel-status {
+    background: var(--surface-hover);
+    color: var(--text-secondary);
+    border-color: var(--border-secondary);
+}
+
+body.theme-light .ig-panel-status.ig-status-loaded {
+    color: var(--success);
+    border-color: color-mix(in srgb, var(--success) 30%, transparent);
+    background: color-mix(in srgb, var(--success) 8%, transparent);
+}
+
+body.theme-light .ig-panel-status.ig-status-loading {
+    color: var(--warning);
+    border-color: color-mix(in srgb, var(--warning) 30%, transparent);
+    background: color-mix(in srgb, var(--warning) 8%, transparent);
+}
+
+body.theme-light .ig-panel-status.ig-status-error {
+    color: var(--danger);
+    border-color: color-mix(in srgb, var(--danger) 30%, transparent);
+    background: color-mix(in srgb, var(--danger) 8%, transparent);
+}
+
+body.theme-light .ig-panel-toggle {
+    color: var(--text-tertiary);
+}
+
+body.theme-light .ig-panel-badge {
+    background: var(--accent-primary);
+    color: #FFFFFF;
+}
+
+body.theme-light .ig-btn-secondary {
+    background: var(--surface-tertiary);
+    color: var(--text-primary);
+    border-color: var(--border-secondary);
+}
+
+body.theme-light .ig-btn-secondary:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+body.theme-light .ig-model-info-box {
+    background: var(--surface-tertiary);
+    color: var(--text-secondary);
+    border-color: var(--border-secondary);
+}
+
+body.theme-light .ig-tool-btn {
+    background: var(--surface-tertiary);
+    border-color: var(--border-secondary);
+    color: var(--text-secondary);
+}
+
+body.theme-light .ig-tool-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    background: var(--surface-hover);
+}
+
+body.theme-light .ig-seed-btn {
+    background: var(--surface-tertiary);
+    border-color: var(--border-secondary);
+    color: var(--text-secondary);
+}
+
+body.theme-light .ig-seed-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    background: var(--surface-hover);
+}
+
+body.theme-light .ig-seed-btn.ig-locked {
+    background: var(--accent-primary-hover);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+body.theme-light .ig-adv-item {
+    background: var(--surface-tertiary);
+    border-color: var(--border-secondary);
+}
+
+body.theme-light .ig-adv-label {
+    color: var(--text-primary);
+}
+
+body.theme-light .ig-adv-coming {
+    color: var(--text-tertiary);
+}
+
+body.theme-light .ig-info-panel {
+    background: var(--surface-secondary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .ig-info-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-secondary);
+}
+
+body.theme-light .ig-info-label {
+    color: var(--text-tertiary);
+}
+
+body.theme-light .ig-info-value {
+    color: var(--text-secondary);
+}
+
+body.theme-light .ig-info-ok { color: var(--success); }
+body.theme-light .ig-info-warn { color: var(--warning); }
+body.theme-light .ig-info-error { color: var(--danger); }
+
+body.theme-light .ig-workflow-btn {
+    background: var(--surface-tertiary);
+    border-color: var(--border-secondary);
+    color: var(--text-secondary);
+}
+
+body.theme-light .ig-workflow-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+    background: var(--surface-hover);
+}
+
+body.theme-light .ig-workflow-btn.active {
+    background: var(--accent-primary-hover);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+body.theme-light .ig-history-item {
+    background: var(--surface-tertiary);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+body.theme-light .ig-history-item:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+body.theme-light .ig-history-item.active {
+    border-color: var(--accent-primary);
+}
+
+body.theme-light .ig-history-placeholder {
+    color: var(--text-tertiary);
+}

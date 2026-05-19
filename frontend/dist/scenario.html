@@ -27,6 +27,8 @@
     <link rel="stylesheet" href="css/world-dropdown-item.css">
     <link rel="stylesheet" href="css/scenario-header.css">
     <link rel="stylesheet" href="css/nav-icon-images.css">
+    <link rel="stylesheet" href="css/icons.css">
+    <link rel="stylesheet" href="css/tutorials.css">
 </head>
 <body>
     <!-- Ambient Background Effects -->
@@ -120,7 +122,7 @@
             <div class="world-grid" id="scenario-grid">
                 <!-- Scenario bubbles will be dynamically added here -->
                 <div class="world-grid-empty">
-                    <div class="world-grid-empty-icon">📜</div>
+                    <div class="world-grid-empty-icon icon icon-scroll icon-xl"></div>
                     <div class="world-grid-empty-text">No scenarios created yet</div>
                     <div class="world-grid-empty-subtext">Click "Create New Scenario" to get started</div>
                 </div>
@@ -137,27 +139,26 @@
             </div>
             <div class="world-creation-content">
                 <div class="world-form-group">
-                    <label class="world-form-label">Title</label>
-                    <input type="text" class="world-title-input" id="scenario-title" placeholder="Enter scenario title...">
+                    <label class="world-form-label" for="scenario-title">Title</label>
+                    <input type="text" class="world-title-input" id="scenario-title" name="scenario-title" placeholder="Enter scenario title...">
                 </div>
                 <div class="world-form-group">
-                    <label class="world-form-label">Scenario Image</label>
-                    <div class="world-image-picker" id="scenario-image-picker" onclick="document.getElementById('scenario-image-input').click()">
-                        <div class="world-image-picker-placeholder" id="scenario-image-placeholder">
-                            <div class="world-image-picker-icon">📷</div>
-                            <div class="world-image-picker-text">Click to select image</div>
+                    <label class="world-form-label" for="scenario-image-input">Scenario Images
+                        <input type="file" id="scenario-image-input" accept="image/*" multiple style="display: none;" onchange="handleScenarioImageSelect(event)">
+                    </label>
+                    <div class="world-images-list" id="scenario-images-list" onclick="document.getElementById('scenario-image-input').click()">
+                        <div class="no-images-placeholder">
+                            <span class="no-images-icon icon icon-image icon-lg"></span>
+                            <span class="no-images-text">Click to add images</span>
                         </div>
-                        <img class="world-image-preview" id="scenario-image-preview" style="display: none;">
-                        <button class="world-image-remove" id="scenario-image-remove" style="display: none;" onclick="removeScenarioImage(event)">×</button>
-                        <input type="file" id="scenario-image-input" accept="image/*" style="display: none;" onchange="handleScenarioImageSelect(event)">
                     </div>
                 </div>
                 <div class="world-form-group">
-                    <label class="world-form-label">Scenario Details</label>
-                    <textarea class="world-details-textarea" id="scenario-details" placeholder="Describe your scenario..."></textarea>
+                    <label class="world-form-label" for="scenario-details">Scenario Details</label>
+                    <textarea class="world-details-textarea" id="scenario-details" name="scenario-details" placeholder="Describe your scenario..."></textarea>
                 </div>
                 <div class="world-form-group">
-                    <label class="world-form-label">Characters</label>
+                    <label class="world-form-label" for="scenario-character-search">Characters</label>
                     <div class="world-dropdown-container" id="scenario-character-dropdown">
                         <div class="world-dropdown-trigger" onclick="toggleDropdown('scenario-character-dropdown')">
                             <span id="scenario-character-dropdown-text">Select characters...</span>
@@ -165,7 +166,7 @@
                         </div>
                         <div class="world-dropdown-menu">
                             <div class="world-dropdown-search">
-                                <input type="text" class="world-dropdown-search-input" placeholder="Search characters..." oninput="searchScenarioCharacters(this.value)">
+                                <input type="text" id="scenario-character-search" name="scenario-character-search" class="world-dropdown-search-input" placeholder="Search characters..." oninput="searchScenarioCharacters(this.value)">
                             </div>
                             <div id="scenario-character-dropdown-items">
                                 <!-- Character items will be dynamically added here -->
@@ -175,7 +176,7 @@
                     <div class="world-selected-items" id="scenario-character-selected-items"></div>
                 </div>
                 <div class="world-form-group">
-                    <label class="world-form-label">Lorebooks</label>
+                    <label class="world-form-label" for="scenario-lorebook-search">Lorebooks</label>
                     <div class="world-dropdown-container" id="scenario-lorebook-dropdown">
                         <div class="world-dropdown-trigger" onclick="toggleDropdown('scenario-lorebook-dropdown')">
                             <span id="scenario-lorebook-dropdown-text">Select lorebooks...</span>
@@ -183,7 +184,7 @@
                         </div>
                         <div class="world-dropdown-menu">
                             <div class="world-dropdown-search">
-                                <input type="text" class="world-dropdown-search-input" placeholder="Search lorebooks..." oninput="searchScenarioLorebooks(this.value)">
+                                <input type="text" id="scenario-lorebook-search" name="scenario-lorebook-search" class="world-dropdown-search-input" placeholder="Search lorebooks..." oninput="searchScenarioLorebooks(this.value)">
                             </div>
                             <div id="scenario-lorebook-dropdown-items">
                                 <!-- Lorebook items will be dynamically added here -->
@@ -202,7 +203,45 @@
 
     <script src="js/theme.js"></script>
     <script src="js/menu.js"></script>
+    <script src="js/storage-manager.js"></script>
+    <script src="js/storage-indexeddb.js"></script>
+    <script src="js/storage-scenarios.js"></script>
+    <script src="js/storage-chat.js"></script>
+    <script src="js/image-processor.js"></script>
+    <script src="js/delete-confirm.js"></script>
+    <script src="js/delete-service.js"></script>
+    <script src="js/scenario-state.js"></script>
+    <script src="js/scenario-dropdowns.js"></script>
+    <script src="js/scenario-grid.js"></script>
+    <script src="js/scenario-form.js"></script>
     <script src="js/scenario.js"></script>
     <script src="js/navigation.js"></script>
+    <script src="js/menu-edit.js"></script>
+    <script src="js/menu-view.js"></script>
+    <script src="js/memory-store.js"></script>
+    <script src="js/menu-memory.js"></script>
+    <script src="js/menu-functions.js"></script>
+    <script src="js/tutorials-data-chat.js"></script>
+    <script src="js/tutorials-data-settings.js"></script>
+    <script src="js/tutorials-data-model.js"></script>
+    <script src="js/tutorials-data-content.js"></script>
+    <script src="js/tutorials-data-advanced.js"></script>
+    <script src="js/tutorials-data-app.js"></script>
+    <script src="js/tutorials-data.js"></script>
+    <script src="js/tutorials-ui.js"></script>
+    <!-- Tutorials Overlay -->
+    <div id="tutorials-overlay" class="tutorials-overlay">
+        <div class="tutorials-container">
+            <div class="tutorials-header">
+                <div class="tutorials-title"><span class="icon icon-book"></span> HOWL Tutorials</div>
+                <div class="tutorials-search"><input type="text" id="tutorials-search-input" placeholder="Search tutorials..."></div>
+                <button class="tutorials-close" onclick="closeTutorials()">&#x2715;</button>
+            </div>
+            <div class="tutorials-body">
+                <div class="tutorials-nav" id="tutorials-nav"></div>
+                <div class="tutorials-content" id="tutorials-content"></div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

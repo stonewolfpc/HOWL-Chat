@@ -58,18 +58,21 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
     });
 });
 
-// Exit application - unload model and quit
+// Exit application - save chat and quit
 async function exitApp() {
-    // Unload the model first to free memory
-    if (window.go && window.go.main && window.go.main.App) {
-        try {
-            await window.go.main.App.UnloadModel();
-        } catch (e) {
-            console.error('Error unloading model:', e);
-        }
+    if (!window.go || !window.go.main || !window.go.main.App) {
+        console.error('Wails runtime not available');
+        return;
     }
-    // Quit the application
-    if (window.runtime) {
-        window.runtime.Quit();
+    
+    try {
+        // Use backend ExitApp which handles final save and shutdown
+        await window.go.main.App.ExitApp();
+    } catch (error) {
+        console.error('Error during application exit:', error);
+        // Fallback: try to quit anyway
+        if (window.runtime) {
+            window.runtime.Quit();
+        }
     }
 }

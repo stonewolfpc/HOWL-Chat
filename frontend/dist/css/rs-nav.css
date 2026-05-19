@@ -1,0 +1,53 @@
+/**
+ * Real Settings — Navigation Tabs
+ * Horizontal tab navigation for switching settings panels.
+ */
+
+.real-settings-nav {
+    display: flex;
+    background: rgba(10, 10, 15, 0.3);
+    border-bottom: 1px solid rgba(100, 100, 100, 0.2);
+    flex-shrink: 0;
+}
+
+.real-settings-nav-item {
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    color: rgba(212, 212, 212, 0.7);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-bottom: 3px solid transparent;
+    flex-shrink: 0;
+}
+
+.real-settings-nav-item:hover {
+    color: var(--static-text);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.real-settings-nav-item.active {
+    color: var(--theme-color);
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom-color: var(--theme-color);
+}
+
+/* Content Panels */
+.real-settings-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.real-settings-panel {
+    display: none;
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.real-settings-panel.active {
+    display: block;
+}

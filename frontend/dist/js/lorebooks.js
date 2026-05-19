@@ -28,10 +28,6 @@ const LOREBOOK_DEFAULTS = {
     linkedCharacters: [],
     linkedLoreEntries: [],
     inheritance: 'none',
-    automated: false,
-    memoryType: 'world',
-    triggerConfidence: 'medium',
-    decayRate: 'never',
     contextBudget: 160,
     scanWindow: 4,
     recursion: 'limited'
@@ -106,21 +102,6 @@ const SELECT_LABELS = {
         child_scenarios: 'Inherit to Child Scenarios',
         child_worlds: 'Inherit to Child Worlds',
         none: 'Do Not Inherit'
-    },
-    memoryType: {
-        world: 'World Memory',
-        scenario: 'Scenario Memory',
-        character: 'Character Memory'
-    },
-    triggerConfidence: {
-        low: 'Low',
-        medium: 'Medium',
-        high: 'High'
-    },
-    decayRate: {
-        never: 'Never Decays',
-        slow: 'Slow Decay',
-        fast: 'Fast Decay'
     },
     recursion: {
         off: 'Off',
@@ -211,7 +192,6 @@ function saveLorebooksToStorage() {
 function selectLorebookType(type) {
     selectedLorebookType = type;
     setValue('lorebook-scope', type);
-    setValue('lorebook-memory-type', type);
 
     document.querySelectorAll('.lorebook-type-item').forEach(item => {
         item.classList.toggle('selected', item.dataset.scope === type);
@@ -224,7 +204,7 @@ function selectLorebookType(type) {
 }
 
 function clearLorebookForm() {
-    const defaults = { ...LOREBOOK_DEFAULTS, scope: selectedLorebookType, memoryType: selectedLorebookType };
+    const defaults = { ...LOREBOOK_DEFAULTS, scope: selectedLorebookType };
 
     setValue('lorebook-title', defaults.title);
     setValue('lorebook-content', defaults.content);
@@ -248,13 +228,8 @@ function clearLorebookForm() {
     setValue('lorebook-linked-characters', '');
     setValue('lorebook-linked-entries', '');
     setValue('lorebook-inheritance', defaults.inheritance);
-    setValue('lorebook-automated', defaults.automated);
-    setValue('lorebook-memory-type', defaults.memoryType);
-    setValue('lorebook-trigger-confidence', defaults.triggerConfidence);
-    setValue('lorebook-decay-rate', defaults.decayRate);
 
     selectLorebookType(selectedLorebookType);
-    toggleAutomatedSettings();
 }
 
 function openLorebookCreationPopup(resetForm = true) {
@@ -314,10 +289,6 @@ function buildLorebookFromForm() {
         linkedCharacters: splitList(getValue('lorebook-linked-characters')),
         linkedLoreEntries: splitList(getValue('lorebook-linked-entries')),
         inheritance: getValue('lorebook-inheritance'),
-        automated: getValue('lorebook-automated'),
-        memoryType: getValue('lorebook-memory-type'),
-        triggerConfidence: getValue('lorebook-trigger-confidence'),
-        decayRate: getValue('lorebook-decay-rate'),
         createdAt: existing?.createdAt || now,
         updatedAt: now
     });
@@ -375,10 +346,12 @@ function loadLorebooks() {
         return;
     }
 
-    const sorted = [...lorebooks].sort((a, b) => {
-        const scopeOrder = { world: 0, scenario: 1, character: 2 };
-        return (scopeOrder[a.scope] ?? 9) - (scopeOrder[b.scope] ?? 9) || a.priorityLevel - b.priorityLevel;
-    });
+    const sorted = [...lorebooks]
+        .filter(lorebook => !lorebook.automated)
+        .sort((a, b) => {
+            const scopeOrder = { world: 0, scenario: 1, character: 2 };
+            return (scopeOrder[a.scope] ?? 9) - (scopeOrder[b.scope] ?? 9) || a.priorityLevel - b.priorityLevel;
+        });
 
     grid.innerHTML = sorted.map(lorebook => `
         <div class="world-bubble lorebook-card ${lorebook.enabled ? '' : 'is-disabled'}" onclick="editLorebookById('${lorebook.id}')">
@@ -386,7 +359,7 @@ function loadLorebooks() {
                 <div class="world-name">${escapeHtml(lorebook.title)}</div>
                 <div class="lorebook-card-content">${escapeHtml(lorebook.content).slice(0, 180)}${lorebook.content.length > 180 ? '...' : ''}</div>
                 <div class="world-meta lorebook-card-meta">
-                    <span class="world-character-count">${optionLabel('memoryType', lorebook.scope)}</span>
+                    <span class="world-character-count">${SCOPE_META[lorebook.scope]?.label || lorebook.scope}</span>
                     <span class="world-character-count">Priority ${lorebook.priorityLevel}</span>
                     <span class="world-character-count">${optionLabel('injectionStyle', lorebook.injectionStyle)}</span>
                     <span class="world-character-count">${optionLabel('maxLength', lorebook.maxLength)}</span>
@@ -394,8 +367,8 @@ function loadLorebooks() {
                 <div class="lorebook-chip-row">${renderTagList(lorebook.triggerPhrases)}${renderTagList(lorebook.tags, 'lorebook-chip muted')}</div>
             </div>
             <div class="world-actions">
-                <button class="world-bubble-action" onclick="event.stopPropagation(); editLorebookById('${lorebook.id}')" title="Edit">Edit</button>
-                <button class="world-bubble-action" onclick="event.stopPropagation(); deleteLorebookById('${lorebook.id}')" title="Delete">Delete</button>
+                <button class="world-bubble-action" onclick="event.stopPropagation(); editLorebookById('${lorebook.id}')" title="Edit"><span class="icon icon-edit"></span></button>
+                <button class="world-bubble-action" onclick="event.stopPropagation(); deleteLorebookById('${lorebook.id}')" title="Delete"><span class="icon icon-trash"></span></button>
             </div>
         </div>
     `).join('');
@@ -437,13 +410,8 @@ function populateForm(lorebook) {
     setValue('lorebook-linked-characters', joinList(lorebook.linkedCharacters));
     setValue('lorebook-linked-entries', joinList(lorebook.linkedLoreEntries));
     setValue('lorebook-inheritance', lorebook.inheritance);
-    setValue('lorebook-automated', lorebook.automated);
-    setValue('lorebook-memory-type', lorebook.memoryType);
-    setValue('lorebook-trigger-confidence', lorebook.triggerConfidence);
-    setValue('lorebook-decay-rate', lorebook.decayRate);
 
     selectLorebookType(lorebook.scope);
-    toggleAutomatedSettings();
 }
 
 function editLorebookById(id) {
@@ -479,13 +447,6 @@ function deleteLorebook(index) {
     }
 }
 
-function toggleAutomatedSettings() {
-    const automatedSection = getField('automated-lore-settings');
-    if (automatedSection) {
-        automatedSection.classList.toggle('is-muted', !getValue('lorebook-automated'));
-    }
-}
-
 function exportLorebooksForBackend() {
     loadLorebooksFromStorage();
     return lorebooks.map(normalizeLorebook);
@@ -496,7 +457,6 @@ document.addEventListener('DOMContentLoaded', function() {
     clearLorebookForm();
 
     getField('lorebook-scope')?.addEventListener('change', event => selectLorebookType(event.target.value));
-    getField('lorebook-automated')?.addEventListener('change', toggleAutomatedSettings);
 
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {

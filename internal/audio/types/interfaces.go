@@ -18,12 +18,12 @@ const (
 
 // AudioMetadata contains properties of an audio stream
 type AudioMetadata struct {
-	Format       AudioFormat
-	SampleRate   int     // Hz (e.g., 16000, 44100)
-	Channels     int     // 1=mono, 2=stereo
-	BitDepth     int     // 16, 24, 32
-	Duration     float64 // seconds
-	BitRate      int     // kbps (for compressed formats)
+	Format     AudioFormat
+	SampleRate int     // Hz (e.g., 16000, 44100)
+	Channels   int     // 1=mono, 2=stereo
+	BitDepth   int     // 16, 24, 32
+	Duration   float64 // seconds
+	BitRate    int     // kbps (for compressed formats)
 }
 
 // AudioChunk represents a segment of audio data
@@ -92,13 +92,13 @@ type ASRRecognizer interface {
 
 // ASRConfig contains recognizer configuration
 type ASRConfig struct {
-	ModelPath    string
-	Language     string // "auto" or specific code
-	Device       string // "cpu", "cuda", "auto"
-	NumThreads   int
-	BeamSize     int
-	BestOf       int
-	Temperature  float64
+	ModelPath   string
+	Language    string // "auto" or specific code
+	Device      string // "cpu", "cuda", "auto"
+	NumThreads  int
+	BeamSize    int
+	BestOf      int
+	Temperature float64
 }
 
 // ASRModelInfo describes recognizer capabilities
@@ -139,6 +139,10 @@ type TTSConfig struct {
 	CacheDir     string
 	CacheEnabled bool
 	MaxCacheSize int64 // MB
+	// Kokoro-specific paths (optional, used by kokoro adapter)
+	ScriptPath string // Path to kokoro-tts.py bridge script
+	VoicesPath string // Path to voices-v1.0.bin ZIP archive
+	ConfigPath string // Path to config.json with vocab
 }
 
 // Voice represents a TTS voice option
@@ -170,10 +174,10 @@ type AudioCache interface {
 
 // CacheStats contains cache performance metrics
 type CacheStats struct {
-	HitCount    int64
-	MissCount   int64
-	EntryCount  int
-	SizeBytes   int64
+	HitCount     int64
+	MissCount    int64
+	EntryCount   int
+	SizeBytes    int64
 	MaxSizeBytes int64
 }
 
@@ -194,10 +198,10 @@ type VADEngine interface {
 
 // VADConfig contains voice activity detection settings
 type VADConfig struct {
-	Threshold     float64 // 0.0 - 1.0
-	MinSilenceMs  int
-	MinSpeechMs   int
-	PaddingMs     int
+	Threshold    float64 // 0.0 - 1.0
+	MinSilenceMs int
+	MinSpeechMs  int
+	PaddingMs    int
 }
 
 // VADResult contains voice detection outcome
@@ -228,9 +232,9 @@ type MultimodalBridge interface {
 
 // MultimodalConfig contains multimodal settings
 type MultimodalConfig struct {
-	ModelPath      string
-	MaxAudioTokens int
-	MaxVisionTokens int
+	ModelPath         string
+	MaxAudioTokens    int
+	MaxVisionTokens   int
 	TextContextTokens int
 }
 
@@ -260,20 +264,32 @@ type AudioPipeline interface {
 
 // PipelineConfig contains full pipeline configuration
 type PipelineConfig struct {
-	ASREnabled       bool
-	TTSEnabled       bool
+	ASREnabled        bool
+	TTSEnabled        bool
 	MultimodalEnabled bool
 	RealtimeEnabled   bool
-	HardwareTier    string
+	HardwareTier      string
+}
+
+// VoiceOverride carries per-request TTS voice settings (e.g. per-character).
+type VoiceOverride struct {
+	Engine          string  `json:"engine"` // "piper", "melotts", "browser", "" = inherit
+	Voice           string  `json:"voice"`  // model name, e.g. "en_US-lessac-medium"
+	Speed           float64 `json:"speed"`
+	Volume          float64 `json:"volume"`
+	NoiseScale      float64 `json:"noise_scale"`
+	NoiseW          float64 `json:"noise_w"`
+	SentenceSilence float64 `json:"sentence_silence"`
 }
 
 // AudioMessage represents an audio input message
 type AudioMessage struct {
-	Type      string  // "audio_input", "audio_output"
-	Text      string  // For TTS requests
-	AudioPath string  // For ASR requests
-	AudioData []byte  // Raw audio data
-	Metadata  AudioMetadata
+	Type          string // "audio_input", "audio_output"
+	Text          string // For TTS requests
+	AudioPath     string // For ASR requests
+	AudioData     []byte // Raw audio data
+	Metadata      AudioMetadata
+	VoiceOverride *VoiceOverride // Optional per-request voice override
 }
 
 // AudioResponse contains processed audio result
@@ -345,9 +361,9 @@ const (
 
 // AudioError provides structured error information
 type AudioError struct {
-	Code    AudioErrorCode
-	Message string
-	Cause   error
+	Code        AudioErrorCode
+	Message     string
+	Cause       error
 	Recoverable bool
 }
 
@@ -362,9 +378,9 @@ func (e *AudioError) Error() string {
 
 func NewAudioError(code AudioErrorCode, message string, cause error) *AudioError {
 	return &AudioError{
-		Code:    code,
-		Message: message,
-		Cause:   cause,
+		Code:        code,
+		Message:     message,
+		Cause:       cause,
 		Recoverable: code != ErrCodeHardwareInsufficient && code != ErrCodeModelNotFound,
 	}
 }

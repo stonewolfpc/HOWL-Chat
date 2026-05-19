@@ -1,0 +1,237 @@
+/**
+ * Sidebar Panels — Lorebook List
+ * Lorebook items, context menus, add button, group headers,
+ * and empty states in the right sidebar.
+ */
+
+/* Lorebook List Container */
+.lorebook-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 260px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+    padding: 4px;
+}
+
+.lorebook-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.lorebook-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.lorebook-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+}
+
+.lorebook-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* Lorebook Item */
+.lorebook-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+.lorebook-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.lorebook-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 8px;
+}
+
+/* Remove Button */
+.lorebook-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255, 59, 48, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    opacity: 0;
+}
+
+.lorebook-item:hover .lorebook-remove {
+    opacity: 1;
+}
+
+.lorebook-remove:hover {
+    background: rgba(255, 59, 48, 1);
+    transform: scale(1.1);
+}
+
+/* Disabled State */
+.lorebook-item.disabled {
+    opacity: 0.4;
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.lorebook-item.disabled .lorebook-name {
+    text-decoration: line-through;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Lorebook Menu Button */
+.lorebook-menu-btn {
+    position: absolute;
+    top: 8px;
+    right: 32px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s ease;
+}
+
+.lorebook-item:hover .lorebook-menu-btn {
+    opacity: 1;
+}
+
+.lorebook-menu-btn:hover {
+    color: #fff;
+}
+
+/* Lorebook Context Menu */
+.lorebook-context-menu {
+    position: fixed;
+    background: rgba(30, 30, 40, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 8px 0;
+    min-width: 180px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    z-index: 10000;
+    animation: menuFadeIn 0.2s ease;
+    overflow: hidden;
+}
+
+/* Empty State */
+.no-lorebooks {
+    text-align: center;
+    padding: 16px 8px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 12px;
+    font-style: italic;
+}
+
+.lorebook-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 8px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 12px;
+}
+
+.lorebook-empty .empty-icon {
+    font-size: 20px;
+    opacity: 0.5;
+}
+
+.lorebook-empty .empty-text {
+    font-style: italic;
+}
+
+/* Group Header */
+.lorebook-group-header {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 4px 2px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    margin-bottom: 2px;
+    margin-top: 4px;
+    opacity: 0.9;
+    flex-shrink: 0;
+}
+
+.lorebook-group-header:first-child {
+    margin-top: 0;
+}
+
+/* Lorebook Icon & Info */
+.lorebook-icon {
+    font-size: 16px;
+    margin-right: 8px;
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.lorebook-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.lorebook-description {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}
+
+/* Add Lorebook Section */
+.add-lorebook-section {
+    padding: 6px 4px 2px;
+    flex-shrink: 0;
+}
+
+.add-lorebook-btn {
+    width: 100%;
+    padding: 7px 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.add-lorebook-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(255, 255, 255, 0.35);
+}

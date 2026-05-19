@@ -1,0 +1,64 @@
+/**
+ * Theme — Scrollbars (Light Mode)
+ * Light theme scrollbar overrides for all scrollable containers.
+ */
+
+body.theme-light ::-webkit-scrollbar-thumb,
+body.theme-light .character-sidebar::-webkit-scrollbar-thumb,
+body.theme-light .world-sidebar::-webkit-scrollbar-thumb,
+body.theme-light .chat-messages::-webkit-scrollbar-thumb,
+body.theme-light .flyout::-webkit-scrollbar-thumb,
+body.theme-light .setting-textarea::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+    border-radius: 4px;
+}
+
+body.theme-light ::-webkit-scrollbar-thumb:hover,
+body.theme-light .character-sidebar::-webkit-scrollbar-thumb:hover,
+body.theme-light .world-sidebar::-webkit-scrollbar-thumb:hover,
+body.theme-light .chat-messages::-webkit-scrollbar-thumb:hover,
+body.theme-light .flyout::-webkit-scrollbar-thumb:hover,
+body.theme-light .setting-textarea::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+body.theme-light ::-webkit-scrollbar-track,
+body.theme-light .flyout::-webkit-scrollbar-track,
+body.theme-light .setting-textarea::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+body.theme-light ::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+body.theme-light,
+body.theme-light .character-sidebar,
+body.theme-light .world-sidebar,
+body.theme-light .chat-messages,
+body.theme-light .flyout,
+body.theme-light .setting-textarea {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-secondary) transparent;
+}
+
+body.theme-light .character-sidebar::-webkit-scrollbar-thumb,
+body.theme-light .world-sidebar::-webkit-scrollbar-thumb,
+body.theme-light .chat-messages::-webkit-scrollbar-thumb,
+body.theme-light .flyout::-webkit-scrollbar-thumb,
+body.theme-light .setting-textarea::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+}
+
+body.theme-light .character-sidebar::-webkit-scrollbar-thumb:hover,
+body.theme-light .world-sidebar::-webkit-scrollbar-thumb:hover,
+body.theme-light .chat-messages::-webkit-scrollbar-thumb:hover,
+body.theme-light .flyout::-webkit-scrollbar-thumb:hover,
+body.theme-light .setting-textarea::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+body.theme-light .flyout::-webkit-scrollbar-track,
+body.theme-light .setting-textarea::-webkit-scrollbar-track {
+    background: var(--surface-tertiary);
+}

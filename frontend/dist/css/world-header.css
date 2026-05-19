@@ -41,3 +41,25 @@
     border-color: var(--theme-color);
     box-shadow: 0 0 8px var(--theme-glow);
 }
+
+/* ==================== LIGHT THEME OVERRIDES ==================== */
+
+body.theme-light .world-page-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .world-page-title {
+    color: var(--accent-primary);
+}
+
+body.theme-light .create-world-button {
+    background: var(--button-primary-bg);
+    border-color: var(--button-primary-bg);
+    color: #FFFFFF;
+}
+
+body.theme-light .create-world-button:hover {
+    background: var(--accent-primary-hover);
+    border-color: var(--accent-primary);
+}

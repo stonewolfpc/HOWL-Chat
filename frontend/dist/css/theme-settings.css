@@ -1,0 +1,295 @@
+/**
+ * Theme — Settings Pages
+ * Real settings, model settings, sampler settings, audio settings.
+ */
+
+/* --- Audio settings inline styles --- */
+body.theme-light .audio-tab-group {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .audio-tab {
+    color: var(--text-secondary);
+    border-bottom-color: transparent;
+}
+
+body.theme-light .audio-tab:hover {
+    color: var(--accent-primary);
+    background: var(--surface-hover);
+}
+
+body.theme-light .audio-tab.active {
+    color: var(--accent-primary);
+    border-bottom-color: var(--accent-primary);
+    background: var(--surface-primary);
+}
+
+/* --- Audio Settings Tabs --- */
+body.theme-light .audio-tab-group {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .audio-tab {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .audio-tab.active {
+    background: var(--surface-primary);
+    color: var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+
+/* --- Model settings / sampler settings --- */
+body.theme-light .model-settings-panel,
+body.theme-light .sampler-settings-panel,
+body.theme-light .model-info,
+body.theme-light .sampler-info {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+/* --- Sampler / Flyout --- */
+body.theme-light .flyout {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-modal);
+}
+
+body.theme-light .flyout-header {
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .flyout-header h2 {
+    color: var(--text-primary);
+}
+
+body.theme-light .flyout-close {
+    background: var(--surface-tertiary);
+    color: var(--text-secondary);
+}
+
+body.theme-light .flyout-close:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+}
+
+/* --- Model Settings --- */
+body.theme-light .model-settings-flyout {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-modal);
+}
+
+body.theme-light .model-settings-flyout .flyout-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .model-settings-flyout .flyout-header h2 {
+    color: var(--text-primary);
+}
+
+body.theme-light .model-settings-flyout .close-button {
+    background: var(--surface-tertiary);
+    color: var(--text-secondary);
+}
+
+body.theme-light .model-settings-flyout .close-button:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+}
+
+/* --- Model Settings Flyout Internals --- */
+body.theme-light .model-settings-flyout .setting-card {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .model-settings-flyout .setting-card:hover {
+    background: var(--surface-secondary);
+    border-color: var(--border-secondary);
+}
+
+body.theme-light .model-settings-flyout .setting-label {
+    color: var(--text-primary);
+}
+
+body.theme-light .model-settings-flyout .setting-description,
+body.theme-light .model-settings-flyout .setting-detail {
+    color: var(--text-secondary);
+}
+
+body.theme-light .model-settings-flyout .setting-value,
+body.theme-light .model-settings-flyout .setting-select,
+body.theme-light .model-settings-flyout .setting-textarea,
+body.theme-light .model-settings-flyout .setting-text-input {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .model-settings-flyout .setting-value:focus,
+body.theme-light .model-settings-flyout .setting-select:focus,
+body.theme-light .model-settings-flyout .setting-textarea:focus,
+body.theme-light .model-settings-flyout .setting-text-input:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-primary-hover);
+}
+
+body.theme-light .model-settings-flyout .setting-value::placeholder,
+body.theme-light .model-settings-flyout .setting-textarea::placeholder,
+body.theme-light .model-settings-flyout .setting-text-input::placeholder {
+    color: var(--input-placeholder);
+}
+
+body.theme-light .model-settings-flyout .toggle-switch {
+    background: var(--border-secondary);
+}
+
+body.theme-light .model-settings-flyout .toggle-switch.active {
+    background: rgba(0, 174, 239, 0.5);
+}
+
+body.theme-light .model-settings-flyout .toggle-switch::after {
+    background: #FFFFFF;
+}
+
+body.theme-light .model-settings-flyout .toggle-label {
+    color: var(--text-secondary);
+}
+
+body.theme-light .model-settings-flyout .setting-slider::-webkit-slider-runnable-track {
+    background: var(--border-secondary);
+}
+
+body.theme-light .model-settings-flyout .setting-slider::-webkit-slider-thumb {
+    background: var(--accent-primary);
+}
+
+body.theme-light .model-settings-flyout .flyout-content::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+}
+
+body.theme-light .model-settings-flyout .flyout-content::-webkit-scrollbar-thumb:hover {
+    background: var(--border-secondary);
+}
+
+/* --- Sampler Settings Internals --- */
+body.theme-light .sampler-settings .setting-value {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .sampler-settings .toggle-switch {
+    background: var(--border-secondary);
+}
+
+body.theme-light .sampler-settings .toggle-switch.active {
+    background: rgba(0, 174, 239, 0.5);
+}
+
+body.theme-light .sampler-settings .toggle-label {
+    color: var(--text-secondary);
+}
+
+body.theme-light .sampler-settings .setting-reset {
+    background: var(--surface-primary);
+    color: var(--text-secondary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .sampler-settings .setting-reset:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+}
+
+body.theme-light .sampler-settings .setting-button {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .sampler-settings .setting-button:hover {
+    background: var(--surface-hover);
+}
+
+body.theme-light .sampler-settings .category-header {
+    color: var(--accent-primary);
+    border-bottom-color: rgba(0, 174, 239, 0.3);
+}
+
+body.theme-light .sampler-settings .memory-list {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .sampler-settings .memory-list-item {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .sampler-settings .memory-list-item:hover {
+    background: var(--surface-hover);
+}
+
+body.theme-light .sampler-settings .memory-edit-field textarea {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .sampler-settings .warning-tooltip {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .sampler-settings .flyout::-webkit-scrollbar-track {
+    background: var(--surface-tertiary);
+}
+
+body.theme-light .sampler-settings .flyout::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+}
+
+body.theme-light .sampler-settings .flyout::-webkit-scrollbar-thumb:hover {
+    background: var(--border-secondary);
+}
+
+/* --- Real Settings Internals --- */
+body.theme-light .real-settings-nav {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .real-settings-footer {
+    background: var(--surface-tertiary);
+    border-top-color: var(--border-primary);
+}
+
+body.theme-light .real-settings .setting-input,
+body.theme-light .real-settings .setting-select,
+body.theme-light .real-settings .setting-value {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .real-settings .setting-input:focus,
+body.theme-light .real-settings .setting-select:focus,
+body.theme-light .real-settings .setting-value:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-primary-hover);
+}
+
+body.theme-light .real-settings .advanced-content {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}

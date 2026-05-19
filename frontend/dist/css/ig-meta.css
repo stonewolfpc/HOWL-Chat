@@ -1,0 +1,37 @@
+/**
+ * Image Generator — Meta & Metadata
+ * Meta info panel and metadata viewer for generated images.
+ */
+
+/* Meta Panel */
+.ig-meta-panel {
+    background: var(--surface-hover);
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    border: 1px solid var(--border-secondary);
+}
+
+/* Metadata Viewer */
+.ig-metadata-viewer {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: var(--shadow-modal);
+}
+
+.ig-metadata-viewer pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+}

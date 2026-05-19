@@ -1,0 +1,352 @@
+/**
+ * Sampler Settings — Settings Grid & Controls
+ * Category headers, setting cards, sliders, value inputs,
+ * toggles, reset buttons, tooltips, descriptions, and icons.
+ */
+
+/* Category Header */
+.category-header {
+    font-size: 20px;
+    font-weight: 600;
+    color: #4a9eff;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid rgba(74, 158, 255, 0.3);
+    text-shadow: 0 0 10px rgba(74, 158, 255, 0.5);
+}
+
+/* Settings Grid */
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px 16px;
+}
+
+/* Setting Card */
+.setting-card {
+    background: rgba(42, 47, 54, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.setting-card:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(42, 47, 54, 0.5);
+}
+
+/* Setting Label */
+.setting-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Warning Icon & Tooltip */
+.warning-icon {
+    color: #ff6b6b;
+    font-size: 14px;
+    cursor: help;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.warning-icon::before {
+    content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff6b6b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'/%3E%3Cline x1='12' y1='9' x2='12' y2='13'/%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'/%3E%3C/svg%3E");
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+}
+
+.warning-icon .tooltip {
+    visibility: hidden;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1d21;
+    color: #e0e0e0;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    border: 1px solid #ff6b6b;
+    margin-bottom: 6px;
+    pointer-events: none;
+}
+
+.warning-icon:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Setting Toggle */
+.setting-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #2A2F36;
+    transition: 0.3s;
+    border-radius: 20px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: #4a9eff;
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(16px);
+}
+
+.toggle-switch input:disabled + .toggle-slider {
+    background-color: #1a1d21;
+    cursor: not-allowed;
+}
+
+.toggle-switch input:disabled + .toggle-slider:before {
+    background-color: #666;
+}
+
+.toggle-label {
+    font-size: 11px;
+    color: rgba(224, 224, 224, 0.6);
+}
+
+/* Reset Button */
+.setting-reset {
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #888;
+    background: rgba(136, 136, 136, 0.1);
+    border: 1px solid rgba(136, 136, 136, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+    align-self: flex-end;
+}
+
+.setting-reset:hover {
+    color: #fff;
+    background: rgba(136, 136, 136, 0.2);
+    border-color: rgba(136, 136, 136, 0.5);
+}
+
+.setting-reset:active {
+    transform: scale(0.98);
+}
+
+.setting-card.disabled .setting-reset {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.setting-card.disabled .setting-slider,
+.setting-card.disabled .setting-value {
+    pointer-events: none;
+}
+
+/* Description & Details */
+.setting-description {
+    font-size: 12px;
+    color: rgba(224, 224, 224, 0.7);
+    line-height: 1.4;
+}
+
+.setting-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.setting-detail {
+    font-size: 12px;
+    color: rgba(224, 224, 224, 0.7);
+    line-height: 1.3;
+}
+
+.setting-detail em {
+    font-style: italic;
+    color: rgba(224, 224, 224, 0.6);
+}
+
+.setting-detail.warning {
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+.setting-detail.warning strong {
+    color: #ff6b6b;
+}
+
+/* Setting Control */
+.setting-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+/* Setting Slider */
+.setting-slider {
+    flex: 1;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 2px;
+    outline: none;
+}
+
+.setting-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #4a9eff;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.setting-slider::-webkit-slider-thumb:hover {
+    background: #6bb3ff;
+}
+
+.setting-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #4a9eff;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s ease;
+}
+
+.setting-slider::-moz-range-thumb:hover {
+    background: #6bb3ff;
+}
+
+/* Setting Value Input */
+.setting-value {
+    width: 60px;
+    height: 24px;
+    font-size: 12px;
+    font-weight: 500;
+    background: #0D0F12;
+    border: 1px solid #2A2F36;
+    border-radius: 4px;
+    color: #e0e0e0;
+    padding: 2px 6px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.setting-value:focus {
+    border-color: #4a9eff;
+}
+
+.setting-value::-webkit-inner-spin-button,
+.setting-value::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.setting-value::-moz-inner-spin-button,
+.setting-value::-moz-outer-spin-button {
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Setting Icon */
+.setting-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid #1F242A;
+    margin-right: 8px;
+    vertical-align: middle;
+    object-fit: contain;
+    transition: all 0.2s ease;
+}
+
+/* Secondary label declaration for icon alignment */
+.setting-label {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    color: #e0e0e0;
+}
+
+/* Setting Buttons */
+.setting-button {
+    padding: 8px 16px;
+    background: #2A2F36;
+    border: 1px solid #1F242A;
+    border-radius: 4px;
+    color: #e0e0e0;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 0.2s ease;
+}
+
+.setting-button:hover {
+    background: #3a3f46;
+}
+
+.setting-button.secondary {
+    background: transparent;
+    color: #999;
+}
+
+.setting-button.secondary:hover {
+    background: #2A2F36;
+}

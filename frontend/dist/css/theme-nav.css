@@ -1,0 +1,96 @@
+/**
+ * Theme — Navigation & Menu
+ * Menu bar, dropdowns, nav sidebar items for light mode.
+ */
+
+/* --- Menu Bar --- */
+body.theme-light .menu-bar,
+body.theme-light .top-menu {
+    background: var(--surface-primary);
+    border-bottom-color: var(--border-primary);
+    box-shadow: var(--shadow-card);
+}
+
+body.theme-light .menu-bar .menu-item,
+body.theme-light .menu-button,
+body.theme-light .app-title {
+    color: var(--text-primary);
+}
+
+body.theme-light .menu-bar .menu-item:hover,
+body.theme-light .menu-button:hover {
+    background: var(--surface-hover);
+    color: var(--accent-primary);
+}
+
+/* --- Menu items inside context menus & dropdowns --- */
+body.theme-light .menu-item,
+body.theme-light .dropdown-item,
+body.theme-light .flyout-item,
+body.theme-light .context-menu-item {
+    color: var(--text-primary);
+}
+
+body.theme-light .menu-item:hover,
+body.theme-light .dropdown-item:hover,
+body.theme-light .flyout-item:hover,
+body.theme-light .context-menu-item:hover {
+    background: var(--surface-hover);
+    color: var(--accent-primary);
+}
+
+/* --- Menu --- */
+body.theme-light .top-menu {
+    background: linear-gradient(180deg, #FFFFFF 0%, var(--surface-secondary) 100%);
+    border-bottom-color: var(--border-primary);
+    box-shadow: var(--shadow-card);
+}
+
+body.theme-light .app-title {
+    color: var(--text-primary);
+}
+
+body.theme-light .menu-button {
+    color: var(--text-primary);
+}
+
+body.theme-light .menu-controls {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .menu-control {
+    background: var(--surface-tertiary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .menu-control:hover {
+    background: var(--surface-hover);
+    color: var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+
+body.theme-light .dropdown {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-modal);
+}
+
+/* --- Nav Items --- */
+body.theme-light .nav-item {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .nav-item:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent-primary);
+}
+
+body.theme-light .nav-item.active {
+    background: var(--surface-hover);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px var(--accent-primary-hover);
+}

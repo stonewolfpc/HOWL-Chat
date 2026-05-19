@@ -1,0 +1,21 @@
+/**
+ * Sidebar Panels — Modular Architecture
+ * Character sidebar (left), world sidebar (right),
+ * context sections, lorebooks, and model controls.
+ *
+ * This file aggregates all sidebar panel CSS modules.
+ * Each module handles a single, well-defined concern.
+ * Do NOT add rules here; use the appropriate module.
+ *
+ * @module sidebar-panels
+ * @version 2.0.0
+ */
+
+@import url('sp-character.css');
+@import url('sp-character-menu.css');
+@import url('sp-world.css');
+@import url('sp-context.css');
+@import url('sp-lorebooks.css');
+@import url('sp-model.css');
+@import url('sp-light-theme.css');
+@import url('sp-responsive.css');

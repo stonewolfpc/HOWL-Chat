@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Settings - HOWL Chat</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/real-settings.css">
+    <link rel="stylesheet" href="css/chat-session-modal.css">
+    <link rel="stylesheet" href="css/icons.css">
+</head>
+<body>
+    <!-- Settings Modal Overlay -->
+    <div class="real-settings-overlay" id="real-settings-overlay">
+        <div class="real-settings-container">
+            <!-- Settings Modal Header -->
+            <div class="real-settings-header">
+                <h2 class="real-settings-title"><span class="icon icon-gear"></span> Settings</h2>
+                <button class="real-settings-close" onclick="closeRealSettings()">✕</button>
+            </div>
+
+            <!-- Settings Navigation -->
+            <div class="real-settings-nav">
+                <button class="real-settings-nav-item active" onclick="showSettingsPanel('general')"><span class="icon icon-palette"></span> General</button>
+                <button class="real-settings-nav-item" onclick="showSettingsPanel('storage')"><span class="icon icon-folder"></span> Files & Storage</button>
+                <button class="real-settings-nav-item" onclick="showSettingsPanel('privacy')"><span class="icon icon-lock"></span> Privacy & Data</button>
+                <button class="real-settings-nav-item" onclick="showSettingsPanel('audio')"><span class="icon icon-broadcast"></span> Audio & TTS</button>
+            </div>
+
+            <!-- Settings Content -->
+            <div class="real-settings-content">
+                <!-- General Settings Panel -->
+                <div class="real-settings-panel active" id="general-panel">
+                    <div class="settings-category-header"><span class="icon icon-palette"></span> General Application Settings</div>
+                    <div class="settings-grid">
+                        <!-- Theme Settings -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="default-theme">Default Theme</label>
+                            <div class="setting-description">Choose your preferred color theme</div>
+                            <div class="setting-control">
+                                <select class="setting-select" id="default-theme">
+                                    <option value="light">Light</option>
+                                    <option value="dark">Dark</option>
+                                    <option value="system">System</option>
+                                    <option value="custom">Custom Palette</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Animation Speed -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="animation-speed">Animation Speed</label>
+                            <div class="setting-description">Control UI transition speeds</div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="animation-speed" min="0" max="2" step="0.1" value="1">
+                                <input type="number" class="setting-value" id="animation-speed-value" min="0" max="2" step="0.1" value="1">
+                            </div>
+                        </div>
+
+                        <!-- UI Scaling -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="ui-scale">UI Scaling</label>
+                            <div class="setting-description">Adjust interface size and font scaling</div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="ui-scale" min="0.5" max="2" step="0.1" value="1">
+                                <input type="number" class="setting-value" id="ui-scale-value" min="0.5" max="2" step="0.1" value="1">
+                            </div>
+                        </div>
+
+                        <!-- Sound Effects -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="sound-effects">Sound Effects</label>
+                            <div class="setting-description">Enable/disable UI sound effects</div>
+                            <div class="setting-control">
+                                <label class="setting-toggle">
+                                    <input type="checkbox" id="sound-effects" checked>
+                                    <span class="setting-toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Startup Sound -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="startup-sound">Startup Sound</label>
+                            <div class="setting-description">Play howl sound when opening the app</div>
+                            <div class="setting-control">
+                                <label class="setting-toggle">
+                                    <input type="checkbox" id="startup-sound" checked>
+                                    <span class="setting-toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- TTS Auto-play -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="tts-autoplay">TTS Auto-play</label>
+                            <div class="setting-description">Automatically play text-to-speech</div>
+                            <div class="setting-control">
+                                <label class="setting-toggle">
+                                    <input type="checkbox" id="tts-autoplay" checked>
+                                    <span class="setting-toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Default Model -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="default-model">Default Model</label>
+                            <div class="setting-description">Model to load on startup</div>
+                            <div class="setting-control">
+                                <select class="setting-select" id="default-model">
+                                    <option value="">None (Ask on startup)</option>
+                                    <option value="last-used">Last Used Model</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Default Sampler Preset -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="default-sampler">Default Sampler Preset</label>
+                            <div class="setting-description">Default sampling parameters</div>
+                            <div class="setting-control">
+                                <select class="setting-select" id="default-sampler">
+                                    <option value="balanced">Balanced</option>
+                                    <option value="creative">Creative</option>
+                                    <option value="precise">Precise</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Auto-save Interval -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="auto-save-interval">Auto-save Interval</label>
+                            <div class="setting-description">Minutes between automatic saves</div>
+                            <div class="setting-control">
+                                <input type="number" class="setting-input" id="auto-save-interval" min="1" max="60" value="5">
+                            </div>
+                        </div>
+
+                        <!-- Android Companion App -->
+                        <div class="setting-card" style="opacity:0.6;">
+                            <label class="setting-label" for="android-companion">Android Companion</label>
+                            <div class="setting-description">Android companion app and remote coming soon</div>
+                            <div class="setting-control">
+                                <label class="setting-toggle">
+                                    <input type="checkbox" id="android-companion" disabled>
+                                    <span class="setting-toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File & Storage Settings Panel -->
+                <div class="real-settings-panel" id="storage-panel">
+                    <div class="settings-category-header"><span class="icon icon-folder"></span> File & Storage Settings</div>
+                    <div class="settings-grid">
+                        <!-- Chat Auto-save Toggle -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="chat-autosave">Chat Auto-save</label>
+                            <div class="setting-description">Automatically save chat sessions</div>
+                            <div class="setting-control">
+                                <label class="setting-toggle">
+                                    <input type="checkbox" id="chat-autosave" checked>
+                                    <span class="setting-toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Auto-archive Old Chats -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="auto-archive">Auto-archive Old Chats</label>
+                            <div class="setting-description">Archive chats older than specified days</div>
+                            <div class="setting-control">
+                                <label class="setting-toggle">
+                                    <input type="checkbox" id="auto-archive" checked>
+                                    <span class="setting-toggle-slider"></span>
+                                </label>
+                                <input type="number" class="setting-input" id="archive-days" min="7" max="365" value="30" placeholder="Days">
+                            </div>
+                        </div>
+
+                        <!-- Maximum Recent Chats -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="max-recent-chats">Maximum Recent Chats</label>
+                            <div class="setting-description">Number of chats to show in recent list</div>
+                            <div class="setting-control">
+                                <input type="number" class="setting-input" id="max-recent-chats" min="5" max="50" value="10">
+                            </div>
+                        </div>
+
+                        <!-- Chat Storage Location -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="chat-storage-location">Chat Storage Location</label>
+                            <div class="setting-description">Directory where chats are saved</div>
+                            <div class="setting-control">
+                                <input type="text" class="setting-input" id="chat-storage-location" readonly value="AppData/Chats">
+                                <div class="setting-actions">
+                                    <button class="setting-btn" onclick="browseChatLocation()">Browse</button>
+                                    <button class="setting-btn" onclick="resetChatLocation()">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Content Storage Location -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="content-storage-location">Content Storage Location</label>
+                            <div class="setting-description">Base directory for worlds, scenarios, characters</div>
+                            <div class="setting-control">
+                                <input type="text" class="setting-input" id="content-storage-location" readonly value="AppData">
+                                <div class="setting-actions">
+                                    <button class="setting-btn" onclick="browseContentLocation()">Browse</button>
+                                    <button class="setting-btn" onclick="resetContentLocation()">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- World Storage Location -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="world-storage-location">World Storage Location</label>
+                            <div class="setting-description">Directory for world data and images</div>
+                            <div class="setting-control">
+                                <input type="text" class="setting-input" id="world-storage-location" readonly value="AppData/Worlds">
+                                <div class="setting-actions">
+                                    <button class="setting-btn" onclick="browseWorldLocation()">Browse</button>
+                                    <button class="setting-btn" onclick="resetWorldLocation()">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scenario Storage Location -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="scenario-storage-location">Scenario Storage Location</label>
+                            <div class="setting-description">Directory for scenario data and images</div>
+                            <div class="setting-control">
+                                <input type="text" class="setting-input" id="scenario-storage-location" readonly value="AppData/Scenarios">
+                                <div class="setting-actions">
+                                    <button class="setting-btn" onclick="browseScenarioLocation()">Browse</button>
+                                    <button class="setting-btn" onclick="resetScenarioLocation()">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Character Storage Location -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="character-storage-location">Character Storage Location</label>
+                            <div class="setting-description">Directory for character data and images</div>
+                            <div class="setting-control">
+                                <input type="text" class="setting-input" id="character-storage-location" readonly value="AppData/Characters">
+                                <div class="setting-actions">
+                                    <button class="setting-btn" onclick="browseCharacterLocation()">Browse</button>
+                                    <button class="setting-btn" onclick="resetCharacterLocation()">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Image Storage Location -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="image-storage-location">Image Storage Location</label>
+                            <div class="setting-description">Directory for generated and saved images</div>
+                            <div class="setting-control">
+                                <input type="text" class="setting-input" id="image-storage-location" readonly value="AppData/Images">
+                                <div class="setting-actions">
+                                    <button class="setting-btn" onclick="browseImageLocation()">Browse</button>
+                                    <button class="setting-btn" onclick="resetImageLocation()">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Backup & Restore -->
+                        <div class="setting-card">
+                            <div class="setting-label">Backup & Restore</div>
+                            <div class="setting-description">Manage application data backups</div>
+                            <div class="setting-actions">
+                                <button class="setting-btn primary" onclick="createBackup()">Create Backup</button>
+                                <button class="setting-btn" onclick="restoreBackup()">Restore Backup</button>
+                                <button class="setting-btn" onclick="manageBackups()">Manage Backups</button>
+                            </div>
+                        </div>
+
+                        <!-- Clear Cache -->
+                        <div class="setting-card">
+                            <div class="setting-label">Clear Cache</div>
+                            <div class="setting-description">Clear temporary files and cached data</div>
+                            <div class="setting-actions">
+                                <button class="setting-btn danger" onclick="clearCache()">Clear Cache</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy & Data Settings Panel -->
+                <div class="real-settings-panel" id="privacy-panel">
+                    <div class="settings-category-header"><span class="icon icon-lock"></span> Privacy & Data Settings</div>
+                    <div class="settings-grid">
+                        <!-- Local-only Mode -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="local-only-mode">Local-only Mode</label>
+                            <div class="setting-description">Disable all network connections</div>
+                            <div class="setting-control">
+                                <label class="setting-toggle">
+                                    <input type="checkbox" id="local-only-mode">
+                                    <span class="setting-toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Disable Telemetry -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="disable-telemetry">Disable Telemetry</label>
+                            <div class="setting-description">Prevent usage data collection</div>
+                            <div class="setting-control">
+                                <label class="setting-toggle">
+                                    <input type="checkbox" id="disable-telemetry" checked>
+                                    <span class="setting-toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Clear All Local Data -->
+                        <div class="setting-card">
+                            <div class="setting-label">Clear All Local Data</div>
+                            <div class="setting-description">Permanently delete all application data</div>
+                            <div class="setting-actions">
+                                <button class="setting-btn danger" onclick="clearAllData()">Clear All Data</button>
+                            </div>
+                        </div>
+
+                        <!-- Manage Permissions -->
+                        <div class="setting-card">
+                            <div class="setting-label">Manage Permissions</div>
+                            <div class="setting-description">Control app access to system resources</div>
+                            <div class="setting-control">
+                                <div class="setting-actions">
+                                    <button class="setting-btn" onclick="managePermissions()">Manage Permissions</button>
+                                    <button class="setting-btn" onclick="resetPermissions()">Reset Permissions</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audio & TTS Settings Panel -->
+                <div class="real-settings-panel" id="audio-panel">
+                    <div class="settings-category-header"><span class="icon icon-broadcast"></span> Audio & TTS Settings</div>
+                    <div class="settings-grid">
+                        <!-- Default TTS Voice -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="default-tts-voice">Default TTS Voice</label>
+                            <div class="setting-description">Preferred voice for text-to-speech</div>
+                            <div class="setting-control">
+                                <select class="setting-select" id="default-tts-voice">
+                                    <option value="system">System Default</option>
+                                    <option value="female-1">Female Voice 1</option>
+                                    <option value="male-1">Male Voice 1</option>
+                                    <option value="female-2">Female Voice 2</option>
+                                    <option value="male-2">Male Voice 2</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- TTS Speed -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="tts-speed">TTS Speed</label>
+                            <div class="setting-description">Speech rate for text-to-speech</div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="tts-speed" min="0.5" max="2" step="0.1" value="1">
+                                <input type="number" class="setting-value" id="tts-speed-value" min="0.5" max="2" step="0.1" value="1">
+                            </div>
+                        </div>
+
+                        <!-- TTS Volume -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="tts-volume">TTS Volume</label>
+                            <div class="setting-description">Audio output volume level</div>
+                            <div class="setting-control">
+                                <input type="range" class="setting-slider" id="tts-volume" min="0" max="1" step="0.1" value="0.8">
+                                <input type="number" class="setting-value" id="tts-volume-value" min="0" max="1" step="0.1" value="0.8">
+                            </div>
+                        </div>
+
+                        <!-- Auto-play on Message -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="tts-autoplay-message">Auto-play on Message</label>
+                            <div class="setting-description">Automatically TTS new messages</div>
+                            <div class="setting-control">
+                                <label class="setting-toggle">
+                                    <input type="checkbox" id="tts-autoplay-message" checked>
+                                    <span class="setting-toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Push-to-talk Settings -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="push-to-talk">Push-to-talk Settings</label>
+                            <div class="setting-description">Voice activation configuration</div>
+                            <div class="setting-control">
+                                <label class="setting-toggle">
+                                    <input type="checkbox" id="push-to-talk" checked>
+                                    <span class="setting-toggle-slider"></span>
+                                </label>
+                                <input type="range" class="setting-slider" id="mic-sensitivity" min="0.1" max="1" step="0.1" value="0.5">
+                                <input type="number" class="setting-value" id="mic-sensitivity-value" min="0.1" max="1" step="0.1" value="0.5">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Footer -->
+            <div class="real-settings-footer">
+                <div class="settings-info">Settings are automatically saved</div>
+                <div class="settings-actions">
+                    <button class="settings-reset-btn" onclick="resetAllSettings()">Reset to Defaults</button>
+                    <button class="settings-save-btn" onclick="saveAllSettings()">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/settings-state.js"></script>
+    <script src="js/settings-actions.js"></script>
+    <script src="js/settings-controls.js"></script>
+    <script src="js/real-settings.js"></script>
+</body>
+</html>

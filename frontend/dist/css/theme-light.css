@@ -1,0 +1,65 @@
+/**
+ * Theme — Light Mode Variable Definitions
+ * Core light theme CSS custom properties.
+ */
+
+/* ==========================================================================
+   HOWL Light Theme — Clean Variable-Based Implementation
+   (Covers ALL pages: index, character, world, scenario, lorebooks,
+    story-tools, image-generator, audio-settings, real-settings)
+   ========================================================================== */
+
+body.theme-light {
+    /* Core Theme Variables */
+    --theme-color: #14b8a6;
+    --theme-secondary: #06b6d4;
+    --theme-glow: rgba(20, 184, 166, 0.25);
+    --theme-text-glow: rgba(20, 184, 166, 0.2);
+
+    /* Text Variables */
+    --static-text: #1A1C1E;
+    --text-primary: #1A1C1E;
+    --text-secondary: #4A4D52;
+    --text-tertiary: #7A7D82;
+
+    /* Surface Variables */
+    --surface-primary: #FFFFFF;
+    --surface-secondary: #F4F6F8;
+    --surface-tertiary: #ECEEF1;
+    --surface-hover: rgba(0, 0, 0, 0.04);
+
+    /* Border Variables */
+    --border-primary: #D3D7DE;
+    --border-secondary: #B8BDC7;
+
+    /* Accent Variables */
+    --accent-primary: var(--theme-color);
+    --accent-primary-hover: rgba(20, 184, 166, 0.12);
+    --accent-secondary: var(--theme-secondary);
+    --accent-secondary-hover: rgba(6, 182, 212, 0.12);
+
+    /* Status Colors (Universal) */
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --danger: #ff3333;
+    --info: #00ccff;
+
+    /* Shadows */
+    --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.06);
+    --shadow-modal: 0 4px 16px rgba(0, 0, 0, 0.12);
+
+    /* Inputs & Forms */
+    --input-bg: #FFFFFF;
+    --input-border: #D3D7DE;
+    --input-placeholder: #9CA1A8;
+
+    /* Buttons */
+    --button-primary-bg: var(--theme-color);
+    --button-secondary-bg: #FFFFFF;
+    --button-secondary-border: var(--theme-color);
+
+    /* Apply to body */
+    background-color: var(--surface-secondary);
+    color: var(--text-primary);
+    color-scheme: light;
+}

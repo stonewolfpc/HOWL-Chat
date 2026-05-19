@@ -7,19 +7,25 @@
  * @module model-settings
  */
 
+const MODEL_SETTINGS_STORAGE_KEY = 'howl-model-settings';
+
 // Model settings state
 let modelSettings = {
     // Core Model Settings (keys match app.go/spawnLlamaServerWithModel)
+    model_family: 'auto',
+    model_variant: 'auto',
     threads: 8,
     batch_size: 512,
     gpu_layers: 0,
     context_size: 4096,
+    kv_cache_size: 4096,
+    kv_cache_type: 'standard',
 
     // Performance Settings
     rope_mode: 'auto',
     rope_factor: 1.0,
     rope_base: 0,
-    tensor_split: '',
+    tensor_split: 0,
     flash_attention: false,
     offload_kqv: true,
     use_mmap: true,
@@ -88,7 +94,7 @@ function initSliderValuePairs() {
         { slider: 'thread-count', value: 'thread-count-value', setting: 'threads' },
         { slider: 'batch-size', value: 'batch-size-value', setting: 'batch_size' },
         { slider: 'gpu-layers', value: 'gpu-layers-value', setting: 'gpu_layers' },
-        { slider: 'kv-cache-size', value: 'kv-cache-size-value', setting: 'context_size' },
+        { slider: 'kv-cache-size', value: 'kv-cache-size-value', setting: 'kv_cache_size' },
         { slider: 'rope-factor', value: 'rope-factor-value', setting: 'rope_factor' },
         { slider: 'tensor-split', value: 'tensor-split-value', setting: 'tensor_split' },
         { slider: 'max-context', value: 'max-context-value', setting: 'context_size' }
@@ -130,6 +136,8 @@ function initSliderValuePairs() {
 // Initialize dropdown selects
 function initDropdowns() {
     const dropdowns = [
+        { id: 'model-family', setting: 'model_family' },
+        { id: 'model-variant', setting: 'model_variant' },
         { id: 'kv-cache-type', setting: 'kv_cache_type' },
         { id: 'rope-scaling-mode', setting: 'rope_mode' },
         { id: 'context-rollover-mode', setting: 'context_rollover_mode' },
@@ -151,11 +159,11 @@ function initDropdowns() {
 // Initialize text inputs
 function initTextInputs() {
     const textInputs = [
-        { id: 'custom-jinja-template', setting: 'customJinjaTemplate' },
-        { id: 'system-prompt-override', setting: 'systemPromptOverride' },
-        { id: 'user-prompt-prefix', setting: 'userPromptPrefix' },
-        { id: 'assistant-prompt-prefix', setting: 'assistantPromptPrefix' },
-        { id: 'stop-sequences', setting: 'stopSequences' }
+        { id: 'custom-jinja-template', setting: 'custom_jinja_template' },
+        { id: 'system-prompt-override', setting: 'system_prompt_override' },
+        { id: 'user-prompt-prefix', setting: 'user_prefix' },
+        { id: 'assistant-prompt-prefix', setting: 'assistant_prefix' },
+        { id: 'stop-sequences', setting: 'stop_sequences' }
     ];
     
     textInputs.forEach(input => {
@@ -171,6 +179,12 @@ function initTextInputs() {
 
 // Save model settings to backend
 async function saveModelSettings() {
+    try {
+        localStorage.setItem(MODEL_SETTINGS_STORAGE_KEY, JSON.stringify(modelSettings));
+    } catch (error) {
+        console.warn('Unable to save model settings locally:', error);
+    }
+
     if (!window.go || !window.go.main || !window.go.main.App) {
         console.log('Wails runtime not available, settings saved locally only');
         return;
@@ -183,22 +197,36 @@ async function saveModelSettings() {
     }
 }
 
-// Load model settings from backend
+// Load model settings from backend or localStorage
 async function loadModelSettings() {
-    if (!window.go || !window.go.main || !window.go.main.App) {
-        console.log('Wails runtime not available, using local settings');
-        return;
-    }
-    
-    try {
-        const settings = await window.go.main.App.GetModelOptions();
-        if (settings && Object.keys(settings).length > 0) {
-            modelSettings = { ...modelSettings, ...settings };
-            updateUIFromSettings();
+    let loaded = false;
+
+    if (window.go && window.go.main && window.go.main.App) {
+        try {
+            const settings = await window.go.main.App.GetModelOptions();
+            if (settings && Object.keys(settings).length > 0) {
+                modelSettings = { ...modelSettings, ...settings };
+                loaded = true;
+            }
+        } catch (error) {
+            console.error('Error loading model settings from backend:', error);
         }
-    } catch (error) {
-        console.error('Error loading model settings:', error);
     }
+
+    if (!loaded) {
+        try {
+            const local = localStorage.getItem(MODEL_SETTINGS_STORAGE_KEY);
+            if (local) {
+                const settings = JSON.parse(local);
+                modelSettings = { ...modelSettings, ...settings };
+                loaded = true;
+            }
+        } catch (error) {
+            console.warn('Failed to load model settings from localStorage:', error);
+        }
+    }
+
+    updateUIFromSettings();
 }
 
 // Update UI from settings
@@ -208,7 +236,7 @@ function updateUIFromSettings() {
         { slider: 'thread-count', value: 'thread-count-value', setting: 'threads' },
         { slider: 'batch-size', value: 'batch-size-value', setting: 'batch_size' },
         { slider: 'gpu-layers', value: 'gpu-layers-value', setting: 'gpu_layers' },
-        { slider: 'kv-cache-size', value: 'kv-cache-size-value', setting: 'context_size' },
+        { slider: 'kv-cache-size', value: 'kv-cache-size-value', setting: 'kv_cache_size' },
         { slider: 'rope-factor', value: 'rope-factor-value', setting: 'rope_factor' },
         { slider: 'tensor-split', value: 'tensor-split-value', setting: 'tensor_split' },
         { slider: 'max-context', value: 'max-context-value', setting: 'context_size' }
@@ -226,6 +254,8 @@ function updateUIFromSettings() {
     
     // Update dropdowns
     const dropdowns = [
+        { id: 'model-family', setting: 'model_family' },
+        { id: 'model-variant', setting: 'model_variant' },
         { id: 'kv-cache-type', setting: 'kv_cache_type' },
         { id: 'rope-scaling-mode', setting: 'rope_mode' },
         { id: 'context-rollover-mode', setting: 'context_rollover_mode' },
@@ -288,4 +318,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load settings from backend on initialization
     loadModelSettings();
+});
+
+// Persist model settings before the page unloads
+window.addEventListener('beforeunload', function() {
+    try {
+        localStorage.setItem(MODEL_SETTINGS_STORAGE_KEY, JSON.stringify(modelSettings));
+    } catch (error) {
+        console.warn('Failed to persist model settings on unload:', error);
+    }
 });

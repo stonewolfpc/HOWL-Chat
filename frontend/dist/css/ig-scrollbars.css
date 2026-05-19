@@ -1,0 +1,32 @@
+/**
+ * Image Generator — Scrollbars
+ * IG-specific scrollbar styling and select positioning fix.
+ */
+
+.ig-sidebar::-webkit-scrollbar,
+.ig-right-panel::-webkit-scrollbar,
+.ig-history-list::-webkit-scrollbar,
+.ig-canvas-wrapper::-webkit-scrollbar { width: 6px; }
+
+.ig-sidebar::-webkit-scrollbar-track,
+.ig-right-panel::-webkit-scrollbar-track,
+.ig-history-list::-webkit-scrollbar-track,
+.ig-canvas-wrapper::-webkit-scrollbar-track { background: transparent; }
+
+.ig-sidebar::-webkit-scrollbar-thumb,
+.ig-right-panel::-webkit-scrollbar-thumb,
+.ig-history-list::-webkit-scrollbar-thumb,
+.ig-canvas-wrapper::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+    border-radius: 3px;
+}
+
+.ig-sidebar::-webkit-scrollbar-thumb:hover,
+.ig-right-panel::-webkit-scrollbar-thumb:hover,
+.ig-history-list::-webkit-scrollbar-thumb:hover,
+.ig-canvas-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+/* Select positioning fix */
+.ig-select { position: relative; z-index: 1; }

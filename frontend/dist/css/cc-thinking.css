@@ -1,0 +1,52 @@
+/**
+ * Chat Components — Think Area
+ * Collapsible reasoning/thinking block for assistant messages.
+ */
+
+.chat-think {
+    margin-top: 8px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.thinking-toggle {
+    font-size: 12px;
+    opacity: 0.7;
+    cursor: pointer;
+    margin-top: 6px;
+    color: var(--theme-color);
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.thinking-toggle:hover {
+    opacity: 1;
+    background: rgba(100, 100, 100, 0.15);
+}
+
+.thinking-block {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+    background: rgba(21, 21, 31, 0.5);
+    border-left: 2px solid var(--theme-color);
+    margin-top: 6px;
+    padding: 0 10px;
+    border-radius: 4px;
+}
+
+.thinking-block.open {
+    max-height: 500px;
+    padding: 10px;
+}
+
+.thinking-block pre {
+    margin: 0;
+    font-size: 12px;
+    color: var(--static-text);
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}

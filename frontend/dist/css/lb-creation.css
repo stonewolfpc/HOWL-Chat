@@ -1,0 +1,113 @@
+/**
+ * Lorebooks — Creation Popup
+ * Full-screen overlay, popup modal, header, content,
+ * footer, save and cancel buttons.
+ */
+
+/* Overlay */
+.lorebook-creation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+/* Popup */
+.lorebook-creation-popup {
+    background: rgba(15, 21, 31, 0.95);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 0 20px var(--theme-glow);
+}
+
+/* Header */
+.lorebook-creation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+}
+
+.lorebook-creation-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--theme-color);
+    text-shadow: 0 0 10px var(--theme-glow);
+    margin: 0;
+}
+
+.lorebook-creation-close {
+    background: none;
+    border: none;
+    color: var(--static-text);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.lorebook-creation-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Content */
+.lorebook-creation-content {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Footer */
+.lorebook-creation-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px;
+    border-top: 1px solid rgba(100, 100, 100, 0.3);
+}
+
+/* Buttons */
+.lorebook-creation-cancel,
+.lorebook-creation-save {
+    padding: 10px 20px;
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.lorebook-creation-cancel {
+    background: rgba(100, 100, 100, 0.2);
+    color: var(--static-text);
+}
+
+.lorebook-creation-save {
+    background: var(--theme-glow);
+    color: var(--static-text);
+    border-color: var(--theme-color);
+}
+
+.lorebook-creation-cancel:hover,
+.lorebook-creation-save:hover {
+    box-shadow: 0 0 8px var(--theme-glow);
+}

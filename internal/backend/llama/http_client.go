@@ -3,6 +3,7 @@ package llama
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -20,6 +21,8 @@ type HTTPClient struct {
 	baseURL    string
 	httpClient *http.Client
 	enabled    bool
+	currentReq *http.Request
+	cancelReq  context.CancelFunc
 }
 
 // NewHTTPClient creates a new llama.cpp HTTP client
@@ -154,7 +157,19 @@ func (c *HTTPClient) GenerateChatCompletionStreaming(req *ChatCompletionRequest,
 	}
 
 	url := fmt.Sprintf("%s/v1/chat/completions", c.baseURL)
-	resp, err := c.httpClient.Post(url, "application/json", bytes.NewBuffer(jsonData))
+
+	// Create request with context for cancellation
+	ctx, cancel := context.WithCancel(context.Background())
+	c.cancelReq = cancel
+
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+	c.currentReq = httpReq
+
+	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
 	}
@@ -351,6 +366,15 @@ func (c *HTTPClient) Close() error {
 	return nil
 }
 
+// CancelRequest cancels the current ongoing request
+func (c *HTTPClient) CancelRequest() {
+	if c.cancelReq != nil {
+		c.cancelReq()
+		c.cancelReq = nil
+	}
+	c.currentReq = nil
+}
+
 // UnloadModel unloads the currently loaded model (implements Client interface)
 func (c *HTTPClient) UnloadModel() error {
 	// llama-server doesn't have an unload API in router mode
@@ -544,10 +568,64 @@ func (c *HTTPClient) GetTotalMemory() int64 {
 	return 0
 }
 
+// EmbeddingRequest represents an embedding request to llama.cpp (OpenAI-compatible)
+type EmbeddingRequest struct {
+	Model string `json:"model"`
+	Input string `json:"input"`
+}
+
+// EmbeddingResponse represents an embedding response from llama.cpp
+type EmbeddingResponse struct {
+	Object string `json:"object"`
+	Data   []struct {
+		Object    string    `json:"object"`
+		Embedding []float32 `json:"embedding"`
+		Index     int       `json:"index"`
+	} `json:"data"`
+	Model string `json:"model"`
+	Usage struct {
+		PromptTokens int `json:"prompt_tokens"`
+		TotalTokens  int `json:"total_tokens"`
+	} `json:"usage"`
+}
+
 // Embedding generates embeddings for the given text (implements Client interface)
 func (c *HTTPClient) Embedding(text string) ([]float32, error) {
-	// This would need to be implemented via HTTP API
-	return nil, fmt.Errorf("embedding not implemented for HTTP client")
+	if !c.enabled {
+		return nil, fmt.Errorf("llama.cpp HTTP client is disabled")
+	}
+
+	req := EmbeddingRequest{
+		Model: "model",
+		Input: text,
+	}
+
+	jsonData, err := json.Marshal(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal embedding request: %w", err)
+	}
+
+	url := fmt.Sprintf("%s/v1/embeddings", c.baseURL)
+	resp, err := c.httpClient.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, fmt.Errorf("failed to send embedding request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("llama-server embedding error: %s - %s", resp.Status, string(body))
+	}
+
+	var result EmbeddingResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("failed to decode embedding response: %w", err)
+	}
+
+	if len(result.Data) == 0 {
+		return nil, fmt.Errorf("no embedding data in response")
+	}
+	return result.Data[0].Embedding, nil
 }
 
 // SetProgressCallback sets a callback for loading progress (implements Client interface)

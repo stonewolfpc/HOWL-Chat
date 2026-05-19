@@ -1,11 +1,58 @@
 /**
  * Sampler Settings Module
- * 
- * This module handles the synchronization between sliders and number inputs
- * for the sampler settings dropdown menu, and communicates with the backend.
- * 
+ *
+ * Handles synchronization between sliders/number inputs/toggles for sampler settings,
+ * communicates with backend, and persists to localStorage as fallback.
+ *
  * @module sampler-settings
  */
+
+const SAMPLER_SETTINGS_STORAGE_KEY = 'howl-sampler-settings';
+const SAMPLER_PRESETS_KEY = 'howl-sampler-presets';
+
+// Built-in sampler presets
+const SAMPLER_PRESETS = {
+    balanced: {
+        temperature: 0.7, top_p: 0.9, top_k: 40, min_p: 0.05,
+        typical_p: 1.0, repeat_penalty: 1.1, repeat_last_n: 64,
+        presence_penalty: 0.0, frequency_penalty: 0.0, no_repeat_ngram: 0,
+        mirostat_mode: 0, mirostat_tau: 5.0, mirostat_eta: 0.1,
+        dyn_temp_range: 0.0, dyn_temp_exp: 1.0, dry_multiplier: 0.0,
+        dry_allowed_length: 2, dry_base: 1.0, smoothing_factor: 0.0,
+        smoothing_curve: 1.0, top_a: 0.0, epsilon_cutoff: 0.0,
+        eta_cutoff: 0.0, encoder_repeat_penalty: 1.0, seed: -1
+    },
+    creative: {
+        temperature: 0.9, top_p: 0.95, top_k: 80, min_p: 0.02,
+        typical_p: 1.0, repeat_penalty: 1.05, repeat_last_n: 32,
+        presence_penalty: 0.0, frequency_penalty: 0.0, no_repeat_ngram: 0,
+        mirostat_mode: 0, mirostat_tau: 5.0, mirostat_eta: 0.1,
+        dyn_temp_range: 0.5, dyn_temp_exp: 1.0, dry_multiplier: 0.0,
+        dry_allowed_length: 2, dry_base: 1.0, smoothing_factor: 0.0,
+        smoothing_curve: 1.0, top_a: 0.0, epsilon_cutoff: 0.0,
+        eta_cutoff: 0.0, encoder_repeat_penalty: 1.0, seed: -1
+    },
+    deterministic: {
+        temperature: 0.2, top_p: 0.5, top_k: 10, min_p: 0.1,
+        typical_p: 1.0, repeat_penalty: 1.2, repeat_last_n: 128,
+        presence_penalty: 0.0, frequency_penalty: 0.0, no_repeat_ngram: 0,
+        mirostat_mode: 0, mirostat_tau: 5.0, mirostat_eta: 0.1,
+        dyn_temp_range: 0.0, dyn_temp_exp: 1.0, dry_multiplier: 0.0,
+        dry_allowed_length: 2, dry_base: 1.0, smoothing_factor: 0.0,
+        smoothing_curve: 1.0, top_a: 0.0, epsilon_cutoff: 0.0,
+        eta_cutoff: 0.0, encoder_repeat_penalty: 1.0, seed: -1
+    },
+    precise: {
+        temperature: 0.2, top_p: 0.5, top_k: 10, min_p: 0.1,
+        typical_p: 1.0, repeat_penalty: 1.2, repeat_last_n: 128,
+        presence_penalty: 0.0, frequency_penalty: 0.0, no_repeat_ngram: 0,
+        mirostat_mode: 0, mirostat_tau: 5.0, mirostat_eta: 0.1,
+        dyn_temp_range: 0.0, dyn_temp_exp: 1.0, dry_multiplier: 0.0,
+        dry_allowed_length: 2, dry_base: 1.0, smoothing_factor: 0.0,
+        smoothing_curve: 1.0, top_a: 0.0, epsilon_cutoff: 0.0,
+        eta_cutoff: 0.0, encoder_repeat_penalty: 1.0, seed: -1
+    }
+};
 
 // Sampler settings configuration
 const samplerSettings = [
@@ -133,9 +180,10 @@ function initResetButtons() {
 function handleConflictDetection(settingId, isEnabled) {
     // Define conflict groups
     const conflictGroups = {
-        'top-p': ['typical-p', 'top-a'],
-        'typical-p': ['top-p'],
+        'top-p': ['typical-p', 'top-a', 'min-p'],
+        'typical-p': ['top-p', 'min-p'],
         'top-a': ['top-p'],
+        'min-p': ['top-p', 'typical-p'],
         'mirostat-mode': ['dyn-temp-range'],
         'dyn-temp-range': ['mirostat-mode'],
         'presence-penalty': ['frequency-penalty'],
@@ -212,30 +260,50 @@ function setSamplerSettings(settings) {
     });
 }
 
-// Save sampler settings to backend
+// Save sampler settings to backend and localStorage
 async function saveSamplerSettings() {
     try {
         const settings = getSamplerSettings();
+        // Save to backend
         if (window.go && window.go.main && window.go.main.App) {
             await window.go.main.App.SetSamplerSettings(settings);
         }
+        // Always save to localStorage as fallback
+        localStorage.setItem(SAMPLER_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
     } catch (error) {
         console.error('Failed to save sampler settings:', error);
     }
 }
 
-// Load sampler settings from backend
+// Load sampler settings from backend or localStorage
 async function loadSamplerSettings() {
+    let loaded = false;
     try {
         if (window.go && window.go.main && window.go.main.App) {
             const settings = await window.go.main.App.GetSamplerSettings();
             if (settings) {
                 setSamplerSettings(settings);
+                loaded = true;
             }
         }
     } catch (error) {
-        console.error('Failed to load sampler settings:', error);
-        // Use defaults if backend call fails
+        console.error('Failed to load sampler settings from backend:', error);
+    }
+    // Fallback to localStorage if backend fails
+    if (!loaded) {
+        const local = localStorage.getItem(SAMPLER_SETTINGS_STORAGE_KEY);
+        if (local) {
+            try {
+                const settings = JSON.parse(local);
+                setSamplerSettings(settings);
+                loaded = true;
+            } catch (e) {
+                // ignore
+            }
+        }
+    }
+    // If still not loaded, use defaults
+    if (!loaded) {
         samplerSettings.forEach(setting => {
             const slider = document.getElementById(setting.id);
             const valueInput = document.getElementById(`${setting.id}-value`);
@@ -247,12 +315,21 @@ async function loadSamplerSettings() {
     }
 }
 
+// Apply a named preset to all sampler controls
+function applySamplerPreset(presetName) {
+    const preset = SAMPLER_PRESETS[presetName];
+    if (!preset) return;
+    setSamplerSettings(preset);
+    saveSamplerSettings();
+    console.log('Applied sampler preset:', presetName);
+}
+
 // Reset all sampler settings to defaults
 function resetSamplerSettings() {
     samplerSettings.forEach(setting => {
         const slider = document.getElementById(setting.id);
         const valueInput = document.getElementById(`${setting.id}-value`);
-        
+
         if (slider && valueInput) {
             slider.value = setting.default;
             valueInput.value = setting.default;
@@ -264,4 +341,14 @@ function resetSamplerSettings() {
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', function() {
     initSamplerSettings();
+});
+
+// Persist sampler settings before the page unloads
+window.addEventListener('beforeunload', function() {
+    try {
+        const settings = getSamplerSettings();
+        localStorage.setItem(SAMPLER_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+    } catch (error) {
+        console.warn('Failed to persist sampler settings on unload:', error);
+    }
 });

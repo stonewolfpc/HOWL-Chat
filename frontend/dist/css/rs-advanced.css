@@ -1,0 +1,49 @@
+/**
+ * Real Settings — Advanced Section
+ * Collapsible advanced settings area.
+ */
+
+.advanced-section {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(100, 100, 100, 0.2);
+}
+
+.advanced-header {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--theme-color);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.advanced-toggle {
+    background: transparent;
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.advanced-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--theme-color);
+}
+
+.advanced-content {
+    display: none;
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(21, 21, 31, 0.3);
+    border-radius: 6px;
+    border: 1px solid rgba(100, 100, 100, 0.2);
+}
+
+.advanced-content.show {
+    display: block;
+}

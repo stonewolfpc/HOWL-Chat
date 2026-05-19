@@ -116,6 +116,7 @@
     padding: 16px;
     cursor: pointer;
     transition: all 0.2s ease;
+    position: relative;
 }
 
 .session-list-item:hover {
@@ -148,6 +149,37 @@
 .session-item-date {
     font-size: 10px;
     color: rgba(212, 212, 212, 0.5);
+}
+
+/* Session Delete Button */
+.session-delete-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: rgba(239, 68, 68, 0.8);
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    opacity: 0;
+}
+
+.session-list-item:hover .session-delete-btn {
+    opacity: 1;
+}
+
+.session-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: rgba(239, 68, 68, 1);
+    transform: scale(1.1);
 }
 
 /* Session List Empty State */

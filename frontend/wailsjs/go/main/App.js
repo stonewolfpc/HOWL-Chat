@@ -6,6 +6,34 @@ export function AbortStream() {
   return window['go']['main']['App']['AbortStream']();
 }
 
+export function AddCharacterToChat(arg1) {
+  return window['go']['main']['App']['AddCharacterToChat'](arg1);
+}
+
+export function AddMemory(arg1, arg2) {
+  return window['go']['main']['App']['AddMemory'](arg1, arg2);
+}
+
+export function AddScenarioToChat(arg1) {
+  return window['go']['main']['App']['AddScenarioToChat'](arg1);
+}
+
+export function AddSystemMessage(arg1) {
+  return window['go']['main']['App']['AddSystemMessage'](arg1);
+}
+
+export function AddWorldToChat(arg1) {
+  return window['go']['main']['App']['AddWorldToChat'](arg1);
+}
+
+export function AppendChatMessage(arg1, arg2, arg3) {
+  return window['go']['main']['App']['AppendChatMessage'](arg1, arg2, arg3);
+}
+
+export function CancelImageJob(arg1) {
+  return window['go']['main']['App']['CancelImageJob'](arg1);
+}
+
 export function ClearChat() {
   return window['go']['main']['App']['ClearChat']();
 }
@@ -14,8 +42,104 @@ export function ClearChatHistory() {
   return window['go']['main']['App']['ClearChatHistory']();
 }
 
+export function ClearScenarioFromSession() {
+  return window['go']['main']['App']['ClearScenarioFromSession']();
+}
+
+export function ClearWorldFromSession() {
+  return window['go']['main']['App']['ClearWorldFromSession']();
+}
+
+export function CreateCharacter(arg1) {
+  return window['go']['main']['App']['CreateCharacter'](arg1);
+}
+
+export function DebugImageEngine() {
+  return window['go']['main']['App']['DebugImageEngine']();
+}
+
+export function DeleteChat(arg1) {
+  return window['go']['main']['App']['DeleteChat'](arg1);
+}
+
+export function DeleteGalleryImage(arg1) {
+  return window['go']['main']['App']['DeleteGalleryImage'](arg1);
+}
+
+export function DeleteMemory(arg1, arg2) {
+  return window['go']['main']['App']['DeleteMemory'](arg1, arg2);
+}
+
+export function DeleteRAGDocument(arg1) {
+  return window['go']['main']['App']['DeleteRAGDocument'](arg1);
+}
+
+export function EditMemory(arg1, arg2, arg3) {
+  return window['go']['main']['App']['EditMemory'](arg1, arg2, arg3);
+}
+
+export function EnableAudioASR(arg1) {
+  return window['go']['main']['App']['EnableAudioASR'](arg1);
+}
+
+export function EnableAudioTTS(arg1) {
+  return window['go']['main']['App']['EnableAudioTTS'](arg1);
+}
+
+export function ExitApp() {
+  return window['go']['main']['App']['ExitApp']();
+}
+
+export function ExportMemories(arg1, arg2) {
+  return window['go']['main']['App']['ExportMemories'](arg1, arg2);
+}
+
+export function GenerateCharacterResponse(arg1, arg2) {
+  return window['go']['main']['App']['GenerateCharacterResponse'](arg1, arg2);
+}
+
+export function GenerateImage(arg1) {
+  return window['go']['main']['App']['GenerateImage'](arg1);
+}
+
+export function GetActiveChatMeta() {
+  return window['go']['main']['App']['GetActiveChatMeta']();
+}
+
+export function GetAppDiagnostics() {
+  return window['go']['main']['App']['GetAppDiagnostics']();
+}
+
+export function GetAudioStatus() {
+  return window['go']['main']['App']['GetAudioStatus']();
+}
+
+export function GetAutoCaptureConfig(arg1) {
+  return window['go']['main']['App']['GetAutoCaptureConfig'](arg1);
+}
+
+export function GetCharacters() {
+  return window['go']['main']['App']['GetCharacters']();
+}
+
+export function GetChatList() {
+  return window['go']['main']['App']['GetChatList']();
+}
+
 export function GetChatMessages() {
   return window['go']['main']['App']['GetChatMessages']();
+}
+
+export function GetGalleryImage(arg1) {
+  return window['go']['main']['App']['GetGalleryImage'](arg1);
+}
+
+export function GetImageEngineConfig() {
+  return window['go']['main']['App']['GetImageEngineConfig']();
+}
+
+export function GetImageJobStatus(arg1) {
+  return window['go']['main']['App']['GetImageJobStatus'](arg1);
 }
 
 export function GetLoadedModelName() {
@@ -30,6 +154,14 @@ export function GetLoadingStage() {
   return window['go']['main']['App']['GetLoadingStage']();
 }
 
+export function GetMemories(arg1, arg2) {
+  return window['go']['main']['App']['GetMemories'](arg1, arg2);
+}
+
+export function GetMemoryDetail(arg1, arg2) {
+  return window['go']['main']['App']['GetMemoryDetail'](arg1, arg2);
+}
+
 export function GetModelOptions() {
   return window['go']['main']['App']['GetModelOptions']();
 }
@@ -42,8 +174,40 @@ export function GetSamplerSettings() {
   return window['go']['main']['App']['GetSamplerSettings']();
 }
 
+export function GetTTSAvailableVoices() {
+  return window['go']['main']['App']['GetTTSAvailableVoices']();
+}
+
 export function IsModelLoaded() {
   return window['go']['main']['App']['IsModelLoaded']();
+}
+
+export function IsRAGEnabled() {
+  return window['go']['main']['App']['IsRAGEnabled']();
+}
+
+export function ListGalleryImages() {
+  return window['go']['main']['App']['ListGalleryImages']();
+}
+
+export function ListImageLoRAs() {
+  return window['go']['main']['App']['ListImageLoRAs']();
+}
+
+export function ListImageModels() {
+  return window['go']['main']['App']['ListImageModels']();
+}
+
+export function ListRAGDocuments(arg1, arg2) {
+  return window['go']['main']['App']['ListRAGDocuments'](arg1, arg2);
+}
+
+export function LoadChat(arg1) {
+  return window['go']['main']['App']['LoadChat'](arg1);
+}
+
+export function LoadChatData() {
+  return window['go']['main']['App']['LoadChatData']();
 }
 
 export function LoadModel(arg1) {
@@ -54,12 +218,60 @@ export function LoadModelMetadata(arg1) {
   return window['go']['main']['App']['LoadModelMetadata'](arg1);
 }
 
+export function NewChat(arg1) {
+  return window['go']['main']['App']['NewChat'](arg1);
+}
+
 export function OnShutdown(arg1) {
   return window['go']['main']['App']['OnShutdown'](arg1);
 }
 
+export function OpenCharacterSheet(arg1) {
+  return window['go']['main']['App']['OpenCharacterSheet'](arg1);
+}
+
+export function OpenImageModelsDirPicker() {
+  return window['go']['main']['App']['OpenImageModelsDirPicker']();
+}
+
 export function OpenModelFilePicker() {
   return window['go']['main']['App']['OpenModelFilePicker']();
+}
+
+export function OpenSDServerFilePicker() {
+  return window['go']['main']['App']['OpenSDServerFilePicker']();
+}
+
+export function PinMemory(arg1, arg2, arg3) {
+  return window['go']['main']['App']['PinMemory'](arg1, arg2, arg3);
+}
+
+export function ResetSessionCharacters() {
+  return window['go']['main']['App']['ResetSessionCharacters']();
+}
+
+export function SaveChat() {
+  return window['go']['main']['App']['SaveChat']();
+}
+
+export function SaveChatAs(arg1) {
+  return window['go']['main']['App']['SaveChatAs'](arg1);
+}
+
+export function SaveChatData(arg1) {
+  return window['go']['main']['App']['SaveChatData'](arg1);
+}
+
+export function SaveEntityImage(arg1, arg2, arg3) {
+  return window['go']['main']['App']['SaveEntityImage'](arg1, arg2, arg3);
+}
+
+export function SaveImageAs(arg1) {
+  return window['go']['main']['App']['SaveImageAs'](arg1);
+}
+
+export function SaveTempImage(arg1) {
+  return window['go']['main']['App']['SaveTempImage'](arg1);
 }
 
 export function SendMessage(arg1) {
@@ -74,6 +286,18 @@ export function SendMessageStreamWithImage(arg1, arg2) {
   return window['go']['main']['App']['SendMessageStreamWithImage'](arg1, arg2);
 }
 
+export function SetActiveImageModel(arg1) {
+  return window['go']['main']['App']['SetActiveImageModel'](arg1);
+}
+
+export function SetAutoCaptureConfig(arg1, arg2) {
+  return window['go']['main']['App']['SetAutoCaptureConfig'](arg1, arg2);
+}
+
+export function SetImageModelsDir(arg1) {
+  return window['go']['main']['App']['SetImageModelsDir'](arg1);
+}
+
 export function SetLorebooks(arg1) {
   return window['go']['main']['App']['SetLorebooks'](arg1);
 }
@@ -82,12 +306,44 @@ export function SetModelOptions(arg1) {
   return window['go']['main']['App']['SetModelOptions'](arg1);
 }
 
+export function SetRAGEnabled(arg1) {
+  return window['go']['main']['App']['SetRAGEnabled'](arg1);
+}
+
+export function SetSDServerPath(arg1) {
+  return window['go']['main']['App']['SetSDServerPath'](arg1);
+}
+
 export function SetSamplerSettings(arg1) {
   return window['go']['main']['App']['SetSamplerSettings'](arg1);
 }
 
+export function StartImageJob(arg1) {
+  return window['go']['main']['App']['StartImageJob'](arg1);
+}
+
+export function SynthesizeSpeech(arg1) {
+  return window['go']['main']['App']['SynthesizeSpeech'](arg1);
+}
+
+export function SynthesizeSpeechWithVoice(arg1, arg2) {
+  return window['go']['main']['App']['SynthesizeSpeechWithVoice'](arg1, arg2);
+}
+
+export function TranscribeAudio(arg1) {
+  return window['go']['main']['App']['TranscribeAudio'](arg1);
+}
+
+export function UnloadImageModel() {
+  return window['go']['main']['App']['UnloadImageModel']();
+}
+
 export function UnloadModel() {
   return window['go']['main']['App']['UnloadModel']();
+}
+
+export function UpdateLorebookContext(arg1) {
+  return window['go']['main']['App']['UpdateLorebookContext'](arg1);
 }
 
 export function UpdatePromptSettings(arg1) {
@@ -96,4 +352,8 @@ export function UpdatePromptSettings(arg1) {
 
 export function UpdateRuntimeSettings(arg1) {
   return window['go']['main']['App']['UpdateRuntimeSettings'](arg1);
+}
+
+export function UploadRAGDocument(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['main']['App']['UploadRAGDocument'](arg1, arg2, arg3, arg4, arg5);
 }

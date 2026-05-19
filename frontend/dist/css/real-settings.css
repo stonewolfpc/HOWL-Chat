@@ -1,0 +1,20 @@
+/**
+ * Real Settings — Modular Architecture
+ * Modal overlay, navigation tabs, settings grid,
+ * form controls, footer actions, advanced section, and theming.
+ *
+ * This file aggregates all real settings CSS modules.
+ * Each module handles a single, well-defined concern.
+ * Do NOT add rules here; use the appropriate module.
+ *
+ * @module real-settings
+ * @version 2.0.0
+ */
+
+@import url('rs-container.css');
+@import url('rs-nav.css');
+@import url('rs-content.css');
+@import url('rs-controls.css');
+@import url('rs-actions.css');
+@import url('rs-advanced.css');
+@import url('rs-light-theme.css');

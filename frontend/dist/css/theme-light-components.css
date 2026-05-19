@@ -1,0 +1,292 @@
+/**
+ * Theme — Light Mode Shared Components
+ * Cards, panels, inputs, buttons, toggles, tabs, notifications, lists.
+ */
+
+/* --- Cards / Panels --- */
+body.theme-light .card,
+body.theme-light .panel,
+body.theme-light .dropdown,
+body.theme-light .flyout,
+body.theme-light .flyout-content,
+body.theme-light .context-menu,
+body.theme-light .character-item,
+body.theme-light .world-item,
+body.theme-light .scenario-item,
+body.theme-light .lorebook-item,
+body.theme-light .session-list-item {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-card);
+}
+
+body.theme-light .card:hover,
+body.theme-light .panel:hover,
+body.theme-light .character-item:hover,
+body.theme-light .world-item:hover,
+body.theme-light .scenario-item:hover,
+body.theme-light .lorebook-item:hover,
+body.theme-light .session-list-item:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
+}
+
+/* --- Settings Specific --- */
+body.theme-light .real-settings-container,
+body.theme-light .real-settings-overlay,
+body.theme-light .settings-modal,
+body.theme-light .settings-panel,
+body.theme-light .model-settings-panel,
+body.theme-light .sampler-settings-panel {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-modal);
+}
+
+body.theme-light .setting-card {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-card);
+}
+
+body.theme-light .setting-card:hover {
+    border-color: var(--border-secondary);
+}
+
+body.theme-light .setting-label,
+body.theme-light .panel-title,
+body.theme-light .section-title {
+    color: var(--text-primary);
+}
+
+body.theme-light .setting-description,
+body.theme-light .setting-detail,
+body.theme-light .settings-info,
+body.theme-light .real-settings-nav-item {
+    color: var(--text-secondary);
+}
+
+body.theme-light .real-settings-nav-item:hover,
+body.theme-light .real-settings-nav-item.active {
+    background: var(--surface-hover);
+    color: var(--accent-primary);
+}
+
+/* --- Inputs --- */
+body.theme-light input,
+body.theme-light textarea,
+body.theme-light select,
+body.theme-light .setting-input,
+body.theme-light .setting-select,
+body.theme-light .setting-value,
+body.theme-light .character-form-input,
+body.theme-light .character-form-textarea,
+body.theme-light .world-form-input,
+body.theme-light .world-form-textarea,
+body.theme-light .ig-select,
+body.theme-light .ig-input,
+body.theme-light .ig-textarea {
+    background: var(--input-bg);
+    color: var(--text-primary);
+    border-color: var(--input-border);
+}
+
+body.theme-light input::placeholder,
+body.theme-light textarea::placeholder {
+    color: var(--input-placeholder);
+}
+
+body.theme-light input:focus,
+body.theme-light textarea:focus,
+body.theme-light select:focus {
+    border-color: var(--accent-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--accent-primary-hover);
+}
+
+/* --- Buttons: Primary --- */
+body.theme-light .btn-primary,
+body.theme-light .settings-save-btn,
+body.theme-light .primary-btn,
+body.theme-light .create-character-button,
+body.theme-light .create-world-button,
+body.theme-light .create-scenario-button {
+    background: var(--button-primary-bg);
+    color: #FFFFFF;
+    border-color: var(--button-primary-bg);
+}
+
+body.theme-light .btn-primary:hover,
+body.theme-light .settings-save-btn:hover {
+    opacity: 0.9;
+}
+
+body.theme-light .btn-primary:disabled,
+body.theme-light .settings-save-btn:disabled {
+    background: var(--surface-tertiary);
+    color: var(--text-tertiary);
+    border-color: var(--border-secondary);
+}
+
+/* --- Buttons: Secondary --- */
+body.theme-light .btn-secondary,
+body.theme-light .settings-reset-btn,
+body.theme-light .setting-btn,
+body.theme-light .secondary-btn {
+    background: var(--button-secondary-bg);
+    color: var(--accent-primary);
+    border-color: var(--button-secondary-border);
+}
+
+body.theme-light .btn-secondary:hover,
+body.theme-light .settings-reset-btn:hover,
+body.theme-light .setting-btn:hover {
+    background: var(--surface-hover);
+}
+
+body.theme-light .btn-secondary:disabled,
+body.theme-light .setting-btn:disabled {
+    background: var(--surface-primary);
+    color: var(--text-tertiary);
+    border-color: var(--border-secondary);
+}
+
+/* --- Toggles / Sliders --- */
+body.theme-light .setting-toggle-slider,
+body.theme-light .toggle-switch,
+body.theme-light .ig-slider,
+body.theme-light input[type="range"]::-webkit-slider-runnable-track {
+    background: var(--border-secondary);
+}
+
+body.theme-light .setting-toggle input:checked + .setting-toggle-slider,
+body.theme-light .toggle-switch.active,
+body.theme-light input[type="range"]::-webkit-slider-thumb {
+    background: var(--accent-primary);
+}
+
+body.theme-light .setting-slider {
+    accent-color: var(--accent-primary);
+}
+
+body.theme-light .toggle-label {
+    color: var(--text-secondary);
+}
+
+/* --- Selection / Highlights --- */
+body.theme-light ::selection {
+    background: var(--accent-primary-hover);
+    color: var(--text-primary);
+}
+
+body.theme-light .selected,
+body.theme-light .active-item,
+body.theme-light .highlighted,
+body.theme-light .character-item.selected,
+body.theme-light .world-item.selected,
+body.theme-light .scenario-item.selected,
+body.theme-light .lorebook-item.selected,
+body.theme-light .session-list-item.selected,
+body.theme-light .nav-item.active,
+body.theme-light .tab.active,
+body.theme-light .tab-btn.active,
+body.theme-light .audio-tab.active {
+    background: var(--accent-primary-hover);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+/* --- Lists / Grids --- */
+body.theme-light .character-list-item,
+body.theme-light .world-list-item,
+body.theme-light .scenario-list-item,
+body.theme-light .session-list-item,
+body.theme-light .lorebook-entry,
+body.theme-light .lorebook-entry-item {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+body.theme-light .character-list-item:hover,
+body.theme-light .world-list-item:hover,
+body.theme-light .scenario-list-item:hover,
+body.theme-light .session-list-item:hover,
+body.theme-light .lorebook-entry-item:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent-primary);
+}
+
+/* --- Tabs / Segmented Controls --- */
+body.theme-light .tab,
+body.theme-light .tab-btn,
+body.theme-light .audio-tab,
+body.theme-light .audio-tab-group,
+body.theme-light .lorebook-type-selector {
+    background: var(--surface-tertiary);
+    color: var(--text-secondary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .lorebook-type-item {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .lorebook-type-item:hover,
+body.theme-light .tab:hover,
+body.theme-light .tab-btn:hover,
+body.theme-light .audio-tab:hover {
+    background: var(--surface-hover);
+    color: var(--accent-primary);
+}
+
+/* --- Notifications / Status --- */
+body.theme-light .notification-success,
+body.theme-light .status-success {
+    background: rgba(74, 222, 128, 0.12);
+    color: var(--success);
+    border-color: var(--success);
+}
+
+body.theme-light .notification-warning,
+body.theme-light .status-warning {
+    background: rgba(251, 191, 36, 0.12);
+    color: var(--warning);
+    border-color: var(--warning);
+}
+
+body.theme-light .notification-error,
+body.theme-light .status-error,
+body.theme-light .danger,
+body.theme-light .delete-btn,
+body.theme-light .remove-btn {
+    background: rgba(255, 51, 51, 0.12);
+    color: var(--danger);
+    border-color: var(--danger);
+}
+
+body.theme-light .notification-info,
+body.theme-light .status-info,
+body.theme-light .chat-sender {
+    background: rgba(0, 204, 255, 0.12);
+    color: var(--info);
+    border-color: var(--info);
+}
+
+/* --- Disabled States --- */
+body.theme-light .disabled,
+body.theme-light [disabled],
+body.theme-light .character-inactive .character-name,
+body.theme-light .lorebook-item.disabled .lorebook-name {
+    color: var(--text-tertiary);
+    opacity: 0.7;
+}
+
+/* --- Avatar Placeholder --- */
+body.theme-light .avatar-placeholder {
+    background: var(--surface-hover);
+    color: var(--input-placeholder);
+}

@@ -39,29 +39,48 @@ class ChatSession {
 
 // Save current chat session
 async function saveChatSession() {
-    if (!currentSession) {
-        currentSession = new ChatSession();
-    }
-    
-    if (!currentSession.name) {
-        saveChatSessionAs();
+    if (!window.go || !window.go.main || !window.go.main.App) {
+        console.error('Wails runtime not available');
         return;
     }
     
-    // Collect chat history from DOM
-    collectChatHistory();
-    
-    // Update metadata
-    updateSessionMetadata();
-    
-    // Save to backend (placeholder for now)
-    console.log('Saving session:', currentSession);
-    
-    // Backend integration needed here
-    // File path: Documents\HOWL_Chat\Chats\<sessionName>.json
-    // Images: Documents\HOWL_Chat\Chats\<sessionName>\images\
-    
-    alert('Session saved successfully');
+    try {
+        await window.go.main.App.SaveChat();
+        console.log('Chat saved successfully with all context data');
+    } catch (error) {
+        console.error('Failed to save chat:', error);
+        alert('Failed to save chat: ' + error);
+    }
+}
+
+// Collect complete chat data including all context for saving
+function collectCompleteChatData() {
+    if (typeof dataSync !== 'undefined' && typeof dataSync.collectCompleteChatData === 'function') {
+        return dataSync.collectCompleteChatData();
+    }
+    if (typeof contextDisplay !== 'undefined') {
+        return {
+            meta: {
+                id: Date.now().toString(),
+                name: contextDisplay.currentChatData?.chatName || 'Chat Session',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                worldName: '',
+                scenarioName: '',
+                characterNames: [],
+                lorebookNames: [],
+                messageCount: 0
+            },
+            history: [],
+            world: null,
+            scenario: null,
+            characters: [],
+            lorebooks: [],
+            memories: []
+        };
+    }
+    console.error('No chat data collector available');
+    return null;
 }
 
 // Save chat session with new name
@@ -82,22 +101,51 @@ function loadChatSession() {
 }
 
 // Delete saved chat session
-function deleteChatSession() {
-    if (!selectedSessionId) {
+function deleteChatSession(sessionId, sessionName, event) {
+    // Prevent event bubbling to avoid triggering session selection
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    
+    if (!sessionId) {
         alert('No session selected to delete');
         return;
     }
     
-    if (confirm('Are you sure you want to delete this chat session?')) {
-        savedSessions = savedSessions.filter(s => s.id !== selectedSessionId);
-        selectedSessionId = null;
-        console.log('Session deleted');
-        
-        // Backend integration needed here
-        // Delete: Documents\HOWL_Chat\Chats\<sessionName>.json
-        // Delete folder: Documents\HOWL_Chat\Chats\<sessionName>\
-        
-        alert('Session deleted successfully');
+    if (confirm(`Are you sure you want to delete "${sessionName}"?\n\nThis will permanently delete the chat and all its associated automated lorebook entries.`)) {
+        // Call backend to delete chat
+        if (window.go && window.go.main && window.go.main.App) {
+            window.go.main.App.DeleteChat(sessionId).then(() => {
+                console.log('Chat session deleted:', sessionId);
+                
+                // Remove from local list and refresh
+                savedSessions = savedSessions.filter(s => s.id !== sessionId);
+                
+                // Clear selection if deleted session was selected
+                if (selectedSessionId === sessionId) {
+                    selectedSessionId = null;
+                    const loadButton = document.querySelector('.session-list-load');
+                    if (loadButton) {
+                        loadButton.disabled = true;
+                    }
+                }
+                
+                renderSessionList();
+                showNotification(`Chat session deleted: ${sessionName}`, 'success');
+            }).catch(err => {
+                console.error('Failed to delete chat session:', err);
+                alert('Failed to delete chat session: ' + err);
+            });
+        } else {
+            // Fallback for development
+            savedSessions = savedSessions.filter(s => s.id !== sessionId);
+            if (selectedSessionId === sessionId) {
+                selectedSessionId = null;
+            }
+            renderSessionList();
+            console.log('Session deleted (fallback mode)');
+        }
     }
 }
 
@@ -109,13 +157,13 @@ function collectChatHistory() {
     document.querySelectorAll('.chat-message').forEach(msg => {
         const sender = msg.querySelector('.chat-sender')?.textContent || '';
         const text = msg.querySelector('.chat-text')?.textContent || '';
-        const isUser = msg.classList.contains('user');
+        const role = msg.classList.contains('system') ? 'system' : msg.classList.contains('user') ? 'user' : 'assistant';
         
         messages.push({
             id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
             sender: sender,
             text: text,
-            isUser: isUser,
+            role: role,
             timestamp: new Date().toISOString(),
             hasImage: false // Future: check for images
         });
@@ -136,42 +184,89 @@ function updateSessionMetadata() {
 
 // Load saved sessions from backend
 async function loadSavedSessions() {
-    // Backend integration needed here
-    // Load from: Documents\HOWL_Chat\Chats\
+    if (!window.go || !window.go.main || !window.go.main.App) {
+        console.error('Wails runtime not available');
+        savedSessions = [];
+        renderSessionList();
+        return;
+    }
     
-    // Placeholder data
-    savedSessions = [];
-    
-    renderSessionList();
+    try {
+        const chatSummaries = await window.go.main.App.GetChatList();
+        
+        // Handle case where chatSummaries might be null or undefined
+        if (!chatSummaries || !Array.isArray(chatSummaries)) {
+            console.log('No chat summaries available');
+            savedSessions = [];
+            renderSessionList();
+            return;
+        }
+        
+        savedSessions = chatSummaries.map(summary => ({
+            id: summary.id || '',
+            name: summary.name || 'Untitled Chat',
+            createdAt: summary.createdAt || new Date().toISOString(),
+            updatedAt: summary.updatedAt || new Date().toISOString(),
+            metadata: {
+                messageCount: summary.messageCount || 0,
+                characterCount: (summary.characterNames && Array.isArray(summary.characterNames)) ? summary.characterNames.length : 0,
+                hasImages: false
+            },
+            worldName: summary.worldName || '',
+            scenarioName: summary.scenarioName || '',
+            characterNames: (summary.characterNames && Array.isArray(summary.characterNames)) ? summary.characterNames : [],
+            lorebookNames: (summary.lorebookNames && Array.isArray(summary.lorebookNames)) ? summary.lorebookNames : []
+        }));
+        
+        renderSessionList();
+    } catch (error) {
+        console.error('Failed to load chat list:', error);
+        savedSessions = [];
+        renderSessionList();
+    }
 }
 
 // Render session list
 function renderSessionList() {
     const grid = document.getElementById('session-list-grid');
     if (!grid) return;
-    
+
     if (savedSessions.length === 0) {
         grid.innerHTML = `
             <div class="session-list-empty">
-                <div class="session-list-empty-icon">💬</div>
+                <div class="session-list-empty-icon"><span class="icon icon-book" style="font-size:2em;"></span></div>
                 <div class="session-list-empty-text">No saved sessions</div>
                 <div class="session-list-empty-subtext">Save a chat session to see it here</div>
             </div>
         `;
         return;
     }
-    
-    grid.innerHTML = savedSessions.map(session => `
-        <div class="session-list-item ${session.id === selectedSessionId ? 'selected' : ''}" 
+
+    const maxRecent = window.settingsState?.current?.general?.maxRecentChats ?? 50;
+    const archivedIds = getArchivedIds();
+    const sorted = savedSessions.slice().sort((a, b) => {
+        const da = new Date(a.updatedAt || a.createdAt).getTime();
+        const db = new Date(b.updatedAt || b.createdAt).getTime();
+        return db - da;
+    });
+    const display = sorted
+        .filter(s => !archivedIds.includes(s.id))
+        .slice(0, Math.max(1, maxRecent));
+
+    grid.innerHTML = display.map(session => `
+        <div class="session-list-item ${session.id === selectedSessionId ? 'selected' : ''}"
              onclick="selectSession('${session.id}')">
             <div class="session-item-name">${session.name || 'Unnamed Session'}</div>
             <div class="session-item-meta">
-                Messages: ${session.metadata.messageCount} | 
+                Messages: ${session.metadata.messageCount} |
                 Characters: ${session.metadata.characterCount}
             </div>
             <div class="session-item-date">
                 ${new Date(session.updatedAt).toLocaleString()}
             </div>
+            <button class="session-delete-btn" onclick="deleteChatSession('${session.id}', '${session.name || 'Unnamed Session'}', event)" title="Delete chat session">
+                <span class="icon icon-trash"></span>
+            </button>
         </div>
     `).join('');
 }
@@ -189,86 +284,111 @@ function selectSession(sessionId) {
 }
 
 // Load selected session
-function loadSelectedSession() {
+async function loadSelectedSession() {
     if (!selectedSessionId) {
         return;
     }
     
-    const session = savedSessions.find(s => s.id === selectedSessionId);
-    if (!session) {
-        alert('Session not found');
+    if (!window.go || !window.go.main || !window.go.main.App) {
+        console.error('Wails runtime not available');
         return;
     }
     
-    // Load session data into current session
-    currentSession = session;
-    
-    // Rebuild chat UI from session history
-    rebuildChatFromHistory(session.chatHistory);
-    
-    // Update session info display
-    updateSessionInfoDisplay(session);
-    
-    closeSessionList();
-    
-    alert('Session loaded successfully');
+    try {
+        const chatData = await window.go.main.App.LoadChat(selectedSessionId);
+        console.log('Chat loaded:', chatData);
+        if (typeof window.logChatContract === 'function') {
+            window.logChatContract('filemenu-load:backend', chatData);
+        }
+        
+        // Clear current chat UI
+        const chatMessages = document.querySelector('.chat-messages');
+        if (chatMessages) {
+            chatMessages.innerHTML = '';
+        }
+        
+        // Rebuild visible chat history from loaded backend data
+        if (chatData && Array.isArray(chatData.History)) {
+            rebuildChatFromLoadedHistory(chatData.History);
+        }
+
+        // Update session info display
+        if (chatData && chatData.Meta) {
+            updateSessionInfoDisplayFromMeta({
+                name: chatData.Meta.Name,
+                worldName: chatData.Meta.WorldName,
+                scenarioName: chatData.Meta.ScenarioName,
+                lorebookNames: chatData.Meta.LorebookNames || []
+            });
+        }
+
+        // Refresh context panels using the loaded chat session.
+        // Prefer sidebar loader first so shared currentChatData stays in sync.
+        if (typeof window.loadChatSessionById === 'function') {
+            await window.loadChatSessionById(selectedSessionId);
+        } else if (window.contextDisplay && typeof window.contextDisplay.loadChatSessionById === 'function') {
+            await window.contextDisplay.loadChatSessionById(selectedSessionId);
+        }
+        if (typeof window.logChatContract === 'function' && typeof currentChatData !== 'undefined') {
+            window.logChatContract('filemenu-load:post-hydrate', currentChatData);
+        }
+        
+        closeSessionList();
+
+    } catch (error) {
+        console.error('Failed to load chat:', error);
+        alert('Failed to load chat: ' + error);
+    }
 }
 
-// Rebuild chat UI from session history
-function rebuildChatFromHistory(history) {
+function rebuildChatFromLoadedHistory(history) {
     const chatMessages = document.querySelector('.chat-messages');
     if (!chatMessages) return;
-    
+
     chatMessages.innerHTML = '';
-    
+
     history.forEach(msg => {
+        const role = (msg.Role || msg.role || '').toLowerCase();
+        const sender = msg.Sender || msg.sender || (role === 'assistant' ? 'AI' : role === 'user' ? 'You' : 'System');
+        const text = msg.Text || msg.text || '';
+
         const messageDiv = document.createElement('div');
-        messageDiv.className = `chat-message ${msg.isUser ? 'user' : 'assistant'}`;
+        messageDiv.className = `chat-message ${role === 'user' ? 'user' : 'assistant'}`;
         messageDiv.innerHTML = `
             <div class="chat-bubble">
-                <div class="chat-sender">${msg.sender}</div>
-                <div class="chat-text">${msg.text}</div>
-                <div class="chat-bubble-buttons">
-                    <button class="bubble-button" onclick="copyMessage(this)">Copy</button>
-                    ${msg.isUser ? 
-                        `<button class="bubble-button" onclick="editMessage(this)">Edit</button>` :
-                        `<button class="bubble-button" onclick="regenerateMessage(this)">Regenerate</button>
-                    `}
-                    ${!msg.isUser ? 
-                        `<button class="bubble-button" onclick="continueMessage(this)">Continue</button>` :
-                        ''
-                    }
-                </div>
+                <div class="chat-sender">${sender}</div>
+                <div class="chat-text">${text}</div>
             </div>
         `;
         chatMessages.appendChild(messageDiv);
     });
 }
+window.rebuildChatFromLoadedHistory = rebuildChatFromLoadedHistory;
 
-// Update session info display
-function updateSessionInfoDisplay(session) {
+// Update session info display from chat meta
+function updateSessionInfoDisplayFromMeta(chatMeta) {
     // Update the info items in the Chats panel
     const currentInfo = document.querySelector('.info-text');
     if (currentInfo) {
-        currentInfo.textContent = `Current: ${session.name || 'New Chat'}`;
+        currentInfo.textContent = `Current: ${chatMeta.name || 'New Chat'}`;
     }
     
     // Update world info
     const worldInfo = document.querySelectorAll('.info-text')[1];
     if (worldInfo) {
-        worldInfo.textContent = `World: ${session.world?.name || 'None'}`;
+        worldInfo.textContent = `World: ${chatMeta.worldName || 'None'}`;
     }
     
     // Update scenario info
     const scenarioInfo = document.querySelectorAll('.info-text')[2];
     if (scenarioInfo) {
-        scenarioInfo.textContent = `Scenario: ${session.scenario?.name || 'None'}`;
+        scenarioInfo.textContent = `Scenario: ${chatMeta.scenarioName || 'None'}`;
     }
     
     // Update lorebooks info
     const lorebooksInfo = document.querySelectorAll('.info-text')[3];
     if (lorebooksInfo) {
-        lorebooksInfo.textContent = `Lorebooks: ${session.lorebooks?.length || 0}`;
+        lorebooksInfo.textContent = `Lorebooks: ${chatMeta.lorebookNames?.length || 0}`;
     }
 }
 
@@ -289,64 +409,118 @@ function closeSessionList() {
 }
 
 // Confirm save as
-function confirmSaveAs() {
+async function confirmSaveAs() {
     const nameInput = document.getElementById('session-name-input');
-    const descInput = document.getElementById('session-desc-input');
     
     if (!nameInput || !nameInput.value.trim()) {
         alert('Please enter a session name');
         return;
     }
     
-    if (!currentSession) {
-        currentSession = new ChatSession();
-    }
-    
-    currentSession.name = nameInput.value.trim();
-    currentSession.description = descInput.value.trim();
-    
-    collectChatHistory();
-    updateSessionMetadata();
-    
-    // Save to backend
-    console.log('Saving session as:', currentSession);
-    
-    closeSessionModal();
-    
-    // Clear inputs
-    nameInput.value = '';
-    descInput.value = '';
-    
-    alert('Session saved successfully');
-}
-
-// Autosave system
-function performAutosave() {
-    if (!currentSession || !currentSession.chatHistory.length) {
+    if (!window.go || !window.go.main || !window.go.main.App) {
+        console.error('Wails runtime not available');
         return;
     }
     
+    try {
+        const chatMeta = await window.go.main.App.SaveChatAs(nameInput.value.trim());
+        console.log('Chat saved as:', chatMeta);
+        
+        closeSessionModal();
+        
+        // Clear input
+        nameInput.value = '';
+        
+        // Refresh chat list if visible
+        if (document.getElementById('session-list-overlay').classList.contains('show')) {
+            loadSavedSessions();
+        }
+        
+    } catch (error) {
+        console.error('Failed to save chat as:', error);
+        alert('Failed to save chat: ' + error);
+    }
+}
+
+// Autosave system
+let _autosaveTimer = null;
+
+function performAutosave() {
+    const settings = window.settingsState?.current;
+    if (settings && settings.storage.chatAutosave === false) return;
+    if (!currentSession || !currentSession.chatHistory.length) return;
+    if (!window.go?.main?.App?.SaveChat) return;
+
     collectChatHistory();
     updateSessionMetadata();
-    
-    const timestamp = new Date().toISOString();
-    const date = timestamp.split('T')[0];
-    const time = timestamp.split('T')[1].split('.')[0].replace(/:/g, '-');
-    
-    const autosaveName = `autosave_${date}_${time}`;
-    
-    // Backend integration needed here
-    // Save to: Documents\HOWL_Chat\Autosaves\autosave_YYYY-MM-DD_HH-MM.json
-    // Keep only 3 most recent autosaves
-    
-    console.log('Autosave performed:', autosaveName);
+
+    window.go.main.App.SaveChat()
+        .then(() => console.log('Autosave completed'))
+        .catch(err => console.error('Autosave failed:', err));
 }
+
+function restartAutosaveTimer() {
+    if (_autosaveTimer) clearInterval(_autosaveTimer);
+    const minutes = window.settingsState?.current?.general?.autoSaveInterval ?? 5;
+    _autosaveTimer = setInterval(performAutosave, minutes * 60 * 1000);
+}
+window.restartAutosaveTimer = restartAutosaveTimer;
+
+// ---------------------------------------------------------------------------
+// Auto-Archive
+// ---------------------------------------------------------------------------
+
+const ARCHIVED_KEY = 'howl-archived-sessions';
+let _archiveTimer = null;
+
+function getArchivedIds() {
+    try { return JSON.parse(localStorage.getItem(ARCHIVED_KEY) || '[]'); }
+    catch (e) { return []; }
+}
+
+function setArchivedIds(ids) {
+    localStorage.setItem(ARCHIVED_KEY, JSON.stringify(ids));
+}
+
+function isArchived(sessionId) {
+    return getArchivedIds().includes(sessionId);
+}
+
+async function performAutoArchive() {
+    const s = window.settingsState?.current;
+    if (!s || s.storage.autoArchive !== true) return;
+    const days = s.storage.archiveDays ?? 30;
+    const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
+
+    const archived = getArchivedIds();
+    let changed = false;
+
+    savedSessions.forEach(session => {
+        const updated = new Date(session.updatedAt || session.createdAt).getTime();
+        if (updated < cutoff && !archived.includes(session.id)) {
+            archived.push(session.id);
+            changed = true;
+        }
+    });
+
+    if (changed) {
+        setArchivedIds(archived);
+        renderSessionList();
+        console.log('Auto-archived sessions older than', days, 'days');
+    }
+}
+
+function restartArchiveTimer() {
+    if (_archiveTimer) clearInterval(_archiveTimer);
+    _archiveTimer = setInterval(performAutoArchive, 60 * 60 * 1000); // hourly check
+}
+window.restartArchiveTimer = restartArchiveTimer;
 
 // Initialize autosave on page load
 window.addEventListener('load', () => {
-    // Autosave every 5 minutes
-    setInterval(performAutosave, 5 * 60 * 1000);
-    
+    restartAutosaveTimer();
+    restartArchiveTimer();
+
     // Autosave on page unload
     window.addEventListener('beforeunload', () => {
         performAutosave();

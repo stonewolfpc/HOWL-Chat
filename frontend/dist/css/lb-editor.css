@@ -1,0 +1,108 @@
+/**
+ * Lorebooks — Editor Layout
+ * Editor overlay, popup, two-column layout, sidebar,
+ * form panels, sections, and responsive grid helpers.
+ */
+
+/* Editor Overlay */
+.lorebook-editor-overlay {
+    z-index: 2200;
+}
+
+.lorebook-editor-popup {
+    width: min(1180px, calc(100vw - 28px));
+    max-width: 1180px;
+    max-height: calc(100vh - 28px);
+}
+
+.lorebook-editor-content {
+    max-height: calc(100vh - 190px);
+    padding: 0;
+}
+
+/* Layout Grid */
+.lorebook-editor-layout {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 0;
+    min-height: 540px;
+}
+
+/* Sidebar */
+.lorebook-editor-sidebar {
+    border-right: 1px solid rgba(100, 100, 100, 0.3);
+    background: rgba(10, 10, 15, 0.35);
+    padding: 18px;
+}
+
+/* Form Panel */
+.lorebook-form-panel {
+    padding: 18px;
+    overflow-y: auto;
+}
+
+/* Form Section */
+.lorebook-form-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+}
+
+/* Editor Section Box */
+.lorebook-editor-section {
+    border: 1px solid rgba(100, 100, 100, 0.26);
+    background: rgba(15, 21, 31, 0.52);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 14px;
+}
+
+.lorebook-editor-section.compact {
+    padding: 12px;
+}
+
+.lorebook-section-title {
+    color: var(--theme-color);
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+/* Grid Helpers */
+.lorebook-grid-two,
+.lorebook-grid-three,
+.lorebook-grid-four {
+    display: grid;
+    gap: 12px;
+}
+
+.lorebook-grid-two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lorebook-grid-three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.lorebook-grid-four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* Toggle */
+.lorebook-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--static-text);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.lorebook-toggle input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--theme-color);
+}

@@ -1,6 +1,7 @@
 package lorebook
 
 import (
+	"encoding/json"
 	"regexp"
 	"sort"
 	"strings"
@@ -42,7 +43,9 @@ const (
 
 type Entry struct {
 	ID                string           `json:"id"`
+	Name              string           `json:"name"`
 	Title             string           `json:"title"`
+	Description       string           `json:"description"`
 	Content           string           `json:"content"`
 	Tags              []string         `json:"tags"`
 	Scope             Scope            `json:"scope"`
@@ -73,8 +76,9 @@ type Entry struct {
 	MemoryType        string           `json:"memoryType"`
 	TriggerConfidence string           `json:"triggerConfidence"`
 	DecayRate         string           `json:"decayRate"`
+	TriggerCount      int              `json:"triggerCount"` // Reinforcement tracking
 	CreatedAt         string           `json:"createdAt"`
-	LastTriggeredAt   *time.Time       `json:"lastTriggeredAt,omitempty"`
+	LastTriggeredAt   string           `json:"lastTriggeredAt,omitempty"`
 	UpdatedAt         string           `json:"updatedAt"`
 }
 
@@ -171,6 +175,10 @@ func BuildPromptBlock(entries []ResolvedEntry) string {
 		b.WriteString(strings.TrimSpace(intToString(item.PriorityLevel)))
 		b.WriteString("] ")
 		b.WriteString(item.Title)
+		if item.Description != "" {
+			b.WriteString(" — ")
+			b.WriteString(strings.TrimSpace(item.Description))
+		}
 		b.WriteString(": ")
 		b.WriteString(strings.TrimSpace(item.Content))
 		b.WriteString("\n")
@@ -299,6 +307,29 @@ func keywordWeight(value string) int {
 	return 4
 }
 
+// RouteResolvedEntries filters resolved lorebook entries for a specific recipient.
+// World entries → all characters.
+// Scenario entries → all characters in the active scenario.
+// Character entries → only the matching owner character.
+func RouteResolvedEntries(entries []ResolvedEntry, characterName, scenarioName, worldName string) []ResolvedEntry {
+	filtered := make([]ResolvedEntry, 0, len(entries))
+	for _, entry := range entries {
+		switch entry.Scope {
+		case ScopeWorld:
+			filtered = append(filtered, entry)
+		case ScopeScenario:
+			filtered = append(filtered, entry)
+		case ScopeCharacter:
+			if entry.OwnerID == "" || entry.OwnerID == characterName {
+				filtered = append(filtered, entry)
+			}
+		default:
+			filtered = append(filtered, entry)
+		}
+	}
+	return filtered
+}
+
 func scopeRank(scope Scope) int {
 	switch scope {
 	case ScopeCharacter:
@@ -403,4 +434,36 @@ func intToString(value int) string {
 		n /= 10
 	}
 	return string(digits[i:])
+}
+
+// ParseLorebookEntryFromMap converts a frontend lorebook map into a typed Entry.
+// The frontend sends camelCase keys that match the JSON tags on Entry.
+// If the "enabled" key is absent, the entry defaults to enabled (true).
+func ParseLorebookEntryFromMap(m map[string]interface{}) (Entry, error) {
+	clean := make(map[string]interface{}, len(m))
+	for k, v := range m {
+		clean[k] = v
+	}
+
+	// Default "enabled" to true when the key is not present in the map.
+	if _, has := clean["enabled"]; !has {
+		clean["enabled"] = true
+	}
+
+	// Hoist "name" into "title" when "title" is missing, matching frontend behaviour.
+	if title, has := clean["title"]; !has || title == "" || title == nil {
+		if name, has := clean["name"]; has && name != "" {
+			clean["title"] = name
+		}
+	}
+
+	b, err := json.Marshal(clean)
+	if err != nil {
+		return Entry{}, err
+	}
+	var entry Entry
+	if err := json.Unmarshal(b, &entry); err != nil {
+		return Entry{}, err
+	}
+	return withDefaults(entry), nil
 }

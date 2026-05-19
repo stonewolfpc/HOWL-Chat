@@ -1,0 +1,43 @@
+/**
+ * Lorebooks — Responsive Breakpoints
+ * Mobile layout adjustments for editor, grids, and type selector.
+ */
+
+@media (max-width: 768px) {
+    .lorebook-editor-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .lorebook-editor-sidebar {
+        border-right: 0;
+        border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+    }
+
+    .lorebook-grid-two,
+    .lorebook-grid-three,
+    .lorebook-grid-four {
+        grid-template-columns: 1fr;
+    }
+
+    .lorebook-type-selector {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .lorebook-type-item {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: center;
+        gap: 8px;
+    }
+
+    .lorebook-entry-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .lorebook-entry-actions {
+        margin-top: 12px;
+        justify-content: center;
+    }
+}

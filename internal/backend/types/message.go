@@ -1,9 +1,9 @@
 /**
  * Message Types
- * 
+ *
  * This package defines all message-related types for the chat system.
  * Messages represent individual chat interactions between users and the AI.
- * 
+ *
  * @package types
  */
 
@@ -25,31 +25,31 @@ const (
 
 // Message represents a single chat message
 type Message struct {
-	ID        string    `json:"id"`        // Unique message identifier
-	Role      Role      `json:"role"`      // Sender role (user/assistant/system)
-	Content   string    `json:"content"`   // Message content
-	Timestamp time.Time `json:"timestamp"` // When the message was created
-	Tokens    int       `json:"tokens"`    // Number of tokens in the message
-	Metadata  Metadata  `json:"metadata"`  // Additional message metadata
+	ID        string   `json:"id"`        // Unique message identifier
+	Role      Role     `json:"role"`      // Sender role (user/assistant/system)
+	Content   string   `json:"content"`   // Message content
+	Timestamp string   `json:"timestamp"` // When the message was created
+	Tokens    int      `json:"tokens"`    // Number of tokens in the message
+	Metadata  Metadata `json:"metadata"`  // Additional message metadata
 }
 
 // Metadata contains optional message metadata
 type Metadata struct {
-	Model        string            `json:"model,omitempty"`        // Model used for generation
-	Temperature  float64           `json:"temperature,omitempty"`  // Generation temperature
-	TopP         float64           `json:"top_p,omitempty"`         // Top P sampling
-	TopK         int              `json:"top_k,omitempty"`         // Top K sampling
-	Images       []ImageReference `json:"images,omitempty"`       // Attached images
-	Audio        AudioReference    `json:"audio,omitempty"`        // Attached audio
-	Documents    []DocumentRef     `json:"documents,omitempty"`    // Attached documents
+	Model       string           `json:"model,omitempty"`       // Model used for generation
+	Temperature float64          `json:"temperature,omitempty"` // Generation temperature
+	TopP        float64          `json:"top_p,omitempty"`       // Top P sampling
+	TopK        int              `json:"top_k,omitempty"`       // Top K sampling
+	Images      []ImageReference `json:"images,omitempty"`      // Attached images
+	Audio       AudioReference   `json:"audio,omitempty"`       // Attached audio
+	Documents   []DocumentRef    `json:"documents,omitempty"`   // Attached documents
 }
 
 // ImageReference represents an attached image
 type ImageReference struct {
-	ID       string `json:"id"`       // Image identifier
-	FilePath string `json:"filepath"` // Path to the image file
+	ID        string `json:"id"`        // Image identifier
+	FilePath  string `json:"filepath"`  // Path to the image file
 	Thumbnail string `json:"thumbnail"` // Thumbnail file path
-	MimeType string `json:"mimetype"` // Image MIME type
+	MimeType  string `json:"mimetype"`  // Image MIME type
 }
 
 // AudioReference represents attached audio
@@ -80,7 +80,7 @@ func NewMessage(role Role, content string) *Message {
 		ID:        generateID(),
 		Role:      role,
 		Content:   content,
-		Timestamp: time.Now(),
+		Timestamp: time.Now().Format(time.RFC3339),
 		Tokens:    0, // Will be calculated by tokenizer
 		Metadata:  Metadata{},
 	}

@@ -1,6 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\build",
+    "\\Scenarios",
+    "\\Worlds"
   ],
+  "SelectedNode": "\\howl-chat.sln",
   "PreviewInSolutionExplorer": false
 }

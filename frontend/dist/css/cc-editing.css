@@ -1,0 +1,30 @@
+/**
+ * Chat Components — Text Editing
+ * Inline chat text edit textarea and action buttons.
+ */
+
+.chat-text-edit {
+    width: 100%;
+    min-height: 80px;
+    background: rgba(21, 21, 31, 0.9);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 8px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+}
+
+.chat-text-edit:focus {
+    border-color: var(--theme-color);
+    box-shadow: 0 0 8px var(--theme-glow);
+}
+
+.chat-edit-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}

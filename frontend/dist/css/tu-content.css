@@ -1,0 +1,122 @@
+/**
+ * Tutorials — Content Typography
+ * Right panel scrollable content and all markdown
+ * element styling (headings, paragraphs, lists, code, etc.).
+ */
+
+/* Content Panel */
+.tutorials-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 32px;
+    scroll-behavior: smooth;
+}
+
+.tutorials-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tutorials-content::-webkit-scrollbar-thumb {
+    background: rgba(100, 100, 100, 0.3);
+    border-radius: 4px;
+}
+
+.tutorials-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Headings */
+.tutorials-content h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--static-text, #e0e0e0);
+    margin: 0 0 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(100, 100, 100, 0.2);
+}
+
+.tutorials-content h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--static-text, #e0e0e0);
+    margin: 28px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(100, 100, 100, 0.15);
+}
+
+.tutorials-content h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--theme-color, #14b8a6);
+    margin: 20px 0 8px;
+}
+
+/* Body Text */
+.tutorials-content p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(212, 212, 212, 0.8);
+    margin: 0 0 14px;
+}
+
+.tutorials-content a {
+    color: var(--theme-color, #14b8a6);
+    text-decoration: none;
+}
+
+.tutorials-content a:hover {
+    text-decoration: underline;
+}
+
+/* Lists */
+.tutorials-content ul,
+.tutorials-content ol {
+    margin: 0 0 14px;
+    padding-left: 22px;
+}
+
+.tutorials-content li {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(212, 212, 212, 0.8);
+    margin-bottom: 6px;
+}
+
+/* Inline Formatting */
+.tutorials-content strong {
+    color: var(--static-text, #e0e0e0);
+    font-weight: 600;
+}
+
+.tutorials-content em {
+    color: rgba(212, 212, 212, 0.9);
+    font-style: italic;
+}
+
+/* Code Blocks */
+.tutorials-content code {
+    background: rgba(20, 184, 166, 0.1);
+    border: 1px solid rgba(20, 184, 166, 0.2);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    color: var(--theme-color, #14b8a6);
+}
+
+.tutorials-content pre {
+    background: rgba(15, 15, 23, 0.8);
+    border: 1px solid rgba(100, 100, 100, 0.2);
+    border-radius: 8px;
+    padding: 14px 18px;
+    overflow-x: auto;
+    margin: 14px 0;
+}
+
+.tutorials-content pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 13px;
+    color: rgba(212, 212, 212, 0.9);
+}

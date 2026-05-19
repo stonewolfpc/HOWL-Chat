@@ -1,0 +1,28 @@
+/**
+ * Tutorials — Search Results
+ * Search result list and individual result items
+ * with match highlighting.
+ */
+
+.tutorials-search-results {
+    padding: 8px 0;
+}
+
+.tutorials-search-result {
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    color: rgba(212, 212, 212, 0.7);
+    border-left: 2px solid transparent;
+    transition: all 0.15s ease;
+}
+
+.tutorials-search-result:hover {
+    background: rgba(100, 100, 100, 0.08);
+    color: var(--static-text, #e0e0e0);
+}
+
+.tutorials-search-result .result-match {
+    color: var(--theme-color, #14b8a6);
+    font-weight: 600;
+}

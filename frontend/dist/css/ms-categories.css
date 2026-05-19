@@ -1,0 +1,45 @@
+/**
+ * Model Settings — Categories & Cards
+ * Category headers, settings grid layout, and setting cards.
+ */
+
+/* Category Headers */
+.model-settings-flyout .category-header {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Settings Grid */
+.model-settings-flyout .settings-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px 16px;
+    margin-bottom: 24px;
+}
+
+/* Setting Cards */
+.model-settings-flyout .setting-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.model-settings-flyout .setting-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.model-settings-flyout .setting-card.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}

@@ -1,0 +1,52 @@
+/**
+ * Image Generator Panels — Buttons
+ * Button row and variant styles: secondary and warn.
+ */
+
+.ig-btn-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ig-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.ig-btn-secondary {
+    background: var(--surface-tertiary);
+    border-color: var(--border-secondary);
+    color: var(--text-primary);
+}
+
+.ig-btn-secondary:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    transform: translateY(-1px);
+}
+
+.ig-btn-warn {
+    background: rgba(220, 50, 50, 0.05);
+    border-color: rgba(220, 50, 50, 0.2);
+    color: var(--danger);
+}
+
+.ig-btn-warn:hover {
+    background: rgba(220, 50, 50, 0.1);
+    border-color: var(--danger);
+    transform: translateY(-1px);
+}

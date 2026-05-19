@@ -1,0 +1,114 @@
+/**
+ * Sampler Settings — Flyout Container
+ * Main centered flyout modal, header, close button,
+ * backdrop overlay, and flyout-specific scrollbars.
+ */
+
+/* Flyout Container */
+.flyout {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 540px;
+    max-height: 85vh;
+    background: #111418;
+    border: 1px solid #1F242A;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    z-index: 10000;
+    overflow-y: auto;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -55%) scale(0.98);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.flyout.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Flyout Header */
+.flyout-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #1F242A;
+}
+
+.flyout-header h2 {
+    color: #e0e0e0;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Close Button */
+.flyout-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+    font-size: 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flyout-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Flyout Content */
+.flyout-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Backdrop Overlay */
+.flyout-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.flyout-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Flyout Scrollbars */
+.flyout::-webkit-scrollbar {
+    width: 8px;
+}
+
+.flyout::-webkit-scrollbar-track {
+    background: #111418;
+    border-radius: 4px;
+}
+
+.flyout::-webkit-scrollbar-thumb {
+    background: #2A2F36;
+    border-radius: 4px;
+}
+
+.flyout::-webkit-scrollbar-thumb:hover {
+    background: #3a3f46;
+}

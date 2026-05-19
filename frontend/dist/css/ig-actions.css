@@ -1,0 +1,158 @@
+/**
+ * Image Generator — Actions & Generate Button
+ * Action bar, save/send/delete buttons, and the primary generate CTA.
+ */
+
+/* Action Bar */
+.ig-action-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.ig-action-btn {
+    background: var(--surface-hover);
+    border: 1px solid var(--border-secondary);
+    color: var(--text-primary);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ig-action-btn:hover {
+    background: var(--surface-tertiary);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    transform: translateY(-1px);
+}
+
+.ig-action-primary {
+    background: var(--button-primary-bg);
+    border-color: var(--button-primary-bg);
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+.ig-action-primary:hover {
+    background: var(--accent-primary-hover);
+    border-color: var(--accent-primary);
+    color: #FFFFFF;
+}
+
+.ig-action-danger {
+    color: var(--danger);
+}
+
+.ig-action-danger:hover {
+    background: var(--danger);
+    border: none;
+    border-radius: 6px;
+    color: #FFFFFF;
+}
+
+/* Entity action buttons — slightly different accent */
+.ig-action-entity {
+    color: var(--accent-secondary);
+}
+
+.ig-action-entity:hover {
+    background: var(--accent-secondary-hover);
+    border-color: var(--accent-secondary);
+}
+
+/* Action group with label */
+.ig-action-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 0 4px;
+}
+
+.ig-action-label {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Main Footer */
+.ig-main-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0 0;
+    flex-shrink: 0;
+    border-top: 1px solid var(--border-secondary);
+}
+
+/* Generate Button */
+.ig-generate-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 36px;
+    background: var(--accent-primary);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    position: relative;
+    box-shadow: 0 4px 15px var(--theme-glow);
+}
+
+.ig-generate-btn:hover {
+    background: var(--accent-primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--theme-glow);
+}
+
+.ig-generate-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.ig-generate-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+.ig-generate-btn.generating {
+    background: var(--danger);
+    box-shadow: 0 4px 15px color-mix(in srgb, var(--danger) 30%, transparent);
+}
+
+.ig-generate-btn.generating:hover {
+    background: var(--danger);
+}
+
+.ig-generate-btn .icon::before,
+.ig-canvas-icon .icon::before {
+    filter: none;
+}
+
+.ig-fab-icon { font-size: 20px; }
+
+.ig-key-hint {
+    font-size: 11px;
+    opacity: 0.8;
+    font-weight: 500;
+    background: rgba(0,0,0,0.15);
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-left: 6px;
+}

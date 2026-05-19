@@ -1,0 +1,78 @@
+/**
+ * Lorebooks — Base Page Layout
+ * Page title, create button, content area, helper text,
+ * and scope note styling.
+ */
+
+/* Page Title */
+.lorebooks-page-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--theme-color);
+    text-shadow: 0 0 10px var(--theme-glow);
+}
+
+/* Create New Button */
+.create-lorebook-button {
+    background: var(--theme-glow);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    margin-top: 16px;
+}
+
+.create-lorebook-button:hover {
+    background: var(--theme-glow);
+    border-color: var(--theme-color);
+    box-shadow: 0 0 8px var(--theme-glow);
+}
+
+/* Content Area */
+.lorebooks-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: rgba(15, 21, 31, 0.95);
+}
+
+/* Helper / Scope */
+.lorebook-page-subtitle,
+.lorebook-editor-subtitle,
+.lorebook-helper,
+.lorebook-scope-note {
+    color: rgba(212, 212, 212, 0.72);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.lorebook-scope-strip {
+    padding: 0 20px 12px;
+}
+
+.lorebook-scope-note {
+    border: 1px solid rgba(100, 100, 100, 0.25);
+    background: rgba(21, 21, 31, 0.5);
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+/* Form Textarea Override */
+.character-form-textarea.small {
+    min-height: 72px;
+}
+
+/* Page wrapper */
+.lorebook-page {
+    min-width: 0;
+}
+
+/* Creation overlay (hidden by default) */
+#lorebook-creation-overlay {
+    display: none;
+}

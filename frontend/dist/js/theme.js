@@ -2,7 +2,7 @@
  * Theme Management Module
  * 
  * This module handles theme cycling through the Artherius color palette
- * with smooth transitions and animations.
+ * with smooth transitions and animations, plus light/dark theme switching.
  * 
  * @module theme
  */
@@ -38,6 +38,9 @@ const frameInterval = 1000 / targetFPS; // ~33.33ms per frame
 let animationStartTime = 0;
 let isAnimating = false;
 
+// Light/Dark mode state
+let currentThemeMode = 'dark'; // 'dark' or 'light'
+
 // Easing function for smooth transitions
 function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -69,22 +72,27 @@ function fadeColor(color1, color2, progress) {
 
 // Fade RGBA interpolation
 function fadeRGBA(rgba1, rgba2, progress) {
-    const r1 = parseInt(rgba1.slice(5, 8), 16);
-    const g1 = parseInt(rgba1.slice(9, 12), 16);
-    const b1 = parseInt(rgba1.slice(13, 16), 16);
-    const a1 = parseFloat(rgba1.slice(17, 20));
+    // Parse RGBA values using regex to handle variable digit lengths
+    const parseRGBA = (rgba) => {
+        const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/);
+        if (!match) return { r: 0, g: 0, b: 0, a: 0 };
+        return {
+            r: parseInt(match[1], 10),
+            g: parseInt(match[2], 10),
+            b: parseInt(match[3], 10),
+            a: parseFloat(match[4])
+        };
+    };
     
-    const r2 = parseInt(rgba2.slice(5, 8), 16);
-    const g2 = parseInt(rgba2.slice(9, 12), 16);
-    const b2 = parseInt(rgba2.slice(13, 16), 16);
-    const a2 = parseFloat(rgba2.slice(17, 20));
+    const color1 = parseRGBA(rgba1);
+    const color2 = parseRGBA(rgba2);
     
     const easedProgress = easeInOutCubic(progress);
     
-    const r = Math.round(r1 + (r2 - r1) * easedProgress);
-    const g = Math.round(g1 + (g2 - g1) * easedProgress);
-    const b = Math.round(b1 + (b2 - b1) * easedProgress);
-    const a = (a1 + (a2 - a1) * easedProgress).toFixed(2);
+    const r = Math.round(color1.r + (color2.r - color1.r) * easedProgress);
+    const g = Math.round(color1.g + (color2.g - color1.g) * easedProgress);
+    const b = Math.round(color1.b + (color2.b - color1.b) * easedProgress);
+    const a = (color1.a + (color2.a - color1.a) * easedProgress).toFixed(2);
     
     return `rgba(${r}, ${g}, ${b}, ${a})`;
 }
@@ -147,5 +155,85 @@ function cycleTheme() {
     requestAnimationFrame(animate);
 }
 
-// Start theme cycling after initial delay
-setTimeout(cycleTheme, 2000);
+// ---------------------------------------------------------------------------
+// Light/Dark Theme Switching
+// ---------------------------------------------------------------------------
+
+/**
+ * Switch between light and dark theme modes
+ * @param {string} mode - 'light' or 'dark'
+ */
+function setThemeMode(mode) {
+    if (mode !== 'light' && mode !== 'dark') {
+        console.error('Invalid theme mode. Use "light" or "dark".');
+        return;
+    }
+    
+    currentThemeMode = mode;
+    const body = document.body;
+    
+    if (mode === 'light') {
+        body.classList.remove('theme-dark');
+        body.classList.add('theme-light');
+        // Light mode uses reduced glow
+        document.documentElement.style.setProperty('--theme-glow', `rgba(20, 184, 166, 0.25)`);
+        document.documentElement.style.setProperty('--theme-text-glow', `rgba(20, 184, 166, 0.2)`);
+    } else {
+        body.classList.remove('theme-light');
+        body.classList.add('theme-dark');
+        // Dark mode uses full glow
+        const currentTheme = themes[currentThemeIndex];
+        document.documentElement.style.setProperty('--theme-glow', currentTheme.glow);
+        document.documentElement.style.setProperty('--theme-text-glow', currentTheme.textGlow);
+    }
+    
+    // Save preference to localStorage
+    try {
+        localStorage.setItem('howl-theme-mode', mode);
+    } catch (e) {
+        console.log('Could not save theme preference:', e);
+    }
+}
+
+/**
+ * Toggle between light and dark theme
+ */
+function toggleThemeMode() {
+    const newMode = currentThemeMode === 'dark' ? 'light' : 'dark';
+    setThemeMode(newMode);
+}
+
+/**
+ * Load saved theme preference on page load
+ */
+function loadThemePreference() {
+    try {
+        const savedMode = localStorage.getItem('howl-theme-mode');
+        if (savedMode && (savedMode === 'light' || savedMode === 'dark')) {
+            setThemeMode(savedMode);
+        }
+    } catch (e) {
+        console.log('Could not load theme preference:', e);
+    }
+}
+
+// Initialize theme preference on page load
+document.addEventListener('DOMContentLoaded', () => {
+    loadThemePreference();
+});
+
+// ---------------------------------------------------------------------------
+// Legacy Function Support for Menu Items
+// ---------------------------------------------------------------------------
+
+/**
+ * Legacy function for menu compatibility
+ * Maps to setThemeMode for existing menu items
+ * @param {string} theme - 'light' or 'dark'
+ */
+function setTheme(theme) {
+    setThemeMode(theme);
+}
+
+// Start theme cycling after initial delay (disabled to prevent flickering)
+// setTimeout(cycleTheme, 2000);

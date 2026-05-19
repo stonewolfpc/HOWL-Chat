@@ -47,6 +47,7 @@ func (r *Reader) ReadProfile(path string) (*types.ModelProfile, error) {
 		Template:      r.resolveTemplate(gguf.Header.MetadataKV),
 		Tokenizer:     r.getString(gguf.Header.MetadataKV, "tokenizer.ggml.model", ""),
 		StopSequences: r.resolveStopSequences(gguf.Header.MetadataKV),
+		LayerCount:    r.getLayerCount(gguf.Header.MetadataKV),
 	}
 
 	// Try alternative context length fields if llama.context_length is 0
@@ -119,6 +120,30 @@ func (r *Reader) getFloat(metadata gguf_parser.GGUFMetadataKVs, key string, defa
 	return defaultValue
 }
 
+// getLayerCount extracts the total layer count from GGUF metadata
+func (r *Reader) getLayerCount(metadata gguf_parser.GGUFMetadataKVs) int {
+	// Try common layer count metadata keys
+	layerKeys := []string{
+		"llama.block_count",
+		"llama.n_layers",
+		"general.block_count",
+		"general.n_layers",
+		"mistral.block_count",
+		"mistral.n_layers",
+		"qwen.block_count",
+		"qwen.n_layers",
+	}
+
+	for _, key := range layerKeys {
+		if count := r.getInt(metadata, key, 0); count > 0 {
+			return count
+		}
+	}
+
+	// Default to 0 if not found (will be handled by frontend)
+	return 0
+}
+
 // resolveTemplate extracts the chat template from metadata with fallbacks
 func (r *Reader) resolveTemplate(metadata gguf_parser.GGUFMetadataKVs) string {
 	// Priority order for template keys
@@ -131,13 +156,14 @@ func (r *Reader) resolveTemplate(metadata gguf_parser.GGUFMetadataKVs) string {
 
 	for _, key := range templateKeys {
 		if v := r.getString(metadata, key, ""); v != "" {
-			return v
+			// Convert Handlebars to Jinja2 if needed
+			return ConvertHandlebarsToJinja(v)
 		}
 	}
 
 	// Fallback by family
 	family := r.getString(metadata, "general.architecture", "llama")
-	return r.getFallbackTemplate(family)
+	return ConvertHandlebarsToJinja(r.getFallbackTemplate(family))
 }
 
 // getFallbackTemplate returns a default template based on model family

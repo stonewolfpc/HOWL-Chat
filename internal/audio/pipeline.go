@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -13,6 +14,7 @@ import (
 	"howl-chat/internal/audio/asr/whisper"
 	"howl-chat/internal/audio/runtime"
 	"howl-chat/internal/audio/tts/cache"
+	"howl-chat/internal/audio/tts/kokoro"
 	"howl-chat/internal/audio/tts/melotts"
 	"howl-chat/internal/audio/tts/piper"
 	"howl-chat/internal/audio/types"
@@ -30,6 +32,7 @@ type Pipeline struct {
 	ttsSynth      types.TTSSynthesizer
 	multimodal    types.MultimodalBridge
 	ttsCache      types.AudioCache
+	loadedVoice   string // Currently loaded TTS voice model name
 }
 
 // NewPipeline creates an empty pipeline with modular runtime loader.
@@ -102,7 +105,7 @@ func (p *Pipeline) ProcessAudioMessage(ctx context.Context, msg types.AudioMessa
 		response.ResponseText = response.TranscribedText
 
 		if ttsSynth != nil && response.ResponseText != "" {
-			audioPath, err := p.synthesizeWithCache(ctx, cacheStore, ttsSynth, response.ResponseText)
+			audioPath, err := p.synthesizeWithCache(ctx, cacheStore, ttsSynth, response.ResponseText, nil)
 			if err != nil {
 				p.recordError()
 				return nil, err
@@ -113,7 +116,13 @@ func (p *Pipeline) ProcessAudioMessage(ctx context.Context, msg types.AudioMessa
 		if ttsSynth == nil {
 			return nil, types.NewAudioError(types.ErrCodeModelNotFound, "tts is not enabled", nil)
 		}
-		audioPath, err := p.synthesizeWithCache(ctx, cacheStore, ttsSynth, msg.Text)
+		// If voice override requests a different model, lazily switch
+		if msg.VoiceOverride != nil && msg.VoiceOverride.Voice != "" {
+			if err := p.ensureTTSVoice(ctx, msg.VoiceOverride.Voice); err != nil {
+				fmt.Printf("WARN: voice switch failed (%v), using current voice\n", err)
+			}
+		}
+		audioPath, err := p.synthesizeWithCache(ctx, cacheStore, ttsSynth, msg.Text, msg.VoiceOverride)
 		if err != nil {
 			p.recordError()
 			return nil, err
@@ -160,6 +169,17 @@ func (p *Pipeline) GetStatus() types.PipelineStatus {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 	return p.status
+}
+
+// GetTTSVoices returns available voices from the current TTS synthesizer.
+func (p *Pipeline) GetTTSVoices() []types.Voice {
+	p.mu.RLock()
+	synth := p.ttsSynth
+	p.mu.RUnlock()
+	if synth == nil {
+		return nil
+	}
+	return synth.GetVoices()
 }
 
 // Shutdown releases loaded resources through loader lifecycle.
@@ -210,12 +230,12 @@ func (p *Pipeline) initASR(ctx context.Context, candidates []types.ASRModelType)
 		return types.NewAudioError(types.ErrCodeModelLoadFailed, "failed to initialize any ASR recognizer", nil)
 	}
 	chain := fallback.NewChain(fallback.ChainConfig{
-		Recognizers:           recognizers,
-		RecognizerMap:         recMap,
-		MaxAttempts:           1,
-		AutoSelectByHardware:  true,
-		MinMemoryTier:         parseTier(p.config.HardwareTier),
-		Language:              "auto",
+		Recognizers:          recognizers,
+		RecognizerMap:        recMap,
+		MaxAttempts:          1,
+		AutoSelectByHardware: true,
+		MinMemoryTier:        parseTier(p.config.HardwareTier),
+		Language:             "auto",
 	})
 	if err := chain.Initialize(ctx, types.ASRConfig{Language: "auto"}); err != nil {
 		return err
@@ -241,10 +261,44 @@ func (p *Pipeline) initTTS(ctx context.Context, candidates []types.TTSModelType)
 		}
 		p.ttsSynth = synth
 		p.status.TTSReady = true
+		p.loadedVoice = cfg.ModelPath
 		return nil
 	}
 	return types.NewAudioError(types.ErrCodeModelLoadFailed,
 		fmt.Sprintf("failed to initialise any configured TTS engine; attempts: %s", strings.Join(errs, "; ")), nil)
+}
+
+// ensureTTSVoice lazily loads a different Piper voice model if the requested
+// voice differs from the currently loaded one. Returns nil if already loaded.
+func (p *Pipeline) ensureTTSVoice(ctx context.Context, voiceName string) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	if p.ttsSynth == nil || p.loadedVoice == voiceName {
+		return nil
+	}
+
+	modelPath := voiceModelPath(voiceName)
+	if _, err := os.Stat(modelPath); err != nil {
+		return types.NewAudioError(types.ErrCodeModelNotFound,
+			fmt.Sprintf("voice model not found: %s", modelPath), err)
+	}
+
+	cacheDir := defaultTTSCacheDir()
+	cfg := types.TTSConfig{
+		ModelPath:    modelPath,
+		CacheDir:     cacheDir,
+		CacheEnabled: true,
+	}
+	synth, err := p.loader.LoadTTS(string(types.TTSPiper), cfg)
+	if err != nil {
+		return types.NewAudioError(types.ErrCodeModelLoadFailed,
+			fmt.Sprintf("failed to load voice %s", voiceName), err)
+	}
+	p.ttsSynth = synth
+	p.loadedVoice = voiceName
+	fmt.Printf("INFO: loaded TTS voice: %s\n", voiceName)
+	return nil
 }
 
 func (p *Pipeline) initMultimodal(ctx context.Context, candidates []types.MultimodalModelType) error {
@@ -257,12 +311,20 @@ func (p *Pipeline) initMultimodal(ctx context.Context, candidates []types.Multim
 		nil)
 }
 
-func (p *Pipeline) synthesizeWithCache(ctx context.Context, cacheStore types.AudioCache, synth types.TTSSynthesizer, text string) (string, error) {
+func (p *Pipeline) synthesizeWithCache(ctx context.Context, cacheStore types.AudioCache, synth types.TTSSynthesizer, text string, override *types.VoiceOverride) (string, error) {
 	voice := firstVoiceOrDefault(synth, "default")
 	req := types.SynthesisRequest{
 		Text:  text,
 		Voice: voice,
 		Speed: 1.0,
+	}
+	if override != nil {
+		if override.Voice != "" {
+			req.Voice = override.Voice
+		}
+		if override.Speed > 0 {
+			req.Speed = override.Speed
+		}
 	}
 	key := types.GenerateCacheKey(req.Text, req.Voice, req.Speed)
 	if cached, ok := cacheStore.Get(key); ok {
@@ -292,6 +354,7 @@ func registerBuiltins(loader *runtime.ModelLoader) {
 	loader.RegisterASR(types.ASRQwen3ASR17B, func() types.ASRRecognizer { return qwen.NewClient(os.Getenv("HOWL_QWEN_API_KEY")) })
 	loader.RegisterTTS(types.TTSPiper, func() types.TTSSynthesizer { return piper.New() })
 	loader.RegisterTTS(types.TTSMeloTTS, func() types.TTSSynthesizer { return melotts.New() })
+	loader.RegisterTTS(types.TTSKokoro, func() types.TTSSynthesizer { return kokoro.New() })
 }
 
 func parseTier(raw string) types.MemoryTier {
@@ -320,7 +383,7 @@ func defaultPiperModelPath() string {
 	if v := os.Getenv("HOWL_TTS_PIPER_MODEL"); v != "" {
 		return v
 	}
-	return "models/piper/en_US-lessac-medium.onnx"
+	return "models/en_US-lessac-medium.onnx"
 }
 
 func defaultTTSCacheDir() string {
@@ -343,6 +406,17 @@ func ttsConfigForModel(model types.TTSModelType, cacheDir string) types.TTSConfi
 			CacheEnabled: true,
 			MaxCacheSize: 100,
 		}
+	case types.TTSKokoro:
+		modelPath := defaultKokoroModelPath()
+		return types.TTSConfig{
+			ModelPath:    modelPath,
+			CacheDir:     cacheDir,
+			CacheEnabled: true,
+			MaxCacheSize: 100,
+			ScriptPath:   defaultKokoroScriptPath(),
+			VoicesPath:   defaultKokoroVoicesPath(),
+			ConfigPath:   defaultKokoroConfigPath(),
+		}
 	default:
 		return types.TTSConfig{
 			ModelPath:    defaultPiperModelPath(),
@@ -353,12 +427,57 @@ func ttsConfigForModel(model types.TTSModelType, cacheDir string) types.TTSConfi
 	}
 }
 
+func defaultKokoroScriptPath() string {
+	candidates := []string{
+		"scripts/kokoro-tts.py",
+		"../scripts/kokoro-tts.py",
+		"../../scripts/kokoro-tts.py",
+	}
+	for _, c := range candidates {
+		if _, err := os.Stat(c); err == nil {
+			abs, _ := filepath.Abs(c)
+			return abs
+		}
+	}
+	return "scripts/kokoro-tts.py"
+}
+
+func defaultKokoroModelPath() string {
+	if v := os.Getenv("HOWL_TTS_KOKORO_MODEL"); v != "" {
+		return v
+	}
+	return `D:\AI GGUF\TTS\kokoro-v1.0.onnx`
+}
+
+func defaultKokoroVoicesPath() string {
+	if v := os.Getenv("HOWL_TTS_KOKORO_VOICES"); v != "" {
+		return v
+	}
+	return `D:\AI GGUF\TTS\voices-v1.0.bin`
+}
+
+func defaultKokoroConfigPath() string {
+	if v := os.Getenv("HOWL_TTS_KOKORO_CONFIG"); v != "" {
+		return v
+	}
+	return `D:\AI GGUF\TTS\hf_cache\config.json`
+}
+
 func firstVoiceOrDefault(synth types.TTSSynthesizer, fallback string) string {
 	voices := synth.GetVoices()
 	if len(voices) > 0 && voices[0].ID != "" {
 		return voices[0].ID
 	}
 	return fallback
+}
+
+// voiceModelPath resolves a voice name (e.g. "en_US-lessac-medium") to its
+// Piper .onnx model file path. Looks in models/ first, then checks env.
+func voiceModelPath(voiceName string) string {
+	if v := os.Getenv("HOWL_TTS_PIPER_MODEL"); v != "" && strings.Contains(v, voiceName) {
+		return v
+	}
+	return filepath.Join("models", voiceName+".onnx")
 }
 
 func defaultASRModelPath(model types.ASRModelType) string {

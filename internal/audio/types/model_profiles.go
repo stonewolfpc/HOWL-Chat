@@ -27,6 +27,9 @@ const (
 	// MeloTTS (better quality)
 	TTSMeloTTS TTSModelType = "melotts"
 
+	// Kokoro (neural ONNX, high quality)
+	TTSKokoro TTSModelType = "kokoro"
+
 	// Bark (highest quality, slowest)
 	TTSBarkSmall TTSModelType = "bark-small"
 	TTSBarkLarge TTSModelType = "bark-large"
@@ -170,6 +173,36 @@ var ModelRegistry = struct {
 			SupportsSpeed:   true,
 			MinSpeed:        0.8,
 			MaxSpeed:        1.2,
+		},
+		TTSKokoro: {
+			ModelProfile: ModelProfile{
+				Type:              "tts",
+				Name:              "Kokoro",
+				Description:       "Neural ONNX TTS, ~350MB",
+				Version:           "kokoro-1.0",
+				VRAMBytes:         0,
+				RAMBytes:          int64(600 * 1024 * 1024),
+				ModelSizeBytes:    int64(350 * 1024 * 1024),
+				Languages:         []string{"en", "en-gb", "fr", "ja", "ko", "zh", "it", "pt", "hi", "pl", "es", "de"},
+				License:           "Apache-2.0",
+				SourceURL:         "https://github.com/hexgrad/kokoro",
+				GGUFAvailable:     false,
+				SupportsStreaming: false,
+				SupportsGPU:       false,
+				SupportsCPU:       true,
+				SupportsQuantized: false,
+				RealTimeFactor:    0.3,
+				QualityScore:      0.92,
+				MinMemoryTier:     TierSmall,
+				RecommendedTier:   TierSmall,
+				Backend:           "local",
+			},
+			SampleRate:      24000,
+			SupportedVoices: []string{}, // Populated dynamically from voices archive
+			SupportsSSML:    false,
+			SupportsSpeed:   true,
+			MinSpeed:        0.5,
+			MaxSpeed:        2.0,
 		},
 	},
 	MultimodalModels: map[MultimodalModelType]MultimodalModelProfile{

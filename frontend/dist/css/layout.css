@@ -99,3 +99,38 @@ body {
     gap: 12px;
     box-shadow: 0 0 15px var(--theme-glow);
 }
+
+/* ==================== LIGHT THEME OVERRIDES ==================== */
+
+body.theme-light {
+    background-color: var(--surface-secondary);
+    color: var(--text-primary);
+}
+
+body.theme-light .main-content {
+    background: var(--surface-secondary);
+}
+
+body.theme-light .nav-sidebar {
+    background: var(--surface-primary);
+    border-right-color: var(--border-primary);
+}
+
+body.theme-light .character-sidebar {
+    background: var(--surface-primary);
+    border-right-color: var(--border-primary);
+}
+
+body.theme-light .chat-panel {
+    background: var(--surface-primary);
+    border-right-color: var(--border-primary);
+}
+
+body.theme-light .world-sidebar {
+    background: var(--surface-primary);
+}
+
+body.theme-light .input-bar {
+    background: var(--surface-tertiary);
+    border-top-color: var(--border-primary);
+}

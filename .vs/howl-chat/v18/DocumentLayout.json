@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "D:\\HOWL_Chat\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\HOWL_Chat\\internal\\backend\\lorebook\\embeddings_test.go||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:internal\\backend\\lorebook\\embeddings_test.go||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\HOWL_Chat\\internal\\backend\\persistence\\storage.go||{3B902123-F8A7-4915-9F01-361F908088D0}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:internal\\backend\\persistence\\storage.go||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
@@ -29,10 +33,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\HOWL_Chat\\internal\\backend\\lorebook\\embeddings.go||{3B902123-F8A7-4915-9F01-361F908088D0}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:internal\\backend\\lorebook\\embeddings.go||{3B902123-F8A7-4915-9F01-361F908088D0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\HOWL_Chat\\internal\\backend\\lorebook\\embeddings_test.go||{3B902123-F8A7-4915-9F01-361F908088D0}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:internal\\backend\\lorebook\\embeddings_test.go||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\HOWL_Chat\\internal\\backend\\lorebook\\conflicts_test.go||{3B902123-F8A7-4915-9F01-361F908088D0}",
@@ -86,7 +86,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 15,
           "Children": [
             {
               "$type": "Document",
@@ -96,8 +96,7 @@
               "ToolTip": "C:\\Users\\StoneWolfPC\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\986675947\\embeddings_test.go",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-05-11T21:10:00.541Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T21:10:00.541Z"
             },
             {
               "$type": "Document",
@@ -107,8 +106,7 @@
               "ToolTip": "C:\\Users\\StoneWolfPC\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\986675947\\embeddings.go",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-05-11T21:10:00.493Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T21:10:00.493Z"
             },
             {
               "$type": "Document",
@@ -118,8 +116,7 @@
               "ToolTip": "C:\\Users\\StoneWolfPC\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\986675947\\conflicts_test.go",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-05-11T21:10:00.452Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T21:10:00.452Z"
             },
             {
               "$type": "Document",
@@ -129,8 +126,7 @@
               "ToolTip": "C:\\Users\\StoneWolfPC\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\986675947\\conflicts.go",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-05-11T21:10:00.416Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T21:10:00.416Z"
             },
             {
               "$type": "Document",
@@ -142,21 +138,18 @@
               "RelativeToolTip": "internal\\backend\\persistence\\entities.go",
               "ViewState": "AgIAAAEBAAAAAAAAAIBJwAMBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-05-11T21:06:30.261Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T21:06:30.261Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "storage.go",
               "DocumentMoniker": "D:\\HOWL_Chat\\internal\\backend\\persistence\\storage.go",
               "RelativeDocumentMoniker": "internal\\backend\\persistence\\storage.go",
               "ToolTip": "D:\\HOWL_Chat\\internal\\backend\\persistence\\storage.go",
               "RelativeToolTip": "internal\\backend\\persistence\\storage.go",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAKIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-05-11T21:06:16.561Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T21:06:16.561Z"
             },
             {
               "$type": "Document",
@@ -168,8 +161,7 @@
               "RelativeToolTip": "COMPLETION_REPORT.md",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAM0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
-              "WhenOpened": "2026-05-11T20:59:12.66Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T20:59:12.66Z"
             },
             {
               "$type": "Document",
@@ -181,8 +173,7 @@
               "RelativeToolTip": "embeddings_test.go",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-05-11T20:58:40.662Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T20:58:40.662Z"
             },
             {
               "$type": "Document",
@@ -194,8 +185,7 @@
               "RelativeToolTip": "embeddings.go",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-05-11T20:58:37.894Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T20:58:37.894Z"
             },
             {
               "$type": "Document",
@@ -207,8 +197,7 @@
               "RelativeToolTip": "conflicts_test.go",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-05-11T20:58:34.607Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T20:58:34.607Z"
             },
             {
               "$type": "Document",
@@ -220,12 +209,11 @@
               "RelativeToolTip": "conflicts.go",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-05-11T20:58:31.747Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T20:58:31.747Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "CHECKLIST.md",
               "DocumentMoniker": "D:\\HOWL_Chat\\CHECKLIST.md",
               "RelativeDocumentMoniker": "CHECKLIST.md",
@@ -233,12 +221,11 @@
               "RelativeToolTip": "CHECKLIST.md",
               "ViewState": "AgIAAGAAAAAAAAAAAAAAABIBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
-              "WhenOpened": "2026-05-11T20:57:59.457Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T20:57:59.457Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "QUICK_REFERENCE.md",
               "DocumentMoniker": "D:\\HOWL_Chat\\QUICK_REFERENCE.md",
               "RelativeDocumentMoniker": "QUICK_REFERENCE.md",
@@ -246,12 +233,11 @@
               "RelativeToolTip": "QUICK_REFERENCE.md",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAPQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
-              "WhenOpened": "2026-05-11T20:57:38.431Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T20:57:38.431Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "IMPLEMENTATION_SUMMARY.md",
               "DocumentMoniker": "D:\\HOWL_Chat\\IMPLEMENTATION_SUMMARY.md",
               "RelativeDocumentMoniker": "IMPLEMENTATION_SUMMARY.md",
@@ -259,8 +245,7 @@
               "RelativeToolTip": "IMPLEMENTATION_SUMMARY.md",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAPYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
-              "WhenOpened": "2026-05-11T20:57:13.444Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T20:57:13.444Z"
             },
             {
               "$type": "Document",
@@ -272,12 +257,11 @@
               "RelativeToolTip": "internal\\backend\\lorebook\\conflicts_test.go",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAFABAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-05-11T20:49:32.861Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T20:49:32.861Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 0,
               "Title": "embeddings_test.go",
               "DocumentMoniker": "D:\\HOWL_Chat\\internal\\backend\\lorebook\\embeddings_test.go",
               "RelativeDocumentMoniker": "internal\\backend\\lorebook\\embeddings_test.go",
@@ -290,7 +274,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "lorebook_test.go",
               "DocumentMoniker": "D:\\HOWL_Chat\\internal\\backend\\lorebook\\lorebook_test.go",
               "RelativeDocumentMoniker": "internal\\backend\\lorebook\\lorebook_test.go",
@@ -298,8 +282,7 @@
               "RelativeToolTip": "internal\\backend\\lorebook\\lorebook_test.go",
               "ViewState": "AgIAABsCAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-05-11T20:48:44.448Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T20:48:44.448Z"
             },
             {
               "$type": "Document",
@@ -311,12 +294,11 @@
               "RelativeToolTip": "internal\\backend\\lorebook\\lorebook.go",
               "ViewState": "AgIAAJMBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-05-11T20:47:35.809Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T20:47:35.809Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "conflicts.go",
               "DocumentMoniker": "D:\\HOWL_Chat\\internal\\backend\\lorebook\\conflicts.go",
               "RelativeDocumentMoniker": "internal\\backend\\lorebook\\conflicts.go",
@@ -324,12 +306,11 @@
               "RelativeToolTip": "internal\\backend\\lorebook\\conflicts.go",
               "ViewState": "AgIAAMEAAAAAAAAAAADwv+AAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-05-11T20:47:28Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T20:47:28Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "embeddings.go",
               "DocumentMoniker": "D:\\HOWL_Chat\\internal\\backend\\lorebook\\embeddings.go",
               "RelativeDocumentMoniker": "internal\\backend\\lorebook\\embeddings.go",
@@ -337,8 +318,7 @@
               "RelativeToolTip": "internal\\backend\\lorebook\\embeddings.go",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAG4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-05-11T20:47:17.216Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-11T20:47:17.216Z"
             }
           ]
         }

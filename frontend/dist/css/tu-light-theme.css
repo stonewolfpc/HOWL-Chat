@@ -1,0 +1,200 @@
+/**
+ * Tutorials — Light Theme Overrides
+ * All body.theme-light rules for tutorial components.
+ */
+
+body.theme-light .tutorials-overlay {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+body.theme-light .tutorials-container {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .tutorials-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .tutorials-title {
+    color: var(--text-primary);
+}
+
+body.theme-light .tutorials-title .icon {
+    color: var(--accent-primary);
+}
+
+body.theme-light .tutorials-search input {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .tutorials-search input:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-primary-hover);
+}
+
+body.theme-light .tutorials-search input::placeholder {
+    color: var(--input-placeholder);
+}
+
+body.theme-light .tutorials-close {
+    background: var(--surface-hover);
+    color: var(--text-secondary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .tutorials-close:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #FFFFFF;
+}
+
+body.theme-light .tutorials-nav {
+    background: var(--surface-tertiary);
+    border-right-color: var(--border-primary);
+}
+
+body.theme-light .tutorials-nav::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+}
+
+body.theme-light .tutorials-nav-section-header {
+    color: var(--text-secondary);
+}
+
+body.theme-light .tutorials-nav-section-header:hover {
+    color: var(--text-primary);
+    background: var(--surface-hover);
+}
+
+body.theme-light .tutorials-nav-item {
+    color: var(--text-secondary);
+}
+
+body.theme-light .tutorials-nav-item:hover {
+    color: var(--text-primary);
+    background: var(--surface-hover);
+}
+
+body.theme-light .tutorials-nav-item.active {
+    color: var(--accent-primary);
+    background: var(--accent-primary-hover);
+    border-left-color: var(--accent-primary);
+}
+
+body.theme-light .tutorials-content::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+}
+
+body.theme-light .tutorials-content h1,
+body.theme-light .tutorials-content h2 {
+    color: var(--text-primary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .tutorials-content h3 {
+    color: var(--accent-primary);
+}
+
+body.theme-light .tutorials-content p,
+body.theme-light .tutorials-content li {
+    color: var(--text-secondary);
+}
+
+body.theme-light .tutorials-content strong {
+    color: var(--text-primary);
+}
+
+body.theme-light .tutorials-content em {
+    color: var(--text-primary);
+}
+
+body.theme-light .tutorials-content code {
+    background: var(--accent-primary-hover);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+body.theme-light .tutorials-content pre {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .tutorials-content pre code {
+    color: var(--text-primary);
+}
+
+body.theme-light .tutorials-info-box {
+    background: var(--accent-primary-hover);
+    border-color: var(--accent-primary);
+}
+
+body.theme-light .tutorials-info-box .info-title {
+    color: var(--accent-primary);
+}
+
+body.theme-light .tutorials-warning-box {
+    background: rgba(234, 179, 8, 0.1);
+    border-color: rgba(234, 179, 8, 0.3);
+}
+
+body.theme-light .tutorials-warning-box .warning-title {
+    color: #ca8a04;
+}
+
+body.theme-light .tutorials-table th {
+    background: var(--surface-tertiary);
+    color: var(--text-primary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .tutorials-table td {
+    color: var(--text-secondary);
+    border-bottom-color: var(--border-secondary);
+}
+
+body.theme-light .tutorials-table tr:hover td {
+    background: var(--surface-hover);
+}
+
+body.theme-light .tutorials-key {
+    background: var(--surface-hover);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+body.theme-light .tutorials-screenshot {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
+    color: var(--text-tertiary);
+}
+
+body.theme-light .tutorials-breadcrumb {
+    color: var(--text-tertiary);
+}
+
+body.theme-light .tutorials-breadcrumb span.active {
+    color: var(--accent-primary);
+}
+
+body.theme-light .tutorials-search-result {
+    color: var(--text-secondary);
+}
+
+body.theme-light .tutorials-search-result:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+}
+
+body.theme-light .tutorials-search-result .result-match {
+    color: var(--accent-primary);
+}
+
+body.theme-light .tutorials-nav-toggle {
+    background: var(--surface-hover);
+    border-color: var(--border-primary);
+    color: var(--text-secondary);
+}

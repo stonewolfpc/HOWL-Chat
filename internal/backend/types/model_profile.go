@@ -45,6 +45,9 @@ type ModelProfile struct {
 
 	// StopSequences are default stop sequences from metadata
 	StopSequences []string
+
+	// LayerCount is the total number of layers in the model
+	LayerCount int
 }
 
 // RuntimeSettings are the settings passed to gollama.cpp for model loading.

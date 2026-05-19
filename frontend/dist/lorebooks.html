@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="css/character-header.css">
     <link rel="stylesheet" href="css/lorebooks.css">
     <link rel="stylesheet" href="css/nav-icon-images.css">
+    <link rel="stylesheet" href="css/icons.css">
+    <link rel="stylesheet" href="css/tutorials.css">
 </head>
 <body>
     <div class="ambient-bg">
@@ -105,9 +107,9 @@
 
             <div class="world-grid lorebooks-grid" id="lorebooks-grid">
                 <div class="world-grid-empty">
-                    <div class="world-grid-empty-icon">BOOK</div>
+                    <div class="world-grid-empty-icon icon icon-book icon-xl"></div>
                     <div class="world-grid-empty-text">No lorebook entries yet</div>
-                    <div class="world-grid-empty-subtext">Create the first memory rule for your world, scenario, or character.</div>
+                    <div class="world-grid-empty-subtext">Click "Create New Lorebook" to get started</div>
                 </div>
             </div>
         </div>
@@ -146,7 +148,7 @@
                             </div>
 
                             <div class="lorebook-editor-section compact">
-                                <label class="lorebook-toggle">
+                                <label class="lorebook-toggle" for="lorebook-enabled">
                                     <input type="checkbox" id="lorebook-enabled" checked>
                                     <span>Entry Enabled</span>
                                 </label>
@@ -328,39 +330,6 @@
                                 </div>
                             </div>
 
-                            <div class="lorebook-editor-section" id="automated-lore-settings">
-                                <div class="lorebook-section-title">Automated Memory</div>
-                                <label class="lorebook-toggle">
-                                    <input type="checkbox" id="lorebook-automated">
-                                    <span>System Generated Entry</span>
-                                </label>
-                                <div class="lorebook-grid-three">
-                                    <div class="character-form-group">
-                                        <label class="character-form-label" for="lorebook-memory-type">Memory Type</label>
-                                        <select class="character-form-input" id="lorebook-memory-type">
-                                            <option value="world">World Memory</option>
-                                            <option value="scenario">Scenario Memory</option>
-                                            <option value="character">Character Memory</option>
-                                        </select>
-                                    </div>
-                                    <div class="character-form-group">
-                                        <label class="character-form-label" for="lorebook-trigger-confidence">Trigger Confidence</label>
-                                        <select class="character-form-input" id="lorebook-trigger-confidence">
-                                            <option value="low">Low</option>
-                                            <option value="medium" selected>Medium</option>
-                                            <option value="high">High</option>
-                                        </select>
-                                    </div>
-                                    <div class="character-form-group">
-                                        <label class="character-form-label" for="lorebook-decay-rate">Decay Rate</label>
-                                        <select class="character-form-input" id="lorebook-decay-rate">
-                                            <option value="never">Never Decays</option>
-                                            <option value="slow">Slow Decay</option>
-                                            <option value="fast">Fast Decay</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
                         </section>
                     </div>
                 </div>
@@ -375,7 +344,36 @@
 
     <script src="js/theme.js"></script>
     <script src="js/menu.js"></script>
+    <script src="js/delete-confirm.js"></script>
+    <script src="js/delete-service.js"></script>
     <script src="js/lorebooks.js"></script>
     <script src="js/navigation.js"></script>
+    <script src="js/menu-edit.js"></script>
+    <script src="js/menu-view.js"></script>
+    <script src="js/memory-store.js"></script>
+    <script src="js/menu-memory.js"></script>
+    <script src="js/menu-functions.js"></script>
+    <script src="js/tutorials-data-chat.js"></script>
+    <script src="js/tutorials-data-settings.js"></script>
+    <script src="js/tutorials-data-model.js"></script>
+    <script src="js/tutorials-data-content.js"></script>
+    <script src="js/tutorials-data-advanced.js"></script>
+    <script src="js/tutorials-data-app.js"></script>
+    <script src="js/tutorials-data.js"></script>
+    <script src="js/tutorials-ui.js"></script>
+    <!-- Tutorials Overlay -->
+    <div id="tutorials-overlay" class="tutorials-overlay">
+        <div class="tutorials-container">
+            <div class="tutorials-header">
+                <div class="tutorials-title"><span class="icon icon-book"></span> HOWL Tutorials</div>
+                <div class="tutorials-search"><input type="text" id="tutorials-search-input" placeholder="Search tutorials..."></div>
+                <button class="tutorials-close" onclick="closeTutorials()">&#x2715;</button>
+            </div>
+            <div class="tutorials-body">
+                <div class="tutorials-nav" id="tutorials-nav"></div>
+                <div class="tutorials-content" id="tutorials-content"></div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

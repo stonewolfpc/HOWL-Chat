@@ -1,0 +1,61 @@
+/**
+ * Chat Components — Bubble Buttons
+ * Action buttons attached to chat bubbles.
+ */
+
+.chat-buttons,
+.chat-bubble-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-direction: row;
+}
+
+.bubble-button {
+    background: rgba(21, 21, 31, 0.8);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 6px 12px;
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.bubble-button:hover {
+    background: var(--theme-glow);
+    border-color: rgba(100, 100, 100, 0.5);
+    box-shadow: 0 0 8px var(--theme-glow);
+}
+
+.bubble-button.icon-button {
+    padding: 6px;
+    font-size: 0;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bubble-button.icon-button svg {
+    stroke: var(--static-text);
+    transition: stroke 0.2s ease;
+    width: 16px;
+    height: 16px;
+}
+
+.bubble-button:hover svg {
+    stroke: var(--theme-color);
+}
+
+.bubble-button.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.bubble-button.disabled:hover {
+    background: rgba(21, 21, 31, 0.8);
+    border-color: rgba(100, 100, 100, 0.3);
+    box-shadow: none;
+}

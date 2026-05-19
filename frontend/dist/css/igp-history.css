@@ -1,0 +1,95 @@
+/**
+ * Image Generator Panels — History
+ * History panel, grid list, history items,
+ * and delete button.
+ */
+
+.ig-history-panel {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.ig-history-list {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+    padding: 16px;
+    background: var(--surface-primary);
+}
+
+.ig-history-placeholder {
+    grid-column: 1 / -1;
+    color: var(--text-tertiary);
+    font-size: 13px;
+    text-align: center;
+    padding: 40px 20px;
+    opacity: 0.7;
+    font-style: italic;
+}
+
+.ig-history-item {
+    background: var(--surface-tertiary);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+    position: relative;
+    aspect-ratio: 1;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.ig-history-item:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+.ig-history-item.active {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 4px var(--accent-primary-hover);
+}
+
+.ig-history-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: filter 0.2s;
+}
+
+.ig-history-item:hover img {
+    filter: brightness(1.1);
+}
+
+.ig-history-item .ig-history-delete {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    background: var(--danger);
+    border: none;
+    border-radius: 6px;
+    color: #FFFFFF;
+    font-size: 14px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.ig-history-item .ig-history-delete:hover {
+    background: var(--danger);
+    transform: scale(1.1);
+}
+
+.ig-history-item:hover .ig-history-delete { display: flex; }

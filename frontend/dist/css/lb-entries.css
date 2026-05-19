@@ -1,0 +1,150 @@
+/**
+ * Lorebooks — Entry List & Preview
+ * Entry list container, entry items, entry preview,
+ * tags, actions, and metadata display.
+ */
+
+/* Entry Preview */
+.lorebook-entry-preview {
+    background: rgba(21, 21, 31, 0.6);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 16px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.lorebook-entry-preview h4 {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--theme-color);
+    text-shadow: 0 0 8px var(--theme-glow);
+    margin: 0 0 16px 0;
+}
+
+.lorebook-entry-preview-content {
+    color: var(--static-text);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+}
+
+.lorebook-entry-preview-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(100, 100, 100, 0.3);
+}
+
+.lorebook-entry-meta-item {
+    background: rgba(100, 100, 100, 0.2);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--static-text);
+}
+
+.lorebook-entry-meta-label {
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+/* Entry List */
+.lorebook-entry-list {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 8px;
+    background: rgba(21, 21, 31, 0.6);
+}
+
+/* Entry Item */
+.lorebook-entry-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px;
+    border-bottom: 1px solid rgba(100, 100, 100, 0.2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 16px;
+}
+
+.lorebook-entry-item:hover {
+    background: rgba(20, 184, 166, 0.2);
+}
+
+.lorebook-entry-item.selected {
+    background: rgba(20, 184, 166, 0.3);
+    border-left: 3px solid var(--theme-color);
+}
+
+.lorebook-entry-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.lorebook-entry-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--theme-color);
+    margin-bottom: 4px;
+}
+
+.lorebook-entry-excerpt {
+    font-size: 14px;
+    color: var(--static-text);
+    opacity: 0.8;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.lorebook-entry-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+/* Entry Tags */
+.lorebook-entry-tags {
+    display: flex;
+    gap: 4px;
+}
+
+.lorebook-entry-tag {
+    background: rgba(100, 100, 100, 0.2);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    color: var(--static-text);
+}
+
+/* Entry Actions */
+.lorebook-entry-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.lorebook-edit-btn,
+.lorebook-delete-btn {
+    background: none;
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.lorebook-edit-btn:hover {
+    background: rgba(100, 100, 100, 0.2);
+}
+
+.lorebook-delete-btn:hover {
+    background: rgba(255, 67, 54, 0.2);
+}

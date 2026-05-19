@@ -1,0 +1,146 @@
+/**
+ * Real Settings — Form Controls
+ * Inputs, selects, sliders, toggles, and value displays.
+ */
+
+.setting-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Text Input */
+.setting-input {
+    flex: 1;
+    background: rgba(21, 21, 31, 0.95);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.setting-input:focus {
+    border-color: var(--theme-color);
+    box-shadow: 0 0 10px var(--theme-glow);
+}
+
+/* Select */
+.setting-select {
+    flex: 1;
+    background: rgba(21, 21, 31, 0.95);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    outline: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.setting-select:focus {
+    border-color: var(--theme-color);
+    box-shadow: 0 0 10px var(--theme-glow);
+}
+
+/* Slider */
+.setting-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    outline: none;
+}
+
+.setting-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--theme-color);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.setting-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: var(--theme-color);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Toggle */
+.setting-toggle {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    background: rgba(100, 100, 100, 0.3);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.setting-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.setting-toggle-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    background: rgba(212, 212, 212, 0.5);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.setting-toggle input:checked + .setting-toggle-slider {
+    background: var(--theme-color);
+}
+
+.setting-toggle input:checked + .setting-toggle-slider::before {
+    transform: translateX(26px);
+}
+
+.setting-toggle-slider::before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+/* Value Display */
+.setting-value {
+    min-width: 60px;
+    text-align: center;
+    background: rgba(21, 21, 31, 0.95);
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--static-text);
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.setting-value:focus {
+    border-color: var(--theme-color);
+    box-shadow: 0 0 10px var(--theme-glow);
+}

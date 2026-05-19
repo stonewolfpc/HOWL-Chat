@@ -34,19 +34,49 @@
     <link rel="stylesheet" href="css/model-settings.css">
     <link rel="stylesheet" href="css/sidebar-panels.css">
     <link rel="stylesheet" href="css/story-tools.css">
+    <link rel="stylesheet" href="css/icons.css">
     <script src="js/menu.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/theme.js"></script>
     <script src="js/storage-manager.js"></script>
+    <script src="js/storage-indexeddb.js"></script>
+    <script src="js/storage-scenarios.js"></script>
+    <script src="js/storage-chat.js"></script>
+    <script src="js/chat-constants.js"></script>
+    <script src="js/chat-render.js"></script>
+    <script src="js/chat-stream.js"></script>
+    <script src="js/chat-actions.js"></script>
+    <script src="js/chat-input.js"></script>
+    <script src="js/chat-model.js"></script>
     <script src="js/chat.js"></script>
     <script src="js/chat-session.js"></script>
+    <script src="js/world-state.js"></script>
+    <script src="js/world-dropdowns.js"></script>
+    <script src="js/world-grid.js"></script>
+    <script src="js/world-form.js"></script>
     <script src="js/world.js"></script>
     <script src="js/loading-progress.js"></script>
     <script src="js/sampler-settings.js"></script>
     <script src="js/model-settings.js"></script>
+    <script src="js/menu-edit.js"></script>
+    <script src="js/menu-view.js"></script>
+    <script src="js/menu-memory.js"></script>
     <script src="js/menu-functions.js"></script>
+    <script src="js/sidebar-state.js"></script>
+    <script src="js/sidebar-session.js"></script>
+    <script src="js/sidebar-characters.js"></script>
+    <script src="js/sidebar-context-world.js"></script>
+    <script src="js/sidebar-context-scenario.js"></script>
+    <script src="js/sidebar-context-lorebooks.js"></script>
+    <script src="js/sidebar-context.js"></script>
     <script src="js/sidebar-panels.js"></script>
+    <script src="js/chat-state-bridge.js"></script>
+    <script src="js/memory-store.js"></script>
+    <script src="js/story-tools-state.js"></script>
+    <script src="js/story-tools-data.js"></script>
+    <script src="js/story-tools-ui.js"></script>
     <script src="js/story-tools.js"></script>
+    <script src="js/rag-knowledge.js"></script>
 </head>
 <body>
     <!-- Top Menu Bar -->
@@ -130,7 +160,7 @@
             <div class="settings-grid">
                 <!-- Memory Search Card -->
                 <div class="setting-card">
-                    <div class="setting-label">🔍 Search Memories</div>
+                    <div class="setting-label"><span class="icon icon-search"></span> Search Memories</div>
                     <div class="setting-description">Search through all stored memories</div>
                     <div class="setting-control">
                         <input type="text" class="memories-search" id="memories-search" placeholder="Search memories...">
@@ -151,13 +181,14 @@
                         <div class="memories-tabs">
                             <button class="memories-tab active" id="memories-tab-all" onclick="switchMemoriesTab('all')">All</button>
                             <button class="memories-tab" id="memories-tab-pinned" onclick="switchMemoriesTab('pinned')">Pinned</button>
+                            <button class="memories-tab" id="memories-tab-knowledge" onclick="switchMemoriesTab('knowledge')">Knowledge</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Memory List Card -->
                 <div class="setting-card" style="grid-column: 1 / -1;">
-                    <div class="setting-label">📚 Memory List</div>
+                    <div class="setting-label"><span class="icon icon-book"></span> Memory List</div>
                     <div class="setting-description">Browse and manage memories</div>
                     <div class="setting-control">
                         <div class="memories-list" id="memories-list">
@@ -168,7 +199,7 @@
 
                 <!-- Memory Editor Card -->
                 <div class="setting-card" style="grid-column: 1 / -1;">
-                    <div class="setting-label">✏️ Memory Editor</div>
+                    <div class="setting-label"><span class="icon icon-edit"></span> Memory Editor</div>
                     <div class="setting-description">Edit selected memory details</div>
                     <div class="setting-control">
                         <!-- Memory Preview -->
@@ -191,7 +222,7 @@
                                 <input type="text" class="editor-input" id="mem-tags" placeholder="comma-separated tags...">
                             </div>
                             <div class="editor-field">
-                                <label class="editor-field">
+                                <label class="editor-field" for="mem-pinned">
                                     <input type="checkbox" class="editor-checkbox" id="mem-pinned">
                                     <span class="editor-checkbox-label">Pinned to Context</span>
                                 </label>
@@ -217,6 +248,44 @@
                                 <button class="editor-btn editor-btn-danger" id="mem-delete" onclick="deleteMemory()">Delete</button>
                                 <button class="editor-btn editor-btn-secondary" id="mem-export" onclick="exportMemories()">Export</button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Knowledge / RAG Panel -->
+                <div class="setting-card" id="knowledge-panel" style="grid-column: 1 / -1; display: none;">
+                    <div class="setting-label"><span class="icon icon-folder"></span> Knowledge Documents</div>
+                    <div class="setting-description">Upload documents for the AI to reference in chat</div>
+                    <div class="setting-control">
+                        <!-- Upload Section -->
+                        <div class="knowledge-upload" style="margin-bottom: 16px;">
+                            <input type="file" id="knowledge-file-input" accept=".txt,.md,.json,.csv" style="display: none;" onchange="handleKnowledgeUpload(this)">
+                            <button class="editor-btn editor-btn-primary" onclick="document.getElementById('knowledge-file-input').click()">Upload Document</button>
+                            <span style="font-size: 12px; color: var(--text-secondary); margin-left: 8px;">Supports .txt, .md, .json, .csv</span>
+                        </div>
+
+                        <!-- Scope Selector -->
+                        <div class="knowledge-scope" style="margin-bottom: 12px;">
+                            <label style="font-size: 13px; color: var(--text-secondary);" for="knowledge-scope-select">Scope:</label>
+                            <select id="knowledge-scope-select" class="setting-select" style="margin-left: 8px; min-width: 140px;">
+                                <option value="world">World</option>
+                                <option value="scenario">Scenario</option>
+                                <option value="chat">Chat</option>
+                            </select>
+                        </div>
+
+                        <!-- Document List -->
+                        <div class="knowledge-list" id="knowledge-list">
+                            <div class="knowledge-empty" style="color: var(--text-secondary); font-size: 13px; padding: 12px 0;">No documents uploaded yet</div>
+                        </div>
+
+                        <!-- RAG Toggle -->
+                        <div class="knowledge-toggle" style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-color, #333);">
+                            <label class="setting-toggle" for="rag-enabled-toggle">
+                                <input type="checkbox" id="rag-enabled-toggle" checked onchange="toggleRAG(this.checked)">
+                                <span class="setting-toggle-slider"></span>
+                            </label>
+                            <span style="font-size: 13px; margin-left: 8px;">Enable RAG for this chat</span>
                         </div>
                     </div>
                 </div>

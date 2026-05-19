@@ -1,0 +1,28 @@
+/**
+ * Model Settings — Light Theme Overrides
+ * All body.theme-light rules for model settings components.
+ */
+
+body.theme-light .model-settings-flyout {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .model-settings-flyout .flyout-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .model-settings-flyout .flyout-header h2 {
+    color: var(--text-primary);
+}
+
+body.theme-light .model-settings-flyout .close-button {
+    background: var(--surface-tertiary);
+    color: var(--text-secondary);
+}
+
+body.theme-light .model-settings-flyout .close-button:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+}

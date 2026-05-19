@@ -1,0 +1,33 @@
+/**
+ * Theme — Image Generator
+ * Image generator panel and input theming for light mode.
+ */
+
+body.theme-light .image-generator-panel,
+body.theme-light .image-gen-panel,
+body.theme-light .image-gen-content {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .ig-select,
+body.theme-light .ig-input,
+body.theme-light .ig-textarea {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .ig-select option {
+    background-color: var(--surface-primary);
+    color: var(--text-primary);
+}
+
+body.theme-light .ig-negative {
+    color: #8B5A5A;
+}
+
+body.theme-light .ig-slider {
+    background: var(--border-secondary);
+}

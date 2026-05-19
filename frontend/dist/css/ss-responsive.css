@@ -1,0 +1,30 @@
+/**
+ * Sampler Settings — Responsive Breakpoints
+ * Mobile adjustments for flyout width, grid, and typography.
+ */
+
+@media (max-width: 768px) {
+    .flyout {
+        width: 90%;
+        max-width: 400px;
+        max-height: 90vh;
+        padding: 16px;
+    }
+
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .category-header {
+        font-size: 18px;
+    }
+
+    .setting-label {
+        font-size: 13px;
+    }
+
+    .setting-description,
+    .setting-detail {
+        font-size: 11px;
+    }
+}

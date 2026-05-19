@@ -1,0 +1,37 @@
+/**
+ * Image Generator Panels — Workflow Bar
+ * Mode selection buttons at the top of the layout.
+ */
+
+.ig-workflow-bar {
+    display: flex;
+    gap: 8px;
+    padding: 0 24px 16px;
+    flex-wrap: wrap;
+}
+
+.ig-workflow-btn {
+    background: var(--surface-tertiary);
+    border: 1px solid var(--border-secondary);
+    color: var(--text-secondary);
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ig-workflow-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+    background: var(--surface-hover);
+    transform: translateY(-1px);
+}
+
+.ig-workflow-btn.active {
+    background: var(--accent-primary-hover);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.15);
+}

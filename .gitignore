@@ -18,3 +18,29 @@ server-test*.log
 *.tmp
 *.temp
 .gocache/
+
+# IDE caches
+.vs/
+.idea/
+
+# CSS refactor backup files
+*.css.old
+
+# Test artifacts and logs
+sd-help*.txt
+sd-test*.txt
+model-test-results.txt
+prompt-pipeline-fix.md
+
+# Build artifacts at root
+howl-chat-test*.exe
+howl-chat-verify.exe
+
+# Dependencies
+node_modules/
+
+# Gallery images (user data)
+images/gallery/
+
+# Submodule (managed separately)
+gollama.cpp/

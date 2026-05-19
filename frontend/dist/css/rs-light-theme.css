@@ -1,0 +1,85 @@
+/**
+ * Real Settings — Light Theme Overrides
+ * All body.theme-light rules for settings components.
+ */
+
+body.theme-light .real-settings-container {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .real-settings-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .real-settings-title {
+    color: var(--text-primary);
+}
+
+body.theme-light .real-settings-nav {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .real-settings-nav-item {
+    color: var(--text-secondary);
+}
+
+body.theme-light .real-settings-nav-item:hover,
+body.theme-light .real-settings-nav-item.active {
+    background: var(--surface-hover);
+    color: var(--accent-primary);
+}
+
+body.theme-light .real-settings-footer {
+    background: var(--surface-tertiary);
+    border-top-color: var(--border-primary);
+}
+
+body.theme-light .setting-input,
+body.theme-light .setting-select,
+body.theme-light .setting-value {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .setting-input:focus,
+body.theme-light .setting-select:focus,
+body.theme-light .setting-value:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-primary-hover);
+}
+
+body.theme-light .setting-label {
+    color: var(--text-primary);
+}
+
+body.theme-light .setting-description {
+    color: var(--text-secondary);
+}
+
+body.theme-light .advanced-section {
+    border-top-color: var(--border-primary);
+}
+
+body.theme-light .advanced-header {
+    color: var(--accent-primary);
+}
+
+body.theme-light .advanced-toggle {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .advanced-toggle:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent-primary);
+}
+
+body.theme-light .advanced-content {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}

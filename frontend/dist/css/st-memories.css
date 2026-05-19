@@ -1,0 +1,108 @@
+/**
+ * Story Tools — Memories Box
+ * Box container, header, recent memories list,
+ * and manage button.
+ */
+
+/* Memories Box */
+.memories-box {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.memories-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.memories-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.memories-expand {
+    background: var(--accent-primary);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.memories-expand:hover {
+    background: var(--accent-primary-hover);
+    transform: translateY(-1px);
+}
+
+/* Recent Memories List */
+.memories-recent {
+    max-height: 250px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.memories-empty {
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+    padding: 20px;
+}
+
+.memory-recent-item {
+    background: var(--surface-tertiary);
+    border: 1px solid var(--border-secondary);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.memory-recent-item:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent-secondary);
+    transform: translateX(2px);
+}
+
+.memory-recent-title {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.memory-recent-date {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+}
+
+/* Memories Controls */
+.memories-controls {
+    text-align: center;
+}
+
+.memories-manage-btn {
+    background: var(--accent-secondary);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    color: white;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.memories-manage-btn:hover {
+    background: var(--accent-secondary-hover);
+    transform: translateY(-1px);
+}

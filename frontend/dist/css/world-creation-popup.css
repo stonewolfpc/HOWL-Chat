@@ -33,6 +33,25 @@
     overflow-y: auto;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.world-creation-popup::-webkit-scrollbar {
+    width: 8px;
+}
+
+.world-creation-popup::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.world-creation-popup::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.world-creation-popup::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 /* Popup Header */
@@ -114,4 +133,63 @@
     background: var(--theme-glow);
     border-color: var(--theme-color);
     box-shadow: 0 0 8px var(--theme-glow);
+}
+
+/* ==================== LIGHT THEME OVERRIDES ==================== */
+
+body.theme-light .world-creation-popup {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .world-creation-popup::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+}
+
+body.theme-light .world-creation-popup::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+body.theme-light .world-creation-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .world-creation-title {
+    color: var(--accent-primary);
+}
+
+body.theme-light .world-creation-close {
+    color: var(--text-secondary);
+}
+
+body.theme-light .world-creation-close:hover {
+    color: var(--accent-primary);
+}
+
+body.theme-light .world-creation-footer {
+    background: var(--surface-tertiary);
+    border-top-color: var(--border-primary);
+}
+
+body.theme-light .world-creation-cancel {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .world-creation-cancel:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
+}
+
+body.theme-light .world-creation-save {
+    background: var(--button-primary-bg);
+    border-color: var(--button-primary-bg);
+    color: #FFFFFF;
+}
+
+body.theme-light .world-creation-save:hover {
+    background: var(--accent-primary-hover);
+    border-color: var(--accent-primary);
 }

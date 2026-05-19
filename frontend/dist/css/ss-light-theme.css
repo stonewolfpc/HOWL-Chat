@@ -1,0 +1,116 @@
+/**
+ * Sampler Settings — Light Theme Overrides
+ * All body.theme-light rules for sampler settings components.
+ */
+
+body.theme-light .flyout {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .flyout-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .setting-card {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .setting-card:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
+}
+
+body.theme-light .setting-label {
+    color: var(--text-primary);
+}
+
+body.theme-light .setting-description,
+body.theme-light .setting-detail {
+    color: var(--text-secondary);
+}
+
+body.theme-light .setting-value,
+body.theme-light .setting-select,
+body.theme-light .setting-textarea {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .setting-value:focus,
+body.theme-light .setting-select:focus,
+body.theme-light .setting-textarea:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-primary-hover);
+}
+
+body.theme-light .toggle-switch {
+    background: var(--border-secondary);
+}
+
+body.theme-light .toggle-switch.active {
+    background: rgba(0, 174, 239, 0.5);
+}
+
+body.theme-light .toggle-label {
+    color: var(--text-secondary);
+}
+
+body.theme-light .setting-reset {
+    background: var(--surface-primary);
+    color: var(--text-secondary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .setting-reset:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+}
+
+body.theme-light .category-header {
+    color: var(--accent-primary);
+    border-bottom-color: rgba(0, 174, 239, 0.3);
+}
+
+body.theme-light .memory-list {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .memory-list-item {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .memory-list-item:hover {
+    background: var(--surface-hover);
+}
+
+body.theme-light .memory-edit-field textarea {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .memory-edit-field textarea::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+}
+
+body.theme-light .memory-edit-field textarea::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+body.theme-light .flyout::-webkit-scrollbar-track {
+    background: var(--surface-tertiary);
+}
+
+body.theme-light .flyout::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+}
+
+body.theme-light .flyout::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}

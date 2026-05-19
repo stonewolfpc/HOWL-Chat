@@ -1,0 +1,228 @@
+/**
+ * Sidebar Panels — Context Sections
+ * World/Scenario display blocks, thumbnails, controls,
+ * and option toggles for the right sidebar.
+ */
+
+/* Context Section Wrapper */
+.context-section {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.3s ease;
+}
+
+.context-section:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* Section Header */
+.context-section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #fff;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.context-icon {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.context-title {
+    flex: 1;
+}
+
+/* Section Content */
+.context-section-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Context Display Block */
+.context-display-block {
+    display: flex;
+    gap: 12px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Thumbnail */
+.context-thumbnail {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.context-thumbnail img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin: auto;
+}
+
+.thumbnail-placeholder {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    text-align: center;
+    padding: 4px;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* Context Info */
+.context-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+}
+
+.context-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.context-description {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Context Controls */
+.context-controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.context-btn {
+    flex: 1;
+    min-width: 100px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.context-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.context-btn:active {
+    transform: translateY(0);
+}
+
+/* Context Option Toggle */
+.context-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+}
+
+.context-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Toggle Switch */
+.option-toggle {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.option-toggle input {
+    display: none;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.3s ease;
+}
+
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.option-toggle input:checked + .toggle-slider {
+    background: rgba(0, 184, 115, 0.3);
+    border-color: rgba(0, 184, 115, 0.5);
+}
+
+.option-toggle input:checked + .toggle-slider::before {
+    transform: translateX(16px);
+    box-shadow: 0 0 6px rgba(0, 184, 115, 0.5);
+}
+
+.option-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    user-select: none;
+    flex: 1;
+}
+
+.context-option:hover .option-label {
+    color: rgba(255, 255, 255, 0.85);
+}

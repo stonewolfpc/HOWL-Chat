@@ -1,0 +1,20 @@
+/**
+ * Image Generator — Responsive Breakpoints
+ * Tablet and mobile layout adjustments.
+ */
+
+@media (max-width: 1200px) {
+    .ig-sidebar { width: 340px; min-width: 340px; }
+    .ig-right-panel { width: 240px; min-width: 240px; }
+}
+
+@media (max-width: 960px) {
+    .ig-layout { flex-direction: column; height: auto; min-height: auto; }
+    .ig-sidebar { width: 100%; min-width: auto; max-height: 50vh; }
+    .ig-main { min-height: 400px; }
+    .ig-right-panel { width: 100%; min-width: auto; flex-direction: row; height: 160px; }
+    .ig-history-list { flex-direction: row; overflow-x: auto; overflow-y: hidden; }
+    .ig-history-item { max-width: 100px; width: 100%; margin: 0; }
+    .ig-info-panel { flex: 1; min-width: 200px; }
+    .ig-workflow-bar { padding: 0 20px 10px; }
+}

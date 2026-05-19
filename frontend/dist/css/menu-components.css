@@ -115,3 +115,55 @@
     background: rgba(100, 100, 100, 0.3);
     margin: 4px 0;
 }
+
+/* ==================== LIGHT THEME OVERRIDES ==================== */
+
+body.theme-light .top-menu {
+    background: linear-gradient(180deg, #FFFFFF 0%, var(--surface-secondary) 100%);
+    border-bottom-color: var(--border-primary);
+    box-shadow: var(--shadow-card);
+}
+
+body.theme-light .app-title {
+    color: var(--text-primary);
+}
+
+body.theme-light .menu-button {
+    color: var(--text-primary);
+}
+
+body.theme-light .menu-button:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
+}
+
+body.theme-light .menu-control {
+    background: var(--surface-tertiary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .menu-control:hover {
+    background: var(--surface-hover);
+    color: var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+
+body.theme-light .dropdown {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-modal);
+}
+
+body.theme-light .dropdown-item {
+    color: var(--text-primary);
+}
+
+body.theme-light .dropdown-item:hover {
+    background: var(--surface-hover);
+    color: var(--accent-primary);
+}
+
+body.theme-light .dropdown-separator {
+    background: var(--border-primary);
+}

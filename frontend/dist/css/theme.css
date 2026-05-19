@@ -1,11 +1,23 @@
 /**
- * Theme Variables and Root Definitions
- * 
- * This file contains all CSS custom properties (variables) for the HOWL Chat application.
- * Theme colors, glow effects, and transitions are defined here.
- * 
- * @module theme
+ * Theme System Aggregator
+ * HOWL Chat Application — Modular Theme Architecture
+ *
+ * This file imports all theme modules. Each module handles a specific concern.
+ * Do NOT add rules directly here; use the appropriate module file.
  */
+
+@import url('theme-base.css');
+@import url('theme-light.css');
+@import url('theme-light-layout.css');
+@import url('theme-light-components.css');
+@import url('theme-overrides.css');
+@import url('theme-nav.css');
+@import url('theme-chat.css');
+@import url('theme-entities.css');
+@import url('theme-settings.css');
+@import url('theme-image-generator.css');
+@import url('theme-story-tools.css');
+@import url('theme-scrollbars.css');
 
 :root {
     /* Artherius Theme Colors */
@@ -14,28 +26,28 @@
     --theme-border: rgba(20, 184, 166, 0.3);
     --theme-text-glow: rgba(20, 184, 166, 0.4);
     --theme-secondary: #06b6d4;
-    
+
     /* Static Colors */
     --static-text: #d4d4d4;
-    
+
+    /* UI Scale */
+    --ui-scale: 1;
+    font-size: calc(14px * var(--ui-scale));
+
+    /* Animation Speed */
+    --animation-speed: 1;
+
     /* Theme Transitions */
-    transition: --theme-color 4s ease-in-out,
-                --theme-glow 4s ease-in-out,
-                --theme-text-glow 4s ease-in-out,
-                --theme-secondary 4s ease-in-out;
+    transition: --theme-color calc(4s * var(--animation-speed)) ease-in-out,
+                --theme-glow calc(4s * var(--animation-speed)) ease-in-out,
+                --theme-text-glow calc(4s * var(--animation-speed)) ease-in-out,
+                --theme-secondary calc(4s * var(--animation-speed)) ease-in-out;
+
+    /* Force dark scrollbars across the entire app */
+    color-scheme: dark;
 }
 
-* {
-    transition: background-color 4s ease-in-out;
-}
-
-/* Theme-aware transitions for major layout elements */
-.menu-bar,
-.nav-sidebar,
-.character-sidebar,
-.chat-panel,
-.world-sidebar,
-.panel,
-.dropdown {
-    transition: background-color 4s ease-in-out;
+/* Dark Mode (default) */
+body.theme-dark {
+    color-scheme: dark;
 }

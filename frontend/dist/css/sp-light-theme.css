@@ -1,0 +1,44 @@
+/**
+ * Sidebar Panels — Light Theme Overrides
+ * All body.theme-light rules for sidebar panel components.
+ */
+
+/* Character Sidebar */
+body.theme-light .character-sidebar {
+    background: var(--surface-tertiary);
+    border-right-color: var(--border-primary);
+}
+
+body.theme-light .character-sidebar::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+}
+
+body.theme-light .character-sidebar::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+/* Panel Header */
+body.theme-light .panel-header {
+    color: var(--text-primary);
+    background: var(--surface-primary);
+    border-bottom-color: var(--border-primary);
+}
+
+/* Character Items */
+body.theme-light .character-item {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .character-item:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
+}
+
+body.theme-light .character-item.character-inactive .character-name {
+    color: var(--text-tertiary);
+}
+
+body.theme-light .character-name {
+    color: var(--text-primary);
+}

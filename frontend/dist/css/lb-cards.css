@@ -1,0 +1,159 @@
+/**
+ * Lorebooks — Grid Cards
+ * Grid layout, individual lorebook cards, content preview,
+ * meta chips, card actions, and empty state.
+ */
+
+/* Grid */
+.lorebooks-grid {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    align-content: start;
+}
+
+/* Card */
+.lorebooks-grid .world-bubble.lorebook-card {
+    width: 100%;
+    height: auto;
+    min-height: 180px;
+    overflow: visible;
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    border-radius: 8px;
+    padding: 12px;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.lorebook-card.is-disabled {
+    opacity: 0.58;
+}
+
+.lorebook-card .world-info {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.lorebook-card .world-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--static-text);
+    margin-bottom: 6px;
+}
+
+.lorebook-card-content {
+    color: rgba(212, 212, 212, 0.82);
+    font-size: 12px;
+    line-height: 1.45;
+    margin: 0 0 12px;
+    white-space: pre-wrap;
+    border: 1px solid rgba(100, 100, 100, 0.25);
+    border-radius: 6px;
+    padding: 8px;
+    background: rgba(15, 21, 31, 0.4);
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Card Meta */
+.lorebook-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.lorebook-card .world-character-count {
+    font-size: 11px;
+    color: rgba(212, 212, 212, 0.65);
+    background: rgba(100, 100, 100, 0.12);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* Chips */
+.lorebook-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.lorebook-chip {
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: rgba(20, 184, 166, 0.14);
+    color: var(--static-text);
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-size: 11px;
+}
+
+.lorebook-chip.muted {
+    background: rgba(100, 100, 100, 0.15);
+    color: rgba(212, 212, 212, 0.72);
+}
+
+/* Card Actions */
+.lorebook-card .world-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(100, 100, 100, 0.2);
+}
+
+.lorebook-card .world-bubble-action {
+    background: transparent;
+    border: none;
+    color: rgba(212, 212, 212, 0.55);
+    padding: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lorebook-card .world-bubble-action:hover {
+    color: var(--theme-color);
+    transform: scale(1.2);
+}
+
+/* Empty State */
+.lorebooks-grid-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.lorebooks-grid-empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+}
+
+.lorebooks-grid-empty-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--static-text);
+    margin-bottom: 8px;
+}
+
+.lorebooks-grid-empty-subtext {
+    font-size: 14px;
+    color: rgba(212, 212, 212, 0.7);
+}

@@ -1,0 +1,105 @@
+/**
+ * Image Generator Panels — Tools
+ * Model info preview, prompt tools, seed row,
+ * and advanced settings placeholders.
+ */
+
+/* Model Info Preview */
+.ig-model-info-box {
+    background: var(--surface-tertiary);
+    border: 1px solid var(--border-secondary);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+/* Prompt Tools */
+.ig-prompt-tools {
+    display: flex;
+    gap: 6px;
+}
+
+.ig-tool-btn {
+    background: var(--surface-tertiary);
+    border: 1px solid var(--border-secondary);
+    color: var(--text-secondary);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.ig-tool-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    background: var(--surface-hover);
+}
+
+/* Seed Row */
+.ig-seed-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.ig-seed-row .ig-input {
+    flex: 1;
+}
+
+.ig-seed-btn {
+    background: var(--surface-tertiary);
+    border: 1px solid var(--border-secondary);
+    color: var(--text-secondary);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+
+.ig-seed-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    background: var(--surface-hover);
+}
+
+.ig-seed-btn.ig-locked {
+    background: var(--accent-primary-hover);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+/* Advanced Placeholders */
+.ig-placeholder-advanced {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ig-adv-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface-tertiary);
+    border: 1px solid var(--border-secondary);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+}
+
+.ig-adv-label { color: var(--text-primary); font-weight: 500; }
+
+.ig-adv-coming {
+    color: var(--text-tertiary);
+    font-size: 11px;
+    font-style: italic;
+}

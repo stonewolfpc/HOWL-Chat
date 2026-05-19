@@ -1,0 +1,38 @@
+/**
+ * Chat Components — Light Theme Overrides
+ * All body.theme-light rules for chat components.
+ */
+
+body.theme-light .chat-message.user .chat-bubble {
+    background: var(--surface-hover);
+    border-color: var(--accent-primary);
+}
+
+body.theme-light .chat-message.assistant .chat-bubble {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-card);
+}
+
+body.theme-light .chat-message.system .chat-bubble {
+    background: var(--surface-tertiary);
+    color: var(--text-secondary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .chat-sender {
+    color: var(--accent-primary);
+}
+
+body.theme-light .character-thumbnail {
+    border-color: var(--border-primary);
+}
+
+body.theme-light .chat-text {
+    color: var(--text-primary);
+}
+
+body.theme-light .chat-characters-empty {
+    color: var(--text-tertiary);
+}

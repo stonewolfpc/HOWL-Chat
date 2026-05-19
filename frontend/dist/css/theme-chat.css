@@ -1,0 +1,77 @@
+/**
+ * Theme — Chat
+ * Chat messages, bubbles, input area, sender, context selectors.
+ */
+
+/* --- Chat Specific --- */
+body.theme-light .chat-messages,
+body.theme-light .character-page-content,
+body.theme-light .lorebooks-page {
+    background: var(--surface-secondary);
+}
+
+body.theme-light .message-bubble,
+body.theme-light .chat-bubble,
+body.theme-light .character-bubble,
+body.theme-light .world-bubble {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-card);
+}
+
+body.theme-light .message-bubble.user,
+body.theme-light .character-bubble:hover,
+body.theme-light .world-bubble:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent-primary);
+}
+
+body.theme-light .typing-indicator,
+body.theme-light .character-role,
+body.theme-light .context-description,
+body.theme-light .lorebook-description {
+    color: var(--text-secondary);
+}
+
+body.theme-light .chat-input-area,
+body.theme-light .input-bar {
+    background: var(--surface-primary);
+    border-top-color: var(--border-primary);
+}
+
+/* --- Context selectors (right sidebar) --- */
+body.theme-light .context-selector,
+body.theme-light .context-panel,
+body.theme-light .context-display,
+body.theme-light .chat-context {
+    background: var(--surface-tertiary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+/* --- Chat Components --- */
+body.theme-light .chat-message.assistant .chat-bubble {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-card);
+}
+
+body.theme-light .chat-message.system .chat-bubble {
+    background: var(--surface-tertiary);
+    color: var(--text-secondary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .character-thumbnail {
+    border-color: var(--border-primary);
+}
+
+body.theme-light .chat-sender {
+    color: var(--accent-primary);
+}
+
+body.theme-light .chat-text {
+    color: var(--text-primary);
+}

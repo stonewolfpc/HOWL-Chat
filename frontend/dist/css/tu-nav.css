@@ -1,0 +1,101 @@
+/**
+ * Tutorials — Left Navigation Panel
+ * Nav panel, collapsible sections, section headers,
+ * nav items, and scrollbars.
+ */
+
+/* Left Panel */
+.tutorials-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.tutorials-nav {
+    width: 260px;
+    min-width: 200px;
+    max-width: 320px;
+    border-right: 1px solid rgba(100, 100, 100, 0.2);
+    background: rgba(15, 15, 23, 0.6);
+    overflow-y: auto;
+    padding: 12px 0;
+    flex-shrink: 0;
+}
+
+.tutorials-nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.tutorials-nav::-webkit-scrollbar-thumb {
+    background: rgba(100, 100, 100, 0.3);
+    border-radius: 4px;
+}
+
+/* Nav Section */
+.tutorials-nav-section {
+    padding: 0;
+    margin-bottom: 4px;
+}
+
+.tutorials-nav-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(212, 212, 212, 0.55);
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.tutorials-nav-section-header:hover {
+    color: var(--static-text, #e0e0e0);
+    background: rgba(100, 100, 100, 0.08);
+}
+
+.tutorials-nav-section-header .icon {
+    font-size: 10px;
+    transition: transform 0.2s ease;
+}
+
+.tutorials-nav-section.expanded .tutorials-nav-section-header .icon {
+    transform: rotate(90deg);
+}
+
+/* Nav Items */
+.tutorials-nav-items {
+    display: none;
+    flex-direction: column;
+}
+
+.tutorials-nav-section.expanded .tutorials-nav-items {
+    display: flex;
+}
+
+.tutorials-nav-item {
+    padding: 7px 16px 7px 28px;
+    font-size: 13px;
+    color: rgba(212, 212, 212, 0.65);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border-left: 2px solid transparent;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tutorials-nav-item:hover {
+    color: var(--static-text, #e0e0e0);
+    background: rgba(100, 100, 100, 0.08);
+}
+
+.tutorials-nav-item.active {
+    color: var(--theme-color, #14b8a6);
+    background: rgba(20, 184, 166, 0.08);
+    border-left-color: var(--theme-color, #14b8a6);
+}
