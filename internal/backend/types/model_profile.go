@@ -48,6 +48,50 @@ type ModelProfile struct {
 
 	// LayerCount is the total number of layers in the model
 	LayerCount int
+
+	// ParameterCount is the total number of parameters in the model (if available)
+	ParameterCount uint64
+
+	// FileType is the quantization type (e.g., "Q4_K_M", "IQ4_XS")
+	FileType string
+
+	// FileSizeBytes is the actual GGUF file size on disk
+	FileSizeBytes int64
+
+	// BitsPerWeight is the average bits per weight (e.g., 4.25 for IQ4_XS)
+	BitsPerWeight float64
+
+	// ArchitectureSpec contains the full architecture detection result.
+	// It is the authoritative source for memory estimation.
+	ArchitectureSpec *ArchitectureSpec
+
+	// HasVision is true if the model supports multimodal image input.
+	// Detected from mmproj file presence alongside the model.
+	HasVision bool
+
+	// MMPProjPath is the path to the mmproj file if found alongside the model.
+	MMPProjPath string
+}
+
+// MemoryEstimate holds computed GPU and RAM requirements for a model load.
+type MemoryEstimate struct {
+	// GPUMB is the estimated GPU VRAM required (weights + KV cache on GPU)
+	GPUMB int64
+
+	// RAMMB is the estimated system RAM required (weights on CPU + KV cache on CPU + overhead)
+	RAMMB int64
+
+	// TotalMB is GPUMB + RAMMB (for reference)
+	TotalMB int64
+
+	// ContextSizeUsed is the context size that was used for this estimate
+	ContextSizeUsed int
+
+	// GPULayersUsed is the GPU layer count used for this estimate
+	GPULayersUsed int
+
+	// Notes explains how the estimate was derived or any adjustments made
+	Notes string
 }
 
 // RuntimeSettings are the settings passed to gollama.cpp for model loading.

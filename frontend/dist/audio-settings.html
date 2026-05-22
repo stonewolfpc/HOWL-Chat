@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Settings - HOWL Chat</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/real-settings.css">
+    <link rel="stylesheet" href="css/icons.css">
+    <style>
+        body { margin: 0; background: transparent; font-family: inherit; }
+        .audio-settings-overlay { display: flex; }
+        .audio-tab-group { display: flex; background: rgba(10,10,15,0.3); border-bottom: 1px solid rgba(100,100,100,0.2); flex-shrink: 0; }
+        .audio-tab { padding: 12px 20px; background: transparent; border: none; color: var(--static-text, #aaa); cursor: pointer; font-size: 14px; transition: all 0.2s; border-bottom: 2px solid transparent; }
+        .audio-tab:hover { color: var(--theme-color, #60a5fa); background: rgba(255,255,255,0.03); }
+        .audio-tab.active { color: var(--theme-color, #60a5fa); border-bottom-color: var(--theme-color, #60a5fa); background: rgba(96,165,250,0.05); }
+        .audio-panel { display: none; padding: 20px; overflow-y: auto; max-height: calc(85vh - 140px); }
+        .audio-panel.active { display: block; }
+        .settings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px; }
+        .setting-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(100,100,100,0.15); border-radius: 8px; padding: 16px; }
+        .setting-label { display: block; font-size: 14px; font-weight: 600; color: var(--text-primary, #e0e0e0); margin-bottom: 4px; }
+        .setting-description { font-size: 12px; color: var(--text-secondary, #888); margin-bottom: 10px; line-height: 1.4; }
+        .setting-control { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .setting-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(100,100,100,0.3); color: var(--text-primary, #e0e0e0); padding: 6px 10px; border-radius: 6px; font-size: 13px; min-width: 180px; }
+        .setting-slider { flex: 1; min-width: 100px; }
+        .setting-value { background: rgba(0,0,0,0.3); border: 1px solid rgba(100,100,100,0.3); color: var(--text-primary, #e0e0e0); padding: 4px 8px; border-radius: 4px; font-size: 13px; width: 70px; text-align: center; }
+        .setting-toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .setting-toggle input { opacity: 0; width: 0; height: 0; }
+        .setting-toggle-slider { position: absolute; cursor: pointer; inset: 0; background: rgba(100,100,100,0.3); border-radius: 24px; transition: .3s; }
+        .setting-toggle-slider::before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .3s; }
+        .setting-toggle input:checked + .setting-toggle-slider { background: var(--theme-color, #60a5fa); }
+        .setting-toggle input:checked + .setting-toggle-slider::before { transform: translateX(20px); }
+        .warning-text { color: #fb923c; font-size: 11px; margin-top: 4px; }
+        .danger-text { color: #f87171; font-size: 11px; margin-top: 4px; }
+        .info-text { color: #60a5fa; font-size: 11px; margin-top: 4px; }
+        .setting-btn { background: rgba(96,165,250,0.1); border: 1px solid rgba(96,165,250,0.3); color: var(--theme-color, #60a5fa); padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+        .setting-btn:hover { background: rgba(96,165,250,0.2); }
+    </style>
+</head>
+<body>
+    <div class="real-settings-overlay audio-settings-overlay show" id="audio-settings-overlay">
+        <div class="real-settings-container" style="width: 850px;">
+            <div class="real-settings-header">
+                <h2 class="real-settings-title"><span class="icon icon-broadcast"></span> Audio & Voice Settings</h2>
+                <button class="real-settings-close" onclick="closeAudioSettings()">✕</button>
+            </div>
+            <div class="audio-tab-group">
+                <button class="audio-tab active" onclick="showAudioTab('general')" id="tab-general">General</button>
+                <button class="audio-tab" onclick="showAudioTab('asr')" id="tab-asr">🎙️ Speech Recognition</button>
+                <button class="audio-tab" onclick="showAudioTab('tts')" id="tab-tts">🔊 Text-to-Speech</button>
+                <button class="audio-tab" onclick="showAudioTab('vad')" id="tab-vad">VAD</button>
+                <button class="audio-tab" onclick="showAudioTab('hardware')" id="tab-hardware">Hardware</button>
+            </div>
+            <div class="real-settings-content" style="padding: 0;">
+                <!-- General -->
+                <div class="audio-panel active" id="panel-general">
+                    <div class="settings-category-header"><span class="icon icon-broadcast"></span> General Audio Configuration</div>
+                    <div class="settings-grid">
+                        <div class="setting-card">
+                            <label class="setting-label" for="asr-enabled">Enable Speech Recognition (ASR)</label>
+                            <div class="setting-description">Allow voice input via microphone. Requires whisper-cli or compatible ASR engine.</div>
+                            <div class="setting-control"><label class="setting-toggle"><input type="checkbox" id="asr-enabled"><span class="setting-toggle-slider"></span></label></div>
+                            <div class="info-text" id="asr-status-text">Status: checking...</div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="tts-enabled">Enable Text-to-Speech (TTS)</label>
+                            <div class="setting-description">Allow AI responses to be spoken aloud. Requires Piper or MeloTTS backend.</div>
+                            <div class="setting-control"><label class="setting-toggle"><input type="checkbox" id="tts-enabled"><span class="setting-toggle-slider"></span></label></div>
+                            <div class="info-text" id="tts-status-text">Status: checking...</div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="tts-autoplay-message">Auto-play TTS on AI Messages</label>
+                            <div class="setting-description">Automatically speak every AI response when it completes.</div>
+                            <div class="setting-control"><label class="setting-toggle"><input type="checkbox" id="tts-autoplay-message"><span class="setting-toggle-slider"></span></label></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="push-to-talk">Push-to-Talk Mode</label>
+                            <div class="setting-description">Hold the mic button to record instead of toggling on/off.</div>
+                            <div class="setting-control"><label class="setting-toggle"><input type="checkbox" id="push-to-talk"><span class="setting-toggle-slider"></span></label></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="tts-volume">TTS Output Volume</label>
+                            <div class="setting-description">Master volume for all text-to-speech playback (0 = mute).</div>
+                            <div class="setting-control"><input type="range" class="setting-slider" id="tts-volume" min="0" max="1" step="0.05"><input type="number" class="setting-value" id="tts-volume-value" min="0" max="1" step="0.05"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ASR -->
+                <div class="audio-panel" id="panel-asr">
+                    <div class="settings-category-header"><span class="icon icon-broadcast"></span> Speech Recognition (ASR) Engine</div>
+                    <div class="settings-grid">
+                        <div class="setting-card">
+                            <label class="setting-label" for="asr-engine">ASR Engine</label>
+                            <div class="setting-description">Select the speech recognition backend. Auto picks based on available hardware.</div>
+                            <div class="setting-control"><select class="setting-select" id="asr-engine"><option value="auto">Auto-Select (Recommended)</option><option value="whisper-tiny">Whisper Tiny (fastest, less accurate)</option><option value="whisper-base">Whisper Base</option><option value="whisper-small">Whisper Small (balanced)</option><option value="whisper-medium">Whisper Medium (accurate, slower)</option><option value="whisper-large">Whisper Large (most accurate, slowest)</option><option value="qwen-asr">Qwen ASR (API-based)</option></select></div>
+                            <div class="warning-text" id="asr-engine-warning">Large models require 8+ GB VRAM or 16+ GB RAM.</div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="asr-language">Spoken Language</label>
+                            <div class="setting-description">Language for transcription. Auto attempts to detect from audio.</div>
+                            <div class="setting-control"><select class="setting-select" id="asr-language"><option value="auto">Auto-Detect</option><option value="en">English</option><option value="es">Spanish</option><option value="fr">French</option><option value="de">German</option><option value="it">Italian</option><option value="pt">Portuguese</option><option value="ja">Japanese</option><option value="zh">Chinese</option><option value="ko">Korean</option><option value="ru">Russian</option><option value="nl">Dutch</option><option value="pl">Polish</option></select></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="asr-device">Compute Device</label>
+                            <div class="setting-description">Hardware to run ASR inference on. CUDA requires NVIDIA GPU.</div>
+                            <div class="setting-control"><select class="setting-select" id="asr-device"><option value="auto">Auto-Select</option><option value="cpu">CPU Only</option><option value="cuda">CUDA (NVIDIA GPU)</option></select></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="asr-threads">CPU Threads</label>
+                            <div class="setting-description">Parallel computation threads for CPU inference. Higher = faster but more CPU usage.</div>
+                            <div class="setting-control"><input type="range" class="setting-slider" id="asr-threads" min="1" max="16" step="1"><input type="number" class="setting-value" id="asr-threads-value" min="1" max="16" step="1"></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="asr-beam-size">Beam Size</label>
+                            <div class="setting-description">Number of beams for beam-search decoding. Higher = more accurate but slower.</div>
+                            <div class="setting-control"><input type="range" class="setting-slider" id="asr-beam-size" min="1" max="10" step="1"><input type="number" class="setting-value" id="asr-beam-size-value" min="1" max="10" step="1"></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="asr-best-of">Best-of (Candidates)</label>
+                            <div class="setting-description">Number of candidate transcriptions to evaluate. Higher = better accuracy.</div>
+                            <div class="setting-control"><input type="range" class="setting-slider" id="asr-best-of" min="1" max="10" step="1"><input type="number" class="setting-value" id="asr-best-of-value" min="1" max="10" step="1"></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="asr-temperature">Temperature</label>
+                            <div class="setting-description">Sampling randomness. 0 = deterministic, 1 = maximum randomness. Lower is more accurate.</div>
+                            <div class="setting-control"><input type="range" class="setting-slider" id="asr-temperature" min="0" max="1" step="0.05"><input type="number" class="setting-value" id="asr-temperature-value" min="0" max="1" step="0.05"></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="asr-translate">Translate to English</label>
+                            <div class="setting-description">Automatically translate all recognized speech to English before sending.</div>
+                            <div class="setting-control"><label class="setting-toggle"><input type="checkbox" id="asr-translate"><span class="setting-toggle-slider"></span></label></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="asr-no-timestamps">Suppress Timestamps</label>
+                            <div class="setting-description">Remove timestamps from output. Cleaner text but loses timing info.</div>
+                            <div class="setting-control"><label class="setting-toggle"><input type="checkbox" id="asr-no-timestamps"><span class="setting-toggle-slider"></span></label></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="asr-flash-attn">Flash Attention</label>
+                            <div class="setting-description">Enable Flash Attention for faster inference on modern GPUs. Disable if encountering errors.</div>
+                            <div class="setting-control"><label class="setting-toggle"><input type="checkbox" id="asr-flash-attn"><span class="setting-toggle-slider"></span></label></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- TTS -->
+                <div class="audio-panel" id="panel-tts">
+                    <div class="settings-category-header"><span class="icon icon-broadcast"></span> Text-to-Speech (TTS) Engine</div>
+                    <div class="settings-grid">
+                        <div class="setting-card">
+                            <label class="setting-label" for="tts-engine">TTS Engine</label>
+                            <div class="setting-description">Select the speech synthesis backend. Piper and Kokoro run locally. MeloTTS requires remote server.</div>
+                            <div class="setting-control"><select class="setting-select" id="tts-engine"><option value="piper">Piper (Local, fast)</option><option value="kokoro">Kokoro (Neural ONNX, high quality)</option><option value="melotts">MeloTTS (Remote API)</option><option value="browser">Browser TTS (fallback, no install)</option><option value="auto">Auto-Select</option></select></div>
+                            <div class="warning-text" id="tts-engine-warning">MeloTTS requires HOWL_MELOTTS_URL environment variable. Kokoro requires Python + kokoro package.</div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="tts-voice">TTS Voice Model</label>
+                            <div class="setting-description">Piper .onnx voice models. Add a directory once — HOWL remembers it and picks up new voices automatically on startup.</div>
+                            <div class="setting-control" style="display:flex;gap:6px;align-items:center;">
+                                <select class="setting-select" id="tts-voice" style="flex:1;">
+                                    <option value="en_US-lessac-medium">en_US-lessac-medium (built-in)</option>
+                                </select>
+                                <button class="setting-btn" id="tts-scan-dir-btn" onclick="scanTTSDirectory()" title="Add a directory of Piper .onnx voice models">+ Dir</button>
+                            </div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="tts-speed">Speech Speed</label>
+                            <div class="setting-description">Playback speed multiplier. 1.0 = normal, 0.5 = half speed, 2.0 = double speed.</div>
+                            <div class="setting-control"><input type="range" class="setting-slider" id="tts-speed" min="0.5" max="2.0" step="0.05"><input type="number" class="setting-value" id="tts-speed-value" min="0.5" max="2.0" step="0.05"></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="tts-noise-scale">Noise Scale</label>
+                            <div class="setting-description">Piper-specific: randomness in audio generation. 0.667 = default. Lower = cleaner, more robotic.</div>
+                            <div class="setting-control"><input type="range" class="setting-slider" id="tts-noise-scale" min="0" max="1" step="0.01"><input type="number" class="setting-value" id="tts-noise-scale-value" min="0" max="1" step="0.01"></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="tts-noise-w">Noise Width</label>
+                            <div class="setting-description">Piper-specific: phoneme width noise. 0.8 = default. Affects naturalness of speech.</div>
+                            <div class="setting-control"><input type="range" class="setting-slider" id="tts-noise-w" min="0" max="1" step="0.01"><input type="number" class="setting-value" id="tts-noise-w-value" min="0" max="1" step="0.01"></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="tts-sentence-silence">Sentence Silence</label>
+                            <div class="setting-description">Seconds of silence added after each sentence. 0.2 = default pause between sentences.</div>
+                            <div class="setting-control"><input type="range" class="setting-slider" id="tts-sentence-silence" min="0" max="2" step="0.05"><input type="number" class="setting-value" id="tts-sentence-silence-value" min="0" max="2" step="0.05"></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="tts-cache-enabled">Enable TTS Cache</label>
+                            <div class="setting-description">Cache synthesized audio to disk to avoid re-generating identical phrases.</div>
+                            <div class="setting-control"><label class="setting-toggle"><input type="checkbox" id="tts-cache-enabled"><span class="setting-toggle-slider"></span></label></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="tts-cache-size">Cache Size Limit</label>
+                            <div class="setting-description">Maximum disk space for TTS cache in megabytes. Oldest files are removed first.</div>
+                            <div class="setting-control"><input type="range" class="setting-slider" id="tts-cache-size" min="50" max="1024" step="50"><input type="number" class="setting-value" id="tts-cache-size-value" min="50" max="1024" step="50"><span style="color:var(--text-secondary);font-size:12px;">MB</span></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- VAD -->
+                <div class="audio-panel" id="panel-vad">
+                    <div class="settings-category-header"><span class="icon icon-broadcast"></span> Voice Activity Detection</div>
+                    <div class="settings-grid">
+                        <div class="setting-card">
+                            <label class="setting-label" for="vad-enabled">Enable VAD</label>
+                            <div class="setting-description">Voice Activity Detection automatically splits speech and removes silence. Recommended for ASR.</div>
+                            <div class="setting-control"><label class="setting-toggle"><input type="checkbox" id="vad-enabled"><span class="setting-toggle-slider"></span></label></div>
+                            <div class="warning-text">VAD requires a compatible model. May increase latency slightly.</div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="vad-threshold">Speech Threshold</label>
+                            <div class="setting-description">Confidence level (0-1) required to classify audio as speech. Higher = fewer false positives.</div>
+                            <div class="setting-control"><input type="range" class="setting-slider" id="vad-threshold" min="0" max="1" step="0.05"><input type="number" class="setting-value" id="vad-threshold-value" min="0" max="1" step="0.05"></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="vad-min-speech">Min Speech Duration</label>
+                            <div class="setting-description">Minimum milliseconds of speech required before a segment is kept. Filters out short noises.</div>
+                            <div class="setting-control"><input type="range" class="setting-slider" id="vad-min-speech" min="0" max="1000" step="50"><input type="number" class="setting-value" id="vad-min-speech-value" min="0" max="1000" step="50"><span style="color:var(--text-secondary);font-size:12px;">ms</span></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="vad-min-silence">Min Silence Duration</label>
+                            <div class="setting-description">Milliseconds of silence required to split speech into separate segments.</div>
+                            <div class="setting-control"><input type="range" class="setting-slider" id="vad-min-silence" min="0" max="1000" step="50"><input type="number" class="setting-value" id="vad-min-silence-value" min="0" max="1000" step="50"><span style="color:var(--text-secondary);font-size:12px;">ms</span></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="vad-padding">Speech Padding</label>
+                            <div class="setting-description">Milliseconds of padding added before and after detected speech segments.</div>
+                            <div class="setting-control"><input type="range" class="setting-slider" id="vad-padding" min="0" max="500" step="10"><input type="number" class="setting-value" id="vad-padding-value" min="0" max="500" step="10"><span style="color:var(--text-secondary);font-size:12px;">ms</span></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Hardware -->
+                <div class="audio-panel" id="panel-hardware">
+                    <div class="settings-category-header"><span class="icon icon-broadcast"></span> Audio Hardware & I/O</div>
+                    <div class="settings-grid">
+                        <div class="setting-card">
+                            <label class="setting-label" for="audio-input-device">Input Device</label>
+                            <div class="setting-description">Microphone or audio input source for speech recognition.</div>
+                            <div class="setting-control"><select class="setting-select" id="audio-input-device"><option value="default">System Default</option><option value="none">No Audio Input</option></select><button class="setting-btn" onclick="refreshAudioDevices()">Refresh</button></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="audio-output-device">Output Device</label>
+                            <div class="setting-description">Speaker or audio output device for TTS playback.</div>
+                            <div class="setting-control"><select class="setting-select" id="audio-output-device"><option value="default">System Default</option><option value="none">No Audio Output</option></select><button class="setting-btn" onclick="refreshAudioDevices()">Refresh</button></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="audio-sample-rate">Sample Rate</label>
+                            <div class="setting-description">Audio sample rate for recording and playback. 16 kHz is optimal for ASR. 44.1 kHz is CD quality.</div>
+                            <div class="setting-control"><select class="setting-select" id="audio-sample-rate"><option value="16000">16000 Hz (ASR Optimal)</option><option value="22050">22050 Hz (Piper Default)</option><option value="44100">44100 Hz (CD Quality)</option><option value="48000">48000 Hz (Studio)</option></select></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="audio-channels">Audio Channels</label>
+                            <div class="setting-description">Mono is required for ASR. Stereo is supported for playback.</div>
+                            <div class="setting-control"><select class="setting-select" id="audio-channels"><option value="mono">Mono (1 channel)</option><option value="stereo">Stereo (2 channels)</option></select></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="audio-bit-depth">Bit Depth</label>
+                            <div class="setting-description">Audio bit depth for recording. 16-bit is standard. 24/32-bit offers higher dynamic range.</div>
+                            <div class="setting-control"><select class="setting-select" id="audio-bit-depth"><option value="16">16-bit (Standard)</option><option value="24">24-bit (High Dynamic Range)</option><option value="32">32-bit float (Professional)</option></select></div>
+                        </div>
+                        <div class="setting-card">
+                            <label class="setting-label" for="mic-sensitivity">Microphone Sensitivity</label>
+                            <div class="setting-description">Input gain for microphone recording. Increase if speech is too quiet, decrease if clipping.</div>
+                            <div class="setting-control"><input type="range" class="setting-slider" id="mic-sensitivity" min="0" max="1" step="0.05"><input type="number" class="setting-value" id="mic-sensitivity-value" min="0" max="1" step="0.05"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="real-settings-footer">
+                <div class="settings-info">Settings persist automatically across sessions</div>
+                <div class="settings-actions">
+                    <button class="settings-reset-btn" onclick="resetAudioSettings()">Reset Audio Defaults</button>
+                    <button class="settings-save-btn" onclick="saveAudioSettings()">Save & Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/settings-state.js"></script>
+    <script src="js/audio-settings.js"></script>
+</body>
+</html>

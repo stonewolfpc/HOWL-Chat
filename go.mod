@@ -8,6 +8,7 @@ require (
 	github.com/gpustack/gguf-parser-go v0.24.0
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/wailsapp/wails/v2 v2.12.0
+	github.com/yusufpapurcu/wmi v1.2.4
 	golang.org/x/sys v0.33.0
 )
 
@@ -51,7 +52,6 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/wailsapp/go-webview2 v1.0.22 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
-	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	golang.org/x/crypto v0.33.0 // indirect
 	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f // indirect
 	golang.org/x/image v0.14.0 // indirect

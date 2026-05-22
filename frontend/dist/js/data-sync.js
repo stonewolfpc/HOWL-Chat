@@ -45,9 +45,16 @@ class DataSync {
     }
 
     /**
-     * Load last chat ID from config
+     * Load last chat ID from config. If no active chat exists on backend,
+     * clear frontend cache so a stale cache cannot create a ghost.
      */
     async loadLastChatId() {
+        // Poll for Wails readiness (same helper used in sidebar-session)
+        let attempts = 0;
+        while ((!window.go || !window.go.main || !window.go.main.App) && attempts < 100) {
+            await new Promise(r => setTimeout(r, 100));
+            attempts++;
+        }
         if (!window.go || !window.go.main || !window.go.main.App) {
             console.log('Backend not available for chat ID loading');
             return;
@@ -55,9 +62,18 @@ class DataSync {
 
         try {
             const activeChatMeta = await window.go.main.App.GetActiveChatMeta();
-            if (activeChatMeta) {
-                this.currentChatId = activeChatMeta.ID;
-                console.log('Loaded active chat ID:', this.currentChatId);
+            const activeId = activeChatMeta && (activeChatMeta.id || activeChatMeta.ID);
+            if (activeId) {
+                this.currentChatId = activeId;
+                console.log('[DataSync] loaded active chat ID:', this.currentChatId);
+            } else {
+                // No active chat on backend — ensure frontend cache is cleared
+                this.currentChatId = null;
+                if (window.HOWLStorage) {
+                    window.HOWLStorage.deleteChatData('howl-chat-current-chat').catch(() => {});
+                }
+                localStorage.removeItem('howl-chat-current-session');
+                console.log('[DataSync] no active chat on backend, cache cleared');
             }
         } catch (error) {
             console.error('Failed to load active chat meta:', error);
@@ -486,6 +502,26 @@ class DataSync {
         });
 
         console.log('Memory entries created for character swap');
+    }
+
+    /**
+     * Stop autosave timer and clear current chat ID and frontend cache.
+     * Call this when the active chat is deleted to prevent recreation.
+     */
+    stopAutosave() {
+        if (this.autosaveInterval) {
+            clearInterval(this.autosaveInterval);
+            this.autosaveInterval = null;
+        }
+        this.currentChatId = null;
+
+        // Wipe frontend cache so the deleted chat cannot resurface on restart
+        if (window.HOWLStorage) {
+            window.HOWLStorage.deleteChatData('howl-chat-current-chat').catch(() => {});
+        }
+        localStorage.removeItem('howl-chat-current-session');
+
+        console.log('[DataSync] autosave stopped and currentChatId cleared');
     }
 
     /**

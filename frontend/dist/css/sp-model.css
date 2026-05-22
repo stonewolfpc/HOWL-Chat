@@ -17,8 +17,88 @@
     color: rgba(255, 255, 255, 0.6);
     font-size: 12px;
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Custom model dropdown */
+.model-select-custom {
+    position: relative;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.model-select-trigger {
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.model-select-trigger:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.model-select-dropdown {
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    max-height: 320px;
+    overflow-y: auto;
+    background: #1a1a1f;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    display: none;
+    z-index: 1000;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.model-select-dropdown.open {
+    display: block;
+}
+
+.model-select-dropdown::-webkit-scrollbar {
+    width: 8px;
+}
+
+.model-select-dropdown::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.model-select-dropdown::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.model-select-dropdown::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.model-select-option {
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.model-select-option:last-child {
+    border-bottom: none;
+}
+
+.model-select-option:hover,
+.model-select-option.active {
+    background: var(--theme-glow, rgba(255, 255, 255, 0.15));
 }
 
 .model-button {

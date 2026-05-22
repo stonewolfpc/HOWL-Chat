@@ -225,6 +225,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // Ensure an active chat exists before sending. If none, auto-create one.
+            const hasActiveChat = window.dataSync?.currentChatId ||
+                                  window.chatBridge?.getState()?.sessionId ||
+                                  window.currentChatId;
+            if (!hasActiveChat && window.dataSync?.createNewChat) {
+                console.log('[chat-input] No active chat — auto-creating before send');
+                const chatMeta = await window.dataSync.createNewChat(`Chat ${new Date().toLocaleString()}`);
+                if (!chatMeta) {
+                    console.error('Failed to auto-create chat before send');
+                    return;
+                }
+            }
+
             // Record user turn in backend history before inference begins
             if (window.go.main.App.AppendChatMessage) {
                 window.go.main.App.AppendChatMessage('user', message, 'User').catch(() => {});

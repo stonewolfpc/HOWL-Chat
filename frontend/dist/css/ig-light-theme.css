@@ -42,6 +42,7 @@ body.theme-light .ig-negative {
 
 body.theme-light .ig-sidebar::-webkit-scrollbar-thumb,
 body.theme-light .ig-right-panel::-webkit-scrollbar-thumb,
+body.theme-light .ig-history-col::-webkit-scrollbar-thumb,
 body.theme-light .ig-history-list::-webkit-scrollbar-thumb,
 body.theme-light .ig-canvas-wrapper::-webkit-scrollbar-thumb {
     background: var(--border-secondary);
@@ -98,6 +99,230 @@ body.theme-light .ig-canvas-placeholder {
     color: var(--text-secondary);
 }
 
+/* ================================================================
+   LOREBOOK AESTHETIC — LIGHT THEME OVERRIDES
+   ================================================================ */
+
+body.theme-light .ig-layout {
+    background: var(--surface-secondary);
+}
+
+body.theme-light .ig-sidebar,
+body.theme-light .ig-right-panel {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-card);
+}
+
+body.theme-light .ig-panel {
+    background: var(--surface-primary);
+    border-color: var(--border-secondary);
+}
+
+body.theme-light .ig-panel:hover {
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent-primary) 8%, transparent);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .ig-panel-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: color-mix(in srgb, var(--accent-primary) 15%, transparent);
+    color: var(--accent-primary);
+}
+
+body.theme-light .ig-panel-header:hover {
+    background: var(--surface-hover);
+}
+
+body.theme-light .ig-panel-title {
+    color: var(--accent-primary);
+}
+
+body.theme-light .ig-panel-status {
+    background: var(--surface-tertiary);
+    border-color: var(--border-secondary);
+    color: var(--text-tertiary);
+}
+
+body.theme-light .ig-panel-status.ig-status-loaded {
+    background: color-mix(in srgb, var(--accent-primary) 10%, var(--surface-primary));
+    border-color: color-mix(in srgb, var(--accent-primary) 25%, transparent);
+    color: var(--accent-primary);
+}
+
+body.theme-light .ig-workflow-btn {
+    background: var(--surface-primary);
+    border-color: var(--border-secondary);
+    color: var(--text-secondary);
+}
+
+body.theme-light .ig-workflow-btn:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+}
+
+body.theme-light .ig-workflow-btn.active {
+    background: color-mix(in srgb, var(--accent-primary) 8%, var(--surface-primary));
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent-primary) 12%, transparent);
+}
+
+body.theme-light .ig-label {
+    color: var(--accent-primary);
+}
+
+body.theme-light .ig-select,
+body.theme-light .ig-input,
+body.theme-light .ig-textarea {
+    background: var(--surface-tertiary);
+    border-color: var(--border-secondary);
+    color: var(--text-primary);
+}
+
+body.theme-light .ig-select::placeholder,
+body.theme-light .ig-input::placeholder,
+body.theme-light .ig-textarea::placeholder {
+    color: var(--text-tertiary);
+}
+
+body.theme-light .ig-select:focus,
+body.theme-light .ig-input:focus,
+body.theme-light .ig-textarea:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 10%, transparent), 0 0 12px color-mix(in srgb, var(--accent-primary) 8%, transparent);
+    background: var(--surface-primary);
+}
+
+body.theme-light .ig-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(80,80,80,0.6)' d='M6 8L2 4h8L6 8z'/%3E%3C/svg%3E");
+}
+
+body.theme-light .ig-negative {
+    color: var(--text-secondary);
+}
+
+body.theme-light .ig-slider {
+    background: var(--border-secondary);
+}
+
+body.theme-light .ig-slider::-webkit-slider-thumb {
+    background: var(--accent-primary);
+    border-color: var(--surface-primary);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--accent-primary) 30%, transparent);
+}
+
+body.theme-light .ig-slider::-moz-range-thumb {
+    background: var(--accent-primary);
+    border-color: var(--surface-primary);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--accent-primary) 30%, transparent);
+}
+
+body.theme-light .ig-checkbox {
+    color: var(--text-primary);
+}
+
+body.theme-light .ig-checkbox input[type="checkbox"] {
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
+}
+
+body.theme-light .ig-checkbox input[type="checkbox"]:checked {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--accent-primary) 30%, transparent);
+}
+
+body.theme-light .ig-btn {
+    background: var(--surface-tertiary);
+    border-color: var(--border-secondary);
+    color: var(--text-primary);
+}
+
+body.theme-light .ig-btn:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--accent-primary) 10%, transparent);
+}
+
+body.theme-light .ig-btn-secondary {
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
+    color: var(--text-secondary);
+}
+
+body.theme-light .ig-btn-secondary:hover {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+body.theme-light .ig-btn-warn {
+    background: rgba(220, 50, 50, 0.06);
+    border-color: rgba(220, 50, 50, 0.2);
+    color: #ef4444;
+}
+
+body.theme-light .ig-btn-warn:hover {
+    background: rgba(220, 50, 50, 0.12);
+    border-color: rgba(220, 50, 50, 0.3);
+}
+
+body.theme-light .ig-apply-btn,
+body.theme-light #ig-generate {
+    background: color-mix(in srgb, var(--accent-primary) 12%, var(--surface-primary));
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--accent-primary) 8%, transparent);
+}
+
+body.theme-light .ig-apply-btn:hover,
+body.theme-light #ig-generate:hover {
+    background: color-mix(in srgb, var(--accent-primary) 20%, var(--surface-primary));
+    box-shadow: 0 0 16px color-mix(in srgb, var(--accent-primary) 15%, transparent);
+}
+
+body.theme-light .ig-aspect-btn {
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
+    color: var(--text-tertiary);
+}
+
+body.theme-light .ig-aspect-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+    background: var(--surface-tertiary);
+}
+
+body.theme-light .ig-aspect-btn.active {
+    background: color-mix(in srgb, var(--accent-primary) 10%, var(--surface-primary));
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--accent-primary) 10%, transparent);
+}
+
+body.theme-light .ig-tool-btn,
+body.theme-light .ig-seed-btn {
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
+    color: var(--text-secondary);
+}
+
+body.theme-light .ig-tool-btn:hover,
+body.theme-light .ig-seed-btn:hover {
+    background: var(--surface-tertiary);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--accent-primary) 10%, transparent);
+}
+
+body.theme-light .ig-canvas-wrapper {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+}
+
 body.theme-light .ig-canvas-text {
     color: var(--text-primary);
 }
@@ -106,23 +331,103 @@ body.theme-light .ig-canvas-sub {
     color: var(--text-secondary);
 }
 
+body.theme-light .ig-canvas-icon {
+    color: var(--accent-primary);
+    opacity: 0.2;
+}
+
+body.theme-light .ig-upload-zone {
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
+}
+
 body.theme-light .ig-upload-zone:hover,
 body.theme-light .ig-upload-zone.dragover {
     border-color: var(--accent-primary);
-    background: var(--accent-primary-hover);
+    background: color-mix(in srgb, var(--accent-primary) 5%, var(--surface-hover));
+    box-shadow: 0 0 16px color-mix(in srgb, var(--accent-primary) 10%, transparent);
 }
 
-body.theme-light .ig-upload-text {
+body.theme-light .ig-info-panel {
+    background: var(--surface-primary);
+    border-color: var(--border-secondary);
+}
+
+body.theme-light .ig-info-section-title {
+    color: var(--accent-primary);
+    border-bottom-color: color-mix(in srgb, var(--accent-primary) 12%, transparent);
+}
+
+body.theme-light .ig-info-row {
+    border-bottom-color: var(--border-secondary);
+}
+
+body.theme-light .ig-info-label {
+    color: var(--text-tertiary);
+}
+
+body.theme-light .ig-info-value {
     color: var(--text-primary);
 }
 
-body.theme-light .ig-upload-sub {
+body.theme-light .ig-history-item {
+    background: var(--surface-primary);
+    border-color: var(--border-secondary);
+}
+
+body.theme-light .ig-history-item:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--accent-primary) 8%, transparent);
+}
+
+body.theme-light .ig-history-delete {
+    background: rgba(220, 50, 50, 0.08);
+    border-color: rgba(220, 50, 50, 0.2);
+    color: #ef4444;
+}
+
+body.theme-light .ig-history-delete:hover {
+    background: rgba(220, 50, 50, 0.15);
+    box-shadow: 0 0 6px rgba(220, 50, 50, 0.1);
+}
+
+body.theme-light .ig-history-send-btn {
+    background: color-mix(in srgb, var(--accent-primary) 8%, transparent);
+    border-color: color-mix(in srgb, var(--accent-primary) 20%, transparent);
+    color: var(--accent-primary);
+}
+
+body.theme-light .ig-history-send-btn:hover {
+    background: color-mix(in srgb, var(--accent-primary) 20%, transparent);
+    color: var(--text-primary);
+}
+
+body.theme-light .ig-model-info-box {
+    background: var(--surface-tertiary);
+    border-color: var(--border-secondary);
     color: var(--text-secondary);
 }
 
 body.theme-light .ig-mode-note {
-    color: var(--text-secondary);
+    color: var(--text-tertiary);
     background: var(--surface-tertiary);
+    border-color: var(--border-secondary);
+}
+
+/* Scrollbars */
+body.theme-light .ig-sidebar::-webkit-scrollbar-thumb,
+body.theme-light .ig-right-panel::-webkit-scrollbar-thumb,
+body.theme-light .ig-history-col::-webkit-scrollbar-thumb,
+body.theme-light .ig-history-list::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+}
+
+body.theme-light .ig-sidebar,
+body.theme-light .ig-right-panel,
+body.theme-light .ig-history-col,
+body.theme-light .ig-history-list {
+    scrollbar-color: var(--border-secondary) transparent;
 }
 
 body.theme-light .ig-upload-mini {
@@ -194,8 +499,12 @@ body.theme-light .ig-action-primary:hover {
     background: var(--accent-primary-hover);
 }
 
-body.theme-light .ig-action-label {
-    color: var(--text-tertiary);
+body.theme-light .ig-history-col::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+}
+
+body.theme-light .ig-history-col {
+    scrollbar-color: var(--border-secondary) transparent;
 }
 
 body.theme-light .ig-generate-btn {

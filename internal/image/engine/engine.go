@@ -18,6 +18,12 @@ type ImageEngine interface {
 	// LoadModel selects a model for subsequent generations.
 	LoadModel(opts types.ModelLoadOptions) error
 
+	// IsRunning returns true if the engine backend is alive.
+	IsRunning() bool
+
+	// EnsureReady starts the engine and loads the model if needed.
+	EnsureReady(modelName string, opts types.ModelLoadOptions) error
+
 	// GenerateTxt2Img creates an image from a text prompt.
 	GenerateTxt2Img(opts types.ImageOptions) (*types.ImageResult, error)
 

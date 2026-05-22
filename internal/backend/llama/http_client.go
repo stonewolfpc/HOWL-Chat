@@ -195,18 +195,42 @@ func (c *HTTPClient) GenerateChatCompletionStreaming(req *ChatCompletionRequest,
 				fmt.Printf("DEBUG: Stream received [DONE] signal, chunks=%d, totalContent=%d\n", chunkCount, totalContent)
 				break
 			}
+			// Log raw chunk for debugging vision/multimodal responses
+			fmt.Printf("DEBUG: raw chunk: %s\n", jsonStr)
+
 			var chunk struct {
 				Choices []struct {
 					Delta struct {
+						Role             string `json:"role"`
 						Content          string `json:"content"`
 						ReasoningContent string `json:"reasoning_content"`
 					} `json:"delta"`
+					FinishReason string `json:"finish_reason"`
+					Message      struct {
+						Content string `json:"content"`
+					} `json:"message"`
 				} `json:"choices"`
 			}
 			if err := json.Unmarshal([]byte(jsonStr), &chunk); err == nil {
 				if len(chunk.Choices) > 0 {
-					content := chunk.Choices[0].Delta.Content
-					reasoning := chunk.Choices[0].Delta.ReasoningContent
+					choice := chunk.Choices[0]
+					content := choice.Delta.Content
+					reasoning := choice.Delta.ReasoningContent
+					role := choice.Delta.Role
+					finish := choice.FinishReason
+					msgContent := choice.Message.Content
+
+					// Log all fields for diagnostics
+					if role != "" || finish != "" || msgContent != "" {
+						fmt.Printf("DEBUG: choice fields role=%q finish=%q msgContent=%q\n", role, finish, msgContent)
+					}
+
+					// Prefer delta.content, fallback to message.content
+					if content == "" && msgContent != "" {
+						content = msgContent
+						fmt.Printf("DEBUG: using message.content fallback: %q\n", content)
+					}
+
 					if content != "" {
 						callback(content)
 						chunkCount++
@@ -284,47 +308,78 @@ func (c *HTTPClient) LoadModel(modelPath string, options *LoadOptions) error {
 	return nil
 }
 
-// findMMProj searches for an mmproj file in the same directory as the model
-// Per llama.cpp docs: mmproj file name must start with "mmproj" (e.g., mmproj-F16.gguf)
+// findMMProj searches for an mmproj file in the same directory as the model.
+// Tries specific naming patterns first, then falls back to a wildcard scan.
 func findMMProj(modelPath string) string {
 	dir := filepath.Dir(modelPath)
 	baseName := filepath.Base(modelPath)
-
-	// Remove extension from model name
 	modelName := strings.TrimSuffix(baseName, filepath.Ext(baseName))
 
-	// Try common mmproj naming patterns
-	// llama.cpp convention: file name must start with "mmproj"
 	patterns := []string{
-		filepath.Join(dir, "mmproj-F16.gguf"),
+		filepath.Join(dir, "mmproj-IQ4_XS.gguf"),
+		filepath.Join(dir, "mmproj-IQ3_XXS.gguf"),
+		filepath.Join(dir, "mmproj-IQ2_XS.gguf"),
+		filepath.Join(dir, "mmproj-IQ2_XXS.gguf"),
+		filepath.Join(dir, "mmproj-IQ2_S.gguf"),
+		filepath.Join(dir, "mmproj-Q2_K.gguf"),
+		filepath.Join(dir, "mmproj-Q3_K.gguf"),
+		filepath.Join(dir, "mmproj-Q3_K_S.gguf"),
+		filepath.Join(dir, "mmproj-Q3_K_M.gguf"),
+		filepath.Join(dir, "mmproj-Q3_K_L.gguf"),
 		filepath.Join(dir, "mmproj-Q4_0.gguf"),
+		filepath.Join(dir, "mmproj-Q4_K.gguf"),
+		filepath.Join(dir, "mmproj-Q4_K_S.gguf"),
 		filepath.Join(dir, "mmproj-Q4_K_M.gguf"),
+		filepath.Join(dir, "mmproj-Q4_K_L.gguf"),
+		filepath.Join(dir, "mmproj-Q5_0.gguf"),
+		filepath.Join(dir, "mmproj-Q5_K.gguf"),
+		filepath.Join(dir, "mmproj-Q5_K_S.gguf"),
+		filepath.Join(dir, "mmproj-Q5_K_M.gguf"),
+		filepath.Join(dir, "mmproj-Q6_K.gguf"),
 		filepath.Join(dir, "mmproj-Q8_0.gguf"),
-		filepath.Join(dir, "mmproj-f16.gguf"),
-		filepath.Join(dir, "mmproj-q4_0.gguf"),
+		filepath.Join(dir, "mmproj-F16.gguf"),
+		filepath.Join(dir, "mmproj-F32.gguf"),
+		filepath.Join(dir, "mmproj-BF16.gguf"),
+		filepath.Join(dir, "mmproj-iq4_xs.gguf"),
+		filepath.Join(dir, "mmproj-iq3_xxs.gguf"),
 		filepath.Join(dir, "mmproj-q4_k_m.gguf"),
+		filepath.Join(dir, "mmproj-q5_k_m.gguf"),
 		filepath.Join(dir, "mmproj-q8_0.gguf"),
+		filepath.Join(dir, "mmproj-f16.gguf"),
+		filepath.Join(dir, "mmproj-bf16.gguf"),
 		filepath.Join(dir, "mmproj.gguf"),
+		filepath.Join(dir, "mmproj-model.gguf"),
+		filepath.Join(dir, "mmproj-vision.gguf"),
+		filepath.Join(dir, "mmproj-image.gguf"),
+		filepath.Join(dir, "mmproj-proj.gguf"),
 		filepath.Join(dir, modelName+"-mmproj.gguf"),
 		filepath.Join(dir, modelName+".mmproj.gguf"),
 	}
 
 	for _, pattern := range patterns {
 		if _, err := os.Stat(pattern); err == nil {
+			fmt.Printf("[findMMProj] found: %s\n", pattern)
 			return pattern
 		}
 	}
 
-	// If no specific pattern matches, look for any file starting with "mmproj"
+	// Fallback: scan directory for any file starting with "mmproj" and ending with ".gguf"
 	entries, err := os.ReadDir(dir)
 	if err == nil {
 		for _, entry := range entries {
-			if !entry.IsDir() && strings.HasPrefix(strings.ToLower(entry.Name()), "mmproj") && strings.HasSuffix(strings.ToLower(entry.Name()), ".gguf") {
-				return filepath.Join(dir, entry.Name())
+			if entry.IsDir() {
+				continue
+			}
+			name := strings.ToLower(entry.Name())
+			if strings.HasPrefix(name, "mmproj") && strings.HasSuffix(name, ".gguf") {
+				found := filepath.Join(dir, entry.Name())
+				fmt.Printf("[findMMProj] found via wildcard: %s\n", found)
+				return found
 			}
 		}
 	}
 
+	fmt.Printf("[findMMProj] no mmproj found in %s\n", dir)
 	return ""
 }
 

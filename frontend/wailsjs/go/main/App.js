@@ -130,6 +130,18 @@ export function GetChatMessages() {
   return window['go']['main']['App']['GetChatMessages']();
 }
 
+export function GetCompatibleAssets(arg1) {
+  return window['go']['main']['App']['GetCompatibleAssets'](arg1);
+}
+
+export function GetErrorLog(arg1) {
+  return window['go']['main']['App']['GetErrorLog'](arg1);
+}
+
+export function GetErrorReportPreview() {
+  return window['go']['main']['App']['GetErrorReportPreview']();
+}
+
 export function GetGalleryImage(arg1) {
   return window['go']['main']['App']['GetGalleryImage'](arg1);
 }
@@ -142,8 +154,24 @@ export function GetImageJobStatus(arg1) {
   return window['go']['main']['App']['GetImageJobStatus'](arg1);
 }
 
+export function GetImageSettings() {
+  return window['go']['main']['App']['GetImageSettings']();
+}
+
+export function GetLLMModelDetails(arg1) {
+  return window['go']['main']['App']['GetLLMModelDetails'](arg1);
+}
+
+export function GetLLMModels() {
+  return window['go']['main']['App']['GetLLMModels']();
+}
+
 export function GetLoadedModelName() {
   return window['go']['main']['App']['GetLoadedModelName']();
+}
+
+export function GetLoadedModels() {
+  return window['go']['main']['App']['GetLoadedModels']();
 }
 
 export function GetLoadingProgress() {
@@ -162,6 +190,14 @@ export function GetMemoryDetail(arg1, arg2) {
   return window['go']['main']['App']['GetMemoryDetail'](arg1, arg2);
 }
 
+export function GetModelIndex() {
+  return window['go']['main']['App']['GetModelIndex']();
+}
+
+export function GetModelMemoryEstimate(arg1, arg2, arg3) {
+  return window['go']['main']['App']['GetModelMemoryEstimate'](arg1, arg2, arg3);
+}
+
 export function GetModelOptions() {
   return window['go']['main']['App']['GetModelOptions']();
 }
@@ -170,12 +206,36 @@ export function GetModelsDir() {
   return window['go']['main']['App']['GetModelsDir']();
 }
 
+export function GetRegisteredModels() {
+  return window['go']['main']['App']['GetRegisteredModels']();
+}
+
+export function GetResourceSnapshot() {
+  return window['go']['main']['App']['GetResourceSnapshot']();
+}
+
+export function GetResourceSummary() {
+  return window['go']['main']['App']['GetResourceSummary']();
+}
+
 export function GetSamplerSettings() {
   return window['go']['main']['App']['GetSamplerSettings']();
 }
 
 export function GetTTSAvailableVoices() {
   return window['go']['main']['App']['GetTTSAvailableVoices']();
+}
+
+export function GetTTSModels() {
+  return window['go']['main']['App']['GetTTSModels']();
+}
+
+export function InstallAssets(arg1) {
+  return window['go']['main']['App']['InstallAssets'](arg1);
+}
+
+export function IsErrorReportingEnabled() {
+  return window['go']['main']['App']['IsErrorReportingEnabled']();
 }
 
 export function IsModelLoaded() {
@@ -230,6 +290,10 @@ export function OpenCharacterSheet(arg1) {
   return window['go']['main']['App']['OpenCharacterSheet'](arg1);
 }
 
+export function OpenDirectoryPicker() {
+  return window['go']['main']['App']['OpenDirectoryPicker']();
+}
+
 export function OpenImageModelsDirPicker() {
   return window['go']['main']['App']['OpenImageModelsDirPicker']();
 }
@@ -244,6 +308,26 @@ export function OpenSDServerFilePicker() {
 
 export function PinMemory(arg1, arg2, arg3) {
   return window['go']['main']['App']['PinMemory'](arg1, arg2, arg3);
+}
+
+export function RefreshResourceSnapshot() {
+  return window['go']['main']['App']['RefreshResourceSnapshot']();
+}
+
+export function RegisterLoadedModel(arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+  return window['go']['main']['App']['RegisterLoadedModel'](arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+}
+
+export function RequestAllocation(arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+  return window['go']['main']['App']['RequestAllocation'](arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+}
+
+export function RescanAllDirs() {
+  return window['go']['main']['App']['RescanAllDirs']();
+}
+
+export function RescanImageModels() {
+  return window['go']['main']['App']['RescanImageModels']();
 }
 
 export function ResetSessionCharacters() {
@@ -274,6 +358,22 @@ export function SaveTempImage(arg1) {
   return window['go']['main']['App']['SaveTempImage'](arg1);
 }
 
+export function ScanImageModels() {
+  return window['go']['main']['App']['ScanImageModels']();
+}
+
+export function ScanLLMDir(arg1) {
+  return window['go']['main']['App']['ScanLLMDir'](arg1);
+}
+
+export function ScanTTSDir(arg1) {
+  return window['go']['main']['App']['ScanTTSDir'](arg1);
+}
+
+export function SendErrorReport() {
+  return window['go']['main']['App']['SendErrorReport']();
+}
+
 export function SendMessage(arg1) {
   return window['go']['main']['App']['SendMessage'](arg1);
 }
@@ -292,6 +392,10 @@ export function SetActiveImageModel(arg1) {
 
 export function SetAutoCaptureConfig(arg1, arg2) {
   return window['go']['main']['App']['SetAutoCaptureConfig'](arg1, arg2);
+}
+
+export function SetErrorReportingEnabled(arg1) {
+  return window['go']['main']['App']['SetErrorReportingEnabled'](arg1);
 }
 
 export function SetImageModelsDir(arg1) {
@@ -340,6 +444,14 @@ export function UnloadImageModel() {
 
 export function UnloadModel() {
   return window['go']['main']['App']['UnloadModel']();
+}
+
+export function UnregisterLoadedModel(arg1, arg2) {
+  return window['go']['main']['App']['UnregisterLoadedModel'](arg1, arg2);
+}
+
+export function UnregisterModel(arg1) {
+  return window['go']['main']['App']['UnregisterModel'](arg1);
 }
 
 export function UpdateLorebookContext(arg1) {

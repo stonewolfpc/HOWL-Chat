@@ -25,6 +25,11 @@
  * updated one, or null if none are found or the backend is unavailable.
  * @returns {Promise<Object|null>}
  */
+function _safeDate(val) {
+    const d = new Date(val || 0);
+    return isNaN(d.getTime()) ? new Date(0) : d;
+}
+
 async function discoverMostRecentChatSession() {
     if (!window.go || !window.go.main || !window.go.main.App) {
         console.log('Backend not available for chat discovery');
@@ -39,12 +44,12 @@ async function discoverMostRecentChatSession() {
         }
 
         const mostRecent = chatSummaries.reduce((best, current) => {
-            const bestDate    = new Date(best.updatedAt    || best.createdAt);
-            const currentDate = new Date(current.updatedAt || current.createdAt);
+            const bestDate    = _safeDate(best.updatedAt    || best.createdAt);
+            const currentDate = _safeDate(current.updatedAt || current.createdAt);
             return currentDate > bestDate ? current : best;
         });
 
-        console.log('Found most recent session:', mostRecent.name);
+        console.log('[discoverMostRecentChatSession] found:', mostRecent.name || mostRecent.Name, mostRecent.id || mostRecent.ID);
         return mostRecent;
 
     } catch (error) {
@@ -58,19 +63,72 @@ async function discoverMostRecentChatSession() {
 // ---------------------------------------------------------------------------
 
 /**
- * Top-level entry point. Auto-discovers the most recent session; falls back
- * to the backend LoadChatData call, then to HOWLStorage.
+ * Waits for the Wails Go bridge to become available.
+ * @param {number} timeout Max ms to wait (default 10000).
+ * @returns {Promise<boolean>}
+ */
+function waitForWails(timeout = 10000) {
+    return new Promise((resolve) => {
+        if (window.go && window.go.main && window.go.main.App) {
+            resolve(true);
+            return;
+        }
+        let attempts = 0;
+        const maxAttempts = Math.max(1, Math.floor(timeout / 100));
+        const interval = setInterval(() => {
+            if (window.go && window.go.main && window.go.main.App) {
+                clearInterval(interval);
+                resolve(true);
+            } else if (++attempts >= maxAttempts) {
+                clearInterval(interval);
+                resolve(false);
+            }
+        }, 100);
+    });
+}
+
+/**
+ * Top-level entry point. Restores the backend's explicit LastChatID first;
+ * falls back to discovering the most recently updated session, then to
+ * LoadChatData / HOWLStorage.
  */
 async function loadChatData() {
-    const recentSession = await discoverMostRecentChatSession();
-    if (recentSession) {
-        console.log('Auto-loading most recent chat session:', recentSession.name);
-        await loadChatSessionById(recentSession.id);
-        return;
+    console.log('[loadChatData] starting startup load sequence...');
+    const wailsReady = await waitForWails(10000);
+    console.log('[loadChatData] Wails ready:', wailsReady);
+
+    if (wailsReady) {
+        // 1. Try the backend's explicit LastChatID first (most accurate)
+        try {
+            const activeMeta = await window.go.main.App.GetActiveChatMeta();
+            console.log('[loadChatData] GetActiveChatMeta returned:', activeMeta);
+            const activeId   = activeMeta && (activeMeta.id   || activeMeta.ID);
+            const activeName = activeMeta && (activeMeta.name || activeMeta.Name);
+            if (activeId) {
+                console.log('[loadChatData] restoring last active chat:', activeName || activeId);
+                await loadChatSessionById(activeId);
+                return;
+            }
+            console.log('[loadChatData] no active chat ID in meta');
+        } catch (err) {
+            console.warn('[loadChatData] GetActiveChatMeta failed, falling back to discovery:', err);
+        }
+
+        // 2. Fallback: discover the most recently updated session
+        const recentSession = await discoverMostRecentChatSession();
+        if (recentSession) {
+            const recentId   = recentSession.id   || recentSession.ID;
+            const recentName = recentSession.name || recentSession.Name;
+            console.log('[loadChatData] auto-loading most recent session:', recentName || recentId);
+            await loadChatSessionById(recentId);
+            return;
+        }
     }
 
+    // 3. Final fallback: generic LoadChatData or frontend cache
     if (window.go && window.go.main && window.go.main.App) {
         try {
+            console.log('[loadChatData] falling back to LoadChatData');
             const data = await window.go.main.App.LoadChatData();
             if (data) {
                 window.sidebarState.currentChatData = data;
@@ -80,10 +138,11 @@ async function loadChatData() {
                 await updateContextDisplay();
             }
         } catch (err) {
-            console.error('Failed to load chat data:', err);
+            console.error('[loadChatData] LoadChatData failed:', err);
             await loadChatDataFromStorage();
         }
     } else {
+        console.log('[loadChatData] backend unavailable, loading from storage');
         await loadChatDataFromStorage();
     }
 }
@@ -134,6 +193,10 @@ async function loadChatSessionById(sessionId) {
             };
         }
 
+        if (window.dataSync) {
+            window.dataSync.currentChatId = sessionId;
+        }
+
         if (window.HOWLStorage) {
             await window.HOWLStorage.setChatData('howl-chat-current-chat',
                 window.sidebarState ? window.sidebarState.currentChatData : { world, scenario, characters, lorebooks });
@@ -170,15 +233,35 @@ async function loadChatSessionById(sessionId) {
  */
 async function loadChatDataFromStorage() {
     const savedData = await window.HOWLStorage.getChatData('howl-chat-current-chat');
-    if (savedData) {
-        if (window.chatBridge) {
-            await window.chatBridge.hydrateFromBackend(savedData);
-        } else {
-            window.sidebarState.currentChatData = savedData;
-            await updateContextDisplay();
-        }
-    } else {
+    if (!savedData) {
         window.sidebarState.resetToDefaultState();
+        await updateContextDisplay();
+        return;
+    }
+
+    // Validate: if the cached session refers to a specific chat ID, verify it still exists on backend
+    const cachedSessionId = savedData.sessionId || (window.chatBridge && window.chatBridge.getState()?.sessionId);
+    if (cachedSessionId && window.go?.main?.App?.GetChatList) {
+        try {
+            const chats = await window.go.main.App.GetChatList();
+            const exists = (chats || []).some(c => c.id === cachedSessionId);
+            if (!exists) {
+                console.warn('[loadChatDataFromStorage] cached session', cachedSessionId, 'no longer exists on backend — clearing cache');
+                await window.HOWLStorage.deleteChatData('howl-chat-current-chat').catch(() => {});
+                localStorage.removeItem('howl-chat-current-session');
+                window.sidebarState.resetToDefaultState();
+                await updateContextDisplay();
+                return;
+            }
+        } catch (err) {
+            console.warn('[loadChatDataFromStorage] backend validation failed:', err);
+        }
+    }
+
+    if (window.chatBridge) {
+        await window.chatBridge.hydrateFromBackend(savedData);
+    } else {
+        window.sidebarState.currentChatData = savedData;
         await updateContextDisplay();
     }
 }
@@ -434,11 +517,20 @@ function deleteChatSession(chatId, chatName, onDeletedOrEvent) {
                     await window.go.main.App.DeleteChat(chatId);
                 }
 
-                // If this was the active session, reset bridge state
+                // If this was the active session, reset bridge state, stop autosave, and wipe cache
                 const activeId = window.chatBridge?.getState()?.sessionId;
                 if (activeId === chatId && window.chatBridge) {
                     await window.chatBridge.clearForNewChat('New Chat');
                 }
+                if (window.dataSync) {
+                    window.dataSync.stopAutosave();
+                }
+
+                // Wipe frontend caches so the deleted chat cannot resurface as a ghost
+                if (window.HOWLStorage) {
+                    await window.HOWLStorage.deleteChatData('howl-chat-current-chat').catch(() => {});
+                }
+                localStorage.removeItem('howl-chat-current-session');
 
                 // Update File > Load session list if it exists
                 if (typeof savedSessions !== 'undefined' && Array.isArray(savedSessions)) {
@@ -451,6 +543,11 @@ function deleteChatSession(chatId, chatName, onDeletedOrEvent) {
                 }
                 if (typeof renderSessionList === 'function') {
                     renderSessionList();
+                }
+
+                // Force re-fetch from backend to ensure sync
+                if (typeof loadSavedSessions === 'function') {
+                    loadSavedSessions().catch(e => console.warn('Post-delete refresh failed:', e));
                 }
 
                 if (typeof callback === 'function') callback(chatId);

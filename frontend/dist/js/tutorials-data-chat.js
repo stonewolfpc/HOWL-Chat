@@ -210,16 +210,28 @@ Deleting a chat session is irreversible. Consider creating a backup first via Se
             title: 'Loading a Model',
             content: `# Loading a Model
 
-Before chatting, you need to load a GGUF model file. HOWL uses **llama.cpp** under the hood for inference.
+Before chatting, you need to load a GGUF model file. HOWL uses **llama.cpp** under the hood for inference. The model controls in the sidebar use the unified registry to remember all your models across directories.
 
 ## How to Load
 
-1. Click **Model Settings** in the top menu (Settings → Model Settings).
-2. Click **Load Model**.
-3. A file picker opens. Select a **.gguf** file.
-4. The backend reads metadata (layer count, context size, architecture).
-5. GPU Layers slider auto-populates with the model's layer count.
-6. Adjust settings if needed, then click **Load**.
+**From the Registry Dropdown (Recommended):**
+1. The sidebar shows a model dropdown populated from your registry.
+2. Select a model from the list.
+3. Click **Load**.
+4. The model loads from its registered path.
+
+**Browse for a Single File:**
+1. Click **Browse…** next to the dropdown.
+2. Select a **.gguf** file.
+3. The model is registered (remembered) and loaded immediately.
+4. Future sessions will show this model in the dropdown.
+
+**Scan a Directory:**
+1. Click **+ Dir** next to the dropdown.
+2. Select a directory containing GGUF models.
+3. All \`.gguf\` files in that directory are scanned and registered.
+4. The directory is remembered for auto-rescan on startup.
+5. Select a model from the refreshed dropdown and click **Load**.
 
 ## What Gets Read
 
@@ -238,9 +250,21 @@ The backend extracts:
 | GGML (legacy) | No | Convert to GGUF |
 | PyTorch (.bin, .safetensors) | No | Convert to GGUF first |
 
+## Registry vs Manual Browse
+
+| Method | When to Use |
+|--------|-------------|
+| **Registry dropdown** | Your permanent model collection. Scan once, use forever. |
+| **Browse…** | Testing a one-off model, or a file you don't want remembered. |
+| **+ Dir** | Adding a new model directory to your permanent collection. |
+
 <info>
 Download models from [HuggingFace](https://huggingface.co/models?search=gguf). Search for "GGUF" to find quantized versions. TheBloke and bartowski are popular quantizers.
-</info>`
+</info>
+
+<success>
+The registry is "add it once, see it forever." Scan your main model directories once, and all models appear in the dropdown automatically on every startup. New models added to those directories are picked up automatically.
+</success>`
         },
         {
             id: 'chat-model-unload',

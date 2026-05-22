@@ -1,0 +1,42 @@
+[
+  {
+    "id": "mem-1779404618774-k5wtst",
+    "title": "Character Swap: Emily",
+    "summary": "Emily was removed from the chat",
+    "content": "Character \"Emily\" was removed from the chat.\nRole: Heiress/Student and Apprentice/Biological Daughter\nPersonality: Funny, intelligent, compassionate, kind, loving, generous, selfless, grounded, adaptable, the girl meets budding woman emotional swings and confusions.\nBackstory: Unknown\nWorld: Earth\nScenario: The cabin up north\nCharacters now present: None",
+    "scope": "chat",
+    "owner_id": "2026-05-21T21-05-12Z",
+    "tags": [
+      "character-swap",
+      "continuity",
+      "emily"
+    ],
+    "pinned": false,
+    "status": "active",
+    "confidence": 100,
+    "source": "auto",
+    "trigger_count": 0,
+    "created_at": "2026-05-21T23:03:38.774Z",
+    "updated_at": "2026-05-21T23:03:38.774Z"
+  },
+  {
+    "id": "mem-1779404622610-2hzgl2",
+    "title": "Character Swap: Emily",
+    "summary": "Emily was removed from the chat",
+    "content": "Character \"Emily\" was removed from the chat.\nRole: Unknown\nPersonality: Funny, intelligent, compassionate, kind, loving, generous, selfless, grounded, adaptable, the girl meets budding woman emotional swings and confusions.\nBackstory: Unknown\nWorld: Earth\nScenario: Home\nCharacters now present: None",
+    "scope": "chat",
+    "owner_id": "2026-05-21T21-05-12Z",
+    "tags": [
+      "character-swap",
+      "continuity",
+      "emily"
+    ],
+    "pinned": false,
+    "status": "active",
+    "confidence": 100,
+    "source": "auto",
+    "trigger_count": 0,
+    "created_at": "2026-05-21T23:03:42.610Z",
+    "updated_at": "2026-05-21T23:03:42.610Z"
+  }
+]

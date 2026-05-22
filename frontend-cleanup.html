@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>HOWL Chat Frontend Cleanup</title>
+<style>
+  body { font-family: sans-serif; padding: 40px; background: #1a1a2e; color: #eee; }
+  h1 { color: #e94560; }
+  button { padding: 14px 28px; font-size: 16px; cursor: pointer; border: none; border-radius: 6px; }
+  .wipe { background: #e94560; color: white; }
+  .done { background: #0f3460; color: white; display: none; }
+  #log { margin-top: 20px; font-family: monospace; font-size: 13px; color: #aaa; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<h1>HOWL Chat Frontend Cleanup</h1>
+<p>This will delete <strong>all</strong> browser-stored data for HOWL Chat:</p>
+<ul>
+  <li>localStorage keys (howl-chat-*, howl-worlds, etc.)</li>
+  <li>IndexedDB databases (HOWLChatStorage, howl-character-images)</li>
+</ul>
+<br>
+<button class="wipe" onclick="wipeAll()">Wipe All Frontend Data</button>
+<button class="done" id="doneBtn" onclick="window.close()">Done — Close This Tab</button>
+<div id="log"></div>
+
+<script>
+function log(msg) {
+  document.getElementById('log').textContent += msg + '\n';
+}
+
+async function wipeAll() {
+  // 1. localStorage
+  let lsCount = 0;
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('howl')) {
+      localStorage.removeItem(key);
+      lsCount++;
+      log('Removed localStorage: ' + key);
+    }
+  }
+  log('--- localStorage: ' + lsCount + ' keys removed ---');
+
+  // 2. IndexedDB
+  try {
+    const dbs = await indexedDB.databases();
+    let dbCount = 0;
+    for (const db of dbs) {
+      if (db.name && (db.name.includes('HOWL') || db.name.includes('howl'))) {
+        await new Promise((res, rej) => {
+          const req = indexedDB.deleteDatabase(db.name);
+          req.onsuccess = () => res();
+          req.onerror = () => rej(req.error);
+        });
+        dbCount++;
+        log('Deleted IndexedDB: ' + db.name);
+      }
+    }
+    log('--- IndexedDB: ' + dbCount + ' databases removed ---');
+  } catch (err) {
+    log('IndexedDB wipe error: ' + err.message);
+  }
+
+  log('\nAll frontend data cleared. You can close this tab and restart HOWL Chat.');
+  document.querySelector('.wipe').style.display = 'none';
+  document.getElementById('doneBtn').style.display = 'inline-block';
+}
+</script>
+</body>
+</html>

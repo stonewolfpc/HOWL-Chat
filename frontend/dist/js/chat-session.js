@@ -43,7 +43,20 @@ async function saveChatSession() {
         console.error('Wails runtime not available');
         return;
     }
-    
+
+    // Ensure an active chat exists before saving
+    const hasActiveChat = window.dataSync?.currentChatId ||
+                          window.chatBridge?.getState()?.sessionId ||
+                          window.currentChatId;
+    if (!hasActiveChat && window.dataSync?.createNewChat) {
+        console.log('[saveChatSession] No active chat — auto-creating before save');
+        const chatMeta = await window.dataSync.createNewChat(`Chat ${new Date().toLocaleString()}`);
+        if (!chatMeta) {
+            console.error('Failed to auto-create chat before save');
+            return;
+        }
+    }
+
     try {
         await window.go.main.App.SaveChat();
         console.log('Chat saved successfully with all context data');
@@ -114,14 +127,18 @@ function deleteChatSession(sessionId, sessionName, event) {
     }
     
     if (confirm(`Are you sure you want to delete "${sessionName}"?\n\nThis will permanently delete the chat and all its associated automated lorebook entries.`)) {
+        // Stop frontend autosave so it doesn't recreate the directory after backend removal
+        if (window.dataSync) {
+            window.dataSync.stopAutosave();
+        }
         // Call backend to delete chat
         if (window.go && window.go.main && window.go.main.App) {
             window.go.main.App.DeleteChat(sessionId).then(() => {
                 console.log('Chat session deleted:', sessionId);
-                
+
                 // Remove from local list and refresh
                 savedSessions = savedSessions.filter(s => s.id !== sessionId);
-                
+
                 // Clear selection if deleted session was selected
                 if (selectedSessionId === sessionId) {
                     selectedSessionId = null;
@@ -130,8 +147,20 @@ function deleteChatSession(sessionId, sessionName, event) {
                         loadButton.disabled = true;
                     }
                 }
-                
+
+                // If this was the active session, reset bridge state
+                const activeId = window.chatBridge?.getState()?.sessionId;
+                if (activeId === sessionId && window.chatBridge) {
+                    window.chatBridge.clearForNewChat('New Chat');
+                }
+
                 renderSessionList();
+
+                // Force re-fetch from backend to ensure sync
+                if (typeof loadSavedSessions === 'function') {
+                    loadSavedSessions().catch(e => console.warn('Post-delete refresh failed:', e));
+                }
+
                 showNotification(`Chat session deleted: ${sessionName}`, 'success');
             }).catch(err => {
                 console.error('Failed to delete chat session:', err);
@@ -411,31 +440,48 @@ function closeSessionList() {
 // Confirm save as
 async function confirmSaveAs() {
     const nameInput = document.getElementById('session-name-input');
-    
+
     if (!nameInput || !nameInput.value.trim()) {
         alert('Please enter a session name');
         return;
     }
-    
+
     if (!window.go || !window.go.main || !window.go.main.App) {
         console.error('Wails runtime not available');
         return;
     }
-    
+
+    // Ensure an active chat exists before saving as
+    const hasActiveChat = window.dataSync?.currentChatId ||
+                          window.chatBridge?.getState()?.sessionId ||
+                          window.currentChatId;
+    if (!hasActiveChat && window.dataSync?.createNewChat) {
+        console.log('[confirmSaveAs] No active chat — auto-creating before save-as');
+        const chatMeta = await window.dataSync.createNewChat(nameInput.value.trim());
+        if (!chatMeta) {
+            console.error('Failed to auto-create chat before save-as');
+            return;
+        }
+        closeSessionModal();
+        nameInput.value = '';
+        showNotification('Chat created and saved', 'success');
+        return;
+    }
+
     try {
         const chatMeta = await window.go.main.App.SaveChatAs(nameInput.value.trim());
         console.log('Chat saved as:', chatMeta);
-        
+
         closeSessionModal();
-        
+
         // Clear input
         nameInput.value = '';
-        
+
         // Refresh chat list if visible
         if (document.getElementById('session-list-overlay').classList.contains('show')) {
             loadSavedSessions();
         }
-        
+
     } catch (error) {
         console.error('Failed to save chat as:', error);
         alert('Failed to save chat: ' + error);
@@ -516,14 +562,18 @@ function restartArchiveTimer() {
 }
 window.restartArchiveTimer = restartArchiveTimer;
 
-// Initialize autosave on page load
+// Initialize autosave on page load (only if dataSync is not present — dataSync handles autosave)
 window.addEventListener('load', () => {
-    restartAutosaveTimer();
+    if (typeof dataSync === 'undefined' || !dataSync.setupAutosave) {
+        restartAutosaveTimer();
+    }
     restartArchiveTimer();
 
-    // Autosave on page unload
+    // Autosave on page unload (only if dataSync is not present)
     window.addEventListener('beforeunload', () => {
-        performAutosave();
+        if (typeof dataSync === 'undefined' || !dataSync.setupAutosave) {
+            performAutosave();
+        }
     });
 });
 

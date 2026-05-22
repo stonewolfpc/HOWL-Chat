@@ -83,11 +83,8 @@ class ContextDisplay {
     // -----------------------------------------------------------------------
 
     initialize() {
-        // Skip if sidebar system already loaded data (prevents double init race)
-        if (!window._chatDataInitialized) {
-            window._chatDataInitialized = true;
-            this.loadChatData();
-        }
+        // Sidebar-panels.js is the canonical startup orchestrator.
+        // Only set up event listeners here; do not independently load chats.
         this.setupEventListeners();
     }
 
@@ -107,10 +104,15 @@ class ContextDisplay {
     // -----------------------------------------------------------------------
 
     async loadChatData() {
+        // Delegate to the canonical sidebar loader if available
+        if (window.sidebarSession && typeof window.sidebarSession.loadChatData === 'function') {
+            return window.sidebarSession.loadChatData();
+        }
+
         const recentSession = await this.discoverMostRecentChatSession();
         if (recentSession) {
-            console.log('Auto-loading most recent chat session:', recentSession.name);
-            await this.loadChatSessionById(recentSession.id);
+            console.log('[context-data] auto-loading most recent session:', recentSession.name || recentSession.Name);
+            await this.loadChatSessionById(recentSession.id || recentSession.ID);
             return;
         }
 
@@ -138,7 +140,8 @@ class ContextDisplay {
         try {
             const chatSummaries = await window.go.main.App.GetChatList();
             if (chatSummaries && chatSummaries.length > 0) {
-                return chatSummaries.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
+                const safeDate = (v) => { const d = new Date(v || 0); return isNaN(d.getTime()) ? new Date(0) : d; };
+                return chatSummaries.sort((a, b) => safeDate(b.updatedAt || b.UpdatedAt) - safeDate(a.updatedAt || a.UpdatedAt))[0];
             }
         } catch (error) {
             console.error('Failed to discover recent chat session:', error);
@@ -147,20 +150,26 @@ class ContextDisplay {
     }
 
     async loadChatSessionById(chatId) {
+        // Delegate to the canonical sidebar loader if available
+        if (window.sidebarSession && typeof window.sidebarSession.loadChatSessionById === 'function') {
+            return window.sidebarSession.loadChatSessionById(chatId);
+        }
+
         if (!window.go || !window.go.main || !window.go.main.App) return;
         try {
             const chatData = await window.go.main.App.LoadChat(chatId);
             if (chatData) {
-                this.currentChatData = {
-                    characters: chatData.Characters || [],
-                    world:      chatData.World,
-                    scenario:   chatData.Scenario,
-                    lorebooks:  chatData.Lorebooks || [],
-                    chatName:   chatData.Meta ? chatData.Meta.Name : 'New Chat'
-                };
+                const characters = chatData.characters || chatData.Characters || [];
+                const world      = chatData.world      || chatData.World      || null;
+                const scenario   = chatData.scenario   || chatData.Scenario   || null;
+                const lorebooks  = chatData.lorebooks  || chatData.Lorebooks  || [];
+                const history    = chatData.history    || chatData.History    || [];
+                const meta       = chatData.meta       || chatData.Meta       || {};
+
+                this.currentChatData = { characters, world, scenario, lorebooks, chatName: meta.name || meta.Name || 'New Chat' };
                 await this.updateContextDisplay();
-                if (Array.isArray(chatData.History) && typeof window.rebuildChatFromLoadedHistory === 'function') {
-                    window.rebuildChatFromLoadedHistory(chatData.History);
+                if (Array.isArray(history) && typeof window.rebuildChatFromHistory === 'function') {
+                    window.rebuildChatFromHistory(history);
                 }
             }
         } catch (error) {

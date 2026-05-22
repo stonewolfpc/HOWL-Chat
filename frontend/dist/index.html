@@ -37,6 +37,7 @@
     <link rel="stylesheet" href="css/loading-progress.css">
     <link rel="stylesheet" href="css/sampler-settings.css">
     <link rel="stylesheet" href="css/model-settings.css">
+    <link rel="stylesheet" href="css/model-browser.css">
     <link rel="stylesheet" href="css/story-tools.css">
     <link rel="stylesheet" href="css/sidebar-panels.css">
     <link rel="stylesheet" href="css/icons.css">
@@ -65,6 +66,9 @@
     <script src="js/real-settings.js"></script>
     <script src="js/chat-session.js"></script>
     <script src="js/loading-progress.js"></script>
+    <script src="js/error-system.js"></script>
+    <script src="js/error-handler.js"></script>
+    <script src="js/error-settings.js"></script>
     <script src="js/sampler-settings.js"></script>
     <script src="js/model-settings.js"></script>
     <script src="js/memory-store.js"></script>
@@ -198,7 +202,7 @@
                 <div class="dropdown" id="help-dropdown">
                     <div class="dropdown-item" onclick="openTutorials()">Tutorials</div>
                     <div class="dropdown-item">Documentation</div>
-                    <div class="dropdown-item">About</div>
+                    <div class="dropdown-item" onclick="showAbout()">About</div>
                 </div>
             </div>
             
@@ -1265,7 +1269,16 @@
             <!-- ==================== MODEL CONTROLS ==================== -->
             <div class="model-controls">
                 <div class="model-name-display" id="model-name-display">No model loaded</div>
-                <button class="model-button load-button" onclick="loadModel()">Load Model</button>
+                <div class="model-picker-row">
+                    <div id="llm-model-select" class="model-select-custom" title="Select a registered LLM model">
+                        <div class="model-select-trigger" data-value="">— select model —</div>
+                        <div class="model-select-dropdown">
+                            <div class="model-select-options"></div>
+                        </div>
+                    </div>
+                    <button class="model-button load-button" onclick="loadSelectedModel()" title="Load selected model">Load</button>
+                    <button class="model-button" onclick="openModelBrowser()" title="Browse all models with memory estimates">Browser</button>
+                </div>
                 <button class="model-button unload-button" onclick="unloadModel()">Unload</button>
             </div>
         </div>
@@ -1813,6 +1826,162 @@
                 <div class="settings-actions">
                     <button class="settings-reset-btn" onclick="resetAllSettings()">Reset to Defaults</button>
                     <button class="settings-save-btn" onclick="saveAllSettings()">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="real-settings-overlay" id="about-overlay" onclick="hideAbout()">
+        <div class="real-settings-container" id="about-container" style="max-width:720px;" onclick="event.stopPropagation()">
+            <div class="real-settings-header">
+                <div class="real-settings-title">About HOWL Chat</div>
+                <button class="real-settings-close" onclick="hideAbout()">✕</button>
+            </div>
+            <div class="about-content">
+                <div class="about-section">
+                    <div class="about-app-name">HOWL Chat</div>
+                    <div class="about-version">Artherius Edition</div>
+                    <p class="about-description">A local-first, privacy-focused roleplay and AI chat application.</p>
+                </div>
+
+                <div class="about-section">
+                    <div class="about-heading">License Agreement</div>
+                    <div class="about-license-box">
+                        <p><strong>HOWL Chat End User License Agreement</strong></p>
+                        <p>This software is provided to you under the following terms. By installing, copying, or using HOWL Chat, you agree to be bound by this agreement.</p>
+
+                        <p><strong>What You May Do</strong></p>
+                        <ul>
+                            <li><strong>Install and run</strong> HOWL Chat on any number of devices you personally own or control.</li>
+                            <li><strong>Use it for personal, non-commercial purposes</strong> — including creative writing, roleplay, worldbuilding, and private entertainment.</li>
+                            <li><strong>Use it offline</strong> — no internet connection is required for core functionality.</li>
+                            <li><strong>Use it without paying</strong> — this software is provided at no cost to end users.</li>
+                        </ul>
+
+                        <p><strong>What You May NOT Do</strong></p>
+                        <ul>
+                            <li><strong>Modify, adapt, or create derivative works</strong> from the source code or compiled binaries.</li>
+                            <li><strong>Redistribute, share, or transmit</strong> the software or any part of it to third parties.</li>
+                            <li><strong>Sell, license, or commercialize</strong> the software in any form.</li>
+                            <li><strong>Incorporate</strong> the software or any portion thereof into another product, service, or project.</li>
+                            <li><strong>Publish forks, mirrors, or clones</strong> of the software on any platform.</li>
+                            <li><strong>Host, stream, or make available</strong> the software via the internet or any network.</li>
+                            <li><strong>Wrap, bundle, or package</strong> the software within another application, installer, or distribution.</li>
+                            <li><strong>Use the software for any commercial purpose</strong>, including providing paid services, using outputs in commercial products, or renting/leasing.</li>
+                        </ul>
+
+                        <p><strong>Intellectual Property</strong></p>
+                        <p>All title, ownership rights, and intellectual property rights in and to the software remain with the author. The software is protected by copyright laws and international treaty provisions.</p>
+
+                        <p><strong>Disclaimer of Warranty</strong></p>
+                        <p>This software is provided "as is," without warranty of any kind, express or implied. The entire risk as to the quality and performance of the software is with you.</p>
+
+                        <p><strong>Limitation of Liability</strong></p>
+                        <p>In no event shall the author be liable for any claim, damages, or other liability arising from the use or other dealings in the software.</p>
+
+                        <p><strong>Contact</strong></p>
+                        <p>For licensing inquiries, permissions, or commercial use discussions, please contact the author directly.</p>
+                    </div>
+                </div>
+
+                <div class="about-section">
+                    <div class="about-heading">Third-Party Licenses</div>
+                    <p class="about-description">This application includes the following open-source components. Their respective licenses are acknowledged below.</p>
+
+                    <div class="about-license-entry">
+                        <div class="about-lib-name">Wails v2</div>
+                        <div class="about-lib-meta">Cross-platform desktop application framework — <span class="about-license-tag">MIT License</span></div>
+                        <div class="about-lib-url">https://wails.io</div>
+                    </div>
+
+                    <div class="about-license-entry">
+                        <div class="about-lib-name">Echo</div>
+                        <div class="about-lib-meta">High performance, minimalist Go web framework — <span class="about-license-tag">MIT License</span></div>
+                        <div class="about-lib-url">https://echo.labstack.com</div>
+                    </div>
+
+                    <div class="about-license-entry">
+                        <div class="about-lib-name">Gorilla WebSocket</div>
+                        <div class="about-lib-meta">WebSocket implementation for Go — <span class="about-license-tag">BSD-2-Clause License</span></div>
+                        <div class="about-lib-url">https://github.com/gorilla/websocket</div>
+                    </div>
+
+                    <div class="about-license-entry">
+                        <div class="about-lib-name">gopsutil</div>
+                        <div class="about-lib-meta">Cross-platform system metrics library — <span class="about-license-tag">BSD-3-Clause License</span></div>
+                        <div class="about-lib-url">https://github.com/shirou/gopsutil</div>
+                    </div>
+
+                    <div class="about-license-entry">
+                        <div class="about-lib-name">Imaging</div>
+                        <div class="about-lib-meta">Image processing utilities for Go — <span class="about-license-tag">BSD-3-Clause License</span></div>
+                        <div class="about-lib-url">https://github.com/disintegration/imaging</div>
+                    </div>
+
+                    <div class="about-license-entry">
+                        <div class="about-lib-name">gguf-parser-go</div>
+                        <div class="about-lib-meta">GGUF model format parser — <span class="about-license-tag">Apache-2.0 License</span></div>
+                        <div class="about-lib-url">https://github.com/gpustack/gguf-parser-go</div>
+                    </div>
+
+                    <div class="about-license-entry">
+                        <div class="about-lib-name">gollama.cpp</div>
+                        <div class="about-lib-meta">Go bindings for llama.cpp — <span class="about-license-tag">MIT License</span></div>
+                        <div class="about-lib-url">https://github.com/dianlight/gollama.cpp</div>
+                    </div>
+
+                    <div class="about-license-entry">
+                        <div class="about-lib-name">go-toast</div>
+                        <div class="about-lib-meta">Windows toast notifications for Go — <span class="about-license-tag">MIT License</span></div>
+                        <div class="about-lib-url">https://git.sr.ht/~jackmordaunt/go-toast</div>
+                    </div>
+                </div>
+
+                <div class="about-footer">
+                    <button class="settings-save-btn" onclick="hideAbout()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODEL BROWSER MODAL ==================== -->
+    <div id="model-browser-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content model-browser-modal">
+            <div class="modal-header">
+                <h2>Model Browser</h2>
+                <button class="modal-close" onclick="closeModelBrowser()">&times;</button>
+            </div>
+            <div class="model-browser-body">
+                <div class="model-browser-search">
+                    <input type="text" id="model-browser-search" placeholder="Search models..." oninput="filterModelBrowser()">
+                </div>
+                <div class="model-browser-list" id="model-browser-list">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="model-browser-detail" id="model-browser-detail" style="display: none;">
+                    <h3 id="mb-detail-name">Model Name</h3>
+                    <div class="mb-detail-grid">
+                        <div><strong>Family:</strong> <span id="mb-detail-family"></span></div>
+                        <div><strong>Parameters:</strong> <span id="mb-detail-params"></span></div>
+                        <div><strong>Quant:</strong> <span id="mb-detail-quant"></span></div>
+                        <div><strong>Layers:</strong> <span id="mb-detail-layers"></span></div>
+                        <div><strong>Max Context:</strong> <span id="mb-detail-context"></span></div>
+                        <div><strong>File Size:</strong> <span id="mb-detail-size"></span></div>
+                    </div>
+                    <div class="mb-memory-bar">
+                        <div class="mb-mem-item">
+                            <span class="mb-mem-label">VRAM</span>
+                            <span class="mb-mem-value" id="mb-detail-vram"></span>
+                        </div>
+                        <div class="mb-mem-item">
+                            <span class="mb-mem-label">RAM</span>
+                            <span class="mb-mem-value" id="mb-detail-ram"></span>
+                        </div>
+                    </div>
+                    <div class="mb-detail-actions">
+                        <button class="model-button load-button" onclick="loadModelFromBrowser()">Load Model</button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -3,6 +3,7 @@
 import {main} from '../models';
 import {types} from '../models';
 import {chat} from '../models';
+import {settings} from '../models';
 import {rag} from '../models';
 import {context} from '../models';
 
@@ -70,13 +71,27 @@ export function GetChatList():Promise<Array<chat.ChatSummary>>;
 
 export function GetChatMessages():Promise<Array<Record<string, any>>>;
 
+export function GetCompatibleAssets(arg1:string):Promise<main.FilteredAssets>;
+
+export function GetErrorLog(arg1:number):Promise<Array<Record<string, any>>>;
+
+export function GetErrorReportPreview():Promise<string>;
+
 export function GetGalleryImage(arg1:string):Promise<string>;
 
 export function GetImageEngineConfig():Promise<types.EngineConfig>;
 
 export function GetImageJobStatus(arg1:string):Promise<types.ImageJob>;
 
+export function GetImageSettings():Promise<settings.ImageSettings>;
+
+export function GetLLMModelDetails(arg1:string):Promise<main.LLMModelDetail>;
+
+export function GetLLMModels():Promise<Array<main.LLMModelInfo>>;
+
 export function GetLoadedModelName():Promise<string>;
+
+export function GetLoadedModels():Promise<Array<main.LoadedModelInfo>>;
 
 export function GetLoadingProgress():Promise<number>;
 
@@ -86,13 +101,29 @@ export function GetMemories(arg1:string,arg2:main.MemoryFilter):Promise<Array<ma
 
 export function GetMemoryDetail(arg1:string,arg2:string):Promise<main.MemoryRecord>;
 
+export function GetModelIndex():Promise<main.ScanResult>;
+
+export function GetModelMemoryEstimate(arg1:string,arg2:number,arg3:number):Promise<types.MemoryEstimate>;
+
 export function GetModelOptions():Promise<Record<string, any>>;
 
 export function GetModelsDir():Promise<string>;
 
+export function GetRegisteredModels():Promise<main.ScanResult>;
+
+export function GetResourceSnapshot():Promise<main.ResourceSnapshot>;
+
+export function GetResourceSummary():Promise<string>;
+
 export function GetSamplerSettings():Promise<Record<string, any>>;
 
 export function GetTTSAvailableVoices():Promise<Array<string>>;
+
+export function GetTTSModels():Promise<Array<main.TTSModelInfo>>;
+
+export function InstallAssets(arg1:boolean):Promise<main.InstallSummary>;
+
+export function IsErrorReportingEnabled():Promise<boolean>;
 
 export function IsModelLoaded():Promise<boolean>;
 
@@ -120,6 +151,8 @@ export function OnShutdown(arg1:context.Context):Promise<void>;
 
 export function OpenCharacterSheet(arg1:string):Promise<void>;
 
+export function OpenDirectoryPicker():Promise<string>;
+
 export function OpenImageModelsDirPicker():Promise<string>;
 
 export function OpenModelFilePicker():Promise<string>;
@@ -127,6 +160,16 @@ export function OpenModelFilePicker():Promise<string>;
 export function OpenSDServerFilePicker():Promise<string>;
 
 export function PinMemory(arg1:string,arg2:string,arg3:boolean):Promise<void>;
+
+export function RefreshResourceSnapshot():Promise<void>;
+
+export function RegisterLoadedModel(arg1:string,arg2:string,arg3:string,arg4:number,arg5:number,arg6:number,arg7:boolean):Promise<void>;
+
+export function RequestAllocation(arg1:string,arg2:string,arg3:number,arg4:number,arg5:number,arg6:boolean,arg7:boolean):Promise<main.AllocationAdvice>;
+
+export function RescanAllDirs():Promise<void>;
+
+export function RescanImageModels():Promise<main.ScanResult>;
 
 export function ResetSessionCharacters():Promise<void>;
 
@@ -142,6 +185,14 @@ export function SaveImageAs(arg1:string):Promise<string>;
 
 export function SaveTempImage(arg1:string):Promise<string>;
 
+export function ScanImageModels():Promise<main.ScanResult>;
+
+export function ScanLLMDir(arg1:string):Promise<Array<main.LLMModelInfo>>;
+
+export function ScanTTSDir(arg1:string):Promise<Array<main.TTSModelInfo>>;
+
+export function SendErrorReport():Promise<string>;
+
 export function SendMessage(arg1:string):Promise<string>;
 
 export function SendMessageStream(arg1:string):Promise<void>;
@@ -151,6 +202,8 @@ export function SendMessageStreamWithImage(arg1:string,arg2:string):Promise<void
 export function SetActiveImageModel(arg1:any):Promise<void>;
 
 export function SetAutoCaptureConfig(arg1:string,arg2:main.AutoCaptureConfig):Promise<void>;
+
+export function SetErrorReportingEnabled(arg1:boolean):Promise<void>;
 
 export function SetImageModelsDir(arg1:string):Promise<void>;
 
@@ -175,6 +228,10 @@ export function TranscribeAudio(arg1:string):Promise<string>;
 export function UnloadImageModel():Promise<void>;
 
 export function UnloadModel():Promise<void>;
+
+export function UnregisterLoadedModel(arg1:string,arg2:string):Promise<void>;
+
+export function UnregisterModel(arg1:string):Promise<void>;
 
 export function UpdateLorebookContext(arg1:Array<string>):Promise<void>;
 

@@ -1,0 +1,2048 @@
+[
+  {
+    "name": "LFM2.5-1.2B-Instruct-UD-Q4_K_XL",
+    "path": "D:\\AI GGUF\\unsloth\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-UD-Q4_K_XL.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 697.0363464355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "ultrahigh realism xl",
+    "path": "D:\\AI GGUF\\Image Models\\ultrahigh realism xl.safetensors",
+    "type": "vae",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 649.7208137512207,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\ultrahigh realism xl.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "realisticVisionV60B1_v51HyperVAE",
+    "path": "D:\\AI GGUF\\Image Models\\realisticVisionV60B1_v51HyperVAE.safetensors",
+    "type": "vae",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 4067.5134773254395,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\realisticVisionV60B1_v51HyperVAE.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "flux1-dev-Q4_0",
+    "path": "D:\\AI GGUF\\Image\\flux1-dev-Q4_0.gguf",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "gguf",
+    "size_mb": 6476.561676025391,
+    "files": {
+      "model": "D:\\AI GGUF\\Image\\flux1-dev-Q4_0.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-05-21T10:41:30.6858573-05:00"
+  },
+  {
+    "name": "tinyllama-1.1b-chat-v1.0.Q8_0",
+    "path": "D:\\AI GGUF\\tinyllama-1.1b-chat-v1.0.Q8_0.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 1116.5443115234375,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-Q5_K_M",
+    "path": "D:\\AI GGUF\\unsloth\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-Q5_K_M.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 804.2863464355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "sd_turbo",
+    "path": "D:\\AI GGUF\\Image Models\\sd_turbo.safetensors",
+    "type": "diffusion",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 4972.993209838867,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\sd_turbo.safetensors"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "epicrealism_naturalSinRC1VAE",
+    "path": "D:\\AI GGUF\\Image Models\\epicrealism_naturalSinRC1VAE.safetensors",
+    "type": "vae",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 2033.8302726745605,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\epicrealism_naturalSinRC1VAE.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive",
+    "path": "D:\\AI GGUF\\HauhauCS\\GPT-OSS-20B-Uncensored-HauhauCS-Aggressive\\GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive.gguf",
+    "type": "llm",
+    "family": "gpt-oss",
+    "format": "gguf",
+    "size_mb": 11548.581970214844,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "flux1-schnell-Q4_K_M",
+    "path": "D:\\AI GGUF\\Image\\flux1-schnell-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "gguf",
+    "size_mb": 6591.172882080078,
+    "files": {
+      "model": "D:\\AI GGUF\\Image\\flux1-schnell-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-05-21T10:41:30.6858573-05:00"
+  },
+  {
+    "name": "Qwen3.5-122B-A10B-Uncensored-HauhauCS-Aggressive-IQ4_XS",
+    "path": "D:\\AI GGUF\\HauhauCS\\Qwen3.5-122B-A10B-Uncensored-HauhauCS-Aggressive\\Qwen3.5-122B-A10B-Uncensored-HauhauCS-Aggressive-IQ4_XS.gguf",
+    "type": "llm",
+    "family": "qwen35moe",
+    "format": "gguf",
+    "size_mb": 62222.367767333984,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "mmproj-Qwen3.6-27B-Uncensored-HauhauCS-Aggressive-f16",
+    "path": "D:\\AI GGUF\\HauhauCS\\Qwen3.6-27B-Uncensored-HauhauCS-Aggressive\\mmproj-Qwen3.6-27B-Uncensored-HauhauCS-Aggressive-f16.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 884.6349487304688,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-Q4_K_M",
+    "path": "D:\\AI GGUF\\lmstudio-community\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 697.0374450683594,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "mmproj-Qwen3.5-122B-A10B-Uncensored-HauhauCS-Aggressive-f16",
+    "path": "D:\\AI GGUF\\HauhauCS\\Qwen3.5-122B-A10B-Uncensored-HauhauCS-Aggressive\\mmproj-Qwen3.5-122B-A10B-Uncensored-HauhauCS-Aggressive-f16.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 866.6270141601562,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-Q4_1",
+    "path": "D:\\AI GGUF\\unsloth\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-Q4_1.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 725.2707214355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "mmproj-Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive-f16",
+    "path": "D:\\AI GGUF\\HauhauCS\\Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive\\mmproj-Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive-f16.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 857.6231689453125,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-Q8_0",
+    "path": "D:\\AI GGUF\\lmstudio-community\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-Q8_0.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 1188.5218200683594,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "Qwen3.6-27B-Uncensored-HauhauCS-Aggressive-IQ4_XS",
+    "path": "D:\\AI GGUF\\HauhauCS\\Qwen3.6-27B-Uncensored-HauhauCS-Aggressive\\Qwen3.6-27B-Uncensored-HauhauCS-Aggressive-IQ4_XS.gguf",
+    "type": "llm",
+    "family": "qwen35",
+    "format": "gguf",
+    "size_mb": 14383.798309326172,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2-VL-3B-Q4_0",
+    "path": "D:\\AI GGUF\\LFM2-VL-3B-Q4_0.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 1414.4019775390625,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "mmproj-Ministral-3-3B-Instruct-2512-F16",
+    "path": "D:\\AI GGUF\\lmstudio-community\\Ministral-3-3B-Instruct-2512-GGUF\\mmproj-Ministral-3-3B-Instruct-2512-F16.gguf",
+    "type": "llm",
+    "family": "mistral3",
+    "format": "gguf",
+    "size_mb": 2047.0602416992188,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-UD-Q5_K_XL",
+    "path": "D:\\AI GGUF\\unsloth\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-UD-Q5_K_XL.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 804.2863464355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "mmproj-Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-f16",
+    "path": "D:\\AI GGUF\\HauhauCS\\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive\\mmproj-Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-f16.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 944.4130249023438,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "DarkForest20B-V3-Ultra-Quality-Q4_k_s",
+    "path": "D:\\AI GGUF\\DavidAU\\DarkForest-20B-V3-Ultra-Quality-GGUF\\DarkForest20B-V3-Ultra-Quality-Q4_k_s.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 10840.478149414062,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "tokenizer-LFM2.5-Audio-1.5B-Q4_0",
+    "path": "D:\\AI GGUF\\LiquidAI\\LFM2.5-Audio-1.5B-GGUF\\tokenizer-LFM2.5-Audio-1.5B-Q4_0.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 48.20452880859375,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive-IQ4_XS",
+    "path": "D:\\AI GGUF\\HauhauCS\\Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive\\Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive-IQ4_XS.gguf",
+    "type": "llm",
+    "family": "qwen35moe",
+    "format": "gguf",
+    "size_mb": 17861.154418945312,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-UD-Q3_K_XL",
+    "path": "D:\\AI GGUF\\unsloth\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-UD-Q3_K_XL.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 572.5363464355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "flatpiecexlVAE_baseonA1579",
+    "path": "D:\\AI GGUF\\Image Models\\flatpiecexlVAE_baseonA1579.safetensors",
+    "type": "vae",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 159.58131217956543,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\flatpiecexlVAE_baseonA1579.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "SDXLnegXL",
+    "path": "D:\\AI GGUF\\Image Models\\SDXLnegXL.safetensors",
+    "type": "embedding",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 0.5860824584960938,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\SDXLnegXL.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-Q5_K_S",
+    "path": "D:\\AI GGUF\\unsloth\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-Q5_K_S.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 787.0207214355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "mmproj-Qwen3.5-4B-Uncensored-HauhauCS-Aggressive-BF16",
+    "path": "D:\\AI GGUF\\HauhauCS\\Qwen3.5-4B-Uncensored-HauhauCS-Aggressive\\mmproj-Qwen3.5-4B-Uncensored-HauhauCS-Aggressive-BF16.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 644.2725830078125,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "sdxlNaturalSkintone_fp32",
+    "path": "D:\\AI GGUF\\Image Models\\sdxlNaturalSkintone_fp32.safetensors",
+    "type": "lora",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 319.1385154724121,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\sdxlNaturalSkintone_fp32.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "combatDaughter_v10",
+    "path": "D:\\AI GGUF\\Image Models\\combatDaughter_v10.safetensors",
+    "type": "embedding",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 10.384001731872559,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\combatDaughter_v10.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "Qwen3.5-4B-Uncensored-HauhauCS-Aggressive-Q4_K_M",
+    "path": "D:\\AI GGUF\\HauhauCS\\Qwen3.5-4B-Uncensored-HauhauCS-Aggressive\\Qwen3.5-4B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "qwen35",
+    "format": "gguf",
+    "size_mb": 2582.0862731933594,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "mmproj-LFM2.5-VL-450m-F32",
+    "path": "D:\\AI GGUF\\LiquidAI\\LFM2.5-VL-450M-GGUF\\mmproj-LFM2.5-VL-450m-F32.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 359.48968505859375,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "terrystyle_XL",
+    "path": "D:\\AI GGUF\\Image Models\\terrystyle_XL.safetensors",
+    "type": "vae",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 435.3391532897949,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\terrystyle_XL.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "absolutereality_v181",
+    "path": "D:\\AI GGUF\\Image Models\\absolutereality_v181.safetensors",
+    "type": "diffusion",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 2033.8301010131836,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\absolutereality_v181.safetensors"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "mmproj-LFM2-VL-3B-F16",
+    "path": "D:\\AI GGUF\\mmproj-LFM2-VL-3B-F16.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 820.9688415527344,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "mmproj-Qwen3.5-35B-A3B-Uncensored-HauhauCS-Aggressive-f16",
+    "path": "D:\\AI GGUF\\HauhauCS\\Qwen3.5-35B-A3B-Uncensored-HauhauCS-Aggressive\\mmproj-Qwen3.5-35B-A3B-Uncensored-HauhauCS-Aggressive-f16.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 857.6231384277344,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "L3.2-8X4B-MOE-V2-Dark-Champion-Inst-21B-uncen-ablit-D_AU-Q4_k_s",
+    "path": "D:\\AI GGUF\\DavidAU\\Llama-3.2-8X4B-MOE-V2-Dark-Champion-Instruct-uncensored-abliterated-21B-GGUF\\L3.2-8X4B-MOE-V2-Dark-Champion-Inst-21B-uncen-ablit-D_AU-Q4_k_s.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 11558.833587646484,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "covering privates_XL_V1.0",
+    "path": "D:\\AI GGUF\\Image Models\\covering privates_XL_V1.0.safetensors",
+    "type": "lora",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 61.11041259765625,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\covering privates_XL_V1.0.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "tinyllama-1.1b-chat-v1.0.Q4_K_M",
+    "path": "D:\\AI GGUF\\TheBloke\\TinyLlama-1.1B-Chat-v1.0-GGUF\\tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 637.8060302734375,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "mmproj-LFM2.5-Audio-1.5B-F16",
+    "path": "D:\\AI GGUF\\LiquidAI\\LFM2.5-Audio-1.5B-GGUF\\mmproj-LFM2.5-Audio-1.5B-F16.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 437.5520935058594,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-Q6_K",
+    "path": "D:\\AI GGUF\\unsloth\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-Q6_K.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 918.2394714355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "lora-sdxl-perfect-eyes",
+    "path": "D:\\AI GGUF\\Image Models\\lora-sdxl-perfect-eyes.safetensors",
+    "type": "lora",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 39.2923698425293,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\lora-sdxl-perfect-eyes.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-Q3_K_M",
+    "path": "D:\\AI GGUF\\unsloth\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-Q3_K_M.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 572.5363464355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "GLM-4.7-Flash-Uncensored-HauhauCS-Aggressive-Q4_K_M",
+    "path": "D:\\AI GGUF\\HauhauCS\\GLM-4.7-Flash-Uncensored-HauhauCS-Aggressive\\GLM-4.7-Flash-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "deepseek2",
+    "format": "gguf",
+    "size_mb": 17292.710510253906,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Thinking-F16",
+    "path": "D:\\AI GGUF\\LiquidAI\\LFM2.5-1.2B-Thinking-GGUF\\LFM2.5-1.2B-Thinking-F16.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 2234.7705078125,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "female orgasm-SDXL-V1",
+    "path": "D:\\AI GGUF\\Image Models\\female orgasm-SDXL-V1.safetensors",
+    "type": "vae",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 464.5472412109375,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\female orgasm-SDXL-V1.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "v1-5-pruned-emaonly",
+    "path": "D:\\AI GGUF\\Image\\v1-5-pruned-emaonly.safetensors",
+    "type": "diffusion",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 4067.5604858398438,
+    "files": {
+      "model": "D:\\AI GGUF\\Image\\v1-5-pruned-emaonly.safetensors"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-05-21T10:41:30.6858573-05:00"
+  },
+  {
+    "name": "L3.2-8X3B-MOE-Dark-Champion-Inst-18.4B-uncen-ablit_D_AU-Q4_k_m",
+    "path": "D:\\AI GGUF\\DavidAU\\Llama-3.2-8X3B-MOE-Dark-Champion-Instruct-uncensored-abliterated-18.4B-GGUF\\L3.2-8X3B-MOE-Dark-Champion-Inst-18.4B-uncen-ablit_D_AU-Q4_k_m.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 10788.862335205078,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-UD-Q2_K_XL",
+    "path": "D:\\AI GGUF\\unsloth\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-UD-Q2_K_XL.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 461.0050964355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-VL-450M-F32",
+    "path": "D:\\AI GGUF\\LiquidAI\\LFM2.5-VL-450M-GGUF\\LFM2.5-VL-450M-F32.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 1354.5265197753906,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "cyberrealistic_final",
+    "path": "D:\\AI GGUF\\Image Models\\cyberrealistic_final.safetensors",
+    "type": "diffusion",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 4067.5604515075684,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\cyberrealistic_final.safetensors"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "tinyllama-1.1b-chat-v1.0.Q8_0",
+    "path": "D:\\AI GGUF\\TheBloke\\TinyLlama-1.1B-Chat-v1.0-GGUF\\tinyllama-1.1b-chat-v1.0.Q8_0.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 1116.5443115234375,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "sdxl_jessidom",
+    "path": "D:\\AI GGUF\\Image Models\\sdxl_jessidom.safetensors",
+    "type": "embedding",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 0.37514495849609375,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\sdxl_jessidom.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Thinking-Q4_K_M",
+    "path": "D:\\AI GGUF\\lmstudio-community\\LFM2.5-1.2B-Thinking-GGUF\\LFM2.5-1.2B-Thinking-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 697.0356140136719,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-UD-Q8_K_XL",
+    "path": "D:\\AI GGUF\\unsloth\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-UD-Q8_K_XL.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 1308.5207214355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "envyStarlight_v10",
+    "path": "D:\\AI GGUF\\Image Models\\envyStarlight_v10.safetensors",
+    "type": "lora",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 34.2315673828125,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\envyStarlight_v10.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-UD-Q6_K_XL",
+    "path": "D:\\AI GGUF\\unsloth\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-UD-Q6_K_XL.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 949.2394714355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-BF16",
+    "path": "D:\\AI GGUF\\LiquidAI\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-BF16.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 2234.7703247070312,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "mistral-7b-instruct-v0.2.Q4_K_S",
+    "path": "D:\\AI GGUF\\TheBloke\\Mistral-7B-Instruct-v0.2-GGUF\\mistral-7b-instruct-v0.2.Q4_K_S.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 3948.568634033203,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "Qwen3.5-35B-A3B-Uncensored-HauhauCS-Aggressive-IQ4_XS",
+    "path": "D:\\AI GGUF\\HauhauCS\\Qwen3.5-35B-A3B-Uncensored-HauhauCS-Aggressive\\Qwen3.5-35B-A3B-Uncensored-HauhauCS-Aggressive-IQ4_XS.gguf",
+    "type": "llm",
+    "family": "qwen35moe",
+    "format": "gguf",
+    "size_mb": 17786.154357910156,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "sdxl_lightning_4step.q8_0",
+    "path": "D:\\AI GGUF\\Image Models\\sdxl_lightning_4step.q8_0.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 3909.1002197265625,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "chroma-unlocked-v18-Q4_K_M",
+    "path": "D:\\AI GGUF\\Image\\chroma-unlocked-v18-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "chroma",
+    "format": "gguf",
+    "size_mb": 5840.035308837891,
+    "files": {
+      "model": "D:\\AI GGUF\\Image\\chroma-unlocked-v18-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-05-21T10:41:30.6858573-05:00"
+  },
+  {
+    "name": "FantasyWizardWitchesXLV3",
+    "path": "D:\\AI GGUF\\Image Models\\FantasyWizardWitchesXLV3.safetensors",
+    "type": "lora",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 217.87011337280273,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\FantasyWizardWitchesXLV3.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "L3.2-8X4B-MOE-V2-Dark-Champion-Inst-21B-uncen-ablit-D_AU-IQ4_XS",
+    "path": "D:\\AI GGUF\\L3.2-8X4B-MOE-V2-Dark-Champion-Inst-21B-uncen-ablit-D_AU-IQ4_XS.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 10986.091400146484,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "mmproj-LFM2-VL-3B-F16",
+    "path": "D:\\AI GGUF\\LiquidAI\\LFM2-VL-3B-GGUF\\mmproj-LFM2-VL-3B-F16.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 820.9688415527344,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2-VL-3B-Q4_0",
+    "path": "D:\\AI GGUF\\LiquidAI\\LFM2-VL-3B-GGUF\\LFM2-VL-3B-Q4_0.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 1414.4019775390625,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "juggernaut_reborn",
+    "path": "D:\\AI GGUF\\Image Models\\juggernaut_reborn.safetensors",
+    "type": "diffusion",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 2033.8564491271973,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\juggernaut_reborn.safetensors"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Thinking-Polaris-Heretic-Uncensored-DISTILL.IQ4_XS",
+    "path": "D:\\AI GGUF\\mradermacher\\LFM2.5-1.2B-Thinking-Polaris-Heretic-Uncensored-DISTILL-GGUF\\LFM2.5-1.2B-Thinking-Polaris-Heretic-Uncensored-DISTILL.IQ4_XS.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 637.6466979980469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "voices-v1.0",
+    "path": "D:\\AI GGUF\\TTS\\voices-v1.0.bin",
+    "type": "llm",
+    "family": "llm",
+    "format": "bin",
+    "size_mb": 26.907346725463867,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "sisters_v3",
+    "path": "D:\\AI GGUF\\Image Models\\sisters_v3.safetensors",
+    "type": "vae",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 435.3373603820801,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\sisters_v3.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "tinyllama-1.1b-chat-v1.0.Q4_0",
+    "path": "D:\\AI GGUF\\TheBloke\\TinyLlama-1.1B-Chat-v1.0-GGUF\\tinyllama-1.1b-chat-v1.0.Q4_0.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 608.1575927734375,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-Q4_0",
+    "path": "D:\\AI GGUF\\unsloth\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-Q4_0.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 663.5207214355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "tomokoXLV1",
+    "path": "D:\\AI GGUF\\Image Models\\tomokoXLV1.safetensors",
+    "type": "lora",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 48.5643196105957,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\tomokoXLV1.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "FHDR_ComfyUI-Q4_K_M",
+    "path": "D:\\AI GGUF\\Image\\FHDR_ComfyUI-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "sd1.5",
+    "format": "gguf",
+    "size_mb": 6610.734893798828,
+    "files": {
+      "model": "D:\\AI GGUF\\Image\\FHDR_ComfyUI-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-05-21T10:41:30.6858573-05:00"
+  },
+  {
+    "name": "phi-4-Q4_K_M",
+    "path": "D:\\AI GGUF\\lmstudio-community\\phi-4-GGUF\\phi-4-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "phi3",
+    "format": "gguf",
+    "size_mb": 8633.722839355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-BF16",
+    "path": "D:\\AI GGUF\\LFM2.5-1.2B-Instruct-BF16.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 2234.7703247070312,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "sd3.5_medium-q8_0",
+    "path": "D:\\AI GGUF\\Image\\sd3.5_medium-q8_0.gguf",
+    "type": "diffusion",
+    "family": "sd3",
+    "format": "gguf",
+    "size_mb": 2723.5277709960938,
+    "files": {
+      "model": "D:\\AI GGUF\\Image\\sd3.5_medium-q8_0.gguf"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-05-21T10:41:30.6858573-05:00"
+  },
+  {
+    "name": "DeepSeek-R1-Distill-Qwen-14B-Uncensored.Q4_K_M",
+    "path": "D:\\AI GGUF\\lmstudio-community\\DeepSeek-R1-Distill-Qwen-14B-Uncensored.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "qwen2",
+    "format": "gguf",
+    "size_mb": 8569.027954101562,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "mmproj-LFM2-VL-1.6B-F16",
+    "path": "D:\\AI GGUF\\LiquidAI\\LFM2-VL-1.6B-GGUF\\mmproj-LFM2-VL-1.6B-F16.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 791.8729858398438,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2-2.6B-Uncensored-X64.i1-IQ4_XS",
+    "path": "D:\\AI GGUF\\mradermacher\\LFM2-2.6B-Uncensored-X64-i1-GGUF\\LFM2-2.6B-Uncensored-X64.i1-IQ4_XS.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 1341.8407592773438,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "sdxl_base_1.0_Q8_0",
+    "path": "D:\\AI GGUF\\Image\\sdxl_base_1.0_Q8_0.gguf",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "gguf",
+    "size_mb": 2630.947235107422,
+    "files": {
+      "model": "D:\\AI GGUF\\Image\\sdxl_base_1.0_Q8_0.gguf"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-05-21T10:41:30.6858573-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Thinking-Q8_0",
+    "path": "D:\\AI GGUF\\lmstudio-community\\LFM2.5-1.2B-Thinking-GGUF\\LFM2.5-1.2B-Thinking-Q8_0.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 1188.5199890136719,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "dreamshaper_8",
+    "path": "D:\\AI GGUF\\Image Models\\dreamshaper_8.safetensors",
+    "type": "diffusion",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 2033.8305416107178,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\dreamshaper_8.safetensors"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "Huihui-gemma-4-31B-it-abliterated-v2.Q4_K_S",
+    "path": "D:\\AI GGUF\\mradermacher\\Huihui-gemma-4-31B-it-abliterated-v2-GGUF\\Huihui-gemma-4-31B-it-abliterated-v2.Q4_K_S.gguf",
+    "type": "llm",
+    "family": "gemma4",
+    "format": "gguf",
+    "size_mb": 16940.269927978516,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "Midnight-Rose-70B-v1.0.i1-Q4_K_M",
+    "path": "D:\\AI GGUF\\mradermacher\\Midnight-Rose-70B-v1.0-i1-GGUF\\Midnight-Rose-70B-v1.0.i1-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 39503.966888427734,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "Qwen3-MOE-6x0.6B-3.6B-Writing-On-Fire-Uncensored.i1-Q6_K",
+    "path": "D:\\AI GGUF\\mradermacher\\Qwen3-MOE-6x0.6B-3.6B-Writing-On-Fire-Uncensored-i1-GGUF\\Qwen3-MOE-6x0.6B-3.6B-Writing-On-Fire-Uncensored.i1-Q6_K.gguf",
+    "type": "llm",
+    "family": "qwen3moe",
+    "format": "gguf",
+    "size_mb": 1506.4264831542969,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "NousResearch_Hermes-4-14B-IQ4_XS",
+    "path": "D:\\AI GGUF\\bartowski\\NousResearch_Hermes-4-14B-GGUF\\NousResearch_Hermes-4-14B-IQ4_XS.gguf",
+    "type": "llm",
+    "family": "qwen3",
+    "format": "gguf",
+    "size_mb": 7734.995056152344,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Thinking-Claude-4.6-Opus-Heretic-Uncensored-DISTILL.Q8_0",
+    "path": "D:\\AI GGUF\\LiquidAI\\LFM2.5-1.2B-Thinking-Claude-4.6-Opus-Heretic-Uncensored-DISTILL.Q8_0.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 1188.5217895507812,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-350M-BF16",
+    "path": "D:\\AI GGUF\\lmstudio-community\\LFM2.5-350M-GGUF\\LFM2.5-350M-BF16.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 678.5263671875,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "Meta-Llama-3-8B-Instruct-abliterated-v3-f32",
+    "path": "D:\\AI GGUF\\bartowski\\Meta-Llama-3-8B-Instruct-abliterated-v3-GGUF\\Meta-Llama-3-8B-Instruct-abliterated-v3-f32.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 30640.48861694336,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "picxReal_10",
+    "path": "D:\\AI GGUF\\Image Models\\picxReal_10.safetensors",
+    "type": "diffusion",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 2033.8544673919678,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\picxReal_10.safetensors"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-Q3_K_S",
+    "path": "D:\\AI GGUF\\unsloth\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-Q3_K_S.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 532.3019714355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "Slider Sdxl Lightning",
+    "path": "D:\\AI GGUF\\Image Models\\Slider Sdxl Lightning.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 1359.6012229919434,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\Slider Sdxl Lightning.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "LFM2-VL-1.6B-Q4_0",
+    "path": "D:\\AI GGUF\\LiquidAI\\LFM2-VL-1.6B-GGUF\\LFM2-VL-1.6B-Q4_0.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 663.5189514160156,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "Juggernaut_Z_V1_by_RunDiffusion_q4_k_m-002",
+    "path": "D:\\AI GGUF\\Image\\Juggernaut_Z_V1_by_RunDiffusion_q4_k_m-002.gguf",
+    "type": "llm",
+    "family": "lumina2",
+    "format": "gguf",
+    "size_mb": 4912.478576660156,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "sweetLolitaXLDora_v6",
+    "path": "D:\\AI GGUF\\Image Models\\sweetLolitaXLDora_v6.safetensors",
+    "type": "lora",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 327.4652671813965,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\sweetLolitaXLDora_v6.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "stable-diffusion-xl-1.0-turbo-Q8_0",
+    "path": "D:\\AI GGUF\\Image\\stable-diffusion-xl-1.0-turbo-Q8_0.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 4807.431945800781,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "boltningRealistic_v10",
+    "path": "D:\\AI GGUF\\Image Models\\boltningRealistic_v10.safetensors",
+    "type": "diffusion",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 6616.633720397949,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\boltningRealistic_v10.safetensors"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "LFM2-24B-A2B-Q4_K_M",
+    "path": "D:\\AI GGUF\\lmstudio-community\\LFM2-24B-A2B-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "lfm2moe",
+    "format": "gguf",
+    "size_mb": 13747.667266845703,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "Ministral-3-3B-Instruct-2512-Q4_K_M",
+    "path": "D:\\AI GGUF\\lmstudio-community\\Ministral-3-3B-Instruct-2512-GGUF\\Ministral-3-3B-Instruct-2512-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "mistral3",
+    "format": "gguf",
+    "size_mb": 2047.0602416992188,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-Q2_K_L",
+    "path": "D:\\AI GGUF\\unsloth\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-Q2_K_L.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 461.0050964355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "Huihui-gemma-4-31B-it-abliterated-v2.mmproj-f16",
+    "path": "D:\\AI GGUF\\mradermacher\\Huihui-gemma-4-31B-it-abliterated-v2-GGUF\\Huihui-gemma-4-31B-it-abliterated-v2.mmproj-f16.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 1143.4146118164062,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-IQ4_XS",
+    "path": "D:\\AI GGUF\\HauhauCS\\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive\\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-IQ4_XS.gguf",
+    "type": "llm",
+    "family": "gemma4",
+    "format": "gguf",
+    "size_mb": 4836.035125732422,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "hdrEffectVAE_v10",
+    "path": "D:\\AI GGUF\\Image Models\\hdrEffectVAE_v10.safetensors",
+    "type": "vae",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 638.2548904418945,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\hdrEffectVAE_v10.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "realcartoon3d_v18",
+    "path": "D:\\AI GGUF\\Image Models\\realcartoon3d_v18.safetensors",
+    "type": "diffusion",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 5409.951648712158,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\realcartoon3d_v18.safetensors"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "LFM2-8B-A1B-Q4_K_M",
+    "path": "D:\\AI GGUF\\lmstudio-community\\LFM2-8B-A1B-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "lfm2moe",
+    "format": "gguf",
+    "size_mb": 4811.076843261719,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "SDXL_BetterFaces-LoRA_v1",
+    "path": "D:\\AI GGUF\\Image Models\\SDXL_BetterFaces-LoRA_v1.safetensors",
+    "type": "lora",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 217.8698387145996,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\SDXL_BetterFaces-LoRA_v1.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "missionaryImminent_v10",
+    "path": "D:\\AI GGUF\\Image Models\\missionaryImminent_v10.safetensors",
+    "type": "vae",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 382.4219436645508,
+    "files": {
+      "model": "D:\\AI GGUF\\Image Models\\missionaryImminent_v10.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-20T19:15:04.5155021-05:00"
+  },
+  {
+    "name": "Llama-3.2-1B-Instruct.fp16",
+    "path": "D:\\AI GGUF\\MaziyarPanahi\\Llama-3.2-1B-Instruct-GGUF\\Llama-3.2-1B-Instruct.fp16.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 2364.7264404296875,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "base-v7-Q4_0",
+    "path": "D:\\AI GGUF\\Image\\base-v7-Q4_0.gguf",
+    "type": "llm",
+    "family": "aura",
+    "format": "gguf",
+    "size_mb": 3766.774688720703,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "Nemotron3-Nano-4B-Uncensored-HauhauCS-Aggressive-IQ4_XS",
+    "path": "D:\\AI GGUF\\HauhauCS\\Nemotron3-Nano-4B-Uncensored-HauhauCS-Aggressive\\Nemotron3-Nano-4B-Uncensored-HauhauCS-Aggressive-IQ4_XS.gguf",
+    "type": "llm",
+    "family": "nemotron_h",
+    "format": "gguf",
+    "size_mb": 2302.524444580078,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  },
+  {
+    "name": "LFM2.5-1.2B-Instruct-Q4_K_S",
+    "path": "D:\\AI GGUF\\unsloth\\LFM2.5-1.2B-Instruct-GGUF\\LFM2.5-1.2B-Instruct-Q4_K_S.gguf",
+    "type": "llm",
+    "family": "lfm2",
+    "format": "gguf",
+    "size_mb": 668.0207214355469,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-05-21T20:50:44.961802-05:00"
+  }
+]

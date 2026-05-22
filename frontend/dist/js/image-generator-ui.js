@@ -28,12 +28,43 @@ function saveState() {
         lora:      Array.from(document.getElementById('ig-lora')?.selectedOptions || []).map(o => o.value).filter(v => v),
         tiling:    document.getElementById('ig-tiling').checked,
         hires:     document.getElementById('ig-hires-enable').checked,
+        hrScale:   document.getElementById('ig-hr-scale')?.value || '2',
+        hrUpscaler: document.getElementById('ig-hr-upscaler')?.value || '',
+        strength:  document.getElementById('ig-strength')?.value || '0.75',
+        strengthInpaint: document.getElementById('ig-strength-inpaint')?.value || '0.75',
+        outpaintStrength: document.getElementById('ig-outpaint-strength')?.value || '0.8',
+        outpaintMargin: document.getElementById('ig-outpaint-margin')?.value || '128',
+        outpaintDirection: document.querySelector('.ig-dir-btn.active')?.dataset?.dir || 'all',
+        upscaleFactor: document.getElementById('ig-upscale-factor')?.value || '2',
+        upscaleDenoise: document.getElementById('ig-upscale-denoise')?.value || '0.4',
         ctrlModel: document.getElementById('ig-control-model').value,
         ctrlStrength: document.getElementById('ig-control-strength').value,
         cacheMode: document.getElementById('ig-cache-mode').value,
         cacheOption: document.getElementById('ig-cache-option').value,
         videoFrames: document.getElementById('ig-video-frames')?.value,
         videoFPS:    document.getElementById('ig-video-fps')?.value,
+        prediction:  document.getElementById('ig-prediction')?.value,
+        rng:         document.getElementById('ig-rng')?.value,
+        samplerRng:  document.getElementById('ig-sampler-rng')?.value,
+        flowShift:   document.getElementById('ig-flow-shift')?.value,
+        vaeTileOverlap: document.getElementById('ig-vae-tile-overlap')?.value,
+        disableMetadata: document.getElementById('ig-disable-metadata')?.checked,
+        skipLayerStart: document.getElementById('ig-skip-layer-start')?.value,
+        skipLayerEnd:   document.getElementById('ig-skip-layer-end')?.value,
+        highNoiseSteps: document.getElementById('ig-high-noise-steps')?.value,
+        highNoiseCfg:   document.getElementById('ig-high-noise-cfg')?.value,
+        highNoiseGuidance: document.getElementById('ig-high-noise-guidance')?.value,
+        highNoiseSlg:   document.getElementById('ig-high-noise-slg')?.value,
+        highNoiseEta:   document.getElementById('ig-high-noise-eta')?.value,
+        highNoiseSkipStart: document.getElementById('ig-high-noise-skip-start')?.value,
+        highNoiseSkipEnd:   document.getElementById('ig-high-noise-skip-end')?.value,
+        backend:      document.getElementById('ig-backend')?.value,
+        paramsBackend: document.getElementById('ig-params-backend')?.value,
+        vaeTiling:    document.getElementById('ig-vae-tiling')?.checked,
+        temporalTiling: document.getElementById('ig-temporal-tiling')?.checked,
+        circular:     document.getElementById('ig-circular')?.checked,
+        flashAttention: document.getElementById('ig-fa')?.checked,
+        offloadToCPU: document.getElementById('ig-offload-cpu')?.checked,
     };
     localStorage.setItem(IG_STATE_KEY, JSON.stringify(state));
 }
@@ -45,6 +76,7 @@ function restoreState() {
         const s = JSON.parse(raw);
         if (s.prompt)    document.getElementById('ig-prompt').value    = s.prompt;
         if (s.negative)  document.getElementById('ig-negative').value  = s.negative;
+        if (s.model)     document.getElementById('ig-model').value     = s.model;
         if (s.width)     document.getElementById('ig-width').value    = s.width;
         if (s.height)    document.getElementById('ig-height').value   = s.height;
         if (s.steps)     document.getElementById('ig-steps').value     = s.steps;
@@ -68,24 +100,66 @@ function restoreState() {
         }
         if (s.tiling !== undefined) document.getElementById('ig-tiling').checked = s.tiling;
         if (s.hires !== undefined)  document.getElementById('ig-hires-enable').checked = s.hires;
+        if (s.hrScale !== undefined && document.getElementById('ig-hr-scale')) document.getElementById('ig-hr-scale').value = s.hrScale;
+        if (s.hrUpscaler !== undefined && document.getElementById('ig-hr-upscaler')) document.getElementById('ig-hr-upscaler').value = s.hrUpscaler;
+        if (s.strength !== undefined && document.getElementById('ig-strength')) document.getElementById('ig-strength').value = s.strength;
+        if (s.strengthInpaint !== undefined && document.getElementById('ig-strength-inpaint')) document.getElementById('ig-strength-inpaint').value = s.strengthInpaint;
+        if (s.outpaintStrength !== undefined && document.getElementById('ig-outpaint-strength')) document.getElementById('ig-outpaint-strength').value = s.outpaintStrength;
+        if (s.outpaintMargin !== undefined && document.getElementById('ig-outpaint-margin')) document.getElementById('ig-outpaint-margin').value = s.outpaintMargin;
+        if (s.outpaintDirection && document.querySelectorAll('.ig-dir-btn')) {
+            document.querySelectorAll('.ig-dir-btn').forEach(btn => { btn.classList.toggle('active', btn.dataset.dir === s.outpaintDirection); });
+        }
+        if (s.upscaleFactor !== undefined && document.getElementById('ig-upscale-factor')) document.getElementById('ig-upscale-factor').value = s.upscaleFactor;
+        if (s.upscaleDenoise !== undefined && document.getElementById('ig-upscale-denoise')) document.getElementById('ig-upscale-denoise').value = s.upscaleDenoise;
         if (s.ctrlModel) document.getElementById('ig-control-model').value = s.ctrlModel;
         if (s.ctrlStrength) document.getElementById('ig-control-strength').value = s.ctrlStrength;
         if (s.cacheMode) document.getElementById('ig-cache-mode').value = s.cacheMode;
         if (s.cacheOption) document.getElementById('ig-cache-option').value = s.cacheOption;
         if (s.videoFrames && document.getElementById('ig-video-frames')) document.getElementById('ig-video-frames').value = s.videoFrames;
         if (s.videoFPS && document.getElementById('ig-video-fps')) document.getElementById('ig-video-fps').value = s.videoFPS;
+        if (s.prediction !== undefined && document.getElementById('ig-prediction')) document.getElementById('ig-prediction').value = s.prediction;
+        if (s.rng !== undefined && document.getElementById('ig-rng')) document.getElementById('ig-rng').value = s.rng;
+        if (s.samplerRng !== undefined && document.getElementById('ig-sampler-rng')) document.getElementById('ig-sampler-rng').value = s.samplerRng;
+        if (s.flowShift !== undefined && document.getElementById('ig-flow-shift')) document.getElementById('ig-flow-shift').value = s.flowShift;
+        if (s.vaeTileOverlap !== undefined && document.getElementById('ig-vae-tile-overlap')) document.getElementById('ig-vae-tile-overlap').value = s.vaeTileOverlap;
+        if (s.disableMetadata !== undefined && document.getElementById('ig-disable-metadata')) document.getElementById('ig-disable-metadata').checked = s.disableMetadata;
+        if (s.skipLayerStart !== undefined && document.getElementById('ig-skip-layer-start')) document.getElementById('ig-skip-layer-start').value = s.skipLayerStart;
+        if (s.skipLayerEnd !== undefined && document.getElementById('ig-skip-layer-end')) document.getElementById('ig-skip-layer-end').value = s.skipLayerEnd;
+        if (s.highNoiseSteps !== undefined && document.getElementById('ig-high-noise-steps')) document.getElementById('ig-high-noise-steps').value = s.highNoiseSteps;
+        if (s.highNoiseCfg !== undefined && document.getElementById('ig-high-noise-cfg')) document.getElementById('ig-high-noise-cfg').value = s.highNoiseCfg;
+        if (s.highNoiseGuidance !== undefined && document.getElementById('ig-high-noise-guidance')) document.getElementById('ig-high-noise-guidance').value = s.highNoiseGuidance;
+        if (s.highNoiseSlg !== undefined && document.getElementById('ig-high-noise-slg')) document.getElementById('ig-high-noise-slg').value = s.highNoiseSlg;
+        if (s.highNoiseEta !== undefined && document.getElementById('ig-high-noise-eta')) document.getElementById('ig-high-noise-eta').value = s.highNoiseEta;
+        if (s.highNoiseSkipStart !== undefined && document.getElementById('ig-high-noise-skip-start')) document.getElementById('ig-high-noise-skip-start').value = s.highNoiseSkipStart;
+        if (s.highNoiseSkipEnd !== undefined && document.getElementById('ig-high-noise-skip-end')) document.getElementById('ig-high-noise-skip-end').value = s.highNoiseSkipEnd;
+        if (s.backend !== undefined && document.getElementById('ig-backend')) document.getElementById('ig-backend').value = s.backend;
+        if (s.paramsBackend !== undefined && document.getElementById('ig-params-backend')) document.getElementById('ig-params-backend').value = s.paramsBackend;
+        if (s.vaeTiling !== undefined && document.getElementById('ig-vae-tiling')) document.getElementById('ig-vae-tiling').checked = s.vaeTiling;
+        if (s.temporalTiling !== undefined && document.getElementById('ig-temporal-tiling')) document.getElementById('ig-temporal-tiling').checked = s.temporalTiling;
+        if (s.circular !== undefined && document.getElementById('ig-circular')) document.getElementById('ig-circular').checked = s.circular;
+        if (s.flashAttention !== undefined && document.getElementById('ig-fa')) document.getElementById('ig-fa').checked = s.flashAttention;
+        if (s.offloadToCPU !== undefined && document.getElementById('ig-offload-cpu')) document.getElementById('ig-offload-cpu').checked = s.offloadToCPU;
         updateLabels();
     } catch (e) { /* ignore */ }
 }
 
 function updateLabels() {
-    const ids = ['ig-steps', 'ig-cfg', 'ig-strength', 'ig-strength-inpaint', 'ig-outpaint-strength', 
-                 'ig-upscale-denoise', 'ig-guidance', 'ig-slg-scale', 'ig-eta', 
-                 'ig-control-strength', 'ig-video-frames', 'ig-video-fps'];
+    const ids = ['ig-steps', 'ig-cfg', 'ig-strength', 'ig-strength-inpaint', 'ig-outpaint-strength',
+                 'ig-upscale-denoise', 'ig-guidance', 'ig-slg-scale', 'ig-eta',
+                 'ig-control-strength', 'ig-video-frames', 'ig-video-fps',
+                 'ig-flow-shift', 'ig-skip-layer-start', 'ig-skip-layer-end',
+                 'ig-vae-tile-overlap', 'ig-high-noise-steps', 'ig-high-noise-cfg',
+                 'ig-high-noise-guidance', 'ig-high-noise-slg', 'ig-high-noise-eta',
+                 'ig-high-noise-skip-start', 'ig-high-noise-skip-end'];
     ids.forEach(id => {
         const slider = document.getElementById(id);
         const valEl = document.getElementById(id + '-val');
-        if (slider && valEl) valEl.textContent = slider.value;
+        if (slider && valEl) {
+            let val = slider.value;
+            if (id === 'ig-flow-shift' && parseFloat(val) === 0) val = 'Auto';
+            if (id === 'ig-high-noise-steps' && parseInt(val, 10) === -1) val = 'Auto';
+            valEl.textContent = val;
+        }
     });
 }
 
@@ -94,39 +168,170 @@ function updateLabels() {
 // ---------------------------------------------------------------------------
 function bindEvents() {
     // Sliders
-    const sliderIds = ['ig-steps', 'ig-cfg', 'ig-strength', 'ig-strength-inpaint', 'ig-outpaint-strength', 
-                       'ig-upscale-denoise', 'ig-guidance', 'ig-slg-scale', 'ig-eta', 
-                       'ig-control-strength', 'ig-video-frames', 'ig-video-fps', 'ig-brush-size'];
+    const sliderIds = ['ig-steps', 'ig-cfg', 'ig-strength', 'ig-strength-inpaint', 'ig-outpaint-strength',
+                       'ig-upscale-denoise', 'ig-guidance', 'ig-slg-scale', 'ig-eta',
+                       'ig-control-strength', 'ig-video-frames', 'ig-video-fps', 'ig-brush-size',
+                       'ig-flow-shift', 'ig-skip-layer-start', 'ig-skip-layer-end',
+                       'ig-vae-tile-overlap', 'ig-high-noise-steps', 'ig-high-noise-cfg',
+                       'ig-high-noise-guidance', 'ig-high-noise-slg', 'ig-high-noise-eta',
+                       'ig-high-noise-skip-start', 'ig-high-noise-skip-end'];
     sliderIds.forEach(id => {
         const slider = document.getElementById(id);
         if (slider) {
             slider.addEventListener('input', () => {
                 const valEl = document.getElementById(id + '-val');
-                if (valEl) valEl.textContent = slider.value;
+                if (valEl) {
+                    let val = slider.value;
+                    if (id === 'ig-flow-shift' && parseFloat(val) === 0) val = 'Auto';
+                    if (id === 'ig-high-noise-steps' && parseInt(val, 10) === -1) val = 'Auto';
+                    valEl.textContent = val;
+                }
                 saveState();
             });
         }
     });
 
-    // Aspect ratio buttons
+    // ── Aspect ratio & resolution controls ────────────────────────────────────
+    let _aspectLocked = true;  // lock on by default
+
+    const _lockBtn     = document.getElementById('ig-aspect-lock');
+    const _optimizeBtn = document.getElementById('ig-optimize-res');
+    const _wInput      = document.getElementById('ig-width');
+    const _hInput      = document.getElementById('ig-height');
+
+    function _snap64(n) { return Math.max(64, Math.round(n / 64) * 64); }
+
+    function _currentRatio() {
+        const w = parseInt(_wInput.value, 10) || 512;
+        const h = parseInt(_hInput.value, 10) || 512;
+        return w / h;
+    }
+
+    function _syncAspectButtons() {
+        const w = parseInt(_wInput.value, 10);
+        const h = parseInt(_hInput.value, 10);
+        document.querySelectorAll('.ig-aspect-btn').forEach(b => {
+            b.classList.toggle('active', parseInt(b.dataset.w) === w && parseInt(b.dataset.h) === h);
+        });
+    }
+
+    function _setDimensions(w, h) {
+        _wInput.value = w;
+        _hInput.value = h;
+        _syncAspectButtons();
+        saveState();
+    }
+
+    // Aspect ratio buttons — set exact preset dimensions
     document.querySelectorAll('.ig-aspect-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('.ig-aspect-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('ig-width').value  = btn.dataset.w;
-            document.getElementById('ig-height').value = btn.dataset.h;
-            saveState();
+            _setDimensions(parseInt(btn.dataset.w), parseInt(btn.dataset.h));
         });
     });
+
+    // Lock toggle
+    if (_lockBtn) {
+        _lockBtn.addEventListener('click', () => {
+            _aspectLocked = !_aspectLocked;
+            _lockBtn.classList.toggle('active', _aspectLocked);
+            _lockBtn.innerHTML = _aspectLocked ? '&#x1F512; Lock' : '&#x1F513; Free';
+        });
+    }
+
+    // Width input — adjust height to preserve ratio when locked
+    if (_wInput) {
+        _wInput.addEventListener('change', () => {
+            if (_aspectLocked) {
+                const ratio = _currentRatio(); // ratio before this change was applied...
+                // ratio was computed from current (new) w / old h — recalculate from active btn
+                const activeBtn = document.querySelector('.ig-aspect-btn.active');
+                const r = activeBtn
+                    ? parseInt(activeBtn.dataset.w) / parseInt(activeBtn.dataset.h)
+                    : _currentRatio();
+                const newW = parseInt(_wInput.value, 10);
+                _hInput.value = _snap64(newW / r);
+            }
+            _syncAspectButtons();
+            saveState();
+        });
+    }
+
+    // Height input — adjust width to preserve ratio when locked
+    if (_hInput) {
+        _hInput.addEventListener('change', () => {
+            if (_aspectLocked) {
+                const activeBtn = document.querySelector('.ig-aspect-btn.active');
+                const r = activeBtn
+                    ? parseInt(activeBtn.dataset.w) / parseInt(activeBtn.dataset.h)
+                    : _currentRatio();
+                const newH = parseInt(_hInput.value, 10);
+                _wInput.value = _snap64(newH * r);
+            }
+            _syncAspectButtons();
+            saveState();
+        });
+    }
+
+    // Optimize — apply the model family's native base resolution, preserving ratio
+    if (_optimizeBtn) {
+        _optimizeBtn.addEventListener('click', () => {
+            const family = (window.currentModelFamily || '').toLowerCase();
+            let nativeW = 512, nativeH = 512;
+            switch (family) {
+                case 'flux': case 'sdxl': case 'sd3': case 'chroma':
+                case 'kolors': case 'auraflow':
+                    nativeW = 1024; nativeH = 1024; break;
+                case 'sd2.1': case 'sd21': case 'cascade':
+                    nativeW = 768;  nativeH = 768;  break;
+                case 'sdxl-turbo': case 'turbo':
+                    nativeW = 512;  nativeH = 512;  break;
+                default: // sd1.5 and unknown
+                    nativeW = 512;  nativeH = 512;  break;
+            }
+            // Preserve current aspect ratio at the model's native megapixel budget.
+            const activeBtn = document.querySelector('.ig-aspect-btn.active');
+            const r = activeBtn
+                ? parseInt(activeBtn.dataset.w) / parseInt(activeBtn.dataset.h)
+                : _currentRatio();
+            // Solve: w * h ≈ nativeW * nativeH, w/h = r  →  w = sqrt(budget * r)
+            const budget = nativeW * nativeH;
+            const w = _snap64(Math.sqrt(budget * r));
+            const h = _snap64(w / r);
+            _setDimensions(w, h);
+        });
+    }
 
     // Inputs that trigger save
     ['ig-model', 'ig-vae-model', 'ig-clip-l', 'ig-clip-g', 'ig-t5xxl', 'ig-taesd',
      'ig-prompt', 'ig-negative', 'ig-width', 'ig-height', 'ig-seed',
      'ig-sampler', 'ig-scheduler', 'ig-batch', 'ig-clip-skip', 'ig-lora', 'ig-tiling',
-     'ig-hires-enable', 'ig-control-model', 'ig-cache-mode', 'ig-cache-option'].forEach(id => {
+     'ig-hires-enable', 'ig-control-model', 'ig-cache-mode', 'ig-cache-option',
+     'ig-prediction', 'ig-rng', 'ig-sampler-rng', 'ig-disable-metadata',
+     'ig-backend', 'ig-params-backend', 'ig-vae-tiling', 'ig-temporal-tiling',
+     'ig-circular', 'ig-fa', 'ig-offload-cpu',
+     'ig-outpaint-margin', 'ig-outpaint-strength', 'ig-upscale-factor', 'ig-upscale-denoise',
+     'ig-hr-scale', 'ig-hr-upscaler'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener('change', saveState);
     });
+
+    // Upscale factor change recalculates dimensions if image is loaded
+    const upscaleFactorSel = document.getElementById('ig-upscale-factor');
+    if (upscaleFactorSel) {
+        upscaleFactorSel.addEventListener('change', () => {
+            if (currentMode === 'upscale' && initImageData) {
+                const img = document.getElementById('ig-init-image');
+                if (img) {
+                    const factor = parseInt(upscaleFactorSel.value || '2', 10);
+                    const w = Math.round(img.naturalWidth * factor / 64) * 64;
+                    const h = Math.round(img.naturalHeight * factor / 64) * 64;
+                    document.getElementById('ig-width').value = w;
+                    document.getElementById('ig-height').value = h;
+                    saveState();
+                }
+            }
+        });
+    }
 
     // File upload for img2img
     const uploadInput = document.getElementById('ig-upload-input');
@@ -182,12 +387,21 @@ function bindEvents() {
     if (clearMaskBtn) clearMaskBtn.addEventListener('click', clearMask);
     initMaskDrawing();
 
+    // Outpaint direction buttons
+    document.querySelectorAll('.ig-dir-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.ig-dir-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            saveState();
+        });
+    });
+
     // Generate
     document.getElementById('ig-generate').addEventListener('click', onGenerate);
 
-    // Load Model button
-    const loadBtn = document.getElementById('ig-load-model');
-    if (loadBtn) loadBtn.addEventListener('click', onLoadModelClick);
+    // Model dropdown change (updates presets, no backend load)
+    const modelSel = document.getElementById('ig-model');
+    if (modelSel) modelSel.addEventListener('change', onModelChange);
 
     // Unload Model button
     const unloadBtn = document.getElementById('ig-unload-model');
@@ -295,8 +509,17 @@ function setWorkflowMode(mode) {
         if (isInpaint) resizeMaskCanvas();
     }
 
-    if ((isTxt2Img || isVideo) && currentResult?.image_data) {
-        previewArea.innerHTML = `<img src="data:image/png;base64,${currentResult.image_data}" alt="Generated">`;
+    if ((isTxt2Img || isVideo) && currentResult) {
+        if (currentResult.images?.length > 1) {
+            let gridHtml = '<div class="ig-batch-grid">';
+            currentResult.images.forEach((b64, idx) => {
+                gridHtml += `<img src="data:image/png;base64,${b64}" alt="Generated ${idx+1}" class="ig-batch-thumb" data-idx="${idx}" onclick="window.viewBatchImage(${idx})">`;
+            });
+            gridHtml += '</div>';
+            previewArea.innerHTML = gridHtml;
+        } else if (currentResult.image_data) {
+            previewArea.innerHTML = `<img src="data:image/png;base64,${currentResult.image_data}" alt="Generated">`;
+        }
     } else if (!needsImage && !initImageData) {
         previewArea.innerHTML = '';
         if (placeholder) placeholder.style.display = '';
@@ -352,6 +575,20 @@ function handleImageUpload(file) {
             z.classList.add('ig-uploaded');
             z.querySelector('span').textContent = 'Image loaded — click to replace';
         });
+
+        // For upscale mode, calculate target dimensions from original image size
+        if (currentMode === 'upscale') {
+            const img = new Image();
+            img.onload = () => {
+                const factor = parseInt(document.getElementById('ig-upscale-factor')?.value || '2', 10);
+                const w = Math.round(img.naturalWidth * factor / 64) * 64;
+                const h = Math.round(img.naturalHeight * factor / 64) * 64;
+                document.getElementById('ig-width').value = w;
+                document.getElementById('ig-height').value = h;
+                saveState();
+            };
+            img.src = dataUrl;
+        }
 
         // Size mask canvas to match the new image
         requestAnimationFrame(() => {

@@ -2,10 +2,12 @@
 
 const IG_STATE_KEY = 'howl-image-gen-state';
 let currentResult = null;
-let models = [];
+let models = [];       // full ModelInfo list (diffusion only)
+let scanIndex = null;  // full ScanResult from ScanImageModels
 let seedHistory = [];
 let lastUsedSeed = -1;
 let currentModelFamily = '';
+window.currentModelFamily = currentModelFamily; // keep in sync below via setter
 
 // ---------------------------------------------------------------------------
 // Diagnostics
@@ -27,204 +29,277 @@ function showRuntimeDebug() {
 // ---------------------------------------------------------------------------
 // Path Configuration
 // ---------------------------------------------------------------------------
+
+let _pathApplyTimer = null;
+
+// Called once on page load. Reads persisted config from the Go backend,
+// populates the inputs, and immediately triggers a model scan.
+// No user action required — it just works.
 async function initPaths() {
-    const settings = window.settingsState?.current?.imageGen || {};
-    const modelsDir = settings.modelsDir || '';
-    const sdPath    = settings.sdServerPath || '';
-
-    document.getElementById('ig-models-dir').value = modelsDir;
-    document.getElementById('ig-sd-server').value = sdPath;
-
-    if (modelsDir && sdPath && window.go?.main?.App) {
-        try {
-            await window.go.main.App.SetImageModelsDir(modelsDir);
-            await window.go.main.App.SetSDServerPath(sdPath);
-            setStatus('Engine initialized with saved paths');
-            await loadModels();
-            if (window.go.main.App.GetImageEngineConfig) {
-                const cfg = await window.go.main.App.GetImageEngineConfig();
-                console.log('[IG] Engine config after init:', cfg);
-            }
-            return;
-        } catch (err) {
-            console.warn('Saved paths failed, falling back to auto-detect:', err);
+    if (!window.go?.main?.App) { loadModels(); return; }
+    try {
+        const saved = await window.go.main.App.GetImageSettings();
+        const modelsDir = saved?.engine_config?.models_dir || '';
+        const sdPath    = saved?.engine_config?.binary_path || '';
+        if (modelsDir) document.getElementById('ig-models-dir').value = modelsDir;
+        if (sdPath)    document.getElementById('ig-sd-server').value  = sdPath;
+        if (modelsDir || sdPath) {
+            setStatus('Paths loaded from saved config');
         }
+    } catch (err) {
+        console.warn('[IG] Could not load saved image settings:', err);
     }
     loadModels();
 }
 
+// Persist both paths to the Go backend (which writes image-settings.json).
+// Also mirrors into settingsState for the frontend settings panel.
+async function _persistPaths(modelsDir, sdPath) {
+    const app = window.go?.main?.App;
+    if (!app) return;
+    try {
+        if (modelsDir) await app.SetImageModelsDir(modelsDir);
+        if (sdPath)    await app.SetSDServerPath(sdPath);
+        if (window.settingsState?.current) {
+            window.settingsState.current.imageGen = window.settingsState.current.imageGen || {};
+            window.settingsState.current.imageGen.modelsDir    = modelsDir;
+            window.settingsState.current.imageGen.sdServerPath = sdPath;
+            window.settingsState.saveSettings?.();
+        }
+    } catch (err) {
+        setStatus('Path error: ' + (err.message || err));
+        console.error('[IG] _persistPaths failed:', err);
+    }
+}
+
+// Auto-apply when the user finishes typing (500 ms debounce), then re-scan.
+function _schedulePathApply() {
+    clearTimeout(_pathApplyTimer);
+    _pathApplyTimer = setTimeout(async () => {
+        const modelsDir = document.getElementById('ig-models-dir')?.value.trim() || '';
+        const sdPath    = document.getElementById('ig-sd-server')?.value.trim()  || '';
+        await _persistPaths(modelsDir, sdPath);
+        await loadModels();
+    }, 500);
+}
+
+// Wire input change listeners — called once after the DOM is ready.
+function initPathListeners() {
+    document.getElementById('ig-models-dir')?.addEventListener('change', _schedulePathApply);
+    document.getElementById('ig-sd-server')?.addEventListener('change', _schedulePathApply);
+}
+
 async function browseModelsDir() {
     const input = document.getElementById('ig-models-dir');
-    if (window.go?.main?.App?.OpenImageModelsDirPicker) {
-        try {
-            const dir = await window.go.main.App.OpenImageModelsDirPicker();
-            if (dir) input.value = dir;
-            return;
-        } catch (err) {
-            console.error('Browse failed:', err);
+    if (!window.go?.main?.App?.OpenImageModelsDirPicker) { input.focus(); return; }
+    try {
+        const dir = await window.go.main.App.OpenImageModelsDirPicker();
+        if (dir) {
+            input.value = dir;
+            await _persistPaths(dir, document.getElementById('ig-sd-server')?.value.trim() || '');
+            await loadModels();
         }
-    }
-    input.focus();
-    input.select();
+    } catch (err) { console.error('Browse models dir failed:', err); }
 }
 
 async function browseSDServer() {
     const input = document.getElementById('ig-sd-server');
-    if (window.go?.main?.App?.OpenSDServerFilePicker) {
-        try {
-            const path = await window.go.main.App.OpenSDServerFilePicker();
-            if (path) input.value = path;
-            return;
-        } catch (err) {
-            console.error('Browse failed:', err);
+    if (!window.go?.main?.App?.OpenSDServerFilePicker) { input.focus(); return; }
+    try {
+        const path = await window.go.main.App.OpenSDServerFilePicker();
+        if (path) {
+            input.value = path;
+            await _persistPaths(document.getElementById('ig-models-dir')?.value.trim() || '', path);
+            await loadModels();
         }
-    }
-    input.focus();
-    input.select();
+    } catch (err) { console.error('Browse sd-server failed:', err); }
 }
 
+// applyPaths kept for the explicit "Apply" button — now just delegates.
 async function applyPaths() {
-    const modelsDir = document.getElementById('ig-models-dir').value.trim();
-    const sdPath    = document.getElementById('ig-sd-server').value.trim();
-    if (!modelsDir || !sdPath) {
-        setStatus('Please set both paths.');
-        return;
-    }
+    const modelsDir = document.getElementById('ig-models-dir')?.value.trim() || '';
+    const sdPath    = document.getElementById('ig-sd-server')?.value.trim()  || '';
+    if (!modelsDir && !sdPath) { setStatus('Set at least one path.'); return; }
     setStatus('Applying paths...');
-    try {
-        await window.go.main.App.SetImageModelsDir(modelsDir);
-        await window.go.main.App.SetSDServerPath(sdPath);
-        if (window.settingsState?.current) {
-            window.settingsState.current.imageGen = window.settingsState.current.imageGen || {};
-            window.settingsState.current.imageGen.modelsDir = modelsDir;
-            window.settingsState.current.imageGen.sdServerPath = sdPath;
-            if (window.go?.main?.App?.SaveSettings) {
-                await window.go.main.App.SaveSettings(window.settingsState.current);
-            }
-        }
-        if (window.go.main.App.GetImageEngineConfig) {
-            const cfg = await window.go.main.App.GetImageEngineConfig();
-            console.log('[IG] Engine config after apply:', cfg);
-        }
-        await loadModels();
-        setStatus('Ready');
-    } catch (err) {
-        setStatus('Error: ' + (err.message || err));
-        console.error('Apply paths failed:', err);
-    }
+    await _persistPaths(modelsDir, sdPath);
+    await loadModels();
+    setStatus('Ready');
 }
 
 // ---------------------------------------------------------------------------
-// Model Loading
+// Model Loading  (full-index, family-aware)
 // ---------------------------------------------------------------------------
+
+// loadModels performs a full scan via ScanImageModels, then populates all dropdowns.
 async function loadModels() {
-    if (!window.go?.main?.App?.ListImageModels) {
-        console.warn('[IG] ListImageModels binding not available');
-        return;
-    }
-    if (window.go?.main?.App?.DebugImageEngine) {
-        try {
-            const dbg = await window.go.main.App.DebugImageEngine();
-            console.log('[IG] DebugImageEngine:', dbg);
-        } catch (e) {
-            console.warn('[IG] DebugImageEngine failed:', e);
-        }
-    }
+    const app = window.go?.main?.App;
+    if (!app) { console.warn('[IG] Wails runtime not available'); return; }
+    setStatus('Scanning models...');
     try {
-        models = await window.go.main.App.ListImageModels();
-        console.log('[IG] ListImageModels returned:', models);
-        if (!models) models = [];
-        populateModelDropdowns();
-        await loadLoRAs();
+        if (app.ScanImageModels) {
+            scanIndex = await app.ScanImageModels();
+        } else if (app.GetModelIndex) {
+            scanIndex = await app.GetModelIndex();
+        } else {
+            // Legacy fallback
+            const legacy = await app.ListImageModels();
+            scanIndex = { models: legacy || [], vaes: [], loras: [], controlnets: [], embeddings: [], upscalers: [] };
+        }
+        if (!scanIndex) scanIndex = { models: [], vaes: [], loras: [], controlnets: [], embeddings: [], upscalers: [] };
+
+        models = scanIndex.models || [];
+        console.log('[IG] Scan:', models.length, 'models,', (scanIndex.vaes||[]).length, 'VAEs,',
+                    (scanIndex.loras||[]).length, 'LoRAs,', (scanIndex.controlnets||[]).length, 'ControlNets');
+
+        _populateDiffusionDropdown();
+        _populateVAEDropdown(scanIndex.vaes || []);
+        _populateLoRAList(scanIndex.loras || []);
+        _populateControlNetDropdown(scanIndex.controlnets || []);
+
         if (models.length === 0) {
             setStatus('No models found. Check Engine Paths.');
             return;
         }
-        setStatus(`${models.length} model(s) discovered. Select one and click Load.`);
+        const total = models.length + (scanIndex.vaes||[]).length + (scanIndex.loras||[]).length;
+        setStatus(`${models.length} model(s) · ${(scanIndex.vaes||[]).length} VAE · ${(scanIndex.loras||[]).length} LoRA discovered`);
+
+        // Restore previously selected model
         const saved = JSON.parse(localStorage.getItem(IG_STATE_KEY) || '{}');
         if (saved.model && models.some(m => m.name === saved.model)) {
             document.getElementById('ig-model').value = saved.model;
+            onModelChange();
         }
     } catch (err) {
-        console.error('Failed to load models:', err);
-        setStatus('Error loading models: ' + err.message);
-        document.getElementById('ig-model').innerHTML = '<option value="">Error loading models</option>';
+        console.error('[IG] Failed to load models:', err);
+        setStatus('Error loading models: ' + (err.message || err));
     }
 }
 
-async function loadLoRAs() {
-    const sel = document.getElementById('ig-lora');
-    if (!sel) return; // LoRA select not present in current UI
-    if (!window.go?.main?.App?.ListImageLoRAs) {
-        sel.innerHTML = '<option value="">LoRA scanning not available</option>';
-        return;
-    }
+// Refresh family-filtered secondary dropdowns without a full rescan.
+async function refreshCompatibleAssets(family) {
+    const app = window.go?.main?.App;
+    if (!app?.GetCompatibleAssets || !family) return;
     try {
-        const loras = await window.go.main.App.ListImageLoRAs();
-        if (!loras) { sel.innerHTML = '<option value="">None</option>'; return; }
-        sel.innerHTML = '<option value="">None</option>';
-        loras.forEach(name => {
-            const opt = document.createElement('option');
-            opt.value = name;
-            opt.textContent = name;
-            sel.appendChild(opt);
-        });
+        const filtered = await app.GetCompatibleAssets(family);
+        _populateVAEDropdown(filtered.vaes || []);
+        _populateLoRAList(filtered.loras || []);
+        _populateControlNetDropdown(filtered.controlnets || []);
     } catch (err) {
-        console.error('Failed to load LoRAs:', err);
-        sel.innerHTML = '<option value="">Error loading LoRAs</option>';
+        console.warn('[IG] GetCompatibleAssets failed, using full index:', err);
     }
 }
 
-function populateModelDropdowns() {
-    const ids = ['ig-model', 'ig-vae-model', 'ig-clip-l', 'ig-clip-g', 'ig-t5xxl', 'ig-control-model'];
-    ids.forEach(id => {
-        const sel = document.getElementById(id);
-        if (!sel) return;
-        sel.innerHTML = '';
-        const placeholder = document.createElement('option');
-        placeholder.value = '';
-        placeholder.textContent = models.length === 0 ? 'No models found' : (id === 'ig-model' ? 'Select a model...' : 'None (Internal)');
-        if (id === 'ig-model') {
-            placeholder.disabled = true;
-            placeholder.selected = true;
-        }
-        sel.appendChild(placeholder);
-        models.forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m.name;
-            const format = m.format || 'unknown';
-            const compat = m.compatibility || 'unknown';
-            let label = `${m.name} (${m.family})`;
-            if (compat === 'unknown') label += ' [GGUF]';
-            if (compat === 'incompatible') label += ' [!]';
-            if (compat === 'verified') label += ` [${format}]`;
-            opt.textContent = label;
-            sel.appendChild(opt);
-        });
+// Exposed for image-model-library.js — called after a successful install to
+// refresh all dropdowns without requiring a separate ScanImageModels call.
+window.refreshModelDropdownsFromScan = loadModels;
+
+// ---- individual dropdown populators ----------------------------------------
+
+function _populateDiffusionDropdown() {
+    const sel = document.getElementById('ig-model');
+    if (!sel) return;
+    sel.innerHTML = '';
+    const ph = document.createElement('option');
+    ph.value = '';
+    ph.disabled = true;
+    ph.selected = true;
+    ph.textContent = models.length === 0 ? 'No models found' : 'Select a model...';
+    sel.appendChild(ph);
+    models.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.name;
+        const tag = m.format === 'bundle' ? '[bundle]' : m.format ? `[${m.format}]` : '';
+        opt.textContent = `${m.name} (${m.family || '?'}) ${tag}`.trim();
+        opt.dataset.family = m.family || '';
+        opt.dataset.recommended = JSON.stringify(m.recommended || {});
+        sel.appendChild(opt);
     });
 }
 
+function _populateVAEDropdown(vaes) {
+    const sel = document.getElementById('ig-vae-model');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">None (built-in)</option>';
+    vaes.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v.path;
+        opt.textContent = `${v.name} [${v.family || 'any'}]`;
+        sel.appendChild(opt);
+    });
+}
+
+function _populateLoRAList(loras) {
+    const sel = document.getElementById('ig-lora');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">None</option>';
+    loras.forEach(l => {
+        const opt = document.createElement('option');
+        opt.value = l.name;
+        opt.textContent = `${l.name} [${l.family || 'any'}]`;
+        sel.appendChild(opt);
+    });
+}
+
+function _populateControlNetDropdown(cns) {
+    const sel = document.getElementById('ig-control-model');
+    if (!sel) return;
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">None</option>';
+    cns.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.path;
+        opt.textContent = `${c.name} [${c.family || 'any'}]`;
+        sel.appendChild(opt);
+    });
+    if (prev) sel.value = prev; // preserve selection if still present
+}
+
+// onModelChange updates UI presets and re-filters secondary dropdowns by family.
+function onModelChange() {
+    const name = document.getElementById('ig-model').value;
+    if (!name) return;
+    const model = models.find(m => m.name === name);
+    if (model) {
+        currentModelFamily = model.family || '';
+        window.currentModelFamily = currentModelFamily;
+        applyModelPreset(model.family, model.recommended || null);
+        updateLiveModelInfo(model);
+        // Re-filter VAE / LoRA / ControlNet for this family
+        if (currentModelFamily) refreshCompatibleAssets(currentModelFamily);
+    }
+    const statusEl = document.getElementById('ig-model-status');
+    if (statusEl) { statusEl.textContent = 'Auto-load on Generate'; statusEl.className = 'ig-panel-status'; }
+    saveState();
+}
+
+// setModel manually loads a model into the backend (used by Reload button).
 async function setModel(name) {
     const statusEl = document.getElementById('ig-model-status');
     if (statusEl) { statusEl.textContent = 'Loading...'; statusEl.className = 'ig-panel-status ig-status-loading'; }
     updateDiagnostics('loadStart');
     setStatus('Loading model: ' + name + '...');
     try {
-        // Prepare advanced model config if present
         const opts = {
             model: name,
             vae: document.getElementById('ig-vae-model')?.value || '',
             clip_l: document.getElementById('ig-clip-l')?.value || '',
             clip_g: document.getElementById('ig-clip-g')?.value || '',
             t5xxl: document.getElementById('ig-t5xxl')?.value || '',
+            backend: document.getElementById('ig-backend')?.value || '',
+            params_backend: document.getElementById('ig-params-backend')?.value || '',
+            vae_tiling: document.getElementById('ig-vae-tiling')?.checked || false,
+            temporal_tiling: document.getElementById('ig-temporal-tiling')?.checked || false,
+            circular: document.getElementById('ig-circular')?.checked || false,
+            flash_attention: document.getElementById('ig-fa')?.checked || false,
+            offload_to_cpu: document.getElementById('ig-offload-cpu')?.checked || false,
+            disable_metadata: document.getElementById('ig-disable-metadata')?.checked || false,
         };
         console.log('[IG] Loading model with config:', opts);
-        
         await window.go.main.App.SetActiveImageModel(opts);
-        
         const model = models.find(m => m.name === name);
         if (model) {
             currentModelFamily = model.family || '';
+            window.currentModelFamily = currentModelFamily;
             applyModelPreset(model.family);
             updateLiveModelInfo(model);
         }
@@ -238,39 +313,32 @@ async function setModel(name) {
     }
 }
 
-async function onLoadModelClick() {
-    const name = document.getElementById('ig-model').value;
-    if (!name) { setStatus('Please select a model first.'); return; }
-    const model = models.find(m => m.name === name);
-    if (model && model.compatibility === 'unknown') {
-        if (!confirm('This model is a GGUF file with unknown compatibility. It may fail to load.\n\nTry loading it anyway?')) return;
-    }
-    if (model && model.compatibility === 'incompatible') {
-        setStatus('This model format is incompatible. Use .safetensors or .ckpt instead.');
-        return;
-    }
-    await setModel(name);
-}
-
-function applyModelPreset(family) {
-    if (family === 'flux') {
-        document.getElementById('ig-steps').value = 4;
-        document.getElementById('ig-cfg').value = 1;
-        document.getElementById('ig-width').value = 1024;
-        document.getElementById('ig-height').value = 1024;
-    } else if (family === 'sd15') {
-        document.getElementById('ig-steps').value = 20;
-        document.getElementById('ig-cfg').value = 7;
-        document.getElementById('ig-width').value = 512;
-        document.getElementById('ig-height').value = 512;
-    } else if (family === 'sdxl' || family === 'sd3') {
-        document.getElementById('ig-steps').value = 20;
-        document.getElementById('ig-cfg').value = 7;
-        document.getElementById('ig-width').value = 1024;
-        document.getElementById('ig-height').value = 1024;
-    }
+function applyModelPreset(family, recommended) {
+    // Prefer scan-manifest recommended values; fall back to family defaults.
+    const rec = recommended || _familyDefaults(family);
+    const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
+    set('ig-steps',  rec.steps);
+    set('ig-cfg',    rec.cfg);
+    set('ig-width',  rec.width);
+    set('ig-height', rec.height);
+    if (rec.sampler) set('ig-sampler', rec.sampler);
     updateLabels();
     saveState();
+}
+
+function _familyDefaults(family) {
+    switch ((family || '').toLowerCase()) {
+        case 'flux':
+            return { steps: 4,  cfg: 1,   width: 1024, height: 1024, sampler: 'euler' };
+        case 'sd1.5': case 'sd15':
+            return { steps: 20, cfg: 7,   width: 512,  height: 512,  sampler: 'euler_a' };
+        case 'sd2.1': case 'sd21':
+            return { steps: 20, cfg: 7.5, width: 768,  height: 768,  sampler: 'dpmpp_2m' };
+        case 'sdxl-turbo': case 'turbo':
+            return { steps: 4,  cfg: 1,   width: 512,  height: 512,  sampler: 'euler_a' };
+        default: // sdxl, sd3, unknown
+            return { steps: 20, cfg: 7,   width: 1024, height: 1024, sampler: 'dpmpp_2m' };
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -292,7 +360,15 @@ async function onGenerate() {
     startProgressBar(steps, currentModelFamily || 'sdxl');
 
     const seedVal = parseInt(document.getElementById('ig-seed').value, 10);
-    if (seedVal === -1 || isNaN(seedVal)) {
+    if (seedLocked && !isNaN(seedVal) && seedVal !== -1) {
+        // Seed is locked to a specific value
+        lastUsedSeed = seedVal;
+    } else if (seedLocked && (isNaN(seedVal) || seedVal === -1)) {
+        // Seed is locked but was random: generate once and lock it
+        lastUsedSeed = Math.floor(Math.random() * 2147483647);
+        document.getElementById('ig-seed').value = lastUsedSeed;
+    } else if (seedVal === -1 || isNaN(seedVal)) {
+        // Not locked, use random seed
         lastUsedSeed = Math.floor(Math.random() * 2147483647);
         document.getElementById('ig-seed').value = lastUsedSeed;
     } else {
@@ -359,6 +435,8 @@ async function onGenerate() {
         control_strength: parseFloat(document.getElementById('ig-control-strength')?.value || '0.9'),
         loras:           Array.from(document.getElementById('ig-lora')?.selectedOptions || []).map(o => o.value).filter(v => v),
         enable_hr:       document.getElementById('ig-hires-enable')?.checked || false,
+        hr_scale:        parseFloat(document.getElementById('ig-hr-scale')?.value || '2'),
+        hr_upscaler:     document.getElementById('ig-hr-upscaler')?.value || '',
         tiling:          document.getElementById('ig-tiling')?.checked || false,
         clip_skip:       parseInt(document.getElementById('ig-clip-skip')?.value || '-1', 10),
         cache_mode:      document.getElementById('ig-cache-mode')?.value || 'none',
@@ -368,11 +446,38 @@ async function onGenerate() {
         strength:        parseFloat(
             (currentMode === 'inpaint'
                 ? document.getElementById('ig-strength-inpaint')
-                : (currentMode === 'outpaint' ? document.getElementById('ig-outpaint-strength') : document.getElementById('ig-strength'))
+                : (currentMode === 'outpaint'
+                    ? document.getElementById('ig-outpaint-strength')
+                    : (currentMode === 'upscale'
+                        ? document.getElementById('ig-upscale-denoise')
+                        : document.getElementById('ig-strength')))
             )?.value || '0.75'
         ),
+        outpaint_margin:    parseInt(document.getElementById('ig-outpaint-margin')?.value || '128', 10),
+        outpaint_direction: document.querySelector('.ig-dir-btn.active')?.dataset?.dir || 'all',
+        upscale_factor:     parseInt(document.getElementById('ig-upscale-factor')?.value || '2', 10),
         init_image_path: initImagePath,
         mask_path:       maskPath,
+        prediction:      document.getElementById('ig-prediction')?.value || '',
+        rng:             document.getElementById('ig-rng')?.value || '',
+        sampler_rng:     document.getElementById('ig-sampler-rng')?.value || '',
+        flow_shift:      parseFloat(document.getElementById('ig-flow-shift')?.value || '0'),
+        vae_tile_overlap: parseFloat(document.getElementById('ig-vae-tile-overlap')?.value || '0.5'),
+        disable_metadata: document.getElementById('ig-disable-metadata')?.checked || false,
+        skip_layer_start: parseFloat(document.getElementById('ig-skip-layer-start')?.value || '0.01'),
+        skip_layer_end:   parseFloat(document.getElementById('ig-skip-layer-end')?.value || '0.2'),
+        high_noise_steps:          parseInt(document.getElementById('ig-high-noise-steps')?.value || '-1', 10),
+        high_noise_cfg_scale:      parseFloat(document.getElementById('ig-high-noise-cfg')?.value || '7'),
+        high_noise_guidance:       parseFloat(document.getElementById('ig-high-noise-guidance')?.value || '3.5'),
+        high_noise_slg_scale:      parseFloat(document.getElementById('ig-high-noise-slg')?.value || '0'),
+        high_noise_eta:            parseFloat(document.getElementById('ig-high-noise-eta')?.value || '0'),
+        high_noise_skip_layer_start: parseFloat(document.getElementById('ig-high-noise-skip-start')?.value || '0.01'),
+        high_noise_skip_layer_end:   parseFloat(document.getElementById('ig-high-noise-skip-end')?.value || '0.2'),
+        // Model startup flags forwarded to lazy-load path
+        vae_tiling:       document.getElementById('ig-vae-tiling')?.checked || false,
+        temporal_tiling:  document.getElementById('ig-temporal-tiling')?.checked || false,
+        flash_attention:  document.getElementById('ig-fa')?.checked || false,
+        offload_to_cpu:   document.getElementById('ig-offload-cpu')?.checked || false,
     };
 
     let activeJobId = null;
@@ -391,8 +496,23 @@ async function onGenerate() {
             return;
         }
 
-        // Async job flow
-        activeJobId = await window.go.main.App.StartImageJob(opts);
+        // Async job flow — wrap in its own try so callback-registration
+        // failures fall back to the synchronous path.
+        try {
+            activeJobId = await window.go.main.App.StartImageJob(opts);
+        } catch (cbErr) {
+            const msg = String(cbErr?.message || cbErr);
+            if (msg.includes('not registered') || msg.includes('callback')) {
+                console.warn('[IG] Async job callback not registered, falling back to sync GenerateImage');
+                currentResult = await window.go.main.App.GenerateImage(opts);
+                displayResult(currentResult);
+                setStatus('Done!');
+                updateDiagnostics('genDone');
+                if (window.loadHistoryPanel) window.loadHistoryPanel();
+                return;
+            }
+            throw cbErr;
+        }
         setStatus('Generating...');
         showSpinner();
 
@@ -556,7 +676,15 @@ function displayResult(result) {
     const meta = document.getElementById('ig-meta');
     const actions = document.getElementById('ig-actions');
 
-    if (result?.image_data) {
+    if (result?.images && result.images.length > 1) {
+        // Batch result: show grid of all images
+        let gridHtml = '<div class="ig-batch-grid">';
+        result.images.forEach((b64, idx) => {
+            gridHtml += `<img src="data:image/png;base64,${b64}" alt="Generated ${idx+1}" class="ig-batch-thumb" data-idx="${idx}" onclick="window.viewBatchImage(${idx})">`;
+        });
+        gridHtml += '</div>';
+        area.innerHTML = gridHtml;
+    } else if (result?.image_data) {
         area.innerHTML = `<img src="data:image/png;base64,${result.image_data}" alt="Generated">`;
     } else if (result?.metadata) {
         area.innerHTML = `<div class="ig-canvas-placeholder"><div class="ig-canvas-text">Image saved to gallery</div></div>`;
@@ -574,20 +702,45 @@ function displayResult(result) {
         `;
         meta.style.display = 'block';
         actions.style.display = 'flex';
-        if (window.addHistoryItem) window.addHistoryItem(result.metadata.file, result.image_data);
+        // Add all batch images to history
+        if (window.addHistoryItem) {
+            if (result.images && result.images.length > 0) {
+                result.images.forEach((b64, idx) => {
+                    const file = result.metadata.file.replace('.png', '') + (idx > 0 ? `_${idx}.png` : '.png');
+                    window.addHistoryItem(file, b64);
+                });
+            } else if (result.image_data) {
+                window.addHistoryItem(result.metadata.file, result.image_data);
+            }
+        }
     }
 }
+
+// Batch image viewer: clicking a thumbnail shows it full-size in the preview area
+window.viewBatchImage = function(idx) {
+    if (!currentResult?.images?.[idx]) return;
+    const area = document.getElementById('ig-preview-area');
+    area.innerHTML = `<img src="data:image/png;base64,${currentResult.images[idx]}" alt="Generated ${idx+1}">`;
+};
 
 // ---------------------------------------------------------------------------
 // Actions
 // ---------------------------------------------------------------------------
 async function saveImageAs() {
-    if (!currentResult?.image_data) { setStatus('No image data to save.'); return; }
+    if (!currentResult?.image_data && !(currentResult?.images?.length > 0)) {
+        setStatus('No image data to save.'); return;
+    }
     if (!window.go?.main?.App?.SaveImageAs) { setStatus('Save dialog not available.'); return; }
     try {
         setStatus('Saving...');
-        const savedPath = await window.go.main.App.SaveImageAs(currentResult.image_data);
-        if (savedPath) setStatus('Saved to: ' + savedPath);
+        // If batch, save all images; otherwise save the single image
+        const imagesToSave = currentResult.images?.length > 0 ? currentResult.images : [currentResult.image_data];
+        let paths = [];
+        for (const b64 of imagesToSave) {
+            const p = await window.go.main.App.SaveImageAs(b64);
+            if (p) paths.push(p);
+        }
+        if (paths.length > 0) setStatus('Saved ' + paths.length + ' image(s).');
         else setStatus('Save cancelled.');
     } catch (err) {
         console.error('Save failed:', err);
@@ -606,23 +759,20 @@ function deleteCurrent() {
             <div class="ig-canvas-text">Generate images from text prompts.</div>
         </div>`;
     document.getElementById('ig-meta').style.display = 'none';
-    document.getElementById('ig-actions').style.display = 'none';
-    document.querySelectorAll('.ig-history-item').forEach(t => t.classList.remove('active'));
 }
 
 async function sendToEntity(entityType) {
-    if (!currentResult?.image_data) { setStatus('No image to send.'); return; }
+    const imageToSend = currentResult?.images?.[0] || currentResult?.image_data;
+    if (!imageToSend) { setStatus('No image to send.'); return; }
     if (!window.go?.main?.App?.SaveEntityImage) { setStatus('Entity image save not available.'); return; }
 
     // Ask user for entity name/ID (or use a default placeholder)
-    const entityName = prompt(`Enter ${entityType} name (or ID):`)?.trim();
-    if (!entityName) { setStatus('Cancelled.'); return; }
-
-    const safeID = entityName.toLowerCase().replace(/[^a-z0-9_-]/g, '_').substring(0, 40);
+    const safeID = prompt(`Enter ${entityType} name/ID to save image for:`);
+    if (!safeID) { setStatus('Send cancelled.'); return; }
 
     try {
         setStatus(`Saving image for ${entityType}...`);
-        const path = await window.go.main.App.SaveEntityImage(currentResult.image_data, entityType, safeID);
+        const path = await window.go.main.App.SaveEntityImage(imageToSend, entityType, safeID);
         setStatus(`Image saved for ${entityType}. Navigate to ${entityType} page to assign it.`);
 
         // Offer to navigate

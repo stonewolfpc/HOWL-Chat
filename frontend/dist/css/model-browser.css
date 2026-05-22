@@ -1,0 +1,155 @@
+/**
+ * Model Browser Styles
+ *
+ * Styles for the model browser modal showing all registered LLM models
+ * with metadata, quant info, and memory estimates.
+ *
+ * @module model-browser
+ * @version 1.0.0
+ */
+
+.model-browser-modal {
+    width: 800px;
+    max-width: 90vw;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.model-browser-body {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    padding: 16px;
+    flex: 1;
+    overflow: hidden;
+}
+
+.model-browser-search {
+    margin-bottom: 12px;
+}
+
+.model-browser-search input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color, #444);
+    border-radius: 6px;
+    background: var(--input-bg, #2a2a2a);
+    color: var(--text-color, #eee);
+    font-size: 14px;
+}
+
+.model-browser-list {
+    flex: 1;
+    overflow-y: auto;
+    min-width: 280px;
+    border-right: 1px solid var(--border-color, #444);
+    padding-right: 12px;
+}
+
+.model-browser-item {
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-bottom: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.model-browser-item:hover {
+    background: var(--hover-bg, #333);
+}
+
+.model-browser-item.active {
+    background: var(--accent-bg, #1a3a5c);
+}
+
+.mb-item-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-color, #eee);
+}
+
+.mb-item-meta {
+    font-size: 12px;
+    color: var(--muted-text, #888);
+}
+
+.mb-item-size {
+    font-size: 11px;
+    color: var(--muted-text, #888);
+}
+
+.model-browser-detail {
+    flex: 1;
+    min-width: 280px;
+    padding-left: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.model-browser-detail h3 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    color: var(--text-color, #eee);
+}
+
+.mb-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    font-size: 13px;
+}
+
+.mb-detail-grid div {
+    color: var(--text-color, #ddd);
+}
+
+.mb-detail-grid strong {
+    color: var(--muted-text, #999);
+}
+
+.mb-memory-bar {
+    display: flex;
+    gap: 16px;
+    padding: 12px;
+    background: var(--card-bg, #252525);
+    border-radius: 8px;
+    margin-top: 8px;
+}
+
+.mb-mem-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.mb-mem-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted-text, #888);
+}
+
+.mb-mem-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-color, #4fc3f7);
+}
+
+.mb-detail-actions {
+    margin-top: auto;
+    display: flex;
+    gap: 8px;
+}
+
+.mb-no-selection {
+    color: var(--muted-text, #888);
+    font-style: italic;
+    text-align: center;
+    padding: 40px 20px;
+}

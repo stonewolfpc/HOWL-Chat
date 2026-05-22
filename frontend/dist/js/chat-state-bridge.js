@@ -133,6 +133,7 @@ async function hydrateFromBackend(chatData) {
         lorebooks,
         removedCharacterIds: removedIds
     };
+    window._chatBridgeState = _state;
 
     // Resolve images asynchronously so displays fill in correctly
     if (world    && world.image)    world._resolvedImage    = await _resolveImage(world.image,    'world');
@@ -258,6 +259,7 @@ async function clearForNewChat(chatName, sessionId) {
     _state = _defaultState(chatName || 'New Chat');
     _state.sessionId = sessionId || null;
     _state.removedCharacterIds = []; // fresh chat = fresh removals
+    window._chatBridgeState = _state;
 
     _pushToContextDisplay();
     _pushToSidebarState();
@@ -379,13 +381,17 @@ async function applyCharacterAdd(character) {
 }
 
 async function applyCharacterRemove(characterId) {
+    console.log('[applyCharacterRemove] called for:', characterId);
+    console.log('[applyCharacterRemove] _state before:', { world: !!_state.world, scenario: !!_state.scenario, characters: (_state.characters || []).length, lorebooks: (_state.lorebooks || []).length });
     _state.characters = _state.characters.filter(c => c.id !== characterId);
     if (!_state.removedCharacterIds.includes(characterId)) {
         _state.removedCharacterIds.push(characterId);
     }
+    console.log('[applyCharacterRemove] _state after filter:', { world: !!_state.world, scenario: !!_state.scenario, characters: (_state.characters || []).length, lorebooks: (_state.lorebooks || []).length });
     _push(); await refreshAllPanels();
     // Persist removal list so ghosts stay dead after reload
     if (typeof saveChatData === 'function') saveChatData();
+    console.log('[applyCharacterRemove] completed');
 }
 
 async function applyLorebookToggle(lorebook) {

@@ -49,6 +49,7 @@ function show(initialTab) {
     window.settingsState.loadSettings();
     _hydrateAllControls();
     _pollBackendStatus();
+    populateTTSDropdown();
     if (initialTab) showTab(initialTab);
     document.addEventListener('keydown', _onEsc);
 }
@@ -76,6 +77,7 @@ window.addEventListener('DOMContentLoaded', () => {
     window.settingsState.loadSettings();
     _hydrateAllControls();
     _pollBackendStatus();
+    populateTTSDropdown();
 });
 
 function showTab(tabId) {
@@ -337,3 +339,51 @@ function resetAudioSettings() {
 // Global aliases for HTML onclick handlers
 function closeAudioSettings() { close(); }
 function showAudioTab(tabId) { AudioSettings.showTab(tabId); }
+
+// ---------------------------------------------------------------------------
+// TTS Voice Model Registry
+// ---------------------------------------------------------------------------
+
+async function populateTTSDropdown() {
+    const app = window.go?.main?.App;
+    const sel = document.getElementById('tts-voice');
+    if (!sel || !app?.GetTTSModels) return;
+    try {
+        const voices = await app.GetTTSModels();
+        const prev = sel.value || window.settingsState?.current?.audio?.ttsVoice || '';
+        // Keep the built-in option, then append registered ones
+        const builtIn = sel.querySelector('option[value="en_US-lessac-medium"]');
+        sel.innerHTML = '';
+        if (builtIn) sel.appendChild(builtIn);
+        else {
+            const opt = document.createElement('option');
+            opt.value = 'en_US-lessac-medium';
+            opt.textContent = 'en_US-lessac-medium (built-in)';
+            sel.appendChild(opt);
+        }
+        (voices || []).forEach(v => {
+            if (v.name === 'en_US-lessac-medium') return; // already present
+            const opt = document.createElement('option');
+            opt.value = v.name;
+            const sizeTxt = v.size_mb > 0 ? ` (${v.size_mb.toFixed(0)} MB)` : '';
+            opt.textContent = `${v.name}${sizeTxt}`;
+            sel.appendChild(opt);
+        });
+        if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
+    } catch (err) {
+        console.warn('[TTS] Failed to populate voice dropdown:', err);
+    }
+}
+
+async function scanTTSDirectory() {
+    const app = window.go?.main?.App;
+    if (!app?.OpenDirectoryPicker || !app?.ScanTTSDir) return;
+    try {
+        const dir = await app.OpenDirectoryPicker();
+        if (!dir) return;
+        await app.ScanTTSDir(dir);
+        await populateTTSDropdown();
+    } catch (err) {
+        console.error('[TTS] Directory scan failed:', err);
+    }
+}

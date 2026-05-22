@@ -352,23 +352,8 @@ class CharacterManager {
         }
     }
 
-    /**
-     * Delete character
-     * @param {string} characterId - Character ID to delete
-     */
-    deleteCharacter(characterId) {
-        const character = this.getCharacterById(characterId);
-        if (!character) return;
-
-        if (confirm(`Delete character "${character.name}"? This action cannot be undone.`)) {
-            this.characters = this.characters.filter(c => c.id !== characterId);
-            this.saveCharacters();
-
-            if (typeof showNotification === 'function') {
-                showNotification(`Character deleted: ${character.name}`, 'success');
-            }
-        }
-    }
+    // NOTE: Deletion is handled by character-grid.js → DeleteService.detachCharacterFromAll + CharacterStorage.remove
+    // which properly cleans up IndexedDB images, cross-references, and localStorage metadata.
 
     /**
      * Get character-specific lorebooks

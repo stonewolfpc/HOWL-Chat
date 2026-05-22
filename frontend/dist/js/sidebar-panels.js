@@ -23,13 +23,13 @@
 // Initialization
 // ---------------------------------------------------------------------------
 
-function initializeSidebarPanels() {
+async function initializeSidebarPanels() {
     if (window._chatDataInitialized) return;
-    window._chatDataInitialized = true;
     console.log('Initializing Sidebar Panels (v2.1)...');
     initializeCharacterPanel();
     window.sidebarContext.initializeContextPanel();
-    loadChatData();
+    await loadChatData();
+    window._chatDataInitialized = true;
 }
 
 function initializeCharacterPanel() {
@@ -37,9 +37,9 @@ function initializeCharacterPanel() {
 }
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeSidebarPanels);
+    document.addEventListener('DOMContentLoaded', () => initializeSidebarPanels());
 } else {
-    setTimeout(initializeSidebarPanels, 0);
+    setTimeout(() => initializeSidebarPanels(), 0);
 }
 
 // ---------------------------------------------------------------------------

@@ -1,0 +1,159 @@
+/**
+ * Image Generator Panels — Model Library
+ * Scan/install workflow panel: table, badges, status bar, and row states.
+ */
+
+/* ── panel sizing ────────────────────────────────────────────────────────── */
+
+.ml-library-panel {
+    display: flex;
+    flex-direction: column;
+    flex: 1;          /* stretch to fill ig-library-col height */
+    min-height: 0;    /* allow flex children to shrink below content size */
+}
+
+.ml-library-panel .ig-info-body {
+    padding: 8px 12px 12px;
+    gap: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* ── status bar ──────────────────────────────────────────────────────────── */
+
+.ml-status {
+    font-size: 11px;
+    padding: 4px 0 2px;
+    color: var(--text-secondary);
+    min-height: 18px;
+}
+
+.ml-status-scanning { color: var(--accent-primary); }
+.ml-status-done     { color: var(--success); }
+.ml-status-error    { color: var(--danger); }
+.ml-status-warn     { color: var(--warning); }
+
+/* ── table ───────────────────────────────────────────────────────────────── */
+
+.ml-table thead tr.ml-thead th {
+    padding: 4px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-tertiary);
+    border-bottom: 1px solid var(--border-secondary);
+    background: var(--surface-tertiary);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.ml-table tbody tr {
+    border-bottom: 1px solid var(--border-secondary);
+    transition: background 0.12s;
+}
+
+.ml-table tbody tr:hover {
+    background: var(--surface-hover, rgba(255,255,255,0.04));
+}
+
+.ml-table tbody tr td {
+    padding: 7px 8px;
+    vertical-align: middle;
+    color: var(--text-secondary);
+}
+
+/* group header rows */
+.ml-group-header td {
+    padding: 8px 6px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-tertiary);
+    background: var(--surface-secondary);
+    border-top: 1px solid var(--border-secondary);
+}
+
+.ml-group-header .ml-count {
+    background: var(--accent-primary);
+    color: #fff;
+    border-radius: 8px;
+    padding: 0 6px;
+    font-size: 9px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+/* name cell — truncate long paths */
+.ml-name {
+    max-width: 0;          /* force truncation inside table-layout:fixed */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-primary);
+    font-size: 12px;
+}
+
+/* empty state */
+.ml-empty {
+    text-align: center;
+    color: var(--text-tertiary);
+    padding: 20px 0 !important;
+    font-style: italic;
+    font-size: 11px;
+}
+
+/* ── row install-status tints ────────────────────────────────────────────── */
+
+.ml-asset-row.ml-status-installed { background: rgba(72, 199, 116, 0.10); }
+.ml-asset-row.ml-status-skipped   { background: rgba(150, 150, 150, 0.08); }
+.ml-asset-row.ml-status-failed    { background: rgba(255, 90, 90, 0.12); }
+
+/* ── family badges ───────────────────────────────────────────────────────── */
+
+.ml-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    background: var(--surface-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-secondary);
+}
+
+.ml-badge-flux      { background: rgba(124, 58, 237, 0.20); color: #a78bfa; border-color: #7c3aed44; }
+.ml-badge-sdxl      { background: rgba(14, 165, 233, 0.18); color: #38bdf8; border-color: #0ea5e944; }
+.ml-badge-sd3       { background: rgba(249, 115,  22, 0.18); color: #fb923c; border-color: #f97316aa; }
+.ml-badge-sd1\.5    { background: rgba(34, 197,  94, 0.18); color: #4ade80; border-color: #22c55e44; }
+.ml-badge-sd2\.1    { background: rgba(34, 197,  94, 0.14); color: #86efac; border-color: #22c55e33; }
+.ml-badge-sdxl-turbo{ background: rgba(236, 72,  153, 0.18); color: #f472b6; border-color: #ec489944; }
+.ml-badge-auraflow  { background: rgba(250, 204,  21, 0.18); color: #fde047; border-color: #facc1544; }
+.ml-badge-kolors    { background: rgba(244,  63,  94, 0.18); color: #fb7185; border-color: #f43f5e44; }
+.ml-badge-cascade   { background: rgba( 20, 184, 166, 0.18); color: #2dd4bf; border-color: #14b8a644; }
+.ml-badge-chroma    { background: rgba(255, 165,   0, 0.18); color: #fbbf24; border-color: #f59e0b44; }
+
+/* ── compatibility warning icon ──────────────────────────────────────────── */
+
+.ml-compat-warn {
+    color: var(--warning, #f59e0b);
+    font-size: 11px;
+    margin-left: 4px;
+    cursor: help;
+    vertical-align: middle;
+}
+
+/* ── checkbox column ─────────────────────────────────────────────────────── */
+
+.ml-asset-row input[type="checkbox"] {
+    accent-color: var(--accent-primary);
+    cursor: pointer;
+    width: 13px;
+    height: 13px;
+}

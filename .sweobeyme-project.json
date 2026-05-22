@@ -1,0 +1,6 @@
+{
+  "maxLines": 5000,
+  "language": "go",
+  "project": "HOWL_Chat",
+  "notes": "Go project — large files like app.go (3345 lines) are normal. SWEObeyMe uses this to override the default 700-line JS limit."
+}

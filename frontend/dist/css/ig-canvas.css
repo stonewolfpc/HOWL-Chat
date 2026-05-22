@@ -130,3 +130,31 @@
 .ig-mask-canvas.active {
     pointer-events: auto;
 }
+
+/* Batch Image Grid */
+.ig-batch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 8px;
+    align-content: start;
+}
+
+.ig-batch-thumb {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    background: #000;
+}
+
+.ig-batch-thumb:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}

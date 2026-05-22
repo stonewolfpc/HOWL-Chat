@@ -26,6 +26,56 @@ func newClient(baseURL string) *client {
 	}
 }
 
+// generateSequentialBatch splits a multi-image batch into sequential
+// single-image requests to avoid CUDA OOM. sd-server allocates all
+// batch latents simultaneously in a true batch, which exceeds VRAM.
+func (c *client) generateSequentialBatch(singleGen func(types.ImageOptions) (*types.ImageResult, error), opts types.ImageOptions) (*types.ImageResult, error) {
+	baseSeed := opts.Seed
+	var allImages []string
+
+	fmt.Printf("[ImageEngine] Batch: splitting %d images into sequential requests (seed=%d)\n", opts.BatchCount, baseSeed)
+
+	for i := 0; i < opts.BatchCount; i++ {
+		singleOpts := opts
+		singleOpts.BatchCount = 1
+		// Increment seed per item for variety (A1111 convention)
+		singleOpts.Seed = baseSeed + int64(i)
+
+		result, err := singleGen(singleOpts)
+		if err != nil {
+			if len(allImages) == 0 {
+				return nil, fmt.Errorf("batch item %d/%d failed: %w", i+1, opts.BatchCount, err)
+			}
+			fmt.Printf("[ImageEngine] Batch interrupted at item %d/%d: %v\n", i+1, opts.BatchCount, err)
+			break
+		}
+		allImages = append(allImages, result.ImageData)
+	}
+
+	if len(allImages) == 0 {
+		return nil, fmt.Errorf("no images generated in batch of %d", opts.BatchCount)
+	}
+
+	fmt.Printf("[ImageEngine] Batch complete: %d/%d images generated\n", len(allImages), opts.BatchCount)
+
+	return &types.ImageResult{
+		ImageData: allImages[0],
+		Images:    allImages,
+		Metadata: types.ImageMetadata{
+			Prompt:         opts.Prompt,
+			NegativePrompt: opts.NegativePrompt,
+			Width:          opts.Width,
+			Height:         opts.Height,
+			Steps:          opts.Steps,
+			Seed:           baseSeed,
+			Sampler:        opts.Sampler,
+			CfgScale:       opts.CfgScale,
+			Mode:           opts.Mode,
+			CreatedAt:      time.Now().Format(time.RFC3339),
+		},
+	}, nil
+}
+
 func (c *client) waitForReady(timeout time.Duration) error {
 	deadline := time.Now().Add(timeout)
 	for time.Now().Before(deadline) {
@@ -41,34 +91,47 @@ func (c *client) waitForReady(timeout time.Duration) error {
 
 // txt2imgRequest mirrors the WebUI /sdapi/v1/txt2img payload.
 type txt2imgRequest struct {
-	Prompt            string   `json:"prompt"`
-	NegativePrompt    string   `json:"negative_prompt"`
-	Width             int      `json:"width"`
-	Height            int      `json:"height"`
-	Steps             int      `json:"steps"`
-	Seed              int64    `json:"seed"`
-	SamplerName       string   `json:"sampler_name"`
-	Scheduler         string   `json:"scheduler"`
-	CfgScale          float64  `json:"cfg_scale"`
-	Guidance          float64  `json:"guidance"`
-	SlgScale          float64  `json:"slg_scale"`
-	SkipLayerStart    float64  `json:"skip_layer_start"`
-	SkipLayerEnd      float64  `json:"skip_layer_end"`
-	Eta               float64  `json:"eta"`
-	BatchSize         int      `json:"batch_size"`
-	EnableHR          bool     `json:"enable_hr"`
-	HRScale           float64  `json:"hr_scale"`
-	HRUpscaler        string   `json:"hr_upscaler"`
-	DenoisingStrength float64  `json:"denoising_strength"`
-	Tiling            bool     `json:"tiling"`
-	ClipSkip          int      `json:"clip_skip"`
-	LoRAs             []string `json:"loras,omitempty"`
-	ControlImage      string   `json:"control_image,omitempty"`
-	ControlStrength   float64  `json:"control_strength,omitempty"`
-	CacheMode         string   `json:"cache_mode,omitempty"`
-	CacheOption       string   `json:"cache_option,omitempty"`
-	VideoFrames       int      `json:"video_frames,omitempty"`
-	FPS               int      `json:"fps,omitempty"`
+	Prompt                  string   `json:"prompt"`
+	NegativePrompt          string   `json:"negative_prompt"`
+	Width                   int      `json:"width"`
+	Height                  int      `json:"height"`
+	Steps                   int      `json:"steps"`
+	Seed                    int64    `json:"seed"`
+	SamplerName             string   `json:"sampler_name"`
+	Scheduler               string   `json:"scheduler"`
+	CfgScale                float64  `json:"cfg_scale"`
+	Guidance                float64  `json:"guidance"`
+	SlgScale                float64  `json:"slg_scale"`
+	SkipLayerStart          float64  `json:"skip_layer_start"`
+	SkipLayerEnd            float64  `json:"skip_layer_end"`
+	Eta                     float64  `json:"eta"`
+	BatchSize               int      `json:"batch_size"`
+	EnableHR                bool     `json:"enable_hr"`
+	HRScale                 float64  `json:"hr_scale"`
+	HRUpscaler              string   `json:"hr_upscaler"`
+	DenoisingStrength       float64  `json:"denoising_strength"`
+	Tiling                  bool     `json:"tiling"`
+	ClipSkip                int      `json:"clip_skip"`
+	LoRAs                   []string `json:"loras,omitempty"`
+	ControlImage            string   `json:"control_image,omitempty"`
+	ControlStrength         float64  `json:"control_strength,omitempty"`
+	CacheMode               string   `json:"cache_mode,omitempty"`
+	CacheOption             string   `json:"cache_option,omitempty"`
+	VideoFrames             int      `json:"video_frames,omitempty"`
+	FPS                     int      `json:"fps,omitempty"`
+	Prediction              string   `json:"prediction,omitempty"`
+	RNG                     string   `json:"rng,omitempty"`
+	SamplerRNG              string   `json:"sampler_rng,omitempty"`
+	FlowShift               float64  `json:"flow_shift,omitempty"`
+	VAETileOverlap          float64  `json:"vae_tile_overlap,omitempty"`
+	DisableMetadata         bool     `json:"disable_metadata,omitempty"`
+	HighNoiseSteps          int      `json:"high_noise_steps,omitempty"`
+	HighNoiseCfgScale       float64  `json:"high_noise_cfg_scale,omitempty"`
+	HighNoiseGuidance       float64  `json:"high_noise_guidance,omitempty"`
+	HighNoiseSlgScale       float64  `json:"high_noise_slg_scale,omitempty"`
+	HighNoiseEta            float64  `json:"high_noise_eta,omitempty"`
+	HighNoiseSkipLayerStart float64  `json:"high_noise_skip_layer_start,omitempty"`
+	HighNoiseSkipLayerEnd   float64  `json:"high_noise_skip_layer_end,omitempty"`
 }
 
 type txt2imgResponse struct {
@@ -78,6 +141,12 @@ type txt2imgResponse struct {
 }
 
 func (c *client) txt2img(opts types.ImageOptions) (*types.ImageResult, error) {
+	if opts.BatchCount > 1 {
+		return c.generateSequentialBatch(func(o types.ImageOptions) (*types.ImageResult, error) {
+			o.BatchCount = 1
+			return c.txt2img(o)
+		}, opts)
+	}
 	var ctrlImgB64 string
 	if opts.ControlImagePath != "" {
 		if data, err := os.ReadFile(opts.ControlImagePath); err == nil {
@@ -86,34 +155,47 @@ func (c *client) txt2img(opts types.ImageOptions) (*types.ImageResult, error) {
 	}
 
 	reqBody := txt2imgRequest{
-		Prompt:            opts.Prompt,
-		NegativePrompt:    opts.NegativePrompt,
-		Width:             opts.Width,
-		Height:            opts.Height,
-		Steps:             opts.Steps,
-		Seed:              opts.Seed,
-		SamplerName:       opts.Sampler,
-		Scheduler:         opts.Scheduler,
-		CfgScale:          opts.CfgScale,
-		Guidance:          opts.Guidance,
-		SlgScale:          opts.SlgScale,
-		SkipLayerStart:    opts.SkipLayerStart,
-		SkipLayerEnd:      opts.SkipLayerEnd,
-		Eta:               opts.Eta,
-		BatchSize:         opts.BatchCount,
-		EnableHR:          opts.EnableHR,
-		HRScale:           opts.HRScale,
-		HRUpscaler:        opts.HRUpscaler,
-		DenoisingStrength: opts.DenoisingStrength,
-		Tiling:            opts.Tiling,
-		ClipSkip:          opts.ClipSkip,
-		LoRAs:             opts.LoRAs,
-		ControlImage:      ctrlImgB64,
-		ControlStrength:   opts.ControlStrength,
-		CacheMode:         opts.CacheMode,
-		CacheOption:       opts.CacheOption,
-		VideoFrames:       opts.VideoFrames,
-		FPS:               opts.FPS,
+		Prompt:                  opts.Prompt,
+		NegativePrompt:          opts.NegativePrompt,
+		Width:                   opts.Width,
+		Height:                  opts.Height,
+		Steps:                   opts.Steps,
+		Seed:                    opts.Seed,
+		SamplerName:             opts.Sampler,
+		Scheduler:               opts.Scheduler,
+		CfgScale:                opts.CfgScale,
+		Guidance:                opts.Guidance,
+		SlgScale:                opts.SlgScale,
+		SkipLayerStart:          opts.SkipLayerStart,
+		SkipLayerEnd:            opts.SkipLayerEnd,
+		Eta:                     opts.Eta,
+		BatchSize:               opts.BatchCount,
+		EnableHR:                opts.EnableHR,
+		HRScale:                 opts.HRScale,
+		HRUpscaler:              opts.HRUpscaler,
+		DenoisingStrength:       opts.DenoisingStrength,
+		Tiling:                  opts.Tiling,
+		ClipSkip:                opts.ClipSkip,
+		LoRAs:                   opts.LoRAs,
+		ControlImage:            ctrlImgB64,
+		ControlStrength:         opts.ControlStrength,
+		CacheMode:               opts.CacheMode,
+		CacheOption:             opts.CacheOption,
+		VideoFrames:             opts.VideoFrames,
+		FPS:                     opts.FPS,
+		Prediction:              opts.Prediction,
+		RNG:                     opts.RNG,
+		SamplerRNG:              opts.SamplerRNG,
+		FlowShift:               opts.FlowShift,
+		VAETileOverlap:          opts.VAETileOverlap,
+		DisableMetadata:         opts.DisableMetadata,
+		HighNoiseSteps:          opts.HighNoiseSteps,
+		HighNoiseCfgScale:       opts.HighNoiseCfgScale,
+		HighNoiseGuidance:       opts.HighNoiseGuidance,
+		HighNoiseSlgScale:       opts.HighNoiseSlgScale,
+		HighNoiseEta:            opts.HighNoiseEta,
+		HighNoiseSkipLayerStart: opts.HighNoiseSkipLayerStart,
+		HighNoiseSkipLayerEnd:   opts.HighNoiseSkipLayerEnd,
 	}
 	if reqBody.BatchSize <= 0 {
 		reqBody.BatchSize = 1
@@ -145,6 +227,7 @@ func (c *client) txt2img(opts types.ImageOptions) (*types.ImageResult, error) {
 
 	return &types.ImageResult{
 		ImageData: result.Images[0],
+		Images:    result.Images,
 		Metadata: types.ImageMetadata{
 			Prompt:         opts.Prompt,
 			NegativePrompt: opts.NegativePrompt,
@@ -161,36 +244,55 @@ func (c *client) txt2img(opts types.ImageOptions) (*types.ImageResult, error) {
 }
 
 type img2imgRequest struct {
-	Prompt            string   `json:"prompt"`
-	NegativePrompt    string   `json:"negative_prompt"`
-	InitImages        []string `json:"init_images"`
-	Mask              string   `json:"mask,omitempty"`
-	Width             int      `json:"width"`
-	Height            int      `json:"height"`
-	Steps             int      `json:"steps"`
-	Seed              int64    `json:"seed"`
-	SamplerName       string   `json:"sampler_name"`
-	Scheduler         string   `json:"scheduler"`
-	CfgScale          float64  `json:"cfg_scale"`
-	Guidance          float64  `json:"guidance"`
-	SlgScale          float64  `json:"slg_scale"`
-	SkipLayerStart    float64  `json:"skip_layer_start"`
-	SkipLayerEnd      float64  `json:"skip_layer_end"`
-	Eta               float64  `json:"eta"`
-	BatchSize         int      `json:"batch_size"`
-	DenoisingStrength float64  `json:"denoising_strength"`
-	Tiling            bool     `json:"tiling"`
-	ClipSkip          int      `json:"clip_skip"`
-	LoRAs             []string `json:"loras,omitempty"`
-	ControlImage      string   `json:"control_image,omitempty"`
-	ControlStrength   float64  `json:"control_strength,omitempty"`
-	CacheMode         string   `json:"cache_mode,omitempty"`
-	CacheOption       string   `json:"cache_option,omitempty"`
-	VideoFrames       int      `json:"video_frames,omitempty"`
-	FPS               int      `json:"fps,omitempty"`
+	Prompt                  string   `json:"prompt"`
+	NegativePrompt          string   `json:"negative_prompt"`
+	InitImages              []string `json:"init_images"`
+	Mask                    string   `json:"mask,omitempty"`
+	Width                   int      `json:"width"`
+	Height                  int      `json:"height"`
+	Steps                   int      `json:"steps"`
+	Seed                    int64    `json:"seed"`
+	SamplerName             string   `json:"sampler_name"`
+	Scheduler               string   `json:"scheduler"`
+	CfgScale                float64  `json:"cfg_scale"`
+	Guidance                float64  `json:"guidance"`
+	SlgScale                float64  `json:"slg_scale"`
+	SkipLayerStart          float64  `json:"skip_layer_start"`
+	SkipLayerEnd            float64  `json:"skip_layer_end"`
+	Eta                     float64  `json:"eta"`
+	BatchSize               int      `json:"batch_size"`
+	DenoisingStrength       float64  `json:"denoising_strength"`
+	Tiling                  bool     `json:"tiling"`
+	ClipSkip                int      `json:"clip_skip"`
+	LoRAs                   []string `json:"loras,omitempty"`
+	ControlImage            string   `json:"control_image,omitempty"`
+	ControlStrength         float64  `json:"control_strength,omitempty"`
+	CacheMode               string   `json:"cache_mode,omitempty"`
+	CacheOption             string   `json:"cache_option,omitempty"`
+	VideoFrames             int      `json:"video_frames,omitempty"`
+	FPS                     int      `json:"fps,omitempty"`
+	Prediction              string   `json:"prediction,omitempty"`
+	RNG                     string   `json:"rng,omitempty"`
+	SamplerRNG              string   `json:"sampler_rng,omitempty"`
+	FlowShift               float64  `json:"flow_shift,omitempty"`
+	VAETileOverlap          float64  `json:"vae_tile_overlap,omitempty"`
+	DisableMetadata         bool     `json:"disable_metadata,omitempty"`
+	HighNoiseSteps          int      `json:"high_noise_steps,omitempty"`
+	HighNoiseCfgScale       float64  `json:"high_noise_cfg_scale,omitempty"`
+	HighNoiseGuidance       float64  `json:"high_noise_guidance,omitempty"`
+	HighNoiseSlgScale       float64  `json:"high_noise_slg_scale,omitempty"`
+	HighNoiseEta            float64  `json:"high_noise_eta,omitempty"`
+	HighNoiseSkipLayerStart float64  `json:"high_noise_skip_layer_start,omitempty"`
+	HighNoiseSkipLayerEnd   float64  `json:"high_noise_skip_layer_end,omitempty"`
 }
 
 func (c *client) img2img(opts types.ImageOptions) (*types.ImageResult, error) {
+	if opts.BatchCount > 1 {
+		return c.generateSequentialBatch(func(o types.ImageOptions) (*types.ImageResult, error) {
+			o.BatchCount = 1
+			return c.img2img(o)
+		}, opts)
+	}
 	if opts.InitImagePath == "" {
 		return nil, fmt.Errorf("img2img requires an init image path")
 	}
@@ -209,30 +311,43 @@ func (c *client) img2img(opts types.ImageOptions) (*types.ImageResult, error) {
 	}
 
 	reqBody := img2imgRequest{
-		Prompt:            opts.Prompt,
-		NegativePrompt:    opts.NegativePrompt,
-		InitImages:        []string{b64Img},
-		Width:             opts.Width,
-		Height:            opts.Height,
-		Steps:             opts.Steps,
-		Seed:              opts.Seed,
-		SamplerName:       opts.Sampler,
-		Scheduler:         opts.Scheduler,
-		CfgScale:          opts.CfgScale,
-		Guidance:          opts.Guidance,
-		SlgScale:          opts.SlgScale,
-		SkipLayerStart:    opts.SkipLayerStart,
-		SkipLayerEnd:      opts.SkipLayerEnd,
-		Eta:               opts.Eta,
-		BatchSize:         opts.BatchCount,
-		DenoisingStrength: opts.Strength,
-		Tiling:            opts.Tiling,
-		ClipSkip:          opts.ClipSkip,
-		LoRAs:             opts.LoRAs,
-		ControlImage:      ctrlImgB64,
-		ControlStrength:   opts.ControlStrength,
-		CacheMode:         opts.CacheMode,
-		CacheOption:       opts.CacheOption,
+		Prompt:                  opts.Prompt,
+		NegativePrompt:          opts.NegativePrompt,
+		InitImages:              []string{b64Img},
+		Width:                   opts.Width,
+		Height:                  opts.Height,
+		Steps:                   opts.Steps,
+		Seed:                    opts.Seed,
+		SamplerName:             opts.Sampler,
+		Scheduler:               opts.Scheduler,
+		CfgScale:                opts.CfgScale,
+		Guidance:                opts.Guidance,
+		SlgScale:                opts.SlgScale,
+		SkipLayerStart:          opts.SkipLayerStart,
+		SkipLayerEnd:            opts.SkipLayerEnd,
+		Eta:                     opts.Eta,
+		BatchSize:               opts.BatchCount,
+		DenoisingStrength:       opts.Strength,
+		Tiling:                  opts.Tiling,
+		ClipSkip:                opts.ClipSkip,
+		LoRAs:                   opts.LoRAs,
+		ControlImage:            ctrlImgB64,
+		ControlStrength:         opts.ControlStrength,
+		CacheMode:               opts.CacheMode,
+		CacheOption:             opts.CacheOption,
+		Prediction:              opts.Prediction,
+		RNG:                     opts.RNG,
+		SamplerRNG:              opts.SamplerRNG,
+		FlowShift:               opts.FlowShift,
+		VAETileOverlap:          opts.VAETileOverlap,
+		DisableMetadata:         opts.DisableMetadata,
+		HighNoiseSteps:          opts.HighNoiseSteps,
+		HighNoiseCfgScale:       opts.HighNoiseCfgScale,
+		HighNoiseGuidance:       opts.HighNoiseGuidance,
+		HighNoiseSlgScale:       opts.HighNoiseSlgScale,
+		HighNoiseEta:            opts.HighNoiseEta,
+		HighNoiseSkipLayerStart: opts.HighNoiseSkipLayerStart,
+		HighNoiseSkipLayerEnd:   opts.HighNoiseSkipLayerEnd,
 	}
 	if reqBody.BatchSize <= 0 {
 		reqBody.BatchSize = 1
@@ -267,6 +382,7 @@ func (c *client) img2img(opts types.ImageOptions) (*types.ImageResult, error) {
 
 	return &types.ImageResult{
 		ImageData: result.Images[0],
+		Images:    result.Images,
 		Metadata: types.ImageMetadata{
 			Prompt:         opts.Prompt,
 			NegativePrompt: opts.NegativePrompt,
@@ -283,6 +399,12 @@ func (c *client) img2img(opts types.ImageOptions) (*types.ImageResult, error) {
 }
 
 func (c *client) inpaint(opts types.ImageOptions) (*types.ImageResult, error) {
+	if opts.BatchCount > 1 {
+		return c.generateSequentialBatch(func(o types.ImageOptions) (*types.ImageResult, error) {
+			o.BatchCount = 1
+			return c.inpaint(o)
+		}, opts)
+	}
 	if opts.InitImagePath == "" {
 		return nil, fmt.Errorf("inpaint requires an init image path")
 	}
@@ -309,33 +431,46 @@ func (c *client) inpaint(opts types.ImageOptions) (*types.ImageResult, error) {
 	}
 
 	reqBody := img2imgRequest{
-		Prompt:            opts.Prompt,
-		NegativePrompt:    opts.NegativePrompt,
-		InitImages:        []string{b64Img},
-		Mask:              b64Mask,
-		Width:             opts.Width,
-		Height:            opts.Height,
-		Steps:             opts.Steps,
-		Seed:              opts.Seed,
-		SamplerName:       opts.Sampler,
-		Scheduler:         opts.Scheduler,
-		CfgScale:          opts.CfgScale,
-		Guidance:          opts.Guidance,
-		SlgScale:          opts.SlgScale,
-		SkipLayerStart:    opts.SkipLayerStart,
-		SkipLayerEnd:      opts.SkipLayerEnd,
-		Eta:               opts.Eta,
-		BatchSize:         opts.BatchCount,
-		DenoisingStrength: opts.Strength,
-		Tiling:            opts.Tiling,
-		ClipSkip:          opts.ClipSkip,
-		LoRAs:             opts.LoRAs,
-		ControlImage:      ctrlImgB64,
-		ControlStrength:   opts.ControlStrength,
-		CacheMode:         opts.CacheMode,
-		CacheOption:       opts.CacheOption,
-		VideoFrames:       opts.VideoFrames,
-		FPS:               opts.FPS,
+		Prompt:                  opts.Prompt,
+		NegativePrompt:          opts.NegativePrompt,
+		InitImages:              []string{b64Img},
+		Mask:                    b64Mask,
+		Width:                   opts.Width,
+		Height:                  opts.Height,
+		Steps:                   opts.Steps,
+		Seed:                    opts.Seed,
+		SamplerName:             opts.Sampler,
+		Scheduler:               opts.Scheduler,
+		CfgScale:                opts.CfgScale,
+		Guidance:                opts.Guidance,
+		SlgScale:                opts.SlgScale,
+		SkipLayerStart:          opts.SkipLayerStart,
+		SkipLayerEnd:            opts.SkipLayerEnd,
+		Eta:                     opts.Eta,
+		BatchSize:               opts.BatchCount,
+		DenoisingStrength:       opts.Strength,
+		Tiling:                  opts.Tiling,
+		ClipSkip:                opts.ClipSkip,
+		LoRAs:                   opts.LoRAs,
+		ControlImage:            ctrlImgB64,
+		ControlStrength:         opts.ControlStrength,
+		CacheMode:               opts.CacheMode,
+		CacheOption:             opts.CacheOption,
+		VideoFrames:             opts.VideoFrames,
+		FPS:                     opts.FPS,
+		Prediction:              opts.Prediction,
+		RNG:                     opts.RNG,
+		SamplerRNG:              opts.SamplerRNG,
+		FlowShift:               opts.FlowShift,
+		VAETileOverlap:          opts.VAETileOverlap,
+		DisableMetadata:         opts.DisableMetadata,
+		HighNoiseSteps:          opts.HighNoiseSteps,
+		HighNoiseCfgScale:       opts.HighNoiseCfgScale,
+		HighNoiseGuidance:       opts.HighNoiseGuidance,
+		HighNoiseSlgScale:       opts.HighNoiseSlgScale,
+		HighNoiseEta:            opts.HighNoiseEta,
+		HighNoiseSkipLayerStart: opts.HighNoiseSkipLayerStart,
+		HighNoiseSkipLayerEnd:   opts.HighNoiseSkipLayerEnd,
 	}
 	if reqBody.BatchSize <= 0 {
 		reqBody.BatchSize = 1
@@ -370,6 +505,7 @@ func (c *client) inpaint(opts types.ImageOptions) (*types.ImageResult, error) {
 
 	return &types.ImageResult{
 		ImageData: result.Images[0],
+		Images:    result.Images,
 		Metadata: types.ImageMetadata{
 			Prompt:         opts.Prompt,
 			NegativePrompt: opts.NegativePrompt,
@@ -386,6 +522,12 @@ func (c *client) inpaint(opts types.ImageOptions) (*types.ImageResult, error) {
 }
 
 func (c *client) video(opts types.ImageOptions) (*types.ImageResult, error) {
+	if opts.BatchCount > 1 {
+		return c.generateSequentialBatch(func(o types.ImageOptions) (*types.ImageResult, error) {
+			o.BatchCount = 1
+			return c.video(o)
+		}, opts)
+	}
 	// Video generation often requires an init image (SVD) or text (WAN).
 	// We'll use the img2img endpoint if an init image is present, otherwise txt2img.
 	if opts.InitImagePath != "" {
@@ -457,12 +599,11 @@ func (c *client) video(opts types.ImageOptions) (*types.ImageResult, error) {
 
 		return &types.ImageResult{
 			ImageData: result.Images[0],
+			Images:    result.Images,
 			Metadata: types.ImageMetadata{
-				Prompt: opts.Prompt,
-				Width:  opts.Width,
-				Height: opts.Height,
-				Steps:  opts.Steps,
-				Mode:   "video",
+				Prompt:    opts.Prompt,
+				Mode:      opts.Mode,
+				CreatedAt: time.Now().Format(time.RFC3339),
 			},
 		}, nil
 	}

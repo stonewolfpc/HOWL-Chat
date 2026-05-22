@@ -94,8 +94,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Listen for Wails backend events
+let _modelEventListenersInitialized = false;
+
 function initModelEventListeners() {
+    if (_modelEventListenersInitialized) {
+        console.log('Model event listeners already initialized, skipping');
+        return;
+    }
     if (window.runtime) {
+        _modelEventListenersInitialized = true;
         // Model loading started
         window.runtime.EventsOn('model:loading', () => {
             updateLoadingProgress(0);

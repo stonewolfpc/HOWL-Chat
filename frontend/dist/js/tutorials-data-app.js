@@ -214,6 +214,165 @@ All settings menus can also be accessed via the **File → Settings** modal, whi
 </info>`
         },
         {
+            id: 'tts-voice-registry',
+            title: 'TTS Voice Model Registry',
+            content: `# TTS Voice Model Registry
+
+HOWL's unified model registry also manages TTS voice models (Piper .onnx files). Scan once, remember forever — voices from any directory appear in the TTS dropdown automatically.
+
+## How It Works
+
+The registry stores voice models the same way it stores LLMs and image models:
+- Scan a directory → all \`.onnx\` voice files are registered with their absolute paths
+- Registry is persisted → saved to \`config/model-registry.json\`
+- Directory is remembered → saved to \`config/model-scan-dirs.json\`
+- Auto-rescan on startup → newly added voices appear automatically
+
+## Where to Find It
+
+**Settings → Audio Settings → TTS tab**
+
+The TTS voice dropdown shows:
+- Built-in voice (en_US-lessac-medium)
+- All registered voices from your scanned directories
+
+## How to Add Voices
+
+**Scan a Directory:**
+1. Open **Settings → Audio Settings**
+2. Click the **TTS** tab
+3. Click **+ Dir** next to the TTS Voice Model dropdown
+4. Select a directory containing Piper .onnx voice models
+5. All voices are scanned and registered
+6. The directory is remembered for auto-rescan on startup
+7. Select a voice from the refreshed dropdown
+
+## Example Workflow
+
+**New User (First Time Setup):**
+1. Download Piper voices from the [Piper repository](https://github.com/rhasspy/piper)
+2. Extract to \`F:\\Voices\\Piper\`
+3. Open HOWL → Settings → Audio Settings → TTS
+4. Click **+ Dir** → select \`F:\\Voices\\Piper\`
+5. All voices appear in the dropdown
+6. Done. Future HOWL sessions show all voices automatically.
+
+**Power User (Multiple Voice Collections):**
+1. Scan \`F:\\Voices\\Piper-English\` (50 English voices)
+2. Scan \`F:\\Voices\\Piper-Multilingual\` (30 other languages)
+3. Scan \`E:\\Work\\Voices\` (10 custom voices)
+4. All 90 voices appear in the dropdown
+5. Next week, download 5 new voices to \`F:\\Voices\\Piper-English\`
+6. Restart HOWL → the 5 new voices appear automatically
+
+## Registry vs Manual Selection
+
+| Method | When to Use |
+|--------|-------------|
+| **Registry dropdown** | Your permanent voice collection. Scan once, use forever. |
+| **Built-in only** | If you only need the default voice and don't want to manage a registry. |
+
+<success>
+The TTS registry works exactly like the LLM registry. Add your voice directories once, and all voices appear automatically on every startup. New voices added to those directories are picked up automatically.
+</success>`
+        },
+        {
+            id: 'image-model-registry',
+            title: 'Image Model Registry',
+            content: `# Image Model Registry
+
+HOWL's unified model registry manages all image generation assets — diffusion models, VAEs, LoRAs, ControlNets, embeddings, and upscalers. Scan once, remember forever — assets from any directory appear in the Image Generator dropdowns automatically.
+
+## How It Works
+
+The registry stores image assets alongside LLMs and TTS voices:
+- Scan a directory → all supported files (.safetensors, .ckpt, .gguf, .bundle, .onnx, .pt) are registered
+- Registry is persisted → saved to \`config/model-registry.json\`
+- Directory is remembered → saved to \`config/model-scan-dirs.json\`
+- Auto-rescan on startup → newly added assets appear automatically
+- Cross-directory access → assets from multiple directories appear together in all dropdowns
+
+## Where to Find It
+
+**Image Generator page** (access via main navigation or File → Image Generator)
+
+The Image Generator has multiple dropdowns, all populated from the registry:
+- **Model** — Main diffusion models (SDXL, Flux, SD1.5, etc.)
+- **VAE** — Variational autoencoders
+- **LoRA** — Style adapters
+- **ControlNet** — Structure/pose control models
+- **Embeddings** — Textual inversions
+- **Upscalers** — Image upscaling models
+
+## How to Add Assets
+
+**Scan a Directory:**
+1. Open the **Image Generator** page
+2. Click **+ Dir** next to the Model dropdown
+3. Select a directory containing diffusion models
+4. All supported files are scanned and registered
+5. The directory is remembered for auto-rescan on startup
+6. Repeat for other asset types if stored in separate directories
+
+## Example Workflow
+
+**New User (First Time Setup):**
+1. Download SDXL models from CivitAI or HuggingFace
+2. Extract to \`D:\\AI GGUF\\Image\\SDXL\`
+3. Download VAEs to \`D:\\AI GGUF\\Image\\VAEs\`
+4. Download LoRAs to \`D:\\AI GGUF\\Image\\LoRAs\`
+5. Open Image Generator → click **+ Dir** for Model → select SDXL directory
+6. Click **+ Dir** for VAE → select VAEs directory
+7. Click **+ Dir** for LoRA → select LoRAs directory
+8. All assets appear in their respective dropdowns
+9. Done. Future sessions show all assets automatically.
+
+**Power User (Multiple Collections):**
+1. Scan \`D:\\AI GGUF\\Image\\SDXL\` (20 SDXL models)
+2. Scan \`E:\\Work\\Models\\Flux\` (15 Flux models)
+3. Scan \`F:\\Experimental\\New\` (10 experimental models)
+4. All 45 models appear in the Model dropdown together
+5. Next week, download 5 new Flux models to \`E:\\Work\\Models\\Flux\`
+6. Restart HOWL → the 5 new models appear automatically in the dropdown
+
+## Cross-Directory Generation
+
+The registry enables a powerful workflow: **generate with models from any directory without copying files**.
+
+**Example:**
+- Your configured \`ModelsDir\` is \`D:\\AI GGUF\\Image\\SDXL\`
+- You also scanned \`E:\\Work\\Models\\Flux\`
+- In the Model dropdown, you see models from BOTH directories
+- Select a Flux model from \`E:\\Work\\Models\\Flux\`
+- Click Generate → HOWL loads it from its original path
+- No file copying required — the engine loads directly from wherever the file lives
+
+## Registry vs Manual Selection
+
+| Method | When to Use |
+|--------|-------------|
+| **Registry dropdown** | Your permanent asset collection. Scan once, use forever. |
+| **Browse (manual)** | Testing a one-off model, or a file you don't want remembered. |
+| **+ Dir** | Adding a new asset directory to your permanent collection. |
+
+## Supported File Types by Asset Type
+
+| Asset Type | Extensions |
+|------------|------------|
+| **Diffusion Models** | .safetensors, .ckpt, .gguf, .bundle |
+| **VAEs** | .safetensors, .ckpt |
+| **LoRAs** | .safetensors |
+| **ControlNets** | .safetensors |
+| **Embeddings** | .pt, .safetensors |
+| **Upscalers** | .safetensors |
+| **TTS Voices** | .onnx |
+| **LLMs** | .gguf, .bin |
+
+<success>
+The image registry is the most powerful part of the unified system. You can have models scattered across multiple drives and directories, and they all appear together in the dropdowns. No need to consolidate your collection — just scan each directory once.
+</success>`
+        },
+        {
             id: 'sidebar-left',
             title: 'Left Sidebar',
             content: `# Left Sidebar

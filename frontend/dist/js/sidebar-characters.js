@@ -561,8 +561,6 @@ async function removeCharacterFromChat(characterId) {
     if (confirm('Remove this character from the chat?')) {
         if (window.chatBridge) {
             await window.chatBridge.applyCharacterRemove(characterId);
-            // Bridge already calls saveChatData, but ensure it fires
-            if (typeof saveChatData === 'function') saveChatData();
         } else {
             const cd = window.sidebarState.currentChatData;
             cd.characters = cd.characters.filter(c => c.id !== characterId);

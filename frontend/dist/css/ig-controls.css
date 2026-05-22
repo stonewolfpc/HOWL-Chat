@@ -8,20 +8,21 @@
 .ig-aspect-row {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 6px;
-    margin-top: 8px;
+    gap: 5px;
+    margin-top: 6px;
 }
 
 .ig-aspect-btn {
     background: var(--surface-hover);
     border: 1px solid var(--border-secondary);
     color: var(--text-secondary);
-    padding: 6px 4px;
-    border-radius: 6px;
-    font-size: 11px;
+    padding: 5px 3px;
+    border-radius: 5px;
+    font-size: 10px;
     cursor: pointer;
     transition: all 0.15s;
     text-align: center;
+    white-space: nowrap;
 }
 
 .ig-aspect-btn:hover {
@@ -35,6 +36,33 @@
     border-color: var(--accent-primary);
     color: var(--accent-primary);
     font-weight: 600;
+}
+
+/* Aspect lock & optimize buttons */
+.ig-aspect-lock-btn,
+.ig-optimize-btn {
+    background: var(--surface-hover);
+    border: 1px solid var(--border-secondary);
+    color: var(--text-secondary);
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.ig-aspect-lock-btn.active {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    background: var(--accent-primary-hover);
+}
+
+.ig-aspect-lock-btn:hover,
+.ig-optimize-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    background: var(--surface-tertiary);
 }
 
 /* Dimension Row */

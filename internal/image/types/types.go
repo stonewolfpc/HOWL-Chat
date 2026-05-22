@@ -2,54 +2,89 @@ package types
 
 // ImageOptions describes a single generation request.
 type ImageOptions struct {
-	Prompt            string   `json:"prompt"`
-	NegativePrompt    string   `json:"negative_prompt"`
-	Width             int      `json:"width"`
-	Height            int      `json:"height"`
-	Steps             int      `json:"steps"`
-	Seed              int64    `json:"seed"`
-	Sampler           string   `json:"sampler"`
-	Scheduler         string   `json:"scheduler"`
-	CfgScale          float64  `json:"cfg_scale"`
-	Guidance          float64  `json:"guidance"`  // distilled guidance (SD3/Flux)
-	SlgScale          float64  `json:"slg_scale"` // skip layer guidance
-	SkipLayerStart    float64  `json:"skip_layer_start"`
-	SkipLayerEnd      float64  `json:"skip_layer_end"`
-	Eta               float64  `json:"eta"`             // noise multiplier
-	Strength          float64  `json:"strength"`        // img2img / inpaint
-	InitImagePath     string   `json:"init_image_path"` // img2img / inpaint
-	MaskPath          string   `json:"mask_path"`       // inpaint only
-	ModelName         string   `json:"model_name"`
-	VAEPath           string   `json:"vae_path"`           // standalone VAE
-	ClipLPath         string   `json:"clip_l_path"`        // CLIP-L
-	ClipGPath         string   `json:"clip_g_path"`        // CLIP-G
-	T5XXLPath         string   `json:"t5xxl_path"`         // T5XXL
-	ControlNetPath    string   `json:"control_net_path"`   // ControlNet model
-	ControlImagePath  string   `json:"control_image_path"` // ControlNet image
-	ControlStrength   float64  `json:"control_strength"`   // ControlNet strength
-	BatchCount        int      `json:"batch_count"`
-	Mode              string   `json:"mode"` // "txt2img", "img2img", "inpaint", "video"
-	LoRAs             []string `json:"loras,omitempty"`
-	EnableHR          bool     `json:"enable_hr"`
-	HRScale           float64  `json:"hr_scale"`
-	HRUpscaler        string   `json:"hr_upscaler"`
-	DenoisingStrength float64  `json:"denoising_strength"`
-	Tiling            bool     `json:"tiling"`
-	ClipSkip          int      `json:"clip_skip"`
-	VideoFrames       int      `json:"video_frames"` // SVD/WAN
-	FPS               int      `json:"fps"`          // SVD/WAN
-	CacheMode         string   `json:"cache_mode"`   // easycache, ucache, etc.
-	CacheOption       string   `json:"cache_option"` // threshold=0.25, etc.
+	Prompt                  string   `json:"prompt"`
+	NegativePrompt          string   `json:"negative_prompt"`
+	Width                   int      `json:"width"`
+	Height                  int      `json:"height"`
+	Steps                   int      `json:"steps"`
+	Seed                    int64    `json:"seed"`
+	Sampler                 string   `json:"sampler"`
+	Scheduler               string   `json:"scheduler"`
+	CfgScale                float64  `json:"cfg_scale"`
+	Guidance                float64  `json:"guidance"`  // distilled guidance (SD3/Flux)
+	SlgScale                float64  `json:"slg_scale"` // skip layer guidance
+	SkipLayerStart          float64  `json:"skip_layer_start"`
+	SkipLayerEnd            float64  `json:"skip_layer_end"`
+	Eta                     float64  `json:"eta"`             // noise multiplier
+	Strength                float64  `json:"strength"`        // img2img / inpaint
+	InitImagePath           string   `json:"init_image_path"` // img2img / inpaint
+	MaskPath                string   `json:"mask_path"`       // inpaint only
+	ModelName               string   `json:"model_name"`
+	VAEPath                 string   `json:"vae_path"`           // standalone VAE
+	ClipLPath               string   `json:"clip_l_path"`        // CLIP-L
+	ClipGPath               string   `json:"clip_g_path"`        // CLIP-G
+	T5XXLPath               string   `json:"t5xxl_path"`         // T5XXL
+	ControlNetPath          string   `json:"control_net_path"`   // ControlNet model
+	ControlImagePath        string   `json:"control_image_path"` // ControlNet image
+	ControlStrength         float64  `json:"control_strength"`   // ControlNet strength
+	BatchCount              int      `json:"batch_count"`
+	Mode                    string   `json:"mode"` // "txt2img", "img2img", "inpaint", "outpaint", "upscale", "video"
+	OutpaintMargin          int      `json:"outpaint_margin,omitempty"`
+	OutpaintDirection       string   `json:"outpaint_direction,omitempty"` // "all", "left", "right", "up", "down"
+	UpscaleFactor           int      `json:"upscale_factor,omitempty"`     // 2 or 4
+	LoRAs                   []string `json:"loras,omitempty"`
+	EnableHR                bool     `json:"enable_hr"`
+	HRScale                 float64  `json:"hr_scale"`
+	HRUpscaler              string   `json:"hr_upscaler"`
+	DenoisingStrength       float64  `json:"denoising_strength"`
+	Tiling                  bool     `json:"tiling"`
+	ClipSkip                int      `json:"clip_skip"`
+	VideoFrames             int      `json:"video_frames"`               // SVD/WAN
+	FPS                     int      `json:"fps"`                        // SVD/WAN
+	CacheMode               string   `json:"cache_mode"`                 // easycache, ucache, etc.
+	CacheOption             string   `json:"cache_option"`               // threshold=0.25, etc.
+	Prediction              string   `json:"prediction,omitempty"`       // eps, v, edm_v, sd3_flow, flux_flow, flux2_flow
+	RNG                     string   `json:"rng,omitempty"`              // std_default, cuda, cpu
+	SamplerRNG              string   `json:"sampler_rng,omitempty"`      // std_default, cuda, cpu
+	FlowShift               float64  `json:"flow_shift,omitempty"`       // shift for Flow models
+	VAETileOverlap          float64  `json:"vae_tile_overlap,omitempty"` // 0.0-1.0
+	DisableMetadata         bool     `json:"disable_metadata,omitempty"` // don't embed metadata
+	HighNoiseSteps          int      `json:"high_noise_steps,omitempty"`
+	HighNoiseCfgScale       float64  `json:"high_noise_cfg_scale,omitempty"`
+	HighNoiseGuidance       float64  `json:"high_noise_guidance,omitempty"`
+	HighNoiseSlgScale       float64  `json:"high_noise_slg_scale,omitempty"`
+	HighNoiseEta            float64  `json:"high_noise_eta,omitempty"`
+	HighNoiseSkipLayerStart float64  `json:"high_noise_skip_layer_start,omitempty"`
+	HighNoiseSkipLayerEnd   float64  `json:"high_noise_skip_layer_end,omitempty"`
+	// Model startup flags — forwarded to lazy-load if engine is not yet running
+	VAETiling      bool `json:"vae_tiling,omitempty"`
+	TemporalTiling bool `json:"temporal_tiling,omitempty"`
+	FlashAttention bool `json:"flash_attention,omitempty"`
+	OffloadToCPU   bool `json:"offload_to_cpu,omitempty"`
 }
 
 // ModelLoadOptions describes how to load a model, including modular sub-models.
 type ModelLoadOptions struct {
-	ModelName      string `json:"model"`
-	VAEPath        string `json:"vae"`
-	ClipLPath      string `json:"clip_l"`
-	ClipGPath      string `json:"clip_g"`
-	T5XXLPath      string `json:"t5xxl"`
-	DiffusionModel string `json:"diffusion_model"`
+	ModelName       string `json:"model"`
+	ModelPath       string `json:"model_path,omitempty"` // absolute path; when set, skips directory scan
+	VAEPath         string `json:"vae"`
+	ClipLPath       string `json:"clip_l"`
+	ClipGPath       string `json:"clip_g"`
+	T5XXLPath       string `json:"t5xxl"`
+	DiffusionModel  string `json:"diffusion_model"`
+	Backend         string `json:"backend,omitempty"`        // cpu, cuda, vulkan, etc.
+	ParamsBackend   string `json:"params_backend,omitempty"` // cpu, cuda
+	VAETiling       bool   `json:"vae_tiling,omitempty"`
+	TemporalTiling  bool   `json:"temporal_tiling,omitempty"`
+	Circular        bool   `json:"circular,omitempty"`
+	FlashAttention  bool   `json:"flash_attention,omitempty"`
+	OffloadToCPU    bool   `json:"offload_to_cpu,omitempty"`
+	DisableMetadata bool   `json:"disable_metadata,omitempty"`
+	// Prediction overrides the model's auto-detected prediction type at startup.
+	// Required for Flux GGUF single-file checkpoints where sd.cpp cannot detect
+	// the architecture from the file. Values: eps, v, edm_v, sd3_flow, flux_flow, flux2_flow.
+	// Leave empty for auto-detection (safetensors/split-component bundles).
+	Prediction string `json:"prediction,omitempty"`
 }
 
 // ModelInfo describes a discovered model bundle.
@@ -69,7 +104,8 @@ type ImageResult struct {
 	Path      string        `json:"path"`
 	ThumbPath string        `json:"thumb_path"`
 	Metadata  ImageMetadata `json:"metadata"`
-	ImageData string        `json:"image_data,omitempty"` // base64 PNG data from sd-server
+	ImageData string        `json:"image_data,omitempty"` // base64 PNG data from sd-server (first image for compat)
+	Images    []string      `json:"images,omitempty"`     // all images when batch_count > 1
 }
 
 // ImageSource links a generated image to an entity.

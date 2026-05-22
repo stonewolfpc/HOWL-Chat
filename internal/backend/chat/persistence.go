@@ -236,7 +236,9 @@ func (pm *PersistenceManager) SaveChat(chatData *ChatData) error {
 	return nil
 }
 
-// LoadChat loads chat data by ID
+// LoadChat loads chat data by ID. Every piece is best-effort:
+// missing or corrupt file → log and continue with empty/default.
+// Only meta.json is required (it IS the chat identity).
 func (pm *PersistenceManager) LoadChat(chatID string) (*ChatData, error) {
 	chatDir := filepath.Join(pm.rootDir, "chats", chatID)
 
@@ -247,82 +249,55 @@ func (pm *PersistenceManager) LoadChat(chatID string) (*ChatData, error) {
 
 	chatData := &ChatData{}
 
-	// Load meta.json
+	// Load meta.json (required)
 	if err := pm.loadJSON(filepath.Join(chatDir, "meta.json"), &chatData.Meta); err != nil {
 		return nil, fmt.Errorf("failed to load meta.json: %w", err)
 	}
 	if chatData.Meta.ID == "" {
-		chatData.Meta.ID = chatID // recover from empty meta — use the directory name as the authoritative ID
+		chatData.Meta.ID = chatID
 	}
 
-	// Load history (ndjson append log preferred, json snapshot fallback)
-	history, err := pm.loadHistoryFile(chatDir)
-	if err != nil {
-		return nil, err
-	}
-	chatData.History = history
+	// Load history (optional — empty if missing)
+	chatData.History = pm.loadHistoryFile(chatDir)
 
 	// Load world.json (optional)
-	if _, err := os.Stat(filepath.Join(chatDir, "world.json")); err == nil {
-		worldBytes, readErr := os.ReadFile(filepath.Join(chatDir, "world.json"))
-		if readErr != nil {
-			return nil, fmt.Errorf("failed to load world.json: %w", readErr)
-		}
-		if len(worldBytes) > 0 {
-			world, decodeErr := decodeWorldContext(worldBytes)
-			if decodeErr != nil {
-				return nil, fmt.Errorf("failed to load world.json: %w", decodeErr)
-			}
-			chatData.World = world // nil is valid — means file contained JSON null
+	if worldBytes, err := os.ReadFile(filepath.Join(chatDir, "world.json")); err == nil && len(worldBytes) > 0 {
+		if world, err := decodeWorldContext(worldBytes); err == nil {
+			chatData.World = world
+		} else {
+			fmt.Printf("[LoadChat] skipping corrupt world.json for %s: %v\n", chatID, err)
 		}
 	}
 
 	// Load scenario.json (optional)
-	if _, err := os.Stat(filepath.Join(chatDir, "scenario.json")); err == nil {
-		scenarioBytes, readErr := os.ReadFile(filepath.Join(chatDir, "scenario.json"))
-		if readErr != nil {
-			return nil, fmt.Errorf("failed to load scenario.json: %w", readErr)
+	if scenarioBytes, err := os.ReadFile(filepath.Join(chatDir, "scenario.json")); err == nil && len(scenarioBytes) > 0 {
+		if scenario, err := decodeScenarioContext(scenarioBytes); err == nil {
+			chatData.Scenario = scenario
+		} else {
+			fmt.Printf("[LoadChat] skipping corrupt scenario.json for %s: %v\n", chatID, err)
 		}
-		if len(scenarioBytes) > 0 {
-			scenario, decodeErr := decodeScenarioContext(scenarioBytes)
-			if decodeErr != nil {
-				return nil, fmt.Errorf("failed to load scenario.json: %w", decodeErr)
+	}
+
+	// Load characters.json (optional)
+	if charactersBytes, err := os.ReadFile(filepath.Join(chatDir, "characters.json")); err == nil && len(charactersBytes) > 0 {
+		var rawCharacters []json.RawMessage
+		if err := json.Unmarshal(charactersBytes, &rawCharacters); err == nil {
+			chatData.Characters = make([]*CharacterContext, 0, len(rawCharacters))
+			for _, raw := range rawCharacters {
+				if character, err := decodeCharacterContext(raw); err == nil && character != nil {
+					chatData.Characters = append(chatData.Characters, character)
+				}
 			}
-			chatData.Scenario = scenario // nil is valid — means file contained JSON null
+		} else {
+			fmt.Printf("[LoadChat] skipping corrupt characters.json for %s: %v\n", chatID, err)
 		}
 	}
 
-	// Load characters.json
-	charactersPath := filepath.Join(chatDir, "characters.json")
-	charactersBytes, readErr := os.ReadFile(charactersPath)
-	if readErr != nil {
-		return nil, fmt.Errorf("failed to load characters.json: %w", readErr)
-	}
-	var rawCharacters []json.RawMessage
-	if err := json.Unmarshal(charactersBytes, &rawCharacters); err != nil {
-		return nil, fmt.Errorf("failed to load characters.json: %w", err)
-	}
-	chatData.Characters = make([]*CharacterContext, 0, len(rawCharacters))
-	for _, raw := range rawCharacters {
-		character, decodeErr := decodeCharacterContext(raw)
-		if decodeErr != nil {
-			return nil, fmt.Errorf("failed to load characters.json: %w", decodeErr)
-		}
-		if character == nil {
-			continue // skip null entries (were JSON null in array)
-		}
-		chatData.Characters = append(chatData.Characters, character)
-	}
+	// Load lorebooks.json (optional)
+	_ = pm.loadJSON(filepath.Join(chatDir, "lorebooks.json"), &chatData.Lorebooks)
 
-	// Load lorebooks.json
-	if err := pm.loadJSON(filepath.Join(chatDir, "lorebooks.json"), &chatData.Lorebooks); err != nil {
-		return nil, fmt.Errorf("failed to load lorebooks.json: %w", err)
-	}
-
-	// Load memories.json
-	if err := pm.loadJSON(filepath.Join(chatDir, "memories.json"), &chatData.Memories); err != nil {
-		return nil, fmt.Errorf("failed to load memories.json: %w", err)
-	}
+	// Load memories.json (optional)
+	_ = pm.loadJSON(filepath.Join(chatDir, "memories.json"), &chatData.Memories)
 
 	return chatData, nil
 }
@@ -361,28 +336,18 @@ func (pm *PersistenceManager) SaveChatAs(currentChatID, newName string) (*ChatDa
 	return newChat, nil
 }
 
-// DeleteChat deletes a chat by ID
+// DeleteChat deletes a chat directory and all its contents.
 func (pm *PersistenceManager) DeleteChat(chatID string) error {
 	chatDir := filepath.Join(pm.rootDir, "chats", chatID)
 
-	// Check if chat directory exists
-	if _, err := os.Stat(chatDir); os.IsNotExist(err) {
-		return fmt.Errorf("chat not found: %s", chatID)
-	}
-
-	// Remove the entire chat directory
 	if err := os.RemoveAll(chatDir); err != nil {
-		return fmt.Errorf("failed to delete chat directory: %w", err)
+		return fmt.Errorf("failed to delete chat: %w", err)
 	}
 
-	// If this was the last chat, clear it from config
 	if pm.config.LastChatID == chatID {
 		pm.config.LastChatID = ""
-		if err := pm.saveConfig(); err != nil {
-			return fmt.Errorf("failed to update config: %w", err)
-		}
+		_ = pm.saveConfig()
 	}
-
 	return nil
 }
 
@@ -414,10 +379,9 @@ func (pm *PersistenceManager) GetChatList() ([]ChatSummary, error) {
 			continue
 		}
 
-		// Load history to get message count
+		// Load history to get message count (ignore error)
 		var history []ChatHistory
-		historyPath := filepath.Join(chatDir, "history.json")
-		pm.loadJSON(historyPath, &history) // Ignore error, history might not exist
+		pm.loadJSON(filepath.Join(chatDir, "history.json"), &history)
 
 		// Parse timestamps
 		createdAt, _ := time.Parse(time.RFC3339, meta.CreatedAt)
@@ -485,9 +449,9 @@ func (pm *PersistenceManager) saveJSON(filename string, data interface{}) error 
 	return os.Rename(tmp, filename)
 }
 
-// loadHistoryFile reads chat history, preferring the append log (history.ndjson) over
-// the full JSON snapshot (history.json). Falls back gracefully when files are absent.
-func (pm *PersistenceManager) loadHistoryFile(chatDir string) ([]ChatHistory, error) {
+// loadHistoryFile reads chat history, preferring the append log over the JSON snapshot.
+// Missing or corrupt history → log and return empty slice. Never errors.
+func (pm *PersistenceManager) loadHistoryFile(chatDir string) []ChatHistory {
 	ndjsonPath := filepath.Join(chatDir, "history.ndjson")
 	jsonPath := filepath.Join(chatDir, "history.json")
 
@@ -495,13 +459,14 @@ func (pm *PersistenceManager) loadHistoryFile(chatDir string) ([]ChatHistory, er
 	if info, err := os.Stat(ndjsonPath); err == nil && info.Size() > 0 {
 		f, err := os.Open(ndjsonPath)
 		if err != nil {
-			return nil, fmt.Errorf("failed to open history.ndjson: %w", err)
+			fmt.Printf("[loadHistoryFile] cannot open ndjson, returning empty: %v\n", err)
+			return []ChatHistory{}
 		}
 		defer f.Close()
 
 		var history []ChatHistory
 		scanner := bufio.NewScanner(f)
-		scanner.Buffer(make([]byte, 1024*1024), 10*1024*1024) // 10 MB line buffer
+		scanner.Buffer(make([]byte, 1024*1024), 10*1024*1024)
 		for scanner.Scan() {
 			line := bytes.TrimSpace(scanner.Bytes())
 			if len(line) == 0 {
@@ -509,28 +474,27 @@ func (pm *PersistenceManager) loadHistoryFile(chatDir string) ([]ChatHistory, er
 			}
 			var entry ChatHistory
 			if err := json.Unmarshal(line, &entry); err != nil {
-				return nil, fmt.Errorf("history.ndjson corrupt at line %d: %w", len(history)+1, err)
+				fmt.Printf("[loadHistoryFile] corrupt ndjson line, stopping: %v\n", err)
+				break // return what we have so far
 			}
 			history = append(history, entry)
 		}
 		if err := scanner.Err(); err != nil {
-			return nil, fmt.Errorf("failed to read history.ndjson: %w", err)
+			fmt.Printf("[loadHistoryFile] scanner error, returning partial: %v\n", err)
 		}
-		return history, nil
+		return history
 	}
 
 	// Fall back to the canonical JSON snapshot
-	if _, err := os.Stat(jsonPath); os.IsNotExist(err) {
-		return []ChatHistory{}, nil // brand-new chat — no history yet
-	}
 	var history []ChatHistory
 	if err := pm.loadJSON(jsonPath, &history); err != nil {
-		return nil, fmt.Errorf("failed to load history.json: %w", err)
+		// Missing or corrupt — just return empty
+		return []ChatHistory{}
 	}
 	if history == nil {
-		history = []ChatHistory{}
+		return []ChatHistory{}
 	}
-	return history, nil
+	return history
 }
 
 // AppendHistoryEntry appends a single entry to history.ndjson using an O(1) file append.

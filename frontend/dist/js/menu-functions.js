@@ -53,6 +53,33 @@ function openTTSSettings()   { _openAudioSettingsIframe('tts'); }
 // openRealSettings() is defined in real-settings.js (loaded earlier)
 
 // ---------------------------------------------------------------------------
+// About Modal
+// ---------------------------------------------------------------------------
+
+function showAbout() {
+    const overlay = document.getElementById('about-overlay');
+    if (overlay) {
+        overlay.classList.add('show');
+    }
+    // Close all dropdown menus
+    document.querySelectorAll('.dropdown').forEach(menu => menu.classList.remove('show'));
+}
+
+function hideAbout() {
+    const overlay = document.getElementById('about-overlay');
+    if (overlay) {
+        overlay.classList.remove('show');
+    }
+}
+
+// Close About on Escape
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        hideAbout();
+    }
+});
+
+// ---------------------------------------------------------------------------
 // Keyboard Shortcuts
 // ---------------------------------------------------------------------------
 

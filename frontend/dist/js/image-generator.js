@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     showRuntimeDebug();
     restoreState();
     await initPaths();
+    initPathListeners();
     bindEvents();
     loadHistoryPanel();
     updateDiagnostics('init');
@@ -45,10 +46,18 @@ async function loadHistoryPanel() {
             item.className = 'ig-history-item';
             item.dataset.file = img.file;
             item.innerHTML = `
-                <img id="hist-img-${escapeId(img.file)}" alt="" loading="lazy"
-                     style="width:100%;height:100%;object-fit:cover;">
                 <button class="ig-history-delete" title="Delete"
                     onclick="event.stopPropagation();deleteHistoryImage('${escapeJS(img.file)}',this)">&#x1F5D1;</button>
+                <img id="hist-img-${escapeId(img.file)}" alt="" loading="lazy"
+                     style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;">
+                <div class="ig-history-actions">
+                    <button class="ig-history-send-btn" title="Send to Character"
+                        onclick="event.stopPropagation();sendHistoryToEntity('${escapeJS(img.file)}','character')">Char</button>
+                    <button class="ig-history-send-btn" title="Send to World"
+                        onclick="event.stopPropagation();sendHistoryToEntity('${escapeJS(img.file)}','world')">World</button>
+                    <button class="ig-history-send-btn" title="Send to Scenario"
+                        onclick="event.stopPropagation();sendHistoryToEntity('${escapeJS(img.file)}','scenario')">Scen</button>
+                </div>
             `;
             item.addEventListener('click', () => viewHistoryImage(img.file));
             list.appendChild(item);
@@ -72,6 +81,8 @@ async function viewHistoryImage(filePath) {
         document.getElementById('ig-meta').innerHTML = `<strong>File:</strong> ${filePath.replace(/^.*[\\/]/, '')}`;
         document.getElementById('ig-meta').style.display = 'block';
         document.getElementById('ig-actions').style.display = 'flex';
+        // Set currentResult so Save/Delete work for history images
+        currentResult = { image_data: b64, metadata: { file: filePath } };
         setStatus('');
     } catch (err) {
         console.error('View history failed:', err);
@@ -94,6 +105,29 @@ async function deleteHistoryImage(filePath, btnElement) {
     }
 }
 
+async function sendHistoryToEntity(filePath, entityType) {
+    if (!window.go?.main?.App?.SaveEntityImage) {
+        setStatus('Entity image save not available.');
+        return;
+    }
+    const entityName = prompt(`Enter ${entityType} name (or ID):`)?.trim();
+    if (!entityName) { setStatus('Cancelled.'); return; }
+    const safeID = entityName.toLowerCase().replace(/[^a-z0-9_-]/g, '_').substring(0, 40);
+    try {
+        setStatus(`Saving image for ${entityType}...`);
+        const b64 = await window.go.main.App.GetGalleryImage(filePath);
+        const path = await window.go.main.App.SaveEntityImage(b64, entityType, safeID);
+        setStatus(`Image saved for ${entityType}. Navigate to ${entityType} page to assign it.`);
+        if (confirm(`Image saved. Open ${entityType} page now?`)) {
+            const pageMap = { character: 'character.html', world: 'world.html', scenario: 'scenario.html' };
+            window.location.href = `${pageMap[entityType] || 'index.html'}?pendingImage=${encodeURIComponent(path)}`;
+        }
+    } catch (err) {
+        console.error('Send to entity failed:', err);
+        setStatus('Failed: ' + (err.message || err));
+    }
+}
+
 function addHistoryItem(filePath, imageData) {
     const list = document.getElementById('ig-history-list');
     if (list.querySelector('.ig-history-placeholder')) list.innerHTML = '';
@@ -103,10 +137,18 @@ function addHistoryItem(filePath, imageData) {
     item.dataset.file = filePath;
     const safeId = escapeId(filePath);
     item.innerHTML = `
-        <img id="hist-img-${safeId}" src="data:image/png;base64,${imageData}" alt=""
-             style="width:100%;height:100%;object-fit:cover;">
         <button class="ig-history-delete" title="Delete"
             onclick="event.stopPropagation();deleteHistoryImage('${escapeJS(filePath)}',this)">&#x1F5D1;</button>
+        <img id="hist-img-${safeId}" src="data:image/png;base64,${imageData}" alt=""
+             style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;">
+        <div class="ig-history-actions">
+            <button class="ig-history-send-btn" title="Send to Character"
+                onclick="event.stopPropagation();sendHistoryToEntity('${escapeJS(filePath)}','character')">Char</button>
+            <button class="ig-history-send-btn" title="Send to World"
+                onclick="event.stopPropagation();sendHistoryToEntity('${escapeJS(filePath)}','world')">World</button>
+            <button class="ig-history-send-btn" title="Send to Scenario"
+                onclick="event.stopPropagation();sendHistoryToEntity('${escapeJS(filePath)}','scenario')">Scen</button>
+        </div>
     `;
     item.addEventListener('click', () => viewHistoryImage(filePath));
     list.insertBefore(item, list.firstChild);
