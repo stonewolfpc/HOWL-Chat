@@ -7,6 +7,64 @@ let scanIndex = null;  // full ScanResult from ScanImageModels
 let seedHistory = [];
 let lastUsedSeed = -1;
 let currentModelFamily = '';
+let generationInFlight = false;
+
+// VRAM Check for Generation
+async function checkVRAMForGeneration(opts) {
+    try {
+        // Get GPU info from backend
+        const gpuInfo = window.go?.main?.App?.GetGPUInfo?.();
+        if (!gpuInfo || !gpuInfo.TotalMemory) {
+            return { willExceedVRAM: false, estimatedVRAM: 0, availableVRAM: 0 };
+        }
+        
+        const availableVRAM = gpuInfo.TotalMemory; // in MB
+        const freeVRAM = gpuInfo.FreeMemory || (availableVRAM * 0.7); // estimate if not provided
+        
+        // Estimate VRAM needed based on resolution and model family
+        // Base estimate: ~2MB per pixel for high-quality generation
+        const pixels = opts.width * opts.height;
+        const baseVRAM = (pixels * 2) / (1024 * 1024); // Convert to MB
+        
+        // Model family multiplier
+        const family = (window.currentModelFamily || '').toLowerCase();
+        const modelMultipliers = {
+            'flux': 1.5,
+            'sdxl': 1.3,
+            'sd3': 1.4,
+            'chroma': 1.5,
+            'sd2.1': 1.0,
+            'sd21': 1.0,
+            'default': 1.0
+        };
+        const multiplier = modelMultipliers[family] || modelMultipliers['default'];
+        
+        // Batch size multiplier
+        const batchMultiplier = opts.batch_count || 1;
+        
+        // Steps multiplier (more steps = more VRAM for intermediate activations)
+        const stepsMultiplier = 1 + (opts.steps / 100) * 0.2;
+        
+        // CFG scale multiplier
+        const cfgMultiplier = 1 + (opts.cfg_scale / 10) * 0.1;
+        
+        const estimatedVRAM = Math.floor(baseVRAM * multiplier * batchMultiplier * stepsMultiplier * cfgMultiplier);
+        
+        // Will exceed if estimated > free VRAM with some buffer
+        const willExceedVRAM = estimatedVRAM > (freeVRAM * 0.9); // 10% buffer
+        
+        console.log(`[VRAM Check] Estimated: ${estimatedVRAM} MB, Available: ${freeVRAM} MB, Exceed: ${willExceedVRAM}`);
+        
+        return {
+            willExceedVRAM,
+            estimatedVRAM,
+            availableVRAM: freeVRAM
+        };
+    } catch (e) {
+        console.warn('VRAM check failed:', e);
+        return { willExceedVRAM: false, estimatedVRAM: 0, availableVRAM: 0 };
+    }
+}
 window.currentModelFamily = currentModelFamily; // keep in sync below via setter
 
 // ---------------------------------------------------------------------------
@@ -143,18 +201,22 @@ async function loadModels() {
         } else {
             // Legacy fallback
             const legacy = await app.ListImageModels();
-            scanIndex = { models: legacy || [], vaes: [], loras: [], controlnets: [], embeddings: [], upscalers: [] };
+            scanIndex = { models: legacy || [], vaes: [], loras: [], controlnets: [], embeddings: [], upscalers: [], t5xxls: [], clip_ls: [], clip_gs: [] };
         }
-        if (!scanIndex) scanIndex = { models: [], vaes: [], loras: [], controlnets: [], embeddings: [], upscalers: [] };
+        if (!scanIndex) scanIndex = { models: [], vaes: [], loras: [], controlnets: [], embeddings: [], upscalers: [], t5xxls: [], clip_ls: [], clip_gs: [] };
 
         models = scanIndex.models || [];
         console.log('[IG] Scan:', models.length, 'models,', (scanIndex.vaes||[]).length, 'VAEs,',
-                    (scanIndex.loras||[]).length, 'LoRAs,', (scanIndex.controlnets||[]).length, 'ControlNets');
+                    (scanIndex.loras||[]).length, 'LoRAs,', (scanIndex.controlnets||[]).length, 'ControlNets',
+                    (scanIndex.t5xxls||[]).length, 'T5,', (scanIndex.clip_ls||[]).length, 'CLIP-L,', (scanIndex.clip_gs||[]).length, 'CLIP-G');
 
         _populateDiffusionDropdown();
         _populateVAEDropdown(scanIndex.vaes || []);
         _populateLoRAList(scanIndex.loras || []);
         _populateControlNetDropdown(scanIndex.controlnets || []);
+        _populateT5XXLDropdown(scanIndex.t5xxls || []);
+        _populateClipLDropdown(scanIndex.clip_ls || []);
+        _populateClipGDropdown(scanIndex.clip_gs || []);
 
         if (models.length === 0) {
             setStatus('No models found. Check Engine Paths.');
@@ -209,9 +271,15 @@ function _populateDiffusionDropdown() {
         const opt = document.createElement('option');
         opt.value = m.name;
         const tag = m.format === 'bundle' ? '[bundle]' : m.format ? `[${m.format}]` : '';
-        opt.textContent = `${m.name} (${m.family || '?'}) ${tag}`.trim();
+        const warn = m.compat === 'unsupported' ? '[⚠ outdated binary]' : '';
+        opt.textContent = `${m.name} (${m.family || '?'}) ${tag} ${warn}`.trim();
         opt.dataset.family = m.family || '';
+        opt.dataset.compat = m.compat || '';
         opt.dataset.recommended = JSON.stringify(m.recommended || {});
+        if (m.compat === 'unsupported') {
+            opt.style.color = '#ff6b6b';
+            opt.title = 'This model requires a newer sd-server binary';
+        }
         sel.appendChild(opt);
     });
 }
@@ -229,9 +297,9 @@ function _populateVAEDropdown(vaes) {
 }
 
 function _populateLoRAList(loras) {
-    const sel = document.getElementById('ig-lora');
+    const sel = document.getElementById('ig-lora-selector');
     if (!sel) return;
-    sel.innerHTML = '<option value="">None</option>';
+    sel.innerHTML = '<option value="">Select a LoRA to add...</option>';
     loras.forEach(l => {
         const opt = document.createElement('option');
         opt.value = l.name;
@@ -260,6 +328,7 @@ function onModelChange() {
     if (!name) return;
     const model = models.find(m => m.name === name);
     if (model) {
+        autoPopulateModelSpecificFields(model);
         currentModelFamily = model.family || '';
         window.currentModelFamily = currentModelFamily;
         applyModelPreset(model.family, model.recommended || null);
@@ -268,23 +337,81 @@ function onModelChange() {
         if (currentModelFamily) refreshCompatibleAssets(currentModelFamily);
     }
     const statusEl = document.getElementById('ig-model-status');
-    if (statusEl) { statusEl.textContent = 'Auto-load on Generate'; statusEl.className = 'ig-panel-status'; }
+    if (statusEl) {
+        if (model && model.compat === 'unsupported') {
+            statusEl.textContent = '⚠ Requires newer sd-server';
+            statusEl.className = 'ig-panel-status ig-status-error';
+        } else {
+            statusEl.textContent = 'Auto-load on Generate';
+            statusEl.className = 'ig-panel-status';
+        }
+    }
     saveState();
+}
+
+function _pickFirstPath(list) {
+    if (!Array.isArray(list) || list.length === 0) return '';
+    const item = list[0] || {};
+    return item.path || '';
+}
+
+function autoPopulateModelSpecificFields(model) {
+    if (!model) return;
+
+    const files = model.files || {};
+    const family = String(model.family || '').toLowerCase();
+
+    // Intentionally excludes VAE/LoRA/ControlNet/workflow fields per product behavior.
+    const clipL = files.clip_l || _pickFirstPath(scanIndex?.clip_ls);
+    const clipG = files.clip_g || _pickFirstPath(scanIndex?.clip_gs);
+    const t5xxl = files.t5xxl || _pickFirstPath(scanIndex?.t5xxls);
+
+    const clipLSel = document.getElementById('ig-clip-l');
+    const clipGSel = document.getElementById('ig-clip-g');
+    const t5Sel = document.getElementById('ig-t5xxl');
+
+    const usesT5 = ['flux', 'flux2', 'sd3', 'auraflow', 'hidream'].includes(family);
+    const usesClipL = ['flux', 'flux2', 'sd3', 'auraflow', 'hidream', 'sdxl', 'sdxl-turbo'].includes(family);
+    const usesClipG = ['sd3', 'sdxl', 'sdxl-turbo'].includes(family);
+
+    if (clipLSel) {
+        if (usesClipL && clipL) clipLSel.value = clipL;
+        if (!usesClipL) clipLSel.value = '';
+    }
+    if (clipGSel) {
+        if (usesClipG && clipG) clipGSel.value = clipG;
+        if (!usesClipG) clipGSel.value = '';
+    }
+    if (t5Sel) {
+        if (usesT5 && t5xxl) t5Sel.value = t5xxl;
+        if (!usesT5) t5Sel.value = '';
+    }
 }
 
 // setModel manually loads a model into the backend (used by Reload button).
 async function setModel(name) {
+    const model = models.find(m => m.name === name);
+    if (model && model.compat === 'unsupported') {
+        setStatus('⚠ This model requires a newer sd-server binary. Please update and try again.');
+        const statusEl = document.getElementById('ig-model-status');
+        if (statusEl) { statusEl.textContent = '⚠ Unsupported'; statusEl.className = 'ig-panel-status ig-status-error'; }
+        updateDiagnostics('error', 'Model requires newer sd-server');
+        return;
+    }
     const statusEl = document.getElementById('ig-model-status');
     if (statusEl) { statusEl.textContent = 'Loading...'; statusEl.className = 'ig-panel-status ig-status-loading'; }
     updateDiagnostics('loadStart');
     setStatus('Loading model: ' + name + '...');
     try {
+        autoPopulateModelSpecificFields(model);
+
         const opts = {
             model: name,
             vae: document.getElementById('ig-vae-model')?.value || '',
             clip_l: document.getElementById('ig-clip-l')?.value || '',
             clip_g: document.getElementById('ig-clip-g')?.value || '',
             t5xxl: document.getElementById('ig-t5xxl')?.value || '',
+            diffusion_model: (model?.files && model.files.diffusion_model) ? model.files.diffusion_model : '',
             backend: document.getElementById('ig-backend')?.value || '',
             params_backend: document.getElementById('ig-params-backend')?.value || '',
             vae_tiling: document.getElementById('ig-vae-tiling')?.checked || false,
@@ -296,7 +423,6 @@ async function setModel(name) {
         };
         console.log('[IG] Loading model with config:', opts);
         await window.go.main.App.SetActiveImageModel(opts);
-        const model = models.find(m => m.name === name);
         if (model) {
             currentModelFamily = model.family || '';
             window.currentModelFamily = currentModelFamily;
@@ -307,37 +433,104 @@ async function setModel(name) {
         if (statusEl) { statusEl.textContent = 'Loaded: ' + name.replace(/^.*[\\/]/, ''); statusEl.className = 'ig-panel-status ig-status-loaded'; }
         updateDiagnostics('loadDone');
     } catch (err) {
-        setStatus('Error loading model: ' + (err.message || err));
+        const msg = err.message || String(err);
+        let displayMsg = 'Error loading model: ' + msg;
+        if (msg.includes('Chroma-family GGUF')) {
+            displayMsg = 'Chroma GGUF may not be supported by older stable-diffusion.cpp builds.\nTry the .safetensors version or update your sd-server binary.';
+        } else if (msg.includes('get sd version from file failed') || msg.includes('cannot be loaded')) {
+            displayMsg = 'Model failed to load — your sd-server binary is outdated.\nPlease download the latest stable-diffusion.cpp build and update your Engine Paths.';
+        }
+        setStatus(displayMsg);
         if (statusEl) { statusEl.textContent = 'Error'; statusEl.className = 'ig-panel-status ig-status-error'; }
-        updateDiagnostics('error', err.message || String(err));
+        updateDiagnostics('error', msg);
     }
+}
+
+function _populateT5XXLDropdown(items) {
+    const sel = document.getElementById('ig-t5xxl');
+    if (!sel) return;
+    const val = sel.value;
+    sel.innerHTML = '<option value="">None</option>';
+    items.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.path;
+        opt.textContent = m.name || m.path.replace(/^.*[\\/]/, '');
+        sel.appendChild(opt);
+    });
+    if (val) sel.value = val;
+}
+
+function _populateClipLDropdown(items) {
+    const sel = document.getElementById('ig-clip-l');
+    if (!sel) return;
+    const val = sel.value;
+    sel.innerHTML = '<option value="">None</option>';
+    items.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.path;
+        opt.textContent = m.name || m.path.replace(/^.*[\\/]/, '');
+        sel.appendChild(opt);
+    });
+    if (val) sel.value = val;
+}
+
+function _populateClipGDropdown(items) {
+    const sel = document.getElementById('ig-clip-g');
+    if (!sel) return;
+    const val = sel.value;
+    sel.innerHTML = '<option value="">None</option>';
+    items.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.path;
+        opt.textContent = m.name || m.path.replace(/^.*[\\/]/, '');
+        sel.appendChild(opt);
+    });
+    if (val) sel.value = val;
 }
 
 function applyModelPreset(family, recommended) {
     // Prefer scan-manifest recommended values; fall back to family defaults.
     const rec = recommended || _familyDefaults(family);
-    const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
-    set('ig-steps',  rec.steps);
-    set('ig-cfg',    rec.cfg);
-    set('ig-width',  rec.width);
-    set('ig-height', rec.height);
-    if (rec.sampler) set('ig-sampler', rec.sampler);
+    const set = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined && val !== null) el.value = val; };
+    const setChecked = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.checked = val; };
+    set('ig-steps',     rec.steps);
+    set('ig-cfg',       rec.cfg);
+    set('ig-guidance',  rec.guidance);
+    set('ig-width',     rec.width);
+    set('ig-height',    rec.height);
+    set('ig-clip-skip', rec.clipSkip);
+    if (rec.sampler)   set('ig-sampler',   rec.sampler);
+    if (rec.scheduler) set('ig-scheduler', rec.scheduler);
+    if (rec.flowShift !== undefined) set('ig-flow-shift', rec.flowShift);
     updateLabels();
     saveState();
 }
 
 function _familyDefaults(family) {
-    switch ((family || '').toLowerCase()) {
+    const f = (family || '').toLowerCase();
+    switch (f) {
         case 'flux':
-            return { steps: 4,  cfg: 1,   width: 1024, height: 1024, sampler: 'euler' };
+            return { steps: 20, cfg: 1,   guidance: 3.5, width: 1024, height: 1024, sampler: 'euler', scheduler: 'simple', clipSkip: -1, flowShift: 0 };
+        case 'hidream':
+            return { steps: 20, cfg: 4.5, guidance: 3.5, width: 1024, height: 1024, sampler: 'euler', scheduler: 'simple', clipSkip: -1, flowShift: 0 };
         case 'sd1.5': case 'sd15':
-            return { steps: 20, cfg: 7,   width: 512,  height: 512,  sampler: 'euler_a' };
+            return { steps: 20, cfg: 7,   guidance: 3.5, width: 512,  height: 512,  sampler: 'euler_a', scheduler: 'karras', clipSkip: 1 };
         case 'sd2.1': case 'sd21':
-            return { steps: 20, cfg: 7.5, width: 768,  height: 768,  sampler: 'dpmpp_2m' };
+            return { steps: 20, cfg: 7.5, guidance: 3.5, width: 768,  height: 768,  sampler: 'dpmpp_2m', scheduler: 'karras', clipSkip: 2 };
         case 'sdxl-turbo': case 'turbo':
-            return { steps: 4,  cfg: 1,   width: 512,  height: 512,  sampler: 'euler_a' };
-        default: // sdxl, sd3, unknown
-            return { steps: 20, cfg: 7,   width: 1024, height: 1024, sampler: 'dpmpp_2m' };
+            return { steps: 4,  cfg: 1,   guidance: 3.5, width: 512,  height: 512,  sampler: 'euler_a', scheduler: 'karras', clipSkip: 2 };
+        case 'sd3':
+            return { steps: 20, cfg: 7,   guidance: 3.5, width: 1024, height: 1024, sampler: 'euler', scheduler: 'simple', clipSkip: -1, flowShift: 0 };
+        case 'chroma':
+            return { steps: 20, cfg: 7,   guidance: 3.5, width: 1024, height: 1024, sampler: 'euler', scheduler: 'simple', clipSkip: -1, flowShift: 0 };
+        case 'kolors':
+            return { steps: 20, cfg: 7,   guidance: 3.5, width: 1024, height: 1024, sampler: 'euler', scheduler: 'karras', clipSkip: -1 };
+        case 'anima':
+            return { steps: 20, cfg: 7,   guidance: 3.5, width: 1024, height: 1024, sampler: 'euler', scheduler: 'simple', clipSkip: -1 };
+        case 'wan': case 'ltx':
+            return { steps: 30, cfg: 1,   guidance: 5.0, width: 512,  height: 512,  sampler: 'euler', scheduler: 'simple', clipSkip: -1, flowShift: 0 };
+        default: // sdxl, unknown
+            return { steps: 30, cfg: 7,   guidance: 3.5, width: 1024, height: 1024, sampler: 'dpmpp_2m', scheduler: 'karras', clipSkip: 2 };
     }
 }
 
@@ -345,10 +538,22 @@ function _familyDefaults(family) {
 // Generation
 // ---------------------------------------------------------------------------
 async function onGenerate() {
+    if (generationInFlight) {
+        setStatus('Generation already in progress...');
+        return;
+    }
+    generationInFlight = true;
     const prompt = document.getElementById('ig-prompt').value.trim();
-    if (!prompt) { setStatus('Please enter a prompt.'); return; }
+    if (!prompt) { setStatus('Please enter a prompt.'); generationInFlight = false; return; }
     const modelSel = document.getElementById('ig-model');
-    if (!modelSel.value) { setStatus('Please select a model.'); return; }
+    if (!modelSel.value) { setStatus('Please select a model.'); generationInFlight = false; return; }
+    const model = models.find(m => m.name === modelSel.value);
+    if (model && model.compat === 'unsupported') {
+        setStatus('⚠ This model requires a newer sd-server binary. Please update and try again.');
+        updateDiagnostics('error', 'Model requires newer sd-server');
+        generationInFlight = false;
+        return;
+    }
 
     const btn = document.getElementById('ig-generate');
     btn.disabled = true;
@@ -411,6 +616,25 @@ async function onGenerate() {
         }
     }
 
+    // Handle video end image if present
+    let endImagePath = '';
+    if (currentMode === 'video' && window.videoEndImageData) {
+        try {
+            endImagePath = await window.go.main.App.SaveTempImage(window.videoEndImageData);
+        } catch (err) {
+            console.error('Video end image upload failed:', err);
+        }
+    }
+
+    // Handle img2img mask if present
+    if (currentMode === 'img2img' && window.img2imgMaskData) {
+        try {
+            maskPath = await window.go.main.App.SaveTempImage(window.img2imgMaskData);
+        } catch (err) {
+            console.error('Mask upload failed:', err);
+        }
+    }
+
     const opts = {
         prompt:          prompt,
         negative_prompt: document.getElementById('ig-negative').value,
@@ -433,14 +657,12 @@ async function onGenerate() {
         t5xxl_path:      document.getElementById('ig-t5xxl')?.value || '',
         control_net_path: document.getElementById('ig-control-model')?.value || '',
         control_strength: parseFloat(document.getElementById('ig-control-strength')?.value || '0.9'),
-        loras:           Array.from(document.getElementById('ig-lora')?.selectedOptions || []).map(o => o.value).filter(v => v),
+        loras:           window.activeLoRAs || [],
         enable_hr:       document.getElementById('ig-hires-enable')?.checked || false,
         hr_scale:        parseFloat(document.getElementById('ig-hr-scale')?.value || '2'),
         hr_upscaler:     document.getElementById('ig-hr-upscaler')?.value || '',
         tiling:          document.getElementById('ig-tiling')?.checked || false,
         clip_skip:       parseInt(document.getElementById('ig-clip-skip')?.value || '-1', 10),
-        cache_mode:      document.getElementById('ig-cache-mode')?.value || 'none',
-        cache_option:    document.getElementById('ig-cache-option')?.value || '',
         video_frames:    parseInt(document.getElementById('ig-video-frames')?.value || '24', 10),
         fps:             parseInt(document.getElementById('ig-video-fps')?.value || '12', 10),
         strength:        parseFloat(
@@ -457,7 +679,39 @@ async function onGenerate() {
         outpaint_direction: document.querySelector('.ig-dir-btn.active')?.dataset?.dir || 'all',
         upscale_factor:     parseInt(document.getElementById('ig-upscale-factor')?.value || '2', 10),
         init_image_path: initImagePath,
+        end_image_path:  endImagePath,
         mask_path:       maskPath,
+        resize_mode:     document.getElementById(
+            currentMode === 'inpaint' ? 'ig-resize-mode-inpaint' :
+            currentMode === 'outpaint' ? 'ig-resize-mode-outpaint' : 'ig-resize-mode'
+        )?.value || 'just_resize',
+        style_strength:  parseFloat(document.getElementById(
+            currentMode === 'inpaint' ? 'ig-style-strength-inpaint' :
+            currentMode === 'outpaint' ? 'ig-style-strength-outpaint' : 'ig-style-strength'
+        )?.value || '0.5'),
+        preserve_colors: document.getElementById(
+            currentMode === 'inpaint' ? 'ig-preserve-colors-inpaint' :
+            currentMode === 'outpaint' ? 'ig-preserve-colors-outpaint' : 'ig-preserve-colors'
+        )?.checked || false,
+        match_histogram: document.getElementById(
+            currentMode === 'inpaint' ? 'ig-match-histogram-inpaint' :
+            currentMode === 'outpaint' ? 'ig-match-histogram-outpaint' : 'ig-match-histogram'
+        )?.checked || false,
+        latent_noise:    parseFloat(document.getElementById(
+            currentMode === 'inpaint' ? 'ig-latent-noise-inpaint' :
+            currentMode === 'outpaint' ? 'ig-latent-noise-outpaint' : 'ig-latent-noise'
+        )?.value || '0'),
+        mask_blur:       parseInt(document.getElementById(
+            currentMode === 'inpaint' ? 'ig-mask-blur-inpaint' : 'ig-mask-blur'
+        )?.value || '4', 10),
+        mask_invert:     document.getElementById(
+            currentMode === 'inpaint' ? 'ig-mask-invert' : 'ig-mask-invert'
+        )?.checked || false,
+        masked_content:  document.getElementById('ig-masked-content')?.value || 'fill',
+        edge_behavior:   document.getElementById('ig-edge-behavior')?.value || 'mirror',
+        upscale_method:  document.getElementById('ig-upscale-method')?.value || 'latent_sd',
+        upscale_sharpen: document.getElementById('ig-upscale-sharpen')?.value || 'medium',
+        upscale_anti_artifact: document.getElementById('ig-upscale-anti-artifact')?.value || 'off',
         prediction:      document.getElementById('ig-prediction')?.value || '',
         rng:             document.getElementById('ig-rng')?.value || '',
         sampler_rng:     document.getElementById('ig-sampler-rng')?.value || '',
@@ -473,12 +727,42 @@ async function onGenerate() {
         high_noise_eta:            parseFloat(document.getElementById('ig-high-noise-eta')?.value || '0'),
         high_noise_skip_layer_start: parseFloat(document.getElementById('ig-high-noise-skip-start')?.value || '0.01'),
         high_noise_skip_layer_end:   parseFloat(document.getElementById('ig-high-noise-skip-end')?.value || '0.2'),
+        // Video-specific
+        video_format:     document.getElementById('ig-video-format')?.value || 'mp4',
+        video_seed_mode:  document.getElementById('ig-video-seed-mode')?.value || 'fixed',
+        video_motion:     parseFloat(document.getElementById('ig-video-motion')?.value || '0.5'),
+        video_denoise:    parseFloat(document.getElementById('ig-video-denoise')?.value || '0.6'),
+        video_loop:       document.getElementById('ig-video-loop')?.checked || false,
+        // Global expert controls
+        cfg_rescale:      parseFloat(document.getElementById('ig-cfg-rescale')?.value || '0'),
+        face_restore:     parseFloat(document.getElementById('ig-face-restore')?.value || '0'),
+        s_churn:          parseFloat(document.getElementById('ig-s-churn')?.value || '0'),
+        s_tmin:           parseFloat(document.getElementById('ig-s-tmin')?.value || '0'),
+        s_tmax:           parseFloat(document.getElementById('ig-s-tmax')?.value || '50'),
+        s_noise:          parseFloat(document.getElementById('ig-s-noise')?.value || '1'),
         // Model startup flags forwarded to lazy-load path
         vae_tiling:       document.getElementById('ig-vae-tiling')?.checked || false,
         temporal_tiling:  document.getElementById('ig-temporal-tiling')?.checked || false,
         flash_attention:  document.getElementById('ig-fa')?.checked || false,
         offload_to_cpu:   document.getElementById('ig-offload-cpu')?.checked || false,
     };
+
+    // VRAM check before generation
+    const vramCheck = await checkVRAMForGeneration(opts);
+    if (vramCheck.willExceedVRAM) {
+        const proceed = confirm(
+            'You don\'t have enough VRAM for this task.\n\n' +
+            'Some of this will use your system RAM instead.\n' +
+            'The image will take longer to appear, please be patient.\n\n' +
+            `Estimated VRAM needed: ${vramCheck.estimatedVRAM} MB\n` +
+            `Available VRAM: ${vramCheck.availableVRAM} MB\n\n` +
+            'Click OK to proceed with CPU/RAM fallback, or Cancel to adjust settings.'
+        );
+        if (!proceed) {
+            setStatus('Cancelled');
+            return;
+        }
+    }
 
     let activeJobId = null;
     let pollInterval = null;
@@ -502,15 +786,6 @@ async function onGenerate() {
             activeJobId = await window.go.main.App.StartImageJob(opts);
         } catch (cbErr) {
             const msg = String(cbErr?.message || cbErr);
-            if (msg.includes('not registered') || msg.includes('callback')) {
-                console.warn('[IG] Async job callback not registered, falling back to sync GenerateImage');
-                currentResult = await window.go.main.App.GenerateImage(opts);
-                displayResult(currentResult);
-                setStatus('Done!');
-                updateDiagnostics('genDone');
-                if (window.loadHistoryPanel) window.loadHistoryPanel();
-                return;
-            }
             throw cbErr;
         }
         setStatus('Generating...');
@@ -587,6 +862,7 @@ async function onGenerate() {
         stopProgressBar();
         resetGenerateButton();
         hideSpinner();
+        generationInFlight = false;
     }
 }
 
@@ -618,7 +894,7 @@ function startProgressBar(steps, family) {
     const text = document.getElementById('ig-progress-text');
     if (!wrap || !bar || !text) return;
 
-    const msPerStep = { sd15: 200, sdxl: 400, sd3: 500, flux: 800 };
+    const msPerStep = { sd15: 200, sdxl: 400, sd3: 500, flux: 800, hidream: 1200 };
     progressSteps = steps;
     progressDuration = steps * (msPerStep[family] || 400);
     progressStart = performance.now();
@@ -651,6 +927,105 @@ function stopProgressBar() {
     if (wrap) wrap.style.display = 'none';
     if (bar) bar.style.width = '0%';
     if (text) text.textContent = '';
+}
+
+function populateOptionsFromHistory(opts, clearModel) {
+    const set = (id, val) => {
+        const el = document.getElementById(id);
+        if (!el || val === undefined || val === null) return;
+        if (el.type === 'checkbox') el.checked = !!val;
+        else el.value = val;
+    };
+    set('ig-prompt', opts.prompt);
+    set('ig-negative', opts.negative_prompt);
+    set('ig-width', opts.width);
+    set('ig-height', opts.height);
+    set('ig-steps', opts.steps);
+    set('ig-seed', opts.seed);
+    set('ig-sampler', opts.sampler);
+    set('ig-scheduler', opts.scheduler);
+    set('ig-cfg', opts.cfg_scale);
+    set('ig-guidance', opts.guidance);
+    set('ig-slg-scale', opts.slg_scale);
+    set('ig-eta', opts.eta);
+    set('ig-batch', opts.batch_count);
+    set('ig-clip-skip', opts.clip_skip);
+    set('ig-vae-model', opts.vae_path);
+    set('ig-clip-l', opts.clip_l_path);
+    set('ig-clip-g', opts.clip_g_path);
+    set('ig-t5xxl', opts.t5xxl_path);
+    set('ig-taesd', opts.taesd);
+    set('ig-strength', opts.strength);
+    set('ig-strength-inpaint', opts.strength);
+    set('ig-outpaint-strength', opts.strength);
+    set('ig-outpaint-margin', opts.outpaint_margin);
+    set('ig-upscale-factor', opts.upscale_factor);
+    set('ig-control-model', opts.control_net_path);
+    set('ig-control-strength', opts.control_strength);
+    set('ig-video-frames', opts.video_frames);
+    set('ig-video-fps', opts.fps);
+    set('ig-prediction', opts.prediction);
+    set('ig-rng', opts.rng);
+    set('ig-sampler-rng', opts.sampler_rng);
+    set('ig-flow-shift', opts.flow_shift);
+    set('ig-vae-tile-overlap', opts.vae_tile_overlap);
+    set('ig-disable-metadata', opts.disable_metadata);
+    set('ig-skip-layer-start', opts.skip_layer_start);
+    set('ig-skip-layer-end', opts.skip_layer_end);
+    set('ig-high-noise-steps', opts.high_noise_steps);
+    set('ig-high-noise-cfg', opts.high_noise_cfg_scale);
+    set('ig-high-noise-guidance', opts.high_noise_guidance);
+    set('ig-high-noise-slg', opts.high_noise_slg_scale);
+    set('ig-high-noise-eta', opts.high_noise_eta);
+    set('ig-high-noise-skip-start', opts.high_noise_skip_layer_start);
+    set('ig-high-noise-skip-end', opts.high_noise_skip_layer_end);
+    set('ig-backend', opts.backend);
+    set('ig-params-backend', opts.params_backend);
+    set('ig-vae-tiling', opts.vae_tiling);
+    set('ig-temporal-tiling', opts.temporal_tiling);
+    set('ig-circular', opts.circular);
+    set('ig-fa', opts.flash_attention);
+    set('ig-offload-cpu', opts.offload_to_cpu);
+    set('ig-tiling', opts.tiling);
+    set('ig-hires-enable', opts.enable_hr);
+    set('ig-hr-scale', opts.hr_scale);
+    set('ig-hr-upscaler', opts.hr_upscaler);
+    if (opts.outpaint_direction && document.querySelectorAll('.ig-dir-btn')) {
+        document.querySelectorAll('.ig-dir-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.dir === opts.outpaint_direction);
+        });
+    }
+    if (opts.loras && Array.isArray(opts.loras)) {
+        const loraSel = document.getElementById('ig-lora');
+        if (loraSel) Array.from(loraSel.options).forEach(opt => { opt.selected = opts.loras.includes(opt.value); });
+    }
+    if (clearModel) set('ig-model', '');
+    else if (opts.model_name) set('ig-model', opts.model_name);
+    saveState();
+}
+
+function populateOptionsFromLegacy(meta, clearModel) {
+    const set = (id, val) => {
+        const el = document.getElementById(id);
+        if (!el || val === undefined || val === null) return;
+        el.value = val;
+    };
+    set('ig-prompt', meta.Prompt);
+    set('ig-negative', meta.NegativePrompt);
+    set('ig-width', meta.Width);
+    set('ig-height', meta.Height);
+    set('ig-steps', meta.Steps);
+    set('ig-seed', meta.Seed);
+    set('ig-sampler', meta.Sampler);
+    set('ig-cfg', meta.CfgScale);
+    if (clearModel) set('ig-model', '');
+    else set('ig-model', meta.Model);
+    saveState();
+}
+
+function triggerGenerate() {
+    const btn = document.getElementById('ig-generate');
+    if (btn && !btn.disabled) btn.click();
 }
 
 function updateProgressBar(percent, label) {
