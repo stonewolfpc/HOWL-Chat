@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -51,7 +52,7 @@ func (a *App) SendMessageStreamWithImage(message string, imageData string) error
 		"timestamp": time.Now().Unix(),
 	})
 
-	prompt := a.buildPrompt()
+	messages := a.buildPromptMessages()
 	opts := a.buildInferenceOptions()
 
 	streamCtx, cancel := context.WithCancel(context.Background())
@@ -62,7 +63,7 @@ func (a *App) SendMessageStreamWithImage(message string, imageData string) error
 
 	var streamErr error
 	if len(imageBytes) > 0 {
-		streamErr = a.httpClient.GenerateStreamWithImage(prompt, imageBytes, opts, func(chunk string, done bool) {
+		streamErr = a.httpClient.GenerateChatStreamWithImage(messages, imageBytes, opts, func(chunk string, done bool) {
 			select {
 			case <-streamCtx.Done():
 				return
@@ -75,7 +76,7 @@ func (a *App) SendMessageStreamWithImage(message string, imageData string) error
 			}
 		})
 	} else {
-		streamErr = a.httpClient.GenerateStream(prompt, opts, func(chunk string, done bool) {
+		streamErr = a.httpClient.GenerateChatStream(messages, opts, func(chunk string, done bool) {
 			select {
 			case <-streamCtx.Done():
 				return
@@ -92,6 +93,11 @@ func (a *App) SendMessageStreamWithImage(message string, imageData string) error
 	a.streamCancel = nil
 
 	if streamErr != nil {
+		// Context canceled means user aborted the stream - this is normal, not an error
+		if streamErr == context.Canceled {
+			fmt.Println("[SendMessageStream] stream canceled by user (context canceled)")
+			return nil
+		}
 		a.logError(errors.LLMStreamInterrupted, errors.High, "llm.infer", "app-prompt.go:82", streamErr)
 		runtime.EventsEmit(a.ctx, "chat:error", streamErr.Error())
 		return streamErr
@@ -129,37 +135,44 @@ func (a *App) GenerateCharacterResponse(message string, characterID string) erro
 			break
 		}
 	}
+
+	// Fallback: if the character isn't in memory, try to load from the
+	// currently persisted chat.  This fixes desyncs where the frontend
+	// chat data has a character that never made it into a.characters.
+	if character == nil && a.chatPersistence != nil {
+		chatID := a.chatPersistence.GetLastChatID()
+		if chatID != "" {
+			if chatData, err := a.chatPersistence.LoadChat(chatID); err == nil {
+				for _, c := range chatData.Characters {
+					if c.ID == characterID {
+						character = c
+						// Seed back into in-memory state so next call hits cache
+						a.characters = append(a.characters, c)
+						break
+					}
+				}
+			}
+		}
+	}
+
+	// Fallback 2: scan the Characters/ directory for the matching ID.
+	if character == nil {
+		character = loadCharacterFromDiskByID(characterID)
+		if character != nil {
+			a.characters = append(a.characters, character)
+		}
+	}
+
 	if character == nil {
 		return fmt.Errorf("character not found: %s", characterID)
 	}
 
-	charName := character.Name
-	var pb strings.Builder
-	fmt.Fprintf(&pb, "You are %s, a distinct participant in a group roleplay conversation.\n", charName)
-	pb.WriteString("You speak only when someone addresses you directly by name, role, or context, or when it is naturally your turn to respond.\n")
-	pb.WriteString("If others are speaking to each other, you listen quietly and stay in character, reacting only when your involvement makes sense.\n\n")
-	if character.Age != "" {
-		fmt.Fprintf(&pb, "Age: %s.\n", character.Age)
+	// The frontend already built a complete character-specific message including
+	// character info, lore, memories, group context, and the user message.
+	// Do NOT prepend backend character info again — that would double-prompt.
+	messages := []llama.ChatMessage{
+		{Role: "user", Content: message},
 	}
-	if character.Role != "" {
-		fmt.Fprintf(&pb, "Role/Relationship: %s.\n", character.Role)
-	}
-	if character.Description != "" {
-		fmt.Fprintf(&pb, "Appearance: %s\n", character.Description)
-	}
-	if character.Personality != "" {
-		fmt.Fprintf(&pb, "Personality: %s\n", character.Personality)
-	}
-	if character.Backstory != "" {
-		fmt.Fprintf(&pb, "Backstory: %s\n", character.Backstory)
-	}
-	if character.Background != "" {
-		fmt.Fprintf(&pb, "Background: %s\n", character.Background)
-	}
-	if loreBlock := a.resolveCharacterLorePromptBlock(charName); loreBlock != "" {
-		fmt.Fprintf(&pb, "\n%s\n", loreBlock)
-	}
-	fmt.Fprintf(&pb, "\nRespond to: %s", message)
 
 	opts := a.buildInferenceOptions()
 	streamCtx, cancel := context.WithCancel(context.Background())
@@ -171,7 +184,7 @@ func (a *App) GenerateCharacterResponse(message string, characterID string) erro
 	eventAborted := fmt.Sprintf("chat:aborted:%s", characterID)
 
 	var response strings.Builder
-	err := a.httpClient.GenerateStream(pb.String(), opts, func(chunk string, done bool) {
+	err := a.httpClient.GenerateChatStream(messages, opts, func(chunk string, done bool) {
 		select {
 		case <-streamCtx.Done():
 			return
@@ -199,7 +212,7 @@ func (a *App) GenerateCharacterResponse(message string, characterID string) erro
 	}
 
 	a.streamCancel = nil
-	_ = a.AppendChatMessage("assistant", response.String(), charName)
+	_ = a.AppendChatMessage("assistant", response.String(), character.Name)
 	runtime.EventsEmit(a.ctx, "chat:complete", map[string]interface{}{
 		"message":     response.String(),
 		"characterId": characterID,
@@ -412,6 +425,196 @@ func (a *App) buildPrompt() string {
 	return p.String()
 }
 
+// truncateMessagesToFitContext truncates the messages array to fit within the context window.
+// It keeps the system prompt and the most recent messages, dropping older messages from the middle.
+func (a *App) truncateMessagesToFitContext(messages []llama.ChatMessage) []llama.ChatMessage {
+	if a.httpClient == nil {
+		return messages
+	}
+
+	// Get the context size from the model
+	contextSize := a.httpClient.GetContextSize()
+	if contextSize <= 0 {
+		contextSize = 2048 // fallback
+	}
+
+	// Rough estimate: 4 characters per token (conservative estimate)
+	maxChars := contextSize * 4
+
+	// Always keep the system prompt
+	var result []llama.ChatMessage
+	if len(messages) > 0 && messages[0].Role == "system" {
+		result = append(result, messages[0])
+	}
+
+	// Calculate total characters
+	totalChars := 0
+	for _, msg := range messages {
+		if content, ok := msg.Content.(string); ok {
+			totalChars += len(content)
+		}
+	}
+
+	// If we're within the context limit, return as-is
+	if totalChars <= maxChars {
+		return messages
+	}
+
+	// We need to truncate. Keep system prompt, last few messages, and drop from the middle
+	// Reserve space for system prompt
+	systemChars := 0
+	if len(result) > 0 {
+		if content, ok := result[0].Content.(string); ok {
+			systemChars = len(content)
+		}
+	}
+	availableChars := maxChars - systemChars
+
+	// Keep the last few messages that fit
+	var recentMessages []llama.ChatMessage
+	usedChars := 0
+
+	// Process messages in reverse order, keeping as many as will fit
+	for i := len(messages) - 1; i >= 0; i-- {
+		if i == 0 && messages[i].Role == "system" {
+			continue // Already handled system prompt
+		}
+
+		var msgChars int
+		if content, ok := messages[i].Content.(string); ok {
+			msgChars = len(content)
+		} else {
+			continue // Skip messages without string content
+		}
+		if usedChars+msgChars > availableChars {
+			break
+		}
+
+		recentMessages = append([]llama.ChatMessage{messages[i]}, recentMessages...)
+		usedChars += msgChars
+	}
+
+	// Combine system prompt with recent messages
+	result = append(result, recentMessages...)
+
+	fmt.Printf("[Context] Truncated from %d to %d messages to fit %d token context\n",
+		len(messages), len(result), contextSize)
+
+	return result
+}
+
+// buildPromptMessages builds a proper messages array for the chat completions endpoint.
+func (a *App) buildPromptMessages() []llama.ChatMessage {
+	userPrefix, assistantPrefix := "", ""
+	if a.modelSettings != nil {
+		if v, ok := a.modelSettings["user_prefix"].(string); ok {
+			userPrefix = v
+		}
+		if v, ok := a.modelSettings["assistant_prefix"].(string); ok {
+			assistantPrefix = v
+		}
+	}
+
+	hasRoleplayContext := a.world != nil || a.scenario != nil || len(a.characters) > 0
+
+	var sys strings.Builder
+	if a.modelSettings != nil {
+		if spo, ok := a.modelSettings["system_prompt_override"].(string); ok && spo != "" {
+			fmt.Fprintf(&sys, "%s\n\n", spo)
+		} else if hasRoleplayContext {
+			sys.WriteString("You are in an immersive roleplay. Stay in character at all times. Speak naturally and concisely unless the scene calls for detail.\n\n")
+		} else {
+			sys.WriteString("You are a helpful, knowledgeable assistant.\n\n")
+		}
+	} else if hasRoleplayContext {
+		sys.WriteString("You are in an immersive roleplay. Stay in character at all times. Speak naturally and concisely unless the scene calls for detail.\n\n")
+	} else {
+		sys.WriteString("You are a helpful, knowledgeable assistant.\n\n")
+	}
+
+	if a.world != nil {
+		if a.world.Name != "" {
+			fmt.Fprintf(&sys, "[WORLD: %s]\n", a.world.Name)
+		}
+		if a.world.Description != "" {
+			fmt.Fprintf(&sys, "Description: %s\n", a.world.Description)
+		}
+		if len(a.world.KeyFacts) > 0 {
+			fmt.Fprintf(&sys, "Key Facts: %s\n", strings.Join(a.world.KeyFacts, ", "))
+		}
+		sys.WriteString("\n")
+	}
+
+	if a.scenario != nil {
+		if a.scenario.Name != "" {
+			fmt.Fprintf(&sys, "[SCENARIO: %s]\n", a.scenario.Name)
+		}
+		if a.scenario.Description != "" {
+			fmt.Fprintf(&sys, "Description: %s\n", a.scenario.Description)
+		}
+		if len(a.scenario.KeyDetails) > 0 {
+			fmt.Fprintf(&sys, "Key Details: %s\n", strings.Join(a.scenario.KeyDetails, ", "))
+		}
+		sys.WriteString("\n")
+	}
+
+	if len(a.characters) > 0 {
+		sys.WriteString("[CHARACTER SHEETS]\n")
+		for _, char := range a.characters {
+			if char.Name != "" {
+				fmt.Fprintf(&sys, "Character: %s\n", char.Name)
+			}
+			if char.Personality != "" {
+				fmt.Fprintf(&sys, "Personality: %s\n", char.Personality)
+			}
+			if char.Backstory != "" {
+				fmt.Fprintf(&sys, "Backstory: %s\n", char.Backstory)
+			}
+			if len(char.Goals) > 0 {
+				fmt.Fprintf(&sys, "Goals: %s\n", strings.Join(char.Goals, ", "))
+			}
+			if len(char.Relationships) > 0 {
+				fmt.Fprintf(&sys, "Relationships: %s\n", strings.Join(char.Relationships, ", "))
+			}
+			sys.WriteString("\n")
+		}
+		sys.WriteString("When replying, use the character information above to keep each response aligned to the character sheet and the scenario context.\n\n")
+	}
+
+	if loreBlock := a.resolveLorePromptBlock(); loreBlock != "" {
+		fmt.Fprintf(&sys, "%s\n", loreBlock)
+	}
+
+	if hasRoleplayContext {
+		sys.WriteString("[RULE: Do not show internal thinking. Do not use 'Here is my thought process'. Start your response immediately as the character.]")
+	} else {
+		sys.WriteString("[RULE: Do not show internal thinking. Do not use 'Here is my thought process'. Start your response immediately.]")
+	}
+
+	messages := []llama.ChatMessage{
+		{Role: "system", Content: sys.String()},
+	}
+
+	for _, msg := range a.chatMessages {
+		role, _ := msg["role"].(string)
+		content, _ := msg["content"].(string)
+		if role == "" || content == "" {
+			continue
+		}
+		if role == "user" && userPrefix != "" {
+			content = userPrefix + content
+		} else if role == "assistant" && assistantPrefix != "" {
+			content = assistantPrefix + content
+		}
+		messages = append(messages, llama.ChatMessage{Role: role, Content: content})
+	}
+
+	// Apply context truncation to prevent exceeding model's context window
+	messages = a.truncateMessagesToFitContext(messages)
+
+	return messages
+}
+
 // resolveLorePromptBlock resolves active lorebooks against the latest user message.
 func (a *App) resolveLorePromptBlock() string {
 	return a.resolveLore("")
@@ -496,11 +699,23 @@ func (a *App) buildInferenceOptions() *llama.InferenceOptions {
 		setFloat := func(dst *float64, key string) {
 			if v, ok := s[key].(float64); ok {
 				*dst = v
+			} else if v, ok := s[key].(int); ok {
+				*dst = float64(v)
+			} else if v, ok := s[key].(json.Number); ok {
+				if fv, err := v.Float64(); err == nil {
+					*dst = fv
+				}
 			}
 		}
 		setInt := func(dst *int, key string) {
 			if v, ok := s[key].(float64); ok {
 				*dst = int(v)
+			} else if v, ok := s[key].(int); ok {
+				*dst = v
+			} else if v, ok := s[key].(json.Number); ok {
+				if iv, err := v.Int64(); err == nil {
+					*dst = int(iv)
+				}
 			}
 		}
 		setBool := func(dst *bool, key string) {
@@ -540,7 +755,7 @@ func (a *App) buildInferenceOptions() *llama.InferenceOptions {
 		setFloat(&opts.TopA, "top_a")
 		setFloat(&opts.EpsilonCutoff, "epsilon_cutoff")
 		setFloat(&opts.EtaCutoff, "eta_cutoff")
-		setInt(&opts.NoRepeatNGramSize, "no_repeat_ngram")
+		setInt(&opts.NoRepeatNGramSize, "no_repeat_ngram_size")
 		setFloat(&opts.EncoderRepeatPenalty, "encoder_repeat_penalty")
 		setInt(&opts.Seed, "seed")
 	}

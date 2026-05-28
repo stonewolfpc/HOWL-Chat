@@ -28,3 +28,41 @@
     gap: 8px;
     margin-top: 8px;
 }
+
+.chat-edit-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    justify-content: flex-end;
+}
+
+.chat-edit-save,
+.chat-edit-cancel {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.chat-edit-save {
+    background: var(--theme-color, #4CAF50);
+    color: white;
+}
+
+.chat-edit-save:hover {
+    background: var(--theme-color-dark, #45a049);
+    transform: translateY(-1px);
+}
+
+.chat-edit-cancel {
+    background: #666;
+    color: white;
+}
+
+.chat-edit-cancel:hover {
+    background: #555;
+    transform: translateY(-1px);
+}

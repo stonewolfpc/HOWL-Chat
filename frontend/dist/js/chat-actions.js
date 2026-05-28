@@ -118,6 +118,16 @@ function editMessage(button) {
 
     textElement.style.display = 'none';
     bubble.insertBefore(textarea, textElement.nextSibling);
+    
+    // Add Save/Cancel buttons
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'chat-edit-buttons';
+    buttonContainer.innerHTML = `
+        <button class="chat-edit-save" title="Save (Ctrl+Enter)">✓ Save</button>
+        <button class="chat-edit-cancel" title="Cancel (Escape)">✕ Cancel</button>
+    `;
+    bubble.insertBefore(buttonContainer, textarea.nextSibling);
+    
     textarea.focus();
     textarea.select();
 
@@ -128,6 +138,8 @@ function editMessage(button) {
         committed = true;
 
         const newText = textarea.value.trim();
+        const buttonContainer = bubble.querySelector('.chat-edit-buttons');
+        if (buttonContainer) buttonContainer.remove();
         textarea.remove();
         textElement.style.display = 'block';
 
@@ -140,11 +152,15 @@ function editMessage(button) {
 
         // Re-send as user message if this is a user bubble
         if (isUser) {
+            if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
             if (window.go?.main?.App?.AppendChatMessage) {
                 window.go.main.App.AppendChatMessage('user', newText, 'User').catch(() => {});
             }
             if (typeof streamMultiCharacterResponses === 'function') {
-                streamMultiCharacterResponses(newText);
+                streamMultiCharacterResponses(newText).catch((err) => {
+                    console.error('Failed to stream response after edit:', err);
+                    showNotification('Failed to generate response: ' + (err.message || err), 'error', 5000);
+                });
             }
         }
     };
@@ -152,10 +168,18 @@ function editMessage(button) {
     const cancelEdit = () => {
         if (committed) return;
         committed = true;
+        const buttonContainer = bubble.querySelector('.chat-edit-buttons');
+        if (buttonContainer) buttonContainer.remove();
         textarea.remove();
         textElement.style.display = 'block';
         textElement.textContent = currentText;
     };
+
+    // Add button event listeners
+    const saveBtn = buttonContainer.querySelector('.chat-edit-save');
+    const cancelBtn = buttonContainer.querySelector('.chat-edit-cancel');
+    if (saveBtn) saveBtn.addEventListener('click', confirmEdit);
+    if (cancelBtn) cancelBtn.addEventListener('click', cancelEdit);
 
     // Confirm on Ctrl+Enter; cancel on Escape; blur = confirm
     textarea.addEventListener('keydown', (e) => {
@@ -195,6 +219,7 @@ function saveEdit(button, isUserMessage) {
         if (input) input.value = '';
 
         clearChatHistory();
+        if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
         streamAssistantResponseFromBackend(editedText);
     } else {
         const newTextElement = document.createElement('div');
@@ -231,22 +256,35 @@ function cancelEdit(button) {
 // ---------------------------------------------------------------------------
 
 function regenerateMessage(button) {
-    const chatHistory       = document.querySelector('.chat-messages');
-    const assistantMessages = Array.from(chatHistory.querySelectorAll('.chat-message.assistant'));
+    try {
+        const chatHistory       = document.querySelector('.chat-messages');
+        const assistantMessages = Array.from(chatHistory.querySelectorAll('.chat-message.assistant'));
 
-    if (assistantMessages.length === 0) {
-        showNotification('No AI messages to regenerate', 'warning');
-        return;
-    }
+        if (assistantMessages.length === 0) {
+            showNotification('No AI messages to regenerate', 'warning');
+            return;
+        }
 
-    const lastAIMessage = assistantMessages[assistantMessages.length - 1];
-    if (lastAIMessage) lastAIMessage.remove();
+        const lastAIMessage = assistantMessages[assistantMessages.length - 1];
+        if (lastAIMessage) lastAIMessage.remove();
 
-    const userMessages  = Array.from(chatHistory.querySelectorAll('.chat-message.user'));
-    const lastUserMsg   = userMessages[userMessages.length - 1];
-    if (lastUserMsg) {
-        const userText = lastUserMsg.querySelector('.chat-text').textContent;
-        streamAssistantResponseFromBackend(userText);
+        const userMessages  = Array.from(chatHistory.querySelectorAll('.chat-message.user'));
+        const lastUserMsg   = userMessages[userMessages.length - 1];
+        if (lastUserMsg) {
+            const userText = lastUserMsg.querySelector('.chat-text').textContent;
+            if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
+            
+            // Add error handling around the stream call
+            streamAssistantResponseFromBackend(userText).catch((err) => {
+                console.error('Regenerate failed:', err);
+                showNotification('Failed to regenerate message: ' + (err.message || err), 'error', 10000);
+            });
+        } else {
+            showNotification('No user message found to regenerate from', 'warning');
+        }
+    } catch (err) {
+        console.error('Regenerate error:', err);
+        showNotification('Error during regenerate: ' + (err.message || err), 'error', 10000);
     }
 }
 
@@ -265,6 +303,7 @@ function continueMessage(button) {
 
     const lastAssistant = assistantMessages[assistantMessages.length - 1];
     const lastText      = lastAssistant.querySelector('.chat-text').textContent;
+    if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
     streamAssistantResponseFromBackend(lastText);
 }
 
@@ -323,4 +362,9 @@ function showGenerateBanner() {
         banner.remove();
     };
     chatPanel.appendChild(banner);
+}
+
+function hideGenerateBanner() {
+    const banner = document.getElementById('generate-banner');
+    if (banner) banner.remove();
 }

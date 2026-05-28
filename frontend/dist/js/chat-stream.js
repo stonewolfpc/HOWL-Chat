@@ -284,6 +284,7 @@ async function streamMultiCharacterResponses(userMessage) {
 
     if (characters.length === 0) {
         console.log('No characters loaded, using generic AI response');
+        if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
         await streamAssistantResponseFromBackend(userMessage);
         setSendButtonSend();
         return;
@@ -306,6 +307,7 @@ async function streamMultiCharacterResponses(userMessage) {
 
     if (activeChars.length === 0) {
         console.log('All characters are inactive — no responses generated');
+        if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
         addSystemMessage('All characters are currently inactive. Add new characters or revive existing ones to continue.');
         setSendButtonSend();
         return;
@@ -417,6 +419,7 @@ async function streamSingleCharacterResponse(message, character) {
             if (localThink) updateThinkArea(thinkArea, localThink, localThinkStart);
             cleanup();
             updateNavigationButtons();
+            if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
 
             if (window.settingsState?.current?.general?.ttsAutoplay && window.AudioService?.playTTS) {
                 window.AudioService.playTTS(streamContent, character.id);
@@ -432,6 +435,7 @@ async function streamSingleCharacterResponse(message, character) {
             if (indicator) indicator.remove();
             messageDiv.classList.remove('streaming');
             cleanup();
+            if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
             resolve(null); // treat error as abort — stops queue, resets send button
         };
 
@@ -441,6 +445,7 @@ async function streamSingleCharacterResponse(message, character) {
             if (indicator) indicator.remove();
             messageDiv.classList.remove('streaming');
             cleanup();
+            if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
             resolve(null); // null signals the caller to stop the queue
         };
 
@@ -545,6 +550,7 @@ async function streamAssistantResponseFromBackend(message) {
         cleanupStreamListeners();
         currentStreamingBubble = null;
         updateNavigationButtons();
+        if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
 
         if (window.settingsState?.current?.general?.ttsAutoplay && window.AudioService?.playTTS) {
             window.AudioService.playTTS(mainContent, null);
@@ -552,12 +558,21 @@ async function streamAssistantResponseFromBackend(message) {
     };
 
     const onError = (err) => {
-        textElement.textContent += '\n[Error: ' + err + ']';
+        const errorMsg = err || 'Unknown error occurred';
+        textElement.textContent += '\n[Error: ' + errorMsg + ']';
         const indicator = bubble.querySelector('.typing-indicator');
         if (indicator) indicator.remove();
         messageDiv.classList.remove('streaming');
+        messageDiv.classList.add('error');
         setSendButtonSend();
         currentStreamingBubble = null;
+        if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
+        
+        // Show a persistent notification
+        showNotification('Chat generation failed: ' + errorMsg, 'error', 10000);
+        
+        // Also log to console for debugging
+        console.error('Chat stream error:', errorMsg);
     };
 
     const onAborted = () => {
@@ -568,6 +583,7 @@ async function streamAssistantResponseFromBackend(message) {
         setSendButtonSend();
         cleanupStreamListeners();
         currentStreamingBubble = null;
+        if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
     };
 
     if (window.runtime) {
@@ -645,6 +661,7 @@ async function streamAssistantResponseFromBackendWithImage(message, imageData) {
         cleanupStreamListeners();
         currentStreamingBubble = null;
         updateNavigationButtons();
+        if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
 
         if (window.settingsState?.current?.general?.ttsAutoplay && window.AudioService?.playTTS) {
             window.AudioService.playTTS(mainContent, null);
@@ -658,6 +675,7 @@ async function streamAssistantResponseFromBackendWithImage(message, imageData) {
         messageDiv.classList.remove('streaming');
         setSendButtonSend();
         currentStreamingBubble = null;
+        if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
     };
 
     const onAborted = () => {
@@ -667,6 +685,7 @@ async function streamAssistantResponseFromBackendWithImage(message, imageData) {
         setSendButtonSend();
         cleanupStreamListeners();
         currentStreamingBubble = null;
+        if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
     };
 
     if (window.runtime) {
