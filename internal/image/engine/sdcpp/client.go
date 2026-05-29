@@ -215,6 +215,7 @@ func (c *client) resetState() {
 func (c *client) generateSequentialBatch(singleGen func(types.ImageOptions) (*types.ImageResult, error), opts types.ImageOptions) (*types.ImageResult, error) {
 	var firstResult *types.ImageResult
 	var firstSeed = opts.Seed
+	var allImages []string
 
 	fmt.Printf("[ImageEngine] Batch: generating %d images sequentially (initial seed=%d)\n", opts.BatchCount, firstSeed)
 
@@ -256,10 +257,10 @@ func (c *client) generateSequentialBatch(singleGen func(types.ImageOptions) (*ty
 			firstResult = result
 		}
 
-		// Save each image immediately to gallery
+		// Accumulate all images for batch display
 		if result.ImageData != "" {
-			fmt.Printf("[ImageEngine] Batch: saved image %d/%d\n", i+1, opts.BatchCount)
-			// The save logic is handled in the core generation function
+			allImages = append(allImages, result.ImageData)
+			fmt.Printf("[ImageEngine] Batch: accumulated image %d/%d\n", i+1, opts.BatchCount)
 		}
 	}
 
@@ -267,9 +268,11 @@ func (c *client) generateSequentialBatch(singleGen func(types.ImageOptions) (*ty
 		return nil, fmt.Errorf("no images generated in batch of %d", opts.BatchCount)
 	}
 
-	fmt.Printf("[ImageEngine] Batch complete: %d images generated\n", opts.BatchCount)
+	// Set all images in the result for batch display
+	firstResult.Images = allImages
 
-	// Return the first image for display, but note that all images have been saved individually
+	fmt.Printf("[ImageEngine] Batch complete: %d images generated\n", len(allImages))
+
 	return firstResult, nil
 }
 
