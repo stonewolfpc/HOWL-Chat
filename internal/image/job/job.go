@@ -64,9 +64,7 @@ func (m *Manager) Status(id string) *types.ImageJob {
 	return m.jobs[id]
 }
 
-// Cancel marks a job as cancelled. It cannot stop an in-flight HTTP request
-// without killing the sd-server process, so cancellation only prevents the
-// result from being committed and updates the status flag.
+// Cancel marks a job as cancelled and signals the backend to abort.
 func (m *Manager) Cancel(id string) bool {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -79,6 +77,10 @@ func (m *Manager) Cancel(id string) bool {
 		return false
 	}
 	job.Status = "cancelled"
+
+	if m.engine != nil {
+		_ = m.engine.CancelJob()
+	}
 	return true
 }
 
@@ -128,7 +130,21 @@ func (m *Manager) run(job *types.ImageJob) {
 					failed = true
 					continue
 				}
-				if p.Progress > 0 || p.Step > 0 {
+
+				// The HTTP client has no timeout, so when sd-server dies the request
+				// blocks forever instead of returning: the job would sit at its last
+				// progress value and the UI would spin indefinitely. A backend that is
+				// no longer running is a definite failure, so report it as one.
+				if !m.engine.IsRunning() {
+					m.mu.RLock()
+					stillGenerating := job.Status == "generating"
+					m.mu.RUnlock()
+					if stillGenerating {
+						m.finish(job, nil, fmt.Errorf("image engine stopped before finishing: sd-server exited. Check the model file and the engine path."))
+						return
+					}
+				}
+				if p.Progress > 0 || p.Step > 0 || p.PreviewImage != "" {
 					m.mu.Lock()
 					if job.Status == "generating" {
 						job.Progress = p.Progress
@@ -170,6 +186,12 @@ func (m *Manager) finish(job *types.ImageJob, result *types.ImageResult, err err
 	defer m.mu.Unlock()
 
 	if job.Status == "cancelled" {
+		return
+	}
+
+	// A failure already reported by the health check must not be overwritten by
+	// a late success from the blocked generation call.
+	if job.Status == "failed" && err == nil {
 		return
 	}
 

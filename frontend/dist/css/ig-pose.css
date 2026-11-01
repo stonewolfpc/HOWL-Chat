@@ -1,0 +1,95 @@
+/* ig-pose.css — pose editor + image workflow panel
+ *
+ * Kept out of ig-fluid.css so the pose dialog's layout rules are easy to find
+ * and cannot be overridden by the generator page's panel styles.
+ */
+
+/* --- Workflow panel --- */
+.ig-wf-count { font-size: 10px; opacity: .55; margin-left: 4px; }
+.ig-wf-import {
+    cursor: pointer;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+#ig-workflow-status[data-kind="error"] { color: var(--danger); }
+#ig-workflow-status[data-kind="ok"] { color: var(--success); }
+#ig-workflow-select { max-width: 100%; }
+#ig-controlnet-status { color: var(--info); }
+#ig-controlnet-status:empty { display: none; }
+
+/* --- Pose editor --- */
+.ig-pose-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, .74);
+    backdrop-filter: blur(2px);
+}
+.ig-pose-overlay.open { display: flex; }
+
+.ig-pose-dialog {
+    width: min(760px, 100%);
+    max-height: calc(100vh - 48px);
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    color: #e9e9ee;
+    background: #15151a;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 14px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .6);
+}
+
+.ig-pose-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 20px 10px;
+}
+.ig-pose-header h2 { margin: 0; font-size: 16px; font-weight: 600; }
+.ig-pose-header p { margin: 4px 0 0; font-size: 12px; opacity: .65; }
+
+.ig-pose-body {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) 220px;
+    gap: 18px;
+    padding: 6px 20px 16px;
+}
+.ig-pose-stage {
+    background: #000;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+#ig-pose-canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    touch-action: none;
+    cursor: default;
+}
+.ig-pose-side { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ig-pose-actions { display: flex; gap: 8px; margin-top: 8px; }
+.ig-pose-hint { font-size: 11px; line-height: 1.45; opacity: .62; margin: 8px 0 0; }
+.ig-pose-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 20px 18px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+@media (max-width: 640px) {
+    .ig-pose-body { grid-template-columns: 1fr; }
+    .ig-pose-footer { flex-direction: column; align-items: stretch; }
+    .ig-pose-overlay { padding: 12px; }
+}

@@ -25,8 +25,8 @@
 
 /* Session Modal Container */
 .session-modal-container {
-    background: rgba(21, 21, 31, 0.98);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-panel-bg);
+    border: 1px solid var(--border-primary);
     border-radius: 12px;
     width: 500px;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
@@ -36,8 +36,8 @@
 /* Session Modal Header */
 .session-modal-header {
     padding: 20px 24px;
-    border-bottom: 1px solid rgba(100, 100, 100, 0.3);
-    background: rgba(10, 10, 15, 0.5);
+    border-bottom: 1px solid var(--border-primary);
+    background: var(--surface-tertiary);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -85,8 +85,8 @@
 
 .session-modal-input {
     width: 100%;
-    background: rgba(21, 21, 31, 0.95);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-panel-bg);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     padding: 12px 16px;
     font-size: 14px;
@@ -101,7 +101,7 @@
 }
 
 .session-modal-input::placeholder {
-    color: rgba(100, 100, 100, 0.5);
+    color: var(--border-secondary);
 }
 
 .session-modal-input.error {
@@ -118,8 +118,8 @@
 .session-modal-textarea {
     width: 100%;
     min-height: 80px;
-    background: rgba(21, 21, 31, 0.95);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-panel-bg);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     padding: 12px 16px;
     font-size: 14px;
@@ -137,12 +137,12 @@
 }
 
 .session-modal-textarea::placeholder {
-    color: rgba(100, 100, 100, 0.5);
+    color: var(--border-secondary);
 }
 
 .session-modal-textarea {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    scrollbar-color: var(--border-secondary) transparent;
 }
 
 .session-modal-textarea::-webkit-scrollbar {
@@ -154,27 +154,27 @@
 }
 
 .session-modal-textarea::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--border-primary);
     border-radius: 4px;
 }
 
 .session-modal-textarea::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--border-primary);
 }
 
 /* Session Modal Footer */
 .session-modal-footer {
     padding: 16px 24px;
-    border-top: 1px solid rgba(100, 100, 100, 0.3);
-    background: rgba(10, 10, 15, 0.5);
+    border-top: 1px solid var(--border-primary);
+    background: var(--surface-tertiary);
     display: flex;
     justify-content: flex-end;
     gap: 12px;
 }
 
 .session-modal-cancel {
-    background: rgba(21, 21, 31, 0.9);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-panel-bg);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     padding: 10px 20px;
     cursor: pointer;
@@ -184,13 +184,13 @@
 }
 
 .session-modal-cancel:hover {
-    background: rgba(100, 100, 100, 0.3);
-    border-color: rgba(100, 100, 100, 0.5);
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
 }
 
 .session-modal-save {
     background: var(--theme-glow);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     padding: 10px 24px;
     cursor: pointer;

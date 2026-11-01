@@ -7,9 +7,7 @@
  * @module model-settings
  */
 
-const MODEL_SETTINGS_STORAGE_KEY = 'howl-model-settings';
-
-// Model settings state
+// Model settings state — synced to unified store under the 'model' key
 let modelSettings = {
     // Core Model Settings (keys match app.go/spawnLlamaServerWithModel)
     model_family: 'auto',
@@ -177,19 +175,21 @@ function initTextInputs() {
     });
 }
 
-// Save model settings to backend
+// Save model settings to unified store and backend
 async function saveModelSettings() {
-    try {
-        localStorage.setItem(MODEL_SETTINGS_STORAGE_KEY, JSON.stringify(modelSettings));
-    } catch (error) {
-        console.warn('Unable to save model settings locally:', error);
+    // Sync to unified store
+    if (window.settingsState?.current) {
+        window.settingsState.current.model = modelSettings;
+        if (window.settingsState.saveSettings) {
+            await window.settingsState.saveSettings();
+        }
     }
 
     if (!window.go || !window.go.main || !window.go.main.App) {
-        console.log('Wails runtime not available, settings saved locally only');
+        console.log('Wails runtime not available, settings saved to local store');
         return;
     }
-    
+
     try {
         await window.go.main.App.SetModelOptions(modelSettings);
     } catch (error) {
@@ -197,32 +197,33 @@ async function saveModelSettings() {
     }
 }
 
-// Load model settings from backend or localStorage
+// Load model settings from unified store, backend, or defaults
 async function loadModelSettings() {
-    let loaded = false;
+    // 1. Try unified settings store first
+    if (window.settingsState?.current?.model) {
+        const settings = window.settingsState.current.model;
+        if (Object.keys(settings).length > 0) {
+            modelSettings = { ...modelSettings, ...settings };
+            updateUIFromSettings();
+            return;
+        }
+    }
 
+    // 2. Fallback to legacy backend binding
+    let loaded = false;
     if (window.go && window.go.main && window.go.main.App) {
         try {
             const settings = await window.go.main.App.GetModelOptions();
             if (settings && Object.keys(settings).length > 0) {
                 modelSettings = { ...modelSettings, ...settings };
+                // Seed into unified store
+                if (window.settingsState?.current) {
+                    window.settingsState.current.model = modelSettings;
+                }
                 loaded = true;
             }
         } catch (error) {
             console.error('Error loading model settings from backend:', error);
-        }
-    }
-
-    if (!loaded) {
-        try {
-            const local = localStorage.getItem(MODEL_SETTINGS_STORAGE_KEY);
-            if (local) {
-                const settings = JSON.parse(local);
-                modelSettings = { ...modelSettings, ...settings };
-                loaded = true;
-            }
-        } catch (error) {
-            console.warn('Failed to load model settings from localStorage:', error);
         }
     }
 
@@ -320,11 +321,17 @@ document.addEventListener('DOMContentLoaded', function() {
     loadModelSettings();
 });
 
-// Persist model settings before the page unloads
-window.addEventListener('beforeunload', function() {
-    try {
-        localStorage.setItem(MODEL_SETTINGS_STORAGE_KEY, JSON.stringify(modelSettings));
-    } catch (error) {
-        console.warn('Failed to persist model settings on unload:', error);
-    }
+// ---------------------------------------------------------------------------
+// Clamped descriptions keep their full sentence reachable
+//
+// The full-screen sheet caps .setting-description at two lines so one long
+// description cannot stretch its whole grid row. The complete sentence stays
+// available as a native tooltip.
+// ---------------------------------------------------------------------------
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('#model-settings-flyout .setting-description').forEach(function (el) {
+        const full = el.textContent.trim();
+        if (full && !el.title) el.title = full;
+    });
 });

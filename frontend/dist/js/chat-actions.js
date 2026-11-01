@@ -46,20 +46,32 @@ function deleteMessage(button) {
 // ---------------------------------------------------------------------------
 
 async function _syncDomHistoryToBackend() {
-    if (!window.go?.main?.App?.ClearChatHistory) return;
+    const app = window.go?.main?.App;
+    if (!app) return;
     try {
-        await window.go.main.App.ClearChatHistory();
-        if (!window.go.main.App.AppendChatMessage) return;
         const msgs = document.querySelectorAll('.chat-messages .chat-message');
-        for (const msgDiv of msgs) {
+        const entries = [];
+        msgs.forEach((msgDiv) => {
             const role   = msgDiv.classList.contains('user')      ? 'user'
                          : msgDiv.classList.contains('assistant') ? 'assistant'
                          : 'system';
             const text   = msgDiv.querySelector('.chat-text')?.textContent?.trim() || '';
             const sender = msgDiv.querySelector('.chat-sender')?.textContent?.trim() || '';
-            if (text) {
-                await window.go.main.App.AppendChatMessage(role, text, sender).catch(() => {});
-            }
+            if (text) entries.push({ role, text, sender });
+        });
+
+        // Replace, never append. Appending the surviving messages on top of the
+        // log left the deleted lines on disk, so they came back on next load.
+        if (typeof app.ReplaceChatHistory === 'function') {
+            await app.ReplaceChatHistory(entries);
+            return;
+        }
+
+        // Fallback for a backend without ReplaceChatHistory.
+        if (!app.ClearChatHistory || !app.AppendChatMessage) return;
+        await app.ClearChatHistory();
+        for (const entry of entries) {
+            await app.AppendChatMessage(entry.role, entry.text, entry.sender).catch(() => {});
         }
     } catch (err) {
         console.warn('Failed to sync DOM history to backend:', err);

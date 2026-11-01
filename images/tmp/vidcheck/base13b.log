@@ -1,0 +1,53 @@
+ggml_cuda_init: found 1 CUDA devices (Total VRAM: 8191 MiB):
+  Device 0: NVIDIA GeForce GTX 1080, compute capability 6.1, VMM: yes, VRAM: 8191 MiB
+load_backend: loaded CUDA backend from E:\HOWL_Chat\ggml-cuda.dll
+load_backend: loaded CPU backend from E:\HOWL_Chat\ggml-cpu-haswell.dll
+[I] loading diffusion model from 'models/video/wan21/Wan2.1-T2V-1.3B-Q4_K_S.gguf' --- diffusion_engine.cpp:692
+[I] load models/video/wan21/Wan2.1-T2V-1.3B-Q4_K_S.gguf using gguf format --- model_loader.cpp:216
+[I] loading t5xxl from 'models/video/wan21/umt5-xxl-encoder-Q4_K_M.gguf' --- diffusion_engine.cpp:734
+[I] load models/video/wan21/umt5-xxl-encoder-Q4_K_M.gguf using gguf format --- model_loader.cpp:216
+[I] loading vae from 'models/video/wan21/wan_2.1_vae.safetensors' --- diffusion_engine.cpp:763
+[I] load models/video/wan21/wan_2.1_vae.safetensors using safetensors format --- model_loader.cpp:222
+[I] Version: Wan 2.x  --- diffusion_engine.cpp:975
+[I] auto-fit plan: --- backend_fit.cpp:323
+[I]   devices: --- backend_fit.cpp:324
+[I]     CUDA0        NVIDIA GeForce GTX 1080          free   7185 MiB, budget   6673 MiB --- backend_fit.cpp:328
+[I]     RAM          free  48703 MiB, params budget  43833 MiB --- backend_fit.cpp:334
+[I]   compute-device weight cache priority: diffusion > te > vae --- backend_fit.cpp:336
+[I]   components (params: compute device -> RAM -> other GPU -> disk): --- backend_fit.cpp:337
+[I]     DiT          params    778 MiB, compute reserve  2048 MiB -> compute CUDA0, params CUDA0 --- backend_fit.cpp:348
+[I]     Conditioner  params   3479 MiB, compute reserve  2048 MiB -> compute CUDA0, params CUDA0 --- backend_fit.cpp:348
+[I]     VAE          params    242 MiB, compute reserve  1024 MiB -> compute CUDA0, params CUDA0 --- backend_fit.cpp:348
+[I] auto-fit: --backend "diffusion=CUDA0,te=CUDA0,vae=CUDA0" --- backend_fit.cpp:477
+[I] Weight type stat:                      f32: 75   |     f16: 340  |    q4_K: 627  |    q6_K: 25   |    bf16: 194   --- diffusion_engine.cpp:1548
+[I] Conditioner weight type stat:          f32: 73   |    q4_K: 144  |    q6_K: 25    --- diffusion_engine.cpp:1549
+[I] Diffusion model weight type stat:      f32: 2    |     f16: 340  |    q4_K: 483   --- diffusion_engine.cpp:1550
+[I] VAE weight type stat:                 bf16: 194   --- diffusion_engine.cpp:1551
+[I] Wan2.1-T2V-1.3B --- wan.hpp:969
+[I] using VAE for encoding / decoding --- model_builders.cpp:210
+[I] flash attention auto: CUDA0 -> on (probe: normal 1.727 ms, flash 1.402 ms) --- flash_attn.cpp:95
+[I] conv2d direct auto: CUDA0 -> off (no implicit GEMM path) --- conv_direct.cpp:90
+[I] conv3d direct auto: CUDA0 -> on (implicit GEMM) --- conv_direct.cpp:87
+[I] total params memory size = 4502.94MB (VRAM 4502.94MB, RAM 0.00MB): text_encoders 3479.75MB(VRAM), diffusion_model 781.10MB(VRAM), vae 242.10MB(VRAM), controlnet 0.00MB(N/A), extensions 0.00MB(N/A) --- diffusion_engine.cpp:1438
+[I] running in FLOW mode --- diffusion_engine.cpp:1478
+[I] get_sigmas with Simple scheduler --- denoiser.hpp:1157
+[I] sampling using Euler method --- request.cpp:477
+[I] t5 build cached graph cut plan done (taking 2 ms) --- ggml_graph_cut.cpp:1042
+  |########                                          |  38/242 -   1.20GB/s[K  |###################                               |  91/242 -   1.94GB/s[K  |##############################                    | 144/242 -   2.21GB/s[K  |#########################################         | 194/242 -   2.27GB/s[K  |##################################################| 242/242 -   1.69GB/s[K
+[I] loading tensors completed, taking 2.01s (read: 0.81s, memcpy: 0.00s, convert: 0.00s, copy_to_backend: 0.34s) --- model_loader.cpp:1427
+[I] get_learned_condition completed, taking 3.86s --- video.cpp:1259
+[I] generate_video 832x480x1 --- video.cpp:1679
+[I] Wan2.1-T2V-1.3B build cached graph cut plan done (taking 5 ms) --- ggml_graph_cut.cpp:1042
+  |##############################                    | 489/825 -   2.05GB/s[K  |##################################################| 825/825 -   1.83GB/s[K
+[I] loading tensors completed, taking 0.42s (read: 0.22s, memcpy: 0.00s, convert: 0.00s, copy_to_backend: 0.12s) --- model_loader.cpp:1427
+  |============>                                     | 1/4 -   2.01s/it[K  |=========================>                        | 2/4 -   1.53s/it[K  |=====================================>            | 3/4 -   1.54s/it[K  |==================================================| 4/4 -   1.54s/it[K
+[I] sampling completed, taking 6.63s --- video.cpp:1776
+[I] generating latent video completed, taking 6.64s --- video.cpp:1920
+[I] wan_vae build cached graph cut plan done (taking 0 ms) --- ggml_graph_cut.cpp:1042
+  |##################################################| 104/104 - 665.47MB/s[K
+[I] loading tensors completed, taking 0.20s (read: 0.04s, memcpy: 0.00s, convert: 0.07s, copy_to_backend: 0.03s) --- model_loader.cpp:1427
+  |=====>                                            |  1/10 -   1.81it/s[K  |==========>                                       |  2/10 -   3.01it/s[K  |===============>                                  |  3/10 -   3.02it/s[K  |====================>                             |  4/10 -   3.04it/s[K  |=========================>                        |  5/10 -   3.02it/s[K  |==============================>                   |  6/10 -   3.02it/s[K  |===================================>              |  7/10 -   3.01it/s[K  |========================================>         |  8/10 -   2.99it/s[K  |=============================================>    |  9/10 -   3.03it/s[K  |==================================================| 10/10 -   3.01it/s[K
+[I] decode_first_stage completed, taking 3.54s --- video.cpp:1290
+[I] generate_video completed in 14.05s --- video.cpp:2008
+[I] save result image 0 to 'images/tmp/vidcheck/base13b.png' (success) --- main.cpp:495
+[I] 1/1 images saved --- main.cpp:571

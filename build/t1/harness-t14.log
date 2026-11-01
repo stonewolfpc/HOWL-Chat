@@ -1,0 +1,104 @@
+[startup] 21:28:53.101  +    2.7ms  image init: begin
+[startup] 21:28:53.104  +    5.8ms  image init: config ready
+[ImageEngine] Initialized: binary=C:\Users\StoneWolfPC\HOWL_Chat\sd-server.exe models=E:\HOWL_Chat\models port=8081
+[startup] 21:28:53.104  +    6.3ms  image init: engine initialized
+[ImageEngine] sd-server commit: c6dfa9d
+[ImageEngine] Restored last model: "image"
+[startup] 21:28:53.124  +   25.9ms  rescan: start
+2026/10/31 21:28:53 [harness] serving frontend/dist on http://127.0.0.1:8799
+[startup] 21:28:53.125  +   26.9ms  rescan: scanning E:\AI GGUF\GGUF
+[startup] 21:28:53.126  +   28.5ms  rescan: done E:\AI GGUF\GGUF 25 entries
+2026/10/31 21:28:58 [rpc] GetSettings                                   ok            0s
+2026/10/31 21:28:58 [rpc] SetSettings                                   ok           1ms
+[LoadModel] START path="E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf"
+[LoadModel] path validated
+[LoadModel] checking port 8080
+[LoadModel] port 8080 free
+[LoadModel] validating llama-server binary
+[LoadModel] llama-server binary validated
+[LoadModel] reading GGUF metadata from: E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf
+[ReadProfile] final: Family=qwen35 Layers=32 Params=13759916804 Size=5366.4MB Quant=IQ2_XXS DModel=4096 Heads=16 KVHeads=4
+[LoadModel] profile: Family=qwen35 Layers=32 Params=13759916804 Size=5366.4MB Quant=IQ2_XXS ArchSpec=true
+[LoadModel] applying safe defaults
+[applySafeDefaults] enter
+[applySafeDefaults] getting hardware snapshot
+[ResourceManager] GetManager called
+[ResourceManager] initializing singleton
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] initialization complete
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[applySafeDefaults] freeVRAM=5798 freeRAM=44157
+[applySafeDefaults] reading settings
+[applySafeDefaults] settings: ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] archSpec: layers=32 dmodel=4096 heads=16 kvheads=4
+[applySafeDefaults] creating memory model
+[applySafeDefaults] calling ClampToHardware
+[applySafeDefaults] ClampToHardware returned
+[applySafeDefaults] final: GPU=4302MB RAM=2468MB ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] done
+[LoadModel] safe defaults applied
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+[LoadModel] no mmproj found — vision not available for this model
+[LoadModel] validating spawn settings
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[LoadModel] spawn params: ctx=3096 gpuLayers=22 batch=256 freeVRAM=5798 freeRAM=44157
+[LoadModel] validation result: level=0 msg="Memory OK — estimated 4302 MB GPU / 2468 MB RAM (free: 5798 / 44157 MB)"
+[LoadModel] spawn validation passed
+[LoadModel] chat template: model-native for family "qwen35" (95 bytes)
+[LoadModel] spawning llama-server
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+INFO: No mmproj file found for model: E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf
+INFO: llama-server started (pid 8972) with model E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf
+[LoadModel] llama-server spawned (pid 8972)
+INFO: Registering model with estimated GPU:4310MB RAM:2476MB
+[ResourceManager] GetManager called
+2026/10/31 21:29:01 [rpc] LoadModel                                     ok        2.366s
+[LoadModel] monitor started (pid 8972, timeout 60s)
+0.00.122.052 I srv  llama_server: initializing ...
+0.00.122.068 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.122.397 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.135.232 I srv    load_model: loading model 'E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf'
+2026/10/31 21:29:03 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 21:29:05 [rpc] IsModelLoaded                                 ok           1ms
+0.04.206.340 I cmn          init: llama threadpool init, n_threads = 8
+0.04.802.175 I srv    load_model: initializing, n_slots = 4, n_ctx_slot = 3328, kv_unified = 'true'
+0.04.804.262 I srv  server_run_i: model loaded
+0.04.804.271 I srv  server_on_li: listening on http://127.0.0.1:8080
+[LoadModel] monitor: server healthy, model loaded
+2026/10/31 21:29:07 [rpc] IsModelLoaded                                 ok            0s
+2026/10/31 21:29:07 [rpc] IsModelLoaded                                 ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/10/31 21:29:07 [rpc] GetEffectiveSampler                           ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/10/31 21:29:07 [rpc] GetEffectiveSampler                           ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/10/31 21:29:07 [rpc] GetEffectiveSampler                           ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/10/31 21:29:07 [rpc] GetEffectiveSampler                           ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/10/31 21:29:07 [rpc] GetEffectiveSampler                           ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/10/31 21:29:07 [rpc] GetEffectiveSampler                           ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+0.06.096.137 I slot get_availabl: id  0 | task -1 | selected slot by LRU, n_tokens = 0, t_last = -1
+0.06.096.160 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.09.989.757 I slot print_timing: id  0 | task 0 | prompt eval time =    2896.30 ms /    86 tokens (   33.68 ms per token,    29.69 tokens per second)
+0.09.989.766 I slot print_timing: id  0 | task 0 |        eval time =     997.25 ms /     9 tokens (  124.66 ms per token,     8.02 tokens per second)
+0.09.989.768 I slot print_timing: id  0 | task 0 |       total time =    3893.55 ms /    95 tokens
+0.09.989.769 I slot print_timing: id  0 | task 0 |    graphs reused =          8
+0.09.989.770 I slot print_timing: id  0 | task 0 |   graph reallocs =          1    /     0        (same size) / (changed size)
+0.09.989.810 I slot      release: id  0 | task 0 | stop processing: n_tokens = 94, truncated = 0
+2026/10/31 21:29:11 [rpc] SendMessage                                   ok        3.896s
+2026/10/31 21:29:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:29:12 [rpc] GetSDServerVersion                            ok            0s

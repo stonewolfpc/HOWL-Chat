@@ -46,32 +46,59 @@ async function loadAvailableLorebooks() {
         const cs       = window.characterState;
         const lorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
         cs.availableLorebooks = lorebooks;
-        dropdownItems.innerHTML = '';
-
-        if (lorebooks.length === 0) {
-            dropdownItems.innerHTML = `<div class="world-dropdown-item disabled"><span class="world-dropdown-item-text">No lorebooks created yet</span></div>`;
-            return;
-        }
-
-        lorebooks.forEach(lorebook => {
-            if (!lorebook.id) lorebook.id = cs.lorebookKey(lorebook);
-            const displayName = cs.lorebookDisplayName(lorebook);
-            const isSelected  = cs.selectedLorebooks.some(l => cs.lorebookKey(l) === cs.lorebookKey(lorebook));
-
-            const item = document.createElement('div');
-            item.className = 'world-dropdown-item';
-            if (isSelected) item.classList.add('selected');
-            item.innerHTML = `<span class="world-dropdown-item-text">${displayName}</span>`;
-            item.dataset.lorebookId = lorebook.id;
-            item.addEventListener('click', () => toggleLorebookSelection(lorebook, item));
-            dropdownItems.appendChild(item);
-        });
+        const fe = window.FilterEngine;
+        const sorted = fe ? fe.sortItems(lorebooks, 'name', 'asc') : lorebooks;
+        renderCharacterLorebookDropdown(sorted);
 
     } catch (error) {
         console.error('Failed to load lorebooks for character:', error);
         dropdownItems.innerHTML = `<div class="world-dropdown-item disabled"><span class="world-dropdown-item-text">Error loading lorebooks</span></div>`;
     }
 }
+
+function renderCharacterLorebookDropdown(items) {
+    const dropdownItems = document.getElementById('character-lorebook-dropdown-items');
+    if (!dropdownItems) return;
+    dropdownItems.innerHTML = '';
+
+    const cs = window.characterState;
+    if (items.length === 0) {
+        dropdownItems.innerHTML = `<div class="world-dropdown-item disabled"><span class="world-dropdown-item-text">No lorebooks found</span></div>`;
+        return;
+    }
+
+    items.forEach(lorebook => {
+        if (!lorebook.id) lorebook.id = cs.lorebookKey(lorebook);
+        const displayName = cs.lorebookDisplayName(lorebook);
+        const isSelected  = cs.selectedLorebooks.some(l => cs.lorebookKey(l) === cs.lorebookKey(lorebook));
+
+        const item = document.createElement('div');
+        item.className = 'world-dropdown-item';
+        if (isSelected) item.classList.add('selected');
+        item.innerHTML = `<span class="world-dropdown-item-text">${displayName}</span>`;
+        item.dataset.lorebookId = lorebook.id;
+        item.addEventListener('click', () => toggleLorebookSelection(lorebook, item));
+        dropdownItems.appendChild(item);
+    });
+}
+
+function searchCharacterLorebooks(query) {
+    const cs = window.characterState;
+    const fe = window.FilterEngine;
+    const sortVal = document.querySelector('#character-lorebook-dropdown .world-dropdown-sort')?.value || 'name:asc';
+    const [field, dir] = sortVal.split(':');
+    const items = fe ? fe.processItems(cs.availableLorebooks, { query, searchFields: ['name','title','description'], sortField: field, sortDirection: dir }) : cs.availableLorebooks;
+    renderCharacterLorebookDropdown(items);
+}
+
+window._characterLorebookSort = (val) => {
+    const [field, dir] = val.split(':');
+    const query = document.querySelector('#character-lorebook-dropdown .world-dropdown-search-input')?.value || '';
+    const cs = window.characterState;
+    const fe = window.FilterEngine;
+    const items = fe ? fe.processItems(cs.availableLorebooks, { query, searchFields: ['name','title','description'], sortField: field, sortDirection: dir }) : cs.availableLorebooks;
+    renderCharacterLorebookDropdown(items);
+};
 
 // ---------------------------------------------------------------------------
 // Toggle & Remove

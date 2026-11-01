@@ -93,9 +93,26 @@ async function toggleMemoriesFlyout() {
 
 function switchMemoriesTab(tab) {
     window.storyToolsState.currentTab = tab;
+
+    // The knowledge tab swaps the memory list and editor for the RAG panel. This
+    // logic used to live in rag-knowledge.js as a wrapper that captured an
+    // "original" and re-ran it conditionally; one owner is enough.
+    const knowledgePanel   = document.getElementById('knowledge-panel');
+    const memoryListCard   = document.querySelector('.setting-card:nth-of-type(3)');
+    const memoryEditorCard = document.querySelector('.setting-card:nth-of-type(4)');
+
+    if (knowledgePanel)   knowledgePanel.style.display   = tab === 'knowledge' ? 'block' : 'none';
+    if (memoryListCard)   memoryListCard.style.display   = tab === 'knowledge' ? 'none'  : 'block';
+    if (memoryEditorCard) memoryEditorCard.style.display = tab === 'knowledge' ? 'none'  : 'block';
+
     document.querySelectorAll('.memories-tab').forEach(t => t.classList.remove('active'));
     document.getElementById(`memories-tab-${tab}`)?.classList.add('active');
-    loadFullMemoriesList();
+
+    if (tab === 'knowledge') {
+        if (typeof refreshKnowledgeList === 'function') refreshKnowledgeList();
+    } else {
+        loadFullMemoriesList();
+    }
 }
 
 async function handleSearch(event) {

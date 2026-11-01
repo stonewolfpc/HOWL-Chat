@@ -11,55 +11,81 @@
 
 body.theme-light {
     /* Core Theme Variables */
-    --theme-color: #14b8a6;
+    /* App canvas: without this the page stayed #0a0a0f while text turned dark */
+    --app-bg: #E9E6DF;
+    --shell-nav-bg: rgba(238, 235, 228, 0.97);
+    --shell-panel-bg: rgba(247, 245, 240, 0.97);
+    --shell-aside-bg: rgba(233, 230, 223, 0.97);
+    --theme-color: #0d9488;
     --theme-secondary: #06b6d4;
     --theme-glow: rgba(20, 184, 166, 0.25);
     --theme-text-glow: rgba(20, 184, 166, 0.2);
 
     /* Text Variables */
-    --static-text: #1A1C1E;
-    --text-primary: #1A1C1E;
-    --text-secondary: #4A4D52;
-    --text-tertiary: #7A7D82;
+    --static-text: #262420;
+    --text-primary: #262420;
+    --text-secondary: #57534B;
+    --text-tertiary: #837C72;
 
     /* Surface Variables */
-    --surface-primary: #FFFFFF;
-    --surface-secondary: #F4F6F8;
-    --surface-tertiary: #ECEEF1;
-    --surface-hover: rgba(0, 0, 0, 0.04);
+    --surface-primary: #F7F5F0;
+    --surface-secondary: #EFEBE3;
+    --surface-tertiary: #E4E0D6;
+    --surface-hover: rgba(38, 36, 32, 0.06);
+    --overlay-scrim: rgba(38, 36, 32, 0.35);
+    --surface-subtle: rgba(38, 36, 32, 0.03);
+    --surface-hover-strong: rgba(38, 36, 32, 0.1);
+    --success-bg: rgba(21, 128, 61, 0.15);
 
     /* Border Variables */
-    --border-primary: #D3D7DE;
-    --border-secondary: #B8BDC7;
+    --border-primary: #CFC9BE;
+    --border-secondary: #B9B2A6;
 
     /* Accent Variables */
     --accent-primary: var(--theme-color);
-    --accent-primary-hover: rgba(20, 184, 166, 0.12);
+    --accent-primary-hover: rgba(13, 148, 136, 0.12);
     --accent-secondary: var(--theme-secondary);
     --accent-secondary-hover: rgba(6, 182, 212, 0.12);
 
     /* Status Colors (Universal) */
-    --success: #4ade80;
-    --warning: #fbbf24;
-    --danger: #ff3333;
-    --info: #00ccff;
+    --success: #15803d;
+    --warning: #b45309;
+    --danger: #c62828;
+    --info: #0369a1;
 
     /* Shadows */
-    --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.06);
-    --shadow-modal: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-card: 0 1px 3px rgba(38, 36, 32, 0.08);
+    --shadow-modal: 0 6px 20px rgba(38, 36, 32, 0.16);
 
     /* Inputs & Forms */
-    --input-bg: #FFFFFF;
-    --input-border: #D3D7DE;
-    --input-placeholder: #9CA1A8;
+    --input-bg: #FBFAF6;
+    --input-border: #CFC9BE;
+    --input-placeholder: #978F85;
 
     /* Buttons */
     --button-primary-bg: var(--theme-color);
-    --button-secondary-bg: #FFFFFF;
+    --button-secondary-bg: #F7F5F0;
     --button-secondary-border: var(--theme-color);
+    /* On teal #0d9488 white is 4.9:1; body text would be ~1.6:1 */
+    --on-accent: #ffffff;
 
-    /* Apply to body */
-    background-color: var(--surface-secondary);
+    /* Apply to body - same canvas token the dark theme uses */
+    background-color: var(--app-bg);
     color: var(--text-primary);
     color-scheme: light;
+}
+
+/* Role accents in light: same identity, softened so they sit on paper. */
+body.theme-light {
+    --user-accent: #0f766e;
+    --user-bg: rgba(20, 184, 166, 0.08);
+    --user-border: rgba(15, 118, 110, 0.45);
+    --user-border-strong: rgba(15, 118, 110, 0.65);
+    --user-glow: rgba(20, 184, 166, 0.1);
+    --user-glow-strong: rgba(20, 184, 166, 0.16);
+    --ai-accent: #7e22ce;
+    --ai-border: rgba(126, 34, 206, 0.35);
+    --ai-border-strong: rgba(126, 34, 206, 0.5);
+    --ai-glow: rgba(126, 34, 206, 0.1);
+    --ai-glow-strong: rgba(126, 34, 206, 0.16);
 }

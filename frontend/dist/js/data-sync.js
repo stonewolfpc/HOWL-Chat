@@ -99,13 +99,38 @@ class DataSync {
     /**
      * Check if there are unsaved changes
      */
-    hasUnsavedChanges() {
-        // Check if contextDisplay has current chat data
-        if (typeof contextDisplay !== 'undefined' && contextDisplay.currentChatData) {
-            // Compare with last saved state (simplified check)
-            return true; // For now, always assume changes exist
+    /**
+     * Cheap signature of everything autosave persists. Two identical signatures
+     * mean there is nothing worth writing.
+     */
+    chatSignature() {
+        if (typeof contextDisplay === 'undefined' || !contextDisplay.currentChatData) {
+            return null;
         }
-        return false;
+        const data = contextDisplay.currentChatData;
+        const messages = document.querySelectorAll('.chat-messages .chat-message');
+        const lastMessage = messages.length
+            ? (messages[messages.length - 1].textContent || '').trim().slice(0, 120)
+            : '';
+        return JSON.stringify([
+            this.currentChatId || '',
+            data.world?.id || data.world?.name || '',
+            data.scenario?.id || data.scenario?.name || '',
+            (data.characters || []).map(c => c.id || c.name || '').join(','),
+            (data.lorebooks || []).map(l => l.id || l.name || '').join(','),
+            (data.activeCharacterIds || []).join(','),
+            (data.activeLorebookIds || []).join(','),
+            messages.length,
+            lastMessage
+        ]);
+    }
+
+    hasUnsavedChanges() {
+        const signature = this.chatSignature();
+        if (signature === null) return false;
+        // Nothing saved yet this session: persist once so the file exists.
+        if (this.lastSavedSignature === undefined) return true;
+        return signature !== this.lastSavedSignature;
     }
 
     /**
@@ -118,8 +143,16 @@ class DataSync {
         }
 
         try {
-            await window.go.main.App.SaveChat();
-            console.log('Chat data saved successfully');
+            // Prefer SaveChatData with full payload (carries tracking arrays)
+            if (window.chatBridge?.collectForSave && window.go.main.App.SaveChatData) {
+                const payload = window.chatBridge.collectForSave();
+                await window.go.main.App.SaveChatData(payload);
+                console.log('Chat data saved successfully via SaveChatData');
+            } else {
+                await window.go.main.App.SaveChat();
+                console.log('Chat data saved successfully via SaveChat');
+            }
+            this.lastSavedSignature = this.chatSignature();
         } catch (error) {
             console.error('Failed to save chat data:', error);
             throw error;
@@ -162,42 +195,58 @@ class DataSync {
             chatData.meta.characterNames = (data.characters || []).map(c => c.name || c.title || '').filter(Boolean);
             chatData.meta.lorebookNames = (data.lorebooks || []).map(l => l.name || l.title || '').filter(Boolean);
 
+            // Source-of-truth tracking arrays
+            chatData.meta.worldId           = data.world?.id    || data.world?.ID    || '';
+            chatData.meta.scenarioId        = data.scenario?.id || data.scenario?.ID || '';
+            chatData.meta.activeCharacters  = data.activeCharacterIds  || [];
+            chatData.meta.removedCharacters = data.removedCharacterIds || [];
+            chatData.meta.addedCharacters   = data.addedCharacterIds   || [];
+            chatData.meta.activeLorebooks  = data.activeLorebookIds   || [];
+            chatData.meta.removedLorebooks = data.removedLorebookIds  || [];
+            chatData.meta.addedLorebooks   = data.addedLorebookIds    || [];
+
             chatData.world = data.world;
             chatData.scenario = data.scenario;
             chatData.characters = data.characters || [];
             chatData.lorebooks = data.lorebooks || [];
         }
 
-        // Get chat history from DOM
+        // Get chat history from DOM — use CSS classes and dataset for accuracy.
+        // NEVER infer role from sender name text; that breaks for names like "You".
         const chatMessages = document.querySelector('.chat-messages');
         if (chatMessages) {
             const messageElements = chatMessages.querySelectorAll('.chat-message');
             chatData.history = Array.from(messageElements).map((msgEl, index) => {
                 const senderEl = msgEl.querySelector('.chat-sender');
-                const textEl = msgEl.querySelector('.chat-text');
+                const textEl   = msgEl.querySelector('.chat-text');
 
-                if (senderEl && textEl) {
-                    const sender = senderEl.textContent.trim();
-                    const text = textEl.textContent.trim();
+                if (!textEl) return null;
+                const text   = textEl.textContent.trim();
+                const sender = senderEl ? senderEl.textContent.trim() : '';
 
-                    // Determine role from sender
-                    let role = 'system';
-                    if (sender.toLowerCase().includes('user')) {
-                        role = 'user';
-                    } else if (sender.toLowerCase().includes('assistant') || sender.toLowerCase().includes('ai')) {
-                        role = 'assistant';
-                    }
-
-                    return {
-                        id: index.toString(),
-                        sender: sender,
-                        text: text,
-                        role: role,
-                        timestamp: new Date().toISOString(),
-                        hasImage: false
-                    };
+                // Role from CSS class (authoritative), never from sender text
+                let role = 'system';
+                if (msgEl.classList.contains('user')) {
+                    role = 'user';
+                } else if (msgEl.classList.contains('assistant')) {
+                    role = 'assistant';
+                } else if (msgEl.classList.contains('system')) {
+                    role = 'system';
                 }
-                return null;
+
+                const entry = {
+                    id:           msgEl.dataset.id || index.toString(),
+                    sender:       sender,
+                    text:         text,
+                    role:         role,
+                    characterId:  msgEl.dataset.characterId || null,
+                    timestamp:    msgEl.dataset.timestamp || new Date().toISOString(),
+                    hasImage:     msgEl.dataset.hasImage === 'true'
+                };
+                if (index < 3 || index >= messageElements.length - 2) {
+                    console.log('[scraper] msg', index, 'role=', role, 'charId=', entry.characterId, 'sender=', sender.slice(0,20));
+                }
+                return entry;
             }).filter(Boolean);
 
             chatData.meta.messageCount = chatData.history.length;

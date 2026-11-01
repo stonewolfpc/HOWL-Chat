@@ -17,7 +17,7 @@
 /* Body Layout */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #0a0a0f;
+    background-color: var(--app-bg, #0a0a0f);
     color: var(--static-text);
     height: 100vh;
     overflow: hidden;
@@ -30,15 +30,15 @@ body {
     flex: 1;
     display: flex;
     overflow: hidden;
-    background: #0a0a0f;
+    background: var(--app-bg, #0a0a0f);
     position: relative;
 }
 
 /* Nav Sidebar Layout */
 .nav-sidebar {
     width: 80px;
-    background: rgba(10, 10, 15, 0.95);
-    border-right: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-nav-bg);
+    border-right: 1px solid var(--border-primary);
     display: flex;
     flex-direction: column;
     padding: 8px 4px;
@@ -49,8 +49,8 @@ body {
 /* Character Sidebar Layout */
 .character-sidebar {
     width: 200px;
-    background: rgba(21, 21, 31, 0.95);
-    border-right: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-panel-bg);
+    border-right: 1px solid var(--border-primary);
     display: flex;
     flex-direction: column;
     padding: 8px;
@@ -60,8 +60,8 @@ body {
 /* Chat Panel Layout */
 .chat-panel {
     flex: 1;
-    background: rgba(15, 21, 31, 0.95);
-    border-right: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-aside-bg);
+    border-right: 1px solid var(--border-primary);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -77,7 +77,7 @@ body {
 /* World Sidebar Layout */
 .world-sidebar {
     width: 200px;
-    background: rgba(21, 21, 31, 0.95);
+    background: var(--shell-panel-bg);
     display: flex;
     flex-direction: column;
     padding: 8px;
@@ -92,8 +92,8 @@ body {
 
 /* Input Bar Layout */
 .input-bar {
-    background: rgba(15, 21, 31, 0.9);
-    border-top: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-aside-bg);
+    border-top: 1px solid var(--border-primary);
     padding: 12px;
     display: flex;
     gap: 12px;
@@ -103,34 +103,27 @@ body {
 /* ==================== LIGHT THEME OVERRIDES ==================== */
 
 body.theme-light {
-    background-color: var(--surface-secondary);
     color: var(--text-primary);
 }
 
 body.theme-light .main-content {
-    background: var(--surface-secondary);
 }
 
 body.theme-light .nav-sidebar {
-    background: var(--surface-primary);
     border-right-color: var(--border-primary);
 }
 
 body.theme-light .character-sidebar {
-    background: var(--surface-primary);
     border-right-color: var(--border-primary);
 }
 
 body.theme-light .chat-panel {
-    background: var(--surface-primary);
     border-right-color: var(--border-primary);
 }
 
 body.theme-light .world-sidebar {
-    background: var(--surface-primary);
 }
 
 body.theme-light .input-bar {
-    background: var(--surface-tertiary);
     border-top-color: var(--border-primary);
 }

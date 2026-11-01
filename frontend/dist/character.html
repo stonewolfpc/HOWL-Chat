@@ -13,19 +13,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Character Creator - HOWL Chat</title>
-    <link rel="stylesheet" href="css/theme.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/menu-components.css">
-    <link rel="stylesheet" href="css/nav-components.css">
-    <link rel="stylesheet" href="css/animations.css">
-    <link rel="stylesheet" href="css/ambient.css">
-    <link rel="stylesheet" href="css/character-components.css">
-    <link rel="stylesheet" href="css/character-header.css">
-    <link rel="stylesheet" href="css/world-form.css">
-    <link rel="stylesheet" href="css/world-dropdown-item.css">
-    <link rel="stylesheet" href="css/nav-icon-images.css">
-    <link rel="stylesheet" href="css/icons.css">
-    <link rel="stylesheet" href="css/tutorials.css">
+    <link rel="stylesheet" href="css/theme.css?v=29">
+    <link rel="stylesheet" href="css/layout.css?v=29">
+    <link rel="stylesheet" href="css/menu-components.css?v=29">
+    <link rel="stylesheet" href="css/nav-components.css?v=29">
+    <link rel="stylesheet" href="css/animations.css?v=29">
+    <link rel="stylesheet" href="css/ambient.css?v=29">
+    <link rel="stylesheet" href="css/character-components.css?v=29">
+    <link rel="stylesheet" href="css/character-header.css?v=29">
+    <link rel="stylesheet" href="css/world-form.css?v=29">
+    <link rel="stylesheet" href="css/world-dropdown-item.css?v=29">
+    <link rel="stylesheet" href="css/nav-icon-images.css?v=29">
+    <link rel="stylesheet" href="css/icons.css?v=29">
+    <link rel="stylesheet" href="css/tutorials.css?v=29">
 </head>
 <body>
     <!-- Ambient Background Effects -->
@@ -76,7 +76,6 @@
             <div class="menu-item">
                 <button class="menu-button">Help</button>
                 <div class="dropdown" id="help-dropdown">
-                    <div class="dropdown-item">Documentation</div>
                     <div class="dropdown-item">About</div>
                 </div>
             </div>
@@ -205,6 +204,17 @@
                                     <span class="world-dropdown-arrow">▼</span>
                                 </button>
                                 <div class="world-dropdown-menu">
+                                    <div class="world-dropdown-search" style="display:flex;gap:6px;padding:6px;">
+                                        <input type="text" class="world-dropdown-search-input" placeholder="Search lorebooks..." style="flex:1;"
+                                            oninput="searchCharacterLorebooks(this.value)">
+                                        <select class="world-dropdown-sort" style="padding:6px 8px;border:1px solid rgba(255,255,255,0.1);border-radius:4px;font-size:12px;cursor:pointer;"
+                                            onchange="window._characterLorebookSort && window._characterLorebookSort(this.value)">
+                                            <option value="name:asc">Name A-Z</option>
+                                            <option value="name:desc">Name Z-A</option>
+                                            <option value="date:desc">Newest First</option>
+                                            <option value="date:asc">Oldest First</option>
+                                        </select>
+                                    </div>
                                     <div id="character-lorebook-dropdown-items">
                                         <!-- Lorebook items will be dynamically added here -->
                                     </div>
@@ -297,32 +307,33 @@
         </div>
     </div>
 
-    <script src="js/theme.js"></script>
-    <script src="js/menu.js"></script>
-    <script src="js/image-processor.js"></script>
-    <script src="js/delete-confirm.js"></script>
-    <script src="js/delete-service.js"></script>
-    <script src="js/character-storage.js"></script>
-    <script src="js/character-state.js"></script>
-    <script src="js/character-images.js"></script>
-    <script src="js/character-lorebooks.js"></script>
-    <script src="js/character-grid.js"></script>
-    <script src="js/character-form.js"></script>
-    <script src="js/character.js"></script>
-    <script src="js/menu-edit.js"></script>
-    <script src="js/menu-view.js"></script>
-    <script src="js/memory-store.js"></script>
-    <script src="js/menu-memory.js"></script>
-    <script src="js/menu-functions.js"></script>
-    <script src="js/navigation.js"></script>
-    <script src="js/tutorials-data-chat.js"></script>
-    <script src="js/tutorials-data-settings.js"></script>
-    <script src="js/tutorials-data-model.js"></script>
-    <script src="js/tutorials-data-content.js"></script>
-    <script src="js/tutorials-data-advanced.js"></script>
-    <script src="js/tutorials-data-app.js"></script>
-    <script src="js/tutorials-data.js"></script>
-    <script src="js/tutorials-ui.js"></script>
+    <script src="js/theme.js?v=29"></script>
+    <script src="js/menu.js?v=29"></script>
+    <script src="js/image-processor.js?v=29"></script>
+    <script src="js/delete-confirm.js?v=29"></script>
+    <script src="js/delete-service.js?v=29"></script>
+    <script src="js/character-storage.js?v=29"></script>
+    <script src="js/filter-engine.js?v=29"></script>
+    <script src="js/character-state.js?v=29"></script>
+    <script src="js/character-images.js?v=29"></script>
+    <script src="js/character-lorebooks.js?v=29"></script>
+    <script src="js/character-grid.js?v=29"></script>
+    <script src="js/character-form.js?v=29"></script>
+    <script src="js/character.js?v=29"></script>
+    <script src="js/menu-edit.js?v=29"></script>
+    <script src="js/menu-view.js?v=29"></script>
+    <script src="js/memory-store.js?v=29"></script>
+    <script src="js/menu-memory.js?v=29"></script>
+    <script src="js/menu-functions.js?v=29"></script>
+    <script src="js/navigation.js?v=29"></script>
+    <script src="js/tutorials-data-chat.js?v=29"></script>
+    <script src="js/tutorials-data-settings.js?v=29"></script>
+    <script src="js/tutorials-data-model.js?v=29"></script>
+    <script src="js/tutorials-data-content.js?v=29"></script>
+    <script src="js/tutorials-data-advanced.js?v=29"></script>
+    <script src="js/tutorials-data-app.js?v=29"></script>
+    <script src="js/tutorials-data.js?v=29"></script>
+    <script src="js/tutorials-ui.js?v=29"></script>
     <!-- Tutorials Overlay -->
     <div id="tutorials-overlay" class="tutorials-overlay">
         <div class="tutorials-container">

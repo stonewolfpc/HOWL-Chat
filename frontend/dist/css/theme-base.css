@@ -44,7 +44,7 @@ select,
 .dropdown,
 .flyout-content {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    scrollbar-color: var(--border-secondary) transparent;
 }
 
 body::-webkit-scrollbar,
@@ -126,7 +126,7 @@ select::-webkit-scrollbar-thumb,
 .scenario-images-list::-webkit-scrollbar-thumb,
 .dropdown::-webkit-scrollbar-thumb,
 .flyout-content::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--border-primary);
     border-radius: 4px;
 }
 
@@ -154,7 +154,7 @@ select::-webkit-scrollbar-thumb:hover,
 .scenario-images-list::-webkit-scrollbar-thumb:hover,
 .dropdown::-webkit-scrollbar-thumb:hover,
 .flyout-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--border-primary);
 }
 
 body::-webkit-scrollbar-corner,
@@ -182,4 +182,173 @@ select::-webkit-scrollbar-corner,
 .dropdown::-webkit-scrollbar-corner,
 .flyout-content::-webkit-scrollbar-corner {
     background: transparent;
+}
+
+/* ---------------------------------------------------------------------------
+   Native <select> / <option> Styling — ensures dark dropdowns everywhere
+   --------------------------------------------------------------------------- */
+
+select,
+.selector-sort-select,
+.world-dropdown-sort,
+#session-sort-select,
+#session-world-filter,
+#session-scenario-filter {
+    background-color: var(--shell-panel-bg);
+    color: var(--static-text);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+}
+
+select option,
+.selector-sort-select option,
+.world-dropdown-sort option,
+#session-sort-select option,
+#session-world-filter option,
+#session-scenario-filter option {
+    background-color: var(--shell-panel-bg);
+    color: var(--static-text);
+}
+
+select:focus,
+.selector-sort-select:focus,
+.world-dropdown-sort:focus {
+    outline: none;
+    border-color: var(--theme-color, #14b8a6);
+    box-shadow: 0 0 0 2px var(--theme-border, rgba(20, 184, 166, 0.3));
+}
+
+/* Scrollbar inside select dropdowns */
+select::-webkit-scrollbar {
+    width: 6px;
+}
+select::-webkit-scrollbar-track {
+    background: transparent;
+}
+select::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+}
+select::-webkit-scrollbar-thumb:hover {
+    background: var(--border-primary);
+}
+
+/* ---------------------------------------------------------------------------
+   Light Theme Overrides — Scrollbars & Native Selects
+   (Dark theme defaults above are untouched)
+   --------------------------------------------------------------------------- */
+
+/* Scrollbars: dark thumb on light background */
+body.theme-light,
+body.theme-light textarea,
+body.theme-light input[type="text"],
+body.theme-light input[type="number"],
+body.theme-light select,
+body.theme-light .main-content,
+body.theme-light .character-content,
+body.theme-light .chat-messages,
+body.theme-light .character-list,
+body.theme-light .world-list,
+body.theme-light .scenario-list,
+body.theme-light .lorebook-list,
+body.theme-light .sidebar-content,
+body.theme-light .panel-content,
+body.theme-light .character-creation-content,
+body.theme-light .user-details-content,
+body.theme-light .world-form-content,
+body.theme-light .scenario-form-content,
+body.theme-light .story-tools-content,
+body.theme-light .character-images-list,
+body.theme-light .world-images-list,
+body.theme-light .scenario-images-list,
+body.theme-light .dropdown,
+body.theme-light .flyout-content {
+    scrollbar-color: var(--border-secondary) transparent;
+}
+
+body.theme-light::-webkit-scrollbar-thumb,
+body.theme-light textarea::-webkit-scrollbar-thumb,
+body.theme-light input[type="text"]::-webkit-scrollbar-thumb,
+body.theme-light input[type="number"]::-webkit-scrollbar-thumb,
+body.theme-light select::-webkit-scrollbar-thumb,
+body.theme-light .main-content::-webkit-scrollbar-thumb,
+body.theme-light .character-content::-webkit-scrollbar-thumb,
+body.theme-light .chat-messages::-webkit-scrollbar-thumb,
+body.theme-light .character-list::-webkit-scrollbar-thumb,
+body.theme-light .world-list::-webkit-scrollbar-thumb,
+body.theme-light .scenario-list::-webkit-scrollbar-thumb,
+body.theme-light .lorebook-list::-webkit-scrollbar-thumb,
+body.theme-light .sidebar-content::-webkit-scrollbar-thumb,
+body.theme-light .panel-content::-webkit-scrollbar-thumb,
+body.theme-light .character-creation-content::-webkit-scrollbar-thumb,
+body.theme-light .user-details-content::-webkit-scrollbar-thumb,
+body.theme-light .world-form-content::-webkit-scrollbar-thumb,
+body.theme-light .scenario-form-content::-webkit-scrollbar-thumb,
+body.theme-light .story-tools-content::-webkit-scrollbar-thumb,
+body.theme-light .character-images-list::-webkit-scrollbar-thumb,
+body.theme-light .world-images-list::-webkit-scrollbar-thumb,
+body.theme-light .scenario-images-list::-webkit-scrollbar-thumb,
+body.theme-light .dropdown::-webkit-scrollbar-thumb,
+body.theme-light .flyout-content::-webkit-scrollbar-thumb {
+}
+
+body.theme-light::-webkit-scrollbar-thumb:hover,
+body.theme-light textarea::-webkit-scrollbar-thumb:hover,
+body.theme-light input[type="text"]::-webkit-scrollbar-thumb:hover,
+body.theme-light input[type="number"]::-webkit-scrollbar-thumb:hover,
+body.theme-light select::-webkit-scrollbar-thumb:hover,
+body.theme-light .main-content::-webkit-scrollbar-thumb:hover,
+body.theme-light .character-content::-webkit-scrollbar-thumb:hover,
+body.theme-light .chat-messages::-webkit-scrollbar-thumb:hover,
+body.theme-light .character-list::-webkit-scrollbar-thumb:hover,
+body.theme-light .world-list::-webkit-scrollbar-thumb:hover,
+body.theme-light .scenario-list::-webkit-scrollbar-thumb:hover,
+body.theme-light .lorebook-list::-webkit-scrollbar-thumb:hover,
+body.theme-light .sidebar-content::-webkit-scrollbar-thumb:hover,
+body.theme-light .panel-content::-webkit-scrollbar-thumb:hover,
+body.theme-light .character-creation-content::-webkit-scrollbar-thumb:hover,
+body.theme-light .user-details-content::-webkit-scrollbar-thumb:hover,
+body.theme-light .world-form-content::-webkit-scrollbar-thumb:hover,
+body.theme-light .scenario-form-content::-webkit-scrollbar-thumb:hover,
+body.theme-light .story-tools-content::-webkit-scrollbar-thumb:hover,
+body.theme-light .character-images-list::-webkit-scrollbar-thumb:hover,
+body.theme-light .world-images-list::-webkit-scrollbar-thumb:hover,
+body.theme-light .scenario-images-list::-webkit-scrollbar-thumb:hover,
+body.theme-light .dropdown::-webkit-scrollbar-thumb:hover,
+body.theme-light .flyout-content::-webkit-scrollbar-thumb:hover {
+}
+
+/* Native <select> dropdowns */
+body.theme-light select,
+body.theme-light .selector-sort-select,
+body.theme-light .world-dropdown-sort,
+body.theme-light #session-sort-select,
+body.theme-light #session-world-filter,
+body.theme-light #session-scenario-filter {
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    border-color: var(--input-border);
+}
+
+body.theme-light select option,
+body.theme-light .selector-sort-select option,
+body.theme-light .world-dropdown-sort option,
+body.theme-light #session-sort-select option,
+body.theme-light #session-world-filter option,
+body.theme-light #session-scenario-filter option {
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+}
+
+body.theme-light select::-webkit-scrollbar-thumb {
+    background: var(--border-primary);
+}
+
+body.theme-light select::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+/* Base canvas for pages that do not include layout.css (settings, audio). */
+body {
+    background-color: var(--app-bg, #0a0a0f);
 }

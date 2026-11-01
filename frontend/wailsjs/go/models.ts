@@ -205,6 +205,14 @@ export namespace chat {
 	    scenarioName: string;
 	    characterNames: string[];
 	    lorebookNames: string[];
+	    worldId: string;
+	    scenarioId: string;
+	    activeCharacters: string[];
+	    removedCharacters: string[];
+	    addedCharacters: string[];
+	    activeLorebooks: string[];
+	    removedLorebooks: string[];
+	    addedLorebooks: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new ChatMeta(source);
@@ -220,6 +228,14 @@ export namespace chat {
 	        this.scenarioName = source["scenarioName"];
 	        this.characterNames = source["characterNames"];
 	        this.lorebookNames = source["lorebookNames"];
+	        this.worldId = source["worldId"];
+	        this.scenarioId = source["scenarioId"];
+	        this.activeCharacters = source["activeCharacters"];
+	        this.removedCharacters = source["removedCharacters"];
+	        this.addedCharacters = source["addedCharacters"];
+	        this.activeLorebooks = source["activeLorebooks"];
+	        this.removedLorebooks = source["removedLorebooks"];
+	        this.addedLorebooks = source["addedLorebooks"];
 	    }
 	}
 	export class ChatData {
@@ -713,6 +729,9 @@ export namespace main {
 	    controlnets: AssetInfo[];
 	    embeddings: AssetInfo[];
 	    upscalers: AssetInfo[];
+	    t5xxls: AssetInfo[];
+	    clip_ls: AssetInfo[];
+	    clip_gs: AssetInfo[];
 	
 	    static createFrom(source: any = {}) {
 	        return new ScanResult(source);
@@ -726,6 +745,9 @@ export namespace main {
 	        this.controlnets = this.convertValues(source["controlnets"], AssetInfo);
 	        this.embeddings = this.convertValues(source["embeddings"], AssetInfo);
 	        this.upscalers = this.convertValues(source["upscalers"], AssetInfo);
+	        this.t5xxls = this.convertValues(source["t5xxls"], AssetInfo);
+	        this.clip_ls = this.convertValues(source["clip_ls"], AssetInfo);
+	        this.clip_gs = this.convertValues(source["clip_gs"], AssetInfo);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -762,6 +784,45 @@ export namespace main {
 	        this.path = source["path"];
 	        this.format = source["format"];
 	        this.size_mb = source["size_mb"];
+	    }
+	}
+
+}
+
+export namespace metadata {
+	
+	export class ExtractedMetadata {
+	    prompt: string;
+	    negative_prompt: string;
+	    steps: number;
+	    sampler: string;
+	    cfg_scale: number;
+	    seed: number;
+	    width: number;
+	    height: number;
+	    model_hash?: string;
+	    model_name?: string;
+	    scheduler?: string;
+	    raw?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ExtractedMetadata(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.prompt = source["prompt"];
+	        this.negative_prompt = source["negative_prompt"];
+	        this.steps = source["steps"];
+	        this.sampler = source["sampler"];
+	        this.cfg_scale = source["cfg_scale"];
+	        this.seed = source["seed"];
+	        this.width = source["width"];
+	        this.height = source["height"];
+	        this.model_hash = source["model_hash"];
+	        this.model_name = source["model_name"];
+	        this.scheduler = source["scheduler"];
+	        this.raw = source["raw"];
 	    }
 	}
 
@@ -958,6 +1019,7 @@ export namespace types {
 	    mode: string;
 	    created_at: string;
 	    source: ImageSource;
+	    options?: ImageOptions;
 	
 	    static createFrom(source: any = {}) {
 	        return new ImageMetadata(source);
@@ -979,6 +1041,7 @@ export namespace types {
 	        this.mode = source["mode"];
 	        this.created_at = source["created_at"];
 	        this.source = this.convertValues(source["source"], ImageSource);
+	        this.options = this.convertValues(source["options"], ImageOptions);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1005,6 +1068,7 @@ export namespace types {
 	    metadata: ImageMetadata;
 	    image_data?: string;
 	    images?: string[];
+	    image_metadatas?: ImageMetadata[];
 	
 	    static createFrom(source: any = {}) {
 	        return new ImageResult(source);
@@ -1017,6 +1081,7 @@ export namespace types {
 	        this.metadata = this.convertValues(source["metadata"], ImageMetadata);
 	        this.image_data = source["image_data"];
 	        this.images = source["images"];
+	        this.image_metadatas = this.convertValues(source["image_metadatas"], ImageMetadata);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1036,6 +1101,22 @@ export namespace types {
 		    }
 		    return a;
 		}
+	}
+	export class LoRAStrength {
+	    name: string;
+	    strength: number;
+	    enabled: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new LoRAStrength(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.strength = source["strength"];
+	        this.enabled = source["enabled"];
+	    }
 	}
 	export class ImageOptions {
 	    prompt: string;
@@ -1068,15 +1149,34 @@ export namespace types {
 	    outpaint_margin?: number;
 	    outpaint_direction?: string;
 	    upscale_factor?: number;
-	    loras?: string[];
+	    loras?: LoRAStrength[];
 	    enable_hr: boolean;
 	    hr_scale: number;
 	    hr_upscaler: string;
 	    denoising_strength: number;
+	    resize_mode?: string;
+	    style_strength?: number;
+	    preserve_colors?: boolean;
+	    match_histogram?: boolean;
+	    latent_noise?: number;
+	    mask_blur?: number;
+	    mask_invert?: boolean;
+	    mask_feather?: number;
+	    masked_content?: string;
+	    edge_behavior?: string;
+	    upscale_method?: string;
+	    upscale_sharpen?: string;
+	    upscale_anti_artifact?: string;
 	    tiling: boolean;
 	    clip_skip: number;
 	    video_frames: number;
 	    fps: number;
+	    video_motion_strength?: number;
+	    video_seed_mode?: string;
+	    video_denoise?: number;
+	    video_loop?: boolean;
+	    output_format?: string;
+	    end_image_path?: string;
 	    cache_mode: string;
 	    cache_option: string;
 	    prediction?: string;
@@ -1085,6 +1185,12 @@ export namespace types {
 	    flow_shift?: number;
 	    vae_tile_overlap?: number;
 	    disable_metadata?: boolean;
+	    cfg_rescale?: number;
+	    face_restore?: number;
+	    s_churn?: number;
+	    s_tmin?: number;
+	    s_tmax?: number;
+	    s_noise?: number;
 	    high_noise_steps?: number;
 	    high_noise_cfg_scale?: number;
 	    high_noise_guidance?: number;
@@ -1133,15 +1239,34 @@ export namespace types {
 	        this.outpaint_margin = source["outpaint_margin"];
 	        this.outpaint_direction = source["outpaint_direction"];
 	        this.upscale_factor = source["upscale_factor"];
-	        this.loras = source["loras"];
+	        this.loras = this.convertValues(source["loras"], LoRAStrength);
 	        this.enable_hr = source["enable_hr"];
 	        this.hr_scale = source["hr_scale"];
 	        this.hr_upscaler = source["hr_upscaler"];
 	        this.denoising_strength = source["denoising_strength"];
+	        this.resize_mode = source["resize_mode"];
+	        this.style_strength = source["style_strength"];
+	        this.preserve_colors = source["preserve_colors"];
+	        this.match_histogram = source["match_histogram"];
+	        this.latent_noise = source["latent_noise"];
+	        this.mask_blur = source["mask_blur"];
+	        this.mask_invert = source["mask_invert"];
+	        this.mask_feather = source["mask_feather"];
+	        this.masked_content = source["masked_content"];
+	        this.edge_behavior = source["edge_behavior"];
+	        this.upscale_method = source["upscale_method"];
+	        this.upscale_sharpen = source["upscale_sharpen"];
+	        this.upscale_anti_artifact = source["upscale_anti_artifact"];
 	        this.tiling = source["tiling"];
 	        this.clip_skip = source["clip_skip"];
 	        this.video_frames = source["video_frames"];
 	        this.fps = source["fps"];
+	        this.video_motion_strength = source["video_motion_strength"];
+	        this.video_seed_mode = source["video_seed_mode"];
+	        this.video_denoise = source["video_denoise"];
+	        this.video_loop = source["video_loop"];
+	        this.output_format = source["output_format"];
+	        this.end_image_path = source["end_image_path"];
 	        this.cache_mode = source["cache_mode"];
 	        this.cache_option = source["cache_option"];
 	        this.prediction = source["prediction"];
@@ -1150,6 +1275,12 @@ export namespace types {
 	        this.flow_shift = source["flow_shift"];
 	        this.vae_tile_overlap = source["vae_tile_overlap"];
 	        this.disable_metadata = source["disable_metadata"];
+	        this.cfg_rescale = source["cfg_rescale"];
+	        this.face_restore = source["face_restore"];
+	        this.s_churn = source["s_churn"];
+	        this.s_tmin = source["s_tmin"];
+	        this.s_tmax = source["s_tmax"];
+	        this.s_noise = source["s_noise"];
 	        this.high_noise_steps = source["high_noise_steps"];
 	        this.high_noise_cfg_scale = source["high_noise_cfg_scale"];
 	        this.high_noise_guidance = source["high_noise_guidance"];
@@ -1162,6 +1293,24 @@ export namespace types {
 	        this.flash_attention = source["flash_attention"];
 	        this.offload_to_cpu = source["offload_to_cpu"];
 	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	export class ImageJob {
 	    id: string;
@@ -1211,6 +1360,7 @@ export namespace types {
 		    return a;
 		}
 	}
+	
 	
 	
 	
@@ -1270,15 +1420,20 @@ export namespace types {
 	    clip_l: string;
 	    clip_g: string;
 	    t5xxl: string;
+	    llm: string;
 	    diffusion_model: string;
 	    backend?: string;
 	    params_backend?: string;
+	    cache_mode?: string;
+	    cache_option?: string;
 	    vae_tiling?: boolean;
 	    temporal_tiling?: boolean;
 	    circular?: boolean;
 	    flash_attention?: boolean;
 	    offload_to_cpu?: boolean;
 	    disable_metadata?: boolean;
+	    max_vram?: number;
+	    mmap?: boolean;
 	    prediction?: string;
 	
 	    static createFrom(source: any = {}) {
@@ -1293,15 +1448,20 @@ export namespace types {
 	        this.clip_l = source["clip_l"];
 	        this.clip_g = source["clip_g"];
 	        this.t5xxl = source["t5xxl"];
+	        this.llm = source["llm"];
 	        this.diffusion_model = source["diffusion_model"];
 	        this.backend = source["backend"];
 	        this.params_backend = source["params_backend"];
+	        this.cache_mode = source["cache_mode"];
+	        this.cache_option = source["cache_option"];
 	        this.vae_tiling = source["vae_tiling"];
 	        this.temporal_tiling = source["temporal_tiling"];
 	        this.circular = source["circular"];
 	        this.flash_attention = source["flash_attention"];
 	        this.offload_to_cpu = source["offload_to_cpu"];
 	        this.disable_metadata = source["disable_metadata"];
+	        this.max_vram = source["max_vram"];
+	        this.mmap = source["mmap"];
 	        this.prediction = source["prediction"];
 	    }
 	}

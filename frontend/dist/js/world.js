@@ -27,6 +27,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     console.log('Initializing world page...');
+
+    // Arrived from the chat's "Change World -> + New World" button: open the
+    // form immediately instead of dropping the user on the grid to click again.
+    if (new URLSearchParams(window.location.search).get('from') === 'chat') {
+        openWorldCreationPopup();
+    }
+
     loadWorlds();
     loadAvailableScenarios();
     loadAvailableCharacters();

@@ -11,10 +11,10 @@
  * @version 2.0.0
  */
 
-@import url('tu-container.css');
-@import url('tu-nav.css');
-@import url('tu-content.css');
-@import url('tu-components.css');
-@import url('tu-search.css');
-@import url('tu-light-theme.css');
-@import url('tu-responsive.css');
+@import url('tu-container.css?v=29');
+@import url('tu-nav.css?v=29');
+@import url('tu-content.css?v=29');
+@import url('tu-components.css?v=29');
+@import url('tu-search.css?v=29');
+@import url('tu-light-theme.css?v=29');
+@import url('tu-responsive.css?v=29');

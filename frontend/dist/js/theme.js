@@ -39,6 +39,7 @@ let animationStartTime = 0;
 let isAnimating = false;
 
 // Light/Dark mode state
+const THEME_MODE_KEY = 'howl-theme-mode';
 let currentThemeMode = 'dark'; // 'dark' or 'light'
 
 // Easing function for smooth transitions
@@ -163,7 +164,7 @@ function cycleTheme() {
  * Switch between light and dark theme modes
  * @param {string} mode - 'light' or 'dark'
  */
-function setThemeMode(mode) {
+function setThemeMode(mode, persistStore) {
     if (mode !== 'light' && mode !== 'dark') {
         console.error('Invalid theme mode. Use "light" or "dark".');
         return;
@@ -187,11 +188,16 @@ function setThemeMode(mode) {
         document.documentElement.style.setProperty('--theme-text-glow', currentTheme.textGlow);
     }
     
-    // Save preference to localStorage
+    // Save to the unified settings store, and mirror it to localStorage.
+    // Only three of the nine pages load settings-state.js, so without the
+    // mirror every other page had nothing to restore from and stayed dark.
     try {
-        localStorage.setItem('howl-theme-mode', mode);
+        localStorage.setItem(THEME_MODE_KEY, mode);
     } catch (e) {
-        console.log('Could not save theme preference:', e);
+        // private mode / disabled storage: the in-memory class still applies
+    }
+    if (persistStore && window.settingsState?.set) {
+        window.settingsState.set('general.theme', mode);
     }
 }
 
@@ -204,23 +210,76 @@ function toggleThemeMode() {
 }
 
 /**
- * Load saved theme preference on page load
+ * Load saved theme preference from unified settings store
+ */
+/**
+ * Resolve a stored preference into a concrete mode.
+ * 'system' is decided at load time on every page.
+ */
+function resolveThemeMode(mode) {
+    if (mode === 'system') {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+            ? 'light' : 'dark';
+    }
+    return (mode === 'light' || mode === 'dark') ? mode : null;
+}
+
+/**
+ * Restore the theme on every page.
+ *
+ * The unified settings store is authoritative when it has an answer, but only
+ * index, audio-settings and real-settings load it. localStorage is the durable
+ * mirror every page can read synchronously, so it carries the preference to the
+ * rest of the app. Restoring never writes back, so 'system' survives.
  */
 function loadThemePreference() {
+    let fromStore = null;
+    if (window.settingsState && window.settingsState.current && window.settingsState.current.general) {
+        fromStore = window.settingsState.current.general.theme;
+    }
+
+    let stored = null;
     try {
-        const savedMode = localStorage.getItem('howl-theme-mode');
-        if (savedMode && (savedMode === 'light' || savedMode === 'dark')) {
-            setThemeMode(savedMode);
-        }
+        stored = localStorage.getItem(THEME_MODE_KEY);
     } catch (e) {
-        console.log('Could not load theme preference:', e);
+        stored = null;
+    }
+
+    const chosen = resolveThemeMode(fromStore) || resolveThemeMode(stored);
+    if (chosen) {
+        setThemeMode(chosen, false);
+        return;
+    }
+
+    // Nothing saved anywhere yet: keep the default, but record it so the first
+    // navigation to another page finds a consistent answer.
+    try {
+        localStorage.setItem(THEME_MODE_KEY, currentThemeMode);
+    } catch (e) {
+        // ignore
     }
 }
 
-// Initialize theme preference on page load
-document.addEventListener('DOMContentLoaded', () => {
+// Initialize theme preference as early as this script is reachable. On most
+// pages theme.js sits near the end of the body, so this runs after the markup
+// is parsed but before first paint of the theme transition.
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadThemePreference);
+} else {
     loadThemePreference();
-});
+}
+
+// Follow the OS while the preference is 'system'. This listener used to sit in
+// menu-view.js and referenced a variable that no longer existed, so switching
+// the OS theme never reached the app. theme.js owns the preference, so it owns
+// the reaction to it too.
+if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', function () {
+        if (currentThemeMode !== 'system') return;
+        const resolved = resolveThemeMode('system');
+        if (resolved) setThemeMode(resolved, false);
+    });
+}
 
 // ---------------------------------------------------------------------------
 // Legacy Function Support for Menu Items
@@ -232,7 +291,21 @@ document.addEventListener('DOMContentLoaded', () => {
  * @param {string} theme - 'light' or 'dark'
  */
 function setTheme(theme) {
-    setThemeMode(theme);
+    // Single owner. menu-view.js used to define its own setTheme, which
+    // shadowed this one on six pages; it resolved 'system' and passed the
+    // result to setThemeMode. That resolution lives here now, because
+    // setThemeMode only ever accepts light or dark.
+    const mode = theme === 'system'
+        ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+        : theme;
+    setThemeMode(mode);
+    // The menu hands us the user's choice, not the resolved mode: store
+    // 'system' as 'system' so Settings shows what was picked, and so the choice
+    // survives a restart. setThemeMode only persists when explicitly asked.
+    if (window.settingsState?.set) {
+        window.settingsState.set('general.theme', theme);
+        if (window.settingsState.saveSettings) window.settingsState.saveSettings();
+    }
 }
 
 // Start theme cycling after initial delay (disabled to prevent flickering)

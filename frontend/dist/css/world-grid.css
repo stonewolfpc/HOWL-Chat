@@ -10,7 +10,7 @@
 /* World Content Area */
 .world-content {
     flex: 1;
-    background: rgba(15, 21, 31, 0.95);
+    background: var(--shell-aside-bg);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -35,7 +35,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: rgba(212, 212, 212, 0.5);
+    color: var(--text-tertiary);
     font-size: 14px;
 }
 
@@ -56,7 +56,6 @@
 /* ==================== LIGHT THEME OVERRIDES ==================== */
 
 body.theme-light .world-content {
-    background: var(--surface-secondary);
 }
 
 body.theme-light .world-grid-empty {

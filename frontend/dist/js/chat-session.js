@@ -16,6 +16,14 @@ let currentSession = null;
 let savedSessions = [];
 let selectedSessionId = null;
 
+// Session list filters
+let _sessionFilterQuery = '';
+let _sessionSortField = 'date';
+let _sessionSortDir = 'desc';
+let _sessionWorldFilter = '';
+let _sessionScenarioFilter = '';
+let _loadingSession = false;
+
 // Chat session data structure
 class ChatSession {
     constructor() {
@@ -82,7 +90,11 @@ function collectCompleteChatData() {
                 scenarioName: '',
                 characterNames: [],
                 lorebookNames: [],
-                messageCount: 0
+                messageCount: 0,
+                // Tracking arrays
+                worldId: '', scenarioId: '',
+                activeCharacters: [], removedCharacters: [], addedCharacters: [],
+                activeLorebooks: [], removedLorebooks: [], addedLorebooks: []
             },
             history: [],
             world: null,
@@ -114,70 +126,6 @@ function loadChatSession() {
 }
 
 // Delete saved chat session
-function deleteChatSession(sessionId, sessionName, event) {
-    // Prevent event bubbling to avoid triggering session selection
-    if (event) {
-        event.stopPropagation();
-        event.preventDefault();
-    }
-    
-    if (!sessionId) {
-        alert('No session selected to delete');
-        return;
-    }
-    
-    if (confirm(`Are you sure you want to delete "${sessionName}"?\n\nThis will permanently delete the chat and all its associated automated lorebook entries.`)) {
-        // Stop frontend autosave so it doesn't recreate the directory after backend removal
-        if (window.dataSync) {
-            window.dataSync.stopAutosave();
-        }
-        // Call backend to delete chat
-        if (window.go && window.go.main && window.go.main.App) {
-            window.go.main.App.DeleteChat(sessionId).then(() => {
-                console.log('Chat session deleted:', sessionId);
-
-                // Remove from local list and refresh
-                savedSessions = savedSessions.filter(s => s.id !== sessionId);
-
-                // Clear selection if deleted session was selected
-                if (selectedSessionId === sessionId) {
-                    selectedSessionId = null;
-                    const loadButton = document.querySelector('.session-list-load');
-                    if (loadButton) {
-                        loadButton.disabled = true;
-                    }
-                }
-
-                // If this was the active session, reset bridge state
-                const activeId = window.chatBridge?.getState()?.sessionId;
-                if (activeId === sessionId && window.chatBridge) {
-                    window.chatBridge.clearForNewChat('New Chat');
-                }
-
-                renderSessionList();
-
-                // Force re-fetch from backend to ensure sync
-                if (typeof loadSavedSessions === 'function') {
-                    loadSavedSessions().catch(e => console.warn('Post-delete refresh failed:', e));
-                }
-
-                showNotification(`Chat session deleted: ${sessionName}`, 'success');
-            }).catch(err => {
-                console.error('Failed to delete chat session:', err);
-                alert('Failed to delete chat session: ' + err);
-            });
-        } else {
-            // Fallback for development
-            savedSessions = savedSessions.filter(s => s.id !== sessionId);
-            if (selectedSessionId === sessionId) {
-                selectedSessionId = null;
-            }
-            renderSessionList();
-            console.log('Session deleted (fallback mode)');
-        }
-    }
-}
-
 // Collect chat history from DOM
 function collectChatHistory() {
     if (!currentSession) return;
@@ -232,31 +180,34 @@ async function loadSavedSessions() {
         }
         
         savedSessions = chatSummaries.map(summary => ({
-            id: summary.id || '',
-            name: summary.name || 'Untitled Chat',
-            createdAt: summary.createdAt || new Date().toISOString(),
-            updatedAt: summary.updatedAt || new Date().toISOString(),
+            id: summary.id || summary.ID || '',
+            name: summary.name || summary.Name || 'Untitled Chat',
+            createdAt: summary.createdAt || summary.CreatedAt || new Date().toISOString(),
+            updatedAt: summary.updatedAt || summary.UpdatedAt || new Date().toISOString(),
             metadata: {
-                messageCount: summary.messageCount || 0,
-                characterCount: (summary.characterNames && Array.isArray(summary.characterNames)) ? summary.characterNames.length : 0,
+                messageCount: summary.messageCount || summary.MessageCount || 0,
+                characterCount: (summary.characterNames || summary.CharacterNames) ? (summary.characterNames || summary.CharacterNames).length : 0,
                 hasImages: false
             },
-            worldName: summary.worldName || '',
-            scenarioName: summary.scenarioName || '',
-            characterNames: (summary.characterNames && Array.isArray(summary.characterNames)) ? summary.characterNames : [],
-            lorebookNames: (summary.lorebookNames && Array.isArray(summary.lorebookNames)) ? summary.lorebookNames : []
-        }));
+            worldName: summary.worldName || summary.WorldName || '',
+            scenarioName: summary.scenarioName || summary.ScenarioName || '',
+            characterNames: Array.isArray(summary.characterNames || summary.CharacterNames) ? (summary.characterNames || summary.CharacterNames) : [],
+            lorebookNames: Array.isArray(summary.lorebookNames || summary.LorebookNames) ? (summary.lorebookNames || summary.LorebookNames) : []
+        })).filter(s => s.id !== '');
         
         renderSessionList();
+        _populateSessionFilterDropdowns();
     } catch (error) {
         console.error('Failed to load chat list:', error);
         savedSessions = [];
         renderSessionList();
+        _populateSessionFilterDropdowns();
     }
 }
 
 // Render session list
 function renderSessionList() {
+    console.log('[renderSessionList] called, selectedSessionId:', selectedSessionId, 'savedSessions:', savedSessions.length);
     const grid = document.getElementById('session-list-grid');
     if (!grid) return;
 
@@ -273,18 +224,45 @@ function renderSessionList() {
 
     const maxRecent = window.settingsState?.current?.general?.maxRecentChats ?? 50;
     const archivedIds = getArchivedIds();
-    const sorted = savedSessions.slice().sort((a, b) => {
-        const da = new Date(a.updatedAt || a.createdAt).getTime();
-        const db = new Date(b.updatedAt || b.createdAt).getTime();
-        return db - da;
-    });
-    const display = sorted
-        .filter(s => !archivedIds.includes(s.id))
-        .slice(0, Math.max(1, maxRecent));
+    const fe = window.FilterEngine;
 
-    grid.innerHTML = display.map(session => `
-        <div class="session-list-item ${session.id === selectedSessionId ? 'selected' : ''}"
-             onclick="selectSession('${session.id}')">
+    let display = savedSessions.slice().filter(s => !archivedIds.includes(s.id));
+
+    // World filter
+    if (_sessionWorldFilter) {
+        display = display.filter(s => s.worldName === _sessionWorldFilter);
+    }
+    // Scenario filter
+    if (_sessionScenarioFilter) {
+        display = display.filter(s => s.scenarioName === _sessionScenarioFilter);
+    }
+    // Text search
+    if (_sessionFilterQuery) {
+        display = fe ? fe.filterItems(display, _sessionFilterQuery, ['name','worldName','scenarioName','characterNames']) : display;
+    }
+    // Sort
+    if (fe) {
+        display = fe.sortItems(display, _sessionSortField, _sessionSortDir);
+    } else {
+        display.sort((a, b) => {
+            const da = new Date(a.updatedAt || a.createdAt).getTime();
+            const db = new Date(b.updatedAt || b.createdAt).getTime();
+            return db - da;
+        });
+    }
+
+    display = display.slice(0, Math.max(1, maxRecent));
+
+    grid.innerHTML = display.map(session => {
+        const safeId = String(session.id).replace(/'/g, "\\'");
+        const safeName = String(session.name || 'Unnamed Session').replace(/'/g, "\\'");
+        const isSelected = String(session.id) === String(selectedSessionId);
+        return `
+        <div class="session-list-item ${isSelected ? 'selected' : ''}"
+             data-session-id="${session.id}"
+             role="button"
+             tabindex="0"
+             onclick="selectSession('${safeId}')">
             <div class="session-item-name">${session.name || 'Unnamed Session'}</div>
             <div class="session-item-meta">
                 Messages: ${session.metadata.messageCount} |
@@ -293,39 +271,77 @@ function renderSessionList() {
             <div class="session-item-date">
                 ${new Date(session.updatedAt).toLocaleString()}
             </div>
-            <button class="session-delete-btn" onclick="deleteChatSession('${session.id}', '${session.name || 'Unnamed Session'}', event)" title="Delete chat session">
+            <button class="session-delete-btn" type="button"
+                onclick="deleteChatSession('${safeId}', '${safeName}', event)"
+                title="Delete chat session">
                 <span class="icon icon-trash"></span>
             </button>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 }
 
-// Select session
-function selectSession(sessionId) {
-    selectedSessionId = sessionId;
+function _populateSessionFilterDropdowns() {
+    const worldSelect = document.getElementById('session-world-filter');
+    const scenarioSelect = document.getElementById('session-scenario-filter');
+    if (!worldSelect || !scenarioSelect) return;
+
+    const worlds = new Set(savedSessions.map(s => s.worldName).filter(Boolean));
+    const scenarios = new Set(savedSessions.map(s => s.scenarioName).filter(Boolean));
+
+    const currentWorld = worldSelect.value;
+    const currentScenario = scenarioSelect.value;
+
+    worldSelect.innerHTML = '<option value="">All Worlds</option>' + Array.from(worlds).sort().map(w => `<option value="${w}">${w}</option>`).join('');
+    scenarioSelect.innerHTML = '<option value="">All Scenarios</option>' + Array.from(scenarios).sort().map(s => `<option value="${s}">${s}</option>`).join('');
+
+    worldSelect.value = currentWorld;
+    scenarioSelect.value = currentScenario;
+}
+
+window._sessionFilter = (val) => { _sessionFilterQuery = val; renderSessionList(); };
+window._sessionSort = (val) => {
+    const [field, dir] = val.split(':');
+    _sessionSortField = field;
+    _sessionSortDir = dir;
     renderSessionList();
-    
-    // Enable load button
-    const loadButton = document.querySelector('.session-list-load');
-    if (loadButton) {
-        loadButton.disabled = false;
-    }
+};
+window._sessionWorldFilter = (val) => { _sessionWorldFilter = val; renderSessionList(); };
+window._sessionScenarioFilter = (val) => { _sessionScenarioFilter = val; renderSessionList(); };
+
+// Select session (loads immediately on click)
+function selectSession(sessionId) {
+    console.log('[selectSession] clicked:', sessionId);
+    if (_loadingSession) { console.log('[selectSession] already loading, ignored'); return; }
+    selectedSessionId = sessionId;
+
+    // Toggle selected class without re-rendering entire grid
+    document.querySelectorAll('.session-list-item').forEach(el => {
+        el.classList.toggle('selected', el.dataset.sessionId === sessionId);
+    });
+
+    // Load immediately
+    loadSelectedSession();
 }
 
 // Load selected session
 async function loadSelectedSession() {
+    console.log('[loadSelectedSession] called with id:', selectedSessionId);
+    if (_loadingSession) { console.log('[loadSelectedSession] already loading, ignored'); return; }
     if (!selectedSessionId) {
+        console.warn('[loadSelectedSession] no session selected');
         return;
     }
     
     if (!window.go || !window.go.main || !window.go.main.App) {
-        console.error('Wails runtime not available');
+        console.error('[loadSelectedSession] Wails runtime not available');
         return;
     }
     
+    _loadingSession = true;
     try {
+        console.log('[loadSelectedSession] calling LoadChat...');
         const chatData = await window.go.main.App.LoadChat(selectedSessionId);
-        console.log('Chat loaded:', chatData);
+        console.log('[loadSelectedSession] chatData:', chatData);
         if (typeof window.logChatContract === 'function') {
             window.logChatContract('filemenu-load:backend', chatData);
         }
@@ -337,17 +353,21 @@ async function loadSelectedSession() {
         }
         
         // Rebuild visible chat history from loaded backend data
-        if (chatData && Array.isArray(chatData.History)) {
-            rebuildChatFromLoadedHistory(chatData.History);
+        const history = chatData?.History || chatData?.history;
+        if (Array.isArray(history)) {
+            rebuildChatFromLoadedHistory(history);
+        } else {
+            console.warn('[loadSelectedSession] no history array in chatData');
         }
 
         // Update session info display
-        if (chatData && chatData.Meta) {
+        const meta = chatData?.Meta || chatData?.meta;
+        if (meta) {
             updateSessionInfoDisplayFromMeta({
-                name: chatData.Meta.Name,
-                worldName: chatData.Meta.WorldName,
-                scenarioName: chatData.Meta.ScenarioName,
-                lorebookNames: chatData.Meta.LorebookNames || []
+                name: meta.Name || meta.name,
+                worldName: meta.WorldName || meta.worldName,
+                scenarioName: meta.ScenarioName || meta.scenarioName,
+                lorebookNames: meta.LorebookNames || meta.lorebookNames || []
             });
         }
 
@@ -367,12 +387,18 @@ async function loadSelectedSession() {
     } catch (error) {
         console.error('Failed to load chat:', error);
         alert('Failed to load chat: ' + error);
+    } finally {
+        _loadingSession = false;
     }
 }
 
 function rebuildChatFromLoadedHistory(history) {
+    console.log('[rebuildChatFromLoadedHistory] history length:', history?.length);
     const chatMessages = document.querySelector('.chat-messages');
-    if (!chatMessages) return;
+    if (!chatMessages) {
+        console.warn('[rebuildChatFromLoadedHistory] no .chat-messages element');
+        return;
+    }
 
     chatMessages.innerHTML = '';
 

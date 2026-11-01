@@ -173,6 +173,16 @@ async function loadChatSessionById(sessionId) {
 
         if (window.sidebarState) window.sidebarState.logChatContract('load:backend', chatData);
 
+        if (history.length > 0) {
+            const first = history[0];
+            const last  = history[history.length - 1];
+            console.log('[TRACE:loadChatSessionById] first msg keys:', Object.keys(first),
+                'role=', first.role || first.Role || '(missing)',
+                'sender=', first.sender || first.Sender || '(missing)');
+            console.log('[TRACE:loadChatSessionById] last  msg keys:', Object.keys(last),
+                'role=', last.role || last.Role || '(missing)',
+                'sender=', last.sender || last.Sender || '(missing)');
+        }
         console.log('Loaded chat data:', {
             hasWorld:       !!world,
             hasScenario:    !!scenario,
@@ -216,7 +226,9 @@ async function loadChatSessionById(sessionId) {
             await updateAllChatPanels();
         }
 
-        await syncAllDataToBackend();
+        // Do NOT syncAllDataToBackend here — LoadChat already set the backend state.
+        // Re-syncing would overwrite chat-specific character/lorebook selections
+        // with the full scenario defaults (e.g. all scenario characters).
         updateSessionInfoDisplay(meta);
         const loadedName = meta.Name || meta.name || 'New Chat';
         showNotification(`Chat session loaded: ${loadedName}`, 'success');
@@ -264,6 +276,9 @@ async function loadChatDataFromStorage() {
         window.sidebarState.currentChatData = savedData;
         await updateContextDisplay();
     }
+
+    // Ensure backend state is in sync when loading from frontend storage
+    await syncAllDataToBackend();
 }
 
 // ---------------------------------------------------------------------------
@@ -280,13 +295,18 @@ function rebuildChatFromHistory(history) {
 
     chatMessages.innerHTML = '';
 
-    history.forEach(msg => {
+    console.log('[rebuildChatFromHistory] rebuilding', history.length, 'messages');
+    history.forEach((msg, index) => {
         const role        = (msg.Role   || msg.role   || '').toLowerCase();
         const isUser      = msg.isUser === true || role === 'user';
         const isSystem    = role === 'system';
         const sender      = msg.Sender || msg.sender || (isUser ? 'User' : 'Assistant');
         const text        = msg.Text   || msg.text   || '';
         const characterId = msg.characterId || msg.CharacterId || null;
+
+        if (index < 3 || index >= history.length - 2) {
+            console.log(`[rebuildChatFromHistory] msg ${index}: role=${role} isUser=${isUser} sender=${sender} charId=${characterId} text=${text.slice(0,40)}`);
+        }
 
         if (isSystem) {
             if (typeof addSystemMessage === 'function') addSystemMessage(text);
@@ -295,7 +315,17 @@ function rebuildChatFromHistory(history) {
         } else {
             if (typeof addAssistantMessage === 'function') addAssistantMessage(sender, text, characterId);
         }
+
+        // Preserve original metadata on the last inserted DOM element
+        const chatHistory = document.querySelector('.chat-messages');
+        const lastMsg = chatHistory ? chatHistory.lastElementChild : null;
+        if (lastMsg) {
+            if (msg.id || msg.ID) lastMsg.dataset.id = msg.id || msg.ID;
+            if (msg.timestamp || msg.Timestamp) lastMsg.dataset.timestamp = msg.timestamp || msg.Timestamp;
+            if (characterId) lastMsg.dataset.characterId = characterId;
+        }
     });
+    console.log('[rebuildChatFromHistory] done');
 
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
@@ -368,8 +398,14 @@ async function saveChatData() {
                 stepOutReason: c.stepOutReason,
                 stepOutMode: c.stepOutMode
             })),
+            chatName: cd.chatName || 'New Chat',
+            // Tracking arrays — chat is the sole source of truth
+            activeCharacterIds:  cd.activeCharacterIds  || [],
             removedCharacterIds: cd.removedCharacterIds || [],
-            chatName: cd.chatName || 'New Chat'
+            addedCharacterIds:   cd.addedCharacterIds   || [],
+            activeLorebookIds:   cd.activeLorebookIds   || [],
+            removedLorebookIds:  cd.removedLorebookIds  || [],
+            addedLorebookIds:    cd.addedLorebookIds    || []
         };
 
         const dataString = JSON.stringify(minimalChatData);
@@ -384,7 +420,42 @@ async function saveChatData() {
         await window.HOWLStorage.setChatData('howl-chat-current-chat', JSON.parse(dataString));
         console.log('Chat data saved successfully to storage');
 
-        if (window.go?.main?.App?.SaveChat) {
+        // Sync full state to backend via SaveChatData (carries tracking arrays)
+        // Merge cd into bridgeState so we don't drop characters that were recovered
+        // from localStorage during hydrateFromBackend but aren't in cd yet.
+        if (window.chatBridge?.getState && window.chatBridge?.collectForSave) {
+            const bridgeState = window.chatBridge.getState();
+            if (bridgeState) {
+                const mergeById = (a, b) => {
+                    const map = new Map();
+                    (a || []).forEach(x => { if (x?.id) map.set(x.id, x); });
+                    (b || []).forEach(x => { if (x?.id) map.set(x.id, x); });
+                    return Array.from(map.values());
+                };
+                bridgeState.world      = cd.world      || bridgeState.world;
+                bridgeState.scenario   = cd.scenario   || bridgeState.scenario;
+                bridgeState.characters = mergeById(bridgeState.characters, cd.characters);
+                bridgeState.lorebooks  = mergeById(bridgeState.lorebooks,  cd.lorebooks);
+                bridgeState.activeCharacterIds  = [...new Set([...(bridgeState.activeCharacterIds  || []), ...(cd.activeCharacterIds  || [])])];
+                bridgeState.removedCharacterIds = [...new Set([...(bridgeState.removedCharacterIds || []), ...(cd.removedCharacterIds || [])])];
+                bridgeState.addedCharacterIds   = [...new Set([...(bridgeState.addedCharacterIds   || []), ...(cd.addedCharacterIds   || [])])];
+                bridgeState.activeLorebookIds   = [...new Set([...(bridgeState.activeLorebookIds   || []), ...(cd.activeLorebookIds   || [])])];
+                bridgeState.removedLorebookIds  = [...new Set([...(bridgeState.removedLorebookIds  || []), ...(cd.removedLorebookIds  || [])])];
+                bridgeState.addedLorebookIds    = [...new Set([...(bridgeState.addedLorebookIds    || []), ...(cd.addedLorebookIds    || [])])];
+            }
+        }
+
+        if (window.chatBridge?.collectForSave && window.go?.main?.App?.SaveChatData) {
+            const payload = window.chatBridge.collectForSave();
+            window.go.main.App.SaveChatData(payload).then(() => {
+                console.log('Chat data saved to backend via SaveChatData');
+            }).catch(err => {
+                console.warn('Backend SaveChatData failed, falling back to SaveChat:', err);
+                if (window.go?.main?.App?.SaveChat) {
+                    window.go.main.App.SaveChat().catch(() => {});
+                }
+            });
+        } else if (window.go?.main?.App?.SaveChat) {
             window.go.main.App.SaveChat().then(() => {
                 console.log('Chat data also saved to backend');
             }).catch(err => {
@@ -403,8 +474,14 @@ async function saveChatData() {
                 const essentialData = {
                     world:    cd.world    ? { id: cd.world.id,    title: cd.world.title    || cd.world.name    } : null,
                     scenario: cd.scenario ? { id: cd.scenario.id, title: cd.scenario.title || cd.scenario.name } : null,
+                    chatName: cd.chatName || 'New Chat',
+                    // Tracking arrays
+                    activeCharacterIds:  cd.activeCharacterIds  || [],
                     removedCharacterIds: cd.removedCharacterIds || [],
-                    chatName: cd.chatName || 'New Chat'
+                    addedCharacterIds:   cd.addedCharacterIds   || [],
+                    activeLorebookIds:   cd.activeLorebookIds   || [],
+                    removedLorebookIds:  cd.removedLorebookIds  || [],
+                    addedLorebookIds:    cd.addedLorebookIds    || []
                 };
                 await window.HOWLStorage.setChatData('howl-chat-current-chat', essentialData);
                 console.log('Essential chat data saved after cleanup');

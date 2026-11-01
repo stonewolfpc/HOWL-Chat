@@ -42,6 +42,9 @@ type ImageEngine interface {
 	// GetLoadedModel returns the currently loaded model, or nil.
 	GetLoadedModel() *types.ModelInfo
 
+	// CancelJob sends a cancellation signal to the backend for the active job.
+	CancelJob() error
+
 	// Shutdown releases all resources.
 	Shutdown() error
 }

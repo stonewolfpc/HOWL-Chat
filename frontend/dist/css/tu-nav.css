@@ -16,8 +16,8 @@
     width: 260px;
     min-width: 200px;
     max-width: 320px;
-    border-right: 1px solid rgba(100, 100, 100, 0.2);
-    background: rgba(15, 15, 23, 0.6);
+    border-right: 1px solid var(--border-primary);
+    background: var(--surface-primary);
     overflow-y: auto;
     padding: 12px 0;
     flex-shrink: 0;
@@ -28,7 +28,7 @@
 }
 
 .tutorials-nav::-webkit-scrollbar-thumb {
-    background: rgba(100, 100, 100, 0.3);
+    background: var(--border-primary);
     border-radius: 4px;
 }
 
@@ -48,14 +48,14 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: rgba(212, 212, 212, 0.55);
+    color: var(--text-tertiary);
     transition: all 0.15s ease;
     user-select: none;
 }
 
 .tutorials-nav-section-header:hover {
-    color: var(--static-text, #e0e0e0);
-    background: rgba(100, 100, 100, 0.08);
+    color: var(--static-text, var(--text-primary));
+    background: var(--surface-hover);
 }
 
 .tutorials-nav-section-header .icon {
@@ -80,7 +80,7 @@
 .tutorials-nav-item {
     padding: 7px 16px 7px 28px;
     font-size: 13px;
-    color: rgba(212, 212, 212, 0.65);
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.15s ease;
     border-left: 2px solid transparent;
@@ -90,8 +90,8 @@
 }
 
 .tutorials-nav-item:hover {
-    color: var(--static-text, #e0e0e0);
-    background: rgba(100, 100, 100, 0.08);
+    color: var(--static-text, var(--text-primary));
+    background: var(--surface-hover);
 }
 
 .tutorials-nav-item.active {

@@ -147,16 +147,16 @@ body.theme-light .model-settings-flyout .setting-text-input::placeholder {
     color: var(--input-placeholder);
 }
 
-body.theme-light .model-settings-flyout .toggle-switch {
-    background: var(--border-secondary);
+body.theme-light #model-settings-flyout .toggle-switch {
+    background: var(--surface-hover) !important;
 }
 
-body.theme-light .model-settings-flyout .toggle-switch.active {
-    background: rgba(0, 174, 239, 0.5);
+body.theme-light #model-settings-flyout .toggle-switch.active {
+    background: rgba(0, 174, 239, 0.5) !important;
 }
 
-body.theme-light .model-settings-flyout .toggle-switch::after {
-    background: #FFFFFF;
+body.theme-light #model-settings-flyout .toggle-switch::after {
+    background: #FFFFFF !important;
 }
 
 body.theme-light .model-settings-flyout .toggle-label {
@@ -164,7 +164,7 @@ body.theme-light .model-settings-flyout .toggle-label {
 }
 
 body.theme-light .model-settings-flyout .setting-slider::-webkit-slider-runnable-track {
-    background: var(--border-secondary);
+    background: var(--surface-hover);
 }
 
 body.theme-light .model-settings-flyout .setting-slider::-webkit-slider-thumb {
@@ -172,11 +172,11 @@ body.theme-light .model-settings-flyout .setting-slider::-webkit-slider-thumb {
 }
 
 body.theme-light .model-settings-flyout .flyout-content::-webkit-scrollbar-thumb {
-    background: var(--border-secondary);
+    background: var(--border-primary);
 }
 
 body.theme-light .model-settings-flyout .flyout-content::-webkit-scrollbar-thumb:hover {
-    background: var(--border-secondary);
+    background: var(--border-primary);
 }
 
 /* --- Sampler Settings Internals --- */
@@ -187,7 +187,7 @@ body.theme-light .sampler-settings .setting-value {
 }
 
 body.theme-light .sampler-settings .toggle-switch {
-    background: var(--border-secondary);
+    background: var(--surface-hover);
 }
 
 body.theme-light .sampler-settings .toggle-switch.active {
@@ -256,11 +256,11 @@ body.theme-light .sampler-settings .flyout::-webkit-scrollbar-track {
 }
 
 body.theme-light .sampler-settings .flyout::-webkit-scrollbar-thumb {
-    background: var(--border-secondary);
+    background: var(--border-primary);
 }
 
 body.theme-light .sampler-settings .flyout::-webkit-scrollbar-thumb:hover {
-    background: var(--border-secondary);
+    background: var(--border-primary);
 }
 
 /* --- Real Settings Internals --- */

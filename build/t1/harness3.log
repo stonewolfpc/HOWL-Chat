@@ -1,0 +1,110 @@
+[startup] 21:09:06.194  +    2.1ms  image init: begin
+[startup] 21:09:06.197  +    4.7ms  image init: config ready
+[ImageEngine] Initialized: binary=C:\Users\StoneWolfPC\HOWL_Chat\sd-server.exe models=E:\HOWL_Chat\models port=8081
+[startup] 21:09:06.198  +    5.2ms  image init: engine initialized
+[ImageEngine] sd-server commit: c6dfa9d
+[ImageEngine] Restored last model: "image"
+[startup] 21:09:06.217  +   25.1ms  rescan: start
+2026/10/31 21:09:06 [harness] serving frontend/dist on http://127.0.0.1:8799
+[startup] 21:09:06.218  +   25.6ms  rescan: scanning E:\AI GGUF\GGUF
+[startup] 21:09:06.220  +   27.3ms  rescan: done E:\AI GGUF\GGUF 25 entries
+[LoadModel] START path="E:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf"
+[LoadModel] path validated
+[LoadModel] checking port 8080
+[LoadModel] port 8080 free
+[LoadModel] validating llama-server binary
+[LoadModel] llama-server binary validated
+[LoadModel] reading GGUF metadata from: E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf
+2026/10/31 21:09:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:09:12 [rpc] GetSDServerVersion                            ok            0s
+[ReadProfile] final: Family=lfm2moe Layers=24 Params=12607000888 Size=4916.7MB Quant=IQ2_XXS DModel=2048 Heads=32 KVHeads=32
+[LoadModel] profile: Family=lfm2moe Layers=24 Params=12607000888 Size=4916.7MB Quant=IQ2_XXS ArchSpec=true
+[LoadModel] applying safe defaults
+[applySafeDefaults] enter
+[applySafeDefaults] getting hardware snapshot
+[ResourceManager] GetManager called
+[ResourceManager] initializing singleton
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] initialization complete
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[applySafeDefaults] freeVRAM=5756 freeRAM=44527
+[applySafeDefaults] reading settings
+[applySafeDefaults] settings: ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] archSpec: layers=24 dmodel=2048 heads=32 kvheads=32
+[applySafeDefaults] creating memory model
+[applySafeDefaults] calling ClampToHardware
+[applySafeDefaults] ClampToHardware returned
+[applySafeDefaults] final: GPU=4023MB RAM=1193MB ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] done
+[LoadModel] safe defaults applied
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+[LoadModel] no mmproj found — vision not available for this model
+[LoadModel] validating spawn settings
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[LoadModel] spawn params: ctx=3096 gpuLayers=22 batch=256 freeVRAM=5756 freeRAM=44527
+[LoadModel] validation result: level=0 msg="Memory OK — estimated 4023 MB GPU / 1193 MB RAM (free: 5756 / 44527 MB)"
+[LoadModel] spawn validation passed
+[LoadModel] spawning llama-server
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+INFO: No mmproj file found for model: E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf
+INFO: llama-server started (pid 27776) with model E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf
+[LoadModel] llama-server spawned (pid 27776)
+INFO: Registering model with estimated GPU:4028MB RAM:1198MB
+[ResourceManager] GetManager called
+[LoadModel] monitor started (pid 27776, timeout 60s)
+2026/10/31 21:09:13 [rpc] LoadModel                                     ok        1.864s
+0.00.121.015 I srv  llama_server: initializing ...
+0.00.121.026 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.121.375 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.135.735 I srv    load_model: loading model 'E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf'
+2026/10/31 21:09:15 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 21:09:16 [rpc] IsModelLoaded                                 ok           1ms
+0.03.097.982 I cmn          init: llama threadpool init, n_threads = 8
+0.03.376.622 I srv    load_model: initializing, n_slots = 4, n_ctx_slot = 3328, kv_unified = 'true'
+0.03.381.506 I srv  server_run_i: model loaded
+0.03.381.515 I srv  server_on_li: listening on http://127.0.0.1:8080
+[LoadModel] monitor: server healthy, model loaded
+2026/10/31 21:09:18 [rpc] IsModelLoaded                                 ok            0s
+2026/10/31 21:09:18 [rpc] IsModelLoaded                                 ok           1ms
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[ResourceManager] GetManager called
+2026/10/31 21:09:18 [rpc] CheckModelFit                                 ok          85ms
+[VRAM] unloading chat model to make room for the image model
+INFO: llama-server killed, model memory freed
+[ResourceManager] GetManager called
+[ResourceManager] GetManager called
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+2026/10/31 21:09:20 [rpc] FreeVRAMFor                                   ok        2.159s

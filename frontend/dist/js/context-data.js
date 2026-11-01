@@ -220,23 +220,28 @@ class ContextDisplay {
 
     resetToDefaultState() {
         this.currentChatData = {
-            characters: [], world: null, scenario: null, lorebooks: [], chatName: 'New Chat', removedCharacterIds: []
+            characters: [], world: null, scenario: null, lorebooks: [], chatName: 'New Chat',
+            activeCharacterIds: [], removedCharacterIds: [], addedCharacterIds: [],
+            activeLorebookIds: [], removedLorebookIds: [], addedLorebookIds: []
         };
     }
 
     saveChatData() {
         try {
+            const cd = this.currentChatData;
             const light = {
-                characters: this.currentChatData.characters
-                    ? this.currentChatData.characters.map(c => ({ id: c.id, name: c.name })) : [],
-                world: this.currentChatData.world
-                    ? { id: this.currentChatData.world.id, name: this.currentChatData.world.name, title: this.currentChatData.world.title } : null,
-                scenario: this.currentChatData.scenario
-                    ? { id: this.currentChatData.scenario.id, name: this.currentChatData.scenario.name, title: this.currentChatData.scenario.title } : null,
-                lorebooks: this.currentChatData.lorebooks
-                    ? this.currentChatData.lorebooks.map(lb => ({ id: lb.id, name: lb.name, title: lb.title })) : [],
-                removedCharacterIds: this.currentChatData.removedCharacterIds || [],
-                chatName: this.currentChatData.chatName
+                characters: cd.characters ? cd.characters.map(c => ({ id: c.id, name: c.name })) : [],
+                world: cd.world ? { id: cd.world.id, name: cd.world.name, title: cd.world.title } : null,
+                scenario: cd.scenario ? { id: cd.scenario.id, name: cd.scenario.name, title: cd.scenario.title } : null,
+                lorebooks: cd.lorebooks ? cd.lorebooks.map(lb => ({ id: lb.id, name: lb.name, title: lb.title })) : [],
+                chatName: cd.chatName,
+                // Tracking arrays
+                activeCharacterIds:  cd.activeCharacterIds  || [],
+                removedCharacterIds: cd.removedCharacterIds || [],
+                addedCharacterIds:   cd.addedCharacterIds   || [],
+                activeLorebookIds:   cd.activeLorebookIds   || [],
+                removedLorebookIds:  cd.removedLorebookIds  || [],
+                addedLorebookIds:    cd.addedLorebookIds    || []
             };
             localStorage.setItem('howl-chat-current-session', JSON.stringify(light));
         } catch (error) {
@@ -254,6 +259,7 @@ class ContextDisplay {
     }
 
     async syncWorldDataToBackend(world) {
+        console.log('[TRACE:syncWorldDataToBackend] world:', world?.id);
         if (window.go?.main?.App?.AddWorldToChat) {
             try   { await window.go.main.App.AddWorldToChat(world); }
             catch (e) { console.warn('Backend world sync failed:', e); }
@@ -261,6 +267,7 @@ class ContextDisplay {
     }
 
     async syncScenarioDataToBackend(scenario) {
+        console.log('[TRACE:syncScenarioDataToBackend] scenario:', scenario?.id);
         if (window.go?.main?.App?.AddScenarioToChat) {
             try   { await window.go.main.App.AddScenarioToChat(scenario); }
             catch (e) { console.warn('Backend scenario sync failed:', e); }
@@ -268,6 +275,7 @@ class ContextDisplay {
     }
 
     async syncCharactersDataToBackend(characters) {
+        console.log('[TRACE:syncCharactersDataToBackend] count:', characters?.length, 'ids:', (characters || []).map(c => c.id));
         if (window.go?.main?.App?.AddCharacterToChat) {
             try {
                 for (const c of characters) await window.go.main.App.AddCharacterToChat(c);
@@ -276,6 +284,7 @@ class ContextDisplay {
     }
 
     async syncLorebooksDataToBackend(lorebooks) {
+        console.log('[TRACE:syncLorebooksDataToBackend] count:', lorebooks?.length);
         if (window.go?.main?.App?.SetLorebooks) {
             try   { await window.go.main.App.SetLorebooks(lorebooks); }
             catch (e) { console.warn('Backend lorebooks sync failed:', e); }

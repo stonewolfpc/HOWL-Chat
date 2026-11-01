@@ -1,0 +1,20 @@
+{
+  "engine_config": {
+    "binary_path": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\sd-server.exe",
+    "models_dir": "E:\\HOWL_Chat\\models",
+    "output_dir": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\images\\gallery",
+    "temp_dir": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\images\\tmp",
+    "port": 8081
+  },
+  "last_model": "unholyDesireMixSinister_v90",
+  "last_model_opts": {
+    "model": "unholyDesireMixSinister_v90",
+    "model_path": "E:\\AI GGUF\\Image models\\unholyDesireMixSinister_v90.safetensors",
+    "vae": "",
+    "clip_l": "",
+    "clip_g": "",
+    "t5xxl": "",
+    "llm": "",
+    "diffusion_model": ""
+  }
+}

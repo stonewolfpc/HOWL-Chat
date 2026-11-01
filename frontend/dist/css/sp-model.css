@@ -6,19 +6,19 @@
 
 .model-controls {
     padding: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--surface-hover);
     background: rgba(255, 255, 255, 0.02);
 }
 
 .model-name-display {
     padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-secondary);
     border-radius: 6px;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary);
     font-size: 12px;
     text-align: center;
     margin-bottom: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--surface-hover);
 }
 
 /* Custom model dropdown */
@@ -30,10 +30,10 @@
 
 .model-select-trigger {
     padding: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--border-secondary);
     border-radius: 6px;
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+    background: var(--surface-secondary);
+    color: var(--text-primary);
     font-size: 12px;
     cursor: pointer;
     user-select: none;
@@ -41,8 +41,8 @@
 }
 
 .model-select-trigger:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
 }
 
 .model-select-dropdown {
@@ -52,14 +52,14 @@
     right: 0;
     max-height: 320px;
     overflow-y: auto;
-    background: #1a1a1f;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: var(--surface-tertiary);
+    border: 1px solid var(--border-secondary);
     border-radius: 6px;
     display: none;
     z-index: 1000;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    scrollbar-color: var(--border-secondary) transparent;
 }
 
 .model-select-dropdown.open {
@@ -75,21 +75,21 @@
 }
 
 .model-select-dropdown::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--border-primary);
     border-radius: 4px;
 }
 
 .model-select-dropdown::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--border-primary);
 }
 
 .model-select-option {
     padding: 8px 12px;
     font-size: 12px;
-    color: #fff;
+    color: var(--text-primary);
     cursor: pointer;
     transition: background 0.15s ease;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border-primary);
 }
 
 .model-select-option:last-child {
@@ -104,10 +104,10 @@
 .model-button {
     width: 100%;
     padding: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--border-secondary);
     border-radius: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    background: var(--surface-hover);
+    color: var(--text-primary);
     cursor: pointer;
     font-size: 12px;
     margin-bottom: 8px;
@@ -115,8 +115,8 @@
 }
 
 .model-button:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
 }
 
 .model-button.load-button {
@@ -128,7 +128,7 @@
 .model-button.load-button:hover {
     background: rgba(40, 167, 69, 0.3);
     border-color: rgba(40, 167, 69, 0.6);
-    color: #fff;
+    color: var(--text-primary);
 }
 
 .model-button.unload-button {
@@ -140,5 +140,5 @@
 .model-button.unload-button:hover {
     background: rgba(220, 53, 69, 0.3);
     border-color: rgba(220, 53, 69, 0.6);
-    color: #fff;
+    color: var(--text-primary);
 }

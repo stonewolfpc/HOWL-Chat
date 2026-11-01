@@ -1,11 +1,14 @@
-﻿package main
+package main
 
 import (
 	"context"
 	"fmt"
+	"howl-chat/internal/proc"
 	"os/exec"
+	"sync"
 	"sync/atomic"
 
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"howl-chat/internal/audio"
 	audiotypes "howl-chat/internal/audio/types"
 	"howl-chat/internal/backend/chat"
@@ -22,6 +25,8 @@ import (
 	"howl-chat/internal/image/registry"
 	imgsettings "howl-chat/internal/image/settings"
 	imagetypes "howl-chat/internal/image/types"
+	"howl-chat/internal/paths"
+	appsettings "howl-chat/internal/settings"
 )
 
 // App represents Wails application
@@ -32,6 +37,9 @@ type App struct {
 	serverProc      *exec.Cmd
 	samplerSettings map[string]interface{}
 	modelSettings   map[string]interface{}
+	modelSettingsMu sync.RWMutex // Protects modelSettings concurrent access
+	appSettings     map[string]interface{}
+	settingsStore   *appsettings.Store
 	chatMessages    []map[string]interface{}
 	world           *chat.WorldContext
 	scenario        *chat.ScenarioContext
@@ -59,10 +67,14 @@ type App struct {
 	audioPipeline *audio.Pipeline
 
 	// Image Generation Engine
-	imageEngine        imageengine.ImageEngine
-	gallerySvc         *gallery.Service
-	jobManager         *job.Manager
-	lastImageModel     string
+	imageEngine    imageengine.ImageEngine
+	gallerySvc     *gallery.Service
+	jobManager     *job.Manager
+	lastImageModel string
+	// autoTemplate is the chat template this app injected into the last
+	// model load. It is tracked so a stale auto template can be replaced when
+	// a different family loads, while a user override is left alone.
+	autoTemplate       string
 	lastImageModelOpts imagetypes.ModelLoadOptions
 	imgSettingsStore   *imgsettings.Store
 	modelRegistry      *registry.Registry
@@ -79,6 +91,12 @@ type App struct {
 // NewApp creates a new instance of the App struct
 // Initializes backend services with llama-server HTTP client
 func NewApp() *App {
+	// Kill model servers left behind by a crashed or force-killed previous instance.
+	// Deferred to a goroutine: this shells out to PowerShell (~0.3-0.5s measured)
+	// and nothing needs it before the window exists, so it must not sit on the
+	// pre-window startup path where every millisecond delays the first paint.
+	go proc.ReapOrphans(paths.ProjectRoot())
+
 	client := llama.NewHTTPClient("localhost", 8080, true)
 
 	// Initialize model manager
@@ -110,7 +128,7 @@ func NewApp() *App {
 	} else {
 		ragEmbedder = rag.NewKeywordEmbedder()
 	}
-	ragService = rag.NewService("d:\\HOWL_Chat", ragEmbedder)
+	ragService = rag.NewService(paths.ProjectRoot(), ragEmbedder)
 	if chatService != nil {
 		chatService.SetRAGService(ragService)
 		chatService.SetRAGEnabled(true)
@@ -165,16 +183,39 @@ func NewApp() *App {
 		ragService:      ragService,
 	}
 
+	// Initialize unified settings store
+	app.settingsStore = appsettings.NewStore(app.getSettingsDir())
+	loadedSettings, err := app.settingsStore.Load()
+	if err != nil {
+		fmt.Printf("Warning: failed to load unified settings: %v\n", err)
+		loadedSettings = make(map[string]interface{})
+	}
+	app.appSettings = loadedSettings
+
+	// Migrate legacy sampler/model settings into unified store if unified is empty
+	if samplerSection, ok := loadedSettings["sampler"].(map[string]interface{}); ok && len(samplerSection) > 0 {
+		for k, v := range samplerSection {
+			app.samplerSettings[k] = v
+		}
+	} else {
+		// No unified sampler section yet — load from legacy file
+		if err := app.loadSamplerSettingsFromFile(); err != nil {
+			fmt.Printf("Warning: failed to load sampler settings from disk: %v\n", err)
+		}
+	}
+	if modelSection, ok := loadedSettings["model"].(map[string]interface{}); ok && len(modelSection) > 0 {
+		for k, v := range modelSection {
+			app.modelSettings[k] = v
+		}
+	} else {
+		// No unified model section yet — load from legacy file
+		if err := app.loadModelSettingsFromFile(); err != nil {
+			fmt.Printf("Warning: failed to load model settings from disk: %v\n", err)
+		}
+	}
+
 	// Initialize image engine from persisted settings (non-fatal)
 	app.initImageEngine()
-
-	// Load persisted settings from disk (overwrites defaults if files exist)
-	if err := app.loadSamplerSettingsFromFile(); err != nil {
-		fmt.Printf("Warning: failed to load sampler settings from disk: %v\n", err)
-	}
-	if err := app.loadModelSettingsFromFile(); err != nil {
-		fmt.Printf("Warning: failed to load model settings from disk: %v\n", err)
-	}
 
 	app.jobManager.SetOnComplete(func(id string, result *imagetypes.ImageResult) {
 		if app.gallerySvc != nil && result != nil {
@@ -192,10 +233,17 @@ func NewApp() *App {
 // startup is called when the application is starting up
 // Initializes the application context and optional audio pipeline
 func (a *App) startup(ctx context.Context) {
+	startupMark("OnStartup: webview reached backend")
 	a.ctx = ctx
 	a.initErrorSystem()
 	a.bindErrorEmitter()
 	a.initAudioPipeline()
+	startupMark("OnStartup: init complete")
+
+	// Model scanning is background work: the window is already visible and the
+	// user can interact, so a slow or unplugged model directory must never
+	// delay the first paint.
+	go a.RescanAllDirs()
 }
 
 // initAudioPipeline creates and initializes the audio pipeline if binaries are available.
@@ -225,17 +273,54 @@ func (a *App) OnShutdown(ctx context.Context) {
 		a.performFinalSave()
 	}
 
+	// Stop the model server (and anything it spawned) before anything else,
+	// so port 8080 and VRAM are released immediately.
 	if a.serverProc != nil && a.serverProc.Process != nil {
+		proc.KillTree(a.serverProc.Process.Pid)
 		_ = a.serverProc.Process.Kill()
 		_, _ = a.serverProc.Process.Wait()
+		a.serverProc = nil
+	}
+
+	// Shut down the image engine, which owns its own sd-server subprocess.
+	if a.imageEngine != nil {
+		_ = a.imageEngine.Shutdown()
 	}
 
 	// Shutdown audio pipeline if initialized
 	if a.audioPipeline != nil {
 		_ = a.audioPipeline.Shutdown(ctx)
 	}
+
+	// Reap anything still attached to the job object, so llama-server and
+	// sd-server can never outlive the app window.
+	proc.CloseJob()
 }
 
 // Chat Management Wails Bindings
 
 // GetChatList returns a list of all chat summaries
+
+// emitEvent is runtime.EventsEmit with a validity guard.
+//
+// Wails' runtime.EventsEmit calls log.Fatalf (os.Exit) when the context
+// carries no event dispatcher — "An invalid context was passed". Any
+// goroutine that emits outside a live webview (the UI harness, headless
+// tests, or a background task that outlives window teardown) would take
+// the whole process down. When there is no dispatcher the event is
+// dropped instead, which is the only sane behaviour: an event nobody
+// can receive is not worth dying for.
+// devEventSink, when set, receives every event the app emits. Only the UI
+// harness assigns it (harness_main.go), so the browser can see events that
+// normally travel over the Wails bridge. It is nil in every release build.
+var devEventSink func(name string, args ...interface{})
+
+func (a *App) emitEvent(name string, data ...interface{}) {
+	if devEventSink != nil {
+		devEventSink(name, data...)
+	}
+	if a.ctx == nil || a.ctx.Value("events") == nil {
+		return
+	}
+	runtime.EventsEmit(a.ctx, name, data...)
+}

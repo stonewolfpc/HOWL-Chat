@@ -108,7 +108,7 @@
     width: 100%;
     background: var(--button-primary-bg);
     border-color: var(--button-primary-bg);
-    color: #FFFFFF;
+    color: var(--on-accent);
     font-weight: 600;
     margin-top: 8px;
     text-transform: uppercase;
@@ -169,19 +169,26 @@
 }
 
 /* Outpaint Direction Buttons */
+.ig-dir-row {
+    display: flex;
+    gap: 6px;
+}
+
 .ig-dir-btn {
     flex: 1;
-    padding: 8px 0;
+    padding: 6px 0;
     background: var(--surface-hover);
     border: 1px solid var(--border-secondary);
     border-radius: 8px;
     color: var(--text-secondary);
-    font-size: 16px;
+    font-size: 12px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.15s;
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 32px;
 }
 
 .ig-dir-btn:hover {
@@ -195,4 +202,279 @@
     border-color: var(--accent-primary);
     color: var(--accent-primary);
     font-weight: 600;
+}
+
+/* Upscale target resolution display */
+.ig-target-res {
+    padding: 8px 12px;
+    background: var(--surface-hover);
+    border: 1px solid var(--border-secondary);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 4px;
+}
+
+/* Image-to-Image Professional Suite */
+.ig-img2img-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.ig-img2img-actions .ig-btn {
+    flex: 1;
+    font-size: 11px;
+    padding: 5px 8px;
+}
+
+.ig-hint {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    line-height: 1.4;
+}
+
+.ig-denoise-hint {
+    font-size: 10px;
+    opacity: 0.75;
+    margin-top: 2px;
+}
+
+/* Inpaint mask tool buttons */
+#ig-eraser-toggle.active,
+#ig-mask-preview-toggle.active {
+    background: var(--accent-primary-hover);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+/* Upscale conditional sections */
+.ig-upscale-latent-only,
+.ig-upscale-esrgan-only {
+    transition: opacity 0.2s ease;
+}
+
+/* Auto-expanding textareas for prompt and negative prompt */
+.ig-textarea.ig-prompt,
+.ig-textarea.ig-negative {
+    min-height: 60px;
+    max-height: 200px;
+    overflow-y: auto;
+    resize: vertical;
+    field-sizing: content;
+    transition: height 0.2s ease;
+}
+
+/* LoRA Professional Panel */
+.ig-lora-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.ig-lora-empty {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 12px;
+    background: var(--surface-tertiary);
+    border-radius: 4px;
+    border: 1px dashed var(--border-default);
+}
+
+.ig-lora-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+}
+
+.ig-lora-item.disabled {
+    opacity: 0.5;
+}
+
+.ig-lora-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.ig-lora-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-primary);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ig-lora-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.ig-lora-toggle input {
+    margin: 0;
+}
+
+.ig-lora-remove {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 4px;
+    line-height: 1;
+}
+
+.ig-lora-remove:hover {
+    color: var(--error);
+}
+
+.ig-lora-strength {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.ig-lora-strength-label {
+    font-size: 10px;
+    color: var(--text-secondary);
+    min-width: 45px;
+}
+
+.ig-lora-strength-val {
+    font-size: 10px;
+    color: var(--text-primary);
+    min-width: 28px;
+    text-align: right;
+}
+
+.ig-lora-strength .ig-slider {
+    flex: 1;
+    margin: 0;
+}
+
+/* Fallback for browsers without field-sizing support */
+@supports not (field-sizing: content) {
+    .ig-textarea.ig-prompt,
+    .ig-textarea.ig-negative {
+        height: auto;
+        overflow: hidden;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+ * Mode-Specific Visibility
+ * --------------------------------------------------------------------------- */
+
+/* Hidden by default, shown only in txt2img mode */
+.ig-txt2img-only {
+    display: none !important;
+}
+
+/* Hidden by default, shown only in img2img mode */
+.ig-img2img-only {
+    display: none !important;
+}
+
+/* Hidden by default, shown only in inpaint mode */
+.ig-inpaint-only {
+    display: none !important;
+}
+
+/* Hidden by default, shown only in outpaint mode */
+.ig-outpaint-only {
+    display: none !important;
+}
+
+/* Hidden by default, shown only in upscale mode */
+.ig-upscale-only {
+    display: none !important;
+}
+
+/* Hidden by default, shown only in video mode */
+.ig-video-only {
+    display: none !important;
+}
+
+/* Show txt2img-only elements when body has mode-txt2img class */
+body.mode-txt2img .ig-txt2img-only {
+    display: flex !important;
+}
+
+body.mode-txt2img .ig-txt2img-only.ig-field {
+    display: flex !important;
+}
+
+body.mode-txt2img .ig-txt2img-only.ig-checkbox {
+    display: flex !important;
+}
+
+body.mode-txt2img .ig-txt2img-only.ig-collapsible {
+    display: block !important;
+}
+
+/* Show img2img-only elements when body has mode-img2img class */
+body.mode-img2img .ig-img2img-only {
+    display: flex !important;
+}
+
+body.mode-img2img .ig-img2img-only.ig-field {
+    display: flex !important;
+}
+
+body.mode-img2img .ig-img2img-only.ig-checkbox {
+    display: flex !important;
+}
+
+/* Show inpaint-only elements when body has mode-inpaint class */
+body.mode-inpaint .ig-inpaint-only {
+    display: flex !important;
+}
+
+body.mode-inpaint .ig-inpaint-only.ig-field {
+    display: flex !important;
+}
+
+/* Show outpaint-only elements when body has mode-outpaint class */
+body.mode-outpaint .ig-outpaint-only {
+    display: flex !important;
+}
+
+body.mode-outpaint .ig-outpaint-only.ig-field {
+    display: flex !important;
+}
+
+/* Show upscale-only elements when body has mode-upscale class */
+body.mode-upscale .ig-upscale-only {
+    display: flex !important;
+}
+
+body.mode-upscale .ig-upscale-only.ig-field {
+    display: flex !important;
+}
+
+/* Show video-only elements when body has mode-video class */
+body.mode-video .ig-video-only {
+    display: flex !important;
+}
+
+body.mode-video .ig-video-only.ig-field {
+    display: flex !important;
 }

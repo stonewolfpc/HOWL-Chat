@@ -7,7 +7,6 @@
  * @module sampler-settings
  */
 
-const SAMPLER_SETTINGS_STORAGE_KEY = 'howl-sampler-settings';
 const SAMPLER_PRESETS_KEY = 'howl-sampler-presets';
 
 // Built-in sampler presets
@@ -15,42 +14,30 @@ const SAMPLER_PRESETS = {
     balanced: {
         temperature: 0.7, top_p: 0.9, top_k: 40, min_p: 0.05,
         typical_p: 1.0, repeat_penalty: 1.1, repeat_last_n: 64,
-        presence_penalty: 0.0, frequency_penalty: 0.0, no_repeat_ngram: 0,
-        mirostat_mode: 0, mirostat_tau: 5.0, mirostat_eta: 0.1,
+        presence_penalty: 0.0, frequency_penalty: 0.0,        mirostat_mode: 0, mirostat_tau: 5.0, mirostat_eta: 0.1,
         dyn_temp_range: 0.0, dyn_temp_exp: 1.0, dry_multiplier: 0.0,
-        dry_allowed_length: 2, dry_base: 1.0, smoothing_factor: 0.0,
-        smoothing_curve: 1.0, top_a: 0.0, epsilon_cutoff: 0.0,
-        eta_cutoff: 0.0, encoder_repeat_penalty: 1.0, seed: -1
+        dry_allowed_length: 2, dry_base: 1.0,        smoothing_curve: 1.0, top_a: 0.0,        eta_cutoff: 0.0, encoder_repeat_penalty: 1.0, seed: -1
     },
     creative: {
         temperature: 0.9, top_p: 0.95, top_k: 80, min_p: 0.02,
         typical_p: 1.0, repeat_penalty: 1.05, repeat_last_n: 32,
-        presence_penalty: 0.0, frequency_penalty: 0.0, no_repeat_ngram: 0,
-        mirostat_mode: 0, mirostat_tau: 5.0, mirostat_eta: 0.1,
+        presence_penalty: 0.0, frequency_penalty: 0.0,        mirostat_mode: 0, mirostat_tau: 5.0, mirostat_eta: 0.1,
         dyn_temp_range: 0.5, dyn_temp_exp: 1.0, dry_multiplier: 0.0,
-        dry_allowed_length: 2, dry_base: 1.0, smoothing_factor: 0.0,
-        smoothing_curve: 1.0, top_a: 0.0, epsilon_cutoff: 0.0,
-        eta_cutoff: 0.0, encoder_repeat_penalty: 1.0, seed: -1
+        dry_allowed_length: 2, dry_base: 1.0,        smoothing_curve: 1.0, top_a: 0.0,        eta_cutoff: 0.0, encoder_repeat_penalty: 1.0, seed: -1
     },
     deterministic: {
         temperature: 0.2, top_p: 0.5, top_k: 10, min_p: 0.1,
         typical_p: 1.0, repeat_penalty: 1.2, repeat_last_n: 128,
-        presence_penalty: 0.0, frequency_penalty: 0.0, no_repeat_ngram: 0,
-        mirostat_mode: 0, mirostat_tau: 5.0, mirostat_eta: 0.1,
+        presence_penalty: 0.0, frequency_penalty: 0.0,        mirostat_mode: 0, mirostat_tau: 5.0, mirostat_eta: 0.1,
         dyn_temp_range: 0.0, dyn_temp_exp: 1.0, dry_multiplier: 0.0,
-        dry_allowed_length: 2, dry_base: 1.0, smoothing_factor: 0.0,
-        smoothing_curve: 1.0, top_a: 0.0, epsilon_cutoff: 0.0,
-        eta_cutoff: 0.0, encoder_repeat_penalty: 1.0, seed: -1
+        dry_allowed_length: 2, dry_base: 1.0,        smoothing_curve: 1.0, top_a: 0.0,        eta_cutoff: 0.0, encoder_repeat_penalty: 1.0, seed: -1
     },
     precise: {
         temperature: 0.2, top_p: 0.5, top_k: 10, min_p: 0.1,
         typical_p: 1.0, repeat_penalty: 1.2, repeat_last_n: 128,
-        presence_penalty: 0.0, frequency_penalty: 0.0, no_repeat_ngram: 0,
-        mirostat_mode: 0, mirostat_tau: 5.0, mirostat_eta: 0.1,
+        presence_penalty: 0.0, frequency_penalty: 0.0,        mirostat_mode: 0, mirostat_tau: 5.0, mirostat_eta: 0.1,
         dyn_temp_range: 0.0, dyn_temp_exp: 1.0, dry_multiplier: 0.0,
-        dry_allowed_length: 2, dry_base: 1.0, smoothing_factor: 0.0,
-        smoothing_curve: 1.0, top_a: 0.0, epsilon_cutoff: 0.0,
-        eta_cutoff: 0.0, encoder_repeat_penalty: 1.0, seed: -1
+        dry_allowed_length: 2, dry_base: 1.0,        smoothing_curve: 1.0, top_a: 0.0,        eta_cutoff: 0.0, encoder_repeat_penalty: 1.0, seed: -1
     }
 };
 
@@ -65,7 +52,6 @@ const samplerSettings = [
     { id: 'repeat-last-n', default: 64 },
     { id: 'presence-penalty', default: 0.0, hasToggle: true },
     { id: 'frequency-penalty', default: 0.0, hasToggle: true },
-    { id: 'no-repeat-ngram', default: 0 },
     { id: 'mirostat-mode', default: 0, hasToggle: true },
     { id: 'mirostat-tau', default: 5.0 },
     { id: 'mirostat-eta', default: 0.1 },
@@ -74,12 +60,6 @@ const samplerSettings = [
     { id: 'dry-multiplier', default: 0.0 },
     { id: 'dry-allowed-length', default: 2 },
     { id: 'dry-base', default: 1.0 },
-    { id: 'smoothing-factor', default: 0.0 },
-    { id: 'smoothing-curve', default: 1.0 },
-    { id: 'top-a', default: 0.0, hasToggle: true },
-    { id: 'epsilon-cutoff', default: 0.0 },
-    { id: 'eta-cutoff', default: 0.0 },
-    { id: 'encoder-repeat-penalty', default: 1.0 },
     { id: 'seed', default: -1 }
 ];
 
@@ -180,9 +160,7 @@ function initResetButtons() {
 function handleConflictDetection(settingId, isEnabled) {
     // Define conflict groups
     const conflictGroups = {
-        'top-p': ['typical-p', 'top-a', 'min-p'],
-        'typical-p': ['top-p', 'min-p'],
-        'top-a': ['top-p'],
+        'top-p': ['typical-p', 'min-p'],
         'min-p': ['top-p', 'typical-p'],
         'mirostat-mode': ['dyn-temp-range'],
         'dyn-temp-range': ['mirostat-mode'],
@@ -209,16 +187,29 @@ function handleConflictDetection(settingId, isEnabled) {
     });
 }
 
+// Frontend slider ID → backend key mapping for IDs that don't follow the simple dash-to-underscore rule.
+const SAMPLER_ID_TO_BACKEND = {
+    'mirostat-mode':        'mirostat',
+    'dyn-temp-range':       'dynamic_temp_range',
+    'dyn-temp-exp':         'dynamic_temp_exponent'
+};
+
+// Backend key → frontend slider ID (reverse of above)
+const SAMPLER_BACKEND_TO_ID = {};
+for (const [fid, bid] of Object.entries(SAMPLER_ID_TO_BACKEND)) {
+    SAMPLER_BACKEND_TO_ID[bid] = fid;
+}
+
 // Get all sampler settings as an object
 function getSamplerSettings() {
     const settings = {};
     samplerSettings.forEach(setting => {
         const slider = document.getElementById(setting.id);
         if (slider) {
-            // Convert ID format (e.g., 'top-p' to 'top_p')
-            const backendId = setting.id.replace(/-/g, '_');
+            // Use explicit mapping if available, otherwise dash → underscore
+            const backendId = SAMPLER_ID_TO_BACKEND[setting.id] || setting.id.replace(/-/g, '_');
             settings[backendId] = parseFloat(slider.value);
-            
+
             // Include enabled state if toggle exists
             if (setting.hasToggle) {
                 const toggle = document.getElementById(`${setting.id}-enabled`);
@@ -234,21 +225,32 @@ function getSamplerSettings() {
 // Set sampler settings from an object
 function setSamplerSettings(settings) {
     Object.keys(settings).forEach(backendId => {
-        // Convert backend ID format (e.g., 'top_p' to 'top-p')
-        const frontendId = backendId.replace(/_/g, '-');
+        // Toggle state is stored as `<key>_enabled`. The suffix is part of the
+        // storage key, not of the element id, so it has to be stripped before
+        // mapping or every toggle resolves to `<id>-enabled-enabled` and is
+        // silently skipped — which is why disabled samplers came back enabled
+        // after a restart.
+        const isEnabledKey = backendId.endsWith('_enabled');
+        const baseKey = isEnabledKey ? backendId.slice(0, -'_enabled'.length) : backendId;
+
+        // Use explicit reverse mapping if available, otherwise underscore → dash
+        let frontendId = SAMPLER_BACKEND_TO_ID[baseKey];
+        if (!frontendId) {
+            frontendId = baseKey.replace(/_/g, '-');
+        }
         const slider = document.getElementById(frontendId);
         const valueInput = document.getElementById(`${frontendId}-value`);
         const toggle = document.getElementById(`${frontendId}-enabled`);
         const card = document.getElementById(`${frontendId}-card`);
-        
+
         if (slider && valueInput) {
             const value = settings[backendId];
             slider.value = value;
             valueInput.value = value;
         }
-        
+
         // Handle toggle state
-        if (backendId.endsWith('_enabled') && toggle && card) {
+        if (isEnabledKey && toggle && card) {
             const isEnabled = settings[backendId];
             toggle.checked = isEnabled;
             if (isEnabled) {
@@ -260,49 +262,56 @@ function setSamplerSettings(settings) {
     });
 }
 
-// Save sampler settings to backend and localStorage
+// Save sampler settings to unified store and backend
 async function saveSamplerSettings() {
     try {
         const settings = getSamplerSettings();
-        // Save to backend
+        // Update unified settings store
+        if (window.settingsState?.current) {
+            window.settingsState.current.sampler = settings;
+            if (window.settingsState.saveSettings) {
+                await window.settingsState.saveSettings();
+            }
+        }
+        // Keep legacy backend binding for compatibility
         if (window.go && window.go.main && window.go.main.App) {
             await window.go.main.App.SetSamplerSettings(settings);
         }
-        // Always save to localStorage as fallback
-        localStorage.setItem(SAMPLER_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
     } catch (error) {
         console.error('Failed to save sampler settings:', error);
     }
 }
 
-// Load sampler settings from backend or localStorage
+// Load sampler settings from unified store, backend, or defaults
 async function loadSamplerSettings() {
+    // 1. Try unified settings store first
+    if (window.settingsState?.current?.sampler) {
+        const settings = window.settingsState.current.sampler;
+        if (Object.keys(settings).length > 0) {
+            setSamplerSettings(settings);
+            return;
+        }
+    }
+
+    // 2. Fallback to legacy backend binding
     let loaded = false;
     try {
         if (window.go && window.go.main && window.go.main.App) {
             const settings = await window.go.main.App.GetSamplerSettings();
             if (settings) {
                 setSamplerSettings(settings);
+                // Seed into unified store
+                if (window.settingsState?.current) {
+                    window.settingsState.current.sampler = settings;
+                }
                 loaded = true;
             }
         }
     } catch (error) {
         console.error('Failed to load sampler settings from backend:', error);
     }
-    // Fallback to localStorage if backend fails
-    if (!loaded) {
-        const local = localStorage.getItem(SAMPLER_SETTINGS_STORAGE_KEY);
-        if (local) {
-            try {
-                const settings = JSON.parse(local);
-                setSamplerSettings(settings);
-                loaded = true;
-            } catch (e) {
-                // ignore
-            }
-        }
-    }
-    // If still not loaded, use defaults
+
+    // 3. Defaults
     if (!loaded) {
         samplerSettings.forEach(setting => {
             const slider = document.getElementById(setting.id);
@@ -338,17 +347,45 @@ function resetSamplerSettings() {
     saveSamplerSettings();
 }
 
+// After a model loads, show the values the engine is actually using. The
+// family defaults live in the backend, so without this the sliders would keep
+// displaying the last saved number while inference ran on something else.
+async function refreshEffectiveSampler() {
+    const app = window.go?.main?.App;
+    if (!app?.GetEffectiveSampler) return;
+    try {
+        const eff = await app.GetEffectiveSampler();
+        if (!eff) return;
+        const shown = {};
+        ["temperature", "top_p", "top_k", "min_p", "repeat_penalty", "repeat_last_n",
+         "presence_penalty", "frequency_penalty"].forEach(k => {
+            if (typeof eff[k] === "number") shown[k] = eff[k];
+        });
+        setSamplerSettings(shown);
+        console.log('[sampler] showing effective values for family:', eff.family || 'unknown');
+    } catch (err) {
+        console.warn('[sampler] could not read effective values:', err);
+    }
+}
+
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', function() {
     initSamplerSettings();
+    refreshEffectiveSampler();
 });
 
-// Persist sampler settings before the page unloads
-window.addEventListener('beforeunload', function() {
-    try {
-        const settings = getSamplerSettings();
-        localStorage.setItem(SAMPLER_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
-    } catch (error) {
-        console.warn('Failed to persist sampler settings on unload:', error);
-    }
+// ---------------------------------------------------------------------------
+// Clamped descriptions keep their full sentence reachable
+//
+// The full-screen sheet caps .setting-description at two lines so one long
+// description cannot stretch its whole grid row, which would undo the compact
+// layout. The complete sentence is exposed as a native tooltip so nothing is
+// hidden, only shortened.
+// ---------------------------------------------------------------------------
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('#sampler-settings-flyout .setting-description').forEach(function (el) {
+        const full = el.textContent.trim();
+        if (full && !el.title) el.title = full;
+    });
 });

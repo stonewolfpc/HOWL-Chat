@@ -11,11 +11,11 @@
  * @version 2.0.0
  */
 
-@import url('cc-messages.css');
-@import url('cc-editing.css');
-@import url('cc-buttons.css');
-@import url('cc-typing.css');
-@import url('cc-thinking.css');
-@import url('cc-images.css');
-@import url('cc-characters.css');
-@import url('cc-light-theme.css');
+@import url('cc-messages.css?v=29');
+@import url('cc-editing.css?v=29');
+@import url('cc-buttons.css?v=29');
+@import url('cc-typing.css?v=29');
+@import url('cc-thinking.css?v=29');
+@import url('cc-images.css?v=29');
+@import url('cc-characters.css?v=29');
+@import url('cc-light-theme.css?v=29');

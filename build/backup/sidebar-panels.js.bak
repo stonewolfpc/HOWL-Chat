@@ -1,0 +1,153 @@
+﻿/**
+ * Sidebar Panels — Orchestrator
+ *
+ * Entry point that wires together the modular sidebar components:
+ *   sidebar-state.js       — shared state, constants, utilities
+ *   sidebar-session.js     — session load/save/sync
+ *   sidebar-characters.js  — character panel rendering & interactions
+ *   sidebar-context.js     — world/scenario/lorebook panel
+ *
+ * This file only handles:
+ *   - Initialization sequencing
+ *   - Cross-page postMessage event handlers
+ *   - Navigation and notification helpers
+ *   - The public window.sidebarPanels API surface
+ *
+ * @module sidebar-panels
+ * @version 2.1.0
+ */
+
+'use strict';
+
+// ---------------------------------------------------------------------------
+// Initialization
+// ---------------------------------------------------------------------------
+
+async function initializeSidebarPanels() {
+    if (window._chatDataInitialized) return;
+    console.log('Initializing Sidebar Panels (v2.1)...');
+    initializeCharacterPanel();
+    window.sidebarContext.initializeContextPanel();
+    await loadChatData();
+    window._chatDataInitialized = true;
+    await applyPendingChatWorld();
+}
+
+function initializeCharacterPanel() {
+    console.log('Initializing Character Panel...');
+}
+
+/**
+ * A world created through the chat's "Change World -> + New World" flow is
+ * recorded in sessionStorage by world-form.js before navigating back here.
+ * That navigation is a full page load, so there is no live postMessage channel
+ * and the world would otherwise never reach the chat that requested it.
+ */
+async function applyPendingChatWorld() {
+    if (!document.getElementById('world-name-display')) return;
+    let worldId = null;
+    try { worldId = sessionStorage.getItem('howl-pending-chat-world'); } catch (_) { return; }
+    if (!worldId) return;
+    try { sessionStorage.removeItem('howl-pending-chat-world'); } catch (_) {}
+    if (typeof contextDisplay === 'undefined' || !contextDisplay.selectWorld) return;
+    try {
+        await contextDisplay.selectWorld(worldId);
+        console.log('[applyPendingChatWorld] attached new world:', worldId);
+    } catch (err) {
+        console.error('[applyPendingChatWorld] failed to attach world:', err);
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => initializeSidebarPanels());
+} else {
+    setTimeout(() => initializeSidebarPanels(), 0);
+}
+
+// ---------------------------------------------------------------------------
+// Delegation shims — route bare function calls to the correct module
+// ---------------------------------------------------------------------------
+
+function loadChatData() { return window.sidebarSession.loadChatData(); }
+function saveChatData() { return window.sidebarSession.saveChatData(); }
+// Re-establish canonical panel shims after sidebar modules load (they overwrite context-display.js shims)
+function updateCharacterPanel()  { return contextDisplay.updateCharacterPanel(); }
+function updateContextDisplay()  { return contextDisplay.updateContextDisplay(); }
+function updateWorldDisplay()    { return contextDisplay.updateWorldDisplay(); }
+function updateScenarioDisplay() { return contextDisplay.updateScenarioDisplay(); }
+function updateLorebookDisplay() { return contextDisplay.updateLorebookDisplay(); }
+
+// ---------------------------------------------------------------------------
+// Cross-Page postMessage Handlers
+// ---------------------------------------------------------------------------
+
+function handleCharacterCreation() {
+    if (!window.location.pathname.includes('character.html')) return;
+    window.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'character-created') {
+            const character = event.data.character;
+            if (character && window.go && window.go.main && window.go.main.App && window.go.main.App.AddCharacterToChat) {
+                window.go.main.App.AddCharacterToChat(character)
+                    .then(() => { console.log('Character added to chat session'); loadChatData(); })
+                    .catch(err => console.error('Failed to add character to chat:', err));
+            }
+        } else if (event.data && event.data.type === 'character-updated') {
+            const { character, index } = event.data;
+            const cd = window.sidebarState.currentChatData;
+            if (character && index !== undefined && cd.characters && cd.characters[index]) {
+                cd.characters[index] = character;
+                saveChatData();
+                updateCharacterPanel();
+            }
+        }
+    });
+}
+
+function handleWorldCreation() {
+    if (!window.location.pathname.includes('world.html')) return;
+    window.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'world-created') {
+            const world = event.data.world;
+            if (world && window.go && window.go.main && window.go.main.App && window.go.main.App.AddWorldToChat) {
+                window.go.main.App.AddWorldToChat(world)
+                    .then(() => { console.log('World added to chat session'); loadChatData(); })
+                    .catch(err => console.error('Failed to add world to chat:', err));
+            }
+        }
+    });
+}
+
+function handleScenarioCreation() {
+    if (!window.location.pathname.includes('scenario.html')) return;
+    window.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'scenario-created') {
+            const scenario = event.data.scenario;
+            if (scenario && window.go && window.go.main && window.go.main.App && window.go.main.App.AddScenarioToChat) {
+                window.go.main.App.AddScenarioToChat(scenario)
+                    .then(() => { console.log('Scenario added to chat session'); loadChatData(); })
+                    .catch(err => console.error('Failed to add scenario to chat:', err));
+            }
+        }
+    });
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
+
+window.sidebarPanels = {
+    loadChatData,
+    updateCharacterPanel,
+    updateContextDisplay,
+    selectWorld:          (id)    => window.sidebarContext.selectWorld(id),
+    selectScenario:       (id)    => window.sidebarContext.selectScenario(id),
+    openCharacterSheet:   (id)    => window.sidebarCharacters.openCharacterSheet(id),
+    showCharacterMenu:    (e, id) => window.sidebarCharacters.showCharacterMenu(e, id),
+    openWorldSelector:    ()      => window.sidebarContext.openWorldSelector(),
+    openScenarioSelector: ()      => window.sidebarContext.openScenarioSelector(),
+    openLorebookManager:  ()      => window.sidebarContext.openLorebookManager(),
+    handleCharacterCreation
+};
+
+// Expose legacy global that some pages bind to directly
+window.logChatContract = (...args) => window.sidebarState.logChatContract(...args);

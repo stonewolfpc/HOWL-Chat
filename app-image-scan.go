@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"howl-chat/internal/errors"
 	"howl-chat/internal/image/installer"
@@ -18,6 +21,9 @@ type ScanResult struct {
 	ControlNets []AssetInfo `json:"controlnets"`
 	Embeddings  []AssetInfo `json:"embeddings"`
 	Upscalers   []AssetInfo `json:"upscalers"`
+	T5XXLs      []AssetInfo `json:"t5xxls"`
+	ClipLs      []AssetInfo `json:"clip_ls"`
+	ClipGs      []AssetInfo `json:"clip_gs"`
 }
 
 // AssetInfo is the frontend-visible description of a scanned asset.
@@ -76,24 +82,78 @@ type InstallSummary struct {
 
 // ScanImageModels performs a full recursive scan of the models directory,
 // classifies every asset, writes .howl.json manifests, and returns the index.
+// imageDirectories returns every directory the image pipeline scans: all
+// directories registered as image directories, plus the configured models
+// directory (registered on startup and whenever it is changed).
+func (a *App) imageDirectories() []string {
+	seen := make(map[string]bool)
+	var dirs []string
+	add := func(dir string) {
+		dir = strings.TrimSpace(dir)
+		if dir == "" {
+			return
+		}
+		key := strings.ToLower(filepath.Clean(dir))
+		if seen[key] {
+			return
+		}
+		seen[key] = true
+		dirs = append(dirs, dir)
+	}
+	if a.modelRegistry != nil {
+		for _, dir := range a.modelRegistry.Directories(registry.KindImage) {
+			add(dir)
+		}
+	}
+	add(a.GetImageEngineConfig().ModelsDir)
+	return dirs
+}
+
+// imageModelResult returns the image-kind slice of the registry as a ScanResult.
+func (a *App) imageModelResult() ScanResult {
+	if a.modelRegistry == nil {
+		return ScanResult{}
+	}
+	return indexToResult(a.modelRegistry.ToModelIndexForKind(registry.KindImage))
+}
+
+// ScanImageModels scans every image directory, merges the results into the
+// registry, and returns the image-only catalogue.
 func (a *App) ScanImageModels() (ScanResult, error) {
-	cfg := a.GetImageEngineConfig()
-	if cfg.ModelsDir == "" {
+	dirs := a.imageDirectories()
+	if len(dirs) == 0 {
 		return ScanResult{}, fmt.Errorf("models directory not configured")
 	}
-	s := scanner.New(cfg.ModelsDir)
-	idx, err := s.Scan()
-	if err != nil {
-		a.logError(errors.IMGRegistryFail, errors.High, "image.scan", "app-image-scan.go:84", err)
-		return ScanResult{}, fmt.Errorf("scan failed: %w", err)
+	scanned := 0
+	var lastErr error
+	for _, dir := range dirs {
+		if _, err := os.Stat(dir); err != nil {
+			continue // unplugged drive: keep the entry, skip the scan
+		}
+		idx, err := scanner.New(dir).Scan()
+		if err != nil {
+			lastErr = err
+			a.logError(errors.IMGRegistryFail, errors.High, "image.scan", "app-image-scan.go", err)
+			continue
+		}
+		scanned++
+		a.mergeIntoRegistry(idx)
 	}
-	a.mergeIntoRegistry(idx)
-	return a.mergeRegistryIntoResult(indexToResult(idx)), nil
+	if scanned == 0 {
+		if lastErr != nil {
+			return ScanResult{}, fmt.Errorf("scan failed: %w", lastErr)
+		}
+		return ScanResult{}, fmt.Errorf("no image model directories are available")
+	}
+	return a.imageModelResult(), nil
 }
 
 // GetModelIndex returns the cached scan index without a full rescan.
 // Falls back to a fresh scan if no cache exists.
 func (a *App) GetModelIndex() (ScanResult, error) {
+	if a.modelRegistry != nil {
+		return a.imageModelResult(), nil
+	}
 	cfg := a.GetImageEngineConfig()
 	if cfg.ModelsDir == "" {
 		return ScanResult{}, fmt.Errorf("models directory not configured")
@@ -115,7 +175,9 @@ func (a *App) GetCompatibleAssets(family string) (FilteredAssets, error) {
 	// Build a combined index from the registry (all registered directories).
 	var idx scanner.ModelIndex
 	if a.modelRegistry != nil {
-		idx = a.modelRegistry.ToModelIndex()
+		// Image directories only: a chat directory's files must never show up
+		// as a VAE, LoRA or ControlNet.
+		idx = a.modelRegistry.ToModelIndexForKind(registry.KindImage)
 	} else {
 		// Fallback: scan ModelsDir only when registry is unavailable.
 		cfg := a.GetImageEngineConfig()
@@ -147,22 +209,20 @@ func (a *App) GetCompatibleAssets(family string) (FilteredAssets, error) {
 // models directory and runs a fresh classification scan. Use this after the
 // classifier logic has been updated or when scan results look wrong.
 func (a *App) RescanImageModels() (ScanResult, error) {
-	cfg := a.GetImageEngineConfig()
-	if cfg.ModelsDir == "" {
+	dirs := a.imageDirectories()
+	if len(dirs) == 0 {
 		return ScanResult{}, fmt.Errorf("models directory not configured")
 	}
-	if err := scanner.ClearManifests(cfg.ModelsDir); err != nil {
-		a.logError(errors.IMGRegistryFail, errors.Medium, "image.manifest.clear", "app-image-scan.go:150", err)
-		return ScanResult{}, fmt.Errorf("clear manifests failed: %w", err)
+	for _, dir := range dirs {
+		if _, err := os.Stat(dir); err != nil {
+			continue
+		}
+		if err := scanner.ClearManifests(dir); err != nil {
+			a.logError(errors.IMGRegistryFail, errors.Medium, "image.manifest.clear", "app-image-scan.go", err)
+			return ScanResult{}, fmt.Errorf("clear manifests failed: %w", err)
+		}
 	}
-	s := scanner.New(cfg.ModelsDir)
-	idx, err := s.Scan()
-	if err != nil {
-		a.logError(errors.IMGRegistryFail, errors.High, "image.rescan", "app-image-scan.go:154", err)
-		return ScanResult{}, fmt.Errorf("rescan failed: %w", err)
-	}
-	a.mergeIntoRegistry(idx)
-	return a.mergeRegistryIntoResult(indexToResult(idx)), nil
+	return a.ScanImageModels()
 }
 
 // InstallAssets scans the models directory, writes .howl.json sidecar manifests
@@ -197,7 +257,7 @@ func (a *App) GetRegisteredModels() (ScanResult, error) {
 	if a.modelRegistry == nil {
 		return ScanResult{}, fmt.Errorf("model registry not initialised")
 	}
-	idx := a.modelRegistry.ToModelIndex()
+	idx := a.modelRegistry.ToModelIndexForKind(registry.KindImage)
 	return indexToResult(idx), nil
 }
 
@@ -235,6 +295,9 @@ func (a *App) mergeRegistryIntoResult(result ScanResult) ScanResult {
 	seenCN := make(map[string]struct{})
 	seenEmb := make(map[string]struct{})
 	seenUp := make(map[string]struct{})
+	seenT5 := make(map[string]struct{})
+	seenClipL := make(map[string]struct{})
+	seenClipG := make(map[string]struct{})
 	for _, a := range result.Models {
 		seenModel[a.Path] = struct{}{}
 	}
@@ -252,6 +315,15 @@ func (a *App) mergeRegistryIntoResult(result ScanResult) ScanResult {
 	}
 	for _, a := range result.Upscalers {
 		seenUp[a.Path] = struct{}{}
+	}
+	for _, a := range result.T5XXLs {
+		seenT5[a.Path] = struct{}{}
+	}
+	for _, a := range result.ClipLs {
+		seenClipL[a.Path] = struct{}{}
+	}
+	for _, a := range result.ClipGs {
+		seenClipG[a.Path] = struct{}{}
 	}
 
 	for _, e := range a.modelRegistry.All() {
@@ -286,6 +358,21 @@ func (a *App) mergeRegistryIntoResult(result ScanResult) ScanResult {
 			if _, ok := seenUp[e.Path]; !ok {
 				result.Upscalers = append(result.Upscalers, info)
 				seenUp[e.Path] = struct{}{}
+			}
+		case scanner.AssetT5XXL:
+			if _, ok := seenT5[e.Path]; !ok {
+				result.T5XXLs = append(result.T5XXLs, info)
+				seenT5[e.Path] = struct{}{}
+			}
+		case scanner.AssetClipL:
+			if _, ok := seenClipL[e.Path]; !ok {
+				result.ClipLs = append(result.ClipLs, info)
+				seenClipL[e.Path] = struct{}{}
+			}
+		case scanner.AssetClipG:
+			if _, ok := seenClipG[e.Path]; !ok {
+				result.ClipGs = append(result.ClipGs, info)
+				seenClipG[e.Path] = struct{}{}
 			}
 		}
 	}
@@ -323,6 +410,9 @@ func indexToResult(idx scanner.ModelIndex) ScanResult {
 		ControlNets: entriesToInfos(idx.ControlNets),
 		Embeddings:  entriesToInfos(idx.Embeddings),
 		Upscalers:   entriesToInfos(idx.Upscalers),
+		T5XXLs:      entriesToInfos(idx.T5XXLs),
+		ClipLs:      entriesToInfos(idx.ClipLs),
+		ClipGs:      entriesToInfos(idx.ClipGs),
 	}
 }
 
@@ -388,9 +478,6 @@ func assetCompat(family, format string) string {
 		compat = "supported"
 	case "bundle":
 		compat = "supported"
-	}
-	if family == "chroma" {
-		compat = "unsupported"
 	}
 	return compat
 }

@@ -36,14 +36,14 @@
 .ig-action-primary {
     background: var(--button-primary-bg);
     border-color: var(--button-primary-bg);
-    color: #FFFFFF;
+    color: var(--on-accent);
     font-weight: 600;
 }
 
 .ig-action-primary:hover {
     background: var(--accent-primary-hover);
     border-color: var(--accent-primary);
-    color: #FFFFFF;
+    color: var(--text-secondary);
 }
 
 .ig-action-danger {
@@ -54,7 +54,7 @@
     background: var(--danger);
     border: none;
     border-radius: 6px;
-    color: #FFFFFF;
+    color: var(--text-secondary);
 }
 
 /* Entity action buttons — slightly different accent */
@@ -102,7 +102,7 @@
     gap: 12px;
     padding: 14px 36px;
     background: var(--accent-primary);
-    color: #FFFFFF;
+    color: var(--text-secondary);
     border: none;
     border-radius: 12px;
     font-size: 16px;

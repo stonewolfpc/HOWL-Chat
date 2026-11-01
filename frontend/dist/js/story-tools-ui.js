@@ -33,10 +33,17 @@ function createRecentItem(memory) {
     item.dataset.memoryId = memory.id;
     const dateStr       = new Date(memory.lastTriggeredAt || memory.createdAt).toLocaleDateString();
     item.innerHTML      = `
-        <div class="memory-recent-title">${window.storyToolsState.escapeHtml(memory.title)}</div>
-        <div class="memory-recent-date">${dateStr}</div>
+        <div class="memory-recent-info">
+            <div class="memory-recent-title">${window.storyToolsState.escapeHtml(memory.title)}</div>
+            <div class="memory-recent-date">${dateStr}</div>
+        </div>
+        <span class="memory-delete-btn" title="Delete memory"><span class="icon icon-trash"></span></span>
     `;
-    item.addEventListener('click', () => selectMemory(memory.id));
+    item.querySelector('.memory-recent-info').addEventListener('click', () => selectMemory(memory.id));
+    item.querySelector('.memory-delete-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteMemory(memory.id, memory.title);
+    });
     return item;
 }
 
@@ -58,16 +65,23 @@ function createFullListItem(memory) {
     const dateStr         = new Date(memory.lastTriggeredAt || memory.createdAt).toLocaleDateString();
     const esc             = window.storyToolsState.escapeHtml;
     item.innerHTML = `
-        <div class="memory-item-title">${esc(memory.title)}</div>
-        <div class="memory-item-summary">${esc(memory.summary || '')}</div>
-        <div class="memory-item-meta">
-            <div class="memory-item-tags">
-                ${(memory.tags || []).map(tag => `<span class="memory-tag">${esc(tag)}</span>`).join('')}
+        <div class="memory-item-content">
+            <div class="memory-item-title">${esc(memory.title)}</div>
+            <div class="memory-item-summary">${esc(memory.summary || '')}</div>
+            <div class="memory-item-meta">
+                <div class="memory-item-tags">
+                    ${(memory.tags || []).map(tag => `<span class="memory-tag">${esc(tag)}</span>`).join('')}
+                </div>
+                <div class="memory-item-date">${dateStr}</div>
             </div>
-            <div class="memory-item-date">${dateStr}</div>
         </div>
+        <span class="memory-delete-btn" title="Delete memory"><span class="icon icon-trash"></span></span>
     `;
-    item.addEventListener('click', () => selectMemory(memory.id));
+    item.querySelector('.memory-item-content').addEventListener('click', () => selectMemory(memory.id));
+    item.querySelector('.memory-delete-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteMemory(memory.id, memory.title);
+    });
     return item;
 }
 
@@ -152,9 +166,56 @@ function openFlyout() {
 // Status / Notifications
 // ---------------------------------------------------------------------------
 
+// One implementation for two call styles that used to be two competing
+// globals: rag-knowledge.js called showLoading('Uploading document...') while
+// chat.js calls showLoading(true). Whichever file loaded last decided which
+// meaning `true` had, so on story-tools the overlay could be shown with the
+// text "true" and never hidden again. Both address #loading-overlay.
 function showLoading(show) {
     const el = document.getElementById('loading-overlay');
-    if (el) el.style.display = show ? 'flex' : 'none';
+    if (!el) return;
+    if (typeof show === 'string') {
+        const label = el.querySelector('.loading-text');
+        if (label) label.textContent = show;
+        el.style.display = 'flex';
+        return;
+    }
+    el.style.display = show ? 'flex' : 'none';
+}
+
+async function deleteMemory(memoryId, memoryTitle) {
+    const st = window.storyToolsState;
+    // Two call styles, one implementation: the editor's Delete button passes
+    // nothing (it acts on the selected memory), list rows pass id and title.
+    const id = memoryId || st?.currentMemoryId;
+    if (!id) { showError('No memory selected to delete'); return; }
+
+    const known = (st?.memoriesData || []).find(m => m.id === id);
+    const title = memoryTitle || known?.title;
+    if (!confirm(`Delete memory "${title || 'Untitled'}"? This cannot be undone.`)) return;
+
+    try {
+        const deleted = window.MemoryStore?.deleteMemoryEntry
+            ? window.MemoryStore.deleteMemoryEntry(id)
+            : false;
+
+        // The backend copy stays authoritative for the chat; a failure here is
+        // logged, not fatal (the local store already dropped it).
+        if (st?.currentChatId && window.go?.main?.App?.DeleteMemory) {
+            try { await window.go.main.App.DeleteMemory(st.currentChatId, id); }
+            catch (err) { console.warn('Backend memory delete failed:', err); }
+        }
+
+        if (!deleted) { showError('Memory not found'); return; }
+
+        renderRecentList(await getMemories({ limit: 5, sort: 'newest' }));
+        renderFullList(await getMemories({}));
+        if (st?.currentMemoryId === id) clearEditor();
+        showSuccess('Memory deleted');
+    } catch (error) {
+        console.error('Failed to delete memory:', error);
+        showError('Failed to delete memory');
+    }
 }
 
 function showSuccess(message) { showNotification(message, 'success'); }

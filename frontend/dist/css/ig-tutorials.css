@@ -68,7 +68,7 @@
 .ig-tutorials-close:hover {
     background: var(--danger);
     border-color: var(--danger);
-    color: #FFFFFF;
+    color: var(--text-secondary);
     transform: rotate(90deg);
 }
 

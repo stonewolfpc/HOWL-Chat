@@ -9,8 +9,33 @@
 
 'use strict';
 
-function editUndo()      { showNotification('Undo functionality coming soon', 'info'); }
-function editRedo()      { showNotification('Redo functionality coming soon', 'info'); }
+// Undo/redo act on the focused text field; the browser keeps that field's edit history.
+function _activeTextTarget() {
+    const el = document.activeElement;
+    if (!el) return null;
+    if (el.isContentEditable) return el;
+    if (el.tagName === 'TEXTAREA') return el;
+    if (el.tagName === 'INPUT') {
+        const t = (el.type || 'text').toLowerCase();
+        if (['text', 'search', 'url', 'tel', 'password', 'email', 'number'].includes(t)) return el;
+    }
+    return null;
+}
+
+function editUndo() {
+    const el = _activeTextTarget();
+    if (!el) { showNotification('Click a text field first, then Undo', 'warning'); return; }
+    el.focus();
+    const done = document.execCommand('undo');
+    showNotification(done ? 'Undo' : 'Nothing to undo', done ? 'success' : 'info');
+}
+function editRedo() {
+    const el = _activeTextTarget();
+    if (!el) { showNotification('Click a text field first, then Redo', 'warning'); return; }
+    el.focus();
+    const done = document.execCommand('redo');
+    showNotification(done ? 'Redo' : 'Nothing to redo', done ? 'success' : 'info');
+}
 
 function editCut() {
     const sel = window.getSelection?.();

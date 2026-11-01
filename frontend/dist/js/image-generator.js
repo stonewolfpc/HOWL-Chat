@@ -235,7 +235,7 @@ async function loadHistoryPanel() {
                     <button onclick="event.stopPropagation();showBoardContextMenu('${escapeJS(img.file)}', event.clientX, event.clientY)" style="color:#4CAF50;">Send to Board</button>
                 </div>
                 <img id="hist-img-${escapeId(img.file)}" alt="" loading="lazy"
-                     style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;">
+                     class="ig-history-thumb">
                 <div class="ig-history-actions">
                     <button class="ig-history-send-btn" title="Send to Character"
                         onclick="event.stopPropagation();sendHistoryToEntity('${escapeJS(img.file)}','character')">Char</button>
@@ -246,10 +246,9 @@ async function loadHistoryPanel() {
                 </div>
             `;
             item.addEventListener('click', () => viewHistoryImage(img.file));
-            item.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                showBoardContextMenu(img.file, e.clientX, e.clientY);
-            });
+            // Right-click is handled once, by image-recall.js, which offers the full
+            // parameter set plus a board action. A handler here would stack a second
+            // menu underneath it.
             list.appendChild(item);
             loadGalleryImage(img.file, `hist-img-${escapeId(img.file)}`);
         });
@@ -319,7 +318,7 @@ function historyMenuAction(filePath, action, btn) {
                 if (el) el.value = prompt;
             }
             if (neg) {
-                const el = document.getElementById('ig-negative-prompt');
+                const el = document.getElementById('ig-negative');
                 if (el) el.value = neg;
             }
             break;
@@ -532,4 +531,25 @@ function toggleMetadata() {
     } else {
         viewer.style.display = 'none';
     }
+}
+
+// Board search: filters the history grid by filename or prompt text.
+// Called from the input's oninput attribute so no load-order or listener timing matters.
+function filterHistoryBySearch(value) {
+    const list = document.getElementById('ig-history-list');
+    if (!list) return;
+    const term = (value || '').trim().toLowerCase();
+    let shown = 0;
+    list.querySelectorAll('.ig-history-item').forEach(item => {
+        if (!term) { item.style.display = ''; shown++; return; }
+        let haystack = (item.dataset.file || '').toLowerCase();
+        try {
+            haystack += ' ' + JSON.stringify(JSON.parse(item.dataset.meta || '{}')).toLowerCase();
+        } catch (e) { /* meta is optional */ }
+        const match = haystack.includes(term);
+        item.style.display = match ? '' : 'none';
+        if (match) shown++;
+    });
+    const status = document.getElementById('ig-history-status');
+    if (status && term) status.textContent = shown + ' match' + (shown === 1 ? '' : 'es') + ' for "' + value + '"';
 }

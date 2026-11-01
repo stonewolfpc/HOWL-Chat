@@ -1,0 +1,170 @@
+/**
+ * Image Generator — Fluid Layout
+ *
+ * Loaded last, after every other image-generator stylesheet, so these rules win
+ * without !important.
+ *
+ * Two problems this fixes:
+ *  1. The three columns used fixed percentages with hard max-widths, so a
+ *     2560 px window left most of the width as empty canvas while the panels
+ *     stayed narrow. Widths now scale with the viewport within sane bounds.
+ *  2. `.ig-history-item` carried `aspect-ratio: 1` from igp-history.css while a
+ *     later sheet made `.ig-history-actions` a normal flex child. The card was
+ *     clamped to a square, the image filled that square, and the action row was
+ *     pushed on top of the artwork. The tile now grows with its content: square
+ *     artwork plus its own action row underneath, never overlapping.
+ */
+
+.ig-layout {
+    gap: clamp(10px, 0.7vw, 20px);
+    padding: 0 clamp(12px, 1.1vw, 28px) clamp(12px, 1.1vw, 28px);
+}
+
+/* Columns scale with the window instead of hugging fixed percentages. */
+.ig-sidebar {
+    width: clamp(300px, 23vw, 560px);
+    min-width: clamp(280px, 20vw, 440px);
+    max-width: clamp(340px, 26vw, 620px);
+}
+
+.ig-main {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.ig-history-col {
+    width: clamp(300px, 24vw, 660px);
+    min-width: clamp(280px, 19vw, 420px);
+    max-width: clamp(360px, 30vw, 780px);
+}
+
+/* Keep the artwork square, give the actions their own row. */
+.ig-history-item {
+    aspect-ratio: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 6px;
+    overflow: hidden;
+}
+
+.ig-history-item img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    flex: 0 0 auto;
+}
+
+.ig-history-actions {
+    position: static;
+    display: flex;
+    flex: 0 0 auto;
+    gap: 4px;
+    padding: 0;
+    background: none;
+    inset: auto;
+}
+
+/* Tile size follows the available width, so wide windows get bigger artwork
+   and narrow ones still fit two columns. */
+.ig-history-list {
+    grid-template-columns: repeat(auto-fill, minmax(clamp(112px, 8.5vw, 200px), 1fr));
+    gap: clamp(8px, 0.6vw, 14px);
+    padding: clamp(8px, 0.8vw, 16px);
+}
+
+/* Canvas uses the space it is given at any size. */
+.ig-canvas-wrapper {
+    padding: clamp(12px, 1.2vw, 32px);
+}
+
+.ig-canvas img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* Prevent any child from forcing a horizontal scrollbar on smaller desktops. */
+.ig-layout,
+.ig-sidebar,
+.ig-main,
+.ig-history-col {
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.ig-sidebar,
+.ig-history-col {
+    min-width: clamp(260px, 19vw, 420px);
+}
+
+
+/* Rows must never be shorter than the tile they contain. Without this the grid
+   squeezes every row to fit the column height, and the artwork overflows its
+   card (measured: 94 px card holding a 266 px image at 1384x798). */
+.ig-history-list {
+    grid-auto-rows: max-content;
+    align-items: start;
+    align-content: start;
+}
+
+.ig-history-item {
+    height: auto;
+    min-height: 0;
+    align-self: start;
+}
+
+.ig-history-item img {
+    display: block;
+    min-height: 0;
+}
+
+
+/* The image-generator page never loads character-header.css, which is the only
+   file that gives .character-content `flex: 1`. Without it the element is a
+   default `flex: 0 1 auto` item that shrinks to its content — measured 1896 px
+   wide inside a 2560 px window, leaving 584 px dead and keeping the canvas at
+   582 px on a 2K monitor. */
+.character-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+}
+
+/* TAESD preview frames arrive at latent scale (64px for a 512px image), so at
+   natural size they are a speck in the middle of the canvas. Scale them up with
+   pixelated rendering: the composition is readable while denoising, and no
+   smoothing pretends there is detail that is not there yet. */
+#ig-preview-area img[src^="data:image/jpeg"] {
+    width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+    opacity: 0.9;
+}
+
+/* Image model folder manager */
+.ig-dir-head {
+    display: flex; align-items: baseline; gap: 6px;
+    margin: 8px 0 4px;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-tertiary);
+}
+.ig-dir-count { text-transform: none; letter-spacing: 0; opacity: 0.8; }
+.ig-model-dirs { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; }
+.ig-dir-row {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 8px;
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    font-size: 11px;
+}
+.ig-dir-row.ig-dir-missing { border-color: rgba(248, 113, 113, 0.35); }
+.ig-dir-path { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ig-dir-meta { color: var(--text-tertiary); flex: 0 0 auto; }
+.ig-dir-remove {
+    flex: 0 0 auto; background: none; border: none; cursor: pointer;
+    color: rgba(248, 113, 113, 0.75); font-size: 11px; padding: 0 2px; line-height: 1;
+}
+.ig-dir-remove:hover { color: var(--danger); }
+.ig-dir-empty { font-size: 11px; opacity: 0.5; font-style: italic; padding: 2px 0; }

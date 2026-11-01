@@ -20,13 +20,19 @@
 
 function _defaultState(chatName) {
     return {
-        chatName:           chatName || 'New Chat',
-        sessionId:          null,
-        world:              null,
-        scenario:           null,
-        characters:         [],
-        lorebooks:          [],
-        removedCharacterIds: []
+        chatName:            chatName || 'New Chat',
+        sessionId:           null,
+        world:               null,
+        scenario:            null,
+        characters:          [],
+        lorebooks:           [],
+        // Tracking arrays — chat is the sole source of truth
+        activeCharacterIds:  [],
+        removedCharacterIds: [],
+        addedCharacterIds:   [],
+        activeLorebookIds:   [],
+        removedLorebookIds:  [],
+        addedLorebookIds:    []
     };
 }
 
@@ -102,27 +108,113 @@ async function hydrateFromBackend(chatData) {
     const world     = chatData.World     || chatData.world     || null;
     const scenario  = chatData.Scenario  || chatData.scenario  || null;
     let   characters= chatData.Characters|| chatData.characters|| [];
-    const lorebooks = chatData.Lorebooks || chatData.lorebooks || [];
+    let   lorebooks = chatData.Lorebooks || chatData.lorebooks || [];
     const meta      = chatData.Meta      || chatData.meta      || {};
     const sessionId = meta.ID || meta.id || chatData.sessionId || null;
     const chatName  = meta.Name || meta.name || 'New Chat';
 
-    // Merge removed-character tracking from payload or persisted storage
-    let removedIds = chatData.removedCharacterIds || [];
-    if (!removedIds.length && window.HOWLStorage) {
+    // -----------------------------------------------------------------------
+    // SOURCE OF TRUTH: tracking arrays in meta
+    // Final lists = (active - removed) + added
+    // -----------------------------------------------------------------------
+    const activeChars  = meta.activeCharacters  || meta.ActiveCharacters  || [];
+    const removedChars = meta.removedCharacters || meta.RemovedCharacters || [];
+    const addedChars   = meta.addedCharacters   || meta.AddedCharacters   || [];
+
+    const activeBooks  = meta.activeLorebooks  || meta.ActiveLorebooks  || [];
+    const removedBooks = meta.removedLorebooks || meta.RemovedLorebooks || [];
+    const addedBooks   = meta.addedLorebooks   || meta.AddedLorebooks   || [];
+
+    console.log('[hydrateFromBackend] raw characters:', characters.length, 'raw lorebooks:', lorebooks.length);
+    console.log('[hydrateFromBackend] activeChars:', activeChars.length, 'removedChars:', removedChars.length, 'addedChars:', addedChars.length);
+    console.log('[hydrateFromBackend] activeBooks:', activeBooks.length, 'removedBooks:', removedBooks.length, 'addedBooks:', addedBooks.length);
+
+    const removedCharSet = new Set(removedChars);
+    const finalCharIds   = new Set([
+        ...activeChars.filter(id => !removedCharSet.has(id)),
+        ...addedChars
+    ]);
+
+    const removedBookSet = new Set(removedBooks);
+    const finalBookIds   = new Set([
+        ...activeBooks.filter(id => !removedBookSet.has(id)),
+        ...addedBooks
+    ]);
+
+    console.log('[hydrateFromBackend] finalCharIds:', [...finalCharIds], 'finalBookIds:', [...finalBookIds]);
+
+    // Ensure every character/lorebook in the raw data is accounted for in the tracking.
+    // If an entity was saved but never made it into the tracking arrays
+    // (e.g. added via world/scenario load before tracking existed), add it now.
+    const rawCharIds = new Set((characters || []).map(c => c.id).filter(Boolean));
+    for (const id of rawCharIds) {
+        if (!finalCharIds.has(id)) {
+            finalCharIds.add(id);
+            if (!activeChars.includes(id) && !addedChars.includes(id)) {
+                addedChars.push(id);
+            }
+        }
+    }
+    const rawBookIds = new Set((lorebooks || []).map(l => l.id).filter(Boolean));
+    for (const id of rawBookIds) {
+        if (!finalBookIds.has(id)) {
+            finalBookIds.add(id);
+            if (!activeBooks.includes(id) && !addedBooks.includes(id)) {
+                addedBooks.push(id);
+            }
+        }
+    }
+
+    // Filter loaded characters/lorebooks to only those in the computed sets
+    characters = characters.filter(c => finalCharIds.has(c.id));
+    lorebooks  = lorebooks.filter(l => finalBookIds.has(l.id));
+    console.log('[hydrateFromBackend] after filter characters:', characters.length, 'lorebooks:', lorebooks.length);
+
+    // If the backend didn't return a character that's supposed to be active,
+    // look it up from localStorage (handles characters added after last save)
+    const loadedCharIds = new Set(characters.map(c => c.id));
+    // Only look up characters that are explicitly ADDED (not stale active ones).
+    // Stale active IDs that aren't loaded should NOT be recovered — they were
+    // removed or the save is old.  Only added-after-save IDs need recovery.
+    const addedCharSet = new Set(addedChars);
+    const missingCharIds = [...finalCharIds].filter(id => !loadedCharIds.has(id) && addedCharSet.has(id));
+    console.log('[hydrateFromBackend] missingCharIds (added-only):', missingCharIds);
+    if (missingCharIds.length > 0) {
         try {
-            const saved = await window.HOWLStorage.getChatData('howl-chat-current-chat');
-            if (saved && Array.isArray(saved.removedCharacterIds)) {
-                removedIds = saved.removedCharacterIds;
+            const allChars = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+            for (const id of missingCharIds) {
+                const found = allChars.find(c => c.id === id);
+                if (found) {
+                    console.log('[hydrateFromBackend] adding missing character from localStorage:', id, found.name);
+                    characters.push(_enrichCharacterFromLocalStorage(found));
+                } else {
+                    console.log('[hydrateFromBackend] character not found in localStorage:', id);
+                }
             }
         } catch (_) {}
     }
 
-    // Filter out characters the user explicitly removed from this chat
-    if (removedIds.length > 0) {
-        const removedSet = new Set(removedIds);
-        characters = characters.filter(c => !removedSet.has(c.id));
+    // Same for lorebooks
+    const loadedBookIds = new Set(lorebooks.map(l => l.id));
+    const addedBookSet = new Set(addedBooks);
+    const missingBookIds = [...finalBookIds].filter(id => !loadedBookIds.has(id) && addedBookSet.has(id));
+    console.log('[hydrateFromBackend] missingBookIds (added-only):', missingBookIds);
+    if (missingBookIds.length > 0) {
+        try {
+            const allBooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+            for (const id of missingBookIds) {
+                const found = allBooks.find(b => b.id === id);
+                if (found) {
+                    console.log('[hydrateFromBackend] adding missing lorebook from localStorage:', id, found.name || found.title);
+                    lorebooks.push(found);
+                } else {
+                    console.log('[hydrateFromBackend] lorebook not found in localStorage:', id);
+                }
+            }
+        } catch (_) {}
     }
+
+    console.log('[hydrateFromBackend] final characters:', characters.length, 'final lorebooks:', lorebooks.length);
 
     _state = {
         chatName,
@@ -131,7 +223,12 @@ async function hydrateFromBackend(chatData) {
         scenario,
         characters,
         lorebooks,
-        removedCharacterIds: removedIds
+        activeCharacterIds:  activeChars,
+        removedCharacterIds: removedChars,
+        addedCharacterIds:   addedChars,
+        activeLorebookIds:   activeBooks,
+        removedLorebookIds:  removedBooks,
+        addedLorebookIds:    addedBooks
     };
     window._chatBridgeState = _state;
 
@@ -149,40 +246,6 @@ async function hydrateFromBackend(chatData) {
     _state.characters = _state.characters.map(c => _enrichCharacterFromLocalStorage(c));
     _state.lorebooks  = _enrichLorebooksFromLocalStorage(_state.lorebooks);
 
-    // Only auto-merge scenario characters if the saved chat has no characters.
-    // If a user explicitly removed characters from the chat, the backend will
-    // return the authoritative (reduced) list — don't re-inject scenario chars.
-    if (_state.scenario && _state.characters.length === 0) {
-        const scenarioChars = _state.scenario.characters || _state.scenario.Characters || [];
-        for (const sc of scenarioChars) {
-            const enriched = _enrichCharacterFromLocalStorage(sc);
-            const realId   = enriched.id;
-            const already  = _state.characters.some(c =>
-                (realId && c.id === realId) ||
-                (c.name && enriched.name && c.name.toLowerCase() === enriched.name.toLowerCase())
-            );
-            if (!already) _state.characters.push(enriched);
-        }
-    }
-
-    // Auto-merge scenario lorebooks (including character-level lorebooks) if the saved chat has none.
-    // This mirrors the logic in applyScenarioChange so hydration and hot-swap behave identically.
-    if (_state.scenario && (!_state.lorebooks || _state.lorebooks.length === 0)) {
-        const scenarioBooks = _state.scenario.lorebooks || _state.scenario.Lorebooks || [];
-        let charLorebooks = [];
-        try {
-            const scenarioChars = _state.scenario.characters || _state.scenario.Characters || [];
-            const allChars = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
-            charLorebooks = scenarioChars.flatMap(sc => {
-                const fullChar = allChars.find(c => c.id === sc.id || c.name === sc.name);
-                return fullChar?.howl?.lorebooks || fullChar?.lorebooks || [];
-            }).filter(Boolean);
-        } catch (_) {}
-        const enrichedScenarioBooks = _enrichLorebooksFromLocalStorage(scenarioBooks);
-        const enrichedCharBooks     = _enrichLorebooksFromLocalStorage(charLorebooks);
-        _state.lorebooks = _dedupeById([...enrichedScenarioBooks, ...enrichedCharBooks]);
-    }
-
     // Resolve images async for anything enrichment added
     if (_state.world && _state.world.image && !_state.world._resolvedImage) {
         _state.world._resolvedImage = await _resolveImage(_state.world.image, 'world');
@@ -190,7 +253,6 @@ async function hydrateFromBackend(chatData) {
     if (_state.scenario && _state.scenario.image && !_state.scenario._resolvedImage) {
         _state.scenario._resolvedImage = await _resolveImage(_state.scenario.image, 'scenario');
     }
-    // Resolve multi-image arrays after enrichment restored them from localStorage
     if (_state.world && _state.world.images && Array.isArray(_state.world.images)) {
         _state.world.images = await _resolveImages(_state.world.images, 'world');
     }
@@ -201,8 +263,6 @@ async function hydrateFromBackend(chatData) {
         if (c.image && !c._resolvedImage) {
             c._resolvedImage = await _resolveImage(c.image, 'character');
         }
-        // CharacterStorage stores full image blobs in a separate IndexedDB.
-        // If the backend/localStorage only has stripped refs, load the real images.
         if (!c._resolvedImage && c.id && window.CharacterStorage) {
             try {
                 const images = await window.CharacterStorage.loadImages(c.id);
@@ -213,7 +273,6 @@ async function hydrateFromBackend(chatData) {
                 }
             } catch (_) {}
         }
-        // Also try howl.images if present (may have base64 data directly)
         if (!c._resolvedImage && c.howl?.images?.length > 0) {
             const thumb = c.howl.images.find(img => img.isThumbnail) || c.howl.images[0];
             if (thumb && thumb.data) {
@@ -226,13 +285,18 @@ async function hydrateFromBackend(chatData) {
     _pushToContextDisplay();
     _pushToSidebarState();
 
-    // Re-sync enriched world/scenario to Go backend so a.world/a.scenario are populated
-    // for buildPrompt and SaveChat (covers the refresh path where LoadChat wasn't called)
+    // Re-sync enriched world/scenario/characters to Go backend so a.world/a.scenario
+    // and a.characters are populated for buildPrompt and SaveChat.
     if (_state.world && window.go?.main?.App?.AddWorldToChat) {
         window.go.main.App.AddWorldToChat(_state.world).catch(() => {});
     }
     if (_state.scenario && window.go?.main?.App?.AddScenarioToChat) {
         window.go.main.App.AddScenarioToChat(_state.scenario).catch(() => {});
+    }
+    if (_state.characters.length > 0 && window.go?.main?.App?.AddCharacterToChat) {
+        _state.characters.forEach(c => {
+            window.go.main.App.AddCharacterToChat(c).catch(() => {});
+        });
     }
 
     // Rebuild chat history DOM
@@ -299,70 +363,10 @@ async function applyScenarioChange(scenario) {
         scenario.images = await _resolveImages(scenario.images, 'scenario');
     }
 
-    // Auto-populate characters and lorebooks from scenario
-    if (scenario) {
-        const rawChars      = scenario.characters || scenario.Characters || [];
-        let   scenarioChars = rawChars.map(c => c.id ? c : Object.assign({}, c, { id: `sc-${(c.name || '').toLowerCase().replace(/\s+/g, '-')}-${scenario.id || ''}` }));
-        const scenarioBooks = scenario.lorebooks  || scenario.Lorebooks  || [];
-
-        console.log('[applyScenarioChange] scenario:', scenario.id, scenario.title || scenario.name);
-        console.log('[applyScenarioChange] rawChars count:', rawChars.length, 'scenarioBooks count:', scenarioBooks.length);
-
-        // Look up full character records from localStorage to get their individual lorebooks
-        let charLorebooks = [];
-        try {
-            const allChars = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
-            console.log('[applyScenarioChange] allChars count:', allChars.length);
-            charLorebooks = scenarioChars.flatMap(sc => {
-                const fullChar = allChars.find(c => c.id === sc.id || c.name === sc.name);
-                console.log('[applyScenarioChange] lookup char:', sc.id, sc.name, 'found:', !!fullChar);
-                if (fullChar) {
-                    const books = fullChar?.howl?.lorebooks || fullChar?.lorebooks || [];
-                    console.log('[applyScenarioChange] char lorebooks:', books.length, books.map(b => b.id || b.name));
-                    return books;
-                }
-                return [];
-            }).filter(Boolean);
-        } catch (e) { console.error('[applyScenarioChange] char lookup error:', e); }
-
-        console.log('[applyScenarioChange] charLorebooks total:', charLorebooks.length);
-
-        // Enrich lorebooks from localStorage so descriptions survive the backend round-trip
-        const enrichedScenarioBooks = _enrichLorebooksFromLocalStorage(scenarioBooks);
-        const enrichedCharBooks     = _enrichLorebooksFromLocalStorage(charLorebooks);
-
-        // Combine scenario-level lorebooks with character-level lorebooks
-        const allScenarioBooks = _dedupeById([...enrichedScenarioBooks, ...enrichedCharBooks]);
-        console.log('[applyScenarioChange] allScenarioBooks:', allScenarioBooks.length, allScenarioBooks.map(b => b.id || b.name));
-
-        // Never re-inject characters the user explicitly removed from this chat
-        const removedSet = new Set(_state.removedCharacterIds || []);
-        scenarioChars    = scenarioChars.filter(c => !removedSet.has(c.id));
-
-        // Merge with existing, deduplicate by id
-        const mergedChars = _dedupeById([..._state.characters, ...scenarioChars]);
-        const mergedBooks = _dedupeById([..._state.lorebooks,  ...allScenarioBooks]);
-
-        // If hot-swapping, remove chars that were ONLY from the previous scenario
-        if (prev) {
-            const prevCharIds = new Set((prev.characters || []).map(c => c.id));
-            const newCharIds  = new Set(scenarioChars.map(c => c.id));
-            _state.characters = mergedChars.filter(c => !prevCharIds.has(c.id) || newCharIds.has(c.id));
-
-            const prevBookIds = new Set((prev.lorebooks || []).map(l => l.id));
-            const newBookIds  = new Set(allScenarioBooks.map(l => l.id));
-            _state.lorebooks  = mergedBooks.filter(l => !prevBookIds.has(l.id) || newBookIds.has(l.id));
-        } else {
-            _state.characters = mergedChars;
-            _state.lorebooks  = mergedBooks;
-        }
-
-        console.log('[applyScenarioChange] final _state.lorebooks:', _state.lorebooks.length, _state.lorebooks.map(b => b.id || b.name));
-
-        // Fire lorebook system event if characters changed
-        if (prev && prev.id !== scenario.id) {
-            _emitScenarioSwapEvent(prev, scenario);
-        }
+    // Scenarios are metadata only — they NEVER override chat state.
+    // Characters and lorebooks remain exactly as the chat defines them.
+    if (prev && scenario && prev.id !== scenario.id) {
+        _emitScenarioSwapEvent(prev, scenario);
     }
 
     _push(); await refreshAllPanels();
@@ -370,9 +374,21 @@ async function applyScenarioChange(scenario) {
 }
 
 async function applyCharacterAdd(character) {
+    console.log('[TRACE:applyCharacterAdd] id:', character?.id, 'name:', character?.name, 'existing:', _state.characters.some(c => c.id === character?.id));
     if (!character || _state.characters.some(c => c.id === character.id)) return;
-    // Do not add back a character the user explicitly removed
-    if ((_state.removedCharacterIds || []).includes(character.id)) return;
+
+    // Update tracking arrays:
+    // If the character was previously removed, clear the removal.
+    // Otherwise, if it's not in the active base list, mark it as added.
+    const wasRemoved = (_state.removedCharacterIds || []).includes(character.id);
+    if (wasRemoved) {
+        _state.removedCharacterIds = _state.removedCharacterIds.filter(id => id !== character.id);
+    } else if (!(_state.activeCharacterIds || []).includes(character.id)) {
+        if (!_state.addedCharacterIds.includes(character.id)) {
+            _state.addedCharacterIds.push(character.id);
+        }
+    }
+
     _state.characters.push(character);
     _push(); await refreshAllPanels();
     if (window.go?.main?.App?.AddCharacterToChat) {
@@ -381,24 +397,104 @@ async function applyCharacterAdd(character) {
 }
 
 async function applyCharacterRemove(characterId) {
-    console.log('[applyCharacterRemove] called for:', characterId);
-    console.log('[applyCharacterRemove] _state before:', { world: !!_state.world, scenario: !!_state.scenario, characters: (_state.characters || []).length, lorebooks: (_state.lorebooks || []).length });
+    console.log('[TRACE:applyCharacterRemove] id:', characterId, 'beforeCount:', _state.characters.length);
+
     _state.characters = _state.characters.filter(c => c.id !== characterId);
-    if (!_state.removedCharacterIds.includes(characterId)) {
-        _state.removedCharacterIds.push(characterId);
+
+    // Update tracking arrays:
+    // If the character was in the active base list, mark it as removed.
+    // If it was in the added list, remove it from there.
+    if ((_state.activeCharacterIds || []).includes(characterId)) {
+        if (!_state.removedCharacterIds.includes(characterId)) {
+            _state.removedCharacterIds.push(characterId);
+        }
     }
-    console.log('[applyCharacterRemove] _state after filter:', { world: !!_state.world, scenario: !!_state.scenario, characters: (_state.characters || []).length, lorebooks: (_state.lorebooks || []).length });
+    _state.addedCharacterIds = (_state.addedCharacterIds || []).filter(id => id !== characterId);
+
     _push(); await refreshAllPanels();
-    // Persist removal list so ghosts stay dead after reload
+
+    // Sync removal to backend so a.characters stays clean
+    if (window.go?.main?.App?.RemoveCharacterFromChat) {
+        window.go.main.App.RemoveCharacterFromChat(characterId).catch(() => {});
+    }
     if (typeof saveChatData === 'function') saveChatData();
-    console.log('[applyCharacterRemove] completed');
+}
+
+/**
+ * Batch update characters: remove a set of IDs, then add a set of characters.
+ * Only refreshes panels once and syncs to backend once — eliminates flicker.
+ */
+async function applyCharacterBatchUpdate(removeIds, addCharacters) {
+    const removeSet = new Set(removeIds || []);
+    const addMap    = new Map((addCharacters || []).map(c => [c.id, c]));
+
+    // Apply all state mutations first
+    _state.characters = _state.characters.filter(c => !removeSet.has(c.id) && !addMap.has(c.id));
+    for (const c of addMap.values()) {
+        _state.characters.push(c);
+    }
+
+    // Update tracking arrays
+    for (const id of removeSet) {
+        if ((_state.activeCharacterIds || []).includes(id)) {
+            if (!_state.removedCharacterIds.includes(id)) _state.removedCharacterIds.push(id);
+        }
+        _state.addedCharacterIds = (_state.addedCharacterIds || []).filter(aid => aid !== id);
+    }
+    for (const c of addMap.values()) {
+        const wasRemoved = (_state.removedCharacterIds || []).includes(c.id);
+        if (wasRemoved) {
+            _state.removedCharacterIds = _state.removedCharacterIds.filter(id => id !== c.id);
+        } else if (!(_state.activeCharacterIds || []).includes(c.id)) {
+            if (!_state.addedCharacterIds.includes(c.id)) _state.addedCharacterIds.push(c.id);
+        }
+    }
+
+    console.log('[TRACE:applyCharacterBatchUpdate] removed:', removeIds?.length || 0, 'added:', addCharacters?.length || 0, 'final:', _state.characters.length);
+    _push(); await refreshAllPanels();
+
+    // Single backend sync: reset then add all final characters
+    if (window.go?.main?.App?.ResetSessionCharacters) {
+        await window.go.main.App.ResetSessionCharacters().catch(() => {});
+    }
+    if (window.go?.main?.App?.AddCharacterToChat) {
+        for (const c of _state.characters) {
+            await window.go.main.App.AddCharacterToChat(c).catch(() => {});
+        }
+    }
+    if (typeof saveChatData === 'function') saveChatData();
+}
+
+function setLorebooks(lorebooks) {
+    _state.lorebooks = lorebooks || [];
+    _push();
+    console.log('[TRACE:setLorebooks] count:', _state.lorebooks.length);
 }
 
 async function applyLorebookToggle(lorebook) {
     if (!lorebook) return;
     const idx = _state.lorebooks.findIndex(l => l.id === lorebook.id);
-    if (idx === -1) { _state.lorebooks.push(lorebook); }
-    else            { _state.lorebooks.splice(idx, 1); }
+    if (idx === -1) {
+        // Adding a lorebook
+        _state.lorebooks.push(lorebook);
+        const wasRemoved = (_state.removedLorebookIds || []).includes(lorebook.id);
+        if (wasRemoved) {
+            _state.removedLorebookIds = _state.removedLorebookIds.filter(id => id !== lorebook.id);
+        } else if (!(_state.activeLorebookIds || []).includes(lorebook.id)) {
+            if (!_state.addedLorebookIds.includes(lorebook.id)) {
+                _state.addedLorebookIds.push(lorebook.id);
+            }
+        }
+    } else {
+        // Removing a lorebook
+        _state.lorebooks.splice(idx, 1);
+        if ((_state.activeLorebookIds || []).includes(lorebook.id)) {
+            if (!_state.removedLorebookIds.includes(lorebook.id)) {
+                _state.removedLorebookIds.push(lorebook.id);
+            }
+        }
+        _state.addedLorebookIds = (_state.addedLorebookIds || []).filter(id => id !== lorebook.id);
+    }
     _push(); await refreshAllPanels();
 }
 
@@ -411,7 +507,12 @@ function collectForSave() {
     const history = msgs ? Array.from(msgs.querySelectorAll('.chat-message')).map((el, i) => {
         const sender = el.querySelector('.chat-sender')?.textContent?.trim() || '';
         const text   = el.querySelector('.chat-text')?.textContent?.trim()   || '';
-        const role   = sender.toLowerCase().includes('user') ? 'user' : 'assistant';
+        // Role comes from the CSS class, never from the sender label. Inferring it
+        // from text labeled every player message "assistant" because the default
+        // display name is "You", which does not contain the word "user".
+        const role   = el.classList.contains('user')      ? 'user'
+                     : el.classList.contains('assistant') ? 'assistant'
+                     : 'system';
         return { id: i.toString(), sender, text, role, timestamp: new Date().toISOString() };
     }) : [];
 
@@ -424,7 +525,16 @@ function collectForSave() {
             scenarioName:   _state.scenario?.title || _state.scenario?.name || '',
             characterNames: _state.characters.map(c => c.name || '').filter(Boolean),
             lorebookNames:  _state.lorebooks.map(l => l.name || l.title || '').filter(Boolean),
-            messageCount:   history.length
+            messageCount:   history.length,
+            // Source-of-truth tracking arrays
+            worldId:           _state.world?.id    || _state.world?.ID    || '',
+            scenarioId:        _state.scenario?.id || _state.scenario?.ID || '',
+            activeCharacters:  _state.activeCharacterIds  || [],
+            removedCharacters: _state.removedCharacterIds || [],
+            addedCharacters:   _state.addedCharacterIds   || [],
+            activeLorebooks:   _state.activeLorebookIds   || [],
+            removedLorebooks:  _state.removedLorebookIds  || [],
+            addedLorebooks:    _state.addedLorebookIds    || []
         },
         history,
         world:      _state.world,
@@ -467,7 +577,13 @@ function _pushToSidebarState() {
         lorebooks:           _state.lorebooks,
         sessionId:           _state.sessionId,
         chatName:            _state.chatName,
-        removedCharacterIds: _state.removedCharacterIds
+        // Tracking arrays — chat is the sole source of truth
+        activeCharacterIds:  _state.activeCharacterIds,
+        removedCharacterIds: _state.removedCharacterIds,
+        addedCharacterIds:   _state.addedCharacterIds,
+        activeLorebookIds:   _state.activeLorebookIds,
+        removedLorebookIds:  _state.removedLorebookIds,
+        addedLorebookIds:    _state.addedLorebookIds
     };
 }
 
@@ -480,7 +596,13 @@ function _pushToContextDisplay() {
         lorebooks:           _state.lorebooks,
         sessionId:           _state.sessionId,
         chatName:            _state.chatName,
-        removedCharacterIds: _state.removedCharacterIds
+        // Tracking arrays — chat is the sole source of truth
+        activeCharacterIds:  _state.activeCharacterIds,
+        removedCharacterIds: _state.removedCharacterIds,
+        addedCharacterIds:   _state.addedCharacterIds,
+        activeLorebookIds:   _state.activeLorebookIds,
+        removedLorebookIds:  _state.removedLorebookIds,
+        addedLorebookIds:    _state.addedLorebookIds
     };
     console.log('[_pushToContextDisplay] lorebooks pushed:', (_state.lorebooks || []).length);
 }
@@ -628,6 +750,8 @@ window.chatBridge = {
     applyScenarioChange,
     applyCharacterAdd,
     applyCharacterRemove,
+    applyCharacterBatchUpdate,
+    setLorebooks,
     applyLorebookToggle,
     collectForSave,
     refreshAllPanels,

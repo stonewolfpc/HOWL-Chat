@@ -13,30 +13,29 @@
 
 function toggleColorblindMode() {
     document.body.classList.toggle('colorblind-mode');
-    showNotification(`Colorblind mode ${document.body.classList.contains('colorblind-mode') ? 'enabled' : 'disabled'}`, 'success');
+    const enabled = document.body.classList.contains('colorblind-mode');
+    if (window.settingsState?.set) {
+        window.settingsState.set('accessibility.colorblindMode', enabled);
+    }
+    showNotification(`Colorblind mode ${enabled ? 'enabled' : 'disabled'}`, 'success');
 }
 
 function toggleHighContrastMode() {
     document.body.classList.toggle('high-contrast-mode');
-    showNotification(`High contrast mode ${document.body.classList.contains('high-contrast-mode') ? 'enabled' : 'disabled'}`, 'success');
-}
-
-function setTheme(theme) {
-    document.body.className = document.body.className.replace(/theme-\w+/g, '');
-    let effective = theme;
-    if (theme === 'system') {
-        effective = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    const enabled = document.body.classList.contains('high-contrast-mode');
+    if (window.settingsState?.set) {
+        window.settingsState.set('accessibility.highContrastMode', enabled);
     }
-    document.body.classList.add(`theme-${effective}`);
-    localStorage.setItem('howl-chat-theme', theme);
-    showNotification(`${effective.charAt(0).toUpperCase() + effective.slice(1)} theme applied`, 'success');
+    showNotification(`High contrast mode ${enabled ? 'enabled' : 'disabled'}`, 'success');
 }
 
 function increaseUIScale() {
     const cur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale') || '1.0');
     const val = Math.min(cur + 0.1, 2.0);
     document.documentElement.style.setProperty('--ui-scale', val.toString());
-    localStorage.setItem('howl-chat-ui-scale', val.toString());
+    if (window.settingsState?.set) {
+        window.settingsState.set('general.uiScale', val);
+    }
     showNotification(`UI scale increased to ${(val * 100).toFixed(0)}%`, 'success');
 }
 
@@ -44,29 +43,54 @@ function decreaseUIScale() {
     const cur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale') || '1.0');
     const val = Math.max(cur - 0.1, 0.5);
     document.documentElement.style.setProperty('--ui-scale', val.toString());
-    localStorage.setItem('howl-chat-ui-scale', val.toString());
+    if (window.settingsState?.set) {
+        window.settingsState.set('general.uiScale', val);
+    }
     showNotification(`UI scale decreased to ${(val * 100).toFixed(0)}%`, 'success');
 }
 
 function resetUIScale() {
     document.documentElement.style.setProperty('--ui-scale', '1.0');
-    localStorage.setItem('howl-chat-ui-scale', '1.0');
+    if (window.settingsState?.set) {
+        window.settingsState.set('general.uiScale', 1.0);
+    }
     showNotification('UI scale reset to 100%', 'success');
 }
 
 function toggleSidebar() {
     const el = document.querySelector('.nav-sidebar');
-    if (el) { el.classList.toggle('hidden'); showNotification(`Sidebar ${el.classList.contains('hidden') ? 'hidden' : 'shown'}`, 'success'); }
+    if (el) {
+        el.classList.toggle('hidden');
+        const hidden = el.classList.contains('hidden');
+        if (window.settingsState?.set) {
+            window.settingsState.set('ui.sidebarHidden', hidden);
+        }
+        showNotification(`Sidebar ${hidden ? 'hidden' : 'shown'}`, 'success');
+    }
 }
 
 function toggleCharacterPanel() {
     const el = document.querySelector('.character-sidebar');
-    if (el) { el.classList.toggle('hidden'); showNotification(`Character panel ${el.classList.contains('hidden') ? 'hidden' : 'shown'}`, 'success'); }
+    if (el) {
+        el.classList.toggle('hidden');
+        const hidden = el.classList.contains('hidden');
+        if (window.settingsState?.set) {
+            window.settingsState.set('ui.characterPanelHidden', hidden);
+        }
+        showNotification(`Character panel ${hidden ? 'hidden' : 'shown'}`, 'success');
+    }
 }
 
 function toggleWorldPanel() {
     const el = document.querySelector('.world-sidebar');
-    if (el) { el.classList.toggle('hidden'); showNotification(`World panel ${el.classList.contains('hidden') ? 'hidden' : 'shown'}`, 'success'); }
+    if (el) {
+        el.classList.toggle('hidden');
+        const hidden = el.classList.contains('hidden');
+        if (window.settingsState?.set) {
+            window.settingsState.set('ui.worldPanelHidden', hidden);
+        }
+        showNotification(`World panel ${hidden ? 'hidden' : 'shown'}`, 'success');
+    }
 }
 
 function toggleFullscreen() {
@@ -86,20 +110,32 @@ function toggleFullscreen() {
 // ---------------------------------------------------------------------------
 
 document.addEventListener('DOMContentLoaded', function () {
-    const settingsTheme = window.settingsState?.current?.general?.theme;
-    const theme = settingsTheme || localStorage.getItem('howl-chat-theme') || 'dark';
-    setTheme(theme);
+    const s = window.settingsState?.current;
 
-    const savedScale = localStorage.getItem('howl-chat-ui-scale');
+    // Theme is restored by theme.js - single owner. It used to be duplicated
+    // here with a third storage key ('howl-chat-theme') and a hardcoded 'dark'
+    // default, so on any page that does not load settings-state.js it overrode
+    // the restored mode and wrote 'dark' back to the mirror.
+
+    // UI Scale
+    const savedScale = s?.general?.uiScale || localStorage.getItem('howl-chat-ui-scale');
     if (savedScale) document.documentElement.style.setProperty('--ui-scale', savedScale);
 
-    const savedAnimSpeed = localStorage.getItem('howl-chat-animation-speed');
+    // Animation Speed
+    const savedAnimSpeed = s?.general?.animationSpeed || localStorage.getItem('howl-chat-animation-speed');
     if (savedAnimSpeed) document.documentElement.style.setProperty('--animation-speed', savedAnimSpeed);
 
-    if (theme === 'system') {
-        window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', e => {
-            document.body.className = document.body.className.replace(/theme-\w+/g, '');
-            document.body.classList.add(e.matches ? 'theme-light' : 'theme-dark');
-        });
-    }
+    // Accessibility modes
+    if (s?.accessibility?.colorblindMode) document.body.classList.add('colorblind-mode');
+    if (s?.accessibility?.highContrastMode) document.body.classList.add('high-contrast-mode');
+
+    // Panel visibility
+    const sidebar = document.querySelector('.nav-sidebar');
+    if (sidebar && s?.ui?.sidebarHidden) sidebar.classList.add('hidden');
+
+    const charPanel = document.querySelector('.character-sidebar');
+    if (charPanel && s?.ui?.characterPanelHidden) charPanel.classList.add('hidden');
+
+    const worldPanel = document.querySelector('.world-sidebar');
+    if (worldPanel && s?.ui?.worldPanelHidden) worldPanel.classList.add('hidden');
 });

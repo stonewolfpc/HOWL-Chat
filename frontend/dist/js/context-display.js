@@ -32,9 +32,13 @@ Object.defineProperty(window, 'currentChatData', {
     set(value) { contextDisplay.currentChatData = value; }
 });
 
-window.resetToDefaultState  = () => contextDisplay.resetToDefaultState();
 window.updateContextDisplay = () => contextDisplay.updateContextDisplay();
 window.updateCharacterPanel = () => contextDisplay.updateCharacterPanel();
+// World and scenario panel rendering is owned by sidebar-context-world.js and
+// sidebar-context-scenario.js: they write the description elements as well, and
+// they load after this file. Publishing a second global here only meant those
+// two modules silently replaced it a few hundred lines later.
+window.updateLorebookDisplay = () => contextDisplay.updateLorebookDisplay();
 
 // ---------------------------------------------------------------------------
 // Init

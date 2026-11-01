@@ -3,7 +3,6 @@ module howl-chat
 go 1.23.8
 
 require (
-	github.com/dianlight/gollama.cpp v0.0.0-00010101000000-000000000000
 	github.com/disintegration/imaging v1.6.2
 	github.com/gpustack/gguf-parser-go v0.24.0
 	github.com/shirou/gopsutil/v3 v3.24.5
@@ -12,22 +11,16 @@ require (
 	golang.org/x/sys v0.33.0
 )
 
-replace github.com/dianlight/gollama.cpp => ./gollama.cpp
-
 require (
 	git.sr.ht/~jackmordaunt/go-toast/v2 v2.0.3 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
-	github.com/ebitengine/purego v0.9.1 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
-	github.com/google/go-github/v68 v68.0.0 // indirect
-	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/henvic/httpretty v0.1.4 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/jupiterrider/ffi v0.5.1 // indirect
 	github.com/labstack/echo/v4 v4.13.3 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/leaanthony/go-ansi-parser v1.6.1 // indirect

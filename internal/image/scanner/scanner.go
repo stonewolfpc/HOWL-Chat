@@ -1,7 +1,9 @@
 package scanner
 
 import (
+	"encoding/binary"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -12,6 +14,7 @@ import (
 type Scanner struct {
 	modelsDir string
 	store     *IndexStore
+	known     KnownFunc
 }
 
 // New creates a Scanner for the given models directory.
@@ -19,6 +22,42 @@ func New(modelsDir string) *Scanner {
 	return &Scanner{
 		modelsDir: modelsDir,
 		store:     NewIndexStore(modelsDir),
+	}
+}
+
+// KnownEntry is a previously recorded asset handed back to the scanner when the
+// file on disk is unchanged, so it never has to be re-read or re-classified.
+type KnownEntry struct {
+	Path        string
+	Type        AssetType
+	Family      ModelFamily
+	Format      string
+	SizeMB      float64
+	Files       map[string]string
+	Recommended Recommended
+	FileSize    int64
+	ModTimeNS   int64
+}
+
+// KnownFunc looks up a recorded asset by absolute path.
+type KnownFunc func(path string) (KnownEntry, bool)
+
+// SetKnown installs the lookup used to skip unchanged files during a scan.
+func (s *Scanner) SetKnown(f KnownFunc) { s.known = f }
+
+func (k KnownEntry) toAssetEntry() AssetEntry {
+	name := strings.TrimSuffix(filepath.Base(k.Path), filepath.Ext(k.Path))
+	return AssetEntry{
+		Name:        name,
+		Path:        k.Path,
+		Type:        k.Type,
+		Family:      k.Family,
+		Format:      k.Format,
+		SizeMB:      k.SizeMB,
+		Files:       k.Files,
+		Recommended: k.Recommended,
+		FileSize:    k.FileSize,
+		ModTimeNS:   k.ModTimeNS,
 	}
 }
 
@@ -72,6 +111,17 @@ func (s *Scanner) Scan() (ModelIndex, error) {
 			return nil
 		}
 
+		// Unchanged files are never re-classified: a recorded entry whose size
+		// and mtime still match this file is reused as-is.
+		if s.known != nil {
+			if fi, statErr := d.Info(); statErr == nil && fi.Size() > 0 {
+				if k, ok := s.known(path); ok && k.FileSize == fi.Size() && k.ModTimeNS == fi.ModTime().UnixNano() {
+					appendEntry(&idx, k.toAssetEntry())
+					return nil
+				}
+			}
+		}
+
 		entry := s.scanFile(path, d)
 		if entry != nil {
 			appendEntry(&idx, *entry)
@@ -83,8 +133,8 @@ func (s *Scanner) Scan() (ModelIndex, error) {
 	}
 
 	_ = s.store.Save(idx)
-	fmt.Printf("[Scanner] Scan complete: %d models, %d VAEs, %d LoRAs, %d ControlNets, %d embeddings\n",
-		len(idx.Models), len(idx.VAEs), len(idx.LoRAs), len(idx.ControlNets), len(idx.Embeddings))
+	fmt.Printf("[Scanner] Scan complete: %d models, %d VAEs, %d LoRAs, %d ControlNets, %d embeddings, %d LLMs\n",
+		len(idx.Models), len(idx.VAEs), len(idx.LoRAs), len(idx.ControlNets), len(idx.Embeddings), len(idx.LLMs))
 	return idx, nil
 }
 
@@ -103,6 +153,20 @@ func (s *Scanner) LoadIndex() (ModelIndex, error) {
 
 // ---- file classification ---------------------------------------------------
 
+// largeCheckpointMB is the size above which an unnamed single-file checkpoint is
+// SDXL-class. SD1.5 checkpoints stay under ~4 GB even in fp32.
+const largeCheckpointMB = 5000.0
+
+// upgradeLargeCheckpoint promotes a name-less SD1.5 classification to SDXL for
+// SDXL-scale weights. Without it a 6.6 GB SDXL merge is labelled SD1.5, which
+// picks a 512x512 default and the wrong sampler.
+func upgradeLargeCheckpoint(family ModelFamily, sizeMB float64) ModelFamily {
+	if family == FamilySD15 && sizeMB >= largeCheckpointMB {
+		return FamilySDXL
+	}
+	return family
+}
+
 func (s *Scanner) scanFile(path string, d os.DirEntry) *AssetEntry {
 	info, err := d.Info()
 	if err != nil {
@@ -111,13 +175,21 @@ func (s *Scanner) scanFile(path string, d os.DirEntry) *AssetEntry {
 	sizeMB := float64(info.Size()) / (1024 * 1024)
 	name := d.Name()
 	stem := strings.TrimSuffix(name, filepath.Ext(name))
-
-	// Reuse existing manifest if present
-	if m := LoadManifest(path); m != nil {
-		return manifestToEntry(m, path)
+	nameType := ClassifyName(name)
+	if nameType == AssetUnknown {
+		nameType = ClassifySafetensorsHeader(path)
 	}
 
-	nameType := ClassifyName(name)
+	// Reuse the sidecar only while it still describes this exact file. A model
+	// replaced under the same name has a new size or mtime, so its stale
+	// classification is discarded instead of being shown as truth.
+	if m := LoadManifest(path); m != nil {
+		fresh := m.FileSize == info.Size() && m.ModTimeNS == info.ModTime().UnixNano() && m.FileSize != 0
+		if fresh && (nameType == AssetUnknown || m.Type == nameType) {
+			return manifestToEntry(m, path)
+		}
+	}
+
 	assetType := ClassifySize(nameType, sizeMB)
 
 	var family ModelFamily
@@ -127,6 +199,7 @@ func (s *Scanner) scanFile(path string, d os.DirEntry) *AssetEntry {
 		if family == FamilyUnknown {
 			return nil // not a diffusion model we can handle
 		}
+		family = upgradeLargeCheckpoint(family, sizeMB)
 	case AssetLoRA, AssetControlNet, AssetVAE:
 		family = GuessFamily(stem) // best-effort; FamilyUnknown is acceptable
 	default:
@@ -140,11 +213,50 @@ func (s *Scanner) scanFile(path string, d os.DirEntry) *AssetEntry {
 		Family:      family,
 		Format:      strings.TrimPrefix(strings.ToLower(filepath.Ext(name)), "."),
 		SizeMB:      sizeMB,
+		FileSize:    info.Size(),
+		ModTimeNS:   info.ModTime().UnixNano(),
 		Files:       map[string]string{"model": path},
 		Recommended: rec,
 	}
 	_ = SaveManifest(path, m)
 	return manifestToEntry(m, path)
+}
+
+// ClassifySafetensorsHeader catches large LoRAs and companion files whose
+// filenames are ambiguous enough for size-based classification to get wrong.
+func ClassifySafetensorsHeader(path string) AssetType {
+	if strings.ToLower(filepath.Ext(path)) != ".safetensors" {
+		return AssetUnknown
+	}
+	f, err := os.Open(path)
+	if err != nil {
+		return AssetUnknown
+	}
+	defer f.Close()
+
+	var headerLen uint64
+	if err := binary.Read(f, binary.LittleEndian, &headerLen); err != nil {
+		return AssetUnknown
+	}
+	if headerLen == 0 {
+		return AssetUnknown
+	}
+	if headerLen > 1<<20 {
+		headerLen = 1 << 20
+	}
+	data := make([]byte, headerLen)
+	if _, err := io.ReadFull(f, data); err != nil {
+		return AssetUnknown
+	}
+	header := strings.ToLower(string(data))
+	switch {
+	case strings.Contains(header, "lora_unet") || strings.Contains(header, "lora_te") || strings.Contains(header, "lycoris"):
+		return AssetLoRA
+	case strings.Contains(header, "first_stage_model.decoder") && !strings.Contains(header, "model.diffusion_model"):
+		return AssetVAE
+	default:
+		return AssetUnknown
+	}
 }
 
 // ---- directory bundle classification ---------------------------------------
@@ -166,6 +278,9 @@ func (s *Scanner) scanDirBundle(dir string) (AssetEntry, bool) {
 	fileMap := make(map[string]string)
 	var totalMB float64
 
+	// A bundle's model slot must hold the checkpoint itself: sidecars such as
+	// TAESD decoders sort earlier alphabetically and would otherwise take it.
+	var modelSize int64
 	for _, f := range files {
 		if f.IsDir() || !IsModelFile(f.Name()) {
 			continue
@@ -178,40 +293,85 @@ func (s *Scanner) scanDirBundle(dir string) (AssetEntry, bool) {
 		fp := filepath.Join(dir, f.Name())
 		lower := strings.ToLower(f.Name())
 
-		switch {
-		case strings.HasPrefix(lower, "diffusion_model"), strings.HasPrefix(lower, "model") && strings.Contains(lower, "diffusion"):
-			fileMap["diffusion_model"] = fp
-		case strings.HasPrefix(lower, "clip_l"), strings.HasPrefix(lower, "clip.l"):
-			fileMap["clip_l"] = fp
-		case strings.HasPrefix(lower, "clip_g"), strings.HasPrefix(lower, "clip.g"):
-			fileMap["clip_g"] = fp
-		case strings.HasPrefix(lower, "t5xxl"), strings.HasPrefix(lower, "t5-xxl"), strings.HasPrefix(lower, "t5_xxl"):
-			fileMap["t5xxl"] = fp
-		case strings.HasPrefix(lower, "vae"):
+		// Classify by content-independent name rules so bundled video packs
+		// (umt5-*-encoder, wan_*_vae, *-T2V-*.gguf) land in the right slot.
+		switch ClassifyName(f.Name()) {
+		case AssetVAE:
 			fileMap["vae"] = fp
-		default:
-			if _, exists := fileMap["model"]; !exists {
+		case AssetT5XXL:
+			fileMap["t5xxl"] = fp
+		case AssetClipL:
+			fileMap["clip_l"] = fp
+		case AssetClipG:
+			fileMap["clip_g"] = fp
+		case AssetLLM:
+			fileMap["llm"] = fp
+		case AssetControlNet:
+			fileMap["control_net"] = fp
+		case AssetLoRA:
+			// LoRAs are indexed on their own, never as bundle components.
+		case AssetDiffusion:
+			if _, exists := fileMap["model"]; !exists || info.Size() > modelSize {
 				fileMap["model"] = fp
+				modelSize = info.Size()
+			}
+		default:
+			switch {
+			case strings.Contains(lower, "taesd"):
+				// TAESD/TAESDXL decoders drive step previews, never the model slot.
+				fileMap["taesd"] = fp
+			case strings.HasPrefix(lower, "diffusion_model"),
+				strings.HasPrefix(lower, "model") && strings.Contains(lower, "diffusion"):
+				fileMap["diffusion_model"] = fp
+			default:
+				if _, exists := fileMap["model"]; !exists || info.Size() > modelSize {
+					fileMap["model"] = fp
+					modelSize = info.Size()
+				}
 			}
 		}
+
 	}
 
 	if len(fileMap) == 0 {
 		return AssetEntry{}, false
 	}
 
-	// Determine family from presence of component files
-	var family ModelFamily
+	// Determine family from the component files, then the model filename.
 	dirName := filepath.Base(dir)
+	modelBase := dirName
+	if p := fileMap["model"]; p != "" {
+		modelBase = strings.TrimSuffix(filepath.Base(p), filepath.Ext(p))
+	}
+	guessed := GuessFamily(modelBase)
+	var family ModelFamily
 	switch {
-	case hasKey(fileMap, "diffusion_model") && hasKey(fileMap, "t5xxl"):
-		family = FamilyFlux
 	case hasKey(fileMap, "clip_g") && !hasKey(fileMap, "t5xxl"):
 		family = FamilySDXL
+	case guessed == FamilyWan || guessed == FamilyLTX || guessed == FamilyHunyuan || guessed == FamilyAnimate:
+		family = guessed
+	case hasKey(fileMap, "diffusion_model") && hasKey(fileMap, "t5xxl"):
+		family = FamilyFlux
+	case guessed != FamilyUnknown:
+		family = guessed
 	default:
-		family = GuessFamily(dirName)
-		if family == FamilyUnknown {
-			family = FamilySD15
+		family = FamilySD15
+	}
+
+	// Same rule as single-file checkpoints: a multi-GB bundle whose model name
+	// carries no architecture hint is SDXL, not SD1.5.
+	if modelPath := fileMap["model"]; modelPath != "" {
+		if fi, err := os.Stat(modelPath); err == nil {
+			family = upgradeLargeCheckpoint(family, float64(fi.Size())/(1024*1024))
+		}
+	}
+
+	// A bundle is just a directory, so a Flux VAE sitting beside an SDXL
+	// checkpoint would otherwise be attached to it and render garbage.
+	if vaePath := fileMap["vae"]; vaePath != "" {
+		vaeFamily := GuessFamily(strings.TrimSuffix(filepath.Base(vaePath), filepath.Ext(vaePath)))
+		if !CompatibleVAE(family, vaeFamily) {
+			delete(fileMap, "vae")
 		}
 	}
 
@@ -249,6 +409,14 @@ func appendEntry(idx *ModelIndex, e AssetEntry) {
 		idx.Embeddings = append(idx.Embeddings, e)
 	case AssetUpscaler:
 		idx.Upscalers = append(idx.Upscalers, e)
+	case AssetT5XXL:
+		idx.T5XXLs = append(idx.T5XXLs, e)
+	case AssetClipL:
+		idx.ClipLs = append(idx.ClipLs, e)
+	case AssetClipG:
+		idx.ClipGs = append(idx.ClipGs, e)
+	case AssetLLM:
+		idx.LLMs = append(idx.LLMs, e)
 	}
 }
 
@@ -263,6 +431,8 @@ func manifestToEntry(m *Manifest, path string) *AssetEntry {
 		Family:      m.Family,
 		Format:      m.Format,
 		SizeMB:      m.SizeMB,
+		FileSize:    m.FileSize,
+		ModTimeNS:   m.ModTimeNS,
 		Files:       m.Files,
 		Recommended: m.Recommended,
 	}

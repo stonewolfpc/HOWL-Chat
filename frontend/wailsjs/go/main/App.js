@@ -94,6 +94,14 @@ export function ExportMemories(arg1, arg2) {
   return window['go']['main']['App']['ExportMemories'](arg1, arg2);
 }
 
+export function ExtractImageMetadata(arg1) {
+  return window['go']['main']['App']['ExtractImageMetadata'](arg1);
+}
+
+export function ExtractImageMetadataFromBase64(arg1) {
+  return window['go']['main']['App']['ExtractImageMetadataFromBase64'](arg1);
+}
+
 export function GenerateCharacterResponse(arg1, arg2) {
   return window['go']['main']['App']['GenerateCharacterResponse'](arg1, arg2);
 }
@@ -206,6 +214,10 @@ export function GetModelsDir() {
   return window['go']['main']['App']['GetModelsDir']();
 }
 
+export function GetRegisteredLLMDirs() {
+  return window['go']['main']['App']['GetRegisteredLLMDirs']();
+}
+
 export function GetRegisteredModels() {
   return window['go']['main']['App']['GetRegisteredModels']();
 }
@@ -218,8 +230,16 @@ export function GetResourceSummary() {
   return window['go']['main']['App']['GetResourceSummary']();
 }
 
+export function GetSDServerVersion() {
+  return window['go']['main']['App']['GetSDServerVersion']();
+}
+
 export function GetSamplerSettings() {
   return window['go']['main']['App']['GetSamplerSettings']();
+}
+
+export function GetSettings() {
+  return window['go']['main']['App']['GetSettings']();
 }
 
 export function GetTTSAvailableVoices() {
@@ -316,6 +336,14 @@ export function RefreshResourceSnapshot() {
 
 export function RegisterLoadedModel(arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
   return window['go']['main']['App']['RegisterLoadedModel'](arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+}
+
+export function RemoveCharacterFromChat(arg1) {
+  return window['go']['main']['App']['RemoveCharacterFromChat'](arg1);
+}
+
+export function RemoveLLMModel(arg1) {
+  return window['go']['main']['App']['RemoveLLMModel'](arg1);
 }
 
 export function RequestAllocation(arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
@@ -422,6 +450,10 @@ export function SetSamplerSettings(arg1) {
   return window['go']['main']['App']['SetSamplerSettings'](arg1);
 }
 
+export function SetSettings(arg1) {
+  return window['go']['main']['App']['SetSettings'](arg1);
+}
+
 export function StartImageJob(arg1) {
   return window['go']['main']['App']['StartImageJob'](arg1);
 }
@@ -446,6 +478,10 @@ export function UnloadModel() {
   return window['go']['main']['App']['UnloadModel']();
 }
 
+export function UnregisterLLMDir(arg1) {
+  return window['go']['main']['App']['UnregisterLLMDir'](arg1);
+}
+
 export function UnregisterLoadedModel(arg1, arg2) {
   return window['go']['main']['App']['UnregisterLoadedModel'](arg1, arg2);
 }
@@ -468,4 +504,12 @@ export function UpdateRuntimeSettings(arg1) {
 
 export function UploadRAGDocument(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['main']['App']['UploadRAGDocument'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function WipeAllData() {
+  return window['go']['main']['App']['WipeAllData']();
+}
+
+export function UploadRAGDocumentText(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['main']['App']['UploadRAGDocumentText'](arg1, arg2, arg3, arg4, arg5);
 }

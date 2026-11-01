@@ -10,7 +10,7 @@
 
     .lorebook-editor-sidebar {
         border-right: 0;
-        border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+        border-bottom: 1px solid var(--border-primary);
     }
 
     .lorebook-grid-two,

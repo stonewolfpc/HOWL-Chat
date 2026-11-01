@@ -8,15 +8,28 @@ import (
 	"howl-chat/internal/audio/types"
 )
 
+// kokoroTestConfig builds a TTS config from the environment so the integration
+// tests run wherever the model set actually lives. Voices and config are
+// derived from the model directory by Initialize, and the cache goes to a temp
+// dir so a test run never writes into a real cache.
+func kokoroTestConfig(t *testing.T) types.TTSConfig {
+	t.Helper()
+	model := os.Getenv("HOWL_TTS_KOKORO_MODEL")
+	if model == "" {
+		t.Skip("set HOWL_TTS_KOKORO_MODEL (optionally HOWL_TTS_KOKORO_VOICES / HOWL_TTS_KOKORO_CONFIG) to run Kokoro integration tests")
+	}
+	return types.TTSConfig{
+		ModelPath:  model,
+		VoicesPath: os.Getenv("HOWL_TTS_KOKORO_VOICES"),
+		ConfigPath: os.Getenv("HOWL_TTS_KOKORO_CONFIG"),
+		CacheDir:   t.TempDir(),
+		ScriptPath: defaultKokoroScriptPath(),
+	}
+}
+
 func TestKokoroListVoices(t *testing.T) {
 	s := New()
-	cfg := types.TTSConfig{
-		ModelPath:  `D:\AI GGUF\TTS\kokoro-v1.0.onnx`,
-		VoicesPath: `D:\AI GGUF\TTS\voices-v1.0.bin`,
-		ConfigPath: `D:\AI GGUF\TTS\hf_cache\config.json`,
-		CacheDir:   `D:\AI GGUF\TTS\cache`,
-		ScriptPath: `D:\HOWL_Chat\scripts\kokoro-tts.py`,
-	}
+	cfg := kokoroTestConfig(t)
 	if err := s.Initialize(context.Background(), cfg); err != nil {
 		t.Skipf("Kokoro initialization skipped (model not available): %v", err)
 		return
@@ -32,13 +45,7 @@ func TestKokoroListVoices(t *testing.T) {
 
 func TestKokoroSynthesize(t *testing.T) {
 	s := New()
-	cfg := types.TTSConfig{
-		ModelPath:  `D:\AI GGUF\TTS\kokoro-v1.0.onnx`,
-		VoicesPath: `D:\AI GGUF\TTS\voices-v1.0.bin`,
-		ConfigPath: `D:\AI GGUF\TTS\hf_cache\config.json`,
-		CacheDir:   `D:\AI GGUF\TTS\cache`,
-		ScriptPath: `D:\HOWL_Chat\scripts\kokoro-tts.py`,
-	}
+	cfg := kokoroTestConfig(t)
 	if err := s.Initialize(context.Background(), cfg); err != nil {
 		t.Skipf("Kokoro initialization skipped: %v", err)
 		return

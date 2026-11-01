@@ -55,7 +55,7 @@ function renderReviewModal(candidates) {
 
     modal.innerHTML = `
         <div class="modal-container" style="
-            background: rgba(20,20,30,0.98); border-radius: 16px;
+            background: var(--shell-panel-bg); border-radius: 16px;
             width: min(800px, 95%); max-height: 85vh;
             display: flex; flex-direction: column;
             border: 1px solid rgba(255,255,255,0.12);
@@ -68,14 +68,14 @@ function renderReviewModal(candidates) {
                     <div style="font-size: 20px; font-weight: 700; color: #fff;">
                         Memory Review Queue
                     </div>
-                    <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 4px;">
+                    <div style="font-size: 13px; color: var(--surface-hover); margin-top: 4px;">
                         ${candidates.length} pending •
                         ${approved.length} approved •
                         ${rejected.length} rejected
                     </div>
                 </div>
                 <button onclick="closeReviewModal()" style="
-                    background: rgba(255,255,255,0.08); border: none; color: #fff;
+                    background: var(--surface-hover); border: none; color: #fff;
                     width: 36px; height: 36px; border-radius: 10px;
                     cursor: pointer; font-size: 18px;
                 ">✕</button>
@@ -98,7 +98,7 @@ function renderCandidateCard(candidate) {
 
     return `
         <div class="candidate-card" data-id="${candidate.id}" style="
-            background: rgba(255,255,255,0.04); border-radius: 12px;
+            background: var(--surface-hover); border-radius: 12px;
             padding: 16px; margin-bottom: 12px;
             border: 1px solid rgba(255,255,255,0.06);
         ">
@@ -119,7 +119,7 @@ function renderCandidateCard(candidate) {
                             text-transform: uppercase; font-weight: 600;
                         ">${candidate.event_type}</span>
                     </div>
-                    <div style="color: rgba(255,255,255,0.55); font-size: 13px; margin-bottom: 8px;">
+                    <div style="color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">
                         ${escapeHtml(candidate.summary)}
                     </div>
                     <div style="
@@ -128,14 +128,14 @@ function renderCandidateCard(candidate) {
                         color: rgba(255,255,255,0.5); margin-bottom: 10px;
                         max-height: 80px; overflow-y: auto;
                     ">
-                        <div style="color: rgba(255,255,255,0.35); margin-bottom: 4px; font-size: 11px;">Source:</div>
+                        <div style="color: var(--text-tertiary); margin-bottom: 4px; font-size: 11px;">Source:</div>
                         ${escapeHtml(candidate.source_message || candidate.content).substring(0, 200)}
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-                        <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden;">
+                        <div style="flex: 1; height: 4px; background: var(--surface-hover); border-radius: 2px; overflow: hidden;">
                             <div style="width: ${confidenceBar}%; height: 100%; background: ${confidenceBar >= 75 ? '#4ade80' : confidenceBar >= 50 ? '#fbbf24' : '#f87171'}; border-radius: 2px;"></div>
                         </div>
-                        <span style="font-size: 11px; color: rgba(255,255,255,0.4);">${confidenceBar}%</span>
+                        <span style="font-size: 11px; color: var(--surface-hover);">${confidenceBar}%</span>
                     </div>
                     <div style="display: flex; gap: 8px;">
                         <button onclick="MemoryCandidates.approve('${candidate.id}')" style="
@@ -157,9 +157,9 @@ function renderCandidateCard(candidate) {
 
 function renderEmptyQueue() {
     return `
-        <div style="text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.4);">
+        <div style="text-align: center; padding: 60px 20px; color: var(--surface-hover);">
             <div style="font-size: 48px; margin-bottom: 16px;">📝</div>
-            <div style="font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
+            <div style="font-size: 16px; font-weight: 600; color: var(--surface-hover); margin-bottom: 8px;">
                 No Pending Memories
             </div>
             <div style="font-size: 13px;">
@@ -366,13 +366,6 @@ function getEventIcon(eventType) {
         shared: '📤', promise: '🤞'
     };
     return icons[eventType] || '📌';
-}
-
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
 }
 
 // Auto-refresh badge on load

@@ -23,8 +23,8 @@
 
 /* Container */
 .tutorials-container {
-    background: rgba(21, 21, 31, 0.98);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-panel-bg);
+    border: 1px solid var(--border-primary);
     border-radius: 16px;
     width: 100%;
     max-width: 1200px;
@@ -46,15 +46,15 @@
     align-items: center;
     justify-content: space-between;
     padding: 14px 20px;
-    border-bottom: 1px solid rgba(100, 100, 100, 0.2);
-    background: rgba(10, 10, 15, 0.5);
+    border-bottom: 1px solid var(--border-primary);
+    background: var(--surface-tertiary);
     flex-shrink: 0;
 }
 
 .tutorials-title {
     font-size: 18px;
     font-weight: 600;
-    color: var(--static-text, #e0e0e0);
+    color: var(--static-text, var(--text-primary));
     display: flex;
     align-items: center;
     gap: 10px;
@@ -74,11 +74,11 @@
 
 .tutorials-search input {
     width: 100%;
-    background: rgba(21, 21, 31, 0.8);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
     border-radius: 8px;
     padding: 8px 14px;
-    color: var(--static-text, #e0e0e0);
+    color: var(--static-text, var(--text-primary));
     font-size: 13px;
     outline: none;
     transition: border-color 0.2s ease;
@@ -90,13 +90,13 @@
 }
 
 .tutorials-search input::placeholder {
-    color: rgba(212, 212, 212, 0.4);
+    color: var(--text-tertiary);
 }
 
 /* Close Button */
 .tutorials-close {
-    background: rgba(100, 100, 100, 0.15);
-    border: 1px solid rgba(100, 100, 100, 0.25);
+    background: var(--surface-hover);
+    border: 1px solid var(--border-primary);
     color: var(--text-secondary, #a0a0b0);
     width: 32px;
     height: 32px;

@@ -12,6 +12,13 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
+// TODO: Implement HuggingFace repo link support for chat models
+// - Add HuggingFace repo URL field to model metadata
+// - Display repo link in model selection UI (like professional apps)
+// - Allow users to click through to view model details, documentation, and download alternatives
+// - Consider adding model card preview or metadata fetching from HuggingFace API
+// - Reference: https://huggingface.co/docs/huggingface_hub/guides/huggingface_hub_py
+
 // ---------------------------------------------------------------------------
 // Chat Persistence Wails Bindings
 // ---------------------------------------------------------------------------
@@ -51,39 +58,13 @@ func (a *App) NewChat(name string) (*chat.ChatMeta, error) {
 }
 
 // SaveChat consolidates the append log into a canonical snapshot.
+// Delegates to performSave() so tracking arrays are always recomputed
+// from the current in-memory state — never reads stale meta from disk.
 func (a *App) SaveChat() error {
 	if a.chatPersistence == nil {
 		return fmt.Errorf("chat persistence not initialized")
 	}
-	chatID := a.chatPersistence.GetLastChatID()
-	if chatID == "" {
-		return fmt.Errorf("no active chat to save")
-	}
-
-	history := a.buildChatHistory()
-	chatMeta, err := a.chatPersistence.GetActiveChatMeta()
-	if err != nil {
-		a.logErrorSilent(errors.CHATSaveFail, errors.Medium, "chat.save", "app-chat.go:62", err)
-		return a.performSave()
-	}
-
-	lorebookEntries := make([]interface{}, 0, len(a.lorebooks))
-	for _, lb := range a.lorebooks {
-		lorebookEntries = append(lorebookEntries, map[string]interface{}{
-			"id": lb.ID, "title": lb.Title, "content": lb.Content,
-		})
-	}
-
-	chatData := &chat.ChatData{
-		Meta:       *chatMeta,
-		History:    history,
-		World:      a.world,
-		Scenario:   a.scenario,
-		Characters: a.characters,
-		Lorebooks:  lorebookEntries,
-	}
-	chatData.Meta.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
-	return a.chatPersistence.SaveChat(chatData)
+	return a.performSave()
 }
 
 // SaveChatAs creates a copy of the current chat with a new name.
@@ -187,13 +168,15 @@ func (a *App) SendMessage(message string) (string, error) {
 	if a.httpClient == nil {
 		return "", fmt.Errorf("llama client not initialized")
 	}
-	a.chatMessages = append(a.chatMessages, map[string]interface{}{
-		"role": "user", "content": message, "timestamp": time.Now().Unix(),
-	})
-	response, err := a.httpClient.Generate(a.buildPrompt(), a.buildInferenceOptions())
+	a.recordUserTurn(message)
+	messages := a.buildPromptMessages()
+	response, err := a.httpClient.GenerateChat(messages, a.buildInferenceOptions())
 	if err != nil {
 		return "", err
 	}
+	// Reasoning is display-only. Stripping here keeps a thought out of history and
+	// out of the next prompt on the non-streaming path too, not just the streamed one.
+	response = stripThinkBlocks(response)
 	a.chatMessages = append(a.chatMessages, map[string]interface{}{
 		"role": "assistant", "content": response, "timestamp": time.Now().Unix(),
 	})
@@ -270,9 +253,22 @@ func (a *App) LoadChatData() (map[string]interface{}, error) {
 				"scanWindow": lb.ScanWindow, "automated": lb.Automated,
 			}
 		}
+		meta := map[string]interface{}{
+			"id":                "",
+			"name":              "New Chat",
+			"worldId":           "",
+			"scenarioId":        "",
+			"activeCharacters":  []string{},
+			"removedCharacters": []string{},
+			"addedCharacters":   []string{},
+			"activeLorebooks":   []string{},
+			"removedLorebooks":  []string{},
+			"addedLorebooks":    []string{},
+		}
 		return map[string]interface{}{
 			"characters": charactersSlice, "world": worldMap,
-			"scenario": scenarioMap, "lorebooks": lorebooksInterface, "chatName": "New Chat",
+			"scenario": scenarioMap, "lorebooks": lorebooksInterface,
+			"chatName": "New Chat", "meta": meta,
 		}, nil
 	}
 	if data, err := a.loadChatDataFromStorage(); err == nil && data != nil {
@@ -282,6 +278,14 @@ func (a *App) LoadChatData() (map[string]interface{}, error) {
 	return map[string]interface{}{
 		"characters": []interface{}{}, "world": nil,
 		"scenario": nil, "lorebooks": []interface{}{}, "chatName": "New Chat",
+		"meta": map[string]interface{}{
+			"activeCharacters":  []string{},
+			"removedCharacters": []string{},
+			"addedCharacters":   []string{},
+			"activeLorebooks":   []string{},
+			"removedLorebooks":  []string{},
+			"addedLorebooks":    []string{},
+		},
 	}, nil
 }
 
@@ -317,8 +321,50 @@ func (a *App) performSave() error {
 
 func (a *App) performFinalSave() {
 	if err := a.performSave(); err != nil {
-		fmt.Printf("Final save failed: %v\n", err)
+		fmt.Println("Final save failed:", err)
+		return
 	}
+	if a.chatPersistence == nil {
+		return
+	}
+	chatID := a.chatPersistence.GetLastChatID()
+	if chatID == "" {
+		return
+	}
+	// On exit, rewrite the append log from the state that was just persisted, so
+	// stale lines (duplicate appends, deleted messages, legacy DOM-scrape entries)
+	// cannot survive into the next launch. Sourced from the saved chat data rather
+	// than a bare in-memory list: a chat that was never loaded this session keeps
+	// its existing history instead of being truncated to nothing.
+	chatData, err := a.chatPersistence.LoadChat(chatID)
+	if err != nil {
+		fmt.Println("Final history reload failed:", err)
+		return
+	}
+	a.updateChatDataFromAppState(chatData)
+	if err := a.chatPersistence.RewriteHistory(chatID, chatData.History); err != nil {
+		fmt.Println("Final history rewrite failed:", err)
+		return
+	}
+	fmt.Println("[FinalSave] rewrote history.ndjson with", len(chatData.History), "entries")
+}
+
+// recordUserTurn appends a user turn to the in-memory history unless the
+// immediately preceding message is already the identical user turn.
+// The frontend records the user's message via AppendChatMessage before it
+// starts inference; without this guard the same turn is appended a second
+// time here and buildPromptMessages() sends it to the model twice.
+func (a *App) recordUserTurn(content string) {
+	if n := len(a.chatMessages); n > 0 {
+		if role, _ := a.chatMessages[n-1]["role"].(string); role == "user" {
+			if prev, _ := a.chatMessages[n-1]["content"].(string); prev == content {
+				return
+			}
+		}
+	}
+	a.chatMessages = append(a.chatMessages, map[string]interface{}{
+		"role": "user", "content": content, "timestamp": time.Now().Unix(),
+	})
 }
 
 func (a *App) buildChatHistory() []chat.ChatHistory {
@@ -403,6 +449,41 @@ func (a *App) updateChatDataFromAppState(chatData *chat.ChatData) {
 		chatData.Meta.CharacterNames = charNames
 	}
 	chatData.Meta.LorebookNames = lorebookNames
+
+	// Sync tracking arrays from current in-memory state.
+	// Any character/lorebook currently present is considered active.
+	// Clear them from removed lists so they aren't accidentally filtered out.
+	activeCharIds := make([]string, 0, len(a.characters))
+	for _, c := range a.characters {
+		if c != nil && c.ID != "" {
+			activeCharIds = append(activeCharIds, c.ID)
+		}
+	}
+	newRemovedChars := make([]string, 0, len(chatData.Meta.RemovedCharacters))
+	for _, id := range chatData.Meta.RemovedCharacters {
+		if !containsString(activeCharIds, id) {
+			newRemovedChars = append(newRemovedChars, id)
+		}
+	}
+	chatData.Meta.ActiveCharacters = activeCharIds
+	chatData.Meta.RemovedCharacters = newRemovedChars
+	chatData.Meta.AddedCharacters = []string{}
+
+	activeBookIds := make([]string, 0, len(a.lorebooks))
+	for _, lb := range a.lorebooks {
+		if lb.ID != "" {
+			activeBookIds = append(activeBookIds, lb.ID)
+		}
+	}
+	newRemovedBooks := make([]string, 0, len(chatData.Meta.RemovedLorebooks))
+	for _, id := range chatData.Meta.RemovedLorebooks {
+		if !containsString(activeBookIds, id) {
+			newRemovedBooks = append(newRemovedBooks, id)
+		}
+	}
+	chatData.Meta.ActiveLorebooks = activeBookIds
+	chatData.Meta.RemovedLorebooks = newRemovedBooks
+	chatData.Meta.AddedLorebooks = []string{}
 }
 
 func (a *App) updateAppStateFromChat(chatData *chat.ChatData) {
@@ -447,6 +528,15 @@ func (a *App) convertFrontendDataToChatData(data map[string]interface{}) (*chat.
 			ScenarioName:   a.getStringFromMap(meta, "scenarioName"),
 			CharacterNames: a.getStringSliceFromMap(meta, "characterNames"),
 			LorebookNames:  a.getStringSliceFromMap(meta, "lorebookNames"),
+			// Source-of-truth tracking arrays
+			WorldID:           a.getStringFromMap(meta, "worldId"),
+			ScenarioID:        a.getStringFromMap(meta, "scenarioId"),
+			ActiveCharacters:  a.getStringSliceFromMap(meta, "activeCharacters"),
+			RemovedCharacters: a.getStringSliceFromMap(meta, "removedCharacters"),
+			AddedCharacters:   a.getStringSliceFromMap(meta, "addedCharacters"),
+			ActiveLorebooks:   a.getStringSliceFromMap(meta, "activeLorebooks"),
+			RemovedLorebooks:  a.getStringSliceFromMap(meta, "removedLorebooks"),
+			AddedLorebooks:    a.getStringSliceFromMap(meta, "addedLorebooks"),
 		}
 	}
 	if historyData, ok := data["history"].([]interface{}); ok {
@@ -543,6 +633,15 @@ func (a *App) getStringSliceFromMap(m map[string]interface{}, key string) []stri
 	return []string{}
 }
 
+func containsString(slice []string, s string) bool {
+	for _, item := range slice {
+		if item == s {
+			return true
+		}
+	}
+	return false
+}
+
 func (a *App) parseImageFromValue(imageVal interface{}) *chat.Image {
 	return chat.ParseImageFromValue(imageVal)
 }
@@ -565,4 +664,41 @@ func (a *App) parseCharacterContextFromMap(characterMap map[string]interface{}) 
 
 func (a *App) parseLorebookEntryFromMap(m map[string]interface{}) (lorebook.Entry, error) {
 	return lorebook.ParseLorebookEntryFromMap(m)
+}
+
+// ---------------------------------------------------------------------------
+// Unified Settings Store
+// ---------------------------------------------------------------------------
+
+func (a *App) GetSettings() map[string]interface{} {
+	if a.appSettings == nil {
+		return make(map[string]interface{})
+	}
+	return a.appSettings
+}
+
+func (a *App) SetSettings(settings map[string]interface{}) error {
+	if a.settingsStore == nil {
+		return fmt.Errorf("settings store not initialized")
+	}
+	a.appSettings = settings
+
+	// Keep legacy sampler/model fields in sync so existing bindings still work.
+	// The sections are REPLACED, not merged: callers send the whole settings
+	// object, so a key missing from it means the user's value is gone. Merging
+	// kept stale sampler values alive and made a cleared section look applied -
+	// which silently overrode the per-family defaults.
+	if sampler, ok := settings["sampler"].(map[string]interface{}); ok {
+		a.samplerSettings = make(map[string]interface{}, len(sampler))
+		for k, v := range sampler {
+			a.samplerSettings[k] = v
+		}
+	}
+	if model, ok := settings["model"].(map[string]interface{}); ok {
+		a.modelSettings = make(map[string]interface{}, len(model))
+		for k, v := range model {
+			a.modelSettings[k] = v
+		}
+	}
+	return a.settingsStore.Save(settings)
 }

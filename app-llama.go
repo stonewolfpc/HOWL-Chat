@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"howl-chat/internal/proc"
 	"io"
 	"net"
 	"os"
@@ -9,6 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"howl-chat/internal/paths"
 )
 
 // ---------------------------------------------------------------------------
@@ -16,11 +19,13 @@ import (
 // ---------------------------------------------------------------------------
 
 // findLlamaServer returns the absolute path to llama-server.exe.
+// The bundled llama.cpp runtime lives in <project>/runtime/llama so its
+// ggml/llama DLLs never collide with the stable-diffusion ones.
 func findLlamaServer() string {
 	candidates := []string{
+		filepath.Join(paths.ProjectRoot(), "runtime", "llama", "llama-server.exe"),
 		filepath.Join(filepath.Dir(os.Args[0]), "llama-server.exe"),
 		"llama-server.exe",
-		`d:\Fantasy\llama-cpu\llama-server.exe`,
 	}
 	for _, c := range candidates {
 		if _, err := os.Stat(c); err == nil {
@@ -113,26 +118,23 @@ func findMMProj(modelPath string) string {
 
 // getProjectRoot returns the project root directory.
 func getProjectRoot() string {
-	if cwd, err := os.Getwd(); err == nil {
-		return cwd
-	}
-	return filepath.Dir(os.Args[0])
+	return paths.ProjectRoot()
 }
 
 // findSDServer searches common locations for the sd-server.exe binary.
 func findSDServer() string {
 	candidates := []string{
-		`D:\StableDiffusion\sd-server.exe`,
-		`D:\stable-diffusion.cpp\build\bin\Release\sd-server.exe`,
-		`D:\stable-diffusion.cpp\build\bin\sd-server.exe`,
-		`D:\stable-diffusion.cpp\sd-server.exe`,
-		`D:\sd.cpp\sd-server.exe`,
 		filepath.Join(getProjectRoot(), "sd-server.exe"),
+		filepath.Join(filepath.Dir(os.Args[0]), "sd-server.exe"),
 	}
 	for _, p := range candidates {
 		if _, err := os.Stat(p); err == nil {
 			return p
 		}
+	}
+	// Last resort: allow sd-server on PATH so users can keep it elsewhere.
+	if p, err := exec.LookPath("sd-server.exe"); err == nil {
+		return p
 	}
 	return ""
 }
@@ -217,7 +219,28 @@ func spawnLlamaServerWithModel(modelPath string, settings map[string]interface{}
 		args = append(args, "--chat-template", jinja)
 	}
 
+	// Thinking models. "--reasoning-budget 0" ends thinking immediately; a
+	// positive budget caps it. The budget MESSAGE is not optional in practice:
+	// when the budget runs out without it the model keeps thinking inside the
+	// answer instead of answering (llama.cpp issue #22717), which is exactly the
+	// loop this is meant to prevent. Verified against this binary's --help.
+	switch strSetting(settings, "think_mode", "hidden") {
+	case "off":
+		args = append(args, "--reasoning", "off", "--reasoning-budget", "0")
+	case "hidden", "on":
+		args = append(args,
+			"--reasoning", "on",
+			"--reasoning-format", "deepseek",
+			"--reasoning-budget", intSetting(settings, "think_budget", 2048),
+			"--reasoning-budget-message",
+			strSetting(settings, "think_budget_message", "I have thought enough. Time to answer."),
+		)
+	case "auto":
+		args = append(args, "--reasoning", "auto")
+	}
+
 	cmd := exec.Command(serverPath, args...)
+	applyHidden(cmd)
 	cmd.Dir = filepath.Dir(serverPath)
 	cmd.Stdout = os.Stdout
 	if stderrW != nil {
@@ -228,6 +251,7 @@ func spawnLlamaServerWithModel(modelPath string, settings map[string]interface{}
 	if err := cmd.Start(); err != nil {
 		return nil, fmt.Errorf("failed to start llama-server: %w", err)
 	}
+	proc.Attach(cmd)
 	fmt.Printf("INFO: llama-server started (pid %d) with model %s\n", cmd.Process.Pid, modelPath)
 	return cmd, nil
 }
@@ -239,6 +263,7 @@ func ValidateLlamaServer() error {
 		return fmt.Errorf("llama-server.exe not found")
 	}
 	cmd := exec.Command(serverPath, "--version")
+	applyHidden(cmd)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		if strings.Contains(err.Error(), "0xc0000135") {

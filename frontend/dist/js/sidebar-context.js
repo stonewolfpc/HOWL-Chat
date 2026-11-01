@@ -22,49 +22,51 @@ async function initializeContextPanel() {
 }
 
 async function loadContextData() {
-    loadWorlds();
+    // Worlds are loaded by world-grid.js (it rehydrates images and renders the
+    // grid). The log-only copy that lived here shadowed it.
     loadScenarios();
     // Panel rendering is handled by sidebar-panels.js init flow via contextDisplay
 }
 
-function loadWorlds() {
-    const worlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
-    console.log('Loaded worlds:', worlds);
-}
 
 function loadScenarios() {
     const scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
     console.log('Loaded scenarios:', scenarios);
 }
 
-function updateContextDisplay() {
-    updateWorldDisplay();
-    updateScenarioDisplay();
-    updateLorebookDisplay();
-}
-
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
+// Every panel entry is resolved at call time. This module is loaded before
+// sidebar-panels.js, and on story-tools.html it loads without context-display.js
+// at all, so a direct reference here was a ReferenceError that left
+// window.sidebarContext undefined on that page.
+function _callGlobal(name) {
+    return function (...args) {
+        const fn = window[name];
+        return typeof fn === 'function' ? fn.apply(window, args) : undefined;
+    };
+}
+
 window.sidebarContext = {
     initializeContextPanel,
     loadContextData,
-    updateContextDisplay,
-    updateWorldDisplay,
-    openWorldSelector,
-    selectWorld,
-    toggleWorldAutoSwitch,
-    updateScenarioDisplay,
-    openScenarioSelector,
-    filterScenarios,
-    selectScenario,
-    toggleScenarioAutoSwitch,
-    updateLorebookDisplay,
-    createLorebookItem,
-    removeLorebookFromChat,
-    openLorebookSelector,
-    filterLorebooks,
-    toggleLorebookSelection,
-    openLorebookManager
+    updateContextDisplay:  _callGlobal('updateContextDisplay'),
+    updateWorldDisplay:    _callGlobal('updateWorldDisplay'),
+    updateScenarioDisplay: _callGlobal('updateScenarioDisplay'),
+    updateLorebookDisplay: _callGlobal('updateLorebookDisplay'),
+    openWorldSelector:     _callGlobal('openWorldSelector'),
+    selectWorld:           _callGlobal('selectWorld'),
+    toggleWorldAutoSwitch: _callGlobal('toggleWorldAutoSwitch'),
+    openScenarioSelector:  _callGlobal('openScenarioSelector'),
+    filterScenarios:       _callGlobal('filterScenarios'),
+    selectScenario:        _callGlobal('selectScenario'),
+    toggleScenarioAutoSwitch: _callGlobal('toggleScenarioAutoSwitch'),
+    createLorebookItem:    _callGlobal('createLorebookItem'),
+    removeLorebookFromChat: _callGlobal('removeLorebookFromChat'),
+    openLorebookSelector:  _callGlobal('openLorebookSelector'),
+    filterLorebooks:       _callGlobal('filterLorebooks'),
+    toggleChatLorebook:    _callGlobal('toggleChatLorebook'),
+    openLorebookManager:   _callGlobal('openLorebookManager')
 };

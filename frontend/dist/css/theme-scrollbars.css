@@ -9,7 +9,7 @@ body.theme-light .world-sidebar::-webkit-scrollbar-thumb,
 body.theme-light .chat-messages::-webkit-scrollbar-thumb,
 body.theme-light .flyout::-webkit-scrollbar-thumb,
 body.theme-light .setting-textarea::-webkit-scrollbar-thumb {
-    background: var(--border-secondary);
+    background: var(--border-primary);
     border-radius: 4px;
 }
 
@@ -47,7 +47,7 @@ body.theme-light .world-sidebar::-webkit-scrollbar-thumb,
 body.theme-light .chat-messages::-webkit-scrollbar-thumb,
 body.theme-light .flyout::-webkit-scrollbar-thumb,
 body.theme-light .setting-textarea::-webkit-scrollbar-thumb {
-    background: var(--border-secondary);
+    background: var(--border-primary);
 }
 
 body.theme-light .character-sidebar::-webkit-scrollbar-thumb:hover,

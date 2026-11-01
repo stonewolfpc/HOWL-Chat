@@ -11,8 +11,8 @@
  * @version 2.0.0
  */
 
-@import url('ss-flyout.css');
-@import url('ss-settings.css');
-@import url('ss-memory.css');
-@import url('ss-light-theme.css');
-@import url('ss-responsive.css');
+@import url('ss-flyout.css?v=29');
+@import url('ss-settings.css?v=29');
+@import url('ss-memory.css?v=29');
+@import url('ss-light-theme.css?v=29');
+@import url('ss-responsive.css?v=29');

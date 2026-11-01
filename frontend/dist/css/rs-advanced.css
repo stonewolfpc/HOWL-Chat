@@ -6,7 +6,7 @@
 .advanced-section {
     margin-top: 24px;
     padding-top: 16px;
-    border-top: 1px solid rgba(100, 100, 100, 0.2);
+    border-top: 1px solid var(--border-primary);
 }
 
 .advanced-header {
@@ -21,7 +21,7 @@
 
 .advanced-toggle {
     background: transparent;
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     padding: 4px 8px;
     border-radius: 4px;
@@ -31,7 +31,7 @@
 }
 
 .advanced-toggle:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-hover);
     border-color: var(--theme-color);
 }
 
@@ -39,9 +39,9 @@
     display: none;
     margin-top: 12px;
     padding: 12px;
-    background: rgba(21, 21, 31, 0.3);
+    background: var(--surface-secondary);
     border-radius: 6px;
-    border: 1px solid rgba(100, 100, 100, 0.2);
+    border: 1px solid var(--border-primary);
 }
 
 .advanced-content.show {

@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"howl-chat/internal/backend/types"
+	"howl-chat/internal/paths"
 )
 
 // Service handles memory operations and persistence
@@ -39,7 +40,7 @@ func (s *Service) SetChatID(chatID string) {
 // NewService creates a new memory service instance
 func NewService(chatID string) *Service {
 	return &Service{
-		projectRoot: "d:\\HOWL_Chat",
+		projectRoot: paths.ProjectRoot(),
 		chatID:      chatID,
 	}
 }
@@ -53,7 +54,7 @@ type MemoryStorage struct {
 // NewMemoryStorage creates a new storage instance
 func NewMemoryStorage(chatID string) *MemoryStorage {
 	return &MemoryStorage{
-		projectRoot: "d:\\HOWL_Chat",
+		projectRoot: paths.ProjectRoot(),
 		chatID:      chatID,
 	}
 }
@@ -237,17 +238,50 @@ func (s *Service) ExportMemories(filter types.MemoryFilter) ([]types.MemoryRecor
 	return filtered, nil
 }
 
-// GetAutoCaptureConfig retrieves automatic memory capture settings
-func (s *Service) GetAutoCaptureConfig() (*types.AutoCaptureConfig, error) {
-	// For now, return default config
-	config := &types.AutoCaptureConfig{
+// defaultAutoCaptureConfig is used for chats that have never saved settings.
+func defaultAutoCaptureConfig() types.AutoCaptureConfig {
+	return types.AutoCaptureConfig{
 		Enabled:       true,
 		MinConfidence: 75,
 		MaxPerMessage: 3,
 		TriggerWords:  []string{"remember", "note", "important", "key"},
 	}
+}
 
+// parseAutoCaptureConfig decodes saved settings, falling back to defaults for
+// fields an older config file may not contain.
+func parseAutoCaptureConfig(raw []byte) (types.AutoCaptureConfig, error) {
+	config := defaultAutoCaptureConfig()
+	if err := json.Unmarshal(raw, &config); err != nil {
+		return config, err
+	}
+	if len(config.TriggerWords) == 0 {
+		config.TriggerWords = defaultAutoCaptureConfig().TriggerWords
+	}
 	return config, nil
+}
+
+// GetAutoCaptureConfig retrieves automatic memory capture settings.
+// Settings live in Chats/<chatID>/auto_capture_config.json; a missing file means
+// the chat has never been configured, so the defaults apply.
+func (s *Service) GetAutoCaptureConfig() (*types.AutoCaptureConfig, error) {
+	storage := NewMemoryStorage(s.chatID)
+	configPath := filepath.Join(storage.projectRoot, "Chats", s.chatID, "auto_capture_config.json")
+
+	raw, err := os.ReadFile(configPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			config := defaultAutoCaptureConfig()
+			return &config, nil
+		}
+		return nil, fmt.Errorf("failed to read auto capture config: %w", err)
+	}
+
+	config, err := parseAutoCaptureConfig(raw)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse auto capture config: %w", err)
+	}
+	return &config, nil
 }
 
 // SetAutoCaptureConfig updates automatic memory capture settings

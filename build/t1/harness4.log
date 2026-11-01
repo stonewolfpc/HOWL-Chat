@@ -1,0 +1,1458 @@
+[startup] 21:09:36.430  +    2.1ms  image init: begin
+[startup] 21:09:36.432  +    4.2ms  image init: config ready
+[ImageEngine] Initialized: binary=C:\Users\StoneWolfPC\HOWL_Chat\sd-server.exe models=E:\HOWL_Chat\models port=8081
+[startup] 21:09:36.433  +    4.7ms  image init: engine initialized
+[ImageEngine] sd-server commit: c6dfa9d
+[ImageEngine] Restored last model: "image"
+[startup] 21:09:36.451  +   22.7ms  rescan: start
+2026/10/31 21:09:36 [harness] serving frontend/dist on http://127.0.0.1:8799
+[startup] 21:09:36.451  +   23.3ms  rescan: scanning E:\AI GGUF\GGUF
+[startup] 21:09:36.454  +   25.9ms  rescan: done E:\AI GGUF\GGUF 25 entries
+[LoadModel] START path="E:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf"
+[LoadModel] path validated
+[LoadModel] checking port 8080
+[LoadModel] port 8080 free
+[LoadModel] validating llama-server binary
+[LoadModel] llama-server binary validated
+[LoadModel] reading GGUF metadata from: E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf
+[ReadProfile] final: Family=lfm2moe Layers=24 Params=12607000888 Size=4916.7MB Quant=IQ2_XXS DModel=2048 Heads=32 KVHeads=32
+[LoadModel] profile: Family=lfm2moe Layers=24 Params=12607000888 Size=4916.7MB Quant=IQ2_XXS ArchSpec=true
+[LoadModel] applying safe defaults
+[applySafeDefaults] enter
+[applySafeDefaults] getting hardware snapshot
+[ResourceManager] GetManager called
+[ResourceManager] initializing singleton
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] initialization complete
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[applySafeDefaults] freeVRAM=5735 freeRAM=44540
+[applySafeDefaults] reading settings
+[applySafeDefaults] settings: ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] archSpec: layers=24 dmodel=2048 heads=32 kvheads=32
+[applySafeDefaults] creating memory model
+[applySafeDefaults] calling ClampToHardware
+[applySafeDefaults] ClampToHardware returned
+[applySafeDefaults] final: GPU=4023MB RAM=1193MB ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] done
+[LoadModel] safe defaults applied
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+[LoadModel] no mmproj found — vision not available for this model
+[LoadModel] validating spawn settings
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[LoadModel] spawn params: ctx=3096 gpuLayers=22 batch=256 freeVRAM=5735 freeRAM=44540
+[LoadModel] validation result: level=0 msg="Memory OK — estimated 4023 MB GPU / 1193 MB RAM (free: 5735 / 44540 MB)"
+[LoadModel] spawn validation passed
+[LoadModel] spawning llama-server
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+INFO: No mmproj file found for model: E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf
+INFO: llama-server started (pid 24608) with model E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf
+[LoadModel] llama-server spawned (pid 24608)
+INFO: Registering model with estimated GPU:4028MB RAM:1198MB
+[ResourceManager] GetManager called
+[LoadModel] monitor started (pid 24608, timeout 60s)
+2026/10/31 21:09:44 [rpc] LoadModel                                     ok        1.811s
+0.00.126.295 I srv  llama_server: initializing ...
+0.00.126.306 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.126.634 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.137.197 I srv    load_model: loading model 'E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf'
+2026/10/31 21:09:45 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 21:09:47 [rpc] IsModelLoaded                                 ok           1ms
+0.03.037.203 I cmn          init: llama threadpool init, n_threads = 8
+0.03.237.713 I srv    load_model: initializing, n_slots = 4, n_ctx_slot = 3328, kv_unified = 'true'
+0.03.243.941 I srv  server_run_i: model loaded
+0.03.243.951 I srv  server_on_li: listening on http://127.0.0.1:8080
+[LoadModel] monitor: server healthy, model loaded
+2026/10/31 21:09:48 [rpc] IsModelLoaded                                 ok            0s
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[ResourceManager] GetManager called
+2026/10/31 21:09:49 [rpc] CheckModelFit                                 ok          97ms
+[VRAM] unloading chat model to make room for the image model
+INFO: llama-server killed, model memory freed
+[ResourceManager] GetManager called
+[ResourceManager] GetManager called
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+2026/10/31 21:09:51 [rpc] FreeVRAMFor                                   ok        2.168s
+2026/10/31 21:09:51 [rpc] IsModelLoaded                                 ok           1ms
+[ImageEngine] ListModels scanning: E:\HOWL_Chat\models
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+[ImageEngine] autoFillCompanions for 'image' (family: sdxl, files: map[control_net:E:\HOWL_Chat\models\image\controlnet_openpose_sdxl_thibaud_fp16.safetensors model:E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors taesd:E:\HOWL_Chat\models\image\taesdxl.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan21' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan21\Wan2.1-T2V-1.3B-Q4_K_S.gguf t5xxl:E:\HOWL_Chat\models\video\wan21\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan21\wan_2.1_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan22-ti2v-5b' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan22-ti2v-5b\Wan2.2-TI2V-5B-Q4_K_M.gguf t5xxl:E:\HOWL_Chat\models\video\wan22-ti2v-5b\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan22-ti2v-5b\wan2.2_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] ListModels returning 3 models (filtered from 3 total)
+[ImageEngine] ListModels scanning: E:\HOWL_Chat\models
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+[ImageEngine] autoFillCompanions for 'image' (family: sdxl, files: map[control_net:E:\HOWL_Chat\models\image\controlnet_openpose_sdxl_thibaud_fp16.safetensors model:E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors taesd:E:\HOWL_Chat\models\image\taesdxl.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan21' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan21\Wan2.1-T2V-1.3B-Q4_K_S.gguf t5xxl:E:\HOWL_Chat\models\video\wan21\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan21\wan_2.1_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan22-ti2v-5b' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan22-ti2v-5b\Wan2.2-TI2V-5B-Q4_K_M.gguf t5xxl:E:\HOWL_Chat\models\video\wan22-ti2v-5b\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan22-ti2v-5b\wan2.2_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] ListModels returning 3 models (filtered from 3 total)
+[ImageEngine] Starting sd-server: C:\Users\StoneWolfPC\HOWL_Chat\sd-server.exe [--listen-port 8081 --threads 16 -m E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors --taesd E:\HOWL_Chat\models\image\taesdxl.safetensors --taesd-preview-only --control-net E:\HOWL_Chat\models\image\controlnet_openpose_sdxl_thibaud_fp16.safetensors --max-vram -1]
+ggml_cuda_init: found 1 CUDA devices (Total VRAM: 8191 MiB):
+  Device 0: NVIDIA GeForce GTX 1080, compute capability 6.1, VMM: yes, VRAM: 8191 MiB
+load_backend: loaded CUDA backend from C:\Users\StoneWolfPC\HOWL_Chat\ggml-cuda.dll
+load_backend: loaded CPU backend from C:\Users\StoneWolfPC\HOWL_Chat\ggml-cpu-haswell.dll
+[I] loading model from 'E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors' --- diffusion_engine.cpp:685
+[I] load E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors using safetensors format --- model_loader.cpp:222
+[I] loading tae from 'E:\HOWL_Chat\models\image\taesdxl.safetensors' --- diffusion_engine.cpp:771
+[I] load E:\HOWL_Chat\models\image\taesdxl.safetensors using safetensors format --- model_loader.cpp:222
+[I] load E:\HOWL_Chat\models\image\controlnet_openpose_sdxl_thibaud_fp16.safetensors using safetensors format --- model_loader.cpp:222
+[I] Version: SDXL  --- diffusion_engine.cpp:975
+[I] auto-fit plan: --- backend_fit.cpp:323
+[I]   devices: --- backend_fit.cpp:324
+[I]     CUDA0        NVIDIA GeForce GTX 1080          free   7185 MiB, budget   6161 MiB --- backend_fit.cpp:328
+[I]     RAM          free  49221 MiB, params budget  44299 MiB --- backend_fit.cpp:334
+[I]   compute-device weight cache priority: diffusion > te > vae --- backend_fit.cpp:336
+[I]   components (params: compute device -> RAM -> other GPU -> disk): --- backend_fit.cpp:337
+[I]     DiT          params   4897 MiB, compute reserve  2048 MiB -> compute CUDA0, params cpu --- backend_fit.cpp:348
+[I]     Conditioner  params   1559 MiB, compute reserve  2048 MiB -> compute CUDA0, params cpu --- backend_fit.cpp:348
+[I]     VAE          params    168 MiB, compute reserve  1024 MiB -> compute CUDA0, params cpu --- backend_fit.cpp:348
+[I] auto-fit: --backend "diffusion=CUDA0,te=CUDA0,vae=CUDA0" --params-backend "diffusion=cpu,te=cpu,vae=cpu" --- backend_fit.cpp:477
+[I] Weight type stat:                      f32: 135  |     f16: 3109 |     i32: 1    |    bf16: 248   --- diffusion_engine.cpp:1548
+[I] Conditioner weight type stat:          f32: 1    |     f16: 585  |     i32: 1     --- diffusion_engine.cpp:1549
+[I] Diffusion model weight type stat:      f16: 1680  --- diffusion_engine.cpp:1550
+[I] VAE weight type stat:                 bf16: 248   --- diffusion_engine.cpp:1551
+[I] using VAE for encoding / decoding --- model_builders.cpp:210
+[I] vae decoder: ch = 128 --- auto_encoder_kl.hpp:529
+[W] No valid VAE specified with --vae or --force-sdxl-vae-conv-scale flag set, using Conv2D scale 0.031 --- sd.cpp:15
+[I] using TAE for preview --- model_builders.cpp:213
+[I] flash attention auto: CUDA0 -> on (probe: normal 1.587 ms, flash 1.343 ms) --- flash_attn.cpp:95
+[I] conv2d direct auto: CUDA0 -> off (no implicit GEMM path) --- conv_direct.cpp:90
+[I] conv3d direct auto: CUDA0 -> on (implicit GEMM) --- conv_direct.cpp:87
+[I] total params memory size = 9014.05MB (VRAM 2387.61MB, RAM 6626.44MB): text_encoders 1564.36MB(RAM), diffusion_model 4900.07MB(RAM), vae 162.02MB(RAM), controlnet 2387.61MB(VRAM), extensions 0.00MB(N/A) --- diffusion_engine.cpp:1438
+[I] running in eps-prediction mode --- diffusion_engine.cpp:1467
+[I] listening on: http://127.0.0.1:8081 --- main.cpp:170
+2026/10/31 21:09:52 [rpc] StartImageJob                                 ok        1.013s
+[DEBUG] txt2img: ModelName="image", isFluxFamily=false, isDiTModel=false
+[DEBUG] txt2img: Skipping DiT parameters for non-DiT model
+[DEBUG] txt2img request JSON: {"prompt":"a grey cube on a table","negative_prompt":"","width":512,"height":512,"steps":4,"seed":4242,"sampler_name":"euler_a","preview":"tae","scheduler":"karras","cfg_scale":5,"batch_size":1,"enable_hr":false,"hr_scale":0,"hr_upscaler":"","denoising_strength":0,"tiling":false,"clip_skip":0}
+[I] generate_image 512x512 --- image.cpp:869
+[I] get_sigmas with Karras scheduler --- denoiser.hpp:1133
+[I] sampling using Euler A method --- request.cpp:477
+[I] clip build cached graph cut plan done (taking 2 ms) --- ggml_graph_cut.cpp:1042
+  |##################################################| 178/178 -   1.04GB/s[K
+[I] loading tensors completed, taking 0.21s (read: 0.05s, memcpy: 0.00s, convert: 0.00s, copy_to_backend: 0.00s) --- model_loader.cpp:1427
+[I] clip build cached graph cut plan done (taking 2 ms) --- ggml_graph_cut.cpp:1042
+[DEBUG] progress() called (jobID="")  |#########################################         | 302/374 -   3.65GB/s[K
+  |##################################################| 374/374 -   2.97GB/s[K
+[I] loading tensors completed, taking 0.42s (read: 0.27s, memcpy: 0.00s, convert: 0.00s, copy_to_backend: 0.00s) --- model_loader.cpp:1427
+[DEBUG] progress() called (jobID="")[I] clip build cached graph cut plan done (taking 2 ms) --- ggml_graph_cut.cpp:1042
+  |##################################################| 15/15 - 195.49MB/s[K
+[I] loading tensors completed, taking 0.21s (read: 0.00s, memcpy: 0.00s, convert: 0.00s, copy_to_backend: 0.00s) --- model_loader.cpp:1427
+[DEBUG] progress() called (jobID="")[I] clip build cached graph cut plan done (taking 2 ms) --- ggml_graph_cut.cpp:1042
+[I] get_learned_condition completed, taking 1.73s --- image.cpp:580
+[I] generating image: 1/1 - seed 4242 --- image.cpp:920
+[I] unet build cached graph cut plan done (taking 11 ms) --- ggml_graph_cut.cpp:1042
+[DEBUG] progress() called (jobID="")[DEBUG] progress() called (jobID="")  |###########                                       |  347/1680 -   2.72GB/s[K
+  |#################                                 |  563/1680 -   3.03GB/s[K
+[DEBUG] progress() called (jobID="")2026/10/31 21:09:55 [rpc] GetImageJobStatus                             ok            0s
+  |########################                          |  783/1680 -   3.24GB/s[K
+  |###############################                   | 1012/1680 -   3.34GB/s[K
+[DEBUG] progress() called (jobID="")  |#####################################             | 1227/1680 -   3.38GB/s[K
+  |###########################################       | 1443/1680 -   3.45GB/s[K
+  |##################################################| 1680/1680 -   3.33GB/s[K
+[I] loading tensors completed, taking 1.44s (read: 1.35s, memcpy: 0.00s, convert: 0.00s, copy_to_backend: 0.00s) --- model_loader.cpp:1427
+[DEBUG] progress() called (jobID="")[DEBUG] progress() called (jobID="")[DEBUG] progress() called (jobID="")[DEBUG] progress() called (jobID="")[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.25, preview_len=2156
+2026/10/31 21:09:58 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.25, preview_len=2156
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.25, preview_len=2156
+  |============>                                     | 1/4 -   4.04s/it - ETA 00:12[K
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.50, preview_len=2692
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.50, preview_len=2692
+  |=========================>                        | 2/4 -   1.34s/it - ETA 00:05[K
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.75, preview_len=2612
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.75, preview_len=2612
+2026/10/31 21:10:01 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.75, preview_len=2612
+  |=====================================>            | 3/4 -   1.32s/it - ETA 00:02[K
+  |==================================================| 4/4 -   1.32s/it[K
+[I] sampling completed, taking 8.04s --- image.cpp:953
+[I] generating 1 latent images completed, taking 8.04s --- image.cpp:967
+[I] decoding 1 latents --- image.cpp:605
+[I] vae build cached graph cut plan done (taking 0 ms) --- ggml_graph_cut.cpp:1042
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=1.00, preview_len=2588
+  |##################################################| 140/140 - 451.65MB/s[K
+[I] loading tensors completed, taking 0.21s (read: 0.03s, memcpy: 0.00s, convert: 0.04s, copy_to_backend: 0.00s) --- model_loader.cpp:1427
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=1.00, preview_len=2588
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=1.00, preview_len=2588
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=1.00, preview_len=2588
+[I] latent 1 decoded, taking 1.84s --- image.cpp:671
+[I] decode_first_stage completed, taking 1.84s --- image.cpp:675
+[I] generate_image completed in 11.65s --- image.cpp:1140
+[App] Job job_1793498992290094400 result saved to gallery
+2026/10/31 21:10:04 [rpc] GetImageJobStatus                             ok            0s
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[ReadProfile] final: Family=lfm2moe Layers=24 Params=12607000888 Size=4916.7MB Quant=IQ2_XXS DModel=2048 Heads=32 KVHeads=32
+2026/10/31 21:10:06 [rpc] CheckModelFit                                 ok        1.774s
+[VRAM] unloading image model "image" to make room for the chat model
+[App] UnloadImageModel called
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[ReadProfile] final: Family=lfm2moe Layers=24 Params=12607000888 Size=4916.7MB Quant=IQ2_XXS DModel=2048 Heads=32 KVHeads=32
+2026/10/31 21:10:09 [rpc] FreeVRAMFor                                   ok        3.734s
+2026/10/31 21:10:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:10:12 [rpc] GetSDServerVersion                            ok            0s
+[ImageEngine] ListModels scanning: E:\HOWL_Chat\models
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+[ImageEngine] autoFillCompanions for 'image' (family: sdxl, files: map[control_net:E:\HOWL_Chat\models\image\controlnet_openpose_sdxl_thibaud_fp16.safetensors model:E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors taesd:E:\HOWL_Chat\models\image\taesdxl.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan21' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan21\Wan2.1-T2V-1.3B-Q4_K_S.gguf t5xxl:E:\HOWL_Chat\models\video\wan21\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan21\wan_2.1_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan22-ti2v-5b' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan22-ti2v-5b\Wan2.2-TI2V-5B-Q4_K_M.gguf t5xxl:E:\HOWL_Chat\models\video\wan22-ti2v-5b\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan22-ti2v-5b\wan2.2_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] ListModels returning 3 models (filtered from 3 total)
+[ImageEngine] ListModels scanning: E:\HOWL_Chat\models
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+[ImageEngine] autoFillCompanions for 'image' (family: sdxl, files: map[control_net:E:\HOWL_Chat\models\image\controlnet_openpose_sdxl_thibaud_fp16.safetensors model:E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors taesd:E:\HOWL_Chat\models\image\taesdxl.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan21' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan21\Wan2.1-T2V-1.3B-Q4_K_S.gguf t5xxl:E:\HOWL_Chat\models\video\wan21\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan21\wan_2.1_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan22-ti2v-5b' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan22-ti2v-5b\Wan2.2-TI2V-5B-Q4_K_M.gguf t5xxl:E:\HOWL_Chat\models\video\wan22-ti2v-5b\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan22-ti2v-5b\wan2.2_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] ListModels returning 3 models (filtered from 3 total)
+[ImageEngine] Starting sd-server: C:\Users\StoneWolfPC\HOWL_Chat\sd-server.exe [--listen-port 8081 --threads 16 -m E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors --taesd E:\HOWL_Chat\models\image\taesdxl.safetensors --taesd-preview-only --control-net E:\HOWL_Chat\models\image\controlnet_openpose_sdxl_thibaud_fp16.safetensors --max-vram -1]
+ggml_cuda_init: found 1 CUDA devices (Total VRAM: 8191 MiB):
+  Device 0: NVIDIA GeForce GTX 1080, compute capability 6.1, VMM: yes, VRAM: 8191 MiB
+load_backend: loaded CUDA backend from C:\Users\StoneWolfPC\HOWL_Chat\ggml-cuda.dll
+load_backend: loaded CPU backend from C:\Users\StoneWolfPC\HOWL_Chat\ggml-cpu-haswell.dll
+[I] loading model from 'E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors' --- diffusion_engine.cpp:685
+[I] load E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors using safetensors format --- model_loader.cpp:222
+[I] loading tae from 'E:\HOWL_Chat\models\image\taesdxl.safetensors' --- diffusion_engine.cpp:771
+[I] load E:\HOWL_Chat\models\image\taesdxl.safetensors using safetensors format --- model_loader.cpp:222
+[I] load E:\HOWL_Chat\models\image\controlnet_openpose_sdxl_thibaud_fp16.safetensors using safetensors format --- model_loader.cpp:222
+[I] Version: SDXL  --- diffusion_engine.cpp:975
+[I] auto-fit plan: --- backend_fit.cpp:323
+[I]   devices: --- backend_fit.cpp:324
+[I]     CUDA0        NVIDIA GeForce GTX 1080          free   7185 MiB, budget   6161 MiB --- backend_fit.cpp:328
+[I]     RAM          free  49305 MiB, params budget  44375 MiB --- backend_fit.cpp:334
+[I]   compute-device weight cache priority: diffusion > te > vae --- backend_fit.cpp:336
+[I]   components (params: compute device -> RAM -> other GPU -> disk): --- backend_fit.cpp:337
+[I]     DiT          params   4897 MiB, compute reserve  2048 MiB -> compute CUDA0, params cpu --- backend_fit.cpp:348
+[I]     Conditioner  params   1559 MiB, compute reserve  2048 MiB -> compute CUDA0, params cpu --- backend_fit.cpp:348
+[I]     VAE          params    168 MiB, compute reserve  1024 MiB -> compute CUDA0, params cpu --- backend_fit.cpp:348
+[I] auto-fit: --backend "diffusion=CUDA0,te=CUDA0,vae=CUDA0" --params-backend "diffusion=cpu,te=cpu,vae=cpu" --- backend_fit.cpp:477
+[I] Weight type stat:                      f32: 135  |     f16: 3109 |     i32: 1    |    bf16: 248   --- diffusion_engine.cpp:1548
+[I] Conditioner weight type stat:          f32: 1    |     f16: 585  |     i32: 1     --- diffusion_engine.cpp:1549
+[I] Diffusion model weight type stat:      f16: 1680  --- diffusion_engine.cpp:1550
+[I] VAE weight type stat:                 bf16: 248   --- diffusion_engine.cpp:1551
+[I] using VAE for encoding / decoding --- model_builders.cpp:210
+[I] vae decoder: ch = 128 --- auto_encoder_kl.hpp:529
+[W] No valid VAE specified with --vae or --force-sdxl-vae-conv-scale flag set, using Conv2D scale 0.031 --- sd.cpp:15
+[I] using TAE for preview --- model_builders.cpp:213
+[I] flash attention auto: CUDA0 -> on (probe: normal 1.628 ms, flash 1.174 ms) --- flash_attn.cpp:95
+[I] conv2d direct auto: CUDA0 -> off (no implicit GEMM path) --- conv_direct.cpp:90
+[I] conv3d direct auto: CUDA0 -> on (implicit GEMM) --- conv_direct.cpp:87
+[I] total params memory size = 9014.05MB (VRAM 2387.61MB, RAM 6626.44MB): text_encoders 1564.36MB(RAM), diffusion_model 4900.07MB(RAM), vae 162.02MB(RAM), controlnet 2387.61MB(VRAM), extensions 0.00MB(N/A) --- diffusion_engine.cpp:1438
+[I] running in eps-prediction mode --- diffusion_engine.cpp:1467
+[I] listening on: http://127.0.0.1:8081 --- main.cpp:170
+2026/10/31 21:10:26 [rpc] StartImageJob                                 ok        1.017s
+[DEBUG] txt2img: ModelName="image", isFluxFamily=false, isDiTModel=false
+[DEBUG] txt2img: Skipping DiT parameters for non-DiT model
+[DEBUG] txt2img request JSON: {"prompt":"a red sphere","negative_prompt":"","width":512,"height":512,"steps":4,"seed":7,"sampler_name":"euler_a","preview":"tae","scheduler":"karras","cfg_scale":5,"batch_size":1,"enable_hr":false,"hr_scale":0,"hr_upscaler":"","denoising_strength":0,"tiling":false,"clip_skip":0}
+[I] generate_image 512x512 --- image.cpp:869
+[I] get_sigmas with Karras scheduler --- denoiser.hpp:1133
+[I] sampling using Euler A method --- request.cpp:477
+[I] clip build cached graph cut plan done (taking 0 ms) --- ggml_graph_cut.cpp:1042
+  |##################################################| 178/178 -   1.00GB/s[K
+[I] loading tensors completed, taking 0.22s (read: 0.05s, memcpy: 0.00s, convert: 0.00s, copy_to_backend: 0.00s) --- model_loader.cpp:1427
+[I] clip build cached graph cut plan done (taking 4 ms) --- ggml_graph_cut.cpp:1042
+[DEBUG] progress() called (jobID="")  |#########################################         | 302/374 -   3.65GB/s[K
+  |##################################################| 374/374 -   3.07GB/s[K
+[I] loading tensors completed, taking 0.41s (read: 0.27s, memcpy: 0.00s, convert: 0.00s, copy_to_backend: 0.00s) --- model_loader.cpp:1427
+[DEBUG] progress() called (jobID="")[I] clip build cached graph cut plan done (taking 2 ms) --- ggml_graph_cut.cpp:1042
+  |##################################################| 15/15 - 190.90MB/s[K
+[I] loading tensors completed, taking 0.21s (read: 0.00s, memcpy: 0.00s, convert: 0.00s, copy_to_backend: 0.00s) --- model_loader.cpp:1427
+[DEBUG] progress() called (jobID="")[I] clip build cached graph cut plan done (taking 2 ms) --- ggml_graph_cut.cpp:1042
+[I] get_learned_condition completed, taking 1.72s --- image.cpp:580
+[I] generating image: 1/1 - seed 7 --- image.cpp:920
+[I] unet build cached graph cut plan done (taking 11 ms) --- ggml_graph_cut.cpp:1042
+[DEBUG] progress() called (jobID="")[DEBUG] progress() called (jobID="")  |##########                                        |  324/1680 -   2.39GB/s[K
+  |#################                                 |  539/1680 -   2.87GB/s[K
+[DEBUG] progress() called (jobID="")2026/10/31 21:10:29 [rpc] GetImageJobStatus                             ok            0s
+  |#######################                           |  758/1680 -   3.10GB/s[K
+  |##############################                    |  979/1680 -   3.23GB/s[K
+[DEBUG] progress() called (jobID="")  |####################################              | 1193/1680 -   3.31GB/s[K
+  |##########################################        | 1406/1680 -   3.35GB/s[K
+  |##################################################| 1680/1680 -   3.34GB/s[K
+[I] loading tensors completed, taking 1.43s (read: 1.38s, memcpy: 0.00s, convert: 0.00s, copy_to_backend: 0.00s) --- model_loader.cpp:1427
+[DEBUG] progress() called (jobID="")[DEBUG] progress() called (jobID="")[DEBUG] progress() called (jobID="")[DEBUG] progress() called (jobID="")[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.25, preview_len=1572
+2026/10/31 21:10:32 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.25, preview_len=1572
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.25, preview_len=1572
+  |============>                                     | 1/4 -   4.04s/it - ETA 00:12[K
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.50, preview_len=1680
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.50, preview_len=1680
+  |=========================>                        | 2/4 -   1.32s/it - ETA 00:05[K
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.75, preview_len=1680
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.75, preview_len=1680
+2026/10/31 21:10:35 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=0.75, preview_len=1680
+  |=====================================>            | 3/4 -   1.33s/it - ETA 00:02[K
+  |==================================================| 4/4 -   1.31s/it[K
+[I] sampling completed, taking 8.03s --- image.cpp:953
+[I] generating 1 latent images completed, taking 8.03s --- image.cpp:967
+[I] decoding 1 latents --- image.cpp:605
+[I] vae build cached graph cut plan done (taking 0 ms) --- ggml_graph_cut.cpp:1042
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=1.00, preview_len=1660
+  |##################################################| 140/140 - 433.00MB/s[K
+[I] loading tensors completed, taking 0.22s (read: 0.03s, memcpy: 0.00s, convert: 0.04s, copy_to_backend: 0.00s) --- model_loader.cpp:1427
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=1.00, preview_len=1660
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=1.00, preview_len=1660
+[DEBUG] progress() called (jobID="")[DEBUG] progress() legacy endpoint: progress=1.00, preview_len=1660
+[I] latent 1 decoded, taking 1.88s --- image.cpp:671
+[I] decode_first_stage completed, taking 1.88s --- image.cpp:675
+[I] generate_image completed in 11.66s --- image.cpp:1140
+[App] Job job_1793499026061635500 result saved to gallery
+2026/10/31 21:10:38 [rpc] GetImageJobStatus                             ok            0s
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[ReadProfile] final: Family=gpt-oss Layers=24 Params=19247637837 Size=11548.6MB Quant=FT38 DModel=2880 Heads=64 KVHeads=8
+2026/10/31 21:10:40 [rpc] CheckModelFit                                 ok        2.703s
+[VRAM] unloading image model "image" to make room for the chat model
+[App] UnloadImageModel called
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[ReadProfile] final: Family=gpt-oss Layers=24 Params=19247637837 Size=11548.6MB Quant=FT38 DModel=2880 Heads=64 KVHeads=8
+2026/10/31 21:10:45 [rpc] FreeVRAMFor                                   ok        4.649s
+[LoadModel] START path="E:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf"
+[LoadModel] path validated
+[LoadModel] checking port 8080
+[LoadModel] port 8080 free
+[LoadModel] validating llama-server binary
+[LoadModel] llama-server binary validated
+[LoadModel] reading GGUF metadata from: E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf
+[ReadProfile] final: Family=lfm2moe Layers=24 Params=12607000888 Size=4916.7MB Quant=IQ2_XXS DModel=2048 Heads=32 KVHeads=32
+[LoadModel] profile: Family=lfm2moe Layers=24 Params=12607000888 Size=4916.7MB Quant=IQ2_XXS ArchSpec=true
+[LoadModel] applying safe defaults
+[applySafeDefaults] enter
+[applySafeDefaults] getting hardware snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[applySafeDefaults] freeVRAM=5740 freeRAM=44574
+[applySafeDefaults] reading settings
+[applySafeDefaults] settings: ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] archSpec: layers=24 dmodel=2048 heads=32 kvheads=32
+[applySafeDefaults] creating memory model
+[applySafeDefaults] calling ClampToHardware
+[applySafeDefaults] ClampToHardware returned
+[applySafeDefaults] final: GPU=4023MB RAM=1193MB ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] done
+[LoadModel] safe defaults applied
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+[LoadModel] no mmproj found — vision not available for this model
+[LoadModel] validating spawn settings
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[LoadModel] spawn params: ctx=3096 gpuLayers=22 batch=256 freeVRAM=5740 freeRAM=44574
+[LoadModel] validation result: level=0 msg="Memory OK — estimated 4023 MB GPU / 1193 MB RAM (free: 5740 / 44574 MB)"
+[LoadModel] spawn validation passed
+[LoadModel] spawning llama-server
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+INFO: No mmproj file found for model: E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf
+INFO: llama-server started (pid 2060) with model E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf
+[LoadModel] llama-server spawned (pid 2060)
+INFO: Registering model with estimated GPU:4028MB RAM:1198MB
+[ResourceManager] GetManager called
+2026/10/31 21:10:47 [rpc] LoadModel                                     ok        1.728s
+[LoadModel] monitor started (pid 2060, timeout 60s)
+0.00.129.214 I srv  llama_server: initializing ...
+0.00.129.225 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.129.558 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.146.387 I srv    load_model: loading model 'E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf'
+2026/10/31 21:10:48 [rpc] IsModelLoaded                                 ok           2ms
+2026/10/31 21:10:50 [rpc] IsModelLoaded                                 ok           1ms
+0.03.038.341 I cmn          init: llama threadpool init, n_threads = 8
+0.03.217.346 I srv    load_model: initializing, n_slots = 4, n_ctx_slot = 3328, kv_unified = 'true'
+0.03.223.649 I srv  server_run_i: model loaded
+0.03.223.658 I srv  server_on_li: listening on http://127.0.0.1:8080
+[LoadModel] monitor: server healthy, model loaded
+2026/10/31 21:10:52 [rpc] IsModelLoaded                                 ok            0s
+2026/10/31 21:10:52 [rpc] IsModelLoaded                                 ok            0s
+2026/10/31 21:10:59 [rpc] SaveChatData                                  ok          13ms
+2026/10/31 21:10:59 [rpc] SaveChat                                      ok          14ms
+2026/10/31 21:10:59 [rpc] GetImageSettings                              ok            0s
+2026/10/31 21:10:59 [rpc] GetRegisteredModels                           ok           1ms
+2026/10/31 21:10:59 [rpc] ListImageWorkflows                            ok           1ms
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+2026/10/31 21:10:59 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:10:59 [rpc] ScanImageModels                               ok           4ms
+2026/10/31 21:10:59 [rpc] ListGalleryImages                             ok           4ms
+2026/10/31 21:10:59 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:10:59 [rpc] GetCompatibleAssets                           ok            0s
+2026/10/31 21:10:59 [rpc] GetGalleryImage                               ok           1ms
+2026/10/31 21:10:59 [rpc] GetGalleryImage                               ok           1ms
+2026/10/31 21:10:59 [rpc] GetGalleryImage                               ok           2ms
+2026/10/31 21:10:59 [rpc] GetGalleryImage                               ok           1ms
+2026/10/31 21:10:59 [rpc] GetGalleryImage                               ok           1ms
+2026/10/31 21:10:59 [rpc] GetGalleryImage                               ok           3ms
+2026/10/31 21:10:59 [rpc] GetGalleryImage                               ok           1ms
+2026/10/31 21:10:59 [rpc] GetGalleryImage                               ok           1ms
+2026/10/31 21:10:59 [rpc] GetGalleryImage                               ok           1ms
+2026/10/31 21:10:59 [rpc] GetGalleryImage                               ok           1ms
+2026/10/31 21:10:59 [rpc] GetGalleryImage                               ok           5ms
+2026/10/31 21:10:59 [rpc] GetGalleryImage                               ok           3ms
+2026/10/31 21:10:59 [rpc] GetGalleryImage                               ok           4ms
+2026/10/31 21:10:59 [rpc] GetGalleryImage                               ok           7ms
+2026/10/31 21:10:59 [rpc] GetGalleryImage                               ok           9ms
+2026/10/31 21:10:59 [rpc] GetModelDirectories                           ok           2ms
+2026/10/31 21:11:00 [rpc] IsModelLoaded                                 ok           7ms
+2026/10/31 21:11:01 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:01 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:03 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:03 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:05 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:05 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:07 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:07 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:09 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:09 [rpc] GetSDServerVersion                            ok            0s
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[ResourceManager] GetManager called
+2026/10/31 21:11:11 [rpc] CheckModelFit                                 ok         106ms
+2026/10/31 21:11:11 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:11 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:13 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:13 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:14 [rpc] IsModelLoaded                                 ok            0s
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[ResourceManager] GetManager called
+2026/10/31 21:11:14 [rpc] CheckModelFit                                 ok          99ms
+[VRAM] unloading chat model to make room for the image model
+INFO: llama-server killed, model memory freed
+[ResourceManager] GetManager called
+[ResourceManager] GetManager called
+2026/10/31 21:11:15 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:15 [rpc] GetSDServerVersion                            ok            0s
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+2026/10/31 21:11:16 [rpc] FreeVRAMFor                                   ok         2.19s
+2026/10/31 21:11:16 [rpc] GetGPUInfo                                    FAILED        0s  no such binding: GetGPUInfo
+[ImageEngine] ListModels scanning: E:\HOWL_Chat\models
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+[ImageEngine] autoFillCompanions for 'image' (family: sdxl, files: map[control_net:E:\HOWL_Chat\models\image\controlnet_openpose_sdxl_thibaud_fp16.safetensors model:E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors taesd:E:\HOWL_Chat\models\image\taesdxl.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan21' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan21\Wan2.1-T2V-1.3B-Q4_K_S.gguf t5xxl:E:\HOWL_Chat\models\video\wan21\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan21\wan_2.1_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan22-ti2v-5b' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan22-ti2v-5b\Wan2.2-TI2V-5B-Q4_K_M.gguf t5xxl:E:\HOWL_Chat\models\video\wan22-ti2v-5b\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan22-ti2v-5b\wan2.2_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] ListModels returning 3 models (filtered from 3 total)
+2026/10/31 21:11:16 [rpc] StartImageJob                                 FAILED       4ms  engine ready failed: model not found: (2 incompatible files hidden) (not in E:\HOWL_Chat\models)
+2026/10/31 21:11:17 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:17 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:19 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:19 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:21 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 21:11:21 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:21 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:23 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:23 [rpc] GetSDServerVersion                            ok            0s
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+2026/10/31 21:11:24 [rpc] CheckModelFit                                 ok          91ms
+2026/10/31 21:11:24 [rpc] GetGPUInfo                                    FAILED        0s  no such binding: GetGPUInfo
+[ImageEngine] ListModels scanning: E:\HOWL_Chat\models
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+[ImageEngine] autoFillCompanions for 'image' (family: sdxl, files: map[control_net:E:\HOWL_Chat\models\image\controlnet_openpose_sdxl_thibaud_fp16.safetensors model:E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors taesd:E:\HOWL_Chat\models\image\taesdxl.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan21' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan21\Wan2.1-T2V-1.3B-Q4_K_S.gguf t5xxl:E:\HOWL_Chat\models\video\wan21\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan21\wan_2.1_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan22-ti2v-5b' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan22-ti2v-5b\Wan2.2-TI2V-5B-Q4_K_M.gguf t5xxl:E:\HOWL_Chat\models\video\wan22-ti2v-5b\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan22-ti2v-5b\wan2.2_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] ListModels returning 3 models (filtered from 3 total)
+2026/10/31 21:11:24 [rpc] StartImageJob                                 FAILED       4ms  engine ready failed: model not found: (2 incompatible files hidden) (not in E:\HOWL_Chat\models)
+2026/10/31 21:11:25 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:25 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:26 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 21:11:27 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:27 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:29 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:29 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:31 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:31 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:33 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:33 [rpc] GetSDServerVersion                            ok            0s
+[LoadModel] START path="E:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf"
+[LoadModel] path validated
+[LoadModel] checking port 8080
+[LoadModel] port 8080 free
+[LoadModel] validating llama-server binary
+[LoadModel] llama-server binary validated
+[LoadModel] reading GGUF metadata from: E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf
+2026/10/31 21:11:35 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:35 [rpc] GetSDServerVersion                            ok            0s
+[ReadProfile] final: Family=lfm2moe Layers=24 Params=12607000888 Size=4916.7MB Quant=IQ2_XXS DModel=2048 Heads=32 KVHeads=32
+[LoadModel] profile: Family=lfm2moe Layers=24 Params=12607000888 Size=4916.7MB Quant=IQ2_XXS ArchSpec=true
+[LoadModel] applying safe defaults
+[applySafeDefaults] enter
+[applySafeDefaults] getting hardware snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[applySafeDefaults] freeVRAM=5729 freeRAM=44556
+[applySafeDefaults] reading settings
+[applySafeDefaults] settings: ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] archSpec: layers=24 dmodel=2048 heads=32 kvheads=32
+[applySafeDefaults] creating memory model
+[applySafeDefaults] calling ClampToHardware
+[applySafeDefaults] ClampToHardware returned
+[applySafeDefaults] final: GPU=4023MB RAM=1193MB ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] done
+[LoadModel] safe defaults applied
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+[LoadModel] no mmproj found — vision not available for this model
+[LoadModel] validating spawn settings
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[LoadModel] spawn params: ctx=3096 gpuLayers=22 batch=256 freeVRAM=5729 freeRAM=44556
+[LoadModel] validation result: level=0 msg="Memory OK — estimated 4023 MB GPU / 1193 MB RAM (free: 5729 / 44556 MB)"
+[LoadModel] spawn validation passed
+[LoadModel] spawning llama-server
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+INFO: No mmproj file found for model: E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf
+INFO: llama-server started (pid 9004) with model E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf
+[LoadModel] llama-server spawned (pid 9004)
+INFO: Registering model with estimated GPU:4028MB RAM:1198MB
+[ResourceManager] GetManager called
+2026/10/31 21:11:36 [rpc] LoadModel                                     ok        1.713s
+[LoadModel] monitor started (pid 9004, timeout 60s)
+0.00.118.690 I srv  llama_server: initializing ...
+0.00.118.702 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.119.045 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.129.743 I srv    load_model: loading model 'E:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf'
+2026/10/31 21:11:37 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:37 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:37 [rpc] IsModelLoaded                                 ok            0s
+0.03.011.479 I cmn          init: llama threadpool init, n_threads = 8
+2026/10/31 21:11:39 [rpc] IsModelLoaded                                 ok           1ms
+0.03.239.946 I srv    load_model: initializing, n_slots = 4, n_ctx_slot = 3328, kv_unified = 'true'
+0.03.247.702 I srv  server_run_i: model loaded
+0.03.247.714 I srv  server_on_li: listening on http://127.0.0.1:8080
+2026/10/31 21:11:39 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:39 [rpc] GetSDServerVersion                            ok            0s
+[LoadModel] monitor: server healthy, model loaded
+2026/10/31 21:11:40 [rpc] IsModelLoaded                                 ok            0s
+2026/10/31 21:11:40 [rpc] IsModelLoaded                                 ok            0s
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[ResourceManager] GetManager called
+2026/10/31 21:11:40 [rpc] CheckModelFit                                 ok          94ms
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[ResourceManager] GetManager called
+2026/10/31 21:11:41 [rpc] CheckModelFit                                 ok         100ms
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[ResourceManager] GetManager called
+2026/10/31 21:11:41 [rpc] CheckModelFit                                 ok          90ms
+2026/10/31 21:11:41 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:41 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:43 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:43 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:45 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:45 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:45 [rpc] GetCompatibleAssets                           ok            0s
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[ResourceManager] GetManager called
+2026/10/31 21:11:46 [rpc] CheckModelFit                                 ok          89ms
+2026/10/31 21:11:47 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:47 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:48 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 21:11:49 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:49 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:11:51 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:51 [rpc] GetSDServerVersion                            ok            0s
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+2026/10/31 21:11:53 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:53 [rpc] GetSDServerVersion                            ok            0s
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[ResourceManager] GetManager called
+2026/10/31 21:11:53 [rpc] CheckModelFit                                 ok         101ms
+[VRAM] unloading chat model to make room for the image model
+INFO: llama-server killed, model memory freed
+[ResourceManager] GetManager called
+[ResourceManager] GetManager called
+2026/10/31 21:11:55 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:55 [rpc] GetSDServerVersion                            ok            0s
+[ResourceManager] GetManager called
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+2026/10/31 21:11:55 [rpc] FreeVRAMFor                                   ok        2.162s
+2026/10/31 21:11:55 [rpc] GetGPUInfo                                    FAILED        0s  no such binding: GetGPUInfo
+[ImageEngine] ListModels scanning: E:\HOWL_Chat\models
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+[ImageEngine] autoFillCompanions for 'image' (family: sdxl, files: map[control_net:E:\HOWL_Chat\models\image\controlnet_openpose_sdxl_thibaud_fp16.safetensors model:E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors taesd:E:\HOWL_Chat\models\image\taesdxl.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan21' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan21\Wan2.1-T2V-1.3B-Q4_K_S.gguf t5xxl:E:\HOWL_Chat\models\video\wan21\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan21\wan_2.1_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan22-ti2v-5b' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan22-ti2v-5b\Wan2.2-TI2V-5B-Q4_K_M.gguf t5xxl:E:\HOWL_Chat\models\video\wan22-ti2v-5b\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan22-ti2v-5b\wan2.2_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] ListModels returning 3 models (filtered from 3 total)
+[ImageEngine] ListModels scanning: E:\HOWL_Chat\models
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+[ImageEngine] autoFillCompanions for 'image' (family: sdxl, files: map[control_net:E:\HOWL_Chat\models\image\controlnet_openpose_sdxl_thibaud_fp16.safetensors model:E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors taesd:E:\HOWL_Chat\models\image\taesdxl.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan21' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan21\Wan2.1-T2V-1.3B-Q4_K_S.gguf t5xxl:E:\HOWL_Chat\models\video\wan21\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan21\wan_2.1_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] autoFillCompanions for 'wan22-ti2v-5b' (family: wan, files: map[model:E:\HOWL_Chat\models\video\wan22-ti2v-5b\Wan2.2-TI2V-5B-Q4_K_M.gguf t5xxl:E:\HOWL_Chat\models\video\wan22-ti2v-5b\umt5-xxl-encoder-Q4_K_M.gguf vae:E:\HOWL_Chat\models\video\wan22-ti2v-5b\wan2.2_vae.safetensors])
+[ImageEngine] Available - VAEs: 0, ClipL: 0, ClipG: 0, T5XXL: 0, LLMs: 0
+[ImageEngine] ListModels returning 3 models (filtered from 3 total)
+[ImageEngine] Starting sd-server: C:\Users\StoneWolfPC\HOWL_Chat\sd-server.exe [--listen-port 8081 --threads 16 -m E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors --taesd E:\HOWL_Chat\models\image\taesdxl.safetensors --taesd-preview-only --control-net E:\HOWL_Chat\models\image\controlnet_openpose_sdxl_thibaud_fp16.safetensors --max-vram -1]
+ggml_cuda_init: found 1 CUDA devices (Total VRAM: 8191 MiB):
+  Device 0: NVIDIA GeForce GTX 1080, compute capability 6.1, VMM: yes, VRAM: 8191 MiB
+load_backend: loaded CUDA backend from C:\Users\StoneWolfPC\HOWL_Chat\ggml-cuda.dll
+load_backend: loaded CPU backend from C:\Users\StoneWolfPC\HOWL_Chat\ggml-cpu-haswell.dll
+[I] loading model from 'E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors' --- diffusion_engine.cpp:685
+[I] load E:\HOWL_Chat\models\image\unholyDesireMixSinister_v90.safetensors using safetensors format --- model_loader.cpp:222
+[I] loading tae from 'E:\HOWL_Chat\models\image\taesdxl.safetensors' --- diffusion_engine.cpp:771
+[I] load E:\HOWL_Chat\models\image\taesdxl.safetensors using safetensors format --- model_loader.cpp:222
+[I] load E:\HOWL_Chat\models\image\controlnet_openpose_sdxl_thibaud_fp16.safetensors using safetensors format --- model_loader.cpp:222
+[I] Version: SDXL  --- diffusion_engine.cpp:975
+[I] auto-fit plan: --- backend_fit.cpp:323
+[I]   devices: --- backend_fit.cpp:324
+[I]     CUDA0        NVIDIA GeForce GTX 1080          free   7185 MiB, budget   6161 MiB --- backend_fit.cpp:328
+[I]     RAM          free  49272 MiB, params budget  44345 MiB --- backend_fit.cpp:334
+[I]   compute-device weight cache priority: diffusion > te > vae --- backend_fit.cpp:336
+[I]   components (params: compute device -> RAM -> other GPU -> disk): --- backend_fit.cpp:337
+[I]     DiT          params   4897 MiB, compute reserve  2048 MiB -> compute CUDA0, params cpu --- backend_fit.cpp:348
+[I]     Conditioner  params   1559 MiB, compute reserve  2048 MiB -> compute CUDA0, params cpu --- backend_fit.cpp:348
+[I]     VAE          params    168 MiB, compute reserve  1024 MiB -> compute CUDA0, params cpu --- backend_fit.cpp:348
+[I] auto-fit: --backend "diffusion=CUDA0,te=CUDA0,vae=CUDA0" --params-backend "diffusion=cpu,te=cpu,vae=cpu" --- backend_fit.cpp:477
+[I] Weight type stat:                      f32: 135  |     f16: 3109 |     i32: 1    |    bf16: 248   --- diffusion_engine.cpp:1548
+[I] Conditioner weight type stat:          f32: 1    |     f16: 585  |     i32: 1     --- diffusion_engine.cpp:1549
+[I] Diffusion model weight type stat:      f16: 1680  --- diffusion_engine.cpp:1550
+[I] VAE weight type stat:                 bf16: 248   --- diffusion_engine.cpp:1551
+[I] using VAE for encoding / decoding --- model_builders.cpp:210
+[I] vae decoder: ch = 128 --- auto_encoder_kl.hpp:529
+[W] No valid VAE specified with --vae or --force-sdxl-vae-conv-scale flag set, using Conv2D scale 0.031 --- sd.cpp:15
+[I] using TAE for preview --- model_builders.cpp:213
+[I] flash attention auto: CUDA0 -> on (probe: normal 1.518 ms, flash 1.229 ms) --- flash_attn.cpp:95
+[I] conv2d direct auto: CUDA0 -> off (no implicit GEMM path) --- conv_direct.cpp:90
+[I] conv3d direct auto: CUDA0 -> on (implicit GEMM) --- conv_direct.cpp:87
+[I] total params memory size = 9014.05MB (VRAM 2387.61MB, RAM 6626.44MB): text_encoders 1564.36MB(RAM), diffusion_model 4900.07MB(RAM), vae 162.02MB(RAM), controlnet 2387.61MB(VRAM), extensions 0.00MB(N/A) --- diffusion_engine.cpp:1438
+[I] running in eps-prediction mode --- diffusion_engine.cpp:1467
+[I] listening on: http://127.0.0.1:8081 --- main.cpp:170
+2026/10/31 21:11:56 [rpc] StartImageJob                                 ok        1.011s
+[DEBUG] txt2img: ModelName="image", isFluxFamily=false, isDiTModel=false
+[DEBUG] txt2img: Skipping DiT parameters for non-DiT model
+[DEBUG] txt2img request JSON: {"prompt":"arbitration test cube","negative_prompt":"","width":1024,"height":1024,"steps":20,"seed":606,"sampler_name":"euler_a","preview":"tae","scheduler":"karras","cfg_scale":7,"batch_size":1,"enable_hr":false,"hr_scale":2,"hr_upscaler":"","denoising_strength":0,"tiling":false,"clip_skip":2,"control_strength":0.9,"video_frames":33,"fps":16,"video_motion_strength":0.5,"video_seed_mode":"fixed","video_denoise":0.6,"output_format":"webm"}
+[I] generate_image 1024x1024 --- image.cpp:869
+[I] get_sigmas with Karras scheduler --- denoiser.hpp:1133
+[I] sampling using Euler A method --- request.cpp:477
+[I] clip build cached graph cut plan done (taking 1 ms) --- ggml_graph_cut.cpp:1042
+  |##################################################| 178/178 -   1.03GB/s[K
+[I] loading tensors completed, taking 0.21s (read: 0.05s, memcpy: 0.00s, convert: 0.00s, copy_to_backend: 0.00s) --- model_loader.cpp:1427
+[I] clip build cached graph cut plan done (taking 2 ms) --- ggml_graph_cut.cpp:1042
+[DEBUG] progress() called (jobID="")2026/10/31 21:11:57 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:11:57 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:57 [rpc] GetSDServerVersion                            ok            0s
+  |#########################################         | 306/374 -   3.64GB/s[K
+  |##################################################| 374/374 -   3.00GB/s[K
+[I] loading tensors completed, taking 0.42s (read: 0.27s, memcpy: 0.00s, convert: 0.00s, copy_to_backend: 0.00s) --- model_loader.cpp:1427
+[DEBUG] progress() called (jobID="")2026/10/31 21:11:57 [rpc] GetImageJobStatus                             ok            0s
+[I] clip build cached graph cut plan done (taking 2 ms) --- ggml_graph_cut.cpp:1042
+  |##################################################| 15/15 - 188.25MB/s[K
+[I] loading tensors completed, taking 0.22s (read: 0.00s, memcpy: 0.00s, convert: 0.00s, copy_to_backend: 0.00s) --- model_loader.cpp:1427
+[DEBUG] progress() called (jobID="")2026/10/31 21:11:58 [rpc] GetImageJobStatus                             ok            0s
+[I] clip build cached graph cut plan done (taking 3 ms) --- ggml_graph_cut.cpp:1042
+2026/10/31 21:11:58 [rpc] IsModelLoaded                                 ok           2ms
+[I] get_learned_condition completed, taking 1.72s --- image.cpp:580
+[I] generating image: 1/1 - seed 606 --- image.cpp:920
+[I] unet build cached graph cut plan done (taking 10 ms) --- ggml_graph_cut.cpp:1042
+[DEBUG] progress() called (jobID="")2026/10/31 21:11:58 [rpc] GetImageJobStatus                             ok           1ms
+[DEBUG] progress() called (jobID="")2026/10/31 21:11:59 [rpc] GetImageJobStatus                             ok            0s
+  |###########                                       |  341/1680 -   2.62GB/s[K
+2026/10/31 21:11:59 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:11:59 [rpc] GetSDServerVersion                            ok            0s
+  |#################                                 |  559/1680 -   3.07GB/s[K
+[DEBUG] progress() called (jobID="")2026/10/31 21:11:59 [rpc] GetImageJobStatus                             ok            0s
+  |########################                          |  780/1680 -   3.23GB/s[K
+  |##############################                    |  994/1680 -   3.31GB/s[K
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:00 [rpc] GetImageJobStatus                             ok            0s
+  |#####################################             | 1212/1680 -   3.38GB/s[K
+  |###########################################       | 1431/1680 -   3.46GB/s[K
+  |##################################################| 1680/1680 -   3.34GB/s[K
+[I] loading tensors completed, taking 1.43s (read: 1.35s, memcpy: 0.00s, convert: 0.00s, copy_to_backend: 0.00s) --- model_loader.cpp:1427
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:00 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:01 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:01 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:01 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:01 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:02 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:02 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:03 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:03 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:03 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:03 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:04 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:04 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:05 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:05 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:05 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:05 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:06 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:06 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:07 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:07 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:07 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:07 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:08 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:08 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:09 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:09 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:09 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:09 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:10 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:10 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:11 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:11 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:11 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:11 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:12 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:12 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:12 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:13 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:13 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:13 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:13 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:14 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:14 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:15 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:15 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:15 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:15 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:16 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:16 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:17 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:17 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:17 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:17 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:18 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:18 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:19 [rpc] GetImageJobStatus                             ok           2ms
+2026/10/31 21:12:19 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:19 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:19 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:20 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:20 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:21 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:21 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:21 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:21 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:22 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:22 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:23 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:23 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:23 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:23 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:24 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:24 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:25 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:25 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:25 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:25 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:26 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:26 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:27 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:27 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:27 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:27 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:28 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:28 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:29 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:29 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:29 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:29 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:30 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:30 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:31 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:31 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:31 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:31 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:32 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:32 [rpc] GetImageJobStatus                             ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:33 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:33 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:33 [rpc] GetSDServerVersion                            ok            0s
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:33 [rpc] GetImageJobStatus                             ok            0s
+[App] UnloadImageModel called
+[DEBUG] progress() called (jobID="")2026/10/31 21:12:34 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:34 [rpc] GetImageJobStatus                             ok            0s
+2026/10/31 21:12:34 [rpc] UnloadImageModel                              ok         701ms
+2026/10/31 21:12:35 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:35 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:12:37 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:37 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:12:39 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:39 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:12:41 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:41 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:12:43 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:43 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:12:45 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:45 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:12:47 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:47 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:12:49 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:49 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:12:51 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:51 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:12:53 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:53 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:12:55 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:55 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:12:57 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:57 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:12:59 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:12:59 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:01 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:01 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:03 [rpc] GetAppDiagnostics                             ok           2ms
+2026/10/31 21:13:03 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:05 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:05 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:07 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:07 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:09 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:09 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:11 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:11 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:13 [rpc] GetAppDiagnostics                             ok           2ms
+2026/10/31 21:13:13 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:15 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:15 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:17 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:17 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:19 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:19 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:21 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:21 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:23 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:23 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:25 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:25 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:27 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:27 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:29 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:29 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:31 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:31 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:33 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:33 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:35 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:35 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:37 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:37 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:39 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:39 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:41 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:41 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:43 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:43 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:45 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:45 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:47 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:47 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:49 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:49 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:51 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:51 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:53 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:53 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:55 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:55 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:57 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:57 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:13:59 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:13:59 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:01 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:01 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:03 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:03 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:05 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:05 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:07 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:07 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:09 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:09 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:11 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:11 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:13 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:13 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:15 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:15 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:17 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:17 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:19 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:19 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:21 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:21 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:23 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:23 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:25 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:25 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:27 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:27 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:29 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:29 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:31 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:31 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:33 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:33 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:35 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:35 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:37 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:37 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:39 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:39 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:41 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:41 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:43 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:43 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:45 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:45 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:47 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:47 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:49 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:49 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:51 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:51 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:53 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:53 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:55 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:55 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:14:57 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:57 [rpc] GetSDServerVersion                            ok           1ms
+2026/10/31 21:14:59 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:14:59 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:01 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:01 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:03 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:03 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:05 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:05 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:07 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:07 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:09 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:09 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:11 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:11 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:13 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:13 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:15 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:15 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:17 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:17 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:19 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:19 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:21 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:21 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:23 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:23 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:25 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:25 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:27 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:27 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:29 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:29 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:31 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:31 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:33 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:33 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:35 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:35 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:37 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:37 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:39 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:39 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:41 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:41 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:43 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:43 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:45 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:45 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:47 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:47 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:49 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:49 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:51 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:51 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:53 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:53 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:55 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:55 [rpc] GetSDServerVersion                            ok           1ms
+2026/10/31 21:15:57 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:57 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:15:59 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:15:59 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:01 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:01 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:03 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:03 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:05 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:05 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:07 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:07 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:09 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:09 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:11 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:11 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:13 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:13 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:15 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:15 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:17 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:17 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:19 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:19 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:21 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:21 [rpc] GetSDServerVersion                            ok           1ms
+2026/10/31 21:16:23 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:23 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:25 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:25 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:27 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:27 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:29 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:29 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:31 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:31 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:33 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:33 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:35 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:35 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:37 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:37 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:39 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:39 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:41 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:41 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:43 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:43 [rpc] GetSDServerVersion                            ok           1ms
+2026/10/31 21:16:45 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:45 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:47 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:47 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:49 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:49 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:51 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:51 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:53 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:53 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:55 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:55 [rpc] GetSDServerVersion                            ok           1ms
+2026/10/31 21:16:57 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:57 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:16:59 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:16:59 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:01 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:01 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:03 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:03 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:05 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:05 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:07 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:07 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:09 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:09 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:11 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:11 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:13 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:13 [rpc] GetSDServerVersion                            ok           1ms
+2026/10/31 21:17:15 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:15 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:17 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:17 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:19 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:19 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:21 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:21 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:23 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:23 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:25 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:25 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:27 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:27 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:29 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:29 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:31 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:31 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:33 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:33 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:35 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:35 [rpc] GetSDServerVersion                            ok           1ms
+2026/10/31 21:17:37 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:37 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:39 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:39 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:41 [rpc] GetAppDiagnostics                             ok           1ms
+2026/10/31 21:17:41 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:43 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:43 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:45 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:45 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:47 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:47 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:49 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:49 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:51 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:51 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:53 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:53 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:55 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:55 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:57 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:57 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:17:59 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:17:59 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:01 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:01 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:03 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:03 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:05 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:05 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:07 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:07 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:09 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:09 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:11 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:11 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:12 [rpc] GetAppDiagnostics                             ok           2ms
+2026/10/31 21:18:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:13 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:13 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:15 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:15 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:17 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:17 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:19 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:19 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:21 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:21 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:23 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:23 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:25 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:25 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:27 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:27 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:29 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:29 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:31 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:31 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:33 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:33 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:35 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:35 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:37 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:37 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:39 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:39 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:41 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:41 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:43 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:43 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:45 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:45 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:47 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:47 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:49 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:49 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:51 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:51 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:53 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:53 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:55 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:55 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:57 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:57 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:18:59 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:18:59 [rpc] GetSDServerVersion                            ok           1ms
+2026/10/31 21:19:01 [rpc] GetAppDiagnostics                             ok           1ms
+2026/10/31 21:19:01 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:03 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:03 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:05 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:05 [rpc] GetSDServerVersion                            ok           1ms
+2026/10/31 21:19:07 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:07 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:09 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:09 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:11 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:11 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:13 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:13 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:15 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:15 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:17 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:17 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:19 [rpc] GetAppDiagnostics                             ok           2ms
+2026/10/31 21:19:19 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:21 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:21 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:23 [rpc] GetAppDiagnostics                             ok           1ms
+2026/10/31 21:19:23 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:25 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:25 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:27 [rpc] GetAppDiagnostics                             ok           1ms
+2026/10/31 21:19:27 [rpc] GetSDServerVersion                            ok           2ms
+2026/10/31 21:19:29 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:29 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:31 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:31 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:33 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:33 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:35 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:35 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:37 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:37 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:39 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:39 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:41 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:41 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:43 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:43 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:45 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:45 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:47 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:47 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:49 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:49 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:51 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:51 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:53 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:53 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:55 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:55 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:57 [rpc] GetAppDiagnostics                             ok           1ms
+2026/10/31 21:19:57 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:19:59 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:19:59 [rpc] GetSDServerVersion                            ok           1ms
+2026/10/31 21:20:01 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:20:01 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:20:03 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:20:03 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:20:05 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:20:05 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:20:07 [rpc] GetAppDiagnostics                             ok           1ms
+2026/10/31 21:20:07 [rpc] GetSDServerVersion                            ok           1ms
+2026/10/31 21:20:09 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:20:09 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:20:11 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:20:11 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:20:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:20:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:20:13 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:20:13 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:20:15 [rpc] GetAppDiagnostics                             ok           1ms
+2026/10/31 21:20:15 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:20:17 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:20:17 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:20:19 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:20:19 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:20:21 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:20:21 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:20:23 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:20:23 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:20:25 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:20:25 [rpc] GetSDServerVersion                            ok            0s

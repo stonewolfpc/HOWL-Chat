@@ -1,0 +1,8 @@
+ggml_cuda_init: found 1 CUDA devices (Total VRAM: 8191 MiB):
+  Device 0: NVIDIA GeForce GTX 1080, compute capability 6.1, VMM: yes, VRAM: 8191 MiB
+load_backend: loaded CUDA backend from E:\HOWL_Chat\ggml-cuda.dll
+load_backend: loaded CPU backend from E:\HOWL_Chat\ggml-cpu-haswell.dll
+[I] loading diffusion model from 'models/video/wan22-ti2v-5b/Wan2.2-TI2V-5B-Q4_K_M.gguf' --- diffusion_engine.cpp:692
+[I] load models/video/wan22-ti2v-5b/Wan2.2-TI2V-5B-Q4_K_M.gguf using gguf format --- model_loader.cpp:216
+[I] loading t5xxl from 'models/video/wan22-ti2v-5b/umt5-xxl-encoder-Q4_K_M.gguf' --- diffusion_engine.cpp:734
+[I] 

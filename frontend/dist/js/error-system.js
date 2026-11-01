@@ -95,6 +95,10 @@ function handleBackendError(payload) {
     }
 
     incrementCircuitBreaker(code);
+
+    // Recovery hooks (error-handler.js) run from here now. It used to wrap this
+    // function after load, which only worked while the load order held.
+    if (typeof onErrorReported === 'function') onErrorReported(payload);
 }
 
 function handleSilentError(payload) {
@@ -147,7 +151,7 @@ function showErrorBanner(code, operation, severity) {
         <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:${color};color:white;border-radius:6px;font-size:13px;max-width:400px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">
             <span style="font-weight:600;">${code}</span>
             <span style="opacity:0.9;">${operation} failed</span>
-            <button onclick="dismissErrorBanner('${code}')" style="margin-left:auto;background:rgba(255,255,255,0.2);border:none;color:white;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px;">Dismiss</button>
+            <button onclick="dismissErrorBanner('${code}')" style="margin-left:auto;background:var(--border-secondary);border:none;color:white;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px;">Dismiss</button>
         </div>
     `;
     banner.style.display = 'block';

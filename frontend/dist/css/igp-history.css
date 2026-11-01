@@ -16,10 +16,11 @@
     overflow-y: auto;
     overflow-x: hidden;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 12px;
-    padding: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+    padding: 12px;
     background: var(--surface-primary);
+    align-content: start;
 }
 
 .ig-history-placeholder {
@@ -69,27 +70,119 @@
 
 .ig-history-item .ig-history-delete {
     position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 24px;
-    height: 24px;
-    background: var(--danger);
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    background: rgba(220, 38, 38, 0.85);
     border: none;
-    border-radius: 6px;
-    color: #FFFFFF;
-    font-size: 14px;
+    border-radius: 4px;
+    color: var(--text-secondary);
+    font-size: 11px;
     cursor: pointer;
     display: none;
     align-items: center;
     justify-content: center;
     line-height: 1;
     transition: background 0.2s, transform 0.1s;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    z-index: 3;
 }
 
 .ig-history-item .ig-history-delete:hover {
-    background: var(--danger);
+    background: rgba(220, 38, 38, 1);
     transform: scale(1.1);
 }
 
 .ig-history-item:hover .ig-history-delete { display: flex; }
+
+.ig-history-menu-btn {
+    position: absolute;
+    top: 4px;
+    right: 26px;
+    width: 20px;
+    height: 20px;
+    background: rgba(0,0,0,0.5);
+    color: var(--text-secondary);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    line-height: 1;
+    z-index: 2;
+}
+
+.ig-history-item:hover .ig-history-menu-btn { display: flex; }
+
+.ig-history-menu-popup {
+    position: absolute;
+    top: 28px;
+    right: 4px;
+    background: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10;
+    min-width: 160px;
+    padding: 4px 0;
+    display: none;
+}
+
+.ig-history-menu-popup button {
+    display: block;
+    width: 100%;
+    padding: 6px 10px;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    text-align: left;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.ig-history-menu-popup button:hover {
+    background: var(--surface-hover);
+    color: var(--accent-primary);
+}
+
+/* Compact action buttons at bottom of history item */
+.ig-history-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: none;
+    gap: 2px;
+    justify-content: center;
+    padding: 3px 4px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    z-index: 2;
+}
+
+.ig-history-item:hover .ig-history-actions {
+    display: flex;
+}
+
+.ig-history-send-btn {
+    background: rgba(20, 184, 166, 0.15);
+    border: 1px solid rgba(20, 184, 166, 0.25);
+    color: var(--accent-primary, var(--accent-primary));
+    border-radius: 4px;
+    padding: 2px 4px;
+    font-size: 9px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1;
+    min-width: 0;
+    flex: 1;
+    text-align: center;
+}
+
+.ig-history-send-btn:hover {
+    background: rgba(20, 184, 166, 0.3);
+    border-color: rgba(20, 184, 166, 0.5);
+}

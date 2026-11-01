@@ -77,6 +77,9 @@ type InferenceOptions struct {
 	NPredict                int      `json:"n_predict"`                  // Maximum tokens to generate
 	NKeep                   int      `json:"n_keep"`                     // Number of tokens to keep from prompt
 	StopStrings             []string `json:"stop_strings"`               // Strings that stop generation
+
+	// OnReasoning receives thinking deltas for display. Local only, never sent.
+	OnReasoning func(string) `json:"-"`
 }
 
 // ContextOptions represents options for context management

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,9 +11,90 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"howl-chat/internal/image/registry"
+	"howl-chat/internal/paths"
 )
 
-var sdServerPath = `D:\StableDiffusion\sd-server.exe`
+var sdServerPath string
+
+// resolveSDServerPath finds the sd-server binary the same way the app does:
+// project root first, then next to the binary, then PATH. An explicit -sd flag
+// always wins so this harness works against a build kept anywhere.
+func resolveSDServerPath(explicit string) string {
+	if explicit != "" {
+		return explicit
+	}
+	candidates := []string{filepath.Join(paths.ProjectRoot(), "sd-server.exe")}
+	if exe, err := os.Executable(); err == nil {
+		candidates = append(candidates, filepath.Join(filepath.Dir(exe), "sd-server.exe"))
+	}
+	for _, c := range candidates {
+		if _, err := os.Stat(c); err == nil {
+			return c
+		}
+	}
+	if p, err := exec.LookPath("sd-server.exe"); err == nil {
+		return p
+	}
+	return ""
+}
+
+// resolveScanDirs defaults to the models directory the app is configured to
+// use, so the harness reports on the same folder the Image Generator scans.
+func resolveScanDirs(explicit string) []string {
+	if strings.TrimSpace(explicit) != "" {
+		var dirs []string
+		for _, p := range strings.Split(explicit, ",") {
+			if p = strings.TrimSpace(p); p != "" {
+				dirs = append(dirs, p)
+			}
+		}
+		return dirs
+	}
+
+	var dirs []string
+	seen := make(map[string]bool)
+	add := func(dir string) {
+		dir = strings.TrimSpace(dir)
+		if dir == "" {
+			return
+		}
+		key := strings.ToLower(filepath.Clean(dir))
+		if seen[key] {
+			return
+		}
+		seen[key] = true
+		dirs = append(dirs, dir)
+	}
+
+	configDir := filepath.Join(paths.ProjectRoot(), "config")
+
+	// Follow the same directory ledger the app uses, so this report covers
+	// exactly the folders the Image Generator scans.
+	if reg, err := registry.New(configDir); err == nil {
+		for _, dir := range reg.Directories(registry.KindImage) {
+			add(dir)
+		}
+	}
+
+	if len(dirs) == 0 {
+		if data, err := os.ReadFile(filepath.Join(configDir, "image-settings.json")); err == nil {
+			var cfg struct {
+				Engine struct {
+					ModelsDir string `json:"models_dir"`
+				} `json:"engine_config"`
+			}
+			if err := json.Unmarshal(data, &cfg); err == nil {
+				add(cfg.Engine.ModelsDir)
+			}
+		}
+	}
+	if len(dirs) == 0 {
+		add(filepath.Join(paths.ProjectRoot(), "models"))
+	}
+	return dirs
+}
 
 // classify determines if a file is a full model, LoRA, VAE, or embedding by size and name
 func classify(name string, size int64) string {
@@ -94,7 +177,17 @@ func testModel(path string) (bool, string) {
 }
 
 func main() {
-	dirs := []string{`D:\AI GGUF\Image`, `D:\AI GGUF\Image Models`}
+	sdFlag := flag.String("sd", "", "path to sd-server executable (default: auto-discover from the project root)")
+	dirsFlag := flag.String("dirs", "", "comma-separated model directories to scan (default: every directory added to HOWL as an image directory)")
+	flag.Parse()
+
+	sdServerPath = resolveSDServerPath(*sdFlag)
+	dirs := resolveScanDirs(*dirsFlag)
+	if sdServerPath == "" {
+		fmt.Println("ERROR: sd-server not found. Pass -sd <path> or place sd-server.exe in the project root.")
+	} else {
+		fmt.Printf("Using sd-server: %s\n", sdServerPath)
+	}
 
 	fmt.Println("╔══════════════════════════════════════════════════════════════════════════════╗")
 	fmt.Println("║                    HOWL Image Model Diagnostic Report                       ║")

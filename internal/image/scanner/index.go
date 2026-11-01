@@ -10,25 +10,31 @@ const indexFile = "model-index.json"
 
 // AssetEntry is one record in the model index — covers all asset types.
 type AssetEntry struct {
-	Name    string            `json:"name"`
-	Path    string            `json:"path"`
-	Type    AssetType         `json:"type"`
-	Family  ModelFamily       `json:"family"`
-	Format  string            `json:"format"`
-	SizeMB  float64           `json:"size_mb"`
-	Files   map[string]string `json:"files,omitempty"`
-	Recommended Recommended   `json:"recommended"`
+	Name        string            `json:"name"`
+	Path        string            `json:"path"`
+	Type        AssetType         `json:"type"`
+	Family      ModelFamily       `json:"family"`
+	Format      string            `json:"format"`
+	SizeMB      float64           `json:"size_mb"`
+	FileSize    int64             `json:"file_size,omitempty"`
+	ModTimeNS   int64             `json:"mod_time_ns,omitempty"`
+	Files       map[string]string `json:"files,omitempty"`
+	Recommended Recommended       `json:"recommended"`
 }
 
 // ModelIndex is the full catalog produced by a scan.
 // Each slice contains only entries of the matching type.
 type ModelIndex struct {
-	Models      []AssetEntry `json:"models"`       // diffusion models only
+	Models      []AssetEntry `json:"models"` // diffusion models only
 	VAEs        []AssetEntry `json:"vaes"`
 	LoRAs       []AssetEntry `json:"loras"`
 	ControlNets []AssetEntry `json:"controlnets"`
 	Embeddings  []AssetEntry `json:"embeddings"`
 	Upscalers   []AssetEntry `json:"upscalers"`
+	T5XXLs      []AssetEntry `json:"t5xxls"`
+	ClipLs      []AssetEntry `json:"clip_ls"`
+	ClipGs      []AssetEntry `json:"clip_gs"`
+	LLMs        []AssetEntry `json:"llms"` // For Anima's Qwen3 text encoder
 }
 
 // IndexStore handles reading and writing the cached model index.

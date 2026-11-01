@@ -42,3 +42,82 @@ body.theme-light .character-item.character-inactive .character-name {
 body.theme-light .character-name {
     color: var(--text-primary);
 }
+
+body.theme-light .character-status {
+    color: var(--text-secondary);
+}
+
+/* Right Sidebar — Context Sections */
+body.theme-light .context-section {
+    background: var(--surface-primary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .context-section:hover {
+    background: var(--surface-hover);
+}
+
+body.theme-light .context-section-header {
+    color: var(--text-primary);
+}
+
+body.theme-light .context-display-block {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .context-thumbnail {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .thumbnail-placeholder {
+    color: var(--text-tertiary);
+}
+
+body.theme-light .context-name {
+    color: var(--text-primary);
+}
+
+body.theme-light .context-description {
+    color: var(--text-secondary);
+}
+
+body.theme-light .context-btn {
+    background: var(--surface-hover);
+    border-color: var(--border-primary);
+    color: var(--text-secondary);
+}
+
+body.theme-light .context-btn:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
+    color: var(--text-primary);
+}
+
+body.theme-light .context-option {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .context-option:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
+}
+
+body.theme-light .toggle-slider {
+    background: var(--border-secondary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .toggle-slider::before {
+    background: var(--surface-primary);
+}
+
+body.theme-light .option-label {
+    color: var(--text-secondary);
+}
+
+body.theme-light .context-option:hover .option-label {
+    color: var(--text-primary);
+}

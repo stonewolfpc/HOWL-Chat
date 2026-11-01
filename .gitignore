@@ -1,6 +1,46 @@
-# Audio models and binaries (large files)
-models/*.bin
-models/*.gguf
+# =============================================================================
+# THIRD-PARTY MODEL FILES — DO NOT REDISTRIBUTE
+# =============================================================================
+# The following are AI/ML model weights, text encoders (T5-XXL, CLIP, etc.),
+# VAEs, and companion files licensed by their respective owners.
+# They CANNOT be legally redistributed. Exclude from ALL builds and packages.
+# =============================================================================
+
+# Core model formats
+*.bin
+*.gguf
+*.safetensors
+*.ckpt
+*.pth
+*.onnx
+*.pt
+*.h5
+*.pb
+*.tflite
+*.mlmodel
+*.weights
+*.params
+
+# Text encoder / companion files (by name prefix)
+*t5xxl*
+*t5-xxl*
+*t5_xxl*
+*clip_l*
+*clip-l*
+*clip_g*
+*clip-g*
+*clip_vision*
+*taesd*
+*vae*
+*diffusion_model*
+*text_encoder*
+*unet*
+*encoder*
+
+# Local models directory
+models/
+
+# Binaries (built, not shipped)
 bin/*.exe
 bin/*.dll
 bin/*.zip
@@ -44,3 +84,17 @@ images/gallery/
 
 # Submodule (managed separately)
 gollama.cpp/
+
+# =============================================================================
+# BACKUP / HEAVYWEIGHT (not source; captured in backups/ snapshot instead)
+# =============================================================================
+backups/
+runtime/
+.sd-upgrade/
+.freebuff/
+build/bin/
+howl-chat-*.exe
+harness.log
+harness.err
+preview-probe.json
+probe2.json

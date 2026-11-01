@@ -6,17 +6,19 @@
     <title>Image Generator - HOWL Chat</title>
     <script src="/wails/ipc.js"></script>
     <script src="/wails/runtime.js"></script>
-    <link rel="stylesheet" href="css/theme.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/menu-components.css">
-    <link rel="stylesheet" href="css/nav-components.css">
-    <link rel="stylesheet" href="css/animations.css">
-    <link rel="stylesheet" href="css/ambient.css">
-    <link rel="stylesheet" href="css/image-generator-panels.css">
-    <link rel="stylesheet" href="css/image-generator.css">
-    <link rel="stylesheet" href="css/icons.css">
-    <link rel="stylesheet" href="css/nav-icon-images.css">
-    <link rel="stylesheet" href="css/tutorials.css">
+    <link rel="stylesheet" href="css/theme.css?v=29">
+    <link rel="stylesheet" href="css/layout.css?v=29">
+    <link rel="stylesheet" href="css/menu-components.css?v=29">
+    <link rel="stylesheet" href="css/nav-components.css?v=29">
+    <link rel="stylesheet" href="css/animations.css?v=29">
+    <link rel="stylesheet" href="css/ambient.css?v=29">
+    <link rel="stylesheet" href="css/image-generator-panels.css?v=29">
+    <link rel="stylesheet" href="css/image-generator.css?v=29">
+    <link rel="stylesheet" href="css/icons.css?v=29">
+    <link rel="stylesheet" href="css/nav-icon-images.css?v=29">
+    <link rel="stylesheet" href="css/tutorials.css?v=29">
+    <link rel="stylesheet" href="css/ig-fluid.css?v=29">
+    <link rel="stylesheet" href="css/ig-pose.css?v=29">
 </head>
 <body>
     <!-- Ambient Background Effects -->
@@ -65,10 +67,19 @@
                 </div>
             </div>
             <div class="menu-item">
+                <button class="menu-button">Settings</button>
+                <div class="dropdown" id="settings-dropdown">
+                    <div class="dropdown-item" onclick="openModal('ig-modal-library')">Model Library</div>
+                    <div class="dropdown-item" onclick="openModal('ig-modal-info')">Model Info</div>
+                    <div class="dropdown-item" onclick="openModal('ig-modal-diagnostics')">Diagnostics</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item" onclick="openModal('ig-modal-paths')">Engine Paths</div>
+                </div>
+            </div>
+            <div class="menu-item">
                 <button class="menu-button">Help</button>
                 <div class="dropdown" id="help-dropdown">
                     <div class="dropdown-item" onclick="openTutorials()">Tutorials</div>
-                    <div class="dropdown-item">Documentation</div>
                     <div class="dropdown-item">About</div>
                 </div>
             </div>
@@ -116,8 +127,11 @@
             </div>
 
             <div class="ig-layout">
+                <!-- Sidebar Toggle -->
+                <button class="ig-sidebar-toggle" id="ig-sidebar-toggle" title="Toggle sidebar">&#x25C0;</button>
+
                 <!-- Left: Controls -->
-                <div class="ig-sidebar">
+                <div class="ig-sidebar" id="ig-sidebar">
                     <div class="ig-panel" data-panel="model">
                         <div class="ig-panel-header">
                             <span class="ig-panel-title">Model Configuration</span>
@@ -133,83 +147,45 @@
                                 <button id="ig-unload-model" class="ig-btn ig-btn-warn">Unload</button>
                                 <button id="ig-reload-model" class="ig-btn ig-btn-secondary">Reload</button>
                             </div>
-                            
-                            <div class="ig-panel ig-panel-collapsed" style="margin-top:8px; border:none; box-shadow:none;">
-                                <div class="ig-panel-header" style="background:transparent; padding:4px 0;">
-                                    <span class="ig-panel-title" style="font-size:11px; opacity:0.8;">Sub-Models & Encoders</span>
-                                    <span class="ig-panel-toggle" style="font-size:8px;">&#x25B6;</span>
-                                </div>
-                                <div class="ig-panel-body" style="display:none; padding:8px 0 0; gap:8px;">
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-vae-model">VAE Model</label>
-                                        <select id="ig-vae-model" class="ig-select"><option value="">None (Internal)</option></select>
-                                    </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-clip-l">CLIP-L Encoder</label>
-                                        <select id="ig-clip-l" class="ig-select"><option value="">None (Internal)</option></select>
-                                    </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-clip-g">CLIP-G Encoder</label>
-                                        <select id="ig-clip-g" class="ig-select"><option value="">None (Internal)</option></select>
-                                    </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-t5xxl">T5XXL Encoder</label>
-                                        <select id="ig-t5xxl" class="ig-select"><option value="">None (Internal)</option></select>
-                                    </div>
-                                    <label class="ig-checkbox">
-                                        <input id="ig-taesd" type="checkbox">
-                                        <span>Use TAESD (Fast Preview)</span>
-                                    </label>
-                                </div>
+                            <div class="ig-btn-row">
+                                <button id="ig-add-model-dir" class="ig-btn ig-btn-secondary" onclick="addImageModelDir()"
+                                    title="Add a folder of Stable Diffusion models. Remembered across restarts.">&#x1F4C1; Add Folder</button>
+                                <button id="ig-rescan-model-dirs" class="ig-btn ig-btn-secondary" onclick="rescanImageModelDirs()"
+                                    title="Rescan every added image folder for new files">&#x21BA; Rescan</button>
                             </div>
-
-                            <div class="ig-panel ig-panel-collapsed" style="margin-top:8px; border:none; box-shadow:none;">
-                                <div class="ig-panel-header" style="background:transparent; padding:4px 0;">
-                                    <span class="ig-panel-title" style="font-size:11px; opacity:0.8;">Engine Startup Flags</span>
-                                    <span class="ig-panel-toggle" style="font-size:8px;">&#x25B6;</span>
-                                </div>
-                                <div class="ig-panel-body" style="display:none; padding:8px 0 0; gap:8px;">
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-backend">Backend Assignment</label>
-                                        <select id="ig-backend" class="ig-select">
-                                            <option value="" selected>Auto (Default)</option>
-                                            <option value="cpu">CPU</option>
-                                            <option value="cuda">CUDA</option>
-                                            <option value="vulkan">Vulkan</option>
-                                        </select>
-                                    </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-params-backend">Params Backend</label>
-                                        <select id="ig-params-backend" class="ig-select">
-                                            <option value="" selected>Auto (Default)</option>
-                                            <option value="cpu">CPU</option>
-                                            <option value="cuda">CUDA</option>
-                                        </select>
-                                    </div>
-                                    <label class="ig-checkbox ig-fullwidth">
-                                        <input id="ig-vae-tiling" type="checkbox">
-                                        <span>VAE Tiling (Low VRAM)</span>
-                                    </label>
-                                    <label class="ig-checkbox ig-fullwidth">
-                                        <input id="ig-temporal-tiling" type="checkbox">
-                                        <span>Temporal Tiling (LTX Video)</span>
-                                    </label>
-                                    <label class="ig-checkbox ig-fullwidth">
-                                        <input id="ig-circular" type="checkbox">
-                                        <span>Circular Padding</span>
-                                    </label>
-                                    <label class="ig-checkbox ig-fullwidth">
-                                        <input id="ig-fa" type="checkbox">
-                                        <span>Flash Attention</span>
-                                    </label>
-                                    <label class="ig-checkbox ig-fullwidth">
-                                        <input id="ig-offload-cpu" type="checkbox">
-                                        <span>Offload to CPU (Low VRAM)</span>
-                                    </label>
-                                </div>
-                            </div>
-
+                            <div class="ig-dir-head">Image folders <span id="ig-model-dirs-count" class="ig-dir-count"></span></div>
+                            <div id="ig-model-dirs-list" class="ig-model-dirs"></div>
                             <div id="ig-model-info-preview" class="ig-model-info-box" style="display:none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Optional Sub-Models (elevated from nested to top-level) -->
+                    <div class="ig-panel ig-panel-collapsed" data-panel="submodels">
+                        <div class="ig-panel-header">
+                            <span class="ig-panel-title">Optional Sub-Models</span>
+                            <span class="ig-panel-toggle">&#x25B6;</span>
+                        </div>
+                        <div class="ig-panel-body" style="display:none;">
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-vae-model">VAE Model</label>
+                                <select id="ig-vae-model" class="ig-select"><option value="">None (Internal)</option></select>
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-clip-l">CLIP-L Encoder</label>
+                                <select id="ig-clip-l" class="ig-select"><option value="">None (Internal)</option></select>
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-clip-g">CLIP-G Encoder</label>
+                                <select id="ig-clip-g" class="ig-select"><option value="">None (Internal)</option></select>
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-t5xxl">T5XXL Encoder</label>
+                                <select id="ig-t5xxl" class="ig-select"><option value="">None (Internal)</option></select>
+                            </div>
+                            <label class="ig-checkbox ig-fullwidth">
+                                <input id="ig-taesd" type="checkbox">
+                                <span>Use TAESD (Fast Preview)</span>
+                            </label>
                         </div>
                     </div>
 
@@ -315,7 +291,7 @@
                             
                             <div class="ig-panel ig-panel-collapsed" style="margin-top:8px; border:none; box-shadow:none;">
                                 <div class="ig-panel-header" style="background:transparent; padding:4px 0;">
-                                    <span class="ig-panel-title" style="font-size:11px; opacity:0.8;">Expert Sampler Options</span>
+                                    <span class="ig-panel-title" style="font-size:11px; opacity:0.8;">Sampler Options</span>
                                     <span class="ig-panel-toggle" style="font-size:8px;">&#x25B6;</span>
                                 </div>
                                 <div class="ig-panel-body" style="display:none; padding:8px 0 0; gap:8px;">
@@ -349,30 +325,6 @@
                                             <option value="cpu">CPU</option>
                                         </select>
                                     </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-flow-shift">Flow Shift: <span id="ig-flow-shift-val">Auto</span></label>
-                                        <input id="ig-flow-shift" type="range" class="ig-slider" min="0" max="10" step="0.1" value="0">
-                                    </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-slg-scale">SLG Scale (DiT): <span id="ig-slg-val">0.0</span></label>
-                                        <input id="ig-slg-scale" type="range" class="ig-slider" min="0" max="5" step="0.1" value="0">
-                                    </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-skip-layer-start">SLG Skip Start: <span id="ig-skip-start-val">0.01</span></label>
-                                        <input id="ig-skip-layer-start" type="range" class="ig-slider" min="0" max="1" step="0.01" value="0.01">
-                                    </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-skip-layer-end">SLG Skip End: <span id="ig-skip-end-val">0.2</span></label>
-                                        <input id="ig-skip-layer-end" type="range" class="ig-slider" min="0" max="1" step="0.01" value="0.2">
-                                    </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-eta">Eta (Noise): <span id="ig-eta-val">0.0</span></label>
-                                        <input id="ig-eta" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0">
-                                    </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-vae-tile-overlap">VAE Tile Overlap: <span id="ig-vae-overlap-val">0.5</span></label>
-                                        <input id="ig-vae-tile-overlap" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0.5">
-                                    </div>
                                 </div>
                             </div>
                             <div class="ig-field">
@@ -387,6 +339,40 @@
                         </div>
                     </div>
 
+                    <!-- DiT / Diffusion Settings (extracted from Expert Sampler Options) -->
+                    <div class="ig-panel ig-panel-collapsed" data-panel="dit">
+                        <div class="ig-panel-header">
+                            <span class="ig-panel-title">DiT Settings</span>
+                            <span class="ig-panel-toggle">&#x25B6;</span>
+                        </div>
+                        <div class="ig-panel-body" style="display:none;">
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-flow-shift">Flow Shift: <span id="ig-flow-shift-val">Auto</span></label>
+                                <input id="ig-flow-shift" type="range" class="ig-slider" min="0" max="10" step="0.1" value="0">
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-slg-scale">SLG Scale: <span id="ig-slg-val">0.0</span></label>
+                                <input id="ig-slg-scale" type="range" class="ig-slider" min="0" max="5" step="0.1" value="0">
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-skip-layer-start">Skip Layer Start: <span id="ig-skip-start-val">0.01</span></label>
+                                <input id="ig-skip-layer-start" type="range" class="ig-slider" min="0" max="1" step="0.01" value="0.01">
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-skip-layer-end">Skip Layer End: <span id="ig-skip-end-val">0.2</span></label>
+                                <input id="ig-skip-layer-end" type="range" class="ig-slider" min="0" max="1" step="0.01" value="0.2">
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-eta">Eta (Noise): <span id="ig-eta-val">0.0</span></label>
+                                <input id="ig-eta" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0">
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-vae-tile-overlap">VAE Tile Overlap: <span id="ig-vae-tile-overlap-val">0.5</span></label>
+                                <input id="ig-vae-tile-overlap" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0.5">
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Mode Tools — changes content per workflow mode -->
                     <div class="ig-panel" data-panel="mode-tools">
                         <div class="ig-panel-header">
@@ -394,54 +380,199 @@
                             <span class="ig-panel-toggle">&#x25BC;</span>
                         </div>
                         <div class="ig-panel-body">
-                            <!-- txt2img: no extra tools shown, just a note -->
+                            <!-- txt2img -->
                             <div id="ig-mode-txt2img" class="ig-mode-section">
-                                <div class="ig-mode-note">Standard text-to-image generation. High-quality latent diffusion.</div>
+                                <div class="ig-mode-note">
+                                    <strong>Text-to-Image</strong> — Enter a prompt and press Ctrl+Enter to generate.
+                                </div>
                             </div>
 
-                            <!-- img2img: strength + init image -->
+                            <!-- img2img: Professional Suite -->
                             <div id="ig-mode-img2img" class="ig-mode-section" style="display:none;">
+                                <!-- 1. Source Image -->
                                 <div class="ig-field">
-                                    <label class="ig-label" for="ig-strength">Denoising Strength: <span id="ig-strength-val">0.75</span></label>
-                                    <input id="ig-strength" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0.75">
-                                </div>
-                                <div class="ig-field">
-                                    <div class="ig-label">Initial Image (Source)</div>
+                                    <div class="ig-label">Source Image</div>
                                     <div class="ig-upload-mini" id="ig-upload-mini-img2img">
                                         <span>Drop image or click to browse</span>
                                     </div>
+                                    <div class="ig-img2img-actions">
+                                        <button class="ig-btn ig-btn-secondary" id="ig-img2img-clear">Clear</button>
+                                        <button class="ig-btn ig-btn-secondary" id="ig-img2img-use-meta">Use Metadata</button>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- inpaint: strength + brush + init image -->
-                            <div id="ig-mode-inpaint" class="ig-mode-section" style="display:none;">
+                                <!-- 2. Denoising Strength -->
                                 <div class="ig-field">
-                                    <label class="ig-label" for="ig-strength-inpaint">Inpaint Strength: <span id="ig-strength-val-inpaint">0.75</span></label>
-                                    <input id="ig-strength-inpaint" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0.75">
+                                    <label class="ig-label" for="ig-strength">Denoise Strength: <span id="ig-strength-val">0.75</span></label>
+                                    <input id="ig-strength" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0.75">
+                                    <div class="ig-hint ig-denoise-hint">
+                                        0.0-0.3 subtle &bull; 0.4-0.6 moderate &bull; 0.7-1.0 heavy
+                                    </div>
                                 </div>
+
+                                <!-- 3. Resize Mode -->
                                 <div class="ig-field">
-                                    <div class="ig-label">Base Image</div>
-                                    <div class="ig-upload-mini" id="ig-upload-mini-inpaint">
-                                        <span>Drop image or click to browse</span>
+                                    <label class="ig-label" for="ig-resize-mode">Resize Mode</label>
+                                    <select id="ig-resize-mode" class="ig-select">
+                                        <option value="just_resize" selected>Just Resize</option>
+                                        <option value="crop">Crop to Fit</option>
+                                        <option value="fill">Resize & Fill (Letterbox)</option>
+                                        <option value="stretch">Stretch</option>
+                                    </select>
+                                </div>
+
+                                <!-- 4. Style Strength -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-style-strength">Style Strength: <span id="ig-style-strength-val">0.5</span></label>
+                                    <input id="ig-style-strength" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0.5">
+                                    <div class="ig-hint">How much the original image influences the output style.</div>
+                                </div>
+
+                                <!-- 5. Color Preservation -->
+                                <label class="ig-checkbox ig-fullwidth">
+                                    <input id="ig-preserve-colors" type="checkbox">
+                                    <span>Preserve Original Colors</span>
+                                </label>
+                                <label class="ig-checkbox ig-fullwidth">
+                                    <input id="ig-match-histogram" type="checkbox">
+                                    <span>Match Histogram</span>
+                                </label>
+
+                                <!-- 6. Latent Noise Injection -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-latent-noise">Latent Noise: <span id="ig-latent-noise-val">0.0</span></label>
+                                    <input id="ig-latent-noise" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0">
+                                    <div class="ig-hint">Adds controlled chaos to break out of "too similar" results.</div>
+                                </div>
+
+                                <!-- 7. Masking (shared with inpaint) -->
+                                <div class="ig-field">
+                                    <div class="ig-label">Mask (Optional)</div>
+                                    <div class="ig-upload-mini" id="ig-upload-mini-img2img-mask">
+                                        <span>Drop mask image or click</span>
                                     </div>
                                 </div>
                                 <div class="ig-field">
-                                    <label class="ig-label" for="ig-brush-size">Mask Brush Size: <span id="ig-brush-val">24</span>px</label>
+                                    <label class="ig-label" for="ig-mask-blur">Mask Blur: <span id="ig-mask-blur-val">4</span> px</label>
+                                    <input id="ig-mask-blur" type="range" class="ig-slider" min="0" max="32" value="4">
+                                </div>
+                                <label class="ig-checkbox ig-fullwidth">
+                                    <input id="ig-mask-invert" type="checkbox">
+                                    <span>Invert Mask</span>
+                                </label>
+                            </div>
+
+                            <!-- inpaint: Professional Suite -->
+                            <div id="ig-mode-inpaint" class="ig-mode-section" style="display:none;">
+                                <!-- 1. Source Image -->
+                                <div class="ig-field">
+                                    <div class="ig-label">Source Image</div>
+                                    <div class="ig-upload-mini" id="ig-upload-mini-inpaint">
+                                        <span>Drop image or click to browse</span>
+                                    </div>
+                                    <div class="ig-img2img-actions">
+                                        <button class="ig-btn ig-btn-secondary" id="ig-inpaint-clear">Clear</button>
+                                        <button class="ig-btn ig-btn-secondary" id="ig-inpaint-use-meta">Use Metadata</button>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Mask Tools -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-brush-size">Brush Size: <span id="ig-brush-val">24</span> px</label>
                                     <input id="ig-brush-size" type="range" class="ig-slider" min="4" max="128" value="24">
+                                </div>
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-brush-hardness">Brush Hardness: <span id="ig-brush-hardness-val">100</span>%</label>
+                                    <input id="ig-brush-hardness" type="range" class="ig-slider" min="0" max="100" value="100">
+                                </div>
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-mask-blur-inpaint">Mask Blur: <span id="ig-mask-blur-inpaint-val">4</span> px</label>
+                                    <input id="ig-mask-blur-inpaint" type="range" class="ig-slider" min="0" max="32" value="4">
+                                </div>
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-mask-feather">Mask Feather: <span id="ig-mask-feather-val">0</span> px</label>
+                                    <input id="ig-mask-feather" type="range" class="ig-slider" min="0" max="32" value="0">
+                                </div>
+                                <div class="ig-btn-row">
+                                    <button id="ig-eraser-toggle" class="ig-btn ig-btn-secondary">Eraser</button>
+                                    <button id="ig-mask-preview-toggle" class="ig-btn ig-btn-secondary">Preview Mask</button>
+                                    <button id="ig-invert-mask" class="ig-btn ig-btn-secondary">Invert</button>
                                 </div>
                                 <div class="ig-btn-row">
                                     <button id="ig-clear-mask" class="ig-btn ig-btn-secondary">Clear Mask</button>
                                 </div>
+
+                                <!-- 3. Denoising Strength -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-strength-inpaint">Denoise Strength: <span id="ig-strength-val-inpaint">0.75</span></label>
+                                    <input id="ig-strength-inpaint" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0.75">
+                                    <div class="ig-hint ig-denoise-hint">
+                                        0.0-0.3 subtle patching &bull; 0.4-0.6 moderate edits &bull; 0.7-1.0 full redraw
+                                    </div>
+                                </div>
+
+                                <!-- 4. Masked Content Behavior -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-masked-content">Masked Content</label>
+                                    <select id="ig-masked-content" class="ig-select">
+                                        <option value="fill" selected>Fill Masked Area</option>
+                                        <option value="preserve">Preserve Original</option>
+                                        <option value="replace">Replace Entire Mask</option>
+                                        <option value="only_modify">Only Modify Masked Area</option>
+                                    </select>
+                                </div>
+
+                                <!-- 5. Resize Mode -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-resize-mode-inpaint">Resize Mode</label>
+                                    <select id="ig-resize-mode-inpaint" class="ig-select">
+                                        <option value="just_resize" selected>Just Resize</option>
+                                        <option value="crop">Crop to Fit</option>
+                                        <option value="fill">Resize & Fill (Letterbox)</option>
+                                        <option value="stretch">Stretch</option>
+                                    </select>
+                                </div>
+
+                                <!-- 6. Style Strength -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-style-strength-inpaint">Style Strength: <span id="ig-style-strength-inpaint-val">0.5</span></label>
+                                    <input id="ig-style-strength-inpaint" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0.5">
+                                    <div class="ig-hint">How much the original image influences the output style.</div>
+                                </div>
+
+                                <!-- 7. Color Preservation -->
+                                <label class="ig-checkbox ig-fullwidth">
+                                    <input id="ig-preserve-colors-inpaint" type="checkbox">
+                                    <span>Preserve Original Colors</span>
+                                </label>
+                                <label class="ig-checkbox ig-fullwidth">
+                                    <input id="ig-match-histogram-inpaint" type="checkbox">
+                                    <span>Match Histogram</span>
+                                </label>
+
+                                <!-- 8. Latent Noise Injection -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-latent-noise-inpaint">Latent Noise: <span id="ig-latent-noise-inpaint-val">0.0</span></label>
+                                    <input id="ig-latent-noise-inpaint" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0">
+                                    <div class="ig-hint">Adds controlled chaos to break out of "too similar" results.</div>
+                                </div>
                             </div>
 
-                            <!-- outpaint: init image + direction + margin -->
+                            <!-- outpaint: Professional Suite -->
                             <div id="ig-mode-outpaint" class="ig-mode-section" style="display:none;">
+                                <!-- 1. Source Image -->
                                 <div class="ig-field">
-                                    <div class="ig-label">Base Image</div>
+                                    <div class="ig-label">Source Image</div>
                                     <div class="ig-upload-mini" id="ig-upload-mini-outpaint">
                                         <span>Drop image or click to browse</span>
                                     </div>
+                                    <div class="ig-img2img-actions">
+                                        <button class="ig-btn ig-btn-secondary" id="ig-outpaint-clear">Clear</button>
+                                        <button class="ig-btn ig-btn-secondary" id="ig-outpaint-use-meta">Use Metadata</button>
+                                    </div>
                                 </div>
+
+                                <!-- 2. Canvas Expansion -->
                                 <div class="ig-field">
                                     <label class="ig-label" for="ig-outpaint-margin">Expansion Margin</label>
                                     <select id="ig-outpaint-margin" class="ig-select">
@@ -453,52 +584,265 @@
                                 </div>
                                 <div class="ig-field">
                                     <div class="ig-label">Expansion Direction</div>
-                                    <div class="ig-btn-row">
-                                        <button class="ig-dir-btn active" data-dir="all" title="All sides">&#x25FB;</button>
-                                        <button class="ig-dir-btn" data-dir="left" title="Left">&#x25C0;</button>
-                                        <button class="ig-dir-btn" data-dir="right" title="Right">&#x25B6;</button>
-                                        <button class="ig-dir-btn" data-dir="up" title="Up">&#x25B2;</button>
-                                        <button class="ig-dir-btn" data-dir="down" title="Down">&#x25BC;</button>
+                                    <div class="ig-dir-row">
+                                        <button class="ig-dir-btn active" data-dir="all" title="All sides">All</button>
+                                        <button class="ig-dir-btn" data-dir="left" title="Left">L</button>
+                                        <button class="ig-dir-btn" data-dir="right" title="Right">R</button>
+                                        <button class="ig-dir-btn" data-dir="up" title="Up">T</button>
+                                        <button class="ig-dir-btn" data-dir="down" title="Down">B</button>
                                     </div>
                                 </div>
+
+                                <!-- 3. Edge Behavior -->
                                 <div class="ig-field">
-                                    <label class="ig-label" for="ig-outpaint-strength">Outpaint Denoise: <span id="ig-outpaint-strength-val">0.8</span></label>
+                                    <label class="ig-label" for="ig-edge-behavior">Edge Behavior</label>
+                                    <select id="ig-edge-behavior" class="ig-select">
+                                        <option value="mirror" selected>Mirror Edges</option>
+                                        <option value="blur">Blur Edges</option>
+                                        <option value="noise">Noise Fill</option>
+                                        <option value="solid">Solid Color Fill</option>
+                                    </select>
+                                </div>
+
+                                <!-- 4. Denoising Strength -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-outpaint-strength">Denoise Strength: <span id="ig-outpaint-strength-val">0.8</span></label>
                                     <input id="ig-outpaint-strength" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0.8">
+                                    <div class="ig-hint ig-denoise-hint">
+                                        0.0-0.3 subtle extension &bull; 0.4-0.6 moderate &bull; 0.7-1.0 full generation
+                                    </div>
+                                </div>
+
+                                <!-- 5. Resize Mode -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-resize-mode-outpaint">Resize Mode</label>
+                                    <select id="ig-resize-mode-outpaint" class="ig-select">
+                                        <option value="just_resize" selected>Just Resize</option>
+                                        <option value="crop">Crop to Fit</option>
+                                        <option value="fill">Resize & Fill (Letterbox)</option>
+                                        <option value="stretch">Stretch</option>
+                                    </select>
+                                </div>
+
+                                <!-- 6. Style Strength -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-style-strength-outpaint">Style Strength: <span id="ig-style-strength-outpaint-val">0.5</span></label>
+                                    <input id="ig-style-strength-outpaint" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0.5">
+                                    <div class="ig-hint">How much the original image influences the output style.</div>
+                                </div>
+
+                                <!-- 7. Color Preservation -->
+                                <label class="ig-checkbox ig-fullwidth">
+                                    <input id="ig-preserve-colors-outpaint" type="checkbox">
+                                    <span>Preserve Original Colors</span>
+                                </label>
+                                <label class="ig-checkbox ig-fullwidth">
+                                    <input id="ig-match-histogram-outpaint" type="checkbox">
+                                    <span>Match Histogram</span>
+                                </label>
+
+                                <!-- 8. Latent Noise Injection -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-latent-noise-outpaint">Latent Noise: <span id="ig-latent-noise-outpaint-val">0.0</span></label>
+                                    <input id="ig-latent-noise-outpaint" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0">
+                                    <div class="ig-hint">Adds controlled chaos to break out of "too similar" results.</div>
                                 </div>
                             </div>
 
-                            <!-- upscale: init image + scale + upscaler -->
+                            <!-- upscale: Professional Suite -->
                             <div id="ig-mode-upscale" class="ig-mode-section" style="display:none;">
+                                <!-- 1. Source Image -->
                                 <div class="ig-field">
-                                    <div class="ig-label">Image to Upscale</div>
+                                    <div class="ig-label">Source Image</div>
                                     <div class="ig-upload-mini" id="ig-upload-mini-upscale">
                                         <span>Drop image or click to browse</span>
                                     </div>
+                                    <div class="ig-img2img-actions">
+                                        <button class="ig-btn ig-btn-secondary" id="ig-upscale-clear">Clear</button>
+                                        <button class="ig-btn ig-btn-secondary" id="ig-upscale-use-meta">Use Metadata</button>
+                                    </div>
                                 </div>
+
+                                <!-- 2. Upscale Method -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-upscale-method">Upscale Method</label>
+                                    <select id="ig-upscale-method" class="ig-select">
+                                        <option value="latent_sd" selected>Latent Upscale (SD)</option>
+                                        <option value="latent_sdxl">Latent Upscale (SDXL)</option>
+                                        <option value="esrgan">ESRGAN</option>
+                                        <option value="realesrgan">RealESRGAN</option>
+                                        <option value="swinir">SwinIR</option>
+                                        <option value="ultrasharp">4x UltraSharp</option>
+                                        <option value="animesharp">4x AnimeSharp</option>
+                                        <option value="remacri">4x Remacri</option>
+                                        <option value="sdxl_refiner">SDXL Refiner Upscale</option>
+                                    </select>
+                                </div>
+
+                                <!-- 3. Scale Factor -->
                                 <div class="ig-field">
                                     <label class="ig-label" for="ig-upscale-factor">Scale Factor</label>
                                     <select id="ig-upscale-factor" class="ig-select">
-                                        <option value="2" selected>2x (4x pixels)</option>
-                                        <option value="4">4x (16x pixels)</option>
+                                        <option value="1.5">1.5x</option>
+                                        <option value="2" selected>2x</option>
+                                        <option value="3">3x</option>
+                                        <option value="4">4x</option>
                                     </select>
                                 </div>
-                                <div class="ig-field">
-                                    <label class="ig-label" for="ig-upscale-denoise">Denoising Strength: <span id="ig-upscale-denoise-val">0.4</span></label>
+
+                                <!-- 4. Target Resolution -->
+                                <div id="ig-upscale-target" class="ig-target-res" style="display:none;"></div>
+
+                                <!-- 5. Denoise Strength (latent only) -->
+                                <div class="ig-field ig-upscale-latent-only">
+                                    <label class="ig-label" for="ig-upscale-denoise">Denoise Strength: <span id="ig-upscale-denoise-val">0.4</span></label>
                                     <input id="ig-upscale-denoise" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0.4">
+                                    <div class="ig-hint ig-denoise-hint">
+                                        0.0-0.3 preserve &bull; 0.4-0.6 enhance &bull; 0.7-1.0 creative
+                                    </div>
+                                </div>
+
+                                <!-- 6. Sharpening (ESRGAN only) -->
+                                <div class="ig-field ig-upscale-esrgan-only" style="display:none;">
+                                    <label class="ig-label" for="ig-upscale-sharpen">Sharpening</label>
+                                    <select id="ig-upscale-sharpen" class="ig-select">
+                                        <option value="none">None</option>
+                                        <option value="mild">Mild</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="strong">Strong</option>
+                                    </select>
+                                </div>
+
+                                <!-- 7. Anti-artifact (ESRGAN only) -->
+                                <div class="ig-field ig-upscale-esrgan-only" style="display:none;">
+                                    <label class="ig-label" for="ig-upscale-anti-artifact">Anti-artifact Mode</label>
+                                    <select id="ig-upscale-anti-artifact" class="ig-select">
+                                        <option value="off" selected>Off</option>
+                                        <option value="mild">Mild</option>
+                                        <option value="strong">Strong</option>
+                                    </select>
+                                </div>
+
+                                <!-- 8. Prompt (latent only) -->
+                                <div class="ig-upscale-latent-only">
+                                    <div class="ig-field">
+                                        <label class="ig-label" for="ig-upscale-prompt">Prompt (Optional)</label>
+                                        <textarea id="ig-upscale-prompt" class="ig-textarea ig-prompt" rows="2" placeholder="Leave empty to use main prompt..."></textarea>
+                                    </div>
+                                    <div class="ig-field">
+                                        <label class="ig-label" for="ig-upscale-negative">Negative Prompt (Optional)</label>
+                                        <textarea id="ig-upscale-negative" class="ig-textarea ig-negative" rows="2" placeholder="Leave empty to use main negative prompt..."></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- 9. Parameters (latent only) -->
+                                <div class="ig-field ig-upscale-latent-only">
+                                    <label class="ig-label" for="ig-upscale-sampler">Sampler</label>
+                                    <select id="ig-upscale-sampler" class="ig-select">
+                                        <option value="euler">Euler</option>
+                                        <option value="euler_a" selected>Euler a</option>
+                                        <option value="dpmpp_2m">DPM++ 2M</option>
+                                        <option value="dpmpp_2m_sde">DPM++ 2M SDE</option>
+                                        <option value="dpmpp_sde">DPM++ SDE</option>
+                                    </select>
+                                </div>
+                                <div class="ig-field ig-upscale-latent-only">
+                                    <label class="ig-label" for="ig-upscale-steps">Steps: <span id="ig-upscale-steps-val">20</span></label>
+                                    <input id="ig-upscale-steps" type="range" class="ig-slider" min="1" max="50" value="20">
+                                </div>
+                                <div class="ig-field ig-upscale-latent-only">
+                                    <label class="ig-label" for="ig-upscale-cfg">CFG Scale: <span id="ig-upscale-cfg-val">7</span></label>
+                                    <input id="ig-upscale-cfg" type="range" class="ig-slider" min="1" max="30" step="0.5" value="7">
+                                </div>
+                                <div class="ig-field ig-upscale-latent-only">
+                                    <label class="ig-label" for="ig-upscale-seed">Seed</label>
+                                    <div class="ig-seed-row">
+                                        <input id="ig-upscale-seed" type="number" class="ig-input" value="-1" min="-1">
+                                        <button id="ig-upscale-random" class="ig-btn ig-btn-icon" title="Randomize">&#x1F3B2;</button>
+                                        <button id="ig-upscale-lock" class="ig-btn ig-btn-icon" title="Lock seed" onclick="toggleUpscaleSeedLock()">&#x1F513;</button>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- video: frames + fps -->
+                            <!-- video: Professional Suite -->
                             <div id="ig-mode-video" class="ig-mode-section" style="display:none;">
+                                <!-- 1. Source Image -->
                                 <div class="ig-field">
-                                    <label class="ig-label" for="ig-video-frames">Frame Count: <span id="ig-video-frames-val">24</span></label>
-                                    <input id="ig-video-frames" type="range" class="ig-slider" min="1" max="120" value="24">
+                                    <div class="ig-label">Source Image (Optional)</div>
+                                    <div class="ig-upload-mini" id="ig-upload-mini-video">
+                                        <span>Drop image or click to browse</span>
+                                    </div>
+                                    <div class="ig-img2img-actions">
+                                        <button class="ig-btn ig-btn-secondary" id="ig-video-clear">Clear</button>
+                                        <button class="ig-btn ig-btn-secondary" id="ig-video-use-meta">Use Metadata</button>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Timing -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-video-frames">Frame Count: <span id="ig-video-frames-val">33</span></label>
+                                    <input id="ig-video-frames" type="range" class="ig-slider" min="1" max="120" value="33">
                                 </div>
                                 <div class="ig-field">
-                                    <label class="ig-label" for="ig-video-fps">FPS: <span id="ig-video-fps-val">12</span></label>
-                                    <input id="ig-video-fps" type="range" class="ig-slider" min="1" max="60" value="12">
+                                    <label class="ig-label" for="ig-video-fps">FPS: <span id="ig-video-fps-val">16</span></label>
+                                    <input id="ig-video-fps" type="range" class="ig-slider" min="1" max="60" value="16">
                                 </div>
-                                <div class="ig-mode-note">Stable Video Diffusion / WAN support required.</div>
+
+                                <!-- 3. Output Format -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-video-format">Output Format</label>
+                                    <select id="ig-video-format" class="ig-select">
+                                        <option value="webm" selected>WebM (plays in app)</option>
+                                        <option value="avi">AVI</option>
+                                        <option value="webp">Animated WebP</option>
+                                    </select>
+                                </div>
+
+                                <!-- 4. Seed Mode -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-video-seed-mode">Seed Mode</label>
+                                    <select id="ig-video-seed-mode" class="ig-select">
+                                        <option value="fixed" selected>Fixed (Stable)</option>
+                                        <option value="per_frame">Per-Frame (Chaotic)</option>
+                                        <option value="interpolated">Interpolated (Smooth)</option>
+                                    </select>
+                                </div>
+
+                                <!-- 5. Motion Strength -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-video-motion">Motion Strength: <span id="ig-video-motion-val">0.5</span></label>
+                                    <input id="ig-video-motion" type="range" class="ig-slider" min="0" max="2" step="0.05" value="0.5">
+                                    <div class="ig-hint ig-denoise-hint">
+                                        0.0 = static &bull; 0.5 = gentle motion &bull; 1.0 = lively &bull; 2.0 = wild
+                                    </div>
+                                </div>
+
+                                <!-- 6. Denoise per Frame -->
+                                <div class="ig-field">
+                                    <label class="ig-label" for="ig-video-denoise">Denoise per Frame: <span id="ig-video-denoise-val">0.6</span></label>
+                                    <input id="ig-video-denoise" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0.6">
+                                    <div class="ig-hint ig-denoise-hint">
+                                        Lower = smoother, less flicker. Higher = more change per frame.
+                                    </div>
+                                </div>
+
+                                <!-- 7. Loop Mode -->
+                                <label class="ig-checkbox ig-fullwidth">
+                                    <input id="ig-video-loop" type="checkbox">
+                                    <span>Seamless Loop</span>
+                                </label>
+
+                                <!-- 8. End Image -->
+                                <div class="ig-field">
+                                    <div class="ig-label">End Image (Optional)</div>
+                                    <div class="ig-upload-mini" id="ig-upload-mini-video-end">
+                                        <span>Drop end frame or click to browse</span>
+                                    </div>
+                                </div>
+
+                                <div class="ig-mode-note" style="font-size:11px; padding:6px 10px;">
+                                    <strong>Video tips:</strong> Use WAN or LTX models. Set Flow Shift in DiT Settings. Enable Temporal Tiling in Performance for long sequences.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -522,6 +866,12 @@
                                 <div class="ig-upload-mini" id="ig-upload-controlnet">
                                     <span>Drop control image or click</span>
                                 </div>
+                                <div class="ig-btn-row">
+                                    <button class="ig-btn ig-btn-secondary" type="button" id="ig-open-pose-editor">&#x270E; Pose Editor</button>
+                                    <button class="ig-btn ig-btn-secondary" type="button" id="ig-clear-controlnet">Clear</button>
+                                </div>
+                                <div class="ig-hint" id="ig-controlnet-status"></div>
+                                <div class="ig-hint">A pose needs an OpenPose ControlNet in the same family as your checkpoint. Without one the engine ignores the control image.</div>
                             </div>
                         </div>
                     </div>
@@ -529,7 +879,6 @@
                     <div class="ig-panel ig-panel-collapsed" data-panel="advanced">
                         <div class="ig-panel-header">
                             <span class="ig-panel-title">Advanced</span>
-                            <span class="ig-panel-badge" title="Features">3</span>
                             <span class="ig-panel-toggle">&#x25B6;</span>
                         </div>
                         <div class="ig-panel-body" style="display:none;">
@@ -541,17 +890,22 @@
                                 <label class="ig-label" for="ig-clip-skip">Clip Skip</label>
                                 <input id="ig-clip-skip" type="number" class="ig-input" value="-1" min="-1" max="12" placeholder="-1 = auto">
                             </div>
+                            <!-- LoRA: Professional Strength Panel -->
                             <div class="ig-field">
-                                <label class="ig-label" for="ig-lora">LoRA (hold Ctrl to multi-select)</label>
-                                <select id="ig-lora" class="ig-select" multiple size="3">
-                                    <option value="">None</option>
+                                <label class="ig-label" for="ig-lora-selector">Add LoRA</label>
+                                <select id="ig-lora-selector" class="ig-select">
+                                    <option value="">Select a LoRA to add...</option>
                                 </select>
                             </div>
-                            <label class="ig-checkbox ig-fullwidth">
+                            <div id="ig-lora-active-panel" class="ig-lora-panel">
+                                <!-- Active LoRAs with strength sliders will be rendered here -->
+                                <div class="ig-lora-empty">No LoRAs selected. Choose from dropdown above.</div>
+                            </div>
+                            <label class="ig-checkbox ig-fullwidth ig-txt2img-only">
                                 <input id="ig-hires-enable" type="checkbox">
                                 <span>Highres Fix (2x upscale)</span>
                             </label>
-                            <div class="ig-field">
+                            <div class="ig-field ig-txt2img-only">
                                 <label class="ig-label" for="ig-hr-scale">HR Scale Factor</label>
                                 <select id="ig-hr-scale" class="ig-select">
                                     <option value="1.5">1.5x</option>
@@ -560,7 +914,7 @@
                                     <option value="4">4x</option>
                                 </select>
                             </div>
-                            <div class="ig-field">
+                            <div class="ig-field ig-txt2img-only">
                                 <label class="ig-label" for="ig-hr-upscaler">HR Upscaler</label>
                                 <select id="ig-hr-upscaler" class="ig-select">
                                     <option value="" selected>None (Latent)</option>
@@ -570,15 +924,22 @@
                                 </select>
                             </div>
                             <label class="ig-checkbox ig-fullwidth">
-                                <input id="ig-tiling" type="checkbox">
-                                <span>VAE Tiling (low VRAM)</span>
-                            </label>
-                            <label class="ig-checkbox ig-fullwidth">
                                 <input id="ig-disable-metadata" type="checkbox">
                                 <span>Disable Image Metadata</span>
                             </label>
 
-                            <div class="ig-panel ig-panel-collapsed" style="margin-top:8px; border:none; box-shadow:none;">
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-cfg-rescale">CFG Rescale: <span id="ig-cfg-rescale-val">0.0</span></label>
+                                <input id="ig-cfg-rescale" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0">
+                                <div class="ig-hint">Prevents overbaked contrast at high CFG. 0 = off.</div>
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-face-restore">Face Restore: <span id="ig-face-restore-val">0.0</span></label>
+                                <input id="ig-face-restore" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0">
+                                <div class="ig-hint">0 = off. Higher = stronger CodeFormer/GFPGAN effect.</div>
+                            </div>
+
+                            <div class="ig-panel ig-panel-collapsed ig-txt2img-only" style="margin-top:8px; border:none; box-shadow:none;">
                                 <div class="ig-panel-header" style="background:transparent; padding:4px 0;">
                                     <span class="ig-panel-title" style="font-size:11px; opacity:0.8;">High-Noise Fix Settings</span>
                                     <span class="ig-panel-toggle" style="font-size:8px;">&#x25B6;</span>
@@ -614,6 +975,108 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="ig-panel ig-panel-collapsed" style="margin-top:8px; border:none; box-shadow:none;">
+                                <div class="ig-panel-header" style="background:transparent; padding:4px 0;">
+                                    <span class="ig-panel-title" style="font-size:11px; opacity:0.8;">Sampler Shaping (DPM++/SDE)</span>
+                                    <span class="ig-panel-toggle" style="font-size:8px;">&#x25B6;</span>
+                                </div>
+                                <div class="ig-panel-body" style="display:none; padding:8px 0 0; gap:8px;">
+                                    <div class="ig-field">
+                                        <label class="ig-label" for="ig-s-churn">S-Churn: <span id="ig-s-churn-val">0.0</span></label>
+                                        <input id="ig-s-churn" type="range" class="ig-slider" min="0" max="100" step="1" value="0">
+                                    </div>
+                                    <div class="ig-field">
+                                        <label class="ig-label" for="ig-s-tmin">S-Tmin: <span id="ig-s-tmin-val">0.0</span></label>
+                                        <input id="ig-s-tmin" type="range" class="ig-slider" min="0" max="1" step="0.01" value="0">
+                                    </div>
+                                    <div class="ig-field">
+                                        <label class="ig-label" for="ig-s-tmax">S-Tmax: <span id="ig-s-tmax-val">50.0</span></label>
+                                        <input id="ig-s-tmax" type="range" class="ig-slider" min="0" max="100" step="1" value="50">
+                                    </div>
+                                    <div class="ig-field">
+                                        <label class="ig-label" for="ig-s-noise">S-Noise: <span id="ig-s-noise-val">1.0</span></label>
+                                        <input id="ig-s-noise" type="range" class="ig-slider" min="0" max="2" step="0.05" value="1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance & Backend (elevated from nested Engine Flags) -->
+                    <div class="ig-panel ig-panel-collapsed" data-panel="performance">
+                        <div class="ig-panel-header">
+                            <span class="ig-panel-title">Performance</span>
+                            <span class="ig-panel-toggle">&#x25B6;</span>
+                        </div>
+                        <div class="ig-panel-body" style="display:none;">
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-backend">Backend Assignment</label>
+                                <select id="ig-backend" class="ig-select">
+                                    <option value="" selected>Auto (Default)</option>
+                                    <option value="cpu">CPU</option>
+                                    <option value="cuda">CUDA</option>
+                                    <option value="vulkan">Vulkan</option>
+                                </select>
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-params-backend">Params Backend</label>
+                                <select id="ig-params-backend" class="ig-select">
+                                    <option value="" selected>Auto (Default)</option>
+                                    <option value="cpu">CPU</option>
+                                    <option value="cuda">CUDA</option>
+                                </select>
+                            </div>
+                            <label class="ig-checkbox ig-fullwidth">
+                                <input id="ig-vae-tiling" type="checkbox">
+                                <span>VAE Tiling (Low VRAM)</span>
+                            </label>
+                            <label class="ig-checkbox ig-fullwidth">
+                                <input id="ig-temporal-tiling" type="checkbox">
+                                <span>Temporal Tiling (LTX Video)</span>
+                            </label>
+                            <label class="ig-checkbox ig-fullwidth">
+                                <input id="ig-circular" type="checkbox">
+                                <span>Circular Padding</span>
+                            </label>
+                            <label class="ig-checkbox ig-fullwidth">
+                                <input id="ig-fa" type="checkbox">
+                                <span>Flash Attention</span>
+                            </label>
+                            <label class="ig-checkbox ig-fullwidth">
+                                <input id="ig-offload-cpu" type="checkbox">
+                                <span>Offload to CPU (Low VRAM)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="ig-panel" data-panel="workflows">
+                        <div class="ig-panel-header">
+                            <span class="ig-panel-title">Workflows <span id="ig-workflow-count" class="ig-wf-count"></span></span>
+                            <span class="ig-panel-toggle">&#x25BC;</span>
+                        </div>
+                        <div class="ig-panel-body">
+                            <label class="ig-label" for="ig-workflow-name">Name</label>
+                            <input id="ig-workflow-name" class="ig-input" type="text" maxlength="80" placeholder="e.g. Portrait &middot; soft light">
+                            <div class="ig-btn-row">
+                                <button class="ig-btn ig-btn-primary" type="button" id="ig-workflow-save">Save</button>
+                                <button class="ig-btn ig-btn-secondary" type="button" id="ig-workflow-export">Export</button>
+                            </div>
+                            <label class="ig-label" for="ig-workflow-select">Saved</label>
+                            <select id="ig-workflow-select" class="ig-select">
+                                <option value="">-- Saved workflows --</option>
+                            </select>
+                            <div class="ig-btn-row">
+                                <button class="ig-btn ig-btn-secondary" type="button" id="ig-workflow-load">Apply</button>
+                                <button class="ig-btn ig-btn-secondary" type="button" id="ig-workflow-delete">Delete</button>
+                            </div>
+                            <div class="ig-btn-row">
+                                <button class="ig-btn ig-btn-secondary" type="button" id="ig-workflow-open-folder">Folder</button>
+                                <label class="ig-btn ig-btn-secondary ig-wf-import" for="ig-workflow-file">Import</label>
+                                <input id="ig-workflow-file" type="file" accept=".json,application/json" hidden>
+                            </div>
+                            <div class="ig-hint" id="ig-workflow-status"></div>
+                            <div class="ig-hint">Saves every setting on this page, the LoRA stack and any pose, so a recipe can be restored exactly.</div>
                         </div>
                     </div>
 
@@ -640,55 +1103,8 @@
                         </div>
                     </div>
 
-                    <div class="ig-panel ig-panel-collapsed" data-panel="caching">
-                        <div class="ig-panel-header">
-                            <span class="ig-panel-title">Engine Caching</span>
-                            <span class="ig-panel-toggle">&#x25B6;</span>
-                        </div>
-                        <div class="ig-panel-body" style="display:none;">
-                            <div class="ig-field">
-                                <label class="ig-label" for="ig-cache-mode">Cache Mode</label>
-                                <select id="ig-cache-mode" class="ig-select">
-                                    <option value="none" selected>None (Standard)</option>
-                                    <option value="easycache">EasyCache (DiT)</option>
-                                    <option value="ucache">UCache (UNET)</option>
-                                    <option value="dbcache">DBCache (DiT Block)</option>
-                                    <option value="spectrum">Spectrum (Forecasting)</option>
-                                </select>
-                            </div>
-                            <div class="ig-field">
-                                <label class="ig-label" for="ig-cache-option">Cache Options (key=val,...)</label>
-                                <input id="ig-cache-option" type="text" class="ig-input" placeholder="threshold=0.25">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="ig-panel ig-panel-collapsed" data-panel="paths">
-                        <div class="ig-panel-header">
-                            <span class="ig-panel-title">Engine Paths</span>
-                            <span class="ig-panel-toggle">&#x25B6;</span>
-                        </div>
-                        <div class="ig-panel-body" style="display:none;">
-                            <div class="ig-field">
-                                <label class="ig-label" for="ig-models-dir">Models Directory</label>
-                                <div class="ig-path-row">
-                                    <input id="ig-models-dir" type="text" class="ig-input ig-path-input" placeholder="D:\AI GGUF\Image Models">
-                                    <button class="ig-path-btn" onclick="browseModelsDir()">Browse</button>
-                                </div>
-                            </div>
-                            <div class="ig-field">
-                                <label class="ig-label" for="ig-sd-server">sd-server Binary</label>
-                                <div class="ig-path-row">
-                                    <input id="ig-sd-server" type="text" class="ig-input ig-path-input" placeholder="sd-server.exe">
-                                    <button class="ig-path-btn" onclick="browseSDServer()">Browse</button>
-                                </div>
-                            </div>
-                            <button class="ig-apply-btn" onclick="applyPaths()">Save & Rescan</button>
-                            <div id="ig-engine-status" class="ig-status"></div>
-                            <div id="ig-runtime-debug" class="ig-debug" style="font-size:11px;opacity:0.6;margin-top:4px;"></div>
-                        </div>
-                    </div>
                 </div>
+                <div class="ig-resizer" data-target="sidebar"></div>
 
                 <!-- Center: Canvas -->
                 <div class="ig-main">
@@ -730,87 +1146,137 @@
                         </div>
                     </div>
                 </div>
+                <div class="ig-resizer" data-target="history"></div>
 
-                <!-- Model Library — dedicated column -->
-                <div class="ig-library-col">
-                    <div class="ig-info-panel ml-library-panel" style="flex:1;display:flex;flex-direction:column;">
-                        <div class="ig-info-header" style="display:flex;align-items:center;justify-content:space-between;">
-                            <span>Model Library</span>
-                            <span style="display:flex;gap:4px;">
-                                <button id="ml-btn-scan"   class="ig-btn ig-btn-secondary" style="padding:2px 10px;font-size:11px;">&#x1F50D; Scan</button>
-                                <button id="ml-btn-rescan" class="ig-btn ig-btn-warn"      style="padding:2px 10px;font-size:11px;" title="Clear cached classifications and re-scan from scratch">&#x21BA; Force Rescan</button>
-                            </span>
-                        </div>
-                        <div class="ig-info-body" style="padding:6px 0 0;flex:1;display:flex;flex-direction:column;min-height:0;">
-                            <!-- Status bar -->
-                            <div id="ml-status" class="ml-status">Click Scan to discover models.</div>
-
-                            <!-- Table toolbar -->
-                            <div class="ml-toolbar" style="display:flex;align-items:center;gap:6px;margin:6px 0 4px;flex-wrap:wrap;">
-                                <button id="ml-btn-select-all"  class="ig-btn ig-btn-secondary" style="padding:2px 8px;font-size:11px;">All</button>
-                                <button id="ml-btn-select-none" class="ig-btn ig-btn-secondary" style="padding:2px 8px;font-size:11px;">None</button>
-                                <span id="ml-selection-count" style="font-size:11px;opacity:0.7;flex:1;"></span>
-                                <button id="ml-btn-register-all"      class="ig-btn" style="padding:2px 10px;font-size:11px;" disabled>&#x2713; Register All</button>
-                                <button id="ml-btn-register-selected" class="ig-btn" style="padding:2px 10px;font-size:11px;" disabled>&#x2713; Register Selected</button>
-                            </div>
-
-                            <!-- Scrollable asset table — fills remaining column height -->
-                            <div style="overflow-y:auto;flex:1;min-height:0;">
-                                <table class="ml-table" style="width:100%;border-collapse:collapse;font-size:12px;">
-                                    <thead>
-                                        <tr class="ml-thead">
-                                            <th style="width:24px;"></th>
-                                            <th style="text-align:left;">Name</th>
-                                            <th style="width:120px;">Type</th>
-                                            <th style="width:80px;">Family</th>
-                                            <th style="width:66px;">Format</th>
-                                            <th style="width:64px;">Size</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="ml-table-body">
-                                        <tr><td colspan="6" class="ml-empty">Scan to discover models.</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right: Model Info + Diagnostics -->
-                <div class="ig-right-panel">
-
-                    <div class="ig-info-panel">
-                        <div class="ig-info-header">Model Info</div>
-                        <div id="ig-live-model-info" class="ig-info-body">
-                            <div class="ig-info-row"><span class="ig-info-label">Status</span><span class="ig-info-value" id="diag-status">Idle</span></div>
-                            <div class="ig-info-row"><span class="ig-info-label">Type</span><span class="ig-info-value" id="diag-type">-</span></div>
-                            <div class="ig-info-row"><span class="ig-info-label">Family</span><span class="ig-info-value" id="diag-family">-</span></div>
-                            <div class="ig-info-row"><span class="ig-info-label">Format</span><span class="ig-info-value" id="diag-format">-</span></div>
-                            <div class="ig-info-row"><span class="ig-info-label">Backend</span><span class="ig-info-value" id="diag-backend">stable-diffusion.cpp</span></div>
-                        </div>
-                    </div>
-                    <div class="ig-info-panel">
-                        <div class="ig-info-header">Diagnostics</div>
-                        <div id="ig-diagnostics" class="ig-info-body">
-                            <div class="ig-info-row"><span class="ig-info-label">Engine</span><span class="ig-info-value" id="diag-engine">-</span></div>
-                            <div class="ig-info-row"><span class="ig-info-label">Go Heap</span><span class="ig-info-value" id="diag-heap">-</span></div>
-                            <div class="ig-info-row"><span class="ig-info-label">Go Sys</span><span class="ig-info-value" id="diag-sys">-</span></div>
-                            <div class="ig-info-row"><span class="ig-info-label">Goroutines</span><span class="ig-info-value" id="diag-goroutines">-</span></div>
-                            <div class="ig-info-row"><span class="ig-info-label">GC Count</span><span class="ig-info-value" id="diag-gc">-</span></div>
-                            <div class="ig-info-row"><span class="ig-info-label">Load Time</span><span class="ig-info-value" id="diag-loadtime">-</span></div>
-                            <div class="ig-info-row"><span class="ig-info-label">Last Gen</span><span class="ig-info-value" id="diag-lastgen">-</span></div>
-                            <div class="ig-info-row"><span class="ig-info-label">Errors</span><span class="ig-info-value ig-info-ok" id="diag-errors">None</span></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Far Right: Full-Height History Gallery -->
+                <!-- Right: Full-Height History Gallery -->
                 <div class="ig-history-col">
-                    <div class="ig-info-header">History</div>
+                    <div class="ig-history-header">
+                        <select id="ig-board-select" class="ig-board-select">
+                            <option value="uncategorized">Uncategorized</option>
+                        </select>
+                        <div class="ig-history-toolbar">
+                            <input id="ig-board-search" type="text" class="ig-board-search" placeholder="Search boards..." oninput="filterHistoryBySearch(this.value)">
+                            <button id="ig-add-board" class="ig-btn ig-btn-secondary ig-add-board-btn" title="Add Board">+</button>
+                        </div>
+                    </div>
                     <div id="ig-history-list" class="ig-history-list">
                         <div class="ig-history-placeholder">Generated images appear here</div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Model Library -->
+    <div id="ig-modal-library" class="ig-modal" style="display:none;">
+        <div class="ig-modal-content">
+            <div class="ig-modal-header">
+                <span>Model Library</span>
+                <button class="ig-modal-close" onclick="closeModal('ig-modal-library')">&#x2715;</button>
+            </div>
+            <div class="ig-modal-body">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <span style="display:flex;gap:4px;">
+                        <button id="ml-btn-scan"   class="ig-btn ig-btn-secondary" style="padding:2px 10px;font-size:11px;">&#x1F50D; Scan</button>
+                        <button id="ml-btn-rescan" class="ig-btn ig-btn-warn"      style="padding:2px 10px;font-size:11px;" title="Clear cached classifications and re-scan from scratch">&#x21BA; Force Rescan</button>
+                    </span>
+                </div>
+                <div id="ml-status" class="ml-status">Click Scan to discover models.</div>
+                <div class="ml-toolbar" style="display:flex;align-items:center;gap:6px;margin:6px 0 4px;flex-wrap:wrap;">
+                    <button id="ml-btn-select-all"  class="ig-btn ig-btn-secondary" style="padding:2px 8px;font-size:11px;">All</button>
+                    <button id="ml-btn-select-none" class="ig-btn ig-btn-secondary" style="padding:2px 8px;font-size:11px;">None</button>
+                    <span id="ml-selection-count" style="font-size:11px;opacity:0.7;flex:1;"></span>
+                    <button id="ml-btn-register-all"      class="ig-btn" style="padding:2px 10px;font-size:11px;" disabled>&#x2713; Register All</button>
+                    <button id="ml-btn-register-selected" class="ig-btn" style="padding:2px 10px;font-size:11px;" disabled>&#x2713; Register Selected</button>
+                </div>
+                <div style="overflow-y:auto;flex:1;min-height:0;">
+                    <table class="ml-table" style="width:100%;border-collapse:collapse;font-size:12px;">
+                        <thead>
+                            <tr class="ml-thead">
+                                <th style="width:24px;"></th>
+                                <th style="text-align:left;">Name</th>
+                                <th style="width:120px;">Type</th>
+                                <th style="width:80px;">Family</th>
+                                <th style="width:66px;">Format</th>
+                                <th style="width:64px;">Size</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ml-table-body">
+                            <tr><td colspan="6" class="ml-empty">Scan to discover models.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Model Info -->
+    <div id="ig-modal-info" class="ig-modal" style="display:none;">
+        <div class="ig-modal-content ig-modal-small">
+            <div class="ig-modal-header">
+                <span>Model Info</span>
+                <button class="ig-modal-close" onclick="closeModal('ig-modal-info')">&#x2715;</button>
+            </div>
+            <div class="ig-modal-body">
+                <div id="ig-live-model-info">
+                    <div class="ig-info-row"><span class="ig-info-label">Status</span><span class="ig-info-value" id="diag-status">Idle</span></div>
+                    <div class="ig-info-row"><span class="ig-info-label">Type</span><span class="ig-info-value" id="diag-type">-</span></div>
+                    <div class="ig-info-row"><span class="ig-info-label">Family</span><span class="ig-info-value" id="diag-family">-</span></div>
+                    <div class="ig-info-row"><span class="ig-info-label">Format</span><span class="ig-info-value" id="diag-format">-</span></div>
+                    <div class="ig-info-row"><span class="ig-info-label">Backend</span><span class="ig-info-value" id="diag-backend">stable-diffusion.cpp</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Diagnostics -->
+    <div id="ig-modal-diagnostics" class="ig-modal" style="display:none;">
+        <div class="ig-modal-content ig-modal-small">
+            <div class="ig-modal-header">
+                <span>Diagnostics</span>
+                <button class="ig-modal-close" onclick="closeModal('ig-modal-diagnostics')">&#x2715;</button>
+            </div>
+            <div class="ig-modal-body">
+                <div id="ig-diagnostics">
+                    <div class="ig-info-row"><span class="ig-info-label">Engine</span><span class="ig-info-value" id="diag-engine">-</span></div>
+                    <div class="ig-info-row"><span class="ig-info-label">sd-server</span><span class="ig-info-value" id="diag-sdver">-</span></div>
+                    <div class="ig-info-row"><span class="ig-info-label">Go Heap</span><span class="ig-info-value" id="diag-heap">-</span></div>
+                    <div class="ig-info-row"><span class="ig-info-label">Go Sys</span><span class="ig-info-value" id="diag-sys">-</span></div>
+                    <div class="ig-info-row"><span class="ig-info-label">Goroutines</span><span class="ig-info-value" id="diag-goroutines">-</span></div>
+                    <div class="ig-info-row"><span class="ig-info-label">GC Count</span><span class="ig-info-value" id="diag-gc">-</span></div>
+                    <div class="ig-info-row"><span class="ig-info-label">Load Time</span><span class="ig-info-value" id="diag-loadtime">-</span></div>
+                    <div class="ig-info-row"><span class="ig-info-label">Last Gen</span><span class="ig-info-value" id="diag-lastgen">-</span></div>
+                    <div class="ig-info-row"><span class="ig-info-label">Errors</span><span class="ig-info-value ig-info-ok" id="diag-errors">None</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Engine Paths -->
+    <div id="ig-modal-paths" class="ig-modal" style="display:none;">
+        <div class="ig-modal-content ig-modal-small">
+            <div class="ig-modal-header">
+                <span>Engine Paths</span>
+                <button class="ig-modal-close" onclick="closeModal('ig-modal-paths')">&#x2715;</button>
+            </div>
+            <div class="ig-modal-body">
+                <div class="ig-field">
+                    <label class="ig-label" for="ig-models-dir">Models Directory</label>
+                    <div class="ig-path-row">
+                        <input id="ig-models-dir" type="text" class="ig-input ig-path-input" placeholder="D:\AI GGUF\Image Models">
+                        <button class="ig-path-btn" onclick="browseModelsDir()">Browse</button>
+                    </div>
+                </div>
+                <div class="ig-field">
+                    <label class="ig-label" for="ig-sd-server">sd-server Binary</label>
+                    <div class="ig-path-row">
+                        <input id="ig-sd-server" type="text" class="ig-input ig-path-input" placeholder="sd-server.exe">
+                        <button class="ig-path-btn" onclick="browseSDServer()">Browse</button>
+                    </div>
+                </div>
+                <button class="ig-apply-btn" onclick="applyPaths()">Save & Rescan</button>
+                <div id="ig-engine-status" class="ig-status"></div>
+                <div id="ig-runtime-debug" class="ig-debug" style="font-size:11px;opacity:0.6;margin-top:4px;"></div>
             </div>
         </div>
     </div>
@@ -830,20 +1296,24 @@
         </div>
     </div>
 
-    <script src="js/theme.js"></script>
-    <script src="js/menu.js"></script>
-    <script src="js/navigation.js"></script>
-    <script src="js/image-generator-core.js"></script>
-    <script src="js/image-generator-ui.js"></script>
-    <script src="js/image-generator.js"></script>
-    <script src="js/tutorials-data-chat.js"></script>
-    <script src="js/tutorials-data-settings.js"></script>
-    <script src="js/tutorials-data-model.js"></script>
-    <script src="js/tutorials-data-content.js"></script>
-    <script src="js/tutorials-data-advanced.js"></script>
-    <script src="js/tutorials-data-app.js"></script>
-    <script src="js/tutorials-data.js"></script>
-    <script src="js/image-model-library.js"></script>
-    <script src="js/tutorials-ui.js"></script>
+    <script src="js/theme.js?v=29"></script>
+    <script src="js/menu.js?v=29"></script>
+    <script src="js/navigation.js?v=29"></script>
+    <script src="js/image-generator-core.js?v=29"></script>
+    <script src="js/image-generator-ui.js?v=29"></script>
+    <script src="js/image-generator.js?v=29"></script>
+    <script src="js/image-recall.js?v=29"></script>
+    <script src="js/tutorials-data-chat.js?v=29"></script>
+    <script src="js/tutorials-data-settings.js?v=29"></script>
+    <script src="js/tutorials-data-model.js?v=29"></script>
+    <script src="js/tutorials-data-content.js?v=29"></script>
+    <script src="js/tutorials-data-advanced.js?v=29"></script>
+    <script src="js/tutorials-data-app.js?v=29"></script>
+    <script src="js/tutorials-data.js?v=29"></script>
+    <script src="js/image-model-library.js?v=29"></script>
+    <script src="js/image-model-dirs.js?v=29"></script>
+    <script src="js/image-workflows.js?v=29"></script>
+    <script src="js/ig-pose.js?v=29"></script>
+    <script src="js/tutorials-ui.js?v=29"></script>
 </body>
 </html>

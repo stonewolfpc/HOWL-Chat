@@ -12,8 +12,8 @@
 }
 
 .bubble-button {
-    background: rgba(21, 21, 31, 0.8);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     padding: 6px 12px;
     font-size: 11px;
@@ -24,7 +24,7 @@
 
 .bubble-button:hover {
     background: var(--theme-glow);
-    border-color: rgba(100, 100, 100, 0.5);
+    border-color: var(--border-secondary);
     box-shadow: 0 0 8px var(--theme-glow);
 }
 
@@ -55,7 +55,7 @@
 }
 
 .bubble-button.disabled:hover {
-    background: rgba(21, 21, 31, 0.8);
-    border-color: rgba(100, 100, 100, 0.3);
+    background: var(--surface-secondary);
+    border-color: var(--border-primary);
     box-shadow: none;
 }

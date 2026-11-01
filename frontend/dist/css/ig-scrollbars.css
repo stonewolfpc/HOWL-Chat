@@ -17,7 +17,7 @@
 .ig-right-panel::-webkit-scrollbar-thumb,
 .ig-history-list::-webkit-scrollbar-thumb,
 .ig-canvas-wrapper::-webkit-scrollbar-thumb {
-    background: var(--border-secondary);
+    background: var(--border-primary);
     border-radius: 3px;
 }
 

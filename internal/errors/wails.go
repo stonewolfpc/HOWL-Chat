@@ -50,7 +50,7 @@ func (e *WailsEmitter) Emit(err *TrackedError) {
 	}
 
 	data, _ := json.Marshal(payload)
-	runtime.EventsEmit(e.ctx, "app:error", string(data))
+	emitGuarded(e.ctx, "app:error", string(data))
 }
 
 // EmitRecovery notifies the frontend that a panic was recovered.
@@ -58,7 +58,7 @@ func (e *WailsEmitter) EmitRecovery(operation string) {
 	if e.ctx == nil {
 		return
 	}
-	runtime.EventsEmit(e.ctx, "app:recovered", map[string]string{
+	emitGuarded(e.ctx, "app:recovered", map[string]string{
 		"operation": operation,
 		"message":   "A system error was recovered. Functionality may be degraded.",
 	})
@@ -69,7 +69,7 @@ func (e *WailsEmitter) EmitSilent(err *TrackedError) {
 	if e.ctx == nil || err == nil {
 		return
 	}
-	runtime.EventsEmit(e.ctx, "app:error:silent", map[string]string{
+	emitGuarded(e.ctx, "app:error:silent", map[string]string{
 		"code":     string(err.Code),
 		"severity": err.Severity.String(),
 	})
@@ -143,4 +143,17 @@ func (s *CombinedSink) LogResourceAlloc(err error, location string) {
 
 func (s *CombinedSink) LogSystemPanic(operation, location string, r interface{}) {
 	s.Handle(New(SYSPanicRecovered, Critical, operation, location, fmt.Errorf("panic: %v", r)))
+}
+
+// emitGuarded is runtime.EventsEmit with a validity guard.
+//
+// Wails calls log.Fatalf (os.Exit) when the context has no event
+// dispatcher, so an error emitted outside a live webview would terminate
+// the process while trying to report that something went wrong. Without
+// a dispatcher the event is dropped; the caller still logs.
+func emitGuarded(ctx context.Context, name string, data ...interface{}) {
+	if ctx == nil || ctx.Value("events") == nil {
+		return
+	}
+	runtime.EventsEmit(ctx, name, data...)
 }

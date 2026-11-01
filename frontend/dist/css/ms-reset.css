@@ -29,7 +29,7 @@
     left: 50%;
     transform: translateX(-50%);
     background: rgba(0, 0, 0, 0.9);
-    color: #ffffff;
+    color: var(--text-secondary);
     font-size: 10px;
     padding: 6px 10px;
     border-radius: 6px;
@@ -47,23 +47,28 @@
 
 /* Default Reset Buttons */
 .model-settings-flyout .setting-reset {
-    margin-top: 8px;
-    padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 11px;
+    /* Corner placement: the control row owns the bottom of the card, so Reset
+       sits beside the label instead of adding its own row to all 21 cards. */
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    margin-top: 0;
+    padding: 3px 7px;
+    background: var(--surface-hover);
+    border: 1px solid var(--surface-hover);
+    border-radius: 5px;
+    color: var(--text-secondary);
+    font-size: 10px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
     width: auto;
-    align-self: flex-end;
+    line-height: 1;
 }
 
 .model-settings-flyout .setting-reset:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
     color: rgba(255, 255, 255, 0.8);
 }
 

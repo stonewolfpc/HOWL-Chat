@@ -10,14 +10,14 @@
  * @version 5.0.0
  */
 
-@import url('ig-base.css');
-@import url('ig-controls.css');
-@import url('ig-canvas.css');
-@import url('ig-meta.css');
-@import url('ig-actions.css');
-@import url('ig-feedback.css');
-@import url('ig-tutorials.css');
-@import url('ig-scrollbars.css');
-@import url('ig-light-theme.css');
-@import url('ig-responsive.css');
-@import url('ig-lorebook-aesthetic.css');
+@import url('ig-base.css?v=29');
+@import url('ig-controls.css?v=29');
+@import url('ig-canvas.css?v=29');
+@import url('ig-meta.css?v=29');
+@import url('ig-actions.css?v=29');
+@import url('ig-feedback.css?v=29');
+@import url('ig-tutorials.css?v=29');
+@import url('ig-scrollbars.css?v=29');
+@import url('ig-light-theme.css?v=29');
+@import url('ig-responsive.css?v=29');
+@import url('ig-lorebook-aesthetic.css?v=29');

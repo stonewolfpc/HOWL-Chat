@@ -106,6 +106,50 @@ body.theme-light select:focus {
     box-shadow: 0 0 0 3px var(--accent-primary-hover);
 }
 
+body.theme-light .input-field {
+    background: var(--input-bg);
+    color: var(--text-primary);
+    border-color: var(--input-border);
+}
+
+body.theme-light .input-field::placeholder {
+    color: var(--input-placeholder);
+}
+
+body.theme-light .input-field:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-primary-hover);
+}
+
+body.theme-light .input-icon {
+    background: var(--surface-tertiary);
+    color: var(--text-primary);
+    border-color: var(--input-border);
+}
+
+body.theme-light .input-icon:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent-primary);
+}
+
+body.theme-light .input-icon svg {
+    stroke: var(--text-primary);
+}
+
+body.theme-light .input-icon:hover svg {
+    stroke: var(--accent-primary);
+}
+
+body.theme-light .send-button {
+    background: var(--accent-primary);
+    color: #FFFFFF;
+    border-color: var(--accent-primary);
+}
+
+body.theme-light .send-button:hover {
+    opacity: 0.9;
+}
+
 /* --- Buttons: Primary --- */
 body.theme-light .btn-primary,
 body.theme-light .settings-save-btn,
@@ -114,7 +158,7 @@ body.theme-light .create-character-button,
 body.theme-light .create-world-button,
 body.theme-light .create-scenario-button {
     background: var(--button-primary-bg);
-    color: #FFFFFF;
+    color: var(--on-accent);
     border-color: var(--button-primary-bg);
 }
 
@@ -241,6 +285,196 @@ body.theme-light .tab-btn:hover,
 body.theme-light .audio-tab:hover {
     background: var(--surface-hover);
     color: var(--accent-primary);
+}
+
+body.theme-light .scenario-content {
+}
+
+body.theme-light .scenario-creation-popup {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+/* --- Scenario Form --- */
+body.theme-light .scenario-form {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .scenario-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .world-bubble-info {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
+}
+
+/* --- World Creation Popup --- */
+body.theme-light .world-creation-popup {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .world-creation-header,
+body.theme-light .world-creation-footer {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .world-creation-cancel {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+body.theme-light .world-dropdown-item {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .world-dropdown-item:hover {
+    background: var(--surface-hover);
+}
+
+/* --- Generic Form Inputs --- */
+body.theme-light .form-input,
+body.theme-light .form-textarea {
+    background: var(--input-bg);
+    color: var(--text-primary);
+    border-color: var(--input-border);
+}
+
+body.theme-light .form-input:focus,
+body.theme-light .form-textarea:focus {
+    background: var(--input-bg);
+    border-color: var(--accent-primary);
+}
+
+/* --- World Form Specific Elements --- */
+body.theme-light .world-title-input,
+body.theme-light .world-details-textarea,
+body.theme-light .world-dropdown-trigger {
+    background: var(--input-bg);
+    color: var(--text-primary);
+    border-color: var(--input-border);
+}
+
+body.theme-light .world-image-picker,
+body.theme-light .world-images-container {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .world-image-picker-placeholder {
+    color: var(--text-tertiary);
+}
+
+body.theme-light .world-image-remove {
+    background: var(--surface-tertiary);
+    color: var(--text-primary);
+}
+
+body.theme-light .world-dropdown-menu {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+/* --- Chat Session Modal --- */
+body.theme-light .session-modal-container {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .session-modal-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .session-modal-input {
+    background: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-primary);
+}
+
+body.theme-light .session-modal-input::placeholder {
+    color: var(--input-placeholder);
+}
+
+body.theme-light .session-modal-textarea {
+    background: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-primary);
+    scrollbar-color: var(--border-secondary) transparent;
+}
+
+body.theme-light .session-modal-textarea::placeholder {
+    color: var(--input-placeholder);
+}
+
+body.theme-light .session-modal-textarea::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+}
+
+body.theme-light .session-modal-footer {
+    background: var(--surface-tertiary);
+    border-top-color: var(--border-primary);
+}
+
+body.theme-light .session-modal-cancel {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+body.theme-light .session-modal-cancel:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
+}
+
+/* --- Chat Session List --- */
+body.theme-light .session-list-container {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+}
+
+body.theme-light .session-list-header {
+    background: var(--surface-tertiary);
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .session-list-search {
+    border-bottom-color: var(--border-primary);
+}
+
+body.theme-light .session-list-search-input {
+    background: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-primary);
+}
+
+body.theme-light .session-list-search-input::placeholder {
+    color: var(--input-placeholder);
+}
+
+body.theme-light .session-list-empty {
+    color: var(--text-tertiary);
+}
+
+body.theme-light .session-list-footer {
+    background: var(--surface-tertiary);
+    border-top-color: var(--border-primary);
+}
+
+body.theme-light .session-list-info {
+    color: var(--text-secondary);
+}
+
+/* --- Loading Progress --- */
+body.theme-light .loading-progress-bar {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
 }
 
 /* --- Notifications / Status --- */

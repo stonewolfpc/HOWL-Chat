@@ -22,7 +22,7 @@ function _buildSelectorModal(innerHtml) {
     modal.className  = 'selector-modal';
     modal.style.cssText = [
         'position:fixed', 'top:0', 'left:0', 'right:0', 'bottom:0',
-        'background:rgba(0,0,0,0.7)', 'display:flex', 'align-items:center',
+        'background:var(--overlay-scrim)', 'display:flex', 'align-items:center',
         'justify-content:center', 'z-index:9999', 'backdrop-filter:blur(4px)'
     ].join(';');
     modal.innerHTML = innerHtml;
@@ -38,19 +38,86 @@ function _itemRow(onclick, isActive, bodyHtml) {
     const bdOut  = isActive ? 'rgba(0,184,115,0.3)'  : 'rgba(255,255,255,0.1)';
     return `<div onclick="${onclick}"
         style="padding:12px;background:${bg};margin-bottom:8px;border-radius:6px;cursor:pointer;border:1px solid ${border};color:#fff;transition:all 0.2s ease;"
-        onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.borderColor='rgba(255,255,255,0.2)';"
+        onmouseover="this.style.background='var(--surface-hover-strong)';this.style.borderColor='var(--border-secondary)';"
         onmouseout="this.style.background='${bgOut}';this.style.borderColor='${bdOut}';">${bodyHtml}</div>`;
 }
 
 function _modalShell(title, listHtml, cancelOnclick, newLabel, newOnclick) {
-    return `<div style="background:rgba(30,30,40,0.98);border-radius:12px;padding:24px;max-width:480px;width:90%;border:1px solid rgba(255,255,255,0.1);">
+    return `<div style="background:var(--shell-panel-bg);border-radius:12px;padding:24px;max-width:480px;width:90%;border:1px solid var(--surface-hover-strong);">
         <h2 style="color:#fff;margin-top:0;margin-bottom:16px;">${title}</h2>
         <div style="max-height:300px;overflow-y:auto;margin-bottom:16px;">${listHtml}</div>
         <div style="display:flex;gap:8px;">
-            <button onclick="${cancelOnclick}" style="flex:1;padding:10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:6px;cursor:pointer;">Cancel</button>
-            <button onclick="${newOnclick}"   style="flex:1;padding:10px;background:rgba(0,184,115,0.2);border:1px solid rgba(0,184,115,0.3);color:#00b873;border-radius:6px;cursor:pointer;">${newLabel}</button>
+            <button onclick="${cancelOnclick}" style="flex:1;padding:10px;background:var(--surface-hover-strong);border:1px solid var(--border-secondary);color:#fff;border-radius:6px;cursor:pointer;">Cancel</button>
+            <button onclick="${newOnclick}"   style="flex:1;padding:10px;background:var(--success-bg);border:1px solid var(--success);color:#00b873;border-radius:6px;cursor:pointer;">${newLabel}</button>
         </div>
     </div>`;
+}
+
+// ---------------------------------------------------------------------------
+// Filterable Modal Builder
+// ---------------------------------------------------------------------------
+
+function _filterBarHtml() {
+    return `
+        <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">
+            <input type="text" class="selector-search-input" placeholder="Search..."
+                style="flex:1;padding:8px 12px;background:var(--surface-hover);border:1px solid var(--surface-hover-strong);border-radius:6px;color:#fff;outline:none;"
+                oninput="window._selectorFilter && window._selectorFilter(this.value)">
+            <select class="selector-sort-select"
+                style="padding:8px 12px;border:1px solid var(--surface-hover-strong);border-radius:6px;outline:none;cursor:pointer;"
+                onchange="window._selectorSort && window._selectorSort(this.value)">
+                <option value="name:asc">Name A-Z</option>
+                <option value="name:desc">Name Z-A</option>
+                <option value="date:desc">Newest First</option>
+                <option value="date:asc">Oldest First</option>
+            </select>
+        </div>`;
+}
+
+function _filterableModalShell(title, listHtml, cancelOnclick, newLabel, newOnclick) {
+    return `<div style="background:var(--shell-panel-bg);border-radius:12px;padding:24px;max-width:480px;width:90%;border:1px solid var(--surface-hover-strong);">
+        <h2 style="color:#fff;margin-top:0;margin-bottom:16px;">${title}</h2>
+        ${_filterBarHtml()}
+        <div class="selector-list-container" style="max-height:260px;overflow-y:auto;margin-bottom:16px;">${listHtml}</div>
+        <div style="display:flex;gap:8px;">
+            <button onclick="${cancelOnclick}" style="flex:1;padding:10px;background:var(--surface-hover-strong);border:1px solid var(--border-secondary);color:#fff;border-radius:6px;cursor:pointer;">Cancel</button>
+            <button onclick="${newOnclick}"   style="flex:1;padding:10px;background:var(--success-bg);border:1px solid var(--success);color:#00b873;border-radius:6px;cursor:pointer;">${newLabel}</button>
+        </div>
+    </div>`;
+}
+
+function _filterBarWithAttachmentHtml(label) {
+    return `
+        <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
+            <input type="text" class="selector-search-input" placeholder="Search..."
+                style="flex:1;min-width:120px;padding:8px 12px;background:var(--surface-hover);border:1px solid var(--surface-hover-strong);border-radius:6px;color:#fff;outline:none;"
+                oninput="window._selectorFilter && window._selectorFilter(this.value)">
+            <select class="selector-sort-select"
+                style="padding:8px 12px;border:1px solid var(--surface-hover-strong);border-radius:6px;outline:none;cursor:pointer;"
+                onchange="window._selectorSort && window._selectorSort(this.value)">
+                <option value="name:asc">Name A-Z</option>
+                <option value="name:desc">Name Z-A</option>
+                <option value="date:desc">Newest First</option>
+                <option value="date:asc">Oldest First</option>
+            </select>
+            <label style="display:flex;align-items:center;gap:6px;color:rgba(255,255,255,0.7);font-size:12px;white-space:nowrap;cursor:pointer;">
+                <input type="checkbox" class="selector-attach-check" style="cursor:pointer;"
+                    onchange="window._selectorAttach && window._selectorAttach(this.checked)">
+                ${label}
+            </label>
+        </div>`;
+}
+
+function _renderWorldList(worlds, activeWorldId) {
+    if (!worlds.length) return '<div style="color:var(--surface-hover);text-align:center;padding:20px;">No worlds available</div>';
+    return worlds.map(w => {
+        const isActive = activeWorldId === w.id;
+        return _itemRow(
+            `contextDisplay.selectWorld('${w.id}');document.querySelector('.selector-modal').remove();`,
+            isActive,
+            `<strong style="display:block;margin-bottom:4px;">${w.title || w.name}</strong><small style="color:var(--surface-hover);">${w.details || w.description || 'No description'}</small>`
+        );
+    }).join('');
 }
 
 // ---------------------------------------------------------------------------
@@ -58,23 +125,35 @@ function _modalShell(title, listHtml, cancelOnclick, newLabel, newOnclick) {
 // ---------------------------------------------------------------------------
 
 ContextDisplay.prototype.openWorldSelector = function () {
-    const worlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
-    const listHtml = worlds.length === 0
-        ? '<div style="color:rgba(255,255,255,0.5);text-align:center;padding:20px;">No worlds available</div>'
-        : worlds.map(w => {
-            const isActive = this.currentChatData.world?.id === w.id;
-            return _itemRow(
-                `contextDisplay.selectWorld('${w.id}');document.querySelector('.selector-modal').remove();`,
-                isActive,
-                `<strong style="display:block;margin-bottom:4px;">${w.title || w.name}</strong><small style="color:rgba(255,255,255,0.5);">${w.details || w.description || 'No description'}</small>`
-            );
-        }).join('');
+    const allWorlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
+    const activeWorldId = this.currentChatData.world?.id;
+    const fe = window.FilterEngine;
 
-    _buildSelectorModal(_modalShell(
-        'Select a World', listHtml,
+    const render = (items) => {
+        const container = document.querySelector('.selector-modal .selector-list-container');
+        if (container) container.innerHTML = _renderWorldList(items, activeWorldId);
+    };
+
+    let currentItems = fe ? fe.processItems(allWorlds, { sortField: 'name', sortDirection: 'asc' }) : allWorlds;
+
+    window._selectorFilter = (query) => {
+        currentItems = fe ? fe.processItems(allWorlds, { query, searchFields: ['name','title','details','description'], sortField: window._selectorSortField || 'name', sortDirection: window._selectorSortDir || 'asc' }) : allWorlds;
+        render(currentItems);
+    };
+    window._selectorSort = (val) => {
+        const [field, dir] = val.split(':');
+        window._selectorSortField = field;
+        window._selectorSortDir = dir;
+        const query = document.querySelector('.selector-modal .selector-search-input')?.value || '';
+        currentItems = fe ? fe.processItems(allWorlds, { query, searchFields: ['name','title','details','description'], sortField: field, sortDirection: dir }) : allWorlds;
+        render(currentItems);
+    };
+
+    _buildSelectorModal(_filterableModalShell(
+        'Select a World', _renderWorldList(currentItems, activeWorldId),
         "document.querySelector('.selector-modal').remove();",
         '+ New World',
-        "navigateTo('world.html');document.querySelector('.selector-modal').remove();"
+        "navigateTo('world.html?from=chat');document.querySelector('.selector-modal').remove();"
     ));
 };
 
@@ -92,6 +171,7 @@ ContextDisplay.prototype.selectWorld = async function (worldId) {
         }
     }
 
+    console.log('[TRACE:selectWorld] start — world:', world?.id, 'name:', world?.title || world?.name);
     this.currentChatData.world     = world;
     this.currentChatData.scenario  = null;
     this.currentChatData.characters = [];
@@ -140,6 +220,7 @@ ContextDisplay.prototype.selectWorld = async function (worldId) {
         });
     }
 
+    console.log('[TRACE:selectWorld] attachedChars count:', attachedChars.length, 'ids:', attachedChars.map(c => c.id));
     attachedChars.forEach(c => {
         if (Array.isArray(c.howl?.lorebooks)) lorebookRefSets.push(c.howl.lorebooks);
         if (Array.isArray(c.lorebooks))       lorebookRefSets.push(c.lorebooks);
@@ -151,19 +232,39 @@ ContextDisplay.prototype.selectWorld = async function (worldId) {
     ];
     if (worldLbRefs.length > 0) lorebookRefSets.push(worldLbRefs);
 
-    this.currentChatData.lorebooks  = this.mergeLorebookRefs(lorebooksCatalog, lorebookRefSets);
+    const mergedLorebooks = this.mergeLorebookRefs(lorebooksCatalog, lorebookRefSets);
+    this.currentChatData.lorebooks  = mergedLorebooks;
     this.currentChatData.characters = attachedChars;
 
-    this.saveChatData();
-    this.updateWorldDisplay();
-    await this.updateScenarioDisplay();
-    this.updateCharacterPanel();
-    this.updateLorebookDisplay();
+    // Character swap: use bridge batch update to avoid flicker.
+    // First update bridge lorebooks so _push() propagates them.
+    // Then batch-update characters (single panel refresh + backend sync).
+    if (window.chatBridge) {
+        // The bridge owns the state the panels render from. Writing
+        // this.currentChatData.world directly was undone by the next _push(),
+        // which rebuilt currentChatData from _state.world (still the previous
+        // world) and re-rendered the World panel from it, so selecting a world
+        // left the box unchanged and never persisted.
+        await window.chatBridge.applyWorldChange(world);
+        await window.chatBridge.applyScenarioChange(firstScenario || null);
+        window.chatBridge.setLorebooks(mergedLorebooks || []);
+        const bridgeChars = window.chatBridge.getState()?.characters || [];
+        const attachedIds = new Set(attachedChars.map(c => c.id));
+        const removeIds   = bridgeChars.filter(c => !attachedIds.has(c.id)).map(c => c.id);
+        await window.chatBridge.applyCharacterBatchUpdate(removeIds, attachedChars);
+    } else {
+        this.saveChatData();
+        this.updateWorldDisplay();
+        await this.updateScenarioDisplay();
+        this.updateCharacterPanel();
+        this.updateLorebookDisplay();
+    }
 
+    // Sync world, scenario, and lorebooks to backend (characters already synced by bridge)
     await this.syncWorldDataToBackend(world);
     if (firstScenario)                             await this.syncScenarioDataToBackend(firstScenario);
-    if (this.currentChatData.characters.length)    await this.syncCharactersDataToBackend(this.currentChatData.characters);
     if (this.currentChatData.lorebooks.length)     await this.syncLorebooksDataToBackend(this.currentChatData.lorebooks);
+    console.log('[TRACE:selectWorld] end — backend synced');
 
     if (typeof showNotification === 'function') {
         showNotification(`World loaded: ${world.title || world.name} (${attachedChars.length} characters, ${this.currentChatData.lorebooks.length} lorebooks)`, 'success');
@@ -174,24 +275,67 @@ ContextDisplay.prototype.selectWorld = async function (worldId) {
 // Scenario Selector
 // ---------------------------------------------------------------------------
 
-ContextDisplay.prototype.openScenarioSelector = function () {
-    const scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
-    const listHtml  = scenarios.length === 0
-        ? '<div style="color:rgba(255,255,255,0.5);text-align:center;padding:20px;">No scenarios available</div>'
-        : scenarios.map(s => {
-            const isActive = this.currentChatData.scenario?.id === s.id;
-            return _itemRow(
-                `contextDisplay.selectScenario('${s.id}');document.querySelector('.selector-modal').remove();`,
-                isActive,
-                `<strong style="display:block;margin-bottom:4px;">${s.title || s.name}</strong><small style="color:rgba(255,255,255,0.5);">${s.description || 'No description'}</small>`
-            );
-        }).join('');
+function _renderScenarioList(scenarios, activeScenarioId) {
+    if (!scenarios.length) return '<div style="color:var(--surface-hover);text-align:center;padding:20px;">No scenarios available</div>';
+    return scenarios.map(s => {
+        const isActive = activeScenarioId === s.id;
+        return _itemRow(
+            `contextDisplay.selectScenario('${s.id}');document.querySelector('.selector-modal').remove();`,
+            isActive,
+            `<strong style="display:block;margin-bottom:4px;">${s.title || s.name}</strong><small style="color:var(--surface-hover);">${s.description || 'No description'}</small>`
+        );
+    }).join('');
+}
 
-    _buildSelectorModal(_modalShell(
-        'Select a Scenario', listHtml,
+function _filterableModalShellWithAttach(title, listHtml, cancelOnclick, newLabel, newOnclick, attachLabel) {
+    return `<div style="background:var(--shell-panel-bg);border-radius:12px;padding:24px;max-width:480px;width:90%;border:1px solid var(--surface-hover-strong);">
+        <h2 style="color:#fff;margin-top:0;margin-bottom:16px;">${title}</h2>
+        ${_filterBarWithAttachmentHtml(attachLabel)}
+        <div class="selector-list-container" style="max-height:240px;overflow-y:auto;margin-bottom:16px;">${listHtml}</div>
+        <div style="display:flex;gap:8px;">
+            <button onclick="${cancelOnclick}" style="flex:1;padding:10px;background:var(--surface-hover-strong);border:1px solid var(--border-secondary);color:#fff;border-radius:6px;cursor:pointer;">Cancel</button>
+            <button onclick="${newOnclick}"   style="flex:1;padding:10px;background:var(--success-bg);border:1px solid var(--success);color:#00b873;border-radius:6px;cursor:pointer;">${newLabel}</button>
+        </div>
+    </div>`;
+}
+
+ContextDisplay.prototype.openScenarioSelector = function () {
+    const allScenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+    const activeScenarioId = this.currentChatData.scenario?.id;
+    const currentWorld = this.currentChatData.world;
+    const fe = window.FilterEngine;
+
+    const render = (items) => {
+        const container = document.querySelector('.selector-modal .selector-list-container');
+        if (container) container.innerHTML = _renderScenarioList(items, activeScenarioId);
+    };
+
+    let currentItems = fe ? fe.processItems(allScenarios, { sortField: 'name', sortDirection: 'asc' }) : allScenarios;
+    let attachOnly = false;
+
+    const apply = () => {
+        const query = document.querySelector('.selector-modal .selector-search-input')?.value || '';
+        const sortVal = document.querySelector('.selector-modal .selector-sort-select')?.value || 'name:asc';
+        const [field, dir] = sortVal.split(':');
+        const opts = { query, searchFields: ['name','title','description'], sortField: field, sortDirection: dir };
+        if (attachOnly && currentWorld) {
+            opts.attachTo = currentWorld;
+            opts.attachField = 'scenarios';
+        }
+        currentItems = fe ? fe.processItems(allScenarios, opts) : allScenarios;
+        render(currentItems);
+    };
+
+    window._selectorFilter = () => apply();
+    window._selectorSort = () => apply();
+    window._selectorAttach = (checked) => { attachOnly = checked; apply(); };
+
+    _buildSelectorModal(_filterableModalShellWithAttach(
+        'Select a Scenario', _renderScenarioList(currentItems, activeScenarioId),
         "document.querySelector('.selector-modal').remove();",
         '+ New Scenario',
-        "navigateTo('scenario.html');document.querySelector('.selector-modal').remove();"
+        "navigateTo('scenario.html');document.querySelector('.selector-modal').remove();",
+        'Only attached to world'
     ));
 };
 
@@ -209,19 +353,20 @@ ContextDisplay.prototype.selectScenario = async function (scenarioId) {
         }
     }
 
+    console.log('[TRACE:selectScenario] start — scenario:', scenario?.id, 'name:', scenario?.title || scenario?.name);
     this.currentChatData.scenario = scenario;
 
+    // Resolve scenario characters from localStorage
+    let scenarioChars = [];
     if (scenario.characters?.length > 0) {
         const all = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
-        const scenarioChars = all.filter(c => scenario.characters.some(sc => sc.id === c.id));
-        if (scenarioChars.length > 0) {
-            if (this.currentChatData.characters?.length > 0 && typeof dataSync !== 'undefined') {
-                await dataSync.createMemoryLorebook(this.currentChatData.characters, scenarioChars);
-            }
-            this.currentChatData.characters = scenarioChars;
+        scenarioChars = all.filter(c => scenario.characters.some(sc => sc.id === c.id));
+        if (scenarioChars.length > 0 && this.currentChatData.characters?.length > 0 && typeof dataSync !== 'undefined') {
+            await dataSync.createMemoryLorebook(this.currentChatData.characters, scenarioChars);
         }
     }
 
+    // Lorebook merge
     const lbRefs = this.getScenarioLorebookRefs(scenario);
     if (lbRefs.length > 0) {
         const catalog    = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
@@ -229,15 +374,29 @@ ContextDisplay.prototype.selectScenario = async function (scenarioId) {
         this.currentChatData.lorebooks = this.mergeLorebookRefs(catalog, [existRefs, lbRefs]);
     }
 
-    this.saveChatData();
-    await this.updateScenarioDisplay();
-    this.updateCharacterPanel();
-    this.updateLorebookDisplay();
+    // Character swap: use bridge batch update to avoid flicker.
+    // First update bridge lorebooks + scenario so _push() propagates them.
+    // Then batch-update characters (single panel refresh + backend sync).
+    if (window.chatBridge) {
+        window.chatBridge.setLorebooks(this.currentChatData.lorebooks || []);
+        await window.chatBridge.applyScenarioChange(scenario);
+        const bridgeChars = window.chatBridge.getState()?.characters || [];
+        const scenarioIds = new Set(scenarioChars.map(c => c.id));
+        const removeIds   = bridgeChars.filter(c => !scenarioIds.has(c.id)).map(c => c.id);
+        await window.chatBridge.applyCharacterBatchUpdate(removeIds, scenarioChars);
+    } else {
+        this.currentChatData.characters = scenarioChars;
+        this.saveChatData();
+        await this.updateScenarioDisplay();
+        this.updateCharacterPanel();
+        this.updateLorebookDisplay();
+    }
 
+    // Sync scenario and lorebooks to backend (characters already synced by bridge)
     await this.syncScenarioDataToBackend(scenario);
-    if (this.currentChatData.characters?.length) await this.syncCharactersDataToBackend(this.currentChatData.characters);
-    if (this.currentChatData.lorebooks?.length)  await this.syncLorebooksDataToBackend(this.currentChatData.lorebooks);
+    if (this.currentChatData.lorebooks?.length) await this.syncLorebooksDataToBackend(this.currentChatData.lorebooks);
 
+    console.log('[TRACE:selectScenario] end — chars:', (this.currentChatData.characters || []).length, 'lorebooks:', (this.currentChatData.lorebooks || []).length);
     if (typeof showNotification === 'function') showNotification(`Scenario set: ${scenario.title || scenario.name}`, 'success');
 };
 
@@ -245,59 +404,100 @@ ContextDisplay.prototype.selectScenario = async function (scenarioId) {
 // Character Selector
 // ---------------------------------------------------------------------------
 
-ContextDisplay.prototype.openCharacterSelector = function () {
-    const characters = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
-    const listHtml   = characters.length === 0
-        ? '<div style="color:rgba(255,255,255,0.5);text-align:center;padding:20px;">No characters available</div>'
-        : characters.map(c => {
-            const isSel = this.currentChatData.characters?.some(ch => ch.id === c.id);
-            const avatar = c.image
-                ? `<img src="${c.image}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`
-                : '👤';
-            const dot = isSel ? '<div style="width:12px;height:12px;border-radius:50%;background:#00b873;"></div>' : '';
-            const bg     = isSel ? 'rgba(0,184,115,0.2)' : 'rgba(255,255,255,0.05)';
-            const border = isSel ? 'rgba(0,184,115,0.3)' : 'rgba(255,255,255,0.1)';
-            return `<div onclick="contextDisplay.toggleCharacter('${c.id}');"
-                style="padding:12px;background:${bg};margin-bottom:8px;border-radius:6px;cursor:pointer;border:1px solid ${border};color:#fff;display:flex;align-items:center;gap:12px;">
-                <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">${avatar}</div>
-                <div style="flex:1;"><strong style="display:block;margin-bottom:2px;">${c.name || 'Unnamed'}</strong><small style="color:rgba(255,255,255,0.5);">${c.role || 'No role'}</small></div>
-                <div style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;">${dot}</div>
-            </div>`;
-        }).join('');
+function _renderCharacterList(characters, selectedIds) {
+    if (!characters.length) return '<div style="color:var(--surface-hover);text-align:center;padding:20px;">No characters available</div>';
+    return characters.map(c => {
+        const isSel = selectedIds.has(c.id);
+        const avatar = c.image
+            ? `<img src="${c.image}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`
+            : '👤';
+        const dot = isSel ? '<div style="width:12px;height:12px;border-radius:50%;background:#00b873;"></div>' : '';
+        const bg     = isSel ? 'rgba(0,184,115,0.2)' : 'rgba(255,255,255,0.05)';
+        const border = isSel ? 'rgba(0,184,115,0.3)' : 'rgba(255,255,255,0.1)';
+        return `<div onclick="contextDisplay.toggleCharacter('${c.id}');"
+            style="padding:12px;background:${bg};margin-bottom:8px;border-radius:6px;cursor:pointer;border:1px solid ${border};color:#fff;display:flex;align-items:center;gap:12px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--border-secondary);display:flex;align-items:center;justify-content:center;flex-shrink:0;">${avatar}</div>
+            <div style="flex:1;"><strong style="display:block;margin-bottom:2px;">${c.name || 'Unnamed'}</strong><small style="color:var(--surface-hover);">${c.role || 'No role'}</small></div>
+            <div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--surface-hover);display:flex;align-items:center;justify-content:center;">${dot}</div>
+        </div>`;
+    }).join('');
+}
 
-    _buildSelectorModal(_modalShell(
-        'Select Characters', listHtml,
+ContextDisplay.prototype.openCharacterSelector = function () {
+    const allCharacters = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+    const selectedIds = new Set((this.currentChatData.characters || []).map(c => c.id));
+    const currentWorld = this.currentChatData.world;
+    const currentScenario = this.currentChatData.scenario;
+    const fe = window.FilterEngine;
+
+    const render = (items) => {
+        const container = document.querySelector('.selector-modal .selector-list-container');
+        if (container) container.innerHTML = _renderCharacterList(items, selectedIds);
+    };
+
+    let currentItems = fe ? fe.processItems(allCharacters, { sortField: 'name', sortDirection: 'asc' }) : allCharacters;
+    let attachOnly = false;
+
+    const apply = () => {
+        const query = document.querySelector('.selector-modal .selector-search-input')?.value || '';
+        const sortVal = document.querySelector('.selector-modal .selector-sort-select')?.value || 'name:asc';
+        const [field, dir] = sortVal.split(':');
+        const opts = { query, searchFields: ['name','role','description'], sortField: field, sortDirection: dir };
+        if (attachOnly) {
+            if (currentWorld) {
+                opts.attachTo = currentWorld;
+                opts.attachField = 'characters';
+            } else if (currentScenario) {
+                opts.attachTo = currentScenario;
+                opts.attachField = 'characters';
+            }
+        }
+        currentItems = fe ? fe.processItems(allCharacters, opts) : allCharacters;
+        render(currentItems);
+    };
+
+    window._selectorFilter = () => apply();
+    window._selectorSort = () => apply();
+    window._selectorAttach = (checked) => { attachOnly = checked; apply(); };
+
+    _buildSelectorModal(_filterableModalShellWithAttach(
+        'Select Characters', _renderCharacterList(currentItems, selectedIds),
         "document.querySelector('.selector-modal').remove();",
         '+ New Character',
-        "navigateTo('character.html');document.querySelector('.selector-modal').remove();"
+        "navigateTo('character.html');document.querySelector('.selector-modal').remove();",
+        'Only attached'
     ));
 };
 
 ContextDisplay.prototype.toggleCharacter = async function (characterId) {
+    console.log('[TRACE:toggleCharacter] id:', characterId);
     const all       = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
     const character = all.find(c => c.id === characterId);
     if (!character) return;
 
-    if (!this.currentChatData.characters) this.currentChatData.characters = [];
-    const idx = this.currentChatData.characters.findIndex(c => c.id === characterId);
+    const isAdding = !(this.currentChatData.characters || []).some(c => c.id === characterId);
 
-    if (idx >= 0) {
-        this.currentChatData.characters.splice(idx, 1);
+    if (window.chatBridge) {
+        if (isAdding) await window.chatBridge.applyCharacterAdd(character);
+        else          await window.chatBridge.applyCharacterRemove(characterId);
     } else {
-        this.currentChatData.characters.push(character);
+        if (!this.currentChatData.characters) this.currentChatData.characters = [];
+        const idx = this.currentChatData.characters.findIndex(c => c.id === characterId);
+        if (idx >= 0) this.currentChatData.characters.splice(idx, 1);
+        else          this.currentChatData.characters.push(character);
     }
 
     this.saveChatData();
     await this.updateCharacterPanel();
-    if (this.currentChatData.characters.length) await this.syncCharactersDataToBackend(this.currentChatData.characters);
+    if ((this.currentChatData.characters || []).length) await this.syncCharactersDataToBackend(this.currentChatData.characters);
 
     const modal = document.querySelector('.selector-modal');
     if (modal) {
         modal.querySelectorAll('div[onclick*="toggleCharacter"]').forEach(div => {
             if (!div.getAttribute('onclick')?.includes(`'${characterId}'`)) return;
             const isNow = this.currentChatData.characters.some(c => c.id === characterId);
-            div.style.background  = isNow ? 'rgba(0,184,115,0.2)' : 'rgba(255,255,255,0.05)';
-            div.style.borderColor = isNow ? 'rgba(0,184,115,0.3)' : 'rgba(255,255,255,0.1)';
+            div.style.background  = isNow ? 'var(--success-bg)' : 'var(--surface-hover)';
+            div.style.borderColor = isNow ? 'var(--success)' : 'var(--surface-hover-strong)';
             const checkbox = div.querySelector('div:last-child');
             if (checkbox) checkbox.innerHTML = isNow ? '<div style="width:12px;height:12px;border-radius:50%;background:#00b873;"></div>' : '';
         });
@@ -310,10 +510,13 @@ ContextDisplay.prototype.removeCharacterFromChat = async function (characterId) 
         await window.chatBridge.applyCharacterRemove(characterId);
     } else {
         this.currentChatData.characters = this.currentChatData.characters.filter(c => c.id !== characterId);
-    }
-    if (!this.currentChatData.removedCharacterIds) this.currentChatData.removedCharacterIds = [];
-    if (!this.currentChatData.removedCharacterIds.includes(characterId)) {
-        this.currentChatData.removedCharacterIds.push(characterId);
+        if ((this.currentChatData.activeCharacterIds || []).includes(characterId)) {
+            if (!this.currentChatData.removedCharacterIds) this.currentChatData.removedCharacterIds = [];
+            if (!this.currentChatData.removedCharacterIds.includes(characterId)) {
+                this.currentChatData.removedCharacterIds.push(characterId);
+            }
+        }
+        this.currentChatData.addedCharacterIds = (this.currentChatData.addedCharacterIds || []).filter(id => id !== characterId);
     }
     this.saveChatData();
     await this.updateCharacterPanel();

@@ -22,14 +22,14 @@
 
 .thinking-toggle:hover {
     opacity: 1;
-    background: rgba(100, 100, 100, 0.15);
+    background: var(--surface-hover);
 }
 
 .thinking-block {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.25s ease;
-    background: rgba(21, 21, 31, 0.5);
+    background: var(--surface-secondary);
     border-left: 2px solid var(--theme-color);
     margin-top: 6px;
     padding: 0 10px;

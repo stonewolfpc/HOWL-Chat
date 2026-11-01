@@ -11,8 +11,8 @@
 .scenario-page-header {
     text-align: center;
     padding: 24px 16px;
-    background: rgba(15, 21, 31, 0.95);
-    border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-aside-bg);
+    border-bottom: 1px solid var(--border-primary);
 }
 
 .scenario-page-title {
@@ -25,7 +25,7 @@
 /* Create New Scenario Button */
 .create-scenario-button {
     background: var(--theme-glow);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     padding: 12px 24px;
     cursor: pointer;
@@ -48,7 +48,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: rgba(15, 21, 31, 0.95);
+    background: var(--shell-aside-bg);
 }
 
 /* Scenario Grid */
@@ -88,7 +88,7 @@
 
 .scenario-grid-empty-subtext {
     font-size: 14px;
-    color: rgba(212, 212, 212, 0.7);
+    color: var(--text-secondary);
 }
 
 /* ==================== LIGHT THEME OVERRIDES ==================== */
@@ -125,8 +125,8 @@ body.theme-light .scenario-grid-empty-subtext {
 }
 
 .scenario-creation-popup {
-    background: rgba(15, 21, 31, 0.95);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-aside-bg);
+    border: 1px solid var(--border-primary);
     border-radius: 8px;
     width: 90%;
     max-width: 600px;
@@ -140,7 +140,7 @@ body.theme-light .scenario-grid-empty-subtext {
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+    border-bottom: 1px solid var(--border-primary);
 }
 
 .scenario-creation-title {
@@ -168,7 +168,7 @@ body.theme-light .scenario-grid-empty-subtext {
 }
 
 .scenario-creation-close:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-hover);
 }
 
 .scenario-creation-content {
@@ -176,7 +176,7 @@ body.theme-light .scenario-grid-empty-subtext {
     max-height: 60vh;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    scrollbar-color: var(--border-secondary) transparent;
 }
 
 .scenario-creation-content::-webkit-scrollbar {
@@ -188,12 +188,12 @@ body.theme-light .scenario-grid-empty-subtext {
 }
 
 .scenario-creation-content::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--border-primary);
     border-radius: 4px;
 }
 
 .scenario-creation-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--border-primary);
 }
 
 .scenario-creation-footer {
@@ -201,13 +201,13 @@ body.theme-light .scenario-grid-empty-subtext {
     justify-content: flex-end;
     gap: 12px;
     padding: 20px;
-    border-top: 1px solid rgba(100, 100, 100, 0.3);
+    border-top: 1px solid var(--border-primary);
 }
 
 .scenario-creation-cancel,
 .scenario-creation-save {
     padding: 10px 20px;
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    border: 1px solid var(--border-primary);
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
@@ -216,7 +216,7 @@ body.theme-light .scenario-grid-empty-subtext {
 }
 
 .scenario-creation-cancel {
-    background: rgba(100, 100, 100, 0.2);
+    background: var(--surface-hover);
     color: var(--static-text);
 }
 
@@ -243,13 +243,12 @@ body.theme-light .scenario-page-title {
 }
 
 body.theme-light .scenario-content {
-    background: var(--surface-secondary);
 }
 
 body.theme-light .create-scenario-button {
     background: var(--button-primary-bg);
     border-color: var(--button-primary-bg);
-    color: #FFFFFF;
+    color: var(--on-accent);
 }
 
 body.theme-light .create-scenario-button:hover {
@@ -288,7 +287,7 @@ body.theme-light .scenario-creation-close:hover {
 }
 
 body.theme-light .scenario-creation-content::-webkit-scrollbar-thumb {
-    background: var(--border-secondary);
+    background: var(--border-primary);
 }
 
 body.theme-light .scenario-creation-content::-webkit-scrollbar-thumb:hover {
@@ -307,7 +306,7 @@ body.theme-light .scenario-creation-cancel {
 
 body.theme-light .scenario-creation-save {
     background: var(--button-primary-bg);
-    color: #FFFFFF;
+    color: var(--on-accent);
     border-color: var(--button-primary-bg);
 }
 

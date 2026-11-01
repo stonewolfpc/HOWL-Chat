@@ -30,11 +30,18 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 540px;
-    max-height: 85vh;
+    /* Full-screen workspace, matching the sampler sheet: the header stays put and
+       only the content pane scrolls, so the controls are all in one view. */
+    display: flex;
+    flex-direction: column;
+    width: min(1560px, 96vw);
+    max-width: min(1560px, 96vw);
+    height: calc(100vh - 24px);
+    max-height: calc(100vh - 24px);
+    padding: 0;
     background: rgba(20, 20, 25, 0.95);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--surface-hover);
     border-radius: 16px;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
     z-index: 9999;
@@ -56,8 +63,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex: 0 0 auto;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--surface-hover);
     background: rgba(255, 255, 255, 0.02);
 }
 
@@ -65,12 +73,12 @@
     margin: 0;
     font-size: 18px;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--text-secondary);
     letter-spacing: -0.02em;
 }
 
 .model-settings-flyout .close-button {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-hover);
     border: none;
     color: rgba(255, 255, 255, 0.7);
     width: 32px;
@@ -87,9 +95,15 @@
 
 /* Flyout Content */
 .model-settings-flyout .flyout-content {
-    padding: 24px;
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
-    max-height: calc(85vh - 80px);
+    overflow-x: hidden;
+    max-height: none;
+    padding: 10px 18px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .model-settings-flyout .flyout-content::-webkit-scrollbar {
@@ -97,15 +111,15 @@
 }
 
 .model-settings-flyout .flyout-content::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-hover);
     border-radius: 3px;
 }
 
 .model-settings-flyout .flyout-content::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--border-primary);
     border-radius: 3px;
 }
 
 .model-settings-flyout .flyout-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--border-primary);
 }

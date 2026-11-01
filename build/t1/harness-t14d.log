@@ -1,0 +1,168 @@
+[startup] 21:32:59.165  +    2.1ms  image init: begin
+[startup] 21:32:59.168  +    5.2ms  image init: config ready
+[ImageEngine] Initialized: binary=C:\Users\StoneWolfPC\HOWL_Chat\sd-server.exe models=E:\HOWL_Chat\models port=8081
+[startup] 21:32:59.169  +    5.7ms  image init: engine initialized
+[ImageEngine] sd-server commit: c6dfa9d
+[ImageEngine] Restored last model: "image"
+[startup] 21:32:59.189  +   26.3ms  rescan: start
+2026/10/31 21:32:59 [harness] serving frontend/dist on http://127.0.0.1:8799
+[startup] 21:32:59.190  +   26.8ms  rescan: scanning E:\AI GGUF\GGUF
+[startup] 21:32:59.191  +   28.3ms  rescan: done E:\AI GGUF\GGUF 25 entries
+2026/10/31 21:33:04 [rpc] GetSettings                                   ok           1ms
+2026/10/31 21:33:04 [rpc] SetSettings                                   ok           1ms
+[LoadModel] START path="E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf"
+[LoadModel] path validated
+[LoadModel] checking port 8080
+[LoadModel] port 8080 free
+[LoadModel] validating llama-server binary
+[LoadModel] llama-server binary validated
+[LoadModel] reading GGUF metadata from: E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf
+[ReadProfile] final: Family=qwen35 Layers=32 Params=13759916804 Size=5366.4MB Quant=IQ2_XXS DModel=4096 Heads=16 KVHeads=4
+[LoadModel] profile: Family=qwen35 Layers=32 Params=13759916804 Size=5366.4MB Quant=IQ2_XXS ArchSpec=true
+[LoadModel] applying safe defaults
+[applySafeDefaults] enter
+[applySafeDefaults] getting hardware snapshot
+[ResourceManager] GetManager called
+[ResourceManager] initializing singleton
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] initialization complete
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[applySafeDefaults] freeVRAM=5789 freeRAM=43994
+[applySafeDefaults] reading settings
+[applySafeDefaults] settings: ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] archSpec: layers=32 dmodel=4096 heads=16 kvheads=4
+[applySafeDefaults] creating memory model
+[applySafeDefaults] calling ClampToHardware
+[applySafeDefaults] ClampToHardware returned
+[applySafeDefaults] final: GPU=4302MB RAM=2468MB ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] done
+[LoadModel] safe defaults applied
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+[LoadModel] no mmproj found — vision not available for this model
+[LoadModel] validating spawn settings
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[LoadModel] spawn params: ctx=3096 gpuLayers=22 batch=256 freeVRAM=5789 freeRAM=43994
+[LoadModel] validation result: level=0 msg="Memory OK — estimated 4302 MB GPU / 2468 MB RAM (free: 5789 / 43994 MB)"
+[LoadModel] spawn validation passed
+[LoadModel] chat template: model-native for family "qwen35" (170 bytes)
+[LoadModel] spawning llama-server
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+INFO: No mmproj file found for model: E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf
+INFO: llama-server started (pid 27352) with model E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf
+[LoadModel] llama-server spawned (pid 27352)
+INFO: Registering model with estimated GPU:4310MB RAM:2476MB
+[ResourceManager] GetManager called
+[LoadModel] monitor started (pid 27352, timeout 60s)
+2026/10/31 21:33:07 [rpc] LoadModel                                     ok        2.384s
+0.00.125.315 I srv  llama_server: initializing ...
+0.00.125.329 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.125.648 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.132.874 I srv    load_model: loading model 'E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf'
+2026/10/31 21:33:09 [rpc] IsModelLoaded                                 ok            0s
+0.02.851.396 I cmn          init: llama threadpool init, n_threads = 8
+0.03.427.117 I srv    load_model: initializing, n_slots = 4, n_ctx_slot = 3328, kv_unified = 'true'
+0.03.429.332 I srv  server_run_i: model loaded
+0.03.429.342 I srv  server_on_li: listening on http://127.0.0.1:8080
+[LoadModel] monitor: server healthy, model loaded
+2026/10/31 21:33:11 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 21:33:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:33:12 [rpc] GetSDServerVersion                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.60 top_p=0.95 top_k=20 min_p=0.00 repeat=1.10 n_predict=2560
+2026/10/31 21:33:12 [rpc] GetEffectiveSampler                           ok            0s
+INFO: llama-server killed, model memory freed
+[ResourceManager] GetManager called
+[ResourceManager] GetManager called
+2026/10/31 21:33:13 [rpc] UnloadModel                                   ok         577ms
+[LoadModel] START path="E:\\AI GGUF\\GGUF\\Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf"
+[LoadModel] path validated
+[LoadModel] checking port 8080
+[LoadModel] port 8080 free
+[LoadModel] validating llama-server binary
+[LoadModel] llama-server binary validated
+[LoadModel] reading GGUF metadata from: E:\AI GGUF\GGUF\Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf
+[ReadProfile] final: Family=gemma4 Layers=48 Params=18049831292 Size=7039.4MB Quant=IQ2_XXS DModel=3840 Heads=16 KVHeads=16
+[LoadModel] profile: Family=gemma4 Layers=48 Params=18049831292 Size=7039.4MB Quant=IQ2_XXS ArchSpec=true
+[LoadModel] applying safe defaults
+[applySafeDefaults] enter
+[applySafeDefaults] getting hardware snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[applySafeDefaults] freeVRAM=5789 freeRAM=43994
+[applySafeDefaults] reading settings
+[applySafeDefaults] settings: ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] archSpec: layers=48 dmodel=3840 heads=16 kvheads=16
+[applySafeDefaults] creating memory model
+[applySafeDefaults] calling ClampToHardware
+[applySafeDefaults] ClampToHardware returned
+[applySafeDefaults] adjustment: SWA model: partial offload unsafe, falling back to CPU-only (all layers would need 8076 MB > 5789 MB free)
+[applySafeDefaults] final: GPU=460MB RAM=8319MB ctx=3096 gpuLayers=0 batch=256
+[applySafeDefaults] done
+[LoadModel] safe defaults applied
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+[LoadModel] no mmproj found — vision not available for this model
+[LoadModel] validating spawn settings
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[LoadModel] spawn params: ctx=3096 gpuLayers=0 batch=256 freeVRAM=5789 freeRAM=43994
+[LoadModel] validation result: level=0 msg="Memory OK — estimated 460 MB GPU / 8319 MB RAM (free: 5789 / 43994 MB)"
+[LoadModel] spawn validation passed
+[LoadModel] SWA model detected, disabling --fit to avoid scheduler crash
+[LoadModel] chat template: model-native for family "gemma4" (133 bytes)
+[LoadModel] spawning llama-server
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+INFO: No mmproj file found for model: E:\AI GGUF\GGUF\Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf
+INFO: llama-server started (pid 12660) with model E:\AI GGUF\GGUF\Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf
+[LoadModel] llama-server spawned (pid 12660)
+INFO: Registering model with estimated GPU:469MB RAM:8329MB
+[ResourceManager] GetManager called
+2026/10/31 21:33:18 [rpc] LoadModel                                     ok        3.617s
+[LoadModel] monitor started (pid 12660, timeout 60s)
+0.00.130.938 I srv  llama_server: initializing ...
+0.00.130.950 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.131.262 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.144.802 I srv    load_model: loading model 'E:\AI GGUF\GGUF\Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf'
+0.00.560.545 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.00.560.618 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.00.612.948 W load: '</s>' is a normal token here, removing it from EOG list
+0.01.380.601 I cmn          init: llama threadpool init, n_threads = 8
+2026/10/31 21:33:20 [rpc] IsModelLoaded                                 ok           1ms
+0.03.418.905 I srv    load_model: initializing, n_slots = 4, n_ctx_slot = 3328, kv_unified = 'true'
+0.03.421.803 I srv  server_run_i: model loaded
+0.03.421.814 I srv  server_on_li: listening on http://127.0.0.1:8080
+[LoadModel] monitor: server healthy, model loaded
+2026/10/31 21:33:22 [rpc] IsModelLoaded                                 ok           1ms
+[inference] family="gemma4" source="gemma defaults (Gemma 4 model card (Gemma 3 ships same top_k/top_p))" temp=1.00 top_p=0.95 top_k=64 min_p=0.05 repeat=1.10 n_predict=2560
+2026/10/31 21:33:23 [rpc] GetEffectiveSampler                           ok            0s
+INFO: llama-server killed, model memory freed
+[ResourceManager] GetManager called
+[ResourceManager] GetManager called
+2026/10/31 21:33:24 [rpc] UnloadModel                                   ok         848ms
+2026/10/31 21:34:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:34:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:35:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:35:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:36:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:36:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:37:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:37:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:38:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:38:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:39:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:39:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:40:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:40:12 [rpc] GetSDServerVersion                            ok            0s

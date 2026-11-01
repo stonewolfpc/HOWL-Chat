@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <!--
-    HOWL Chat - Artherius Edition
+    HOWL Chat
     
     Main HTML structure for the HOWL Chat application.
     This file defines the UI layout including:
@@ -17,128 +17,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOWL Chat - Artherius Edition</title>
+    <title>HOWL Chat</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet" href="css/theme.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/menu-components.css">
-    <link rel="stylesheet" href="css/nav-components.css">
-    <link rel="stylesheet" href="css/panel-components.css">
-    <link rel="stylesheet" href="css/character-components.css">
-    <link rel="stylesheet" href="css/chat-components.css">
-    <link rel="stylesheet" href="css/input-components.css">
-    <link rel="stylesheet" href="css/world-components.css">
-    <link rel="stylesheet" href="css/animations.css">
-    <link rel="stylesheet" href="css/ambient.css">
-    <link rel="stylesheet" href="css/chat-session-list.css">
-    <link rel="stylesheet" href="css/chat-session-modal.css">
-    <link rel="stylesheet" href="css/real-settings.css">
-    <link rel="stylesheet" href="css/sidebar-panels.css">
-    <link rel="stylesheet" href="css/loading-progress.css">
-    <link rel="stylesheet" href="css/sampler-settings.css">
-    <link rel="stylesheet" href="css/model-settings.css">
-    <link rel="stylesheet" href="css/model-browser.css">
-    <link rel="stylesheet" href="css/story-tools.css">
-    <link rel="stylesheet" href="css/sidebar-panels.css">
-    <link rel="stylesheet" href="css/icons.css">
-    <link rel="stylesheet" href="css/tutorials.css">
-    <script src="js/menu.js"></script>
-    <script src="js/navigation.js"></script>
-    <script src="js/theme.js"></script>
-    <script src="js/storage-manager.js"></script>
-    <script src="js/storage-indexeddb.js"></script>
-    <script src="js/storage-scenarios.js"></script>
-    <script src="js/storage-chat.js"></script>
-    <script src="js/image-processor.js"></script>
-    <script src="js/character-storage.js"></script>
-    <script src="js/character-queue.js"></script>
-    <script src="js/chat-constants.js"></script>
-    <script src="js/chat-render.js"></script>
-    <script src="js/chat-stream.js"></script>
-    <script src="js/chat-actions.js"></script>
-    <script src="js/chat-input.js"></script>
-    <script src="js/chat-model.js"></script>
-    <script src="js/chat.js"></script>
-    <script src="js/audio-service.js"></script>
-    <script src="js/settings-state.js"></script>
-    <script src="js/settings-actions.js"></script>
-    <script src="js/settings-controls.js"></script>
-    <script src="js/real-settings.js"></script>
-    <script src="js/chat-session.js"></script>
-    <script src="js/loading-progress.js"></script>
-    <script src="js/error-system.js"></script>
-    <script src="js/error-handler.js"></script>
-    <script src="js/error-settings.js"></script>
-    <script src="js/sampler-settings.js"></script>
-    <script src="js/model-settings.js"></script>
-    <script src="js/memory-store.js"></script>
-    <script src="js/story-tools-state.js"></script>
-    <script src="js/story-tools-data.js"></script>
-    <script src="js/story-tools-ui.js"></script>
-    <script src="js/story-tools.js"></script>
-    <script src="js/menu-edit.js"></script>
-    <script src="js/menu-view.js"></script>
-    <script src="js/menu-memory.js"></script>
-    <script src="js/memory-candidates.js"></script>
-    <script src="js/menu-functions.js"></script>
-    <script src="js/tutorials-data-chat.js"></script>
-    <script src="js/tutorials-data-settings.js"></script>
-    <script src="js/tutorials-data-model.js"></script>
-    <script src="js/tutorials-data-content.js"></script>
-    <script src="js/tutorials-data-advanced.js"></script>
-    <script src="js/tutorials-data-app.js"></script>
-    <script src="js/tutorials-data.js"></script>
-    <script src="js/tutorials-ui.js"></script>
+    <link rel="stylesheet" href="css/theme.css?v=29">
+    <link rel="stylesheet" href="css/layout.css?v=29">
+    <link rel="stylesheet" href="css/menu-components.css?v=29">
+    <link rel="stylesheet" href="css/nav-components.css?v=29">
+    <link rel="stylesheet" href="css/panel-components.css?v=29">
+    <link rel="stylesheet" href="css/character-components.css?v=29">
+    <link rel="stylesheet" href="css/chat-components.css?v=29">
+    <link rel="stylesheet" href="css/input-components.css?v=29">
+    <link rel="stylesheet" href="css/world-components.css?v=29">
+    <link rel="stylesheet" href="css/animations.css?v=29">
+    <link rel="stylesheet" href="css/ambient.css?v=29">
+    <link rel="stylesheet" href="css/chat-session-list.css?v=29">
+    <link rel="stylesheet" href="css/chat-session-modal.css?v=29">
+    <link rel="stylesheet" href="css/real-settings.css?v=29">
+    <link rel="stylesheet" href="css/sidebar-panels.css?v=29">
+    <link rel="stylesheet" href="css/loading-progress.css?v=29">
+    <link rel="stylesheet" href="css/sampler-settings.css?v=29">
+    <link rel="stylesheet" href="css/model-settings.css?v=29">
+    <link rel="stylesheet" href="css/model-browser.css?v=29">
+    <link rel="stylesheet" href="css/story-tools.css?v=29">
+    <link rel="stylesheet" href="css/icons.css?v=29">
+    <link rel="stylesheet" href="css/tutorials.css?v=29">
+    <script src="js/html-utils.js?v=29"></script>
+    <script src="js/menu.js?v=29"></script>
+    <script src="js/navigation.js?v=29"></script>
+    <script src="js/theme.js?v=29"></script>
+    <script src="js/storage-manager.js?v=29"></script>
+    <script src="js/storage-indexeddb.js?v=29"></script>
+    <script src="js/storage-scenarios.js?v=29"></script>
+    <script src="js/storage-chat.js?v=29"></script>
+    <script src="js/image-processor.js?v=29"></script>
+    <script src="js/character-storage.js?v=29"></script>
+    <script src="js/character-queue.js?v=29"></script>
+    <script src="js/chat-constants.js?v=29"></script>
+    <script src="js/chat-render.js?v=29"></script>
+    <script src="js/chat-stream.js?v=29"></script>
+    <script src="js/chat-think.js?v=29"></script>
+    <script src="js/chat-actions.js?v=29"></script>
+    <script src="js/chat-input.js?v=29"></script>
+    <script src="js/chat-model.js?v=29"></script>
+    <script src="js/chat.js?v=29"></script>
+    <script src="js/audio-service.js?v=29"></script>
+    <script src="js/settings-state.js?v=29"></script>
+    <script src="js/settings-actions.js?v=29"></script>
+    <script src="js/settings-controls.js?v=29"></script>
+    <script src="js/real-settings.js?v=29"></script>
+    <script src="js/chat-session.js?v=29"></script>
+    <script src="js/loading-progress.js?v=29"></script>
+    <script src="js/error-system.js?v=29"></script>
+    <script src="js/error-handler.js?v=29"></script>
+    <script src="js/error-settings.js?v=29"></script>
+    <script src="js/sampler-settings.js?v=29"></script>
+    <script src="js/model-settings.js?v=29"></script>
+    <script src="js/memory-store.js?v=29"></script>
+    <script src="js/story-tools-state.js?v=29"></script>
+    <script src="js/story-tools-data.js?v=29"></script>
+    <script src="js/story-tools-ui.js?v=29"></script>
+    <script src="js/story-tools.js?v=29"></script>
+    <script src="js/menu-edit.js?v=29"></script>
+    <script src="js/menu-view.js?v=29"></script>
+    <script src="js/menu-memory.js?v=29"></script>
+    <script src="js/memory-candidates.js?v=29"></script>
+    <script src="js/menu-functions.js?v=29"></script>
+    <script src="js/app-wipe.js?v=29"></script>
+    <script src="js/tutorials-data-chat.js?v=29"></script>
+    <script src="js/tutorials-data-settings.js?v=29"></script>
+    <script src="js/tutorials-data-model.js?v=29"></script>
+    <script src="js/tutorials-data-content.js?v=29"></script>
+    <script src="js/tutorials-data-advanced.js?v=29"></script>
+    <script src="js/tutorials-data-app.js?v=29"></script>
+    <script src="js/tutorials-data.js?v=29"></script>
+    <script src="js/tutorials-ui.js?v=29"></script>
     <!-- Modular sidebar components -->
-    <script src="js/lorebook-manager.js"></script>
-    <script src="js/context-data.js"></script>
-    <script src="js/context-panels.js"></script>
-    <script src="js/context-selectors.js"></script>
-    <script src="js/context-display.js"></script>
-    <script src="js/data-sync.js"></script>
-    <script src="js/delete-confirm.js"></script>
-    <script src="js/delete-service.js"></script>
-    <script src="js/sidebar-state.js"></script>
-    <script src="js/sidebar-session.js"></script>
-    <script src="js/sidebar-characters.js"></script>
-    <script src="js/character-memories.js"></script>
-    <script src="js/sidebar-context-world.js"></script>
-    <script src="js/sidebar-context-scenario.js"></script>
-    <script src="js/sidebar-context-lorebooks.js"></script>
-    <script src="js/sidebar-context.js"></script>
-    <script src="js/sidebar-panels.js"></script>
-    <script src="js/memory-candidates-menu.js"></script>
-    <script src="js/chat-state-bridge.js"></script>
-    <script>
-        // Play startup sound on page load (only if enabled in settings)
-        window.addEventListener('load', function() {
-            const settings = window.settingsState?.current?.general;
-            if (settings && (settings.startupSound === false || settings.soundEffects === false)) {
-                return; // User disabled startup sound or all sound effects
-            }
-            const startupSound = document.getElementById('startupSound');
-            if (startupSound) {
-                startupSound.volume = 0.5; // Set volume to 50%
-                startupSound.play().catch(err => {
-                    console.log('Could not play startup sound:', err);
-                });
-            }
-        });
-    </script>
+    <script src="js/lorebook-manager.js?v=29"></script>
+    <script src="js/filter-engine.js?v=29"></script>
+    <script src="js/context-data.js?v=29"></script>
+    <script src="js/context-panels.js?v=29"></script>
+    <script src="js/context-selectors.js?v=29"></script>
+    <script src="js/context-display.js?v=29"></script>
+    <script src="js/data-sync.js?v=29"></script>
+    <script src="js/delete-confirm.js?v=29"></script>
+    <script src="js/delete-service.js?v=29"></script>
+    <script src="js/sidebar-state.js?v=29"></script>
+    <script src="js/sidebar-session.js?v=29"></script>
+    <script src="js/sidebar-characters.js?v=29"></script>
+    <script src="js/character-memories.js?v=29"></script>
+    <script src="js/sidebar-context-world.js?v=29"></script>
+    <script src="js/sidebar-context-scenario.js?v=29"></script>
+    <script src="js/sidebar-context-lorebooks.js?v=29"></script>
+    <script src="js/sidebar-context.js?v=29"></script>
+    <script src="js/sidebar-panels.js?v=29"></script>
+    <script src="js/memory-candidates-menu.js?v=29"></script>
+    <script src="js/chat-state-bridge.js?v=29"></script>
 </head>
-<body>
-    <!-- Startup Sound -->
-    <audio id="startupSound" preload="auto">
-        <source src="assets/startup.mp3" type="audio/mpeg">
-    </audio>
-
-    <!-- Ambient Background Effects (from Artherius) -->
+<body>    <!-- Ambient Background Effects (from Artherius) -->
     <div class="ambient-bg">
         <div class="ambient-orb-1"></div>
         <div class="ambient-orb-2"></div>
         <div class="hexagon-grid"></div>
     </div>
-
+    
     <!-- Top Menu (from D:\HOWL layout) -->
     <div class="top-menu">
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -159,6 +140,8 @@
                     <div class="dropdown-item" onclick="openRealSettings()">Settings</div>
                     <div class="dropdown-separator"></div>
                     <div class="dropdown-item" onclick="toggleFlyout('sampler-settings-flyout')">Advanced</div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-item" onclick="resetApplication()" style="color: var(--danger-color, #ff4444);">Reset Application...</div>
                     <div class="dropdown-separator"></div>
                     <div class="dropdown-item" onclick="exitApp()">Exit</div>
                 </div>
@@ -190,7 +173,6 @@
                     <div class="dropdown-item" onclick="toggleModelSettingsFlyout()">Model Settings</div>
                     <div class="dropdown-item" onclick="openStoryTools()">Story Tools</div>
                     <div class="dropdown-separator"></div>
-                    <div class="dropdown-item" onclick="openAdvancedSettings()">Advanced / Experimental</div>
                     <div class="dropdown-separator"></div>
                     <div class="dropdown-item" onclick="showKeyboardShortcuts()">Keyboard Shortcuts</div>
                     <div class="dropdown-item" onclick="openAudioSettings()">Audio Settings</div>
@@ -201,12 +183,10 @@
                 <button class="menu-button" onclick="toggleMenu('help-dropdown')">Help</button>
                 <div class="dropdown" id="help-dropdown">
                     <div class="dropdown-item" onclick="openTutorials()">Tutorials</div>
-                    <div class="dropdown-item">Documentation</div>
                     <div class="dropdown-item" onclick="showAbout()">About</div>
                 </div>
             </div>
-            
-            <!-- Sampler Settings Flyout Overlay -->
+<!-- Sampler Settings Flyout Overlay -->
             <div class="flyout-overlay" id="flyout-overlay" onclick="toggleFlyout('sampler-settings-flyout')"></div>
             
             <!-- Sampler Settings Flyout Panel -->
@@ -219,6 +199,20 @@
                     <!-- Category 1: Core Settings -->
                     <div class="category-header">Core Settings</div>
                     <div class="settings-grid">
+                        <!-- Reasoning / thinking models -->
+                        <div class="setting-card" id="think-card">
+                            <div class="setting-label"><span class="icon icon-lightbulb"></span> Reasoning (thinking models)</div>
+                            <div class="setting-description">Thinking models reason before answering. On shows the thought in a collapsible block; Hidden uses it without showing it; Off answers directly. Takes effect the next time a model loads.</div>
+                            <div class="setting-control" style="display:flex;gap:8px;align-items:center;">
+                                <select id="think-mode" class="setting-value" style="flex:1;">
+                                    <option value="off">Off - answer only</option>
+                                    <option value="on">On - show the thought</option>
+                                    <option value="hidden">Hidden - think, never show</option>
+                                </select>
+                                <input type="number" class="setting-value" id="think-budget" min="0" max="20000" step="128" value="2048" title="Thinking token budget">
+                            </div>
+                        </div>
+
                         <!-- Temperature -->
                         <div class="setting-card">
                             <div class="setting-label"><span class="icon icon-flame"></span> Temperature</div>
@@ -392,38 +386,6 @@
                             <button class="setting-reset" data-setting="frequency-penalty" data-default="0.0">Default</button>
                         </div>
                         
-                        <!-- No-Repeat N-Gram Size -->
-                        <div class="setting-card">
-                            <div class="setting-label"><span class="icon icon-ban"></span> No‑Repeat N‑Gram Size</div>
-                            <div class="setting-description">Prevents repeating any N‑gram.</div>
-                            <div class="setting-details">
-                                <div class="setting-detail"><strong>Good for:</strong> Killing loops dead.</div>
-                                <div class="setting-detail"><em>Example:</em> N=3 → no repeated 3‑word phrases.</div>
-                                <div class="setting-detail warning"><strong>Warning:</strong> Can break poetry or dialogue.</div>
-                            </div>
-                            <div class="setting-control">
-                                <input type="range" class="setting-slider" id="no-repeat-ngram" min="0" max="10" step="1" value="0">
-                                <input type="number" class="setting-value" id="no-repeat-ngram-value" min="0" max="10" step="1" value="0">
-                            </div>
-                            <button class="setting-reset" data-setting="no-repeat-ngram" data-default="0">Default</button>
-                        </div>
-
-                        <!-- Epsilon Cutoff -->
-                        <div class="setting-card">
-                            <div class="setting-label"><span class="icon icon-filter-slash"></span> Epsilon Cutoff</div>
-                            <div class="setting-description">Removes tokens below absolute probability.</div>
-                            <div class="setting-details">
-                                <div class="setting-detail"><strong>Good for:</strong> Quality filtering.</div>
-                                <div class="setting-detail"><em>Example:</em> 0.0 = disabled.</div>
-                                <div class="setting-detail"><strong>Warning:</strong> None.</div>
-                            </div>
-                            <div class="setting-control">
-                                <input type="range" class="setting-slider" id="epsilon-cutoff" min="0.0" max="1.0" step="0.01" value="0.0">
-                                <input type="number" class="setting-value" id="epsilon-cutoff-value" min="0.0" max="1.0" step="0.01" value="0.0">
-                            </div>
-                            <button class="setting-reset" data-setting="epsilon-cutoff" data-default="0.0">Default</button>
-                        </div>
-                        
                         <!-- Typical-P -->
                         <div class="setting-card" id="typical-p-card">
                             <div class="setting-toggle">
@@ -455,6 +417,7 @@
                     
                     <!-- Category 3: Advanced Controls -->
                     <div class="category-header">Advanced Controls</div>
+                    <div class="settings-grid">
                         <!-- Mirostat Mode -->
                         <div class="setting-card" id="mirostat-mode-card">
                             <div class="setting-toggle">
@@ -515,22 +478,6 @@
                             <button class="setting-reset" data-setting="mirostat-eta" data-default="0.1">Default</button>
                         </div>
                         
-                        <!-- Temperature -->
-                        <div class="setting-card">
-                            <div class="setting-label"><span class="icon icon-gear"></span> Temperature</div>
-                            <div class="setting-description">Controls randomness in responses.</div>
-                            <div class="setting-details">
-                                <div class="setting-detail"><strong>Good for:</strong> Adjusting creativity.</div>
-                                <div class="setting-detail"><em>Example:</em> 0.7 = balanced.</div>
-                                <div class="setting-detail warning"><strong>Warning:</strong> Overridden by Mirostat.</div>
-                            </div>
-                            <div class="setting-control">
-                                <input type="range" class="setting-slider" id="temperature-advanced" min="0.0" max="2.0" step="0.1" value="0.7">
-                                <input type="number" class="setting-value" id="temperature-advanced-value" min="0.0" max="2.0" step="0.1" value="0.7">
-                            </div>
-                            <button class="setting-reset" data-setting="temperature" data-default="0.7">Default</button>
-                        </div>
-                        
                         <!-- Dynamic Temperature Range -->
                         <div class="setting-card" id="dyn-temp-range-card">
                             <div class="setting-toggle">
@@ -575,22 +522,6 @@
                             <button class="setting-reset" data-setting="dyn-temp-exp" data-default="1.0">Default</button>
                         </div>
                         
-                        <!-- Eta Cutoff -->
-                        <div class="setting-card">
-                            <div class="setting-label"><span class="icon icon-close"></span> Eta Cutoff</div>
-                            <div class="setting-description">Removes tokens based on relative probability.</div>
-                            <div class="setting-details">
-                                <div class="setting-detail"><strong>Good for:</strong> Outlier control.</div>
-                                <div class="setting-detail"><em>Example:</em> Smooths output.</div>
-                                <div class="setting-detail"><strong>Warning:</strong> None.</div>
-                            </div>
-                            <div class="setting-control">
-                                <input type="range" class="setting-slider" id="eta-cutoff" min="0.0" max="1.0" step="0.01" value="0.0">
-                                <input type="number" class="setting-value" id="eta-cutoff-value" min="0.0" max="1.0" step="0.01" value="0.0">
-                            </div>
-                            <button class="setting-reset" data-setting="eta-cutoff" data-default="0.0">Default</button>
-                        </div>
-
                         <!-- DRY Multiplier -->
                         <div class="setting-card">
                             <div class="setting-label"><span class="icon icon-gear"></span> DRY Multiplier</div>
@@ -639,82 +570,6 @@
                             <button class="setting-reset" data-setting="dry-base" data-default="1.0">Default</button>
                         </div>
 
-                        <!-- Smoothing Factor -->
-                        <div class="setting-card">
-                            <div class="setting-label"><span class="icon icon-wave"></span> Smoothing Factor</div>
-                            <div class="setting-description">Smooths probability distribution.</div>
-                            <div class="setting-details">
-                                <div class="setting-detail"><strong>Good for:</strong> Reducing noise.</div>
-                                <div class="setting-detail"><em>Example:</em> 0.0 = no smoothing.</div>
-                                <div class="setting-detail"><strong>Warning:</strong> Too high = too smooth.</div>
-                            </div>
-                            <div class="setting-control">
-                                <input type="range" class="setting-slider" id="smoothing-factor" min="0.0" max="5.0" step="0.1" value="0.0">
-                                <input type="number" class="setting-value" id="smoothing-factor-value" min="0.0" max="5.0" step="0.1" value="0.0">
-                            </div>
-                            <button class="setting-reset" data-setting="smoothing-factor" data-default="0.0">Default</button>
-                        </div>
-
-                        <!-- Smoothing Curve -->
-                        <div class="setting-card">
-                            <div class="setting-label"><span class="icon icon-trend"></span> Smoothing Curve</div>
-                            <div class="setting-description">Curve for smoothing function.</div>
-                            <div class="setting-details">
-                                <div class="setting-detail"><strong>Good for:</strong> Shaping smoothing.</div>
-                                <div class="setting-detail"><em>Example:</em> 1.0 = linear.</div>
-                                <div class="setting-detail"><strong>Warning:</strong> None.</div>
-                            </div>
-                            <div class="setting-control">
-                                <input type="range" class="setting-slider" id="smoothing-curve" min="0.1" max="5.0" step="0.1" value="1.0">
-                                <input type="number" class="setting-value" id="smoothing-curve-value" min="0.1" max="5.0" step="0.1" value="1.0">
-                            </div>
-                            <button class="setting-reset" data-setting="smoothing-curve" data-default="1.0">Default</button>
-                        </div>
-
-                        <!-- Top-A -->
-                        <div class="setting-card" id="top-a-card">
-                            <div class="setting-toggle">
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="top-a-enabled" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                                <span class="toggle-label">Enabled</span>
-                            </div>
-                            <div class="setting-label">
-                                <span class="icon icon-triangle"></span> Top‑A
-                                <span class="warning-icon">
-                                    <span class="tooltip">Conflicts with Top‑P</span>
-                                </span>
-                            </div>
-                            <div class="setting-description">Alternative to Top-P using absolute probability.</div>
-                            <div class="setting-details">
-                                <div class="setting-detail"><strong>Good for:</strong> Alternative filtering.</div>
-                                <div class="setting-detail"><em>Example:</em> 0.0 = disabled.</div>
-                                <div class="setting-detail warning"><strong>Warning:</strong> Conflicts with Top‑P.</div>
-                            </div>
-                            <div class="setting-control">
-                                <input type="range" class="setting-slider" id="top-a" min="0.0" max="1.0" step="0.01" value="0.0">
-                                <input type="number" class="setting-value" id="top-a-value" min="0.0" max="1.0" step="0.01" value="0.0">
-                            </div>
-                            <button class="setting-reset" data-setting="top-a" data-default="0.0">Default</button>
-                        </div>
-
-                        <!-- Encoder Repetition Penalty -->
-                        <div class="setting-card">
-                            <div class="setting-label"><span class="icon icon-brain"></span> Encoder Repetition Penalty</div>
-                            <div class="setting-description">Penalizes repeated tokens at the encoder level.</div>
-                            <div class="setting-details">
-                                <div class="setting-detail"><strong>Good for:</strong> Preventing encoder-level loops.</div>
-                                <div class="setting-detail"><em>Example:</em> 1.0 = no penalty.</div>
-                                <div class="setting-detail"><strong>Warning:</strong> None.</div>
-                            </div>
-                            <div class="setting-control">
-                                <input type="range" class="setting-slider" id="encoder-repeat-penalty" min="1.0" max="2.0" step="0.01" value="1.0">
-                                <input type="number" class="setting-value" id="encoder-repeat-penalty-value" min="1.0" max="2.0" step="0.01" value="1.0">
-                            </div>
-                            <button class="setting-reset" data-setting="encoder-repeat-penalty" data-default="1.0">Default</button>
-                        </div>
-                        
                         <!-- Seed -->
                         <div class="setting-card">
                             <div class="setting-label"><span class="icon icon-hash"></span> Seed</div>
@@ -1311,8 +1166,32 @@
                 <h2 class="session-list-title">Load Chat Session</h2>
                 <button class="session-list-close" onclick="closeSessionList()">×</button>
             </div>
-            <div class="session-list-search">
-                <input type="text" class="session-list-search-input" id="session-search-input" placeholder="Search sessions...">
+            <div class="session-list-search" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <input type="text" class="session-list-search-input" id="session-search-input" placeholder="Search sessions..."
+                    style="flex:1;min-width:120px;"
+                    oninput="window._sessionFilter && window._sessionFilter(this.value)">
+                <select id="session-sort-select"
+                    style="padding:8px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:6px;outline:none;cursor:pointer;"
+                    onchange="window._sessionSort && window._sessionSort(this.value)">
+                    <option value="date:desc">Newest First</option>
+                    <option value="date:asc">Oldest First</option>
+                    <option value="name:asc">Name A-Z</option>
+                    <option value="name:desc">Name Z-A</option>
+                    <option value="messageCount:desc">Most Messages</option>
+                    <option value="messageCount:asc">Fewest Messages</option>
+                    <option value="characterCount:desc">Most Characters</option>
+                    <option value="characterCount:asc">Fewest Characters</option>
+                </select>
+                <select id="session-world-filter"
+                    style="padding:8px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:6px;outline:none;cursor:pointer;"
+                    onchange="window._sessionWorldFilter && window._sessionWorldFilter(this.value)">
+                    <option value="">All Worlds</option>
+                </select>
+                <select id="session-scenario-filter"
+                    style="padding:8px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:6px;outline:none;cursor:pointer;"
+                    onchange="window._sessionScenarioFilter && window._sessionScenarioFilter(this.value)">
+                    <option value="">All Scenarios</option>
+                </select>
             </div>
             <div class="session-list-content">
                 <div class="session-list-grid" id="session-list-grid">
@@ -1376,7 +1255,6 @@
             <div class="real-settings-nav">
                 <button class="real-settings-nav-item active" onclick="showSettingsPanel('general')"><span class="icon icon-palette"></span> General</button>
                 <button class="real-settings-nav-item" onclick="showSettingsPanel('storage')"><span class="icon icon-folder"></span> Files & Storage</button>
-                <button class="real-settings-nav-item" onclick="showSettingsPanel('network')"><span class="icon icon-network"></span> Network & Remote</button>
                 <button class="real-settings-nav-item" onclick="showSettingsPanel('privacy')"><span class="icon icon-lock"></span> Privacy & Data</button>
                 <button class="real-settings-nav-item" onclick="showSettingsPanel('audio')"><span class="icon icon-broadcast"></span> Audio & TTS</button>
             </div>
@@ -1396,7 +1274,6 @@
                                     <option value="light">Light</option>
                                     <option value="dark">Dark</option>
                                     <option value="system">System</option>
-                                    <option value="custom">Custom Palette</option>
                                 </select>
                             </div>
                         </div>
@@ -1411,16 +1288,6 @@
                             </div>
                         </div>
 
-                        <!-- UI Scaling -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="ui-scale">UI Scaling</label>
-                            <div class="setting-description">Adjust interface size and font scaling</div>
-                            <div class="setting-control">
-                                <input type="range" class="setting-slider" id="ui-scale" min="0.5" max="2" step="0.1" value="1">
-                                <input type="number" class="setting-value" id="ui-scale-value" min="0.5" max="2" step="0.1" value="1">
-                            </div>
-                        </div>
-
                         <!-- Sound Effects -->
                         <div class="setting-card">
                             <label class="setting-label" for="sound-effects">Sound Effects</label>
@@ -1428,18 +1295,6 @@
                             <div class="setting-control">
                                 <label class="setting-toggle">
                                     <input type="checkbox" id="sound-effects" checked>
-                                    <span class="setting-toggle-slider"></span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Startup Sound -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="startup-sound">Startup Sound</label>
-                            <div class="setting-description">Play howl sound when opening the app</div>
-                            <div class="setting-control">
-                                <label class="setting-toggle">
-                                    <input type="checkbox" id="startup-sound" checked>
                                     <span class="setting-toggle-slider"></span>
                                 </label>
                             </div>
@@ -1531,88 +1386,10 @@
                             </div>
                         </div>
 
-                        <!-- Chat Storage Location -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="chat-storage-location">Chat Storage Location</label>
-                            <div class="setting-description">Directory where chats are saved</div>
-                            <div class="setting-control">
-                                <input type="text" class="setting-input" id="chat-storage-location" readonly value="AppData/Chats">
-                                <div class="setting-actions">
-                                    <button class="setting-btn" onclick="browseChatLocation()">Browse</button>
-                                    <button class="setting-btn" onclick="resetChatLocation()">Reset</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Content Storage Location -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="content-storage-location">Content Storage Location</label>
-                            <div class="setting-description">Base directory for worlds, scenarios, characters</div>
-                            <div class="setting-control">
-                                <input type="text" class="setting-input" id="content-storage-location" readonly value="AppData">
-                                <div class="setting-actions">
-                                    <button class="setting-btn" onclick="browseContentLocation()">Browse</button>
-                                    <button class="setting-btn" onclick="resetContentLocation()">Reset</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- World Storage Location -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="world-storage-location">World Storage Location</label>
-                            <div class="setting-description">Directory for world data and images</div>
-                            <div class="setting-control">
-                                <input type="text" class="setting-input" id="world-storage-location" readonly value="AppData/Worlds">
-                                <div class="setting-actions">
-                                    <button class="setting-btn" onclick="browseWorldLocation()">Browse</button>
-                                    <button class="setting-btn" onclick="resetWorldLocation()">Reset</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Scenario Storage Location -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="scenario-storage-location">Scenario Storage Location</label>
-                            <div class="setting-description">Directory for scenario data and images</div>
-                            <div class="setting-control">
-                                <input type="text" class="setting-input" id="scenario-storage-location" readonly value="AppData/Scenarios">
-                                <div class="setting-actions">
-                                    <button class="setting-btn" onclick="browseScenarioLocation()">Browse</button>
-                                    <button class="setting-btn" onclick="resetScenarioLocation()">Reset</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Character Storage Location -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="character-storage-location">Character Storage Location</label>
-                            <div class="setting-description">Directory for character data and images</div>
-                            <div class="setting-control">
-                                <input type="text" class="setting-input" id="character-storage-location" readonly value="AppData/Characters">
-                                <div class="setting-actions">
-                                    <button class="setting-btn" onclick="browseCharacterLocation()">Browse</button>
-                                    <button class="setting-btn" onclick="resetCharacterLocation()">Reset</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Image Storage Location -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="image-storage-location">Image Storage Location</label>
-                            <div class="setting-description">Directory for generated and saved images</div>
-                            <div class="setting-control">
-                                <input type="text" class="setting-input" id="image-storage-location" readonly value="AppData/Images">
-                                <div class="setting-actions">
-                                    <button class="setting-btn" onclick="browseImageLocation()">Browse</button>
-                                    <button class="setting-btn" onclick="resetImageLocation()">Reset</button>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Backup & Restore -->
                         <div class="setting-card">
                             <div class="setting-label">Backup & Restore</div>
-                            <div class="setting-description">Manage application data backups</div>
+                            <div class="setting-description">Export and restore settings and browser-stored data. Chats and cards live in AppData and are not included.</div>
                             <div class="setting-actions">
                                 <button class="setting-btn primary" onclick="createBackup()">Create Backup</button>
                                 <button class="setting-btn" onclick="restoreBackup()">Restore Backup</button>
@@ -1626,76 +1403,6 @@
                             <div class="setting-description">Clear temporary files and cached data</div>
                             <div class="setting-actions">
                                 <button class="setting-btn danger" onclick="clearCache()">Clear Cache</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Network & Remote Settings Panel -->
-                <div class="real-settings-panel" id="network-panel">
-                    <div class="settings-category-header"><span class="icon icon-network"></span> Network & Remote Settings</div>
-                    <div class="settings-grid">
-                        <!-- Remote Inference Endpoint -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="remote-endpoint">Remote Inference Endpoint</label>
-                            <div class="setting-description">URL for remote model inference</div>
-                            <div class="setting-control">
-                                <input type="url" class="setting-input" id="remote-endpoint" placeholder="https://api.example.com/v1">
-                            </div>
-                        </div>
-
-                        <!-- API Keys -->
-                        <div class="setting-card">
-                            <div class="setting-label">API Keys</div>
-                            <div class="setting-description">Encrypted storage for API credentials</div>
-                            <div class="setting-control">
-                                <div class="setting-actions">
-                                    <button class="setting-btn" onclick="manageApiKeys()">Manage API Keys</button>
-                                    <button class="setting-btn" onclick="testApiConnection()">Test Connection</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Timeout Settings -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="request-timeout">Timeout Settings</label>
-                            <div class="setting-description">Network request timeouts in seconds</div>
-                            <div class="setting-control">
-                                <input type="number" class="setting-input" id="request-timeout" min="5" max="300" value="30">
-                                <input type="number" class="setting-input" id="connection-timeout" min="5" max="300" value="60">
-                            </div>
-                        </div>
-
-                        <!-- Retry Behavior -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="max-retries">Retry Behavior</label>
-                            <div class="setting-description">Automatic retry configuration</div>
-                            <div class="setting-control">
-                                <input type="number" class="setting-input" id="max-retries" min="0" max="10" value="3">
-                                <input type="number" class="setting-input" id="retry-delay" min="1" max="60" value="5">
-                            </div>
-                        </div>
-
-                        <!-- Proxy Settings -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="proxy-host">Proxy Settings</label>
-                            <div class="setting-description">HTTP proxy configuration</div>
-                            <div class="setting-control">
-                                <input type="text" class="setting-input" id="proxy-host" placeholder="proxy.example.com">
-                                <input type="number" class="setting-input" id="proxy-port" min="1" max="65535" placeholder="8080">
-                            </div>
-                        </div>
-
-                        <!-- Remote Model Selection -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="remote-model">Remote Model Selection</label>
-                            <div class="setting-description">Choose from available remote models</div>
-                            <div class="setting-control">
-                                <select class="setting-select" id="remote-model">
-                                    <option value="">Local Models Only</option>
-                                    <option value="cloud">Cloud Models</option>
-                                    <option value="hybrid">Hybrid Mode</option>
-                                </select>
                             </div>
                         </div>
                     </div>
@@ -1717,18 +1424,6 @@
                             </div>
                         </div>
 
-                        <!-- Disable Telemetry -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="disable-telemetry">Disable Telemetry</label>
-                            <div class="setting-description">Prevent usage data collection</div>
-                            <div class="setting-control">
-                                <label class="setting-toggle">
-                                    <input type="checkbox" id="disable-telemetry" checked>
-                                    <span class="setting-toggle-slider"></span>
-                                </label>
-                            </div>
-                        </div>
-
                         <!-- Clear All Local Data -->
                         <div class="setting-card">
                             <div class="setting-label">Clear All Local Data</div>
@@ -1738,39 +1433,13 @@
                             </div>
                         </div>
 
-                        <!-- Manage Permissions -->
-                        <div class="setting-card">
-                            <div class="setting-label">Manage Permissions</div>
-                            <div class="setting-description">Control app access to system resources</div>
-                            <div class="setting-control">
-                                <div class="setting-actions">
-                                    <button class="setting-btn" onclick="managePermissions()">Manage Permissions</button>
-                                    <button class="setting-btn" onclick="resetPermissions()">Reset Permissions</button>
-                                </div>
-                            </div>
                         </div>
-                    </div>
                 </div>
 
                 <!-- Audio & TTS Settings Panel -->
                 <div class="real-settings-panel" id="audio-panel">
                     <div class="settings-category-header"><span class="icon icon-broadcast"></span> Audio & TTS Settings</div>
                     <div class="settings-grid">
-                        <!-- Default TTS Voice -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="default-tts-voice">Default TTS Voice</label>
-                            <div class="setting-description">Preferred voice for text-to-speech</div>
-                            <div class="setting-control">
-                                <select class="setting-select" id="default-tts-voice">
-                                    <option value="system">System Default</option>
-                                    <option value="female-1">Female Voice 1</option>
-                                    <option value="male-1">Male Voice 1</option>
-                                    <option value="female-2">Female Voice 2</option>
-                                    <option value="male-2">Male Voice 2</option>
-                                </select>
-                            </div>
-                        </div>
-
                         <!-- TTS Speed -->
                         <div class="setting-card">
                             <label class="setting-label" for="tts-speed">TTS Speed</label>
@@ -1788,18 +1457,6 @@
                             <div class="setting-control">
                                 <input type="range" class="setting-slider" id="tts-volume" min="0" max="1" step="0.1" value="0.8">
                                 <input type="number" class="setting-value" id="tts-volume-value" min="0" max="1" step="0.1" value="0.8">
-                            </div>
-                        </div>
-
-                        <!-- Auto-play on Message -->
-                        <div class="setting-card">
-                            <label class="setting-label" for="tts-autoplay-message">Auto-play on Message</label>
-                            <div class="setting-description">Automatically TTS new messages</div>
-                            <div class="setting-control">
-                                <label class="setting-toggle">
-                                    <input type="checkbox" id="tts-autoplay-message" checked>
-                                    <span class="setting-toggle-slider"></span>
-                                </label>
                             </div>
                         </div>
 
@@ -1841,7 +1498,7 @@
             <div class="about-content">
                 <div class="about-section">
                     <div class="about-app-name">HOWL Chat</div>
-                    <div class="about-version">Artherius Edition</div>
+                    <div class="about-version">1.0.0</div>
                     <p class="about-description">A local-first, privacy-focused roleplay and AI chat application.</p>
                 </div>
 
@@ -1946,18 +1603,39 @@
     </div>
 
     <!-- ==================== MODEL BROWSER MODAL ==================== -->
-    <div id="model-browser-modal" class="modal-overlay" style="display: none;">
+    <div id="model-browser-modal" class="modal-overlay">
         <div class="modal-content model-browser-modal">
             <div class="modal-header">
                 <h2>Model Browser</h2>
                 <button class="modal-close" onclick="closeModelBrowser()">&times;</button>
             </div>
             <div class="model-browser-body">
-                <div class="model-browser-search">
-                    <input type="text" id="model-browser-search" placeholder="Search models..." oninput="filterModelBrowser()">
-                </div>
-                <div class="model-browser-list" id="model-browser-list">
-                    <!-- Populated by JS -->
+                <div class="model-browser-left">
+                    <div class="model-browser-dirs">
+                        <div class="mb-dirs-header">
+                            <div class="mb-dirs-label">Model Directories</div>
+                            <button class="mb-dirs-rescan" onclick="rescanModelDirectories()" title="Rescan all directories">Rescan</button>
+                        </div>
+                        <div id="model-browser-dirs-select" class="mb-dirs-custom">
+                            <div class="mb-dirs-trigger" data-value="">All directories</div>
+                            <div class="mb-dirs-dropdown">
+                                <div class="mb-dirs-options" id="model-browser-dirs-options"></div>
+                                <div class="mb-dirs-add-path">
+                                    <input type="text" id="mb-add-dir-path" class="mb-dirs-add-input"
+                                           placeholder="Paste a folder path..."
+                                           onkeydown="if (event.key === 'Enter') { event.preventDefault(); addModelDirectoryFromInput(); }">
+                                    <button type="button" class="mb-dirs-add-input-btn" onclick="addModelDirectoryFromInput()">Add</button>
+                                </div>
+                                <div class="mb-dirs-add" onclick="addModelDirectory()">+ Browse for Directory...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="model-browser-search">
+                        <input type="text" id="model-browser-search" placeholder="Search models..." oninput="filterModelBrowser()">
+                    </div>
+                    <div class="model-browser-list" id="model-browser-list">
+                        <!-- Populated by JS -->
+                    </div>
                 </div>
                 <div class="model-browser-detail" id="model-browser-detail" style="display: none;">
                     <h3 id="mb-detail-name">Model Name</h3>
@@ -1988,3 +1666,5 @@
     </div>
 </body>
 </html>
+
+

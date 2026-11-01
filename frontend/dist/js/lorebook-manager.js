@@ -410,7 +410,7 @@ class LorebookManager {
         console.log('Opening lorebook selector...');
         const modal = document.createElement('div');
         modal.className = 'lorebook-selector-modal';
-        modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px);';
+        modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:var(--overlay-scrim);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px);';
         modal.innerHTML = this.createLorebookSelectorContent();
         document.body.appendChild(modal);
 
@@ -443,7 +443,7 @@ class LorebookManager {
         }
 
         let content = `
-            <div style="background: rgba(30, 30, 40, 0.98); border-radius: 12px; padding: 24px; max-width: 600px; max-height: 80vh; border: 1px solid rgba(255, 255, 255, 0.1); overflow-y: auto;">
+            <div style="background: var(--shell-panel-bg); border-radius: 12px; padding: 24px; max-width: 600px; max-height: 80vh; border: 1px solid var(--surface-hover-strong); overflow-y: auto;">
                 <h2 style="color: #fff; margin-top: 0; margin-bottom: 16px;">Select Lorebooks</h2>
         `;
 
@@ -463,7 +463,7 @@ class LorebookManager {
                 content += `
                     <div class="lorebook-item" data-lorebook-id="${lorebook.id}" onclick="lorebookManager.toggleLorebookSelection('${lorebook.id}');" style="
                         padding: 12px;
-                        background: ${isActive ? 'rgba(0, 184, 115, 0.2)' : 'rgba(255, 255, 255, 0.05)'};
+                        background: ${isActive ? 'var(--success-bg)' : 'var(--surface-hover)'};
                         margin-bottom: 8px;
                         border-radius: 6px;
                         cursor: pointer;
@@ -474,7 +474,7 @@ class LorebookManager {
                     ">
                         ${isActive ? '<span style="position: absolute; top: 8px; right: 8px; color: #00b873;">✓</span>' : ''}
                         <strong>${lorebook.title || lorebook.name || 'Unnamed'}</strong>
-                        <div style="color: rgba(255, 255, 255, 0.6); font-size: 12px; margin-top: 4px;">World Lorebook</div>
+                        <div style="color: var(--surface-hover); font-size: 12px; margin-top: 4px;">World Lorebook</div>
                     </div>
                 `;
             });
@@ -492,7 +492,7 @@ class LorebookManager {
         `;
 
         if (availableLorebooks.length === 0) {
-            content += '<div style="color: rgba(255, 255, 255, 0.3); text-align: center; padding: 16px; font-style: italic;">No additional lorebooks available</div>';
+            content += '<div style="color: var(--surface-hover); text-align: center; padding: 16px; font-style: italic;">No additional lorebooks available</div>';
         } else {
             availableLorebooks.forEach(lorebook => {
                 const isActive = currentChatData.lorebooks &&
@@ -503,7 +503,7 @@ class LorebookManager {
                 content += `
                     <div class="lorebook-item" data-lorebook-id="${lorebook.id}" onclick="lorebookManager.toggleLorebookSelection('${lorebook.id}');" style="
                         padding: 12px;
-                        background: ${isActive ? 'rgba(0, 184, 115, 0.2)' : 'rgba(255, 255, 255, 0.05)'};
+                        background: ${isActive ? 'var(--success-bg)' : 'var(--surface-hover)'};
                         margin-bottom: 8px;
                         border-radius: 6px;
                         cursor: pointer;
@@ -527,7 +527,7 @@ class LorebookManager {
                 <button onclick="this.closest('.lorebook-selector-modal').remove();" style="
                     flex: 1;
                     padding: 10px;
-                    background: rgba(255, 255, 255, 0.1);
+                    background: var(--surface-hover-strong);
                     border: 1px solid rgba(255, 255, 255, 0.2);
                     color: #fff;
                     border-radius: 6px;

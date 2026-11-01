@@ -7,7 +7,7 @@
 /* Context Section Wrapper */
 .context-section {
     padding: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--surface-hover);
     background: rgba(255, 255, 255, 0.02);
     transition: all 0.3s ease;
 }
@@ -22,7 +22,7 @@
     align-items: center;
     margin-bottom: 12px;
     font-weight: 600;
-    color: #fff;
+    color: var(--text-secondary);
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -49,9 +49,9 @@
     display: flex;
     gap: 12px;
     padding: 10px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-hover);
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--surface-hover);
 }
 
 /* Thumbnail */
@@ -62,8 +62,8 @@
     border-radius: 8px;
     overflow: hidden;
     flex-shrink: 0;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--surface-hover);
+    border: 1px solid var(--surface-hover);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -81,7 +81,7 @@
 
 .thumbnail-placeholder {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-secondary);
     text-align: center;
     padding: 4px;
     line-height: 1.2;
@@ -104,7 +104,7 @@
 .context-name {
     font-size: 13px;
     font-weight: 500;
-    color: #fff;
+    color: var(--text-secondary);
     margin-bottom: 4px;
     white-space: nowrap;
     overflow: hidden;
@@ -113,7 +113,7 @@
 
 .context-description {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -129,8 +129,8 @@
 .context-btn {
     flex: 1;
     min-width: 100px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: var(--surface-hover);
+    border: 1px solid var(--border-secondary);
     color: rgba(255, 255, 255, 0.8);
     padding: 8px 12px;
     border-radius: 6px;
@@ -142,8 +142,8 @@
 
 .context-btn:hover {
     background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
-    color: #fff;
+    border-color: var(--border-secondary);
+    color: var(--text-secondary);
     transform: translateY(-1px);
 }
 
@@ -159,12 +159,12 @@
     padding: 8px 10px;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--surface-hover);
     transition: all 0.3s ease;
 }
 
 .context-option:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-hover);
     border-color: rgba(255, 255, 255, 0.12);
 }
 
@@ -188,7 +188,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--surface-hover);
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.15);
     transition: all 0.3s ease;

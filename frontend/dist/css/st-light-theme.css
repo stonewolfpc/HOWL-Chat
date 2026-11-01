@@ -3,10 +3,6 @@
  * All body.theme-light rules for story tools components.
  */
 
-body.theme-light .story-tools-page {
-    background: var(--surface-secondary);
-}
-
 body.theme-light .story-tools-header {
     background: var(--surface-tertiary);
     border-bottom-color: var(--border-primary);
@@ -14,10 +10,6 @@ body.theme-light .story-tools-header {
 
 body.theme-light .story-tools-title {
     color: var(--accent-primary);
-}
-
-body.theme-light .story-tools-grid {
-    background: var(--surface-secondary);
 }
 
 body.theme-light .story-tool-card {
@@ -132,7 +124,7 @@ body.theme-light .editor-label {
 body.theme-light .editor-btn-primary {
     background: var(--button-primary-bg);
     border-color: var(--button-primary-bg);
-    color: #FFFFFF;
+    color: var(--on-accent);
 }
 
 body.theme-light .editor-btn-secondary {

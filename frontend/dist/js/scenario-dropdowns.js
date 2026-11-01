@@ -73,11 +73,17 @@ function updateCharacterDropdown() {
 
 function searchScenarioCharacters(searchTerm) {
     const ss = window.scenarioState;
-    const filtered = ss.availableCharacters.filter(c =>
+    const fe = window.FilterEngine;
+    const sortVal = document.querySelector('#scenario-character-dropdown .world-dropdown-sort')?.value || 'name:asc';
+    const [field, dir] = sortVal.split(':');
+
+    let filtered = ss.availableCharacters.filter(c =>
         !ss.selectedCharacters.find(s => s.name === c.name) &&
         (c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
          (c.metadata?.role || '').toLowerCase().includes(searchTerm.toLowerCase()))
     );
+
+    if (fe) filtered = fe.sortItems(filtered, field, dir);
 
     const dropdownItems = document.getElementById('scenario-character-dropdown-items');
     if (!dropdownItems) return;
@@ -167,13 +173,19 @@ async function loadAvailableLorebooks() {
 
 function searchScenarioLorebooks(searchTerm) {
     const ss = window.scenarioState;
+    const fe = window.FilterEngine;
+    const sortVal = document.querySelector('#scenario-lorebook-dropdown .world-dropdown-sort')?.value || 'name:asc';
+    const [field, dir] = sortVal.split(':');
+
     const all = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]')
         .map(ss.normalizeStoredLorebook).filter(Boolean);
     const term = searchTerm.toLowerCase();
-    const filtered = all.filter(l => {
+    let filtered = all.filter(l => {
         const name = ss.lorebookDisplayName(l).toLowerCase();
         return name.includes(term);
     });
+
+    if (fe) filtered = fe.sortItems(filtered, field, dir);
 
     const dropdownItems = document.getElementById('scenario-lorebook-dropdown-items');
     if (!dropdownItems) return;
@@ -196,6 +208,16 @@ function searchScenarioLorebooks(searchTerm) {
         dropdownItems.appendChild(item);
     });
 }
+
+window._scenarioDropdownSort = (type, val) => {
+    if (type === 'character') {
+        const query = document.getElementById('scenario-character-search')?.value || '';
+        searchScenarioCharacters(query);
+    } else if (type === 'lorebook') {
+        const query = document.getElementById('scenario-lorebook-search')?.value || '';
+        searchScenarioLorebooks(query);
+    }
+};
 
 function toggleLorebookSelection(lorebook, itemElement) {
     const ss  = window.scenarioState;

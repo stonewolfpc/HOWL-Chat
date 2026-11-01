@@ -12,8 +12,8 @@
 
 .setting-btn {
     padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--surface-hover);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     border-radius: 6px;
     cursor: pointer;
@@ -48,8 +48,8 @@
 /* Footer */
 .real-settings-footer {
     padding: 16px 24px;
-    border-top: 1px solid rgba(100, 100, 100, 0.3);
-    background: rgba(10, 10, 15, 0.5);
+    border-top: 1px solid var(--border-primary);
+    background: var(--surface-tertiary);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -58,7 +58,7 @@
 
 .settings-info {
     font-size: 12px;
-    color: rgba(212, 212, 212, 0.7);
+    color: var(--text-secondary);
 }
 
 .settings-actions {
@@ -68,7 +68,7 @@
 
 .settings-save-btn {
     background: var(--theme-glow);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     padding: 10px 24px;
     cursor: pointer;
@@ -85,8 +85,8 @@
 }
 
 .settings-reset-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--surface-hover);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     padding: 10px 20px;
     cursor: pointer;
@@ -96,6 +96,6 @@
 }
 
 .settings-reset-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(100, 100, 100, 0.5);
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
 }

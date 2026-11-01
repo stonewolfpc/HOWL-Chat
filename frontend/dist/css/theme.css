@@ -6,18 +6,18 @@
  * Do NOT add rules directly here; use the appropriate module file.
  */
 
-@import url('theme-base.css');
-@import url('theme-light.css');
-@import url('theme-light-layout.css');
-@import url('theme-light-components.css');
-@import url('theme-overrides.css');
-@import url('theme-nav.css');
-@import url('theme-chat.css');
-@import url('theme-entities.css');
-@import url('theme-settings.css');
-@import url('theme-image-generator.css');
-@import url('theme-story-tools.css');
-@import url('theme-scrollbars.css');
+@import url('theme-base.css?v=29');
+@import url('theme-light.css?v=29');
+@import url('theme-light-layout.css?v=29');
+@import url('theme-light-components.css?v=29');
+@import url('theme-overrides.css?v=29');
+@import url('theme-nav.css?v=29');
+@import url('theme-chat.css?v=29');
+@import url('theme-entities.css?v=29');
+@import url('theme-settings.css?v=29');
+@import url('theme-image-generator.css?v=29');
+@import url('theme-story-tools.css?v=29');
+@import url('theme-scrollbars.css?v=29');
 
 :root {
     /* Artherius Theme Colors */
@@ -27,8 +27,84 @@
     --theme-text-glow: rgba(20, 184, 166, 0.4);
     --theme-secondary: #06b6d4;
 
+    /* Speaking roles. These do NOT follow the theme rotation: the AI is always
+       purple, the user always teal. Previously the user bubble hardcoded teal
+       while the assistant bubble borrowed the rotating --theme-glow, so both
+       turned teal whenever the cycle stood on index 0. */
+    --user-accent: #14b8a6;
+    --user-bg: rgba(20, 184, 166, 0.1);
+    --user-border: rgba(20, 184, 166, 0.3);
+    --user-border-strong: rgba(20, 184, 166, 0.5);
+    --user-glow: rgba(20, 184, 166, 0.15);
+    --user-glow-strong: rgba(20, 184, 166, 0.25);
+    --ai-accent: #a855f7;
+    --ai-border: rgba(168, 85, 247, 0.45);
+    --ai-border-strong: rgba(168, 85, 247, 0.6);
+    --ai-glow: rgba(168, 85, 247, 0.22);
+    --ai-glow-strong: rgba(168, 85, 247, 0.32);
+
+    /* App canvas - the one value every page paints behind its content */
+    --app-bg: #0a0a0f;
+    /* Shell surfaces: every panel that used to hardcode its own dark value */
+    --shell-nav-bg: rgba(10, 10, 15, 0.95);
+    --shell-panel-bg: rgba(21, 21, 31, 0.95);
+    --shell-aside-bg: rgba(15, 21, 31, 0.95);
+
     /* Static Colors */
     --static-text: #d4d4d4;
+
+    /* Semantic palette - mirrors theme-light.css so ONE vocabulary drives both modes.
+       Values chosen to reproduce the existing dark appearance exactly. */
+    --surface-primary: #0d0d14;
+    --surface-secondary: #15151f;
+    --surface-tertiary: #1a1a24;
+    --surface-hover: rgba(255, 255, 255, 0.06);
+    --overlay-scrim: rgba(0, 0, 0, 0.7);
+    --surface-subtle: rgba(255, 255, 255, 0.03);
+    --surface-hover-strong: rgba(255, 255, 255, 0.1);
+    --success-bg: rgba(0, 184, 115, 0.2);
+    --border-primary: rgba(100, 100, 100, 0.3);
+    --border-secondary: rgba(100, 100, 100, 0.5);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(212, 212, 212, 0.7);
+    --text-tertiary: rgba(212, 212, 212, 0.5);
+    --input-bg: rgba(21, 21, 31, 0.6);
+
+    /* Accent + status + component tokens. Previously defined ONLY in light sheets,
+       so any rule using them resolved to nothing in dark. */
+    --accent-primary: var(--theme-color);
+    --accent-primary-hover: rgba(20, 184, 166, 0.12);
+    --accent-secondary: var(--theme-secondary);
+    --accent-secondary-hover: rgba(6, 182, 212, 0.12);
+    --accent-bg: rgba(20, 184, 166, 0.15);
+    --accent-color: var(--theme-color);
+    /* Text that sits on a filled accent button */
+    --on-accent: #ffffff;
+    --bg-hover: rgba(255, 255, 255, 0.06);
+    --bg-secondary: #15151f;
+    --bg-tertiary: #1a1a24;
+    --border-color: rgba(100, 100, 100, 0.3);
+    --border-default: rgba(100, 100, 100, 0.3);
+    --button-primary-bg: var(--theme-color);
+    --button-secondary-bg: #15151f;
+    --button-secondary-border: var(--theme-color);
+    --card-bg: #15151f;
+    --danger: #ff3333;
+    --danger-color: #ff4444;
+    --danger-color-hover: #ff6666;
+    --error: #ff3333;
+    --hover-bg: rgba(255, 255, 255, 0.06);
+    --info: #00ccff;
+    --input-border: rgba(100, 100, 100, 0.3);
+    --input-placeholder: rgba(212, 212, 212, 0.4);
+    --muted-text: rgba(212, 212, 212, 0.5);
+    --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.4);
+    --shadow-modal: 0 4px 16px rgba(0, 0, 0, 0.5);
+    --success: #4ade80;
+    --text-color: var(--static-text);
+    --theme-color-dark: #0f766e;
+    --warning: #fbbf24;
+    --warning-color: #fbbf24;
 
     /* UI Scale */
     --ui-scale: 1;

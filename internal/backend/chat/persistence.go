@@ -189,14 +189,12 @@ func (pm *PersistenceManager) SaveChat(chatData *ChatData) error {
 		return fmt.Errorf("failed to save meta.json: %w", err)
 	}
 
-	// Save canonical history.json snapshot (atomic write)
+	// Save canonical history.json snapshot (atomic write) for fallback/backup only.
+	// The append log (history.ndjson) is the true source of truth and must NOT
+	// be deleted — frontend DOM scraping can corrupt history.json roles/ids.
 	if err := pm.saveJSON(filepath.Join(chatDir, "history.json"), chatData.History); err != nil {
 		return fmt.Errorf("failed to save history.json: %w", err)
 	}
-	// Remove the append log — the canonical snapshot is now authoritative.
-	// On the next turn, AppendHistoryEntry recreates history.ndjson from scratch.
-	// This keeps the log from diverging from the full snapshot.
-	_ = os.Remove(filepath.Join(chatDir, "history.ndjson"))
 
 	// Save world.json
 	if chatData.World != nil {
@@ -299,7 +297,128 @@ func (pm *PersistenceManager) LoadChat(chatID string) (*ChatData, error) {
 	// Load memories.json (optional)
 	_ = pm.loadJSON(filepath.Join(chatDir, "memories.json"), &chatData.Memories)
 
+	// Migrate legacy meta format → source-of-truth tracking arrays
+	pm.migrateLegacyMeta(chatData)
+
+	// Filter loaded characters/lorebooks by tracking arrays.
+	// Final list = (active - removed) + added
+	pm.filterChatDataByTracking(chatData)
+
 	return chatData, nil
+}
+
+// filterChatDataByTracking filters Characters and Lorebooks so only
+// entities that pass (active - removed) + added remain.
+func (pm *PersistenceManager) filterChatDataByTracking(chatData *ChatData) {
+	meta := chatData.Meta
+
+	// Characters
+	removedCharSet := make(map[string]struct{}, len(meta.RemovedCharacters))
+	for _, id := range meta.RemovedCharacters {
+		removedCharSet[id] = struct{}{}
+	}
+	addedCharSet := make(map[string]struct{}, len(meta.AddedCharacters))
+	for _, id := range meta.AddedCharacters {
+		addedCharSet[id] = struct{}{}
+	}
+	finalCharIds := make(map[string]struct{})
+	for _, id := range meta.ActiveCharacters {
+		if _, removed := removedCharSet[id]; !removed {
+			finalCharIds[id] = struct{}{}
+		}
+	}
+	for id := range addedCharSet {
+		finalCharIds[id] = struct{}{}
+	}
+
+	filteredChars := make([]*CharacterContext, 0, len(chatData.Characters))
+	for _, c := range chatData.Characters {
+		if c != nil && c.ID != "" {
+			if _, ok := finalCharIds[c.ID]; ok {
+				filteredChars = append(filteredChars, c)
+			}
+		}
+	}
+	chatData.Characters = filteredChars
+
+	// Lorebooks
+	removedBookSet := make(map[string]struct{}, len(meta.RemovedLorebooks))
+	for _, id := range meta.RemovedLorebooks {
+		removedBookSet[id] = struct{}{}
+	}
+	addedBookSet := make(map[string]struct{}, len(meta.AddedLorebooks))
+	for _, id := range meta.AddedLorebooks {
+		addedBookSet[id] = struct{}{}
+	}
+	finalBookIds := make(map[string]struct{})
+	for _, id := range meta.ActiveLorebooks {
+		if _, removed := removedBookSet[id]; !removed {
+			finalBookIds[id] = struct{}{}
+		}
+	}
+	for id := range addedBookSet {
+		finalBookIds[id] = struct{}{}
+	}
+
+	filteredBooks := make([]interface{}, 0, len(chatData.Lorebooks))
+	for _, lb := range chatData.Lorebooks {
+		if m, ok := lb.(map[string]interface{}); ok {
+			if id, ok := m["id"].(string); ok && id != "" {
+				if _, ok := finalBookIds[id]; ok {
+					filteredBooks = append(filteredBooks, lb)
+				}
+				continue
+			}
+		}
+		// If no id, keep it (legacy or inline lorebook)
+		filteredBooks = append(filteredBooks, lb)
+	}
+	chatData.Lorebooks = filteredBooks
+}
+
+// migrateLegacyMeta populates new tracking fields from legacy characterNames /
+// lorebookNames when the new arrays are empty.  This is a one-time migration
+// for chats created before the tracking-array architecture.
+func (pm *PersistenceManager) migrateLegacyMeta(chatData *ChatData) {
+	meta := &chatData.Meta
+
+	// Characters
+	if len(meta.ActiveCharacters) == 0 {
+		if len(chatData.Characters) > 0 {
+			for _, c := range chatData.Characters {
+				if c != nil && c.ID != "" {
+					meta.ActiveCharacters = append(meta.ActiveCharacters, c.ID)
+				}
+			}
+		}
+		// Fallback: use legacy names as pseudo-IDs
+		if len(meta.ActiveCharacters) == 0 && len(meta.CharacterNames) > 0 {
+			meta.ActiveCharacters = append([]string{}, meta.CharacterNames...)
+		}
+	}
+
+	// Lorebooks
+	if len(meta.ActiveLorebooks) == 0 {
+		for _, lb := range chatData.Lorebooks {
+			if m, ok := lb.(map[string]interface{}); ok {
+				if id, ok := m["id"].(string); ok && id != "" {
+					meta.ActiveLorebooks = append(meta.ActiveLorebooks, id)
+				}
+			}
+		}
+		// Fallback: use legacy names as pseudo-IDs
+		if len(meta.ActiveLorebooks) == 0 && len(meta.LorebookNames) > 0 {
+			meta.ActiveLorebooks = append([]string{}, meta.LorebookNames...)
+		}
+	}
+
+	// World / Scenario IDs (fallback to names for now)
+	if meta.WorldID == "" && meta.WorldName != "" {
+		meta.WorldID = meta.WorldName
+	}
+	if meta.ScenarioID == "" && meta.ScenarioName != "" {
+		meta.ScenarioID = meta.ScenarioName
+	}
 }
 
 // SaveChatAs creates a copy of the current chat with a new name
@@ -497,11 +616,64 @@ func (pm *PersistenceManager) loadHistoryFile(chatDir string) []ChatHistory {
 	return history
 }
 
+// RewriteHistory atomically replaces history.ndjson with entries, so deletions and
+// edits actually remove messages. The previous delete path cleared in-memory state
+// and re-appended the surviving messages on top of the log, which left the deleted
+// lines in place for the next load to replay.
+func (pm *PersistenceManager) RewriteHistory(chatID string, entries []ChatHistory) error {
+	chatDir := filepath.Join(pm.rootDir, "chats", chatID)
+	if err := os.MkdirAll(chatDir, 0755); err != nil {
+		return fmt.Errorf("failed to create chat directory: %w", err)
+	}
+
+	var buf bytes.Buffer
+	for _, e := range entries {
+		line, err := json.Marshal(e)
+		if err != nil {
+			return fmt.Errorf("failed to marshal history entry: %w", err)
+		}
+		buf.Write(line)
+		buf.WriteByte(0x0A)
+	}
+
+	ndjsonPath := filepath.Join(chatDir, "history.ndjson")
+	tmp := ndjsonPath + ".tmp"
+	if err := os.WriteFile(tmp, buf.Bytes(), 0644); err != nil {
+		return fmt.Errorf("failed to write history.ndjson: %w", err)
+	}
+	if err := os.Rename(tmp, ndjsonPath); err != nil {
+		return fmt.Errorf("failed to replace history.ndjson: %w", err)
+	}
+
+	// Keep the JSON snapshot identical so a fallback load sees the same history.
+	return pm.saveJSON(filepath.Join(chatDir, "history.json"), entries)
+}
+
 // AppendHistoryEntry appends a single entry to history.ndjson using an O(1) file append.
 // This is the hot path called after every message — no full file rewrite.
+// If history.ndjson does not yet exist but history.json does, we migrate the
+// snapshot entries first so old messages are not lost.
 func (pm *PersistenceManager) AppendHistoryEntry(chatID string, entry ChatHistory) error {
 	chatDir := filepath.Join(pm.rootDir, "chats", chatID)
 	ndjsonPath := filepath.Join(chatDir, "history.ndjson")
+	jsonPath := filepath.Join(chatDir, "history.json")
+
+	// Migrate existing history.json into history.ndjson on first append
+	if _, err := os.Stat(ndjsonPath); os.IsNotExist(err) {
+		if _, err := os.Stat(jsonPath); err == nil {
+			var history []ChatHistory
+			if loadErr := pm.loadJSON(jsonPath, &history); loadErr == nil && len(history) > 0 {
+				f, openErr := os.OpenFile(ndjsonPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+				if openErr == nil {
+					for _, h := range history {
+						line, _ := json.Marshal(h)
+						f.Write(append(line, '\n'))
+					}
+					f.Close()
+				}
+			}
+		}
+	}
 
 	line, err := json.Marshal(entry)
 	if err != nil {

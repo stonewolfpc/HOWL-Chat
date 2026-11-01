@@ -22,6 +22,10 @@ function addUserMessage(text) {
     const messageDiv  = document.createElement('div');
     messageDiv.className = 'chat-message user';
 
+    const msgId = 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+    messageDiv.dataset.id        = msgId;
+    messageDiv.dataset.timestamp = new Date().toISOString();
+
     let userName = 'You';
     const cd = (typeof currentChatData !== 'undefined') ? currentChatData
              : (window.sidebarState ? window.sidebarState.currentChatData : null);
@@ -59,6 +63,11 @@ function addAssistantMessage(sender, text, characterId = null) {
     const chatHistory = document.querySelector('.chat-messages');
     const messageDiv  = document.createElement('div');
     messageDiv.className = 'chat-message assistant';
+
+    const msgId = 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+    messageDiv.dataset.id          = msgId;
+    messageDiv.dataset.characterId = characterId || '';
+    messageDiv.dataset.timestamp   = new Date().toISOString();
 
     const cd = (typeof currentChatData !== 'undefined') ? currentChatData
              : (window.sidebarState ? window.sidebarState.currentChatData : null);
@@ -116,6 +125,11 @@ function addSystemMessage(text) {
     const chatHistory = document.querySelector('.chat-messages');
     const messageDiv  = document.createElement('div');
     messageDiv.className = 'chat-message system';
+
+    const msgId = 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+    messageDiv.dataset.id        = msgId;
+    messageDiv.dataset.timestamp = new Date().toISOString();
+
     messageDiv.innerHTML = `
         <div class="chat-bubble">
             <div class="chat-sender">Narrator</div>

@@ -248,6 +248,21 @@ async function saveWorld() {
 
     alert(`World "${worldData.title}" saved successfully!\n\nAttached:\n- ${worldData.scenarios.length} scenarios\n- ${worldData.characters.length} characters\n- ${worldData.howl.lorebooks.length} lorebooks`);
 
+    // Creation started from the chat's world picker: that world is meant for
+    // the chat. navigateTo() is a full page load, so the picker cannot be told
+    // by postMessage — mark the world and return, and the chat attaches it on
+    // load. Without this the created world never reaches the chat, and the
+    // World panel keeps showing "No World Selected".
+    if (new URLSearchParams(window.location.search).get('from') === 'chat') {
+        try {
+            sessionStorage.setItem('howl-pending-chat-world', worldData.id);
+        } catch (err) {
+            console.warn('Could not record pending world:', err);
+        }
+        window.location.href = 'index.html';
+        return;
+    }
+
     if (window.parent && window.parent !== window) {
         window.parent.postMessage({ type: 'world-created', world: worldData }, '*');
     }

@@ -41,7 +41,7 @@ body.theme-light .context-menu-item:hover {
 
 /* --- Menu --- */
 body.theme-light .top-menu {
-    background: linear-gradient(180deg, #FFFFFF 0%, var(--surface-secondary) 100%);
+    background: linear-gradient(180deg, var(--surface-primary) 0%, var(--surface-secondary) 100%);
     border-bottom-color: var(--border-primary);
     box-shadow: var(--shadow-card);
 }

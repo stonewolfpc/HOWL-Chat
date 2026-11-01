@@ -271,13 +271,20 @@ func (r *Reader) resolveTemplate(metadata gguf_parser.GGUFMetadataKVs) string {
 
 // getFallbackTemplate returns a default template based on model family
 func (r *Reader) getFallbackTemplate(family string) string {
-	switch family {
-	case "llama":
-		return "{{ system }}\n{{#each messages}}{{ role }}: {{ content }}\n{{/each}}assistant:"
-	case "mistral":
+	f := strings.ToLower(family)
+	// Prefix matching, not exact equality: real architectures are "qwen35",
+	// "gemma4", "llama" etc. The old exact-match switch sent qwen35 and gemma4
+	// to the generic default, so those models were prompted in a format they
+	// were never trained on (both produced the same 95-byte template).
+	switch {
+	case strings.Contains(f, "qwen"):
+		return "<|im_start|>system\n{{ system }}<|im_end|>\n{{#each messages}}<|im_start|>{{ role }}\n{{ content }}<|im_end|>\n{{/each}}<|im_start|>assistant\n"
+	case strings.Contains(f, "gemma"):
+		return "{{#each messages}}<start_of_turn>{{ role }}\n{{ content }}<end_of_turn>\n{{/each}}<start_of_turn>model\n"
+	case strings.Contains(f, "mistral"):
 		return "<s>[INST] {{ system }} {{#each messages}}{{ role }}: {{ content }} [/INST]\n{{/each}}"
-	case "qwen":
-		return "<|im_start|>system\n{{ system }}<|im_end|>\n{{#each messages}}<|im_start|>{{ role }}\n{{ content }}<|im_end|>\n{{/each}}<|im_start|>assistant"
+	case strings.Contains(f, "llama"):
+		return "{{ system }}\n{{#each messages}}{{ role }}: {{ content }}\n{{/each}}assistant:"
 	default:
 		return "{{#each messages}}{{ role }}: {{ content }}\n{{/each}}assistant:"
 	}

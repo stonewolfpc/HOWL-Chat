@@ -30,6 +30,7 @@ func (a *App) AddCharacterToChat(character map[string]interface{}) error {
 	if err != nil {
 		return fmt.Errorf("AddCharacterToChat: failed to parse character: %w", err)
 	}
+	fmt.Printf("[TRACE:AddCharacterToChat] id=%s name=%s (total=%d)\n", parsed.ID, parsed.Name, len(a.characters))
 	for i, c := range a.characters {
 		if c.ID == parsed.ID {
 			a.characters[i] = &parsed
@@ -37,6 +38,18 @@ func (a *App) AddCharacterToChat(character map[string]interface{}) error {
 		}
 	}
 	a.characters = append(a.characters, &parsed)
+	return nil
+}
+
+// RemoveCharacterFromChat removes a character from the current chat session.
+func (a *App) RemoveCharacterFromChat(characterId string) error {
+	filtered := make([]*chat.CharacterContext, 0, len(a.characters))
+	for _, c := range a.characters {
+		if c != nil && c.ID != characterId {
+			filtered = append(filtered, c)
+		}
+	}
+	a.characters = filtered
 	return nil
 }
 
@@ -139,6 +152,42 @@ func characterExistsOnDisk(name string) bool {
 		fmt.Printf("[DEBUG] Characters dir contents: %v\n", listDirNames(dir))
 	}
 	return exists
+}
+
+// loadCharacterFromDiskByID scans the Characters directory for a character
+// whose JSON file contains the matching ID.  Returns nil if not found.
+func loadCharacterFromDiskByID(id string) *chat.CharacterContext {
+	if id == "" {
+		return nil
+	}
+	dir := getCharactersDir()
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil
+	}
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		path := filepath.Join(dir, entry.Name(), "character.json")
+		data, err := os.ReadFile(path)
+		if err != nil {
+			continue
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(data, &raw); err != nil {
+			continue
+		}
+		if raw["id"] != id {
+			continue
+		}
+		cc, err := chat.ParseCharacterContextFromMap(raw)
+		if err != nil {
+			continue
+		}
+		return &cc
+	}
+	return nil
 }
 
 // worldExistsOnDisk returns true if a world's JSON file still exists.
@@ -307,6 +356,18 @@ func (a *App) loadChatDataFromStorage() (map[string]interface{}, error) {
 		"scenario":   scenarioMap,
 		"lorebooks":  chatData.Lorebooks,
 		"chatName":   chatData.Meta.Name,
+		"meta": map[string]interface{}{
+			"id":                chatData.Meta.ID,
+			"name":              chatData.Meta.Name,
+			"worldId":           chatData.Meta.WorldID,
+			"scenarioId":        chatData.Meta.ScenarioID,
+			"activeCharacters":  chatData.Meta.ActiveCharacters,
+			"removedCharacters": chatData.Meta.RemovedCharacters,
+			"addedCharacters":   chatData.Meta.AddedCharacters,
+			"activeLorebooks":   chatData.Meta.ActiveLorebooks,
+			"removedLorebooks":  chatData.Meta.RemovedLorebooks,
+			"addedLorebooks":    chatData.Meta.AddedLorebooks,
+		},
 	}, nil
 }
 

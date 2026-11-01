@@ -1,20 +1,26 @@
 /**
  * Image Generator — Responsive Breakpoints
- * Tablet and mobile layout adjustments.
+ * Three-column layout scaling for various screen sizes.
  */
 
 @media (max-width: 1200px) {
-    .ig-sidebar { width: 340px; min-width: 340px; }
-    .ig-right-panel { width: 240px; min-width: 240px; }
+    .ig-sidebar { width: 24%; min-width: 260px; }
+    .ig-history-col { width: 28%; min-width: 260px; }
+    .ig-main { min-width: 350px; }
 }
 
-@media (max-width: 960px) {
-    .ig-layout { flex-direction: column; height: auto; min-height: auto; }
-    .ig-sidebar { width: 100%; min-width: auto; max-height: 50vh; }
-    .ig-main { min-height: 400px; }
-    .ig-right-panel { width: 100%; min-width: auto; flex-direction: row; height: 160px; }
-    .ig-history-list { flex-direction: row; overflow-x: auto; overflow-y: hidden; }
-    .ig-history-item { max-width: 100px; width: 100%; margin: 0; }
-    .ig-info-panel { flex: 1; min-width: 200px; }
-    .ig-workflow-bar { padding: 0 20px 10px; }
+@media (max-width: 900px) {
+    .ig-sidebar { width: 26%; min-width: 240px; }
+    .ig-history-col { width: 30%; min-width: 220px; }
+    .ig-main { min-width: 300px; }
+    .ig-history-list { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+    .ig-workflow-bar { flex-wrap: wrap; gap: 4px; }
+    .ig-workflow-btn { font-size: 11px; padding: 4px 10px; }
+}
+
+@media (max-width: 700px) {
+    .ig-sidebar { display: none; }
+    .ig-sidebar-toggle { display: flex; }
+    .ig-history-col { display: none; }
+    .ig-main { flex: 1; min-width: 0; }
 }

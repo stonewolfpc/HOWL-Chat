@@ -11,12 +11,12 @@
  * @version 5.0.0
  */
 
-@import url('igp-layout.css');
-@import url('igp-workflow.css');
-@import url('igp-panels.css');
-@import url('igp-buttons.css');
-@import url('igp-tools.css');
-@import url('igp-info.css');
-@import url('igp-history.css');
-@import url('igp-model-library.css');
-@import url('igp-light-theme.css');
+@import url('igp-layout.css?v=29');
+@import url('igp-workflow.css?v=29');
+@import url('igp-panels.css?v=29');
+@import url('igp-buttons.css?v=29');
+@import url('igp-tools.css?v=29');
+@import url('igp-info.css?v=29');
+@import url('igp-history.css?v=29');
+@import url('igp-model-library.css?v=29');
+@import url('igp-light-theme.css?v=29');

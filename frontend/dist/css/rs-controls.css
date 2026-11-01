@@ -12,8 +12,8 @@
 /* Text Input */
 .setting-input {
     flex: 1;
-    background: rgba(21, 21, 31, 0.95);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-panel-bg);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     padding: 10px 12px;
     font-size: 14px;
@@ -30,8 +30,8 @@
 /* Select */
 .setting-select {
     flex: 1;
-    background: rgba(21, 21, 31, 0.95);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-panel-bg);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     padding: 10px 12px;
     font-size: 14px;
@@ -52,7 +52,7 @@
     -webkit-appearance: none;
     appearance: none;
     height: 6px;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--surface-hover);
     border-radius: 3px;
     outline: none;
 }
@@ -83,7 +83,7 @@
     display: inline-block;
     width: 50px;
     height: 24px;
-    background: rgba(100, 100, 100, 0.3);
+    background: var(--surface-hover);
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -101,7 +101,7 @@
     left: 2px;
     right: 2px;
     bottom: 2px;
-    background: rgba(212, 212, 212, 0.5);
+    background: var(--text-tertiary);
     border-radius: 10px;
     transition: all 0.2s ease;
 }
@@ -130,8 +130,8 @@
 .setting-value {
     min-width: 60px;
     text-align: center;
-    background: rgba(21, 21, 31, 0.95);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-panel-bg);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     padding: 8px 12px;
     font-size: 14px;

@@ -84,28 +84,28 @@ function openWorldSelector() {
 
     const modal = document.createElement('div');
     modal.className   = 'selector-modal';
-    modal.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px);`;
+    modal.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:var(--overlay-scrim);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px);`;
 
     let content = `
-        <div style="background:rgba(30,30,40,0.98);border-radius:12px;padding:24px;max-width:400px;border:1px solid rgba(255,255,255,0.1);">
+        <div style="background:var(--shell-panel-bg);border-radius:12px;padding:24px;max-width:400px;border:1px solid var(--surface-hover-strong);">
             <h2 style="color:#fff;margin-top:0;margin-bottom:16px;">Select a World</h2>
             <div style="max-height:300px;overflow-y:auto;margin-bottom:16px;">
     `;
 
     if (worlds.length === 0) {
-        content += `<div style="color:rgba(255,255,255,0.5);text-align:center;padding:20px;">No worlds available</div>`;
+        content += `<div style="color:var(--surface-hover);text-align:center;padding:20px;">No worlds available</div>`;
     } else {
         worlds.forEach(world => {
             const isActive = cd.world && cd.world.id === world.id;
             content += `
                 <div onclick="selectWorld('${world.id}'); document.querySelector('.selector-modal').remove();" style="
-                    padding:12px;background:${isActive ? 'rgba(0,184,115,0.2)' : 'rgba(255,255,255,0.05)'};
+                    padding:12px;background:${isActive ? 'var(--success-bg)' : 'var(--surface-hover)'};
                     margin-bottom:8px;border-radius:6px;cursor:pointer;
-                    border:1px solid ${isActive ? 'rgba(0,184,115,0.3)' : 'rgba(255,255,255,0.1)'};color:#fff;transition:all 0.2s ease;"
-                    onmouseover="this.style.background='rgba(255,255,255,0.1)'"
-                    onmouseout="this.style.background='${isActive ? 'rgba(0,184,115,0.2)' : 'rgba(255,255,255,0.05)'}'">
+                    border:1px solid ${isActive ? 'var(--success)' : 'rgba(255,255,255,0.1)'};color:#fff;transition:all 0.2s ease;"
+                    onmouseover="this.style.background='var(--surface-hover-strong)'"
+                    onmouseout="this.style.background='${isActive ? 'var(--success-bg)' : 'var(--surface-hover)'}'">
                     <strong style="display:block;margin-bottom:4px;">${world.title || world.name}</strong>
-                    <small style="color:rgba(255,255,255,0.5);">${world.description || 'No description'}</small>
+                    <small style="color:var(--surface-hover);">${world.description || 'No description'}</small>
                 </div>
             `;
         });
@@ -114,8 +114,8 @@ function openWorldSelector() {
     content += `
             </div>
             <div style="display:flex;gap:8px;">
-                <button onclick="document.querySelector('.selector-modal').remove();" style="flex:1;padding:10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:6px;cursor:pointer;">Cancel</button>
-                <button onclick="navigateTo('world.html'); document.querySelector('.selector-modal').remove();" style="flex:1;padding:10px;background:rgba(0,184,115,0.2);border:1px solid rgba(0,184,115,0.3);color:#00b873;border-radius:6px;cursor:pointer;">+ New World</button>
+                <button onclick="document.querySelector('.selector-modal').remove();" style="flex:1;padding:10px;background:var(--surface-hover-strong);border:1px solid var(--border-secondary);color:#fff;border-radius:6px;cursor:pointer;">Cancel</button>
+                <button onclick="navigateTo('world.html'); document.querySelector('.selector-modal').remove();" style="flex:1;padding:10px;background:var(--success-bg);border:1px solid var(--success);color:#00b873;border-radius:6px;cursor:pointer;">+ New World</button>
             </div>
         </div>
     `;

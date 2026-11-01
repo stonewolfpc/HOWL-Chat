@@ -25,7 +25,7 @@
 /* Setting Card */
 .setting-card {
     background: rgba(42, 47, 54, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-primary);
     border-radius: 6px;
     padding: 12px;
     display: flex;
@@ -34,7 +34,7 @@
 }
 
 .setting-card:hover {
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--surface-hover);
     background: rgba(42, 47, 54, 0.5);
 }
 
@@ -42,7 +42,7 @@
 .setting-label {
     font-size: 14px;
     font-weight: 500;
-    color: #e0e0e0;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -73,7 +73,7 @@
     left: 50%;
     transform: translateX(-50%);
     background: #1a1d21;
-    color: #e0e0e0;
+    color: var(--text-primary);
     padding: 8px 12px;
     border-radius: 4px;
     font-size: 11px;
@@ -91,70 +91,77 @@
     opacity: 1;
 }
 
-/* Setting Toggle */
-.setting-toggle {
+/* Setting Toggle — scoped to sampler flyout to avoid ALL conflicts */
+#sampler-settings-flyout .setting-card .setting-toggle {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 4px;
 }
 
-.toggle-switch {
-    position: relative;
-    width: 36px;
-    height: 20px;
+/* Toggle Switch — max specificity to override sp-context.css etc */
+#sampler-settings-flyout .setting-card .toggle-switch {
+    position: relative !important;
+    display: inline-block !important;
+    width: 48px !important;
+    height: 26px !important;
+    flex-shrink: 0;
 }
 
-.toggle-switch input {
+#sampler-settings-flyout .setting-card .toggle-switch input {
     opacity: 0;
     width: 0;
     height: 0;
 }
 
-.toggle-slider {
-    position: absolute;
+#sampler-settings-flyout .setting-card .toggle-switch .toggle-slider {
+    position: absolute !important;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #2A2F36;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background-color: var(--surface-secondary) !important;
+    background-image: none !important;
+    border: none !important;
     transition: 0.3s;
-    border-radius: 20px;
+    border-radius: 20px !important;
 }
 
-.toggle-slider:before {
+#sampler-settings-flyout .setting-card .toggle-switch .toggle-slider:before {
     position: absolute;
     content: "";
-    height: 14px;
-    width: 14px;
+    height: 20px;
+    width: 20px;
     left: 3px;
-    bottom: 3px;
-    background-color: white;
+    top: 3px;
+    background-color: #fff !important;
     transition: 0.3s;
     border-radius: 50%;
+    box-shadow: none !important;
 }
 
-.toggle-switch input:checked + .toggle-slider {
-    background-color: #4a9eff;
+#sampler-settings-flyout .setting-card .toggle-switch input:checked + .toggle-slider {
+    background-color: #4a9eff !important;
 }
 
-.toggle-switch input:checked + .toggle-slider:before {
-    transform: translateX(16px);
+#sampler-settings-flyout .setting-card .toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(22px);
+    background-color: #fff !important;
 }
 
-.toggle-switch input:disabled + .toggle-slider {
-    background-color: #1a1d21;
+#sampler-settings-flyout .setting-card .toggle-switch input:disabled + .toggle-slider {
+    background-color: #1a1d21 !important;
     cursor: not-allowed;
 }
 
-.toggle-switch input:disabled + .toggle-slider:before {
-    background-color: #666;
+#sampler-settings-flyout .setting-card .toggle-switch input:disabled + .toggle-slider:before {
+    background-color: #666 !important;
 }
 
-.toggle-label {
+#sampler-settings-flyout .setting-card .toggle-label {
     font-size: 11px;
-    color: rgba(224, 224, 224, 0.6);
+    color: var(--text-tertiary);
 }
 
 /* Reset Button */
@@ -173,7 +180,7 @@
 }
 
 .setting-reset:hover {
-    color: #fff;
+    color: var(--text-secondary);
     background: rgba(136, 136, 136, 0.2);
     border-color: rgba(136, 136, 136, 0.5);
 }
@@ -195,7 +202,7 @@
 /* Description & Details */
 .setting-description {
     font-size: 12px;
-    color: rgba(224, 224, 224, 0.7);
+    color: var(--text-secondary);
     line-height: 1.4;
 }
 
@@ -207,13 +214,13 @@
 
 .setting-detail {
     font-size: 12px;
-    color: rgba(224, 224, 224, 0.7);
+    color: var(--text-secondary);
     line-height: 1.3;
 }
 
 .setting-detail em {
     font-style: italic;
-    color: rgba(224, 224, 224, 0.6);
+    color: var(--text-tertiary);
 }
 
 .setting-detail.warning {
@@ -282,7 +289,7 @@
     background: #0D0F12;
     border: 1px solid #2A2F36;
     border-radius: 4px;
-    color: #e0e0e0;
+    color: var(--text-primary);
     padding: 2px 6px;
     text-align: center;
     outline: none;
@@ -323,16 +330,16 @@
     display: flex;
     align-items: center;
     font-weight: 600;
-    color: #e0e0e0;
+    color: var(--text-primary);
 }
 
 /* Setting Buttons */
 .setting-button {
     padding: 8px 16px;
-    background: #2A2F36;
+    background: var(--surface-secondary);
     border: 1px solid #1F242A;
     border-radius: 4px;
-    color: #e0e0e0;
+    color: var(--text-primary);
     cursor: pointer;
     margin-top: 12px;
     transition: all 0.2s ease;
@@ -348,5 +355,130 @@
 }
 
 .setting-button.secondary:hover {
-    background: #2A2F36;
+    background: var(--surface-secondary);
+}
+
+/* ---------------------------------------------------------------------------
+   Sampler settings density rules
+
+   Three changes, all scoped to the sampler sheet so no other flyout inherits
+   them: an auto-fitting grid (4 columns on a wide screen, 3 mid, 1 narrow),
+   Reset moved into the card's top-right corner instead of its own row, and the
+   three "Good for / Example / Warning" lines revealed on hover instead of
+   always occupying ~50px per card.
+   --------------------------------------------------------------------------- */
+#sampler-settings-flyout .settings-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+    align-items: start;
+}
+
+#sampler-settings-flyout .category-header {
+    font-size: 14px;
+    margin: 0;
+    padding-bottom: 5px;
+    border-bottom-width: 1px;
+    text-shadow: none;
+}
+
+#sampler-settings-flyout .setting-card {
+    position: relative;
+    padding: 8px 10px 7px;
+    gap: 3px;
+    z-index: 1;
+}
+
+/* The enable toggle joins Reset in the card's top-right corner instead of
+   owning a row of its own, which was ~34px on every toggle card. */
+#sampler-settings-flyout .setting-card .setting-toggle {
+    position: absolute;
+    top: 11px;
+    right: 58px;
+    margin: 0;
+    gap: 6px;
+}
+
+#sampler-settings-flyout .setting-card .setting-toggle .toggle-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* Narrow sheets cannot fit label + toggle + reset on one line. */
+@media (max-width: 900px) {
+    #sampler-settings-flyout .setting-card .setting-toggle {
+        position: static;
+        margin-bottom: 2px;
+    }
+
+    #sampler-settings-flyout .setting-card .setting-label {
+        padding-right: 52px;
+    }
+}
+
+/* Keep the reset reachable but out of the reading order of the card. */
+#sampler-settings-flyout .setting-card .setting-reset {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    margin: 0;
+    padding: 2px 7px;
+    font-size: 10px;
+}
+
+/* Room for the reset button so long labels never slide under it. */
+#sampler-settings-flyout .setting-card .setting-label {
+    padding-right: 104px;
+    font-size: 13px;
+}
+
+#sampler-settings-flyout .setting-card .setting-description {
+    font-size: 11.5px;
+    line-height: 1.35;
+    /* Two lines is the cap: one long description must not make its whole grid
+       row taller than the rest. Nothing here needs more than two at this width. */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Detail lines become a hover popover: nothing is removed, nothing reflows. */
+#sampler-settings-flyout .setting-card .setting-details {
+    display: none;
+    position: absolute;
+    top: calc(100% - 4px);
+    left: 10px;
+    right: 10px;
+    z-index: 60;
+    padding: 10px 12px;
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+}
+
+#sampler-settings-flyout .setting-card:hover,
+#sampler-settings-flyout .setting-card:focus-within {
+    z-index: 40;
+}
+
+#sampler-settings-flyout .setting-card:hover .setting-details,
+#sampler-settings-flyout .setting-card:focus-within .setting-details {
+    display: flex;
+}
+
+/* Touch devices cannot hover, so the detail lines stay inline there. */
+@media (hover: none) {
+    #sampler-settings-flyout .setting-card .setting-details {
+        display: flex;
+        position: static;
+        padding: 0;
+        background: none;
+        border: none;
+        box-shadow: none;
+    }
 }

@@ -80,7 +80,7 @@
 
 .ml-group-header .ml-count {
     background: var(--accent-primary);
-    color: #fff;
+    color: var(--text-secondary);
     border-radius: 8px;
     padding: 0 6px;
     font-size: 9px;
@@ -131,18 +131,18 @@
 .ml-badge-flux      { background: rgba(124, 58, 237, 0.20); color: #a78bfa; border-color: #7c3aed44; }
 .ml-badge-sdxl      { background: rgba(14, 165, 233, 0.18); color: #38bdf8; border-color: #0ea5e944; }
 .ml-badge-sd3       { background: rgba(249, 115,  22, 0.18); color: #fb923c; border-color: #f97316aa; }
-.ml-badge-sd1\.5    { background: rgba(34, 197,  94, 0.18); color: #4ade80; border-color: #22c55e44; }
-.ml-badge-sd2\.1    { background: rgba(34, 197,  94, 0.14); color: #86efac; border-color: #22c55e33; }
+.ml-badge-sd1\.5    { background: rgba(34, 197, 94, 0.18); color: var(--success); border-color: rgba(34, 197, 94, 0.27); }
+.ml-badge-sd2\.1    { background: rgba(34, 197, 94, 0.14); color: var(--success); border-color: rgba(34, 197, 94, 0.2); }
 .ml-badge-sdxl-turbo{ background: rgba(236, 72,  153, 0.18); color: #f472b6; border-color: #ec489944; }
 .ml-badge-auraflow  { background: rgba(250, 204,  21, 0.18); color: #fde047; border-color: #facc1544; }
 .ml-badge-kolors    { background: rgba(244,  63,  94, 0.18); color: #fb7185; border-color: #f43f5e44; }
 .ml-badge-cascade   { background: rgba( 20, 184, 166, 0.18); color: #2dd4bf; border-color: #14b8a644; }
-.ml-badge-chroma    { background: rgba(255, 165,   0, 0.18); color: #fbbf24; border-color: #f59e0b44; }
+.ml-badge-chroma    { background: rgba(255, 165,   0, 0.18); color: var(--warning); border-color: #f59e0b44; }
 
 /* ── compatibility warning icon ──────────────────────────────────────────── */
 
 .ml-compat-warn {
-    color: var(--warning, #f59e0b);
+    color: var(--warning, var(--warning));
     font-size: 11px;
     margin-left: 4px;
     cursor: help;

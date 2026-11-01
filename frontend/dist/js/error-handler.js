@@ -91,21 +91,6 @@ function showSaveWarning() {
     setTimeout(() => { warn.style.display = 'none'; }, 4000);
 }
 
-function setLoadingStatus(status, state) {
-    // Forward to loading-progress.js if available
-    if (window.setLoadingStatusOriginal) {
-        window.setLoadingStatusOriginal(status, state);
-        return;
-    }
-    const el = document.getElementById('loading-status');
-    if (el) el.textContent = status;
-}
-
-function updateModelDisplay(name) {
-    const display = document.getElementById('model-name-display');
-    if (display) display.textContent = name;
-}
-
 // ---------------------------------------------------------------------------
 // Integration with ErrorSystem
 // ---------------------------------------------------------------------------
@@ -117,12 +102,8 @@ function onErrorReported(err) {
     }
 }
 
-// Patch ErrorSystem to trigger recovery
-const originalHandleBackendError = window.handleBackendError;
-window.handleBackendError = function(payload) {
-    if (originalHandleBackendError) originalHandleBackendError(payload);
-    onErrorReported(payload);
-};
+// ErrorSystem calls onErrorReported() itself now, so handleBackendError is not
+// monkey-patched. Recovery happens even if this file loads after error-system.
 
 // ---------------------------------------------------------------------------
 // Global error boundary

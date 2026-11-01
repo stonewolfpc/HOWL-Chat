@@ -40,12 +40,6 @@ function getCurrentChatId() {
 // DOM Utilities
 // ---------------------------------------------------------------------------
 
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
 function debounce(func, wait) {
     let timeout;
     return function (...args) {

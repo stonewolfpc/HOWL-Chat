@@ -210,22 +210,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             await flushPendingNarratorEvents();
 
-            addUserMessage(message);
-            if (input) input.value = '';
-
-            let imageData = '';
-            if (currentImage) {
-                imageData = currentImage.split(',')[1];
-                removeImage();
-            }
-
             if (!window.go || !window.go.main || !window.go.main.App) {
                 console.error('Wails runtime not available');
+                addUserMessage(message);
                 addAssistantMessage('AI', 'Error: Backend not available. Please run this application through Wails (wails dev) to enable backend functionality.');
                 return;
             }
 
-            // Ensure an active chat exists before sending. If none, auto-create one.
+            // Ensure an active chat exists BEFORE the user's message is rendered.
+            // createNewChat() clears the chat DOM (clearForNewChat), so drawing the
+            // bubble first makes it vanish until the chat is reloaded from disk.
             const hasActiveChat = window.dataSync?.currentChatId ||
                                   window.chatBridge?.getState()?.sessionId ||
                                   window.currentChatId;
@@ -236,6 +230,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('Failed to auto-create chat before send');
                     return;
                 }
+            }
+
+            addUserMessage(message);
+            if (typeof hideGenerateBanner === 'function') hideGenerateBanner();
+            if (input) input.value = '';
+
+            let imageData = '';
+            if (currentImage) {
+                imageData = currentImage.split(',')[1];
+                removeImage();
             }
 
             // Record user turn in backend history before inference begins

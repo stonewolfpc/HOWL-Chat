@@ -114,3 +114,30 @@ body.theme-light .flyout::-webkit-scrollbar-thumb {
 body.theme-light .flyout::-webkit-scrollbar-thumb:hover {
     background: var(--text-tertiary);
 }
+
+/* Sampler toggle switch — override hardcoded !important dark colors */
+body.theme-light #sampler-settings-flyout .setting-card .toggle-switch .toggle-slider {
+    background-color: var(--border-secondary) !important;
+}
+
+body.theme-light #sampler-settings-flyout .setting-card .toggle-switch .toggle-slider:before {
+    background-color: var(--surface-primary) !important;
+}
+
+body.theme-light #sampler-settings-flyout .setting-card .toggle-switch input:checked + .toggle-slider {
+    background-color: var(--accent-primary) !important;
+}
+
+body.theme-light #sampler-settings-flyout .setting-card .toggle-switch input:disabled + .toggle-slider {
+    background-color: var(--surface-tertiary) !important;
+}
+
+body.theme-light #sampler-settings-flyout .setting-card .toggle-switch input:disabled + .toggle-slider:before {
+    background-color: var(--text-tertiary) !important;
+}
+
+body.theme-light .warning-icon .tooltip {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    border-color: var(--danger);
+}

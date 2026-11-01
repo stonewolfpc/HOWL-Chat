@@ -1,0 +1,864 @@
+[startup] 21:47:18.261  +    3.3ms  image init: begin
+[startup] 21:47:18.264  +    6.6ms  image init: config ready
+[ImageEngine] Initialized: binary=C:\Users\StoneWolfPC\HOWL_Chat\sd-server.exe models=E:\HOWL_Chat\models port=8081
+[startup] 21:47:18.265  +    7.1ms  image init: engine initialized
+[ImageEngine] sd-server commit: c6dfa9d
+[ImageEngine] Restored last model: "image"
+[startup] 21:47:18.283  +   25.5ms  rescan: start
+2026/10/31 21:47:18 [harness] serving frontend/dist on http://127.0.0.1:8799
+[startup] 21:47:18.284  +   26.5ms  rescan: scanning E:\AI GGUF\GGUF
+[startup] 21:47:18.286  +   28.1ms  rescan: done E:\AI GGUF\GGUF 25 entries
+[proc] reaped 1 orphaned model process(es)
+2026/10/31 21:47:25 [rpc] GetSettings                                   ok            0s
+2026/10/31 21:47:25 [rpc] SetSettings                                   ok           1ms
+2026/10/31 21:47:25 [rpc] IsModelLoaded                                 ok          11ms
+[LoadModel] START path="E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf"
+[LoadModel] path validated
+[LoadModel] checking port 8080
+[LoadModel] port 8080 free
+[LoadModel] validating llama-server binary
+[LoadModel] llama-server binary validated
+[LoadModel] reading GGUF metadata from: E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf
+[ReadProfile] final: Family=qwen35 Layers=32 Params=13759916804 Size=5366.4MB Quant=IQ2_XXS DModel=4096 Heads=16 KVHeads=4
+[LoadModel] profile: Family=qwen35 Layers=32 Params=13759916804 Size=5366.4MB Quant=IQ2_XXS ArchSpec=true
+[LoadModel] applying safe defaults
+[applySafeDefaults] enter
+[applySafeDefaults] getting hardware snapshot
+[ResourceManager] GetManager called
+[ResourceManager] initializing singleton
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] initialization complete
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[applySafeDefaults] freeVRAM=5733 freeRAM=44199
+[applySafeDefaults] reading settings
+[applySafeDefaults] settings: ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] archSpec: layers=32 dmodel=4096 heads=16 kvheads=4
+[applySafeDefaults] creating memory model
+[applySafeDefaults] calling ClampToHardware
+[applySafeDefaults] ClampToHardware returned
+[applySafeDefaults] final: GPU=4302MB RAM=2468MB ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] done
+[LoadModel] safe defaults applied
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+[LoadModel] no mmproj found — vision not available for this model
+[LoadModel] validating spawn settings
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[LoadModel] spawn params: ctx=3096 gpuLayers=22 batch=256 freeVRAM=5733 freeRAM=44199
+[LoadModel] validation result: level=0 msg="Memory OK — estimated 4302 MB GPU / 2468 MB RAM (free: 5733 / 44199 MB)"
+[LoadModel] spawn validation passed
+[LoadModel] chat template: model-native for family "qwen35" (170 bytes)
+[LoadModel] spawning llama-server
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+INFO: No mmproj file found for model: E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf
+INFO: llama-server started (pid 10600) with model E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf
+[LoadModel] llama-server spawned (pid 10600)
+INFO: Registering model with estimated GPU:4310MB RAM:2476MB
+[ResourceManager] GetManager called
+2026/10/31 21:47:27 [rpc] LoadModel                                     ok        2.426s
+[LoadModel] monitor started (pid 10600, timeout 60s)
+0.00.124.558 I srv  llama_server: initializing ...
+0.00.124.580 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.124.965 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.136.246 I srv    load_model: loading model 'E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf'
+2026/10/31 21:47:29 [rpc] IsModelLoaded                                 ok           1ms
+0.02.885.858 I cmn          init: llama threadpool init, n_threads = 8
+0.03.469.752 I srv    load_model: initializing, n_slots = 4, n_ctx_slot = 3328, kv_unified = 'true'
+0.03.471.942 I srv  server_run_i: model loaded
+0.03.471.950 I srv  server_on_li: listening on http://127.0.0.1:8080
+[LoadModel] monitor: server healthy, model loaded
+2026/10/31 21:47:31 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 21:47:31 [rpc] GetSettings                                   ok            0s
+2026/10/31 21:47:31 [rpc] IsModelLoaded                                 ok            0s
+2026/10/31 21:47:31 [rpc] LoadChatData                                  ok           1ms
+2026/10/31 21:47:59 [rpc] SaveChatData                                  ok           9ms
+2026/10/31 21:47:59 [rpc] SaveChat                                      ok          10ms
+2026/10/31 21:47:59 [rpc] GetSettings                                   ok            0s
+2026/10/31 21:47:59 [rpc] GetLLMModels                                  ok           1ms
+2026/10/31 21:47:59 [rpc] GetSettings                                   ok            0s
+2026/10/31 21:47:59 [rpc] IsModelLoaded                                 ok           7ms
+2026/10/31 21:47:59 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=2560
+2026/10/31 21:47:59 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 21:47:59 [rpc] GetModelOptions                               ok            0s
+2026/10/31 21:47:59 [rpc] GetMemories                                   ok           1ms
+2026/10/31 21:47:59 [rpc] GetActiveChatMeta                             ok           1ms
+2026/10/31 21:47:59 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 21:47:59 [rpc] GetLoadedModelName                            ok           1ms
+2026/10/31 21:47:59 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/10/31 21:47:59 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/10/31 21:47:59 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/10/31 21:47:59 [rpc] AddCharacterToChat                            ok            0s
+2026/10/31 21:47:59 [rpc] SetSettings                                   ok           1ms
+2026/10/31 21:48:05 [rpc] AppendChatMessage                             ok           1ms
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=2560
+0.37.287.535 I slot get_availabl: id  0 | task -1 | selected slot by LRU, n_tokens = 0, t_last = -1
+0.37.287.577 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"role":"assistant","content":null}}],"created":1793501286,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: choice fields role="assistant" finish="" msgContent=""
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n<think>"}}],"created":1793501286,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 1, content len=8: "\n<think>"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n\n</think>"}}],"created":1793501286,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 2, content len=10: "\n\n</think>"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n\nThe"}}],"created":1793501286,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 3, content len=5: "\n\nThe"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" sky"}}],"created":1793501286,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 4, content len=4: " sky"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'s"}}],"created":1793501286,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 5, content len=2: "'s"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" got"}}],"created":1793501287,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" that"}}],"created":1793501287,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" same"}}],"created":1793501287,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" grey"}}],"created":1793501287,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" look"}}],"created":1793501287,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" it"}}],"created":1793501287,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" had"}}],"created":1793501287,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" when"}}],"created":1793501287,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" my"}}],"created":1793501287,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" ma"}}],"created":1793501288,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" taught"}}],"created":1793501288,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" me"}}],"created":1793501288,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" to"}}],"created":1793501288,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" read"}}],"created":1793501288,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" the"}}],"created":1793501288,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" clouds"}}],"created":1793501288,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":","}}],"created":1793501288,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" so"}}],"created":1793501288,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" I"}}],"created":1793501288,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'m"}}],"created":1793501289,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" guessing"}}],"created":1793501289,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" another"}}],"created":1793501289,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" storm"}}],"created":1793501289,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'s"}}],"created":1793501289,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" brew"}}],"created":1793501289,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"in"}}],"created":1793501289,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'"}}],"created":1793501289,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" before"}}],"created":1793501289,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" we"}}],"created":1793501290,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" know"}}],"created":1793501290,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" it"}}],"created":1793501290,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793501290,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Just"}}],"created":1793501290,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" keep"}}],"created":1793501290,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" your"}}],"created":1793501290,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" coats"}}],"created":1793501290,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" tight"}}],"created":1793501290,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" and"}}],"created":1793501290,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" your"}}],"created":1793501291,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" eyes"}}],"created":1793501291,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" on"}}],"created":1793501291,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" the"}}],"created":1793501291,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" water"}}],"created":1793501291,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":";"}}],"created":1793501291,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" that"}}],"created":1793501291,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 50, content len=5: " that"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" tide"}}],"created":1793501291,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" doesn"}}],"created":1793501291,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'t"}}],"created":1793501291,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" care"}}],"created":1793501292,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+2026/10/31 21:48:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:48:12 [rpc] GetSDServerVersion                            ok            0s
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" if"}}],"created":1793501292,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" you"}}],"created":1793501292,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'re"}}],"created":1793501292,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" rich"}}],"created":1793501292,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" or"}}],"created":1793501292,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" poor"}}],"created":1793501292,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":","}}],"created":1793501292,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" she"}}],"created":1793501293,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" just"}}],"created":1793501293,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" takes"}}],"created":1793501293,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" what"}}],"created":1793501293,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" she"}}],"created":1793501293,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" can"}}],"created":1793501293,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" get"}}],"created":1793501293,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793501293,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+0.46.112.949 I slot print_timing: id  0 | task 0 | prompt eval time =    1110.34 ms /   162 tokens (    6.85 ms per token,   145.90 tokens per second)
+0.46.112.954 I slot print_timing: id  0 | task 0 |        eval time =    7714.97 ms /    73 tokens (  107.15 ms per token,     9.33 tokens per second)
+0.46.112.955 I slot print_timing: id  0 | task 0 |       total time =    8825.31 ms /   235 tokens
+0.46.112.956 I slot print_timing: id  0 | task 0 |    graphs reused =         72
+0.46.112.957 I slot print_timing: id  0 | task 0 |   graph reallocs =          1    /     0        (same size) / (changed size)
+0.46.113.019 I slot      release: id  0 | task 0 | stop processing: n_tokens = 234, truncated = 0
+DEBUG: raw chunk: {"choices":[{"finish_reason":"stop","index":0,"delta":{}}],"created":1793501293,"id":"chatcmpl-06JKv9hwuZ8I7EzXSfhc0pwLV5KA7hTC","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk","timings":{"cache_n":0,"prompt_n":162,"prompt_ms":1110.341,"prompt_per_token_ms":6.853956790123456,"prompt_per_second":145.9011240690923,"predicted_n":73,"predicted_ms":7714.965,"predicted_per_token_ms":107.15229166666667,"predicted_per_second":9.332511553843732}}
+DEBUG: choice fields role="" finish="stop" msgContent=""
+DEBUG: Stream received [DONE] signal, chunks=69, totalContent=295
+DEBUG: Stream completed, total chunks=69, total content=295 bytes
+DEBUG: Stream reasoning: 0 chunks, 0 chars (never fed back)
+2026/10/31 21:48:13 [rpc] GenerateCharacterResponse                     ok        8.835s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=2560
+0.46.125.729 I slot get_availabl: id  1 | task -1 | selected slot by LRU, n_tokens = 0, t_last = -1
+0.46.125.752 I slot launch_slot_: id  1 | task 76 | processing task, is_child = 0
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"role":"assistant","content":null}}],"created":1793501294,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: choice fields role="assistant" finish="" msgContent=""
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n<think>"}}],"created":1793501294,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 1, content len=8: "\n<think>"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n\n</think>"}}],"created":1793501295,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 2, content len=10: "\n\n</think>"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n\n\""}}],"created":1793501295,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 3, content len=3: "\n\n\""
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"Right"}}],"created":1793501295,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 4, content len=5: "Right"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"..."}}],"created":1793501295,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 5, content len=3: "..."
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" right"}}],"created":1793501295,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"!"}}],"created":1793501295,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" I"}}],"created":1793501295,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" mean"}}],"created":1793501296,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":","}}],"created":1793501296,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" look"}}],"created":1793501296,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" at"}}],"created":1793501296,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" it"}}],"created":1793501296,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"—"}}],"created":1793501296,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"tr"}}],"created":1793501296,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"uly"}}],"created":1793501296,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" ominous"}}],"created":1793501296,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":","}}],"created":1793501297,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" isn"}}],"created":1793501297,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'t"}}],"created":1793501297,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" it"}}],"created":1793501297,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"?"}}],"created":1793501297,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" The"}}],"created":1793501297,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" pressure"}}],"created":1793501297,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" must"}}],"created":1793501297,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" be"}}],"created":1793501297,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" dropping"}}],"created":1793501297,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" fast"}}],"created":1793501298,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" if"}}],"created":1793501298,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" the"}}],"created":1793501298,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" grey"}}],"created":1793501298,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'s"}}],"created":1793501298,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" this"}}],"created":1793501298,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" deep"}}],"created":1793501298,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":";"}}],"created":1793501298,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" I"}}],"created":1793501298,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'ve"}}],"created":1793501299,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" been"}}],"created":1793501299,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" calculating"}}],"created":1793501299,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" bar"}}],"created":1793501299,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"ometric"}}],"created":1793501299,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" shifts"}}],"created":1793501299,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" from"}}],"created":1793501299,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" my"}}],"created":1793501299,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" s"}}],"created":1793501299,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"atch"}}],"created":1793501300,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"el"}}],"created":1793501300,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" all"}}],"created":1793501300,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" morning"}}],"created":1793501300,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":","}}],"created":1793501300,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 50, content len=1: ","
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" and"}}],"created":1793501300,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" the"}}],"created":1793501300,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" math"}}],"created":1793501300,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" says"}}],"created":1793501300,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" we"}}],"created":1793501300,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'re"}}],"created":1793501301,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" in"}}],"created":1793501301,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" for"}}],"created":1793501301,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" a"}}],"created":1793501301,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" del"}}],"created":1793501301,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"uge"}}],"created":1793501301,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" of"}}],"created":1793501301,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" epic"}}],"created":1793501301,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" proportions"}}],"created":1793501301,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793501302,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Just"}}],"created":1793501302,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" wrap"}}],"created":1793501302,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" those"}}],"created":1793501302,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" clo"}}],"created":1793501302,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"aks"}}],"created":1793501302,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" tight"}}],"created":1793501302,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"!"}}],"created":1793501302,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" And"}}],"created":1793501302,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" if"}}],"created":1793501302,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" anyone"}}],"created":1793501303,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" sees"}}],"created":1793501303,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" me"}}],"created":1793501303,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" scri"}}],"created":1793501303,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"b"}}],"created":1793501303,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"bling"}}],"created":1793501303,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" fur"}}],"created":1793501303,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"iously"}}],"created":1793501303,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" by"}}],"created":1793501303,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" the"}}],"created":1793501304,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" mast"}}],"created":1793501304,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":","}}],"created":1793501304,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" don"}}],"created":1793501304,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'t"}}],"created":1793501304,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" mind"}}],"created":1793501304,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" me"}}],"created":1793501304,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":";"}}],"created":1793501304,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" I"}}],"created":1793501304,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'m"}}],"created":1793501305,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" noting"}}],"created":1793501305,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" the"}}],"created":1793501305,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" wind"}}],"created":1793501305,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+0.57.721.209 I slot print_timing: id  1 | task 76 | n_gen =    100, tg =   9.36 t/s, tg_3s =   9.46 t/s
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" velocity"}}],"created":1793501305,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" before"}}],"created":1793501305,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" it"}}],"created":1793501305,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" hits"}}],"created":1793501305,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 100, content len=5: " hits"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" us"}}],"created":1793501305,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"!\""}}],"created":1793501306,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+0.58.366.130 I slot print_timing: id  1 | task 76 | prompt eval time =     970.30 ms /   241 tokens (    4.03 ms per token,   248.38 tokens per second)
+0.58.366.136 I slot print_timing: id  1 | task 76 |        eval time =   11218.45 ms /   106 tokens (  106.84 ms per token,     9.36 tokens per second)
+0.58.366.137 I slot print_timing: id  1 | task 76 |       total time =   12188.74 ms /   347 tokens
+0.58.366.138 I slot print_timing: id  1 | task 76 |    graphs reused =        175
+0.58.366.139 I slot print_timing: id  1 | task 76 |   graph reallocs =          2    /     0        (same size) / (changed size)
+0.58.366.198 I slot      release: id  1 | task 76 | stop processing: n_tokens = 346, truncated = 0
+DEBUG: raw chunk: {"choices":[{"finish_reason":"stop","index":0,"delta":{}}],"created":1793501306,"id":"chatcmpl-BKT5eAlyCevOgrWLPevX61uNy6nbfaXg","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk","timings":{"cache_n":0,"prompt_n":241,"prompt_ms":970.296,"prompt_per_token_ms":4.026124481327801,"prompt_per_second":248.3778146050277,"predicted_n":106,"predicted_ms":11218.446,"predicted_per_token_ms":106.84234285714285,"predicted_per_second":9.359585097615124}}
+DEBUG: choice fields role="" finish="stop" msgContent=""
+DEBUG: Stream received [DONE] signal, chunks=102, totalContent=422
+DEBUG: Stream completed, total chunks=102, total content=422 bytes
+DEBUG: Stream reasoning: 0 chunks, 0 chars (never fed back)
+2026/10/31 21:48:26 [rpc] GenerateCharacterResponse                     ok       12.249s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=2560
+0.58.381.668 I slot get_availabl: id  2 | task -1 | selected slot by LRU, n_tokens = 0, t_last = -1
+0.58.381.705 I slot launch_slot_: id  2 | task 185 | processing task, is_child = 0
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"role":"assistant","content":null}}],"created":1793501307,"id":"chatcmpl-53sIOPIp8KXyccPPIQq5O6k6e2vfezDG","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: choice fields role="assistant" finish="" msgContent=""
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n<think>"}}],"created":1793501307,"id":"chatcmpl-53sIOPIp8KXyccPPIQq5O6k6e2vfezDG","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 1, content len=8: "\n<think>"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n\n</think>"}}],"created":1793501307,"id":"chatcmpl-53sIOPIp8KXyccPPIQq5O6k6e2vfezDG","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 2, content len=10: "\n\n</think>"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n\nRain"}}],"created":1793501308,"id":"chatcmpl-53sIOPIp8KXyccPPIQq5O6k6e2vfezDG","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 3, content len=6: "\n\nRain"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'s"}}],"created":1793501308,"id":"chatcmpl-53sIOPIp8KXyccPPIQq5O6k6e2vfezDG","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 4, content len=2: "'s"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" coming"}}],"created":1793501308,"id":"chatcmpl-53sIOPIp8KXyccPPIQq5O6k6e2vfezDG","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 5, content len=7: " coming"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793501308,"id":"chatcmpl-53sIOPIp8KXyccPPIQq5O6k6e2vfezDG","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Watch"}}],"created":1793501308,"id":"chatcmpl-53sIOPIp8KXyccPPIQq5O6k6e2vfezDG","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" out"}}],"created":1793501308,"id":"chatcmpl-53sIOPIp8KXyccPPIQq5O6k6e2vfezDG","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793501308,"id":"chatcmpl-53sIOPIp8KXyccPPIQq5O6k6e2vfezDG","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+1.01.207.457 I slot print_timing: id  2 | task 185 | prompt eval time =    1484.23 ms /   348 tokens (    4.27 ms per token,   234.46 tokens per second)
+1.01.207.462 I slot print_timing: id  2 | task 185 |        eval time =    1286.69 ms /    13 tokens (  107.22 ms per token,     9.33 tokens per second)
+1.01.207.463 I slot print_timing: id  2 | task 185 |       total time =    2770.92 ms /   361 tokens
+1.01.207.464 I slot print_timing: id  2 | task 185 |    graphs reused =        186
+1.01.207.465 I slot print_timing: id  2 | task 185 |   graph reallocs =          3    /     0        (same size) / (changed size)
+1.01.207.507 I slot      release: id  2 | task 185 | stop processing: n_tokens = 360, truncated = 0
+DEBUG: raw chunk: {"choices":[{"finish_reason":"stop","index":0,"delta":{}}],"created":1793501308,"id":"chatcmpl-53sIOPIp8KXyccPPIQq5O6k6e2vfezDG","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk","timings":{"cache_n":0,"prompt_n":348,"prompt_ms":1484.233,"prompt_per_token_ms":4.265037356321839,"prompt_per_second":234.46453488097893,"predicted_n":13,"predicted_ms":1286.691,"predicted_per_token_ms":107.22425,"predicted_per_second":9.326248493227977}}
+DEBUG: choice fields role="" finish="stop" msgContent=""
+DEBUG: Stream received [DONE] signal, chunks=9, totalContent=45
+DEBUG: Stream completed, total chunks=9, total content=45 bytes
+DEBUG: Stream reasoning: 0 chunks, 0 chars (never fed back)
+2026/10/31 21:48:28 [rpc] GenerateCharacterResponse                     ok        2.837s
+2026/10/31 21:48:28 [rpc] SaveChat                                      ok           9ms
+2026/10/31 21:48:29 [rpc] SaveChatData                                  ok           4ms
+2026/10/31 21:49:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:49:12 [rpc] GetSDServerVersion                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=2560
+2.09.323.560 I slot get_availabl: id  3 | task -1 | selected slot by LRU, n_tokens = 0, t_last = -1
+2.09.323.586 I slot launch_slot_: id  3 | task 202 | processing task, is_child = 0
+2.12.762.340 I slot print_timing: id  3 | task 202 | prompt processing, n_tokens =    938, progress = 1.00, t =   3.36 s / 279.32 tokens per second
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"role":"assistant","content":null}}],"created":1793501380,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: choice fields role="assistant" finish="" msgContent=""
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n<think>"}}],"created":1793501381,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 1, content len=8: "\n<think>"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n\n</think>"}}],"created":1793501381,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 2, content len=10: "\n\n</think>"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n\nThe"}}],"created":1793501381,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 3, content len=5: "\n\nThe"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" sky"}}],"created":1793501381,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 4, content len=4: " sky"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'s"}}],"created":1793501381,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 5, content len=2: "'s"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" got"}}],"created":1793501381,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" that"}}],"created":1793501381,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" same"}}],"created":1793501381,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" grey"}}],"created":1793501382,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" look"}}],"created":1793501382,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" it"}}],"created":1793501382,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" had"}}],"created":1793501382,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" when"}}],"created":1793501382,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" my"}}],"created":1793501382,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" ma"}}],"created":1793501382,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" taught"}}],"created":1793501382,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" me"}}],"created":1793501382,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" to"}}],"created":1793501383,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" read"}}],"created":1793501383,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" the"}}],"created":1793501383,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" clouds"}}],"created":1793501383,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":","}}],"created":1793501383,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" so"}}],"created":1793501383,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" I"}}],"created":1793501383,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'m"}}],"created":1793501383,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" guessing"}}],"created":1793501383,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" another"}}],"created":1793501384,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" storm"}}],"created":1793501384,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'s"}}],"created":1793501384,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" brew"}}],"created":1793501384,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"in"}}],"created":1793501384,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'"}}],"created":1793501384,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" before"}}],"created":1793501384,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" we"}}],"created":1793501384,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" know"}}],"created":1793501384,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" it"}}],"created":1793501385,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793501385,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" Just"}}],"created":1793501385,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" keep"}}],"created":1793501385,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" your"}}],"created":1793501385,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" coats"}}],"created":1793501385,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" tight"}}],"created":1793501385,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" and"}}],"created":1793501385,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" your"}}],"created":1793501385,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" eyes"}}],"created":1793501386,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" on"}}],"created":1793501386,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" the"}}],"created":1793501386,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" water"}}],"created":1793501386,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":";"}}],"created":1793501386,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" that"}}],"created":1793501386,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: Stream chunk 50, content len=5: " that"
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" tide"}}],"created":1793501386,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" doesn"}}],"created":1793501386,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'t"}}],"created":1793501386,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" care"}}],"created":1793501387,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" if"}}],"created":1793501387,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" you"}}],"created":1793501387,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"'re"}}],"created":1793501387,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" rich"}}],"created":1793501387,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" or"}}],"created":1793501387,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" poor"}}],"created":1793501387,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":","}}],"created":1793501387,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" she"}}],"created":1793501387,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" just"}}],"created":1793501388,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" takes"}}],"created":1793501388,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" what"}}],"created":1793501388,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" she"}}],"created":1793501388,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" can"}}],"created":1793501388,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" get"}}],"created":1793501388,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+DEBUG: raw chunk: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793501388,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk"}
+2.21.097.488 I slot print_timing: id  3 | task 202 | prompt eval time =    3770.05 ms /   942 tokens (    4.00 ms per token,   249.86 tokens per second)
+2.21.097.494 I slot print_timing: id  3 | task 202 |        eval time =    7923.27 ms /    73 tokens (  110.05 ms per token,     9.09 tokens per second)
+2.21.097.495 I slot print_timing: id  3 | task 202 |       total time =   11693.32 ms /  1015 tokens
+2.21.097.496 I slot print_timing: id  3 | task 202 |    graphs reused =        257
+2.21.097.497 I slot print_timing: id  3 | task 202 |   graph reallocs =          6    /     0        (same size) / (changed size)
+2.21.097.589 I slot      release: id  3 | task 202 | stop processing: n_tokens = 1014, truncated = 0
+DEBUG: raw chunk: {"choices":[{"finish_reason":"stop","index":0,"delta":{}}],"created":1793501388,"id":"chatcmpl-BNeei5Rjuaj71jKfNYtrwm8WpWMoMtAu","model":"E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf","system_fingerprint":"b12015-a34de8618","object":"chat.completion.chunk","timings":{"cache_n":0,"prompt_n":942,"prompt_ms":3770.049,"prompt_per_token_ms":4.0021751592356685,"prompt_per_second":249.86412643443094,"predicted_n":73,"predicted_ms":7923.274,"predicted_per_token_ms":110.04547222222223,"predicted_per_second":9.08715260888365}}
+DEBUG: choice fields role="" finish="stop" msgContent=""
+DEBUG: Stream received [DONE] signal, chunks=69, totalContent=295
+DEBUG: Stream completed, total chunks=69, total content=295 bytes
+DEBUG: Stream reasoning: 0 chunks, 0 chars (never fed back)
+2026/10/31 21:49:48 [rpc] SendMessageStream                             ok       11.786s
+2026/10/31 21:49:59 [rpc] SaveChatData                                  ok           4ms
+2026/10/31 21:50:12 [rpc] GetAppDiagnostics                             ok           1ms
+2026/10/31 21:50:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:50:50 [rpc] GetSettings                                   ok            0s
+2026/10/31 21:50:50 [rpc] SetSettings                                   ok           2ms
+2026/10/31 21:50:50 [rpc] GetSettings                                   ok            0s
+INFO: llama-server killed, model memory freed
+[ResourceManager] GetManager called
+[ResourceManager] GetManager called
+2026/10/31 21:50:51 [rpc] UnloadModel                                   ok         651ms
+2026/10/31 21:50:51 [rpc] IsModelLoaded                                 ok           6ms
+2026/10/31 21:51:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:51:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:52:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:52:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:53:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:53:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:54:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:54:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:55:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:55:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:56:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:56:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:57:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:57:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:58:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:58:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 21:59:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:59:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 22:00:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 22:00:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 22:00:48 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:48 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:48 [rpc] GetLLMModels                                  ok           1ms
+2026/10/31 22:00:48 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:48 [rpc] IsModelLoaded                                 ok          10ms
+2026/10/31 22:00:48 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=2560
+2026/10/31 22:00:48 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:00:48 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:00:48 [rpc] GetMemories                                   ok            0s
+2026/10/31 22:00:48 [rpc] GetActiveChatMeta                             ok           1ms
+2026/10/31 22:00:48 [rpc] GetActiveChatMeta                             ok           1ms
+2026/10/31 22:00:48 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:48 [rpc] GetLLMModels                                  ok           1ms
+2026/10/31 22:00:48 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:00:48 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:48 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=2560
+2026/10/31 22:00:48 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:00:48 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:00:48 [rpc] GetMemories                                   ok           1ms
+2026/10/31 22:00:48 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:48 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:48 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:48 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:00:48 [rpc] GetLLMModels                                  ok           1ms
+2026/10/31 22:00:48 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:48 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=2560
+2026/10/31 22:00:48 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:00:48 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:00:48 [rpc] GetMemories                                   ok            0s
+2026/10/31 22:00:48 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:48 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:48 [rpc] SetSettings                                   ok           2ms
+2026/10/31 22:00:48 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:48 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:00:48 [rpc] GetLLMModels                                  ok           1ms
+2026/10/31 22:00:48 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:48 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=2560
+2026/10/31 22:00:48 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:00:48 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:00:48 [rpc] GetMemories                                   ok           1ms
+2026/10/31 22:00:48 [rpc] GetActiveChatMeta                             ok           1ms
+2026/10/31 22:00:48 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:48 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:00:48 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:49 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:00:49 [rpc] GetLLMModels                                  ok           1ms
+2026/10/31 22:00:49 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:49 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=2560
+2026/10/31 22:00:49 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:00:49 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:00:49 [rpc] GetMemories                                   ok            0s
+2026/10/31 22:00:49 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:49 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:49 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:00:49 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:49 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:00:49 [rpc] GetLLMModels                                  ok           1ms
+2026/10/31 22:00:49 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:49 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=2560
+2026/10/31 22:00:49 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:00:49 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:00:49 [rpc] GetMemories                                   ok            0s
+2026/10/31 22:00:49 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:49 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:49 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:00:49 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:49 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:00:49 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:00:49 [rpc] GetLLMModels                                  ok            0s
+2026/10/31 22:00:49 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:49 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=2560
+2026/10/31 22:00:49 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:00:49 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:00:49 [rpc] GetMemories                                   ok            0s
+2026/10/31 22:00:49 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:49 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:49 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:00:49 [rpc] GetLLMModels                                  ok            0s
+2026/10/31 22:00:49 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:49 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=2560
+2026/10/31 22:00:49 [rpc] GetEffectiveSampler                           ok           1ms
+2026/10/31 22:00:49 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:00:49 [rpc] GetMemories                                   ok            0s
+2026/10/31 22:00:49 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:49 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:49 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:00:49 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:49 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:49 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:00:49 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:49 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:50 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:00:50 [rpc] GetLLMModels                                  ok           1ms
+2026/10/31 22:00:50 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:50 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.60 top_p=0.95 top_k=20 min_p=0.00 repeat=1.10 n_predict=512
+2026/10/31 22:00:50 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:00:50 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:00:50 [rpc] GetMemories                                   ok            0s
+2026/10/31 22:00:50 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:50 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:50 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:50 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:50 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:51 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:00:51 [rpc] GetLLMModels                                  ok            0s
+2026/10/31 22:00:51 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:51 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.60 top_p=0.95 top_k=20 min_p=0.00 repeat=1.10 n_predict=512
+2026/10/31 22:00:51 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:00:51 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:00:51 [rpc] GetMemories                                   ok           1ms
+2026/10/31 22:00:51 [rpc] GetActiveChatMeta                             ok           1ms
+2026/10/31 22:00:51 [rpc] GetActiveChatMeta                             ok           1ms
+2026/10/31 22:00:51 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:51 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:00:51 [rpc] GetLLMModels                                  ok            0s
+2026/10/31 22:00:51 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:51 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.60 top_p=0.95 top_k=20 min_p=0.00 repeat=1.10 n_predict=512
+2026/10/31 22:00:51 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:00:51 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:00:51 [rpc] GetMemories                                   ok           1ms
+2026/10/31 22:00:51 [rpc] GetActiveChatMeta                             ok           1ms
+2026/10/31 22:00:51 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:51 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:00:51 [rpc] GetLLMModels                                  ok            0s
+2026/10/31 22:00:51 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:51 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.60 top_p=0.95 top_k=20 min_p=0.00 repeat=1.10 n_predict=512
+2026/10/31 22:00:51 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:00:51 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:00:51 [rpc] GetMemories                                   ok           1ms
+2026/10/31 22:00:51 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:51 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:52 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:00:52 [rpc] GetLLMModels                                  ok           1ms
+2026/10/31 22:00:52 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:52 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.60 top_p=0.95 top_k=20 min_p=0.00 repeat=1.10 n_predict=512
+2026/10/31 22:00:52 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:00:52 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:00:52 [rpc] GetMemories                                   ok           1ms
+2026/10/31 22:00:52 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:52 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:52 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:00:52 [rpc] GetLLMModels                                  ok            0s
+2026/10/31 22:00:52 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:52 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.60 top_p=0.95 top_k=20 min_p=0.00 repeat=1.10 n_predict=512
+2026/10/31 22:00:52 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:00:52 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:00:52 [rpc] GetMemories                                   ok            0s
+2026/10/31 22:00:52 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:52 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:52 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:52 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:00:52 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:00:52 [rpc] GetLLMModels                                  ok            0s
+2026/10/31 22:00:52 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:52 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.60 top_p=0.95 top_k=20 min_p=0.00 repeat=1.10 n_predict=512
+2026/10/31 22:00:52 [rpc] GetEffectiveSampler                           ok           1ms
+2026/10/31 22:00:52 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:00:52 [rpc] GetMemories                                   ok            0s
+2026/10/31 22:00:52 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:52 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:00:52 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:00:53 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:55 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:55 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:55 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:55 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:55 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:55 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:55 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:56 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:56 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:56 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:56 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:56 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:56 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:56 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:56 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:56 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:57 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:57 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:58 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:58 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:58 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:58 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:58 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:58 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:59 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:59 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:59 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:59 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:59 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:59 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:59 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:00:59 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:00 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:00 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:00 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:10 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:19 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:20 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:20 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:01:20 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:02:01 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 22:02:01 [rpc] IsModelLoaded                                 ok           9ms
+2026/10/31 22:02:01 [rpc] GetLLMModels                                  ok            0s
+2026/10/31 22:02:01 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:02:01 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.60 top_p=0.95 top_k=20 min_p=0.00 repeat=1.10 n_predict=512
+2026/10/31 22:02:01 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:02:01 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:02:01 [rpc] GetMemories                                   ok            0s
+2026/10/31 22:02:01 [rpc] GetActiveChatMeta                             ok           1ms
+2026/10/31 22:02:01 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:02:01 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:02:01 [rpc] GetLLMModels                                  ok            0s
+2026/10/31 22:02:01 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:02:01 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.60 top_p=0.95 top_k=20 min_p=0.00 repeat=1.10 n_predict=512
+2026/10/31 22:02:01 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:02:01 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:02:01 [rpc] GetMemories                                   ok            0s
+2026/10/31 22:02:01 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:02:01 [rpc] GetActiveChatMeta                             ok           1ms
+2026/10/31 22:02:01 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:02:01 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:02:01 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 22:02:01 [rpc] SaveChat                                      FAILED      12ms  failed to save characters.json: open C:\Users\StoneWolfPC\AppData\Roaming\HOWLChat\chats\2026-11-01T02-42-41Z\characters.json.tmp: The process cannot access the file because it is being used by another process.
+2026/10/31 22:02:01 [rpc] SaveChatData                                  ok          27ms
+2026/10/31 22:02:01 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:02:02 [rpc] GetLLMModels                                  ok           1ms
+2026/10/31 22:02:02 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 22:02:02 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:02:02 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.60 top_p=0.95 top_k=20 min_p=0.00 repeat=1.10 n_predict=512
+2026/10/31 22:02:02 [rpc] GetEffectiveSampler                           ok           1ms
+2026/10/31 22:02:02 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:02:02 [rpc] GetMemories                                   ok           1ms
+2026/10/31 22:02:02 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:02:02 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:02:02 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/10/31 22:02:02 [rpc] AddCharacterToChat                            ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/10/31 22:02:02 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/10/31 22:02:02 [rpc] AddCharacterToChat                            ok            0s
+2026/10/31 22:02:02 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:02:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 22:02:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 22:02:12 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:02:32 [rpc] SaveChatData                                  ok           6ms
+2026/10/31 22:02:41 [rpc] SaveChatData                                  ok          10ms
+2026/10/31 22:02:41 [rpc] SaveChat                                      ok          11ms
+2026/10/31 22:02:41 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:02:41 [rpc] GetLLMModels                                  ok           1ms
+2026/10/31 22:02:41 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:02:41 [rpc] IsModelLoaded                                 ok           7ms
+2026/10/31 22:02:41 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.60 top_p=0.95 top_k=20 min_p=0.00 repeat=1.10 n_predict=512
+2026/10/31 22:02:41 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:02:41 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:02:41 [rpc] GetMemories                                   ok           1ms
+2026/10/31 22:02:41 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:02:41 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:02:41 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/10/31 22:02:41 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/10/31 22:02:41 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/10/31 22:02:41 [rpc] AddCharacterToChat                            ok            0s
+2026/10/31 22:02:41 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:02:48 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:02:53 [rpc] GetChatList                                   ok           7ms
+2026/10/31 22:02:57 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:02:57 [rpc] GetLLMModels                                  ok           1ms
+2026/10/31 22:02:57 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:02:57 [rpc] IsModelLoaded                                 ok           6ms
+2026/10/31 22:02:57 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.60 top_p=0.95 top_k=20 min_p=0.00 repeat=1.10 n_predict=512
+2026/10/31 22:02:57 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:02:57 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:02:57 [rpc] GetMemories                                   ok            0s
+2026/10/31 22:02:57 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:02:57 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:02:57 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/10/31 22:02:57 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/10/31 22:02:57 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/10/31 22:02:57 [rpc] AddCharacterToChat                            ok            0s
+2026/10/31 22:02:58 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:03:07 [rpc] SaveChatData                                  ok          11ms
+2026/10/31 22:03:07 [rpc] SaveChat                                      ok          11ms
+2026/10/31 22:03:07 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:03:07 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:03:07 [rpc] GetLLMModels                                  ok           1ms
+2026/10/31 22:03:07 [rpc] IsModelLoaded                                 ok           6ms
+2026/10/31 22:03:07 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.60 top_p=0.95 top_k=20 min_p=0.00 repeat=1.10 n_predict=512
+2026/10/31 22:03:07 [rpc] GetEffectiveSampler                           ok            0s
+2026/10/31 22:03:07 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:03:07 [rpc] GetMemories                                   ok            0s
+2026/10/31 22:03:07 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:03:07 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:03:07 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/10/31 22:03:07 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/10/31 22:03:07 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/10/31 22:03:07 [rpc] AddCharacterToChat                            ok            0s
+2026/10/31 22:03:07 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:03:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 22:03:12 [rpc] GetSDServerVersion                            ok            0s
+2026/10/31 22:03:16 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:03:28 [rpc] SaveChatData                                  ok           7ms
+2026/10/31 22:03:37 [rpc] SaveChatData                                  ok           6ms
+2026/10/31 22:03:44 [rpc] SaveChatData                                  ok           9ms
+2026/10/31 22:03:44 [rpc] SaveChat                                      ok          11ms
+2026/10/31 22:03:44 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:03:44 [rpc] GetSettings                                   ok            0s
+2026/10/31 22:03:44 [rpc] GetLLMModels                                  ok           1ms
+2026/10/31 22:03:44 [rpc] IsModelLoaded                                 ok           7ms
+2026/10/31 22:03:44 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="qwen35" source="qwen3 defaults (Qwen3 model card (thinking mode))" temp=0.60 top_p=0.95 top_k=20 min_p=0.00 repeat=1.10 n_predict=512
+2026/10/31 22:03:44 [rpc] GetEffectiveSampler                           ok           1ms
+2026/10/31 22:03:44 [rpc] GetModelOptions                               ok            0s
+2026/10/31 22:03:44 [rpc] GetMemories                                   ok           1ms
+2026/10/31 22:03:44 [rpc] GetActiveChatMeta                             ok           1ms
+2026/10/31 22:03:44 [rpc] GetActiveChatMeta                             ok            0s
+2026/10/31 22:03:44 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/10/31 22:03:44 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/10/31 22:03:44 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/10/31 22:03:44 [rpc] AddCharacterToChat                            ok            0s
+2026/10/31 22:03:44 [rpc] SetSettings                                   ok           1ms
+2026/10/31 22:03:51 [rpc] SetSettings                                   ok           1ms

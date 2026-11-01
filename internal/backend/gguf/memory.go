@@ -253,14 +253,39 @@ func ReduceContext(current int) int {
 	return next
 }
 
+// ValidationLevel describes how concerning a spawn validation result is.
+type ValidationLevel int
+
+const (
+	ValidationSafe     ValidationLevel = iota // Fits comfortably within hardware
+	ValidationWarning                         // May be tight; user should be informed
+	ValidationCritical                        // Likely to OOM; strongly discouraged
+)
+
+// SpawnValidationResult is returned by ValidateSpawn. It never hard-blocks;
+// callers decide whether to proceed, warn, or block based on Level and user policy.
+type SpawnValidationResult struct {
+	Level        ValidationLevel
+	EstimatedGPU int64
+	EstimatedRAM int64
+	FreeVRAM     int64
+	FreeRAM      int64
+	Message      string
+	Suggestion   string
+}
+
 // ValidateSpawn checks whether the given settings are safe to start a server with.
-// It returns an error if the settings are impossible (would OOM or use invalid values).
-func ValidateSpawn(spec *types.ArchitectureSpec, ctxSize, gpuLayers, batchSize int, freeVRAMMB, freeRAMMB int64) error {
+// It returns a result with a level instead of hard-blocking. Callers in the UI
+// layer should present the message to the user and let them decide.
+func ValidateSpawn(spec *types.ArchitectureSpec, ctxSize, gpuLayers, batchSize int, freeVRAMMB, freeRAMMB int64) SpawnValidationResult {
 	if spec == nil {
-		return fmt.Errorf("no architecture spec available — cannot validate spawn")
+		return SpawnValidationResult{
+			Level:      ValidationCritical,
+			Message:    "no architecture spec available — cannot estimate memory",
+			Suggestion: "Try reloading the model or verify the GGUF file is not corrupted.",
+		}
 	}
 	if spec.Layers <= 0 {
-		// Metadata missing layers — estimate from file size so we don't reject valid models
 		if spec.FileSizeBytes > 0 {
 			estParams := estimateParamsFromFileSize(spec.FileSizeBytes, spec.QuantType)
 			spec.Layers = EstimateLayers(float64(estParams))
@@ -287,35 +312,97 @@ func ValidateSpawn(spec *types.ArchitectureSpec, ctxSize, gpuLayers, batchSize i
 		}
 	}
 	if spec.Layers <= 0 {
-		return fmt.Errorf("architecture spec has zero layers — cannot estimate memory (file_size=%d)", spec.FileSizeBytes)
+		return SpawnValidationResult{
+			Level:      ValidationCritical,
+			Message:    fmt.Sprintf("architecture spec has zero layers — cannot estimate memory (file_size=%d)", spec.FileSizeBytes),
+			Suggestion: "The model metadata may be incomplete. Try a different GGUF file.",
+		}
 	}
 	if ctxSize <= 0 {
-		return fmt.Errorf("context size must be > 0, got %d", ctxSize)
+		return SpawnValidationResult{
+			Level:      ValidationCritical,
+			Message:    fmt.Sprintf("context size must be > 0, got %d", ctxSize),
+			Suggestion: "Set context_size to a positive value (e.g., 4096).",
+		}
 	}
 	if gpuLayers < 0 || gpuLayers > spec.Layers {
-		return fmt.Errorf("gpu_layers %d out of range [0, %d]", gpuLayers, spec.Layers)
+		return SpawnValidationResult{
+			Level:      ValidationCritical,
+			Message:    fmt.Sprintf("gpu_layers %d out of range [0, %d]", gpuLayers, spec.Layers),
+			Suggestion: "Set gpu_layers between 0 and the model's layer count.",
+		}
 	}
 	if batchSize <= 0 {
-		return fmt.Errorf("batch_size must be > 0, got %d", batchSize)
+		return SpawnValidationResult{
+			Level:      ValidationCritical,
+			Message:    fmt.Sprintf("batch_size must be > 0, got %d", batchSize),
+			Suggestion: "Set batch_size to a positive value (e.g., 512).",
+		}
 	}
 
 	model := NewMemoryModel(spec)
 	est := model.Estimate(ctxSize, gpuLayers, batchSize)
 
-	// Hard reject if any single component exceeds 90% of available memory
-	// (leaving headroom for OS and other processes)
+	// If detection reports impossibly low free memory (< 256 MB), the detection
+	// itself is likely wrong. Downgrade to Warning so the user isn't blocked.
+	detectionSuspicious := freeVRAMMB < 256 && freeRAMMB < 512
+
+	var result SpawnValidationResult
+	result.EstimatedGPU = est.GPUMB
+	result.EstimatedRAM = est.RAMMB
+	result.FreeVRAM = freeVRAMMB
+	result.FreeRAM = freeRAMMB
+
+	// Check VRAM — allow up to 110% of reported free as a safety buffer
 	if est.GPUMB > int64(float64(freeVRAMMB)*1.1) {
-		return fmt.Errorf(
-			"spawn would exceed VRAM: estimated %d MB GPU > %d MB free (%d layers, %d context). "+
-				"Reduce gpu_layers or context_size.",
-			est.GPUMB, freeVRAMMB, gpuLayers, ctxSize)
-	}
-	if est.RAMMB > int64(float64(freeRAMMB)*1.1) {
-		return fmt.Errorf(
-			"spawn would exceed RAM: estimated %d MB RAM > %d MB free (%d layers, %d context). "+
-				"Reduce context_size or use GPU offloading.",
-			est.RAMMB, freeRAMMB, gpuLayers, ctxSize)
+		if detectionSuspicious {
+			result.Level = ValidationWarning
+			result.Message = fmt.Sprintf(
+				"VRAM detection looks suspicious (reported %d MB free). Model needs ~%d MB GPU. "+
+					"This may be a false alarm from GPU detection failing to read your real VRAM.",
+				freeVRAMMB, est.GPUMB)
+			result.Suggestion = "You can proceed (auto-clamp will try to fit), or set gpu_layers lower. " +
+				"If your GPU has more VRAM than detected, detection may be failing."
+		} else {
+			result.Level = ValidationCritical
+			result.Message = fmt.Sprintf(
+				"Model needs ~%d MB GPU but only %d MB VRAM is free (%d layers, %d context).",
+				est.GPUMB, freeVRAMMB, gpuLayers, ctxSize)
+			result.Suggestion = "Reduce gpu_layers or context_size, or unload other GPU models."
+		}
+		return result
 	}
 
+	// Check RAM
+	if est.RAMMB > int64(float64(freeRAMMB)*1.1) {
+		if detectionSuspicious {
+			result.Level = ValidationWarning
+			result.Message = fmt.Sprintf(
+				"RAM detection looks suspicious (reported %d MB free). Model needs ~%d MB RAM.",
+				freeRAMMB, est.RAMMB)
+			result.Suggestion = "You can proceed (auto-clamp will try to fit), or reduce context_size."
+		} else {
+			result.Level = ValidationCritical
+			result.Message = fmt.Sprintf(
+				"Model needs ~%d MB RAM but only %d MB is free (%d layers, %d context).",
+				est.RAMMB, freeRAMMB, gpuLayers, ctxSize)
+			result.Suggestion = "Reduce context_size or use GPU offloading."
+		}
+		return result
+	}
+
+	result.Level = ValidationSafe
+	result.Message = fmt.Sprintf("Memory OK — estimated %d MB GPU / %d MB RAM (free: %d / %d MB)",
+		est.GPUMB, est.RAMMB, freeVRAMMB, freeRAMMB)
+	return result
+}
+
+// ValidateSpawnLegacy returns an error for callers that still expect the old behavior.
+// New code should use ValidateSpawn and handle the result struct.
+func ValidateSpawnLegacy(spec *types.ArchitectureSpec, ctxSize, gpuLayers, batchSize int, freeVRAMMB, freeRAMMB int64) error {
+	res := ValidateSpawn(spec, ctxSize, gpuLayers, batchSize, freeVRAMMB, freeRAMMB)
+	if res.Level == ValidationCritical {
+		return fmt.Errorf("%s %s", res.Message, res.Suggestion)
+	}
 	return nil
 }

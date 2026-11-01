@@ -99,12 +99,16 @@ func detectViaNvidiaSMI() []GPUInfo {
 	}
 }
 
+// minUsableVRAMBytes filters out integrated GPUs and virtual adapters.
+const minUsableVRAMBytes = 512 * 1024 * 1024
+
 func detectViaRegistry() []GPUInfo {
 	classes := []string{
 		`{4d36e968-e325-11ce-bfc1-08002be10318}`,
 		`{4d36e967-e325-11ce-bfc1-08002be10318}`,
 	}
 	var gpus []GPUInfo
+	var foundDiscrete bool
 	for _, classGUID := range classes {
 		keyPath := `SYSTEM\CurrentControlSet\Control\Class\` + classGUID
 		k, err := registry.OpenKey(registry.LOCAL_MACHINE, keyPath, registry.READ)
@@ -118,22 +122,35 @@ func detectViaRegistry() []GPUInfo {
 				continue
 			}
 			driverDesc, _, _ := sub.GetStringValue("DriverDesc")
-			// Try HardwareInformation.qwMemorySize (hex string, in bytes)
 			memStr, _, _ := sub.GetStringValue("HardwareInformation.qwMemorySize")
 			sub.Close()
 			if driverDesc == "" {
 				continue
 			}
+			lowerDesc := strings.ToLower(driverDesc)
+			isIntelIGP := strings.Contains(lowerDesc, "intel") &&
+				(strings.Contains(lowerDesc, "uhd") ||
+					strings.Contains(lowerDesc, "iris") ||
+					strings.Contains(lowerDesc, "hd graphics"))
+
 			var totalBytes int64
 			if memStr != "" {
-				memStr = strings.TrimSpace(memStr)
-				if strings.HasPrefix(memStr, "0x") {
-					memStr = memStr[2:]
-				}
+				memStr = strings.TrimPrefix(strings.TrimSpace(memStr), "0x")
 				n, err := strconv.ParseInt(memStr, 16, 64)
 				if err == nil && n > 0 {
 					totalBytes = n
 				}
+			}
+			// If registry lacks memory size but we know the GPU series, estimate it
+			if totalBytes == 0 && !isIntelIGP {
+				totalBytes = estimateVRAMFromGPUName(driverDesc)
+			}
+			if totalBytes < minUsableVRAMBytes {
+				continue
+			}
+			// If we already found a discrete GPU, skip Intel integrated
+			if foundDiscrete && isIntelIGP {
+				continue
 			}
 			used := estimateUsedVRAM()
 			gpus = append(gpus, GPUInfo{
@@ -144,6 +161,9 @@ func detectViaRegistry() []GPUInfo {
 				UsedVRAMBytes:  used,
 				FreeVRAMBytes:  maxInt64(0, totalBytes-used),
 			})
+			if !isIntelIGP {
+				foundDiscrete = true
+			}
 		}
 		k.Close()
 	}
@@ -151,6 +171,42 @@ func detectViaRegistry() []GPUInfo {
 		fmt.Printf("[resource] GPU detected via registry: %s (%d MB)\n", gpus[0].Name, gpus[0].TotalVRAMBytes/1024/1024)
 	}
 	return gpus
+}
+
+// estimateVRAMFromGPUName guesses VRAM from GPU model name patterns.
+func estimateVRAMFromGPUName(name string) int64 {
+	lower := strings.ToLower(name)
+	switch {
+	case strings.Contains(lower, "rtx 4090"):
+		return 24 * 1024 * 1024 * 1024
+	case strings.Contains(lower, "rtx 4080"), strings.Contains(lower, "rtx 3090"):
+		return 16 * 1024 * 1024 * 1024
+	case strings.Contains(lower, "rtx 4070"), strings.Contains(lower, "rtx 3080"):
+		return 12 * 1024 * 1024 * 1024
+	case strings.Contains(lower, "rtx 4060"), strings.Contains(lower, "rtx 3070"):
+		return 8 * 1024 * 1024 * 1024
+	case strings.Contains(lower, "rtx 3060"), strings.Contains(lower, "gtx 1080"):
+		return 8 * 1024 * 1024 * 1024
+	case strings.Contains(lower, "gtx 1070"), strings.Contains(lower, "gtx 1660"):
+		return 8 * 1024 * 1024 * 1024
+	case strings.Contains(lower, "gtx 1060"):
+		return 6 * 1024 * 1024 * 1024
+	case strings.Contains(lower, "rtx 50"), strings.Contains(lower, "rtx 40"),
+		strings.Contains(lower, "rtx 30"):
+		return 8 * 1024 * 1024 * 1024
+	case strings.Contains(lower, "radeon rx 79"), strings.Contains(lower, "radeon rx 78"):
+		return 24 * 1024 * 1024 * 1024
+	case strings.Contains(lower, "radeon rx 69"), strings.Contains(lower, "radeon rx 68"):
+		return 16 * 1024 * 1024 * 1024
+	case strings.Contains(lower, "radeon rx 67"), strings.Contains(lower, "radeon rx 66"):
+		return 12 * 1024 * 1024 * 1024
+	case strings.Contains(lower, "radeon rx 6650"), strings.Contains(lower, "radeon rx 6600"):
+		return 8 * 1024 * 1024 * 1024
+	case strings.Contains(lower, "radeon rx 5700"), strings.Contains(lower, "radeon rx 5600"):
+		return 8 * 1024 * 1024 * 1024
+	default:
+		return 0
+	}
 }
 
 func detectViaWMI() ([]GPUInfo, error) {

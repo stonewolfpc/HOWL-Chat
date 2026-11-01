@@ -15,7 +15,7 @@ body.theme-light .scenario-content,
 body.theme-light .lorebook-content,
 body.theme-light .story-tools-content,
 body.theme-light .image-gen-content {
-    background: var(--surface-secondary);
+    /* canvas comes from body; no per-region repaint */
     color: var(--text-primary);
 }
 
@@ -31,7 +31,7 @@ body.theme-light .real-settings-header,
 body.theme-light .sidebar-header,
 body.theme-light .panel-header,
 body.theme-light .section-header {
-    background: var(--surface-tertiary);
+    /* chrome inherits --shell-nav-bg / --shell-aside-bg */
     color: var(--text-primary);
     border-color: var(--border-primary);
 }

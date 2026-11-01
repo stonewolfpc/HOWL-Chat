@@ -67,7 +67,7 @@
     width: 100%;
     height: 6px;
     border-radius: 3px;
-    background: var(--border-secondary);
+    background: var(--surface-hover);
     outline: none;
     margin: 8px 0;
 }

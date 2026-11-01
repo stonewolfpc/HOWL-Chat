@@ -33,6 +33,8 @@ type Entry struct {
 	Family       string              `json:"family"`
 	Format       string              `json:"format"`
 	SizeMB       float64             `json:"size_mb"`
+	FileSize     int64               `json:"file_size,omitempty"`
+	ModTimeNS    int64               `json:"mod_time_ns,omitempty"`
 	Files        map[string]string   `json:"files,omitempty"`
 	Recommended  scanner.Recommended `json:"recommended"`
 	RegisteredAt time.Time           `json:"registered_at"`
@@ -44,6 +46,9 @@ type Registry struct {
 	configDir string
 	entries   map[string]Entry  // keyed on absolute path
 	dirs      map[string]string // dir path → asset type ("llm", "tts", "image")
+	// needsSave is set when load() dropped entries, so the healing is written
+	// back instead of being repeated (and re-injected) on every start.
+	needsSave bool
 }
 
 // New creates a Registry that persists to configDir/model-registry.json.
@@ -60,6 +65,12 @@ func New(configDir string) (*Registry, error) {
 	if err := r.loadDirs(); err != nil {
 		return nil, err
 	}
+	if r.needsSave {
+		if err := r.save(); err != nil {
+			return nil, err
+		}
+		r.needsSave = false
+	}
 	return r, nil
 }
 
@@ -75,6 +86,63 @@ func (r *Registry) MergeEntries(entries []Entry) error {
 		r.entries[e.Path] = e
 	}
 	return r.save()
+}
+
+// Lookup returns the registered entry for an absolute path, if present.
+func (r *Registry) Lookup(path string) (Entry, bool) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	e, ok := r.entries[path]
+	return e, ok
+}
+
+// SyncDir merges the entries just scanned out of dir and drops any registered
+// entry under that directory whose file was not seen on disk. That makes a scan
+// a true directory sync: new files are added, vanished files are removed, and
+// unchanged files are reused without re-reading their GGUF headers.
+func (r *Registry) SyncDir(dir string, entries []Entry, seen map[string]struct{}) (int, int, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	added := 0
+	for _, e := range entries {
+		if e.RegisteredAt.IsZero() {
+			e.RegisteredAt = time.Now()
+		}
+		if prev, ok := r.entries[e.Path]; !ok || !sameIdentity(prev, e) {
+			added++
+		}
+		r.entries[e.Path] = e
+	}
+
+	removed := 0
+	for path := range r.entries {
+		if !IsUnderDir(path, dir) {
+			continue
+		}
+		if _, ok := seen[path]; ok {
+			continue
+		}
+		// Only drop entries whose file is actually gone. A file the scanner
+		// chose not to classify (unknown family, unreadable header) is still on
+		// disk and must stay listed rather than silently disappearing.
+		if _, err := os.Stat(path); err == nil {
+			continue
+		}
+		delete(r.entries, path)
+		removed++
+	}
+
+	if err := r.save(); err != nil {
+		return added, removed, err
+	}
+	return added, removed, nil
+}
+
+// sameIdentity reports whether two entries describe the same unchanged file.
+func sameIdentity(a, b Entry) bool {
+	return a.FileSize != 0 && a.FileSize == b.FileSize &&
+		a.ModTimeNS == b.ModTimeNS && a.Type == b.Type && a.Family == b.Family
 }
 
 // ByType returns a snapshot of all live entries of the given asset type
@@ -111,6 +179,30 @@ func (r *Registry) RegisteredDirs() map[string]string {
 	return out
 }
 
+// UnregisterDir removes a directory from the remembered scan locations and
+// also removes all registry entries whose path starts with that directory.
+func (r *Registry) UnregisterDir(dir string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	// Match regardless of case or trailing separators so a directory added by
+	// the picker can always be removed by path. Only the registry forgets it —
+	// the files on disk are never touched.
+	for registered := range r.dirs {
+		if IsUnderDir(registered, dir) && IsUnderDir(dir, registered) {
+			delete(r.dirs, registered)
+		}
+	}
+	for path := range r.entries {
+		if IsUnderDir(path, dir) {
+			delete(r.entries, path)
+		}
+	}
+	if err := r.saveDirs(); err != nil {
+		return err
+	}
+	return r.save()
+}
+
 // Merge adds or updates entries from a scanner.ModelIndex.
 // Existing entries for the same path are overwritten with fresh metadata.
 func (r *Registry) Merge(idx scanner.ModelIndex) error {
@@ -125,12 +217,39 @@ func (r *Registry) Merge(idx scanner.ModelIndex) error {
 			Family:       string(e.Family),
 			Format:       e.Format,
 			SizeMB:       e.SizeMB,
+			FileSize:     e.FileSize,
+			ModTimeNS:    e.ModTimeNS,
 			Files:        e.Files,
 			Recommended:  e.Recommended,
 			RegisteredAt: time.Now(),
 		}
 	}
 	return r.save()
+}
+
+// SyncIndex merges a scanned image index for dir and drops registry entries
+// under that directory whose files are gone from disk, mirroring the behaviour
+// of a chat-model directory sync.
+func (r *Registry) SyncIndex(dir string, idx scanner.ModelIndex) (int, int, error) {
+	entries := make([]Entry, 0)
+	seen := make(map[string]struct{})
+	for _, ae := range collectEntries(idx) {
+		entries = append(entries, Entry{
+			Name:         ae.Name,
+			Path:         ae.Path,
+			Type:         string(ae.Type),
+			Family:       string(ae.Family),
+			Format:       ae.Format,
+			SizeMB:       ae.SizeMB,
+			FileSize:     ae.FileSize,
+			ModTimeNS:    ae.ModTimeNS,
+			Files:        ae.Files,
+			Recommended:  ae.Recommended,
+			RegisteredAt: time.Now(),
+		})
+		seen[ae.Path] = struct{}{}
+	}
+	return r.SyncDir(dir, entries, seen)
 }
 
 // All returns a snapshot of all known entries, pruning any whose file has
@@ -168,7 +287,11 @@ func (r *Registry) Remove(path string) error {
 // ToModelIndex converts the current registry snapshot back into a ModelIndex
 // so existing engine/scanner code can consume it without changes.
 func (r *Registry) ToModelIndex() scanner.ModelIndex {
-	entries := r.All()
+	return buildModelIndex(r.All())
+}
+
+// buildModelIndex groups registry entries into the scanner's index buckets.
+func buildModelIndex(entries []Entry) scanner.ModelIndex {
 	var idx scanner.ModelIndex
 	for _, e := range entries {
 		ae := scanner.AssetEntry{
@@ -194,6 +317,12 @@ func (r *Registry) ToModelIndex() scanner.ModelIndex {
 			idx.Embeddings = append(idx.Embeddings, ae)
 		case scanner.AssetUpscaler:
 			idx.Upscalers = append(idx.Upscalers, ae)
+		case scanner.AssetT5XXL:
+			idx.T5XXLs = append(idx.T5XXLs, ae)
+		case scanner.AssetClipL:
+			idx.ClipLs = append(idx.ClipLs, ae)
+		case scanner.AssetClipG:
+			idx.ClipGs = append(idx.ClipGs, ae)
 		}
 	}
 	return idx
@@ -223,9 +352,17 @@ func (r *Registry) load() error {
 	}
 
 	for _, e := range raw {
-		if _, err := os.Stat(e.Path); err == nil {
-			r.entries[e.Path] = e // only keep entries whose files still exist
+		if _, err := os.Stat(e.Path); err != nil {
+			r.needsSave = true // file is gone
+			continue
 		}
+		// Kind validation deliberately does NOT run here. It used to call
+		// entryKindMatches, which parses the GGUF header of every registered
+		// model on every launch (measured 49s for 27 models) on the goroutine
+		// that must finish before the window is created. Mis-filed entries are
+		// re-filed by the background rescan instead, so startup pays only the
+		// os.Stat above.
+		r.entries[e.Path] = e
 	}
 	return nil
 }
@@ -288,5 +425,8 @@ func collectEntries(idx scanner.ModelIndex) []scanner.AssetEntry {
 	out = append(out, idx.ControlNets...)
 	out = append(out, idx.Embeddings...)
 	out = append(out, idx.Upscalers...)
+	out = append(out, idx.T5XXLs...)
+	out = append(out, idx.ClipLs...)
+	out = append(out, idx.ClipGs...)
 	return out
 }

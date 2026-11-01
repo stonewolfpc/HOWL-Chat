@@ -11,8 +11,8 @@
 .world-page-header {
     text-align: center;
     padding: 24px 16px;
-    background: rgba(15, 21, 31, 0.95);
-    border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-aside-bg);
+    border-bottom: 1px solid var(--border-primary);
 }
 
 .world-page-title {
@@ -25,7 +25,7 @@
 /* Create New World Button */
 .create-world-button {
     background: var(--theme-glow);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     padding: 12px 24px;
     cursor: pointer;
@@ -56,7 +56,7 @@ body.theme-light .world-page-title {
 body.theme-light .create-world-button {
     background: var(--button-primary-bg);
     border-color: var(--button-primary-bg);
-    color: #FFFFFF;
+    color: var(--on-accent);
 }
 
 body.theme-light .create-world-button:hover {

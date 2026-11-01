@@ -11,11 +11,11 @@
  * @version 2.0.0
  */
 
-@import url('lb-base.css');
-@import url('lb-editor.css');
-@import url('lb-types.css');
-@import url('lb-cards.css');
-@import url('lb-entries.css');
-@import url('lb-creation.css');
-@import url('lb-light-theme.css');
-@import url('lb-responsive.css');
+@import url('lb-base.css?v=29');
+@import url('lb-editor.css?v=29');
+@import url('lb-types.css?v=29');
+@import url('lb-cards.css?v=29');
+@import url('lb-entries.css?v=29');
+@import url('lb-creation.css?v=29');
+@import url('lb-light-theme.css?v=29');
+@import url('lb-responsive.css?v=29');

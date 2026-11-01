@@ -85,3 +85,16 @@
         transform: rotate(360deg);
     }
 }
+
+/* Light Theme — reduce ambient visibility on light backgrounds */
+body.theme-light .ambient-orb-1 {
+    background: rgba(20, 184, 166, 0.06);
+}
+
+body.theme-light .ambient-orb-2 {
+    background: rgba(6, 182, 212, 0.06);
+}
+
+body.theme-light .hexagon-grid {
+    opacity: 0.12;
+}

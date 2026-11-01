@@ -20,35 +20,7 @@
 // Panel Render
 // ---------------------------------------------------------------------------
 
-async function updateCharacterPanel() {
-    const characterList = document.querySelector('.character-list');
-    if (!characterList) return;
-    if (!window.sidebarState) return;
 
-    const cd = window.sidebarState.currentChatData;
-    characterList.innerHTML = '';
-
-    if (!cd.characters || cd.characters.length === 0) {
-        characterList.innerHTML = `
-            <div class="character-empty">
-                <div class="empty-icon icon icon-users icon-xl"></div>
-                <div class="empty-text">No characters in chat</div>
-                <button class="add-character-btn" onclick="addCharacterToChat()">Add Character</button>
-            </div>
-        `;
-        return;
-    }
-
-    for (const character of cd.characters) {
-        const item = await createCharacterItem(character);
-        characterList.appendChild(item);
-    }
-
-    const addBtn = document.createElement('div');
-    addBtn.className = 'add-character-section';
-    addBtn.innerHTML = `<button class="add-character-btn" onclick="addCharacterToChat()">Add Character</button>`;
-    characterList.appendChild(addBtn);
-}
 
 // ---------------------------------------------------------------------------
 // Character Item Creation
@@ -209,16 +181,16 @@ function openStepOutDialog(characterId) {
 
     const modal = document.createElement('div');
     modal.className = 'stepout-modal-overlay';
-    modal.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10001;backdrop-filter:blur(4px);`;
+    modal.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:var(--overlay-scrim);display:flex;align-items:center;justify-content:center;z-index:10001;backdrop-filter:blur(4px);`;
 
     modal.innerHTML = `
-        <div style="background:rgba(20,20,30,0.98);border-radius:14px;width:min(520px,95%);max-width:520px;padding:24px;border:1px solid rgba(255,255,255,0.12);">
+        <div style="background:var(--shell-panel-bg);border-radius:14px;width:min(520px,95%);max-width:520px;padding:24px;border:1px solid rgba(255,255,255,0.12);">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
                 <div>
                     <div style="font-size:18px;font-weight:700;color:#fff;">Step Out</div>
                     <div style="font-size:13px;color:rgba(255,255,255,0.65);">${character.name} will be marked as inactive.</div>
                 </div>
-                <button onclick="document.body.removeChild(document.querySelector('.stepout-modal-overlay'))" style="background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;">✕</button>
+                <button onclick="document.body.removeChild(document.querySelector('.stepout-modal-overlay'))" style="background:var(--surface-hover);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;">✕</button>
             </div>
             <div style="display:flex;gap:12px;margin-bottom:16px;">
                 <button id="stepout-mode-regular" class="stepout-mode-btn active">Stepped Out</button>
@@ -226,10 +198,10 @@ function openStepOutDialog(characterId) {
             </div>
             <div style="margin-bottom:16px;">
                 <label for="stepout-reason" style="display:block;margin-bottom:8px;font-size:13px;color:rgba(255,255,255,0.75);">Reason</label>
-                <textarea id="stepout-reason" rows="4" placeholder="Enter the reason for ${character.name} stepping out..." style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:10px;padding:12px;resize:vertical;"></textarea>
+                <textarea id="stepout-reason" rows="4" placeholder="Enter the reason for ${character.name} stepping out..." style="width:100%;background:var(--surface-hover);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:10px;padding:12px;resize:vertical;"></textarea>
             </div>
             <div style="display:flex;gap:12px;justify-content:flex-end;">
-                <button onclick="document.body.removeChild(document.querySelector('.stepout-modal-overlay'))" style="padding:10px 16px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);color:#fff;border-radius:8px;cursor:pointer;">Cancel</button>
+                <button onclick="document.body.removeChild(document.querySelector('.stepout-modal-overlay'))" style="padding:10px 16px;background:var(--surface-hover);border:1px solid rgba(255,255,255,0.14);color:#fff;border-radius:8px;cursor:pointer;">Cancel</button>
                 <button id="stepout-confirm-btn" style="padding:10px 16px;background:rgba(0,184,115,0.18);border:1px solid rgba(0,184,115,0.35);color:#00b873;border-radius:8px;cursor:pointer;">Confirm</button>
             </div>
         </div>
@@ -292,7 +264,7 @@ async function applyCharacterStepOut(characterId, mode, reason) {
 
     // Persist the status change so it survives reloads
     saveChatData();
-    await updateCharacterPanel();
+    if (window.updateCharacterPanel) await window.updateCharacterPanel();
 
     const eventText = mode === 'death'
         ? `${character.name} has died: ${reason}`
@@ -342,23 +314,23 @@ function openReturnDialog(characterId, returnType) {
 
     const modal = document.createElement('div');
     modal.className = 'return-modal-overlay';
-    modal.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10001;backdrop-filter:blur(4px);`;
+    modal.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:var(--overlay-scrim);display:flex;align-items:center;justify-content:center;z-index:10001;backdrop-filter:blur(4px);`;
 
     modal.innerHTML = `
-        <div style="background:rgba(20,20,30,0.98);border-radius:14px;width:min(520px,95%);max-width:520px;padding:24px;border:1px solid rgba(255,255,255,0.12);">
+        <div style="background:var(--shell-panel-bg);border-radius:14px;width:min(520px,95%);max-width:520px;padding:24px;border:1px solid rgba(255,255,255,0.12);">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
                 <div>
                     <div style="font-size:18px;font-weight:700;color:#fff;">${title}</div>
                     <div style="font-size:13px;color:rgba(255,255,255,0.65);">${subtitle}</div>
                 </div>
-                <button onclick="document.body.removeChild(document.querySelector('.return-modal-overlay'))" style="background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;">&#10005;</button>
+                <button onclick="document.body.removeChild(document.querySelector('.return-modal-overlay'))" style="background:var(--surface-hover);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;">&#10005;</button>
             </div>
             <div style="margin-bottom:16px;">
                 <label for="return-reason" style="display:block;margin-bottom:8px;font-size:13px;color:rgba(255,255,255,0.75);">${isRevive ? 'Method / Reason' : 'Reason'}</label>
-                <textarea id="return-reason" rows="4" placeholder="${placeholder}" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:10px;padding:12px;resize:vertical;"></textarea>
+                <textarea id="return-reason" rows="4" placeholder="${placeholder}" style="width:100%;background:var(--surface-hover);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:10px;padding:12px;resize:vertical;"></textarea>
             </div>
             <div style="display:flex;gap:12px;justify-content:flex-end;">
-                <button onclick="document.body.removeChild(document.querySelector('.return-modal-overlay'))" style="padding:10px 16px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);color:#fff;border-radius:8px;cursor:pointer;">Cancel</button>
+                <button onclick="document.body.removeChild(document.querySelector('.return-modal-overlay'))" style="padding:10px 16px;background:var(--surface-hover);border:1px solid rgba(255,255,255,0.14);color:#fff;border-radius:8px;cursor:pointer;">Cancel</button>
                 <button id="return-confirm-btn" style="padding:10px 16px;background:rgba(0,184,115,0.18);border:1px solid rgba(0,184,115,0.35);color:#00b873;border-radius:8px;cursor:pointer;">Confirm</button>
             </div>
         </div>
@@ -402,7 +374,7 @@ async function applyCharacterReturn(characterId, returnType, reason) {
 
     // Persist the status change so it survives reloads
     saveChatData();
-    await updateCharacterPanel();
+    if (window.updateCharacterPanel) await window.updateCharacterPanel();
 
     const eventText = wasDead
         ? `${character.name} has been revived: ${reason}`
@@ -492,7 +464,7 @@ function updateCharacterImage(characterId, imageData) {
         if (bc) { bc.image = imageData; bc._resolvedImage = imageData; }
         window.chatBridge.refreshAllPanels();
     } else {
-        if (typeof updateCharacterPanel === 'function') updateCharacterPanel();
+        if (typeof window.updateCharacterPanel === 'function') window.updateCharacterPanel();
     }
 
     if (typeof showNotification === 'function') showNotification('Character image updated', 'success');
@@ -533,7 +505,7 @@ function replaceCharacterImage(characterId) {
                 window.chatBridge.refreshAllPanels();
             } else {
                 saveChatData();
-                updateCharacterPanel();
+                if (window.updateCharacterPanel) window.updateCharacterPanel();
             }
             showNotification('Character image updated', 'success');
         } catch (err) {
@@ -564,12 +536,15 @@ async function removeCharacterFromChat(characterId) {
         } else {
             const cd = window.sidebarState.currentChatData;
             cd.characters = cd.characters.filter(c => c.id !== characterId);
-            if (!cd.removedCharacterIds) cd.removedCharacterIds = [];
-            if (!cd.removedCharacterIds.includes(characterId)) {
-                cd.removedCharacterIds.push(characterId);
+            if ((cd.activeCharacterIds || []).includes(characterId)) {
+                if (!cd.removedCharacterIds) cd.removedCharacterIds = [];
+                if (!cd.removedCharacterIds.includes(characterId)) {
+                    cd.removedCharacterIds.push(characterId);
+                }
             }
+            cd.addedCharacterIds = (cd.addedCharacterIds || []).filter(id => id !== characterId);
             saveChatData();
-            updateCharacterPanel();
+            if (window.updateCharacterPanel) window.updateCharacterPanel();
         }
         showNotification('Character removed from chat', 'success');
     }
@@ -596,28 +571,28 @@ function addCharacterToChat() {
     const cd = window.sidebarState.currentChatData;
     const modal = document.createElement('div');
     modal.className = 'selector-modal';
-    modal.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px);`;
+    modal.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:var(--overlay-scrim);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px);`;
 
     let content = `
-        <div style="background:rgba(30,30,40,0.98);border-radius:12px;padding:24px;max-width:400px;border:1px solid rgba(255,255,255,0.1);">
+        <div style="background:var(--shell-panel-bg);border-radius:12px;padding:24px;max-width:400px;border:1px solid var(--surface-hover-strong);">
             <h2 style="color:#fff;margin-top:0;margin-bottom:16px;">Select a Character</h2>
             <div style="max-height:300px;overflow-y:auto;margin-bottom:16px;">
     `;
 
     if (characters.length === 0) {
-        content += `<div style="color:rgba(255,255,255,0.5);text-align:center;padding:20px;">No characters available</div>`;
+        content += `<div style="color:var(--surface-hover);text-align:center;padding:20px;">No characters available</div>`;
     } else {
         characters.forEach(character => {
             const isActive = cd.characters && cd.characters.find(c => c.id === character.id);
             content += `
                 <div onclick="selectCharacterForChat('${character.id}'); document.querySelector('.selector-modal').remove();" style="
-                    padding:12px;background:${isActive ? 'rgba(0,184,115,0.2)' : 'rgba(255,255,255,0.05)'};
+                    padding:12px;background:${isActive ? 'var(--success-bg)' : 'var(--surface-hover)'};
                     margin-bottom:8px;border-radius:6px;cursor:pointer;
-                    border:1px solid ${isActive ? 'rgba(0,184,115,0.3)' : 'rgba(255,255,255,0.1)'};color:#fff;transition:all 0.2s ease;"
-                    onmouseover="this.style.background='rgba(255,255,255,0.1)'"
-                    onmouseout="this.style.background='${isActive ? 'rgba(0,184,115,0.2)' : 'rgba(255,255,255,0.05)'}'">
+                    border:1px solid ${isActive ? 'var(--success)' : 'rgba(255,255,255,0.1)'};color:#fff;transition:all 0.2s ease;"
+                    onmouseover="this.style.background='var(--surface-hover-strong)'"
+                    onmouseout="this.style.background='${isActive ? 'var(--success-bg)' : 'var(--surface-hover)'}'">
                     <strong style="display:block;margin-bottom:4px;">${character.name}</strong>
-                    <small style="color:rgba(255,255,255,0.5);">${character.description || 'No description'}</small>
+                    <small style="color:var(--surface-hover);">${character.description || 'No description'}</small>
                 </div>
             `;
         });
@@ -626,8 +601,8 @@ function addCharacterToChat() {
     content += `
             </div>
             <div style="display:flex;gap:8px;">
-                <button onclick="document.querySelector('.selector-modal').remove();" style="flex:1;padding:10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:6px;cursor:pointer;">Cancel</button>
-                <button onclick="navigateTo('character.html'); document.querySelector('.selector-modal').remove();" style="flex:1;padding:10px;background:rgba(0,184,115,0.2);border:1px solid rgba(0,184,115,0.3);color:#00b873;border-radius:6px;cursor:pointer;">+ New Character</button>
+                <button onclick="document.querySelector('.selector-modal').remove();" style="flex:1;padding:10px;background:var(--surface-hover-strong);border:1px solid var(--border-secondary);color:#fff;border-radius:6px;cursor:pointer;">Cancel</button>
+                <button onclick="navigateTo('character.html'); document.querySelector('.selector-modal').remove();" style="flex:1;padding:10px;background:var(--success-bg);border:1px solid var(--success);color:#00b873;border-radius:6px;cursor:pointer;">+ New Character</button>
             </div>
         </div>
     `;
@@ -654,7 +629,7 @@ async function selectCharacterForChat(characterId) {
         if (!cd.characters) cd.characters = [];
         cd.characters.push(character);
         saveChatData();
-        updateCharacterPanel();
+        if (window.updateCharacterPanel) window.updateCharacterPanel();
     }
     showNotification(`Character added to chat: ${character.name}`, 'success');
 }
@@ -664,7 +639,7 @@ async function selectCharacterForChat(characterId) {
 // ---------------------------------------------------------------------------
 
 window.sidebarCharacters = {
-    updateCharacterPanel,
+    updateCharacterPanel: (...args) => window.updateCharacterPanel?.(...args),
     createCharacterItem,
     openCharacterSheet,
     editCharacter,

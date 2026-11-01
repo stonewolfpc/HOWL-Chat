@@ -128,7 +128,7 @@ function _renderSearchResults(navEl) {
     });
 
     if (results.length === 0) {
-        navEl.innerHTML = `<div class="tutorials-search-results"><div class="tutorials-search-result" style="color:rgba(212,212,212,0.4)">No results for "${_searchQuery}"</div></div>`;
+        navEl.innerHTML = `<div class="tutorials-search-results"><div class="tutorials-search-result" style="color:var(--text-tertiary)">No results for "${_searchQuery}"</div></div>`;
         return;
     }
 
@@ -139,7 +139,7 @@ function _renderSearchResults(navEl) {
         ${results.map(r => `
             <div class="tutorials-search-result" data-topic-id="${r.topic.id}">
                 ${r.titleMatch ? `<span class="result-match">${r.topic.title}</span>` : r.topic.title}
-                <span style="color:rgba(212,212,212,0.35);font-size:11px"> — ${r.section.title}</span>
+                <span style="color:var(--text-tertiary);font-size:11px"> — ${r.section.title}</span>
             </div>
         `).join('')}
     </div>`;
@@ -195,13 +195,13 @@ function _renderContent() {
 
     const topic = _findTopic(_activeTopicId);
     if (!topic) {
-        contentEl.innerHTML = `<div style="text-align:center;padding:60px 20px;color:rgba(212,212,212,0.4)"><div style="font-size:48px;margin-bottom:16px" class="icon icon-book"></div><p>Select a topic from the left panel</p></div>`;
+        contentEl.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--text-tertiary)"><div style="font-size:48px;margin-bottom:16px" class="icon icon-book"></div><p>Select a topic from the left panel</p></div>`;
         return;
     }
 
     const section = _findSectionForTopic(_activeTopicId);
     const breadcrumb = section
-        ? `<div class="tutorials-breadcrumb"><span>${section.title}</span><span style="color:rgba(212,212,212,0.3)">/</span><span class="active">${topic.title}</span></div>`
+        ? `<div class="tutorials-breadcrumb"><span>${section.title}</span><span style="color:var(--text-tertiary)">/</span><span class="active">${topic.title}</span></div>`
         : '';
 
     contentEl.innerHTML = breadcrumb + _parseContent(topic.content);

@@ -17,70 +17,37 @@
 // ---------------------------------------------------------------------------
 
 function applyTheme(theme) {
-    document.body.className = document.body.className.replace(/theme-\w+/g, '');
-    let effectiveTheme = theme;
-    if (theme === 'system') {
-        effectiveTheme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    // Themes have exactly one owner: theme.js. This used to reimplement the
+    // body-class swap and write the settings store directly, which skipped the
+    // localStorage mirror that the other eight pages restore from — so picking
+    // a theme here changed this page and nothing else.
+    if (typeof window.setThemeMode === 'function') {
+        // setThemeMode only accepts a concrete mode and only persists when told
+        // to, so 'system' has to be resolved here and the preference recorded
+        // separately — otherwise Settings' choice was lost on the next load.
+        const effective = theme === 'system'
+            ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+            : theme;
+        window.setThemeMode(effective, false);
+        if (window.settingsState?.set) {
+            window.settingsState.set('general.theme', theme);
+        }
+        return;
     }
-    document.body.classList.add(`theme-${effectiveTheme}`);
-    localStorage.setItem('howl-chat-theme', theme);
+    document.body.classList.remove('theme-light', 'theme-dark');
+    const effective = theme === 'system'
+        ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+        : theme;
+    document.body.classList.add(`theme-${effective}`);
 }
 
-function applyUIScale(scale) {
-    document.documentElement.style.setProperty('--ui-scale', scale.toString());
-    localStorage.setItem('howl-chat-ui-scale', scale.toString());
-}
 
 function applyAnimationSpeed(speed) {
     document.documentElement.style.setProperty('--animation-speed', speed.toString());
-    localStorage.setItem('howl-chat-animation-speed', speed.toString());
+    if (window.settingsState?.set) {
+        window.settingsState.set('general.animationSpeed', speed);
+    }
 }
-
-// ---------------------------------------------------------------------------
-// Storage Path Actions
-// ---------------------------------------------------------------------------
-
-function _browseDirectory(inputId, settingsKey) {
-    const el = document.getElementById(inputId);
-    if (!el) return;
-
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.webkitdirectory = true;
-    input.style.display = 'none';
-    document.body.appendChild(input);
-
-    input.addEventListener('change', () => {
-        if (input.files && input.files.length > 0) {
-            const first = input.files[0];
-            const path = first.path || first.webkitRelativePath.split('/')[0] || first.name;
-            el.value = path;
-            window.settingsState.current.storage[settingsKey] = path;
-        }
-        document.body.removeChild(input);
-    });
-    input.click();
-}
-
-function _resetLocation(inputId, settingsKey, defaultValue) {
-    window.settingsState.current.storage[settingsKey] = defaultValue;
-    const el = document.getElementById(inputId);
-    if (el) el.value = defaultValue;
-    window.settingsState.saveSettings();
-}
-
-function browseChatLocation()     { _browseDirectory('chat-storage-location',     'chatStorageLocation'); }
-function resetChatLocation()      { _resetLocation('chat-storage-location',       'chatStorageLocation', 'AppData/Chats'); }
-function browseContentLocation()  { _browseDirectory('content-storage-location',  'contentStorageLocation'); }
-function resetContentLocation()   { _resetLocation('content-storage-location',  'contentStorageLocation', 'AppData'); }
-function browseWorldLocation()    { _browseDirectory('world-storage-location',    'worldStorageLocation'); }
-function resetWorldLocation()     { _resetLocation('world-storage-location',    'worldStorageLocation', 'AppData/Worlds'); }
-function browseScenarioLocation() { _browseDirectory('scenario-storage-location', 'scenarioStorageLocation'); }
-function resetScenarioLocation()  { _resetLocation('scenario-storage-location',   'scenarioStorageLocation', 'AppData/Scenarios'); }
-function browseCharacterLocation(){ _browseDirectory('character-storage-location','characterStorageLocation'); }
-function resetCharacterLocation() { _resetLocation('character-storage-location',  'characterStorageLocation', 'AppData/Characters'); }
-function browseImageLocation()    { _browseDirectory('image-storage-location',    'imageStorageLocation'); }
-function resetImageLocation()     { _resetLocation('image-storage-location',      'imageStorageLocation', 'AppData/Images'); }
 
 // ---------------------------------------------------------------------------
 // Backup Actions
@@ -166,6 +133,14 @@ function clearCache() {
 }
 
 function clearAllData() {
+    // Chats, worlds, characters, scenarios and lorebooks live as JSON files
+    // under AppData and are removed by the backend. Clearing localStorage here
+    // left every one of them on disk while telling the user everything was gone.
+    // resetApplication() is the real wipe: backend WipeAllData, IndexedDB, then
+    // localStorage, with its own two-step confirmation.
+    if (typeof window.resetApplication === 'function') {
+        return window.resetApplication();
+    }
     if (!confirm('Clear all local data? This will permanently delete ALL application data including chats, settings, and cached files. This action cannot be undone.')) return;
     if (!confirm('Are you absolutely sure? This cannot be undone.')) return;
     try {
@@ -176,42 +151,6 @@ function clearAllData() {
     } catch (err) {
         console.error('Clear all data failed:', err);
     }
-}
-
-// ---------------------------------------------------------------------------
-// Permission Actions
-// ---------------------------------------------------------------------------
-
-function managePermissions() {
-    const s = window.settingsState.current;
-    const perms = s.privacy.permissions || {};
-    const permList = Object.entries(perms).map(([k, v]) => `${k}: ${v ? 'allowed' : 'denied'}`).join('\n') || 'No custom permissions set.';
-    const action = prompt(`Current Permissions:\n\n${permList}\n\nEnter action: (add, remove, clear, or cancel)`);
-    if (!action) return;
-    const act = action.trim().toLowerCase();
-    if (act === 'add') {
-        const name = prompt('Enter permission name:');
-        if (name) {
-            perms[name] = true;
-            s.privacy.permissions = perms;
-            if (typeof showNotification === 'function') showNotification(`Permission "${name}" allowed`, 'success');
-        }
-    } else if (act === 'remove') {
-        const name = prompt(`Enter permission to deny:\n${Object.keys(perms).join(', ')}`);
-        if (name && perms.hasOwnProperty(name)) {
-            perms[name] = false;
-            s.privacy.permissions = perms;
-            if (typeof showNotification === 'function') showNotification(`Permission "${name}" denied`, 'success');
-        }
-    } else if (act === 'clear') {
-        s.privacy.permissions = {};
-        if (typeof showNotification === 'function') showNotification('All permissions reset', 'success');
-    }
-}
-
-function resetPermissions() {
-    window.settingsState.current.privacy.permissions = {};
-    if (typeof showNotification === 'function') showNotification('Permissions reset to defaults', 'success');
 }
 
 // ---------------------------------------------------------------------------

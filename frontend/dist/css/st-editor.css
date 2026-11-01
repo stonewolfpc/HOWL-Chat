@@ -79,7 +79,7 @@
     resize: vertical;
     font-family: inherit;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    scrollbar-color: var(--border-secondary) transparent;
 }
 
 .editor-textarea::-webkit-scrollbar {
@@ -91,12 +91,12 @@
 }
 
 .editor-textarea::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--border-primary);
     border-radius: 4px;
 }
 
 .editor-textarea::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--border-primary);
 }
 
 /* Checkbox */

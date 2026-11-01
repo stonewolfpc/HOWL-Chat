@@ -46,53 +46,6 @@ function getLorebookSourceType(lorebook, cd) {
  * Renders the sidebar lorebook panel, grouped by World / Scenario / Character.
  * Automated lorebooks (automated: true) are never shown here.
  */
-function updateLorebookDisplay() {
-    const lorebookList = document.getElementById('lorebook-list');
-    if (!lorebookList) return;
-    if (!window.sidebarState) return;
-
-    const cd = window.sidebarState.currentChatData;
-    lorebookList.innerHTML = '';
-
-    const manualLorebooks = (cd.lorebooks || []).filter(l => !l.automated);
-
-    if (manualLorebooks.length === 0) {
-        lorebookList.innerHTML = `
-            <div class="lorebook-empty">
-                <div class="empty-icon">📚</div>
-                <div class="empty-text">No lorebooks selected</div>
-                <button class="add-lorebook-btn" onclick="openLorebookSelector()">Add Lorebook</button>
-            </div>
-        `;
-        return;
-    }
-
-    const groups = { world: [], scenario: [], character: [], standalone: [] };
-    manualLorebooks.forEach(lb => groups[getLorebookSourceType(lb, cd)].push(lb));
-
-    const groupConfig = [
-        { key: 'world',      label: 'World Lorebooks',      color: '#00b873' },
-        { key: 'scenario',   label: 'Scenario Lorebooks',   color: '#007acc' },
-        { key: 'character',  label: 'Character Lorebooks',  color: '#9c27b0' },
-        { key: 'standalone', label: 'Additional Lorebooks', color: '#ff9500' }
-    ];
-
-    groupConfig.forEach(({ key, label, color }) => {
-        if (groups[key].length === 0) return;
-        const header = document.createElement('div');
-        header.className = 'lorebook-group-header';
-        header.style.cssText = `color:${color};font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;padding:6px 4px 2px;opacity:0.8;`;
-        header.textContent = label;
-        lorebookList.appendChild(header);
-        groups[key].forEach(lb => lorebookList.appendChild(createLorebookItem(lb, key)));
-    });
-
-    const addBtn = document.createElement('div');
-    addBtn.className = 'add-lorebook-section';
-    addBtn.innerHTML = `<button class="add-lorebook-btn" onclick="openLorebookSelector()">Add Lorebook</button>`;
-    lorebookList.appendChild(addBtn);
-}
-
 function _resolveLorebookDescription(lorebook) {
     if (lorebook.description) return lorebook.description;
     try {
@@ -205,6 +158,7 @@ async function toggleLorebookEnabled(lorebookId) {
 function openLorebookSelector() {
     const allLorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
     const cd           = window.sidebarState.currentChatData;
+    const fe           = window.FilterEngine;
 
     const manualLorebooks = allLorebooks.filter(l => !l.automated);
 
@@ -263,38 +217,77 @@ function openLorebookSelector() {
 
     const modal = document.createElement('div');
     modal.className   = 'lorebook-selector-modal';
-    modal.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px);`;
+    modal.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:var(--overlay-scrim);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px);`;
 
-    let content = `
-        <div style="background:rgba(30,30,40,0.98);border-radius:12px;padding:24px;max-width:600px;width:90%;max-height:80vh;border:1px solid rgba(255,255,255,0.1);overflow-y:auto;">
+    let sortField = 'name';
+    let sortDir   = 'asc';
+
+    const buildListHtml = (searchTerm) => {
+        let html = '';
+        let anyItems = false;
+        const term = (searchTerm || '').toLowerCase();
+
+        selectorGroups.forEach(({ key, label, color, items }) => {
+            let groupItems = items.slice();
+            if (fe && (sortField || sortDir)) {
+                groupItems = fe.sortItems(groupItems, sortField, sortDir);
+            }
+            if (term) {
+                groupItems = groupItems.filter(l => {
+                    const name = (l.name || l.title || '').toLowerCase();
+                    const desc = (l.description || '').toLowerCase();
+                    return name.includes(term) || desc.includes(term);
+                });
+            }
+            if (groupItems.length === 0) return;
+            anyItems = true;
+            html += `<div style="color:${color};font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;padding:8px 0 4px;opacity:0.9;">${label}</div>`;
+            groupItems.forEach(l => { html += buildLorebookItem(l, cd, key); });
+        });
+
+        if (!anyItems) {
+            html += `<div style="color:var(--surface-hover);text-align:center;padding:24px;font-style:italic;">No lorebooks available</div>`;
+        }
+        return html;
+    };
+
+    const content = `
+        <div style="background:var(--shell-panel-bg);border-radius:12px;padding:24px;max-width:600px;width:90%;max-height:80vh;border:1px solid var(--surface-hover-strong);overflow-y:auto;">
             <h2 style="color:#fff;margin-top:0;margin-bottom:4px;">Select Lorebooks</h2>
-            <p style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:0;margin-bottom:16px;">Manual lorebooks only. Automated memories are in Story Tools.</p>
-            <div style="margin-bottom:12px;">
-                <input type="text" id="lorebook-search" placeholder="Search lorebooks..." style="width:100%;box-sizing:border-box;padding:8px 12px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:#fff;font-size:14px;" onkeyup="filterLorebooks(this.value)">
+            <p style="color:var(--surface-hover);font-size:12px;margin-top:0;margin-bottom:16px;">Manual lorebooks only. Automated memories are in Story Tools.</p>
+            <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">
+                <input type="text" id="lorebook-search" placeholder="Search lorebooks..."
+                    style="flex:1;box-sizing:border-box;padding:8px 12px;background:var(--surface-hover-strong);border:1px solid var(--border-secondary);border-radius:6px;color:#fff;font-size:14px;"
+                    onkeyup="window._lorebookSelectorSearch && window._lorebookSelectorSearch(this.value)">
+                <select id="lorebook-sort"
+                    style="padding:8px 12px;border:1px solid var(--border-secondary);border-radius:6px;font-size:14px;cursor:pointer;"
+                    onchange="window._lorebookSelectorSort && window._lorebookSelectorSort(this.value)">
+                    <option value="name:asc">Name A-Z</option>
+                    <option value="name:desc">Name Z-A</option>
+                    <option value="date:desc">Newest First</option>
+                    <option value="date:asc">Oldest First</option>
+                </select>
             </div>
-            <div id="available-lorebooks-list">
-    `;
-
-    let anyItems = false;
-    selectorGroups.forEach(({ key, label, color, items }) => {
-        if (items.length === 0) return;
-        anyItems = true;
-        content += `<div style="color:${color};font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;padding:8px 0 4px;opacity:0.9;">${label}</div>`;
-        items.forEach(l => { content += buildLorebookItem(l, cd, key); });
-    });
-
-    if (!anyItems) {
-        content += `<div style="color:rgba(255,255,255,0.3);text-align:center;padding:24px;font-style:italic;">No lorebooks available</div>`;
-    }
-
-    content += `
-            </div>
+            <div id="available-lorebooks-list">${buildListHtml('')}</div>
             <div style="display:flex;gap:8px;margin-top:16px;">
-                <button onclick="document.querySelector('.lorebook-selector-modal').remove();" style="flex:1;padding:10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:6px;cursor:pointer;">Done</button>
-                <button onclick="navigateTo('lorebooks.html'); document.querySelector('.lorebook-selector-modal').remove();" style="flex:1;padding:10px;background:rgba(0,184,115,0.2);border:1px solid rgba(0,184,115,0.3);color:#00b873;border-radius:6px;cursor:pointer;">+ New Lorebook</button>
+                <button onclick="document.querySelector('.lorebook-selector-modal').remove();" style="flex:1;padding:10px;background:var(--surface-hover-strong);border:1px solid var(--border-secondary);color:#fff;border-radius:6px;cursor:pointer;">Done</button>
+                <button onclick="navigateTo('lorebooks.html'); document.querySelector('.lorebook-selector-modal').remove();" style="flex:1;padding:10px;background:var(--success-bg);border:1px solid var(--success);color:#00b873;border-radius:6px;cursor:pointer;">+ New Lorebook</button>
             </div>
         </div>
     `;
+
+    window._lorebookSelectorSearch = (val) => {
+        const list = document.getElementById('available-lorebooks-list');
+        if (list) list.innerHTML = buildListHtml(val);
+    };
+    window._lorebookSelectorSort = (val) => {
+        const [field, dir] = val.split(':');
+        sortField = field;
+        sortDir = dir;
+        const searchVal = document.getElementById('lorebook-search')?.value || '';
+        const list = document.getElementById('available-lorebooks-list');
+        if (list) list.innerHTML = buildListHtml(searchVal);
+    };
 
     modal.innerHTML = content;
     document.body.appendChild(modal);
@@ -305,13 +298,13 @@ function buildLorebookItem(lorebook, cd, sourceKey) {
     const isActive  = cd.lorebooks && cd.lorebooks.some(l => l.id === lorebook.id);
     const lbName    = (lorebook.name || lorebook.title || '').toLowerCase();
     return `
-        <div class="lorebook-item available-lorebook" data-lorebook-id="${lorebook.id}" data-lorebook-name="${lbName}" data-source="${sourceKey}" onclick="toggleLorebookSelection('${lorebook.id}');" style="
-            padding:12px;background:${isActive ? 'rgba(0,184,115,0.2)' : 'rgba(255,255,255,0.05)'};
+        <div class="lorebook-item available-lorebook" data-lorebook-id="${lorebook.id}" data-lorebook-name="${lbName}" data-source="${sourceKey}" onclick="toggleChatLorebook('${lorebook.id}');" style="
+            padding:12px;background:${isActive ? 'var(--success-bg)' : 'var(--surface-hover)'};
             margin-bottom:8px;border-radius:6px;cursor:pointer;position:relative;
-            border:1px solid ${isActive ? 'rgba(0,184,115,0.3)' : 'rgba(255,255,255,0.1)'};color:#fff;transition:all 0.2s ease;">
+            border:1px solid ${isActive ? 'var(--success)' : 'rgba(255,255,255,0.1)'};color:#fff;transition:all 0.2s ease;">
             ${isActive ? '<span style="position:absolute;top:8px;right:8px;color:#00b873;">✓</span>' : ''}
             <strong style="display:block;margin-bottom:4px;">${lorebook.name || lorebook.title || 'Untitled'}</strong>
-            <small style="color:rgba(255,255,255,0.5);">${lorebook.description || 'No description'}</small>
+            <small style="color:var(--surface-hover);">${lorebook.description || 'No description'}</small>
         </div>
     `;
 }
@@ -323,7 +316,10 @@ function filterLorebooks(searchTerm) {
     });
 }
 
-async function toggleLorebookSelection(lorebookId) {
+// Chat-level toggle (by id). The world/scenario dropdowns have their own
+// toggleLorebookSelection(lorebook, element); same name, different job,
+// which is why this one is named for what it does.
+async function toggleChatLorebook(lorebookId) {
     const lorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
     const lorebook  = lorebooks.find(l => l.id === lorebookId);
     if (!lorebook) return;

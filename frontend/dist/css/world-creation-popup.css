@@ -25,8 +25,8 @@
 
 /* World Creation Popup Container */
 .world-creation-popup {
-    background: rgba(21, 21, 31, 0.98);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-panel-bg);
+    border: 1px solid var(--border-primary);
     border-radius: 12px;
     width: 600px;
     max-height: 90vh;
@@ -34,7 +34,7 @@
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    scrollbar-color: var(--border-secondary) transparent;
 }
 
 .world-creation-popup::-webkit-scrollbar {
@@ -46,19 +46,19 @@
 }
 
 .world-creation-popup::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--border-primary);
     border-radius: 4px;
 }
 
 .world-creation-popup::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--border-primary);
 }
 
 /* Popup Header */
 .world-creation-header {
     padding: 20px 24px;
-    border-bottom: 1px solid rgba(100, 100, 100, 0.3);
-    background: rgba(10, 10, 15, 0.5);
+    border-bottom: 1px solid var(--border-primary);
+    background: var(--surface-tertiary);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -94,16 +94,16 @@
 /* Popup Footer */
 .world-creation-footer {
     padding: 16px 24px;
-    border-top: 1px solid rgba(100, 100, 100, 0.3);
-    background: rgba(10, 10, 15, 0.5);
+    border-top: 1px solid var(--border-primary);
+    background: var(--surface-tertiary);
     display: flex;
     justify-content: flex-end;
     gap: 12px;
 }
 
 .world-creation-cancel {
-    background: rgba(21, 21, 31, 0.9);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-panel-bg);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     padding: 10px 20px;
     cursor: pointer;
@@ -113,13 +113,13 @@
 }
 
 .world-creation-cancel:hover {
-    background: rgba(100, 100, 100, 0.3);
-    border-color: rgba(100, 100, 100, 0.5);
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
 }
 
 .world-creation-save {
     background: var(--theme-glow);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    border: 1px solid var(--border-primary);
     color: var(--static-text);
     padding: 10px 24px;
     cursor: pointer;
@@ -143,7 +143,7 @@ body.theme-light .world-creation-popup {
 }
 
 body.theme-light .world-creation-popup::-webkit-scrollbar-thumb {
-    background: var(--border-secondary);
+    background: var(--border-primary);
 }
 
 body.theme-light .world-creation-popup::-webkit-scrollbar-thumb:hover {
@@ -186,7 +186,7 @@ body.theme-light .world-creation-cancel:hover {
 body.theme-light .world-creation-save {
     background: var(--button-primary-bg);
     border-color: var(--button-primary-bg);
-    color: #FFFFFF;
+    color: var(--on-accent);
 }
 
 body.theme-light .world-creation-save:hover {

@@ -36,9 +36,15 @@ def _get_g2p():
     return _g2p_pipeline
 
 
-DEFAULT_MODEL = r"D:\AI GGUF\TTS\kokoro-v1.0.onnx"
-DEFAULT_VOICES = r"D:\AI GGUF\TTS\voices-v1.0.bin"
-DEFAULT_CONFIG = r"D:\AI GGUF\TTS\hf_cache\config.json"
+# Standalone-CLI fallbacks only: the Go backend always passes --model, --voices
+# and --config. Resolve them relative to the project instead of a fixed drive so
+# a moved checkout still works, and honour the same env vars the Go side uses.
+_PROJECT_DIR = Path(__file__).resolve().parent.parent
+_DEFAULT_KOKORO_DIR = _PROJECT_DIR / "models" / "kokoro"
+
+DEFAULT_MODEL = os.environ.get("HOWL_TTS_KOKORO_MODEL") or str(_DEFAULT_KOKORO_DIR / "kokoro-v1.0.onnx")
+DEFAULT_VOICES = os.environ.get("HOWL_TTS_KOKORO_VOICES") or str(_DEFAULT_KOKORO_DIR / "voices-v1.0.bin")
+DEFAULT_CONFIG = os.environ.get("HOWL_TTS_KOKORO_CONFIG") or str(_DEFAULT_KOKORO_DIR / "hf_cache" / "config.json")
 
 
 def text_to_ipa(text):

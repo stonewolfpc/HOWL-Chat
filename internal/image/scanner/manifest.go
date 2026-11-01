@@ -27,6 +27,8 @@ type Manifest struct {
 	Family      ModelFamily       `json:"family"`
 	Format      string            `json:"format"` // gguf, safetensors, ckpt, …
 	SizeMB      float64           `json:"size_mb"`
+	FileSize    int64             `json:"file_size,omitempty"`
+	ModTimeNS   int64             `json:"mod_time_ns,omitempty"`
 	Hash        string            `json:"hash,omitempty"`
 	Files       map[string]string `json:"files,omitempty"`    // sub-file role → abs path
 	VAEPath     string            `json:"vae_path,omitempty"` // suggested companion VAE

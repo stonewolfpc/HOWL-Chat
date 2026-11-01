@@ -138,11 +138,15 @@ func (rm *ResourceManager) RefreshHardware() {
 // refreshHardware must be called with rm.mu held.
 func (rm *ResourceManager) refreshHardware() {
 	fmt.Println("[ResourceManager] refreshHardware: calling hw.DetectHardware()")
-	// Static info from existing hw package (fast, no WMI)
 	info := hw.DetectHardware()
 	fmt.Println("[ResourceManager] refreshHardware: hw.DetectHardware() returned")
 
-	// Live GPU metrics — query with a 3s timeout so WMI hangs don't deadlock callers
+	// Preserve last known good GPU values so a single failed query
+	// doesn't wipe out a correct detection.
+	lastTotal := rm.snapshot.TotalVRAMBytes
+	lastName := rm.snapshot.GPUModel
+	lastVendor := rm.snapshot.GPUVendor
+
 	gpuTotal, gpuUsed := int64(0), int64(0)
 	gpuName, gpuVendor := "", ""
 	fmt.Println("[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout")
@@ -162,14 +166,26 @@ func (rm *ResourceManager) refreshHardware() {
 			gpuName = gpus[0].Name
 			gpuVendor = gpus[0].Vendor
 		} else {
-			fmt.Println("[ResourceManager] refreshHardware: queryGPUs() returned empty/failed")
-			gpuTotal = info.GPUMemoryBytes
-			gpuUsed = rm.usedVRAMLocked()
+			fmt.Println("[ResourceManager] refreshHardware: queryGPUs() returned empty/failed, using fallback")
+			gpuTotal, gpuUsed = rm.fallbackGPUValues(info, lastTotal)
+			gpuName = lastName
+			gpuVendor = lastVendor
 		}
 	case <-time.After(3 * time.Second):
 		fmt.Println("[ResourceManager] refreshHardware: queryGPUs() TIMED OUT after 3s, using fallback")
-		gpuTotal = info.GPUMemoryBytes
-		gpuUsed = rm.usedVRAMLocked()
+		gpuTotal, gpuUsed = rm.fallbackGPUValues(info, lastTotal)
+		gpuName = lastName
+		gpuVendor = lastVendor
+	}
+
+	// Sanity-check: if detection claims < 1 GB total on a system that
+	// previously had a real GPU, keep the last known good total.
+	if gpuTotal > 0 && gpuTotal < 1024*1024*1024 && lastTotal >= 1024*1024*1024 {
+		fmt.Printf("[ResourceManager] refreshHardware: suspicious GPU total %d MB, restoring last known %d MB\n",
+			gpuTotal/1024/1024, lastTotal/1024/1024)
+		gpuTotal = lastTotal
+		gpuName = lastName
+		gpuVendor = lastVendor
 	}
 	fmt.Println("[ResourceManager] refreshHardware: storing snapshot")
 
@@ -189,6 +205,18 @@ func (rm *ResourceManager) refreshHardware() {
 		Arch:           info.Arch,
 	}
 	rm.lastScan = time.Now()
+}
+
+// fallbackGPUValues returns total and used VRAM when live queries fail.
+// It prefers the last known good total; otherwise falls back to hw detection.
+func (rm *ResourceManager) fallbackGPUValues(info *hw.HardwareInfo, lastTotal int64) (total, used int64) {
+	if lastTotal > 0 {
+		return lastTotal, rm.usedVRAMLocked()
+	}
+	if info.GPUMemoryBytes > 0 {
+		return info.GPUMemoryBytes, rm.usedVRAMLocked()
+	}
+	return 0, 0
 }
 
 // usedVRAMLocked sums GPU memory from tracked models. Must hold rm.mu.

@@ -9,8 +9,8 @@
 
 /* World Bubble Container */
 .world-bubble {
-    background: rgba(21, 21, 31, 0.8);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    background: var(--shell-panel-bg);
+    border: 1px solid var(--border-primary);
     border-radius: 8px;
     padding: 16px;
     cursor: pointer;
@@ -50,7 +50,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(30, 30, 35, 0.8);
+    background: var(--shell-panel-bg);
     border-radius: 50%;
     border: 2px solid var(--theme-color);
     box-shadow: 0 0 10px var(--theme-glow);
@@ -59,7 +59,7 @@
 
 .world-bubble-placeholder-icon {
     font-size: 32px;
-    color: rgba(212, 212, 212, 0.5);
+    color: var(--text-tertiary);
 }
 
 /* World Bubble Name */
@@ -77,11 +77,11 @@
 /* World Bubble Meta / Description */
 .world-bubble-meta {
     font-size: 12px;
-    background: rgba(100, 100, 100, 0.2);
+    background: var(--surface-hover);
     padding: 4px 8px;
     border-radius: 12px;
-    color: rgba(212, 212, 212, 0.8);
-    border: 1px solid rgba(100, 100, 100, 0.3);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-primary);
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
@@ -121,7 +121,7 @@
 }
 
 .world-bubble-action:hover {
-    background: rgba(100, 100, 100, 0.2);
+    background: var(--surface-hover);
     color: var(--theme-color);
     transform: scale(1.2);
 }

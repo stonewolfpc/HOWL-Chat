@@ -8,21 +8,64 @@
 .memory-entry {
     padding: 8px 0;
     border-bottom: 1px solid #1F242A;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
 }
 
 .memory-entry:last-child {
     border-bottom: none;
 }
 
+.memory-entry-content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
 .memory-title {
     font-weight: 600;
-    color: #e0e0e0;
+    color: var(--text-primary);
     margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .memory-time {
     font-size: 0.8rem;
     color: #999;
+}
+
+.memory-delete-btn {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease, background 0.15s ease;
+    flex-shrink: 0;
+    color: rgba(239, 68, 68, 0.7);
+}
+
+.memory-delete-btn .icon-trash::before {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+}
+
+.memory-entry:hover .memory-delete-btn,
+.memory-list-item:hover .memory-delete-btn {
+    opacity: 1;
+}
+
+.memory-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: rgba(239, 68, 68, 1);
 }
 
 /* Memory List Flyout (right side) */
@@ -33,7 +76,7 @@
     transform: translateY(-50%);
     width: 300px;
     max-height: 70vh;
-    background: #111418;
+    background: var(--surface-secondary);
     border: 1px solid #1F242A;
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -59,7 +102,7 @@
 
 .memory-list-header h3 {
     margin: 0;
-    color: #e0e0e0;
+    color: var(--text-primary);
     font-size: 16px;
     font-weight: 600;
 }
@@ -73,14 +116,23 @@
     border-bottom: 1px solid #1F242A;
     cursor: pointer;
     transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .memory-list-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-hover);
 }
 
 .memory-list-item:last-child {
     border-bottom: none;
+}
+
+.memory-list-item-content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .memory-item-time {
@@ -90,8 +142,11 @@
 }
 
 .memory-item-title {
-    color: #e0e0e0;
+    color: var(--text-primary);
     font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Memory Edit Flyout (centered) */
@@ -102,7 +157,7 @@
     transform: translate(-50%, -50%);
     width: 500px;
     max-height: 80vh;
-    background: #111418;
+    background: var(--surface-secondary);
     border: 1px solid #1F242A;
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -128,7 +183,7 @@
 
 .memory-edit-header h3 {
     margin: 0;
-    color: #e0e0e0;
+    color: var(--text-primary);
     font-size: 16px;
     font-weight: 600;
 }
@@ -145,7 +200,7 @@
 .memory-edit-field label {
     display: block;
     margin-bottom: 6px;
-    color: #e0e0e0;
+    color: var(--text-primary);
     font-weight: 500;
     font-size: 0.9rem;
 }
@@ -154,10 +209,10 @@
 .memory-edit-field textarea {
     width: 100%;
     padding: 10px;
-    background: #1F242A;
+    background: var(--surface-secondary);
     border: 1px solid #2A2F36;
     border-radius: 4px;
-    color: #e0e0e0;
+    color: var(--text-primary);
     font-family: inherit;
 }
 
@@ -169,7 +224,7 @@
 
 .memory-edit-field textarea {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    scrollbar-color: var(--border-secondary) transparent;
 }
 
 .memory-edit-field textarea::-webkit-scrollbar {
@@ -181,12 +236,12 @@
 }
 
 .memory-edit-field textarea::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--border-primary);
     border-radius: 4px;
 }
 
 .memory-edit-field textarea::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--border-primary);
 }
 
 .memory-edit-actions {

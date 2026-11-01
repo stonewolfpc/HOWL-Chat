@@ -30,8 +30,8 @@
 
 /* Sidebar */
 .lorebook-editor-sidebar {
-    border-right: 1px solid rgba(100, 100, 100, 0.3);
-    background: rgba(10, 10, 15, 0.35);
+    border-right: 1px solid var(--border-primary);
+    background: var(--surface-tertiary);
     padding: 18px;
 }
 
@@ -52,8 +52,8 @@
 
 /* Editor Section Box */
 .lorebook-editor-section {
-    border: 1px solid rgba(100, 100, 100, 0.26);
-    background: rgba(15, 21, 31, 0.52);
+    border: 1px solid var(--border-primary);
+    background: var(--shell-aside-bg);
     border-radius: 8px;
     padding: 16px;
     margin-bottom: 14px;

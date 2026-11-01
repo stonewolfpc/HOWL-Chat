@@ -3,10 +3,6 @@
  * All body.theme-light rules for lorebook components.
  */
 
-body.theme-light .lorebooks-page {
-    background: var(--surface-secondary);
-}
-
 body.theme-light .lorebook-page-header {
     background: var(--surface-tertiary);
     border-bottom-color: var(--border-primary);
@@ -19,7 +15,7 @@ body.theme-light .lorebook-page-title {
 body.theme-light .create-lorebook-button {
     background: var(--button-primary-bg);
     border-color: var(--button-primary-bg);
-    color: #FFFFFF;
+    color: var(--on-accent);
 }
 
 body.theme-light .create-lorebook-button:hover {
@@ -121,7 +117,7 @@ body.theme-light .lorebook-creation-cancel {
 
 body.theme-light .lorebook-creation-save {
     background: var(--button-primary-bg);
-    color: #FFFFFF;
+    color: var(--on-accent);
     border-color: var(--button-primary-bg);
 }
 

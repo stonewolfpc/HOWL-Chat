@@ -304,6 +304,55 @@ The Image Generator has multiple dropdowns, all populated from the registry:
 - **Embeddings** — Textual inversions
 - **Upscalers** — Image upscaling models
 
+## Supported Model Families
+
+HOWL supports the following diffusion model families via stable-diffusion.cpp:
+
+| Model Family | CLI Flag | Companion Models Required | Special Flags | Download Links |
+|--------------|----------|---------------------------|---------------|----------------|
+| **SD1.x / SD2.x** | \`-m\` | clip_l + vae | None | [CivitAI SD1.5](https://civitai.com/models/3/realistic-vision-v51) |
+| **SDXL** | \`-m\` | clip_l + vae | None | [CivitAI SDXL](https://civitai.com/models/164278/juggernaut-xl-v9) |
+| **SD3 / SD3.5** | \`-m\` | clip_l + clip_g + t5xxl + vae | None | [HuggingFace SD3](https://huggingface.co/stabilityai/stable-diffusion-3-medium) |
+| **Flux.1 / Flux.2** | \`--diffusion-model\` | clip_l + t5xxl + vae | None | [HuggingFace Flux](https://huggingface.co/black-forest-labs/FLUX.1-dev) |
+| **Chroma** | \`--diffusion-model\` | clip_l + t5xxl + vae | \`--chroma-disable-dit-mask\` | [HuggingFace Chroma](https://huggingface.co/filipstrand/chroma-v10) |
+| **Anima** | \`--diffusion-model\` | \`--llm\` (Qwen3-0.6B-Base) + qwen_image_vae | None | [HuggingFace Anima](https://huggingface.co/circlestone-labs/Anima) |
+| **HiDream-O1** | \`-m\` | None (self-contained) | None | [HuggingFace HiDream](https://huggingface.co/Comfy-Org/HiDream-O1-Image) |
+| **Qwen Image** | \`-m\` | None (self-contained) | None | [HuggingFace Qwen Image](https://huggingface.co/Qwen/Qwen2-VL-72B-Instruct) |
+| **AuraFlow** | ❌ NOT SUPPORTED | ❌ | ❌ | — |
+
+## Companion Model Requirements
+
+Some models require specific companion files. HOWL auto-detects these if they're in the same directory or scanned directories.
+
+### For Flux / Chroma
+- **clip_l**: CLIP-L text encoder (usually named \`clip_l.safetensors\` or \`CLIP-L.safetensors\`)
+- **t5xxl**: T5-XXL text encoder (usually named \`t5xxl_fp16.safetensors\` or \`t5xxl_fp32.safetensors\`)
+- **vae**: VAE model (usually named \`ae.safetensors\` or \`vae.safetensors\`)
+
+### For Anima
+- **llm**: Qwen3-0.6B-Base text encoder (NOT clip_l or t5xxl!)
+  - Download: [Qwen3-0.6B-Base](https://huggingface.co/circlestone-labs/Anima/tree/main/split_files/text_encoders)
+- **vae**: qwen_image_vae (NOT standard ae.safetensors!)
+  - Download: [qwen_image_vae](https://huggingface.co/circlestone-labs/Anima/tree/main/split_files/vae)
+
+### For SD3 / SD3.5
+- **clip_l**: CLIP-L text encoder
+- **clip_g**: CLIP-G text encoder
+- **t5xxl**: T5-XXL text encoder
+- **vae**: VAE model
+
+### For SDXL
+- **clip_l**: CLIP-L text encoder
+- **vae**: VAE model
+
+### For SD1.x / SD2.x
+- **clip_l**: CLIP-L text encoder
+- **vae**: VAE model
+
+<warning>
+Anima requires Qwen3-0.6B-Base as its text encoder, NOT clip_l or t5xxl. Using the wrong companion model will cause "unknown tensor" errors.
+</warning>
+
 ## How to Add Assets
 
 **Scan a Directory:**

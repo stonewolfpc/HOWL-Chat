@@ -77,25 +77,23 @@ type ChatCompletionRequest struct {
 	Seed             *int    `json:"seed,omitempty"`
 
 	// llama.cpp extensions
-	TopK              int     `json:"top_k,omitempty"`
-	MinP              float64 `json:"min_p,omitempty"`
-	TypicalP          float64 `json:"typical_p,omitempty"`
-	RepeatPenalty     float64 `json:"repeat_penalty,omitempty"`
-	RepeatLastN       int     `json:"repeat_last_n,omitempty"`
-	Mirostat          int     `json:"mirostat,omitempty"`
-	MirostatTau       float64 `json:"mirostat_tau,omitempty"`
-	MirostatEta       float64 `json:"mirostat_eta,omitempty"`
-	DynTempRange      float64 `json:"dynatemp_range,omitempty"`
-	DynTempExponent   float64 `json:"dynatemp_exponent,omitempty"`
-	DryMultiplier     float64 `json:"dry_multiplier,omitempty"`
-	DryAllowedLength  int     `json:"dry_allowed_length,omitempty"`
-	DryBase           float64 `json:"dry_base,omitempty"`
-	SmoothingFactor   float64 `json:"smoothing_factor,omitempty"`
-	SmoothingCurve    float64 `json:"smoothing_curve,omitempty"`
-	TopA              float64 `json:"top_a,omitempty"`
-	EpsilonCutoff     float64 `json:"epsilon_cutoff,omitempty"`
-	EtaCutoff         float64 `json:"eta_cutoff,omitempty"`
-	NoRepeatNgramSize int     `json:"no_repeat_ngram_size,omitempty"`
+	TopK             int     `json:"top_k,omitempty"`
+	MinP             float64 `json:"min_p,omitempty"`
+	TypicalP         float64 `json:"typical_p,omitempty"`
+	RepeatPenalty    float64 `json:"repeat_penalty,omitempty"`
+	RepeatLastN      int     `json:"repeat_last_n,omitempty"`
+	Mirostat         int     `json:"mirostat,omitempty"`
+	MirostatTau      float64 `json:"mirostat_tau,omitempty"`
+	MirostatEta      float64 `json:"mirostat_eta,omitempty"`
+	DynTempRange     float64 `json:"dynatemp_range,omitempty"`
+	DynTempExponent  float64 `json:"dynatemp_exponent,omitempty"`
+	DryMultiplier    float64 `json:"dry_multiplier,omitempty"`
+	DryAllowedLength int     `json:"dry_allowed_length,omitempty"`
+	DryBase          float64 `json:"dry_base,omitempty"`
+
+	// OnReasoning receives reasoning/thinking deltas separately from content.
+	// Never marshalled: a local delivery hook, not a server field.
+	OnReasoning func(string) `json:"-"`
 }
 
 // ChatCompletionResponse represents a chat completion response from llama.cpp (OpenAI-compatible)
@@ -184,6 +182,8 @@ func (c *HTTPClient) GenerateChatCompletionStreaming(req *ChatCompletionRequest,
 	scanner := bufio.NewScanner(resp.Body)
 	chunkCount := 0
 	totalContent := 0
+	reasoningChars := 0
+	reasoningChunks := 0
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" || line == "[DONE]" {
@@ -240,9 +240,15 @@ func (c *HTTPClient) GenerateChatCompletionStreaming(req *ChatCompletionRequest,
 						}
 					}
 					if reasoning != "" {
-						callback(reasoning)
-						chunkCount++
-						totalContent += len(reasoning)
+						// Reasoning must never travel through the content callback:
+						// whatever lands there becomes the assistant reply, is saved
+						// to history, and is fed back to the model next turn. Count it
+						// for diagnostics only.
+						reasoningChars += len(reasoning)
+						reasoningChunks++
+						if req.OnReasoning != nil {
+							req.OnReasoning(reasoning)
+						}
 					}
 				}
 			} else {
@@ -254,6 +260,7 @@ func (c *HTTPClient) GenerateChatCompletionStreaming(req *ChatCompletionRequest,
 		return fmt.Errorf("scanner error: %w", err)
 	}
 	fmt.Printf("DEBUG: Stream completed, total chunks=%d, total content=%d bytes\n", chunkCount, totalContent)
+	fmt.Printf("DEBUG: Stream reasoning: %d chunks, %d chars (never fed back)\n", reasoningChunks, reasoningChars)
 
 	return nil
 }
@@ -446,10 +453,82 @@ func (c *HTTPClient) IsLoaded() bool {
 	return ok && len(data) > 0
 }
 
-// GetModelInfo returns information about the currently loaded model (implements Client interface)
+// GetModelInfo returns information about the currently loaded model (implements Client interface).
+// llama-server exposes the loaded model through /props (model_path, n_ctx) and /v1/models (id),
+// so the info is read from the server rather than the local model registry.
 func (c *HTTPClient) GetModelInfo() (*types.Model, error) {
-	// This would need to be implemented based on the HTTP API
-	return nil, fmt.Errorf("GetModelInfo not implemented for HTTP client")
+	props, err := c.serverProps()
+	if err != nil {
+		return nil, err
+	}
+
+	modelPath, _ := props["model_path"].(string)
+	if modelPath == "" {
+		if loaded, loadErr := c.GetLoadedModel(); loadErr == nil {
+			if data, ok := loaded["data"].([]interface{}); ok && len(data) > 0 {
+				if first, ok := data[0].(map[string]interface{}); ok {
+					modelPath, _ = first["id"].(string)
+				}
+			}
+		}
+	}
+	if modelPath == "" {
+		return nil, fmt.Errorf("llama.cpp server did not report a loaded model")
+	}
+
+	cleanPath := strings.ReplaceAll(modelPath, "\\", "/")
+	format := types.FormatGGUF
+	if strings.EqualFold(filepath.Ext(cleanPath), ".ggml") {
+		format = types.FormatGGML
+	}
+
+	model := &types.Model{
+		ID:       modelPath,
+		Name:     filepath.Base(cleanPath),
+		FilePath: modelPath,
+		Format:   format,
+		LoadedAt: time.Now().Format(time.RFC3339),
+	}
+	model.Parameters.ContextSize = contextSizeFromProps(props)
+	return model, nil
+}
+
+// serverProps fetches /props from llama-server.
+func (c *HTTPClient) serverProps() (map[string]interface{}, error) {
+	if !c.enabled {
+		return nil, fmt.Errorf("llama.cpp HTTP client is disabled")
+	}
+
+	resp, err := c.httpClient.Get(c.baseURL + "/props")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get server props: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("llama.cpp props failed: %s - %s", resp.Status, string(body))
+	}
+
+	var props map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&props); err != nil {
+		return nil, fmt.Errorf("failed to decode props: %w", err)
+	}
+	return props, nil
+}
+
+// contextSizeFromProps reads n_ctx, which current builds nest under
+// default_generation_settings and older builds report at the top level.
+func contextSizeFromProps(props map[string]interface{}) int {
+	if gen, ok := props["default_generation_settings"].(map[string]interface{}); ok {
+		if n, ok := gen["n_ctx"].(float64); ok && n > 0 {
+			return int(n)
+		}
+	}
+	if n, ok := props["n_ctx"].(float64); ok && n > 0 {
+		return int(n)
+	}
+	return 0
 }
 
 // Generate generates text completion for the given prompt (implements Client interface)
@@ -514,26 +593,20 @@ func buildRequestWithImage(model string, prompt string, options *InferenceOption
 		Messages: []ChatMessage{{Role: "user", Content: content}},
 		Stream:   stream,
 
-		MaxTokens:         options.NPredict,
-		Temperature:       options.Temperature,
-		TopK:              options.TopK,
-		MinP:              options.MinP,
-		RepeatPenalty:     options.RepeatPenalty,
-		RepeatLastN:       options.RepeatLastN,
-		Mirostat:          options.Mirostat,
-		MirostatTau:       options.MirostatTau,
-		MirostatEta:       options.MirostatETA,
-		DynTempRange:      options.DynamicTempRange,
-		DynTempExponent:   options.DynamicTempExponent,
-		DryMultiplier:     options.DRYMultiplier,
-		DryAllowedLength:  options.DRYAllowedLength,
-		DryBase:           options.DRYBase,
-		SmoothingFactor:   options.SmoothingFactor,
-		SmoothingCurve:    options.SmoothingCurve,
-		TopA:              options.TopA,
-		EpsilonCutoff:     options.EpsilonCutoff,
-		EtaCutoff:         options.EtaCutoff,
-		NoRepeatNgramSize: options.NoRepeatNGramSize,
+		MaxTokens:        options.NPredict,
+		Temperature:      options.Temperature,
+		TopK:             options.TopK,
+		MinP:             options.MinP,
+		RepeatPenalty:    options.RepeatPenalty,
+		RepeatLastN:      options.RepeatLastN,
+		Mirostat:         options.Mirostat,
+		MirostatTau:      options.MirostatTau,
+		MirostatEta:      options.MirostatETA,
+		DynTempRange:     options.DynamicTempRange,
+		DynTempExponent:  options.DynamicTempExponent,
+		DryMultiplier:    options.DRYMultiplier,
+		DryAllowedLength: options.DRYAllowedLength,
+		DryBase:          options.DRYBase,
 	}
 
 	// Conditionally enabled fields
@@ -565,6 +638,132 @@ func base64Encode(data []byte) string {
 	return base64.StdEncoding.EncodeToString(data)
 }
 
+// buildRequestFromMessages constructs a ChatCompletionRequest from a messages array.
+func buildRequestFromMessages(messages []ChatMessage, options *InferenceOptions, stream bool) *ChatCompletionRequest {
+	req := &ChatCompletionRequest{
+		Model:    "model",
+		Messages: messages,
+		Stream:   stream,
+
+		MaxTokens:        options.NPredict,
+		Temperature:      options.Temperature,
+		TopK:             options.TopK,
+		MinP:             options.MinP,
+		RepeatPenalty:    options.RepeatPenalty,
+		RepeatLastN:      options.RepeatLastN,
+		Mirostat:         options.Mirostat,
+		MirostatTau:      options.MirostatTau,
+		MirostatEta:      options.MirostatETA,
+		DynTempRange:     options.DynamicTempRange,
+		DynTempExponent:  options.DynamicTempExponent,
+		DryMultiplier:    options.DRYMultiplier,
+		DryAllowedLength: options.DRYAllowedLength,
+		DryBase:          options.DRYBase,
+	}
+
+	// Conditionally enabled fields
+	if options.TopPEnabled {
+		req.TopP = options.TopP
+	}
+	if options.TypicalPEnabled {
+		req.TypicalP = options.TypicalP
+	}
+	if options.FrequencyPenaltyEnabled {
+		req.FrequencyPenalty = options.FrequencyPenalty
+	}
+	if options.PresencePenaltyEnabled {
+		req.PresencePenalty = options.PresencePenalty
+	}
+	if options.Seed >= 0 {
+		s := options.Seed
+		req.Seed = &s
+	}
+	if len(options.StopStrings) > 0 {
+		req.Stop = options.StopStrings
+	}
+
+	return req
+}
+
+// GenerateChatStream sends a proper messages array to the chat completions endpoint.
+func (c *HTTPClient) GenerateChatStream(messages []ChatMessage, options *InferenceOptions, callback TokenCallback) error {
+	req := buildRequestFromMessages(messages, options, true)
+	req.OnReasoning = options.OnReasoning
+	err := c.GenerateChatCompletionStreaming(req, func(chunk string) {
+		callback(chunk, false)
+	})
+	if err != nil {
+		return err
+	}
+	callback("", true)
+	return nil
+}
+
+// GenerateChatStreamWithImage sends a proper messages array with optional image.
+func (c *HTTPClient) GenerateChatStreamWithImage(messages []ChatMessage, imageData []byte, options *InferenceOptions, callback TokenCallback) error {
+	req := buildRequestFromMessages(messages, options, true)
+	req.OnReasoning = options.OnReasoning
+	if imageData != nil {
+		// Replace the last user message content with vision format
+		for i := len(req.Messages) - 1; i >= 0; i-- {
+			if req.Messages[i].Role == "user" {
+				req.Messages[i].Content = []ImageContent{
+					{Type: "text", Text: fmt.Sprintf("%v", req.Messages[i].Content)},
+					{Type: "image_url", ImageURL: &ImageURL{
+						URL:    fmt.Sprintf("data:image/jpeg;base64,%s", base64Encode(imageData)),
+						Detail: "auto",
+					}},
+				}
+				break
+			}
+		}
+	}
+	err := c.GenerateChatCompletionStreaming(req, func(chunk string) {
+		callback(chunk, false)
+	})
+	if err != nil {
+		return err
+	}
+	callback("", true)
+	return nil
+}
+
+// GenerateChat generates text completion from a messages array (non-streaming).
+func (c *HTTPClient) GenerateChat(messages []ChatMessage, options *InferenceOptions) (string, error) {
+	if !c.enabled {
+		return "", fmt.Errorf("llama.cpp HTTP client is disabled")
+	}
+
+	req := buildRequestFromMessages(messages, options, false)
+
+	jsonData, err := json.Marshal(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal request: %w", err)
+	}
+
+	url := fmt.Sprintf("%s/v1/chat/completions", c.baseURL)
+	resp, err := c.httpClient.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return "", fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("llama-server error: %s - %s", resp.Status, string(body))
+	}
+
+	var result ChatCompletionResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	if len(result.Choices) == 0 {
+		return "", fmt.Errorf("no choices in response")
+	}
+	return result.Choices[0].Message.Content, nil
+}
+
 // GenerateStreamWithImage generates text completion with streaming output and optional image
 func (c *HTTPClient) GenerateStreamWithImage(prompt string, imageData []byte, options *InferenceOptions, callback TokenCallback) error {
 	req := buildRequestWithImage("model", prompt, options, true, imageData)
@@ -593,22 +792,93 @@ func (c *HTTPClient) GenerateStream(prompt string, options *InferenceOptions, ca
 	return nil
 }
 
-// Tokenize converts text to token IDs (implements Client interface)
+// Tokenize converts text to token IDs (implements Client interface).
+// Uses llama-server's POST /tokenize; the server returns {"tokens": [...]}.
 func (c *HTTPClient) Tokenize(text string, options *TokenizerOptions) ([]int, error) {
-	// This would need to be implemented via HTTP API
-	return nil, fmt.Errorf("tokenize not implemented for HTTP client")
+	if !c.enabled {
+		return nil, fmt.Errorf("llama.cpp HTTP client is disabled")
+	}
+
+	payload := map[string]interface{}{"content": text}
+	if options != nil && (options.AddBOS || options.AddEOS) {
+		payload["add_special"] = true
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal tokenize request: %w", err)
+	}
+
+	resp, err := c.httpClient.Post(c.baseURL+"/tokenize", "application/json", bytes.NewReader(body))
+	if err != nil {
+		return nil, fmt.Errorf("failed to tokenize: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		raw, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("llama.cpp tokenize failed: %s - %s", resp.Status, string(raw))
+	}
+
+	var decoded struct {
+		Tokens []interface{} `json:"tokens"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&decoded); err != nil {
+		return nil, fmt.Errorf("failed to decode tokenize response: %w", err)
+	}
+
+	ids := make([]int, 0, len(decoded.Tokens))
+	for _, token := range decoded.Tokens {
+		switch v := token.(type) {
+		case float64:
+			ids = append(ids, int(v))
+		case map[string]interface{}:
+			if id, ok := v["id"].(float64); ok {
+				ids = append(ids, int(id))
+			}
+		}
+	}
+	return ids, nil
 }
 
-// Detokenize converts token IDs back to text (implements Client interface)
+// Detokenize converts token IDs back to text (implements Client interface).
+// Uses llama-server's POST /detokenize; the server returns {"content": "..."}.
 func (c *HTTPClient) Detokenize(tokens []int) (string, error) {
-	// This would need to be implemented via HTTP API
-	return "", fmt.Errorf("detokenize not implemented for HTTP client")
+	if !c.enabled {
+		return "", fmt.Errorf("llama.cpp HTTP client is disabled")
+	}
+
+	body, err := json.Marshal(map[string]interface{}{"tokens": tokens})
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal detokenize request: %w", err)
+	}
+
+	resp, err := c.httpClient.Post(c.baseURL+"/detokenize", "application/json", bytes.NewReader(body))
+	if err != nil {
+		return "", fmt.Errorf("failed to detokenize: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		raw, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("llama.cpp detokenize failed: %s - %s", resp.Status, string(raw))
+	}
+
+	var decoded struct {
+		Content string `json:"content"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&decoded); err != nil {
+		return "", fmt.Errorf("failed to decode detokenize response: %w", err)
+	}
+	return decoded.Content, nil
 }
 
-// GetContextSize returns the maximum context window size (implements Client interface)
+// GetContextSize returns the maximum context window size (implements Client interface).
 func (c *HTTPClient) GetContextSize() int {
-	// This would need to be implemented via HTTP API
-	return 0
+	props, err := c.serverProps()
+	if err != nil {
+		return 0
+	}
+	return contextSizeFromProps(props)
 }
 
 // GetUsedMemory returns the amount of memory used by the model (implements Client interface)

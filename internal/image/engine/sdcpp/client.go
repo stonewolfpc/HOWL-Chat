@@ -327,6 +327,7 @@ type txt2imgRequest struct {
 	Steps                   int           `json:"steps"`
 	Seed                    int64         `json:"seed"`
 	SamplerName             string        `json:"sampler_name"`
+	Preview                 string        `json:"preview,omitempty"`
 	Scheduler               string        `json:"scheduler"`
 	CfgScale                float64       `json:"cfg_scale"`
 	Guidance                float64       `json:"guidance,omitempty"`
@@ -354,6 +355,7 @@ type txt2imgRequest struct {
 	Tiling                  bool          `json:"tiling"`
 	ClipSkip                int           `json:"clip_skip"`
 	LoRAs                   []LoRARequest `json:"loras,omitempty"`
+	ControlNetPath          string        `json:"control_net_path,omitempty"`
 	ControlImage            string        `json:"control_image,omitempty"`
 	ControlStrength         float64       `json:"control_strength,omitempty"`
 	CacheMode               string        `json:"cache_mode,omitempty"`
@@ -450,6 +452,7 @@ func (c *client) txt2img(opts types.ImageOptions) (*types.ImageResult, error) {
 		Steps:               opts.Steps,
 		Seed:                opts.Seed,
 		SamplerName:         opts.Sampler,
+		Preview:             "tae",
 		Scheduler:           opts.Scheduler,
 		CfgScale:            opts.CfgScale,
 		BatchSize:           opts.BatchCount,
@@ -460,6 +463,7 @@ func (c *client) txt2img(opts types.ImageOptions) (*types.ImageResult, error) {
 		Tiling:              opts.Tiling,
 		ClipSkip:            opts.ClipSkip,
 		LoRAs:               convertLoRAs(opts.LoRAs),
+		ControlNetPath:      opts.ControlNetPath,
 		ControlImage:        ctrlImgB64,
 		ControlStrength:     opts.ControlStrength,
 		VideoFrames:         opts.VideoFrames,
@@ -645,6 +649,7 @@ type img2imgRequest struct {
 	Steps                   int           `json:"steps"`
 	Seed                    int64         `json:"seed"`
 	SamplerName             string        `json:"sampler_name"`
+	Preview                 string        `json:"preview,omitempty"`
 	Scheduler               string        `json:"scheduler"`
 	CfgScale                float64       `json:"cfg_scale"`
 	Guidance                float64       `json:"guidance,omitempty"`
@@ -670,6 +675,7 @@ type img2imgRequest struct {
 	Tiling                  bool          `json:"tiling"`
 	ClipSkip                int           `json:"clip_skip"`
 	LoRAs                   []LoRARequest `json:"loras,omitempty"`
+	ControlNetPath          string        `json:"control_net_path,omitempty"`
 	ControlImage            string        `json:"control_image,omitempty"`
 	ControlStrength         float64       `json:"control_strength,omitempty"`
 	CacheMode               string        `json:"cache_mode,omitempty"`
@@ -767,6 +773,7 @@ func (c *client) img2img(opts types.ImageOptions) (*types.ImageResult, error) {
 		Steps:               opts.Steps,
 		Seed:                opts.Seed,
 		SamplerName:         opts.Sampler,
+		Preview:             "tae",
 		Scheduler:           opts.Scheduler,
 		CfgScale:            opts.CfgScale,
 		BatchSize:           opts.BatchCount,
@@ -784,6 +791,7 @@ func (c *client) img2img(opts types.ImageOptions) (*types.ImageResult, error) {
 		Tiling:              opts.Tiling,
 		ClipSkip:            opts.ClipSkip,
 		LoRAs:               convertLoRAs(opts.LoRAs),
+		ControlNetPath:      opts.ControlNetPath,
 		ControlImage:        ctrlImgB64,
 		ControlStrength:     opts.ControlStrength,
 		RNG:                 opts.RNG,
@@ -956,6 +964,7 @@ func (c *client) inpaint(opts types.ImageOptions) (*types.ImageResult, error) {
 		Steps:               opts.Steps,
 		Seed:                opts.Seed,
 		SamplerName:         opts.Sampler,
+		Preview:             "tae",
 		Scheduler:           opts.Scheduler,
 		CfgScale:            opts.CfgScale,
 		BatchSize:           opts.BatchCount,
@@ -973,6 +982,7 @@ func (c *client) inpaint(opts types.ImageOptions) (*types.ImageResult, error) {
 		Tiling:              opts.Tiling,
 		ClipSkip:            opts.ClipSkip,
 		LoRAs:               convertLoRAs(opts.LoRAs),
+		ControlNetPath:      opts.ControlNetPath,
 		ControlImage:        ctrlImgB64,
 		ControlStrength:     opts.ControlStrength,
 		VideoFrames:         opts.VideoFrames,
@@ -1082,121 +1092,6 @@ func (c *client) inpaint(opts types.ImageOptions) (*types.ImageResult, error) {
 	}, nil
 }
 
-func (c *client) video(opts types.ImageOptions) (*types.ImageResult, error) {
-	if opts.BatchCount > 1 {
-		return c.generateSequentialBatch(func(o types.ImageOptions) (*types.ImageResult, error) {
-			o.BatchCount = 1
-			return c.video(o)
-		}, opts)
-	}
-	// Video generation often requires an init image (SVD) or text (WAN).
-	// We'll use the img2img endpoint if an init image is present, otherwise txt2img.
-	if opts.InitImagePath != "" {
-		imgData, err := os.ReadFile(opts.InitImagePath)
-		if err != nil {
-			return nil, fmt.Errorf("read init image: %w", err)
-		}
-		b64Img := base64.StdEncoding.EncodeToString(imgData)
-
-		var ctrlImgB64 string
-		if opts.ControlImagePath != "" {
-			if data, err := os.ReadFile(opts.ControlImagePath); err == nil {
-				ctrlImgB64 = base64.StdEncoding.EncodeToString(data)
-			}
-		}
-		var endImgB64 string
-		if opts.EndImagePath != "" {
-			if data, err := os.ReadFile(opts.EndImagePath); err == nil {
-				endImgB64 = base64.StdEncoding.EncodeToString(data)
-			}
-		}
-
-		reqBody := img2imgRequest{
-			Prompt:            opts.Prompt,
-			NegativePrompt:    opts.NegativePrompt,
-			InitImages:        []string{b64Img},
-			Width:             opts.Width,
-			Height:            opts.Height,
-			Steps:             opts.Steps,
-			Seed:              opts.Seed,
-			SamplerName:       opts.Sampler,
-			Scheduler:         opts.Scheduler,
-			CfgScale:          opts.CfgScale,
-			Guidance:          opts.Guidance,
-			SlgScale:          opts.SlgScale,
-			SkipLayerStart:    opts.SkipLayerStart,
-			SkipLayerEnd:      opts.SkipLayerEnd,
-			Eta:               opts.Eta,
-			BatchSize:         opts.BatchCount,
-			DenoisingStrength: opts.Strength,
-			Tiling:            opts.Tiling,
-			ClipSkip:          opts.ClipSkip,
-			LoRAs:             convertLoRAs(opts.LoRAs),
-			ControlImage:      ctrlImgB64,
-			ControlStrength:   opts.ControlStrength,
-			VideoFrames:       opts.VideoFrames,
-			FPS:               opts.FPS,
-			EndImage:          endImgB64,
-		}
-
-		jsonData, err := json.Marshal(reqBody)
-		if err != nil {
-			return nil, fmt.Errorf("marshal video request: %w", err)
-		}
-
-		// Use async job API for live preview support
-		resp, err := c.http.Post(c.baseURL+"/sdcpp/v1/img_gen", "application/json", bytes.NewBuffer(jsonData))
-		if err != nil {
-			return nil, fmt.Errorf("sd-server img_gen request failed: %w", err)
-		}
-		defer resp.Body.Close()
-
-		body, _ := io.ReadAll(resp.Body)
-		if resp.StatusCode != http.StatusOK {
-			return nil, fmt.Errorf("sd-server img_gen error %d: %s", resp.StatusCode, string(body))
-		}
-
-		var jobResp struct {
-			JobID string `json:"job_id"`
-		}
-		if err := json.Unmarshal(body, &jobResp); err != nil {
-			return nil, fmt.Errorf("decode job response: %w", err)
-		}
-		if jobResp.JobID == "" {
-			return nil, fmt.Errorf("no job ID in response")
-		}
-
-		// Store active job ID for progress polling
-		c.mu.Lock()
-		c.activeJobID = jobResp.JobID
-		c.mu.Unlock()
-
-		// Poll job until completion
-		job, err := c.pollJob(jobResp.JobID)
-		if err != nil {
-			return nil, err
-		}
-
-		if len(job.Result.Images) == 0 {
-			return nil, fmt.Errorf("no images in job result")
-		}
-
-		return &types.ImageResult{
-			ImageData: job.Result.Images[0],
-			Images:    job.Result.Images,
-			Metadata: types.ImageMetadata{
-				Prompt:    opts.Prompt,
-				Mode:      opts.Mode,
-				CreatedAt: time.Now().Format(time.RFC3339),
-				Options:   opts,
-			},
-		}, nil
-	}
-
-	// Txt2Video flow
-	return c.txt2img(opts)
-}
-
 func (c *client) getSamplers() ([]string, error) {
 	resp, err := c.http.Get(c.baseURL + "/sdapi/v1/samplers")
 	if err != nil {
@@ -1236,20 +1131,10 @@ func (c *client) progress() (types.ProgressInfo, error) {
 	jobID := c.activeJobID
 	c.mu.Unlock()
 
-	if jobID == "" {
-		return types.ProgressInfo{}, nil
-	}
-
-	fmt.Printf("[DEBUG] progress() called for jobID: %s\n", jobID)
-
-	// NOTE: Live preview limitation - stable-diffusion.cpp's async job API (/sdcpp/v1/jobs/{id})
-	// does not currently return progress/preview data (step, progress, preview_image fields are always 0/empty).
-	// The legacy /sdapi/v1/progress endpoint also doesn't work with async jobs.
-	// This is a limitation of the current stable-diffusion.cpp implementation (as of May 2026).
-	// To enable live preview, either:
-	// 1. Wait for stable-diffusion.cpp to add progress support to the async job API
-	// 2. Switch back to synchronous API (loses async capability but gets progress)
-	// See: https://github.com/leejet/stable-diffusion.cpp/issues
+	// /sdapi/v1/progress is job-agnostic and is the only place a decoded
+	// preview frame shows up (current_image), so it has to be queried even
+	// when no async job id exists. The id is only needed by the fallback.
+	fmt.Printf("[DEBUG] progress() called (jobID=%q)", jobID)
 
 	// Try legacy /sdapi/v1/progress endpoint first (may have preview data)
 	resp, err := c.http.Get(c.baseURL + "/sdapi/v1/progress")
@@ -1273,6 +1158,10 @@ func (c *client) progress() (types.ProgressInfo, error) {
 				}
 			}
 		}
+	}
+
+	if jobID == "" {
+		return types.ProgressInfo{}, nil
 	}
 
 	// Fallback to async job endpoint

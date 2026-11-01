@@ -29,5 +29,5 @@ body.theme-light .ig-negative {
 }
 
 body.theme-light .ig-slider {
-    background: var(--border-secondary);
+    background: var(--surface-hover);
 }

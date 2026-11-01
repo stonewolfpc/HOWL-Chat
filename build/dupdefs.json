@@ -1,0 +1,145 @@
+{
+ "real": [],
+ "harmless": [
+  {
+   "name": "editCharacter",
+   "files": [
+    "character-grid.js",
+    "sidebar-characters.js"
+   ],
+   "variants": 2,
+   "shadows": [],
+   "bodies": {
+    "character-grid.js": "{ if (event) event.stopPropagation(); const cs = window.characterState; cs.currentEditingIndex = index; const characters = cs.characterCache || JSON.parse(localStorage.getItem(\"\") || \"\"); const character = characters[index]; if (!character) { console.error(\"\", index); return; } const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; }; const setChecked = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; }; set(\"\", character.name || \"\"); set(\"\", character.metadata?.age || \"\"); set(\"\", character.metadata?.role || \"\"); set(\"\", character.metadata?.priority ?? 3); set(\"\", character.description || \"\"); set(\"\", character.personality || \"\"); set(\"\", character.metadata?.background || \"\"); set(\"\", character.first_mes || \"\"); set(\"\", character.mes_example || \"\"); const voice = character.howl?.voice; setChecked(\"\", voice?.enabled || false); set(\"\", voice?.engine || \"\"); set(\"\", voice?.voice || \"\"); set(\"\", voice?.speed ?? 1.0); set(\"\", voice?.volume ?? 0.8); if (typeof _updateVoiceControlsVisible === \"\") _updateVoiceControlsVisible(); if (typeof _updateSliderDisplay === \"\") { _updateSliderDisplay(\"\", \"\", \"\"); _updateSliderDisplay(\"\", \"\", \"\"); } cs.characterImages = character.howl?.images || []; updateImagesList(); cs.selectedLorebooks = cs.resolveLorebooksFromRefs(character.howl?.lorebooks || character.lorebooks || []); updateSelectedLorebooksList(); loadAvailableLorebooks(); if (window.go?.main?.App?.SetLorebooks) { window.go.main.App.SetLorebooks(Array.isArray(cs.selectedLorebooks) ? cs.selectedLorebooks : []); } openCharacterCreationPopup(); }",
+    "sidebar-characters.js": "{ console.log(\"\", characterId); if (window.go && window.go.main && window.go.main.App && window.go.main.App.OpenCharacterSheet) { window.go.main.App.OpenCharacterSheet(characterId) .then(() => console.log(\"\", characterId)) .catch(err => { console.error(\"\", err); navigateTo(\"\" + characterId); }); } else { navigateTo(\"\" + characterId); } }"
+   }
+  },
+  {
+   "name": "loadAvailableCharacters",
+   "files": [
+    "character-grid.js",
+    "scenario-dropdowns.js"
+   ],
+   "variants": 2,
+   "shadows": [],
+   "bodies": {
+    "character-grid.js": "{ const cs = window.characterState; let chars = cs.characterCache || JSON.parse(localStorage.getItem(\"\") || \"\"); chars = cs.migrateCharactersWithIds(chars); cs.characterCache = chars; }",
+    "scenario-dropdowns.js": "{ const characters = JSON.parse(localStorage.getItem(\"\") || \"\"); window.scenarioState.availableCharacters = characters; updateCharacterDropdown(); }"
+   }
+  },
+  {
+   "name": "lorebookDisplayName",
+   "files": [
+    "character-state.js",
+    "scenario-state.js",
+    "world-state.js"
+   ],
+   "variants": 1,
+   "shadows": [],
+   "bodies": {
+    "character-state.js": "{ return (lorebook?.title || lorebook?.name || \"\").trim() || \"\"; }",
+    "scenario-state.js": "{ return (lorebook?.title || lorebook?.name || \"\").trim() || \"\"; }",
+    "world-state.js": "{ return (lorebook?.title || lorebook?.name || \"\").trim() || \"\"; }"
+   }
+  },
+  {
+   "name": "lorebookKey",
+   "files": [
+    "character-state.js",
+    "scenario-state.js",
+    "world-state.js"
+   ],
+   "variants": 1,
+   "shadows": [],
+   "bodies": {
+    "character-state.js": "{ const id = (lorebook?.id || \"\").toString().trim(); if (id) return id; return lorebookDisplayName(lorebook).toLowerCase(); }",
+    "scenario-state.js": "{ const id = (lorebook?.id || \"\").toString().trim(); if (id) return id; return lorebookDisplayName(lorebook).toLowerCase(); }",
+    "world-state.js": "{ const id = (lorebook?.id || \"\").toString().trim(); if (id) return id; return lorebookDisplayName(lorebook).toLowerCase(); }"
+   }
+  },
+  {
+   "name": "removeImage",
+   "files": [
+    "character-images.js",
+    "chat-input.js"
+   ],
+   "variants": 2,
+   "shadows": [],
+   "bodies": {
+    "character-images.js": "{ event.stopPropagation(); const cs = window.characterState; cs.characterImages.splice(index, 1); if (cs.characterImages.length > 0 && cs.thumbnailIndex >= cs.characterImages.length) { cs.thumbnailIndex = 0; cs.characterImages[0].isThumbnail = true; } updateImagesList(); }",
+    "chat-input.js": "{ currentImage = null; const preview = document.querySelector(\"\"); if (preview) preview.remove(); }"
+   }
+  },
+  {
+   "name": "resolveLorebooksFromRefs",
+   "files": [
+    "character-state.js",
+    "scenario-state.js",
+    "world-state.js"
+   ],
+   "variants": 3,
+   "shadows": [],
+   "bodies": {
+    "character-state.js": "{ const all = JSON.parse(localStorage.getItem(\"\") || \"\"); if (!Array.isArray(refs)) return []; return refs.map(ref => { const refId = (ref?.id || \"\").toString().trim().toLowerCase(); const refName = lorebookDisplayName(ref).toLowerCase(); const canonical = all.find(lb => { const lbId = (lb?.id || \"\").toString().trim().toLowerCase(); const lbName = lorebookDisplayName(lb).toLowerCase(); return (refId && lbId && refId === lbId) || (refName && lbName && refName === lbName); }); return canonical || ref; }).filter(Boolean).reduce((acc, lb) => { const key = lorebookKey(lb); if (!acc.some(e => lorebookKey(e) === key)) acc.push(lb); return acc; }, []); }",
+    "scenario-state.js": "{ const all = JSON.parse(localStorage.getItem(\"\") || \"\") .map(normalizeStoredLorebook).filter(Boolean); if (!Array.isArray(refs)) return []; return refs.map(rawRef => { const ref = typeof rawRef === \"\" ? { id: rawRef } : (rawRef && typeof rawRef === \"\" ? rawRef : null); if (!ref) return null; const refId = (ref.id || \"\").toString().trim().toLowerCase(); const refName = refDisplayName(ref).toLowerCase(); let canonical = refId ? all.find(lb => (lb.id || \"\").toString().trim().toLowerCase() === refId) : null; if (!canonical && refName) { canonical = all.find(lb => (lb.title || lb.name || \"\").trim().toLowerCase() === refName); } return mergeLorebookWithRef(canonical, ref); }).filter(Boolean).reduce((acc, lb) => { const key = lorebookKey(lb); if (!acc.some(e => lorebookKey(e) === key)) acc.push(lb); return acc; }, []); }",
+    "world-state.js": "{ const allLorebooks = JSON.parse(localStorage.getItem(\"\") || \"\"); if (!Array.isArray(refs)) return []; const resolved = refs.map(ref => { const refId = (ref?.id || \"\").toString().trim().toLowerCase(); const refName = lorebookDisplayName(ref).toLowerCase(); return allLorebooks.find(lb => { const lbId = (lb?.id || \"\").toString().trim().toLowerCase(); const lbName = lorebookDisplayName(lb).toLowerCase(); return (refId && lbId && refId === lbId) || (refName && lbName && refName === lbName); }) || ref; }); return resolved.filter(Boolean).reduce((acc, lorebook) => { const key = lorebookKey(lorebook); if (!acc.some(existing => lorebookKey(existing) === key)) acc.push(lorebook); return acc; }, []); }"
+   }
+  },
+  {
+   "name": "toggleDropdown",
+   "files": [
+    "character-lorebooks.js",
+    "scenario-dropdowns.js",
+    "world-dropdowns.js"
+   ],
+   "variants": 3,
+   "shadows": [],
+   "bodies": {
+    "character-lorebooks.js": "{ const container = document.getElementById(dropdownId); if (!container) { console.error(\"\"); return; } const menu = container.querySelector(\"\"); if (!menu) { console.error(\"\"); return; } document.querySelectorAll(\"\").forEach(d => { if (d.parentElement.id !== dropdownId) d.classList.remove(\"\"); }); const isNowShowing = !menu.classList.contains(\"\"); menu.classList.toggle(\"\"); container.classList.toggle(\"\", menu.classList.contains(\"\")); if (dropdownId === \"\" && isNowShowing) loadAvailableLorebooks(); }",
+    "scenario-dropdowns.js": "{ const container = document.getElementById(dropdownId); if (!container) { console.warn(\"\"); return; } const menu = container.querySelector(\"\"); if (!menu) { console.warn(\"\"); return; } document.querySelectorAll(\"\").forEach(d => { if (d.parentElement.id !== dropdownId) d.classList.remove(\"\"); }); const isNowShowing = !menu.classList.contains(\"\"); menu.classList.toggle(\"\"); if (isNowShowing) { if (dropdownId === \"\") { if (typeof window.characterLoadAvailableLorebooks === \"\") window.characterLoadAvailableLorebooks(); } else if (dropdownId === \"\") { loadAvailableLorebooks(); } } }",
+    "world-dropdowns.js": "{ const dropdown = document.getElementById(dropdownId); const isOpen = dropdown.classList.contains(\"\"); document.querySelectorAll(\"\").forEach(d => { if (d.id !== dropdownId) d.classList.remove(\"\"); }); dropdown.classList.toggle(\"\"); if (dropdownId === \"\" && !isOpen) loadAvailableScenarios(); if (dropdownId === \"\" && !isOpen) loadAvailableCharacters(); if (dropdownId === \"\" && !isOpen) loadAvailableLorebooks(); }"
+   }
+  },
+  {
+   "name": "toggleLorebookSelection",
+   "files": [
+    "character-lorebooks.js",
+    "scenario-dropdowns.js",
+    "world-dropdowns.js"
+   ],
+   "variants": 3,
+   "shadows": [],
+   "bodies": {
+    "character-lorebooks.js": "{ const cs = window.characterState; const key = cs.lorebookKey(lorebook); const idx = cs.selectedLorebooks.findIndex(l => cs.lorebookKey(l) === key); if (idx > -1) { cs.selectedLorebooks.splice(idx, 1); itemElement.classList.remove(\"\"); } else { if (!cs.selectedLorebooks.some(l => cs.lorebookKey(l) === key)) cs.selectedLorebooks.push(lorebook); itemElement.classList.add(\"\"); } updateSelectedLorebooksList(); const dropdown = document.getElementById(\"\"); const menu = dropdown?.querySelector(\"\"); if (menu) { menu.classList.remove(\"\"); dropdown.classList.remove(\"\"); } }",
+    "scenario-dropdowns.js": "{ const ss = window.scenarioState; const key = ss.lorebookKey(lorebook); const idx = ss.selectedLorebooks.findIndex(l => ss.lorebookKey(l) === key); if (idx > -1) { ss.selectedLorebooks.splice(idx, 1); itemElement.classList.remove(\"\"); } else { if (!ss.selectedLorebooks.some(l => ss.lorebookKey(l) === key)) ss.selectedLorebooks.push(lorebook); itemElement.classList.add(\"\"); } updateSelectedLorebooksList(); document.getElementById(\"\")?.classList.remove(\"\"); }",
+    "world-dropdowns.js": "{ const ws = window.worldState; const key = ws.lorebookKey(lorebook); const index = ws.selectedLorebooks.findIndex(l => ws.lorebookKey(l) === key); if (index > -1) { ws.selectedLorebooks.splice(index, 1); itemElement.classList.remove(\"\"); } else { if (!ws.selectedLorebooks.some(l => ws.lorebookKey(l) === key)) ws.selectedLorebooks.push(lorebook); itemElement.classList.add(\"\"); } updateSelectedLorebooksDisplay(); document.getElementById(\"\")?.classList.remove(\"\"); }"
+   }
+  },
+  {
+   "name": "toggleSidebar",
+   "files": [
+    "image-generator.js",
+    "menu-view.js"
+   ],
+   "variants": 2,
+   "shadows": [],
+   "bodies": {
+    "image-generator.js": "{ const sidebar = document.getElementById(\"\"); if (!sidebar) return; sidebar.classList.toggle(\"\"); const btn = document.getElementById(\"\"); if (btn) { btn.innerHTML = sidebar.classList.contains(\"\") ? \"\" : \"\"; } }",
+    "menu-view.js": "{ const el = document.querySelector(\"\"); if (el) { el.classList.toggle(\"\"); const hidden = el.classList.contains(\"\"); if (window.settingsState?.set) { window.settingsState.set(\"\", hidden); } showNotification(\"\", \"\"); } }"
+   }
+  },
+  {
+   "name": "updateSelectedLorebooksList",
+   "files": [
+    "character-lorebooks.js",
+    "scenario-dropdowns.js"
+   ],
+   "variants": 2,
+   "shadows": [],
+   "bodies": {
+    "character-lorebooks.js": "{ const container = document.getElementById(\"\"); if (!container) return; const cs = window.characterState; container.innerHTML = cs.selectedLorebooks.length === 0 ? \"\" : cs.selectedLorebooks.map(l => \"\").join(\"\"); }",
+    "scenario-dropdowns.js": "{ const selectedItems = document.getElementById(\"\"); if (!selectedItems) return; const ss = window.scenarioState; selectedItems.innerHTML = ss.selectedLorebooks.length === 0 ? \"\" : ss.selectedLorebooks.map(l => \"\").join(\"\"); }"
+   }
+  }
+ ]
+}

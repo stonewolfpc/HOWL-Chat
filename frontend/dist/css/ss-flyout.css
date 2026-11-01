@@ -11,8 +11,9 @@
     left: 50%;
     transform: translate(-50%, -50%);
     width: 540px;
+    max-width: calc(100vw - 24px);
     max-height: 85vh;
-    background: #111418;
+    background: var(--surface-secondary);
     border: 1px solid #1F242A;
     border-radius: 8px;
     padding: 20px;
@@ -42,7 +43,7 @@
 }
 
 .flyout-header h2 {
-    color: #e0e0e0;
+    color: var(--text-primary);
     font-size: 20px;
     font-weight: 600;
     margin: 0;
@@ -53,8 +54,8 @@
     width: 32px;
     height: 32px;
     border: none;
-    background: rgba(255, 255, 255, 0.1);
-    color: #e0e0e0;
+    background: var(--surface-hover);
+    color: var(--text-primary);
     font-size: 18px;
     border-radius: 4px;
     cursor: pointer;
@@ -65,7 +66,7 @@
 }
 
 .flyout-close:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--surface-hover);
 }
 
 /* Flyout Content */
@@ -100,15 +101,72 @@
 }
 
 .flyout::-webkit-scrollbar-track {
-    background: #111418;
+    background: var(--surface-secondary);
     border-radius: 4px;
 }
 
 .flyout::-webkit-scrollbar-thumb {
-    background: #2A2F36;
+    background: var(--surface-secondary);
     border-radius: 4px;
 }
 
 .flyout::-webkit-scrollbar-thumb:hover {
+    background: #3a3f46;
+}
+
+/* ---------------------------------------------------------------------------
+   Sampler settings: a full-screen sheet, not a popover
+
+   This flyout holds three categories and twenty controls. At 540px with a
+   two-column grid each card was ~240px wide and every description wrapped onto
+   several lines plus three always-visible detail rows, so a card stood ~220px
+   tall and the sheet ran far past the viewport. It is also a workspace, not a
+   confirmation: it earns the screen.
+   --------------------------------------------------------------------------- */
+#sampler-settings-flyout.flyout {
+    width: min(1560px, 96vw);
+    /* ss-responsive.css caps every .flyout at 400px on small windows; this sheet
+       is a full-screen workspace, so it takes the window width instead. */
+    max-width: min(1560px, 96vw);
+    height: calc(100vh - 24px);
+    max-height: calc(100vh - 24px);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#sampler-settings-flyout .flyout-header {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 12px 20px;
+    background: var(--surface-secondary);
+    border-bottom: 1px solid #1F242A;
+}
+
+/* Only the content scrolls; the title and close button stay put. */
+#sampler-settings-flyout .flyout-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px 18px 12px;
+    gap: 8px;
+}
+
+#sampler-settings-flyout .flyout-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+#sampler-settings-flyout .flyout-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#sampler-settings-flyout .flyout-content::-webkit-scrollbar-thumb {
+    background: #2A2F36;
+    border-radius: 5px;
+}
+
+#sampler-settings-flyout .flyout-content::-webkit-scrollbar-thumb:hover {
     background: #3a3f46;
 }

@@ -1,11 +1,15 @@
 /**
- * Settings State
+ * Settings State — Single Source of Truth
  *
- * Default settings object, load/save persistence, and full reset.
- * All other settings modules read/write through window.settingsState.
+ * Professional settings store pattern:
+ *   - One in-memory object (currentSettings)
+ *   - One backend file (settings.json)  — survives localStorage clears
+ *   - One localStorage key (howl-chat-settings) — fallback when backend unavailable
+ *   - Every write syncs to both instantly
+ *   - UI never stores state independently
  *
  * @module settings-state
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 'use strict';
@@ -45,11 +49,8 @@ function _defaultSettings() {
             permissions:      {}
         },
         audio: {
-            // General toggles
             asrEnabled:          false,
             ttsEnabled:          false,
-
-            // ASR Engine Settings
             asrEngine:           'auto',
             asrLanguage:         'auto',
             asrDevice:           'auto',
@@ -60,15 +61,11 @@ function _defaultSettings() {
             asrTranslateToEnglish: false,
             asrNoTimestamps:     false,
             asrFlashAttention:   true,
-
-            // VAD Settings
             vadEnabled:          false,
             vadThreshold:        0.5,
             vadMinSpeechMs:      250,
             vadMinSilenceMs:     100,
             vadPaddingMs:        30,
-
-            // TTS Engine Settings
             ttsEngine:           'piper',
             ttsVoice:            'en_US-lessac-medium',
             ttsSpeed:            1.0,
@@ -79,8 +76,6 @@ function _defaultSettings() {
             ttsAutoplayMessage:  true,
             ttsCacheEnabled:     true,
             ttsCacheSizeMB:      256,
-
-            // Audio Hardware / I/O
             audioInputDevice:    'default',
             audioOutputDevice:   'default',
             audioSampleRate:     16000,
@@ -90,15 +85,17 @@ function _defaultSettings() {
             pushToTalk:          true
         },
         imageGen: {
-            modelsDir:      '',  // empty = auto-detect next to exe
-            sdServerPath:   '',  // empty = auto-detect next to exe
-            outputDir:      '',  // empty = auto-detect
+            modelsDir:      '',
+            sdServerPath:   '',
+            outputDir:      '',
             defaultWidth:   1024,
             defaultHeight:  1024,
             defaultSteps:   20,
             defaultSampler: 'euler_a',
             defaultCfg:     7.0
-        }
+        },
+        sampler: {},     // populated from backend / legacy files
+        model:   {}      // populated from backend / legacy files
     };
 }
 
@@ -125,26 +122,90 @@ function deepMerge(target, source) {
 let currentSettings = _defaultSettings();
 
 // ---------------------------------------------------------------------------
-// Persistence
+// Persistence — backend first, localStorage fallback
 // ---------------------------------------------------------------------------
 
-function loadSettings() {
-    try {
-        const saved = localStorage.getItem('howl-chat-settings');
-        if (saved) deepMerge(currentSettings, JSON.parse(saved));
-    } catch (error) {
-        console.error('Failed to load settings:', error);
+async function loadSettings() {
+    let loaded = false;
+
+    // 1. Try backend unified settings
+    if (window.go?.main?.App?.GetSettings) {
+        try {
+            const backend = await window.go.main.App.GetSettings();
+            if (backend && Object.keys(backend).length > 0) {
+                deepMerge(currentSettings, backend);
+                loaded = true;
+                console.log('[settingsState] loaded from backend');
+            }
+        } catch (e) {
+            console.warn('[settingsState] backend load failed:', e);
+        }
     }
+
+    // 2. Fallback to localStorage
+    if (!loaded) {
+        try {
+            const saved = localStorage.getItem('howl-chat-settings');
+            if (saved) {
+                deepMerge(currentSettings, JSON.parse(saved));
+                loaded = true;
+                console.log('[settingsState] loaded from localStorage');
+            }
+        } catch (e) {
+            console.error('[settingsState] localStorage load failed:', e);
+        }
+    }
+
+    return loaded;
 }
 
-function saveSettings() {
+let saveDebounceTimer = null;
+
+async function saveSettings() {
+    // 1. Always write to localStorage immediately (cheap, synchronous)
     try {
         localStorage.setItem('howl-chat-settings', JSON.stringify(currentSettings));
-        if (typeof showNotification === 'function') showNotification('Settings saved successfully', 'success');
-    } catch (error) {
-        console.error('Failed to save settings:', error);
-        if (typeof showNotification === 'function') showNotification('Failed to save settings', 'error');
+    } catch (e) {
+        console.warn('[settingsState] localStorage save failed:', e);
     }
+
+    // 2. Debounce backend sync — batch rapid changes (e.g. slider drags)
+    //    into a single call 150ms after the user pauses.
+    if (saveDebounceTimer) clearTimeout(saveDebounceTimer);
+    saveDebounceTimer = setTimeout(async () => {
+        saveDebounceTimer = null;
+        if (window.go?.main?.App?.SetSettings) {
+            try {
+                await window.go.main.App.SetSettings(currentSettings);
+                console.log('[settingsState] saved to backend');
+            } catch (e) {
+                console.warn('[settingsState] backend save failed:', e);
+            }
+        }
+    }, 150);
+}
+
+// Convenience: set a value by dot-path (e.g. 'general.theme') and auto-save
+function setSetting(path, value) {
+    const keys = path.split('.');
+    let obj = currentSettings;
+    for (let i = 0; i < keys.length - 1; i++) {
+        if (!obj[keys[i]]) obj[keys[i]] = {};
+        obj = obj[keys[i]];
+    }
+    obj[keys[keys.length - 1]] = value;
+    saveSettings();
+}
+
+// Convenience: get a value by dot-path
+function getSetting(path, fallback) {
+    const keys = path.split('.');
+    let obj = currentSettings;
+    for (const key of keys) {
+        if (obj == null || typeof obj !== 'object') return fallback;
+        obj = obj[key];
+    }
+    return obj !== undefined ? obj : fallback;
 }
 
 function saveAllSettings() {
@@ -162,6 +223,14 @@ function resetAllSettings() {
 }
 
 // ---------------------------------------------------------------------------
+// Init
+// ---------------------------------------------------------------------------
+
+(async function _initSettings() {
+    await loadSettings();
+})();
+
+// ---------------------------------------------------------------------------
 // Public Surface
 // ---------------------------------------------------------------------------
 
@@ -169,5 +238,7 @@ window.settingsState = {
     get current() { return currentSettings; },
     loadSettings,
     saveSettings,
+    set: setSetting,
+    get: getSetting,
     resetAllSettings
 };

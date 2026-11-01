@@ -4,8 +4,7 @@
  */
 
 body.theme-light .ig-layout {
-    background: var(--surface-secondary);
-}
+    }
 
 body.theme-light .ig-sidebar,
 body.theme-light .ig-right-panel {
@@ -88,7 +87,7 @@ body.theme-light .ig-path-btn:hover {
 body.theme-light .ig-apply-btn {
     background: var(--button-primary-bg);
     border-color: var(--button-primary-bg);
-    color: #FFFFFF;
+    color: var(--on-accent);
 }
 
 body.theme-light .ig-apply-btn:hover {
@@ -99,13 +98,63 @@ body.theme-light .ig-canvas-placeholder {
     color: var(--text-secondary);
 }
 
+/* History 3-dot menu button */
+body.theme-light .ig-history-menu-btn {
+    position: absolute;
+    top: 4px;
+    right: 28px;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    z-index: 2;
+}
+
+body.theme-light .ig-history-menu-btn:hover {
+    background: rgba(0,0,0,0.7);
+}
+
+/* History menu popup */
+body.theme-light .ig-history-menu-popup {
+    position: absolute;
+    top: 28px;
+    right: 4px;
+    background: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10;
+    min-width: 200px;
+    padding: 4px 0;
+}
+
+body.theme-light .ig-history-menu-popup button {
+    display: block;
+    width: 100%;
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    text-align: left;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+body.theme-light .ig-history-menu-popup button:hover {
+    background: var(--surface-hover);
+    color: var(--accent-primary);
+}
+
 /* ================================================================
    LOREBOOK AESTHETIC — LIGHT THEME OVERRIDES
    ================================================================ */
 
 body.theme-light .ig-layout {
-    background: var(--surface-secondary);
-}
+    }
 
 body.theme-light .ig-sidebar,
 body.theme-light .ig-right-panel {
@@ -261,7 +310,7 @@ body.theme-light .ig-btn-secondary:hover {
 body.theme-light .ig-btn-warn {
     background: rgba(220, 50, 50, 0.06);
     border-color: rgba(220, 50, 50, 0.2);
-    color: #ef4444;
+    color: var(--danger);
 }
 
 body.theme-light .ig-btn-warn:hover {
@@ -384,7 +433,7 @@ body.theme-light .ig-history-item:hover {
 body.theme-light .ig-history-delete {
     background: rgba(220, 50, 50, 0.08);
     border-color: rgba(220, 50, 50, 0.2);
-    color: #ef4444;
+    color: var(--danger);
 }
 
 body.theme-light .ig-history-delete:hover {
@@ -492,7 +541,7 @@ body.theme-light .ig-action-btn:hover {
 body.theme-light .ig-action-primary {
     background: var(--button-primary-bg);
     border-color: var(--button-primary-bg);
-    color: #FFFFFF;
+    color: var(--on-accent);
 }
 
 body.theme-light .ig-action-primary:hover {
@@ -509,7 +558,7 @@ body.theme-light .ig-history-col {
 
 body.theme-light .ig-generate-btn {
     background: var(--accent-primary);
-    color: #FFFFFF;
+    color: var(--on-accent);
     box-shadow: 0 4px 15px var(--theme-glow);
 }
 
@@ -588,7 +637,7 @@ body.theme-light .ig-tutorials-close {
 body.theme-light .ig-tutorials-close:hover {
     background: var(--danger);
     border-color: var(--danger);
-    color: #FFFFFF;
+    color: var(--on-accent);
 }
 
 body.theme-light .ig-tutorials-placeholder {

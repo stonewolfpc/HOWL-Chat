@@ -103,33 +103,7 @@ async function saveMemory() {
     }
 }
 
-async function deleteMemory() {
-    const st = window.storyToolsState;
-    if (!st.currentMemoryId) { showError('No memory selected to delete'); return; }
-    if (!confirm('Are you sure you want to delete this memory? This action cannot be undone.')) return;
 
-    try {
-        showLoading(true);
-
-        if (window.MemoryStore) {
-            window.MemoryStore.deleteMemoryEntry(st.currentMemoryId);
-        }
-
-        if (window.go?.main?.App?.DeleteMemory) {
-            await window.go.main.App.DeleteMemory(st.currentChatId, st.currentMemoryId);
-        }
-
-        st.memoriesData = window.MemoryStore ? window.MemoryStore.getMemoryEntries() : st.memoriesData;
-        clearEditor();
-        renderFullList(st.memoriesData);
-        showSuccess('Memory deleted successfully');
-        showLoading(false);
-    } catch (error) {
-        console.error('Delete failed:', error);
-        showError('Failed to delete memory');
-        showLoading(false);
-    }
-}
 
 // ---------------------------------------------------------------------------
 // Export

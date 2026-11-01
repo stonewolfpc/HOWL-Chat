@@ -261,13 +261,26 @@ function _populateDiffusionDropdown() {
     const sel = document.getElementById('ig-model');
     if (!sel) return;
     sel.innerHTML = '';
+    // Only files stable-diffusion.cpp can actually load belong in this dropdown.
+    // LoRAs, VAEs, ControlNets, embeddings and workflow JSON are classified
+    // separately (Model Library) and must never appear as if they were a model.
+    const split = (typeof window.splitCompatibleImageModels === 'function')
+        ? window.splitCompatibleImageModels(models, (typeof currentMode !== 'undefined' ? currentMode : 'txt2img'))
+        : { usable: models, hidden: 0, total: models.length };
+    const usable = split.usable;
     const ph = document.createElement('option');
     ph.value = '';
     ph.disabled = true;
     ph.selected = true;
-    ph.textContent = models.length === 0 ? 'No models found' : 'Select a model...';
+    ph.textContent = usable.length === 0 ? 'No compatible models found' : 'Select a model...';
     sel.appendChild(ph);
-    models.forEach(m => {
+    if (split.hidden > 0) {
+        const note = document.createElement('option');
+        note.disabled = true;
+        note.textContent = '(' + split.hidden + ' incompatible file' + (split.hidden === 1 ? '' : 's') + ' hidden)';
+        sel.appendChild(note);
+    }
+    usable.forEach(m => {
         const opt = document.createElement('option');
         opt.value = m.name;
         const tag = m.format === 'bundle' ? '[bundle]' : m.format ? `[${m.format}]` : '';
@@ -320,6 +333,19 @@ function _populateControlNetDropdown(cns) {
         sel.appendChild(opt);
     });
     if (prev) sel.value = prev; // preserve selection if still present
+
+    // A ControlNet can also be bound to the checkpoint bundle, where sd-server
+    // loads it at startup. Say so rather than showing an empty list.
+    const modelSel = document.getElementById('ig-model');
+    const boundModel = (models || []).find(m => m.name === (modelSel && modelSel.value)) || {};
+    const bound = (boundModel.files || {}).control_net || '';
+    const hint = document.getElementById('ig-controlnet-status');
+    if (bound && hint) {
+        const fname = String(bound).split(/[\/]/).pop();
+        hint.textContent = 'Bound to this model: ' + fname + ' — pose applies automatically.';
+    } else if (hint && !prev) {
+        hint.textContent = '';
+    }
 }
 
 // onModelChange updates UI presets and re-filters secondary dropdowns by family.
@@ -527,8 +553,14 @@ function _familyDefaults(family) {
             return { steps: 20, cfg: 7,   guidance: 3.5, width: 1024, height: 1024, sampler: 'euler', scheduler: 'karras', clipSkip: -1 };
         case 'anima':
             return { steps: 20, cfg: 7,   guidance: 3.5, width: 1024, height: 1024, sampler: 'euler', scheduler: 'simple', clipSkip: -1 };
-        case 'wan': case 'ltx':
-            return { steps: 30, cfg: 1,   guidance: 5.0, width: 512,  height: 512,  sampler: 'euler', scheduler: 'simple', clipSkip: -1, flowShift: 0 };
+        // Video families keep their native landscape frame instead of a square:
+        // these match sdcpp.videoResolution, so the UI and engine agree.
+        case 'wan': case 'wan2.1': case 'wan2.2': case 'wan21': case 'wan22':
+            // cfg 7 / guidance 3.5 are sd.cpp's own defaults and the only values
+            // verified to produce a coherent clip; cfg 1 washed the frames out.
+            return { steps: 20, cfg: 7,   guidance: 3.5, width: 832,  height: 480,  sampler: 'euler', scheduler: 'simple', clipSkip: -1, flowShift: 0 };
+        case 'ltx': case 'ltx2': case 'ltx-video':
+            return { steps: 20, cfg: 7,   guidance: 3.5, width: 768,  height: 512,  sampler: 'euler', scheduler: 'simple', clipSkip: -1, flowShift: 0 };
         default: // sdxl, unknown
             return { steps: 30, cfg: 7,   guidance: 3.5, width: 1024, height: 1024, sampler: 'dpmpp_2m', scheduler: 'karras', clipSkip: 2 };
     }
@@ -537,6 +569,25 @@ function _familyDefaults(family) {
 // ---------------------------------------------------------------------------
 // Generation
 // ---------------------------------------------------------------------------
+// VRAM arbitration before generation: sd-server needs GPU room for the
+// checkpoint, and a loaded chat model is holding most of the card.
+async function requestImageVRAMArbitration() {
+    const app = window.go?.main?.App;
+    if (!app?.CheckModelFit) return true;
+    try {
+        let fit = await app.CheckModelFit('image', '');
+        if (fit.can_fit || !fit.blocking || fit.blocking.length === 0) return true;
+        if (!confirm(fit.message)) return false;
+        setStatus('Unloading the chat model…');
+        fit = await app.FreeVRAMFor('image', '');
+        if (!fit.can_fit) { alert(fit.message); setStatus('Not enough VRAM'); return false; }
+        return true;
+    } catch (err) {
+        console.warn('[VRAM] arbitration check failed, continuing:', err);
+        return true;
+    }
+}
+
 async function onGenerate() {
     if (generationInFlight) {
         setStatus('Generation already in progress...');
@@ -551,6 +602,13 @@ async function onGenerate() {
     if (model && model.compat === 'unsupported') {
         setStatus('⚠ This model requires a newer sd-server binary. Please update and try again.');
         updateDiagnostics('error', 'Model requires newer sd-server');
+        generationInFlight = false;
+        return;
+    }
+
+    // The chat model is holding the VRAM; ask before unloading it.
+    if (!(await requestImageVRAMArbitration())) {
+        setStatus('Cancelled — not enough VRAM with the chat model loaded.');
         generationInFlight = false;
         return;
     }
@@ -578,6 +636,15 @@ async function onGenerate() {
         document.getElementById('ig-seed').value = lastUsedSeed;
     } else {
         lastUsedSeed = seedVal;
+    }
+    // Upscale mode has its own seed field; when locked it wins over the main seed.
+    if (currentMode === 'upscale' && typeof upscaleSeedLocked !== 'undefined' && upscaleSeedLocked) {
+        const upscaleSeedEl = document.getElementById('ig-upscale-seed');
+        const lockedSeed = upscaleSeedEl ? parseInt(upscaleSeedEl.value, 10) : NaN;
+        if (!isNaN(lockedSeed) && lockedSeed >= 0) {
+            document.getElementById('ig-seed').value = lockedSeed;
+            lastUsedSeed = lockedSeed;
+        }
     }
     seedHistory.unshift(lastUsedSeed);
     if (seedHistory.length > 10) seedHistory.pop();
@@ -616,6 +683,22 @@ async function onGenerate() {
         }
     }
 
+    // A control image without a ControlNet model is ignored by the engine: the
+    // run burns a full sampling pass and looks unresponsive. Stop and say why.
+    const controlModel = (document.getElementById('ig-control-model') || {}).value || '';
+    // A ControlNet may already be bound to the checkpoint bundle, in which case
+    // sd-server loads it at startup (--control_net) and no dropdown pick is needed.
+    const boundModel = (models || []).find(m => m.name === modelSel.value) || {};
+    const bundleControlNet = (boundModel.files || {}).control_net || '';
+    if (window.controlNetImageData && !controlModel && !bundleControlNet) {
+        setStatus('ControlNet: choose a Control Net model, or clear the control image.');
+        btn.disabled = false;
+        generationInFlight = false;
+        hideSpinner();
+        stopProgressBar();
+        return;
+    }
+
     // Handle video end image if present
     let endImagePath = '';
     if (currentMode === 'video' && window.videoEndImageData) {
@@ -642,7 +725,7 @@ async function onGenerate() {
         height:          parseInt(document.getElementById('ig-height').value, 10),
         steps:           parseInt(document.getElementById('ig-steps').value, 10),
         seed:            lastUsedSeed,
-        sampler:         document.getElementById('ig-sampler').value,
+        sampler:         readSamplerValue(),
         scheduler:       document.getElementById('ig-scheduler').value,
         cfg_scale:       parseFloat(document.getElementById('ig-cfg').value),
         guidance:        parseFloat(document.getElementById('ig-guidance')?.value || '3.5'),
@@ -656,15 +739,15 @@ async function onGenerate() {
         clip_g_path:     document.getElementById('ig-clip-g')?.value || '',
         t5xxl_path:      document.getElementById('ig-t5xxl')?.value || '',
         control_net_path: document.getElementById('ig-control-model')?.value || '',
+        control_image_path: controlNetPath,
         control_strength: parseFloat(document.getElementById('ig-control-strength')?.value || '0.9'),
         loras:           window.activeLoRAs || [],
         enable_hr:       document.getElementById('ig-hires-enable')?.checked || false,
         hr_scale:        parseFloat(document.getElementById('ig-hr-scale')?.value || '2'),
         hr_upscaler:     document.getElementById('ig-hr-upscaler')?.value || '',
-        tiling:          document.getElementById('ig-tiling')?.checked || false,
         clip_skip:       parseInt(document.getElementById('ig-clip-skip')?.value || '-1', 10),
-        video_frames:    parseInt(document.getElementById('ig-video-frames')?.value || '24', 10),
-        fps:             parseInt(document.getElementById('ig-video-fps')?.value || '12', 10),
+        video_frames:    parseInt(document.getElementById('ig-video-frames')?.value || '33', 10),
+        fps:             parseInt(document.getElementById('ig-video-fps')?.value || '16', 10),
         strength:        parseFloat(
             (currentMode === 'inpaint'
                 ? document.getElementById('ig-strength-inpaint')
@@ -728,9 +811,9 @@ async function onGenerate() {
         high_noise_skip_layer_start: parseFloat(document.getElementById('ig-high-noise-skip-start')?.value || '0.01'),
         high_noise_skip_layer_end:   parseFloat(document.getElementById('ig-high-noise-skip-end')?.value || '0.2'),
         // Video-specific
-        video_format:     document.getElementById('ig-video-format')?.value || 'mp4',
+        output_format:     document.getElementById('ig-video-format')?.value || 'webm',
         video_seed_mode:  document.getElementById('ig-video-seed-mode')?.value || 'fixed',
-        video_motion:     parseFloat(document.getElementById('ig-video-motion')?.value || '0.5'),
+        video_motion_strength:     parseFloat(document.getElementById('ig-video-motion')?.value || '0.5'),
         video_denoise:    parseFloat(document.getElementById('ig-video-denoise')?.value || '0.6'),
         video_loop:       document.getElementById('ig-video-loop')?.checked || false,
         // Global expert controls
@@ -766,6 +849,8 @@ async function onGenerate() {
 
     let activeJobId = null;
     let pollInterval = null;
+    let pollWatchdog = null;
+    let lastPollMs = 0;
     let abortReject = null;
     progressReal = false;
 
@@ -812,6 +897,7 @@ async function onGenerate() {
             pollInterval = setInterval(async () => {
                 try {
                     const job = await window.go.main.App.GetImageJobStatus(activeJobId);
+                    lastPollMs = Date.now();
                     if (!job) return;
                     if (job.status === 'completed') {
                         clearInterval(pollInterval);
@@ -842,6 +928,20 @@ async function onGenerate() {
                     reject(pollErr);
                 }
             }, 500);
+
+            // Watchdog: one stalled status request must never leave the button on
+            // "Abort" and the bar on "Generating..." forever. If nothing has come
+            // back for 20s, fail with a message that says where the image went.
+            lastPollMs = Date.now();
+            pollWatchdog = setInterval(() => {
+                if (Date.now() - lastPollMs < 20000) return;
+                if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+                if (abortReject) {
+                    const fail = abortReject;
+                    abortReject = null;
+                    fail(new Error('Lost contact with the image engine. The job may still finish in the background — check the gallery.'));
+                }
+            }, 2000);
         });
 
         // Job completed successfully — result is the resolved value
@@ -859,6 +959,7 @@ async function onGenerate() {
         }
     } finally {
         if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+        if (pollWatchdog) { clearInterval(pollWatchdog); pollWatchdog = null; }
         stopProgressBar();
         resetGenerateButton();
         hideSpinner();
@@ -880,7 +981,11 @@ function showSpinner() {
     area.innerHTML = '<div class="ig-spinner"></div>';
 }
 
-function hideSpinner() {}
+function hideSpinner() {
+    const area = document.getElementById('ig-preview-area');
+    if (!area) return;
+    area.querySelectorAll('.ig-spinner').forEach(el => el.remove());
+}
 
 let progressTimer = null;
 let progressStart = 0;
@@ -934,6 +1039,14 @@ function populateOptionsFromHistory(opts, clearModel) {
         const el = document.getElementById(id);
         if (!el || val === undefined || val === null) return;
         if (el.type === 'checkbox') el.checked = !!val;
+        else if (el.tagName === 'SELECT') {
+            // Only adopt a value the select actually offers. Assigning a value
+            // with no matching option leaves selectedIndex at -1: the field
+            // looks blank and the request carries '', so the engine silently
+            // substitutes its own default for the user's choice.
+            const wanted = String(val);
+            if ([...el.options].some(o => o.value === wanted)) el.value = wanted;
+        }
         else el.value = val;
     };
     set('ig-prompt', opts.prompt);
@@ -986,7 +1099,6 @@ function populateOptionsFromHistory(opts, clearModel) {
     set('ig-circular', opts.circular);
     set('ig-fa', opts.flash_attention);
     set('ig-offload-cpu', opts.offload_to_cpu);
-    set('ig-tiling', opts.tiling);
     set('ig-hires-enable', opts.enable_hr);
     set('ig-hr-scale', opts.hr_scale);
     set('ig-hr-upscaler', opts.hr_upscaler);
@@ -996,8 +1108,15 @@ function populateOptionsFromHistory(opts, clearModel) {
         });
     }
     if (opts.loras && Array.isArray(opts.loras)) {
-        const loraSel = document.getElementById('ig-lora');
-        if (loraSel) Array.from(loraSel.options).forEach(opt => { opt.selected = opts.loras.includes(opt.value); });
+        window.activeLoRAs = opts.loras.map(lora => {
+            if (typeof lora === 'string') return { name: lora, strength: 1.0, enabled: true };
+            return {
+                name: lora.name || lora.Name || '',
+                strength: lora.strength ?? lora.Strength ?? 1.0,
+                enabled: lora.enabled !== false
+            };
+        }).filter(lora => lora.name);
+        if (typeof renderActiveLoRAs === 'function') renderActiveLoRAs();
     }
     if (clearModel) set('ig-model', '');
     else if (opts.model_name) set('ig-model', opts.model_name);
@@ -1007,7 +1126,8 @@ function populateOptionsFromHistory(opts, clearModel) {
 function populateOptionsFromLegacy(meta, clearModel) {
     const set = (id, val) => {
         const el = document.getElementById(id);
-        if (!el || val === undefined || val === null) return;
+        if (!el || val === undefined || val === null || val === '') return;
+        if (el.tagName === 'SELECT' && ![...el.options].some(o => o.value === String(val))) return;
         el.value = val;
     };
     set('ig-prompt', meta.Prompt);
@@ -1042,8 +1162,16 @@ function updateProgressBar(percent, label) {
 function showPreviewImage(b64) {
     const area = document.getElementById('ig-preview-area');
     if (!area || !b64) return;
-    const prefix = b64.startsWith('data:') ? '' : 'data:image/png;base64,';
-    area.innerHTML = `<img src="${prefix}${b64}" alt="Preview" style="opacity:0.85;filter:contrast(1.05);">`;
+    // sd-server's current_image is a JPEG, so a hardcoded image/png prefix lies
+    // about the payload. Base64 magic is enough to pick the right one.
+    let mime = 'image/png';
+    if (b64.startsWith('/9j/')) mime = 'image/jpeg';
+    else if (b64.startsWith('UklGR')) mime = 'image/webp';
+    const prefix = b64.startsWith('data:') ? '' : 'data:' + mime + ';base64,';
+    // TAESD frames are tiny (64-128 px for a 512-1024 px render), so without a
+    // sizing class they paint at natural size in the middle of the canvas and
+    // leave black bands around them. .ig-live-preview scales them to the canvas.
+    area.innerHTML = `<img class="ig-live-preview" src="${prefix}${b64}" alt="Preview" style="opacity:0.85;filter:contrast(1.05);">`;
 }
 
 function displayResult(result) {
@@ -1059,6 +1187,12 @@ function displayResult(result) {
         });
         gridHtml += '</div>';
         area.innerHTML = gridHtml;
+    } else if (result?.video_data) {
+        if ((result.video_mime || '').includes('webp')) {
+            area.innerHTML = `<img src="data:image/webp;base64,${result.video_data}" alt="Generated animation">`;
+        } else {
+            area.innerHTML = `<video controls autoplay loop style="max-width:100%;height:auto;border-radius:8px;" src="data:${result.video_mime || 'video/webm'};base64,${result.video_data}"></video>`;
+        }
     } else if (result?.image_data) {
         area.innerHTML = `<img src="data:image/png;base64,${result.image_data}" alt="Generated">`;
     } else if (result?.metadata) {
@@ -1161,21 +1295,6 @@ async function sendToEntity(entityType) {
     }
 }
 
-function toggleMetadata() {
-    const viewer = document.getElementById('ig-metadata-viewer');
-    if (!viewer) return;
-    if (viewer.style.display === 'none') {
-        if (currentResult?.metadata) {
-            viewer.innerHTML = '<pre>' + JSON.stringify(currentResult.metadata, null, 2) + '</pre>';
-        } else {
-            viewer.innerHTML = '<div class="ig-mode-note">No metadata available for this image.</div>';
-        }
-        viewer.style.display = 'block';
-    } else {
-        viewer.style.display = 'none';
-    }
-}
-
 // ---------------------------------------------------------------------------
 // Gallery Helpers
 // ---------------------------------------------------------------------------
@@ -1214,3 +1333,37 @@ function setStatus(msg) {
     const el = document.getElementById('ig-status');
     if (el) el.textContent = msg;
 }
+
+// A select with no matching option reports value '' and selectedIndex -1: the
+// field looks blank and the request carries an empty sampler, so the engine
+// substitutes its own default. Nothing should ever read a sampler-less select,
+// so re-establish a valid selection whenever restore paths may have cleared it.
+function ensureSamplerSelected() {
+    const sel = document.getElementById('ig-sampler');
+    if (!sel || !sel.options || sel.options.length === 0) return;
+    if (sel.selectedIndex >= 0 && sel.value !== '') return;
+    const preferred = [...sel.options].find(o => o.defaultSelected) ||
+                      [...sel.options].find(o => o.value === 'euler_a') ||
+                      sel.options[0];
+    if (preferred) {
+        sel.value = preferred.value;
+        console.log('[IG] sampler selection repaired to', sel.value);
+    }
+}
+
+function readSamplerValue() {
+    ensureSamplerSelected();
+    const el = document.getElementById('ig-sampler');
+    return el ? el.value : '';
+}
+
+// Settings restore is asynchronous, so a repair at load can be undone a
+// moment later. Re-check a few times as restore settles.
+function repairSamplerAfterRestore() {
+    [0, 250, 1000, 2500].forEach(ms => setTimeout(ensureSamplerSelected, ms));
+}
+window.addEventListener('load', repairSamplerAfterRestore);
+document.addEventListener('DOMContentLoaded', repairSamplerAfterRestore);
+document.addEventListener('change', (e) => {
+    if (e.target && e.target.id === 'ig-model') setTimeout(ensureSamplerSelected, 0);
+});

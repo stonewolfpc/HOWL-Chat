@@ -66,18 +66,57 @@ function removeSelectedItem(type, itemId) {
 }
 
 // ---------------------------------------------------------------------------
+// Dropdown Cache & Helpers
+// ---------------------------------------------------------------------------
+
+window._worldDropdownCache = { scenarios: [], characters: [], lorebooks: [] };
+
+function _worldDropdownSortSelectHtml(id) {
+    return `<select class="world-dropdown-sort" style="padding:6px 8px;border:1px solid var(--surface-hover-strong);border-radius:4px;font-size:12px;cursor:pointer;"
+        onchange="window._worldDropdownSort && window._worldDropdownSort('${id}', this.value)">
+        <option value="name:asc">Name A-Z</option>
+        <option value="name:desc">Name Z-A</option>
+        <option value="date:desc">Newest First</option>
+        <option value="date:asc">Oldest First</option>
+    </select>`;
+}
+
+// ---------------------------------------------------------------------------
 // Scenario Dropdown
 // ---------------------------------------------------------------------------
+
+function renderScenarioDropdown(items) {
+    const dropdownItems = document.getElementById('scenario-dropdown-items');
+    if (!dropdownItems) return;
+    dropdownItems.innerHTML = '';
+
+    const ws = window.worldState;
+    if (items.length === 0) {
+        dropdownItems.innerHTML = `<div class="world-dropdown-item disabled"><span class="world-dropdown-item-text">No scenarios found</span></div>`;
+        return;
+    }
+
+    items.forEach((scenario) => {
+        const displayTitle = scenario.title || scenario.name || 'Untitled';
+        const isSelected = ws.selectedScenarios.some(s => s.id === scenario.id);
+        const item = document.createElement('div');
+        item.className = 'world-dropdown-item' + (isSelected ? ' selected' : '');
+        item.innerHTML = `<span class="world-dropdown-item-text">${displayTitle}</span>`;
+        item.dataset.scenarioId = scenario.id;
+        item.addEventListener('click', () => toggleScenarioSelection(scenario, item));
+        dropdownItems.appendChild(item);
+    });
+}
 
 async function loadAvailableScenarios() {
     const dropdownItems = document.getElementById('scenario-dropdown-items');
     if (!dropdownItems) return;
-    dropdownItems.innerHTML = '';
 
     try {
         const scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
         if (scenarios.length === 0) {
             dropdownItems.innerHTML = `<div class="world-dropdown-item disabled"><span class="world-dropdown-item-text">No scenarios created yet</span></div>`;
+            window._worldDropdownCache.scenarios = [];
             return;
         }
 
@@ -92,21 +131,24 @@ async function loadAvailableScenarios() {
             return p;
         }));
 
-        processed.forEach((scenario, index) => {
-            if (!scenario.id) scenario.id = `scenario-${index}-${Date.now()}`;
-            const displayTitle = scenario.title || `Scenario ${index + 1}`;
-            const item = document.createElement('div');
-            item.className = 'world-dropdown-item';
-            item.innerHTML = `<span class="world-dropdown-item-text">${displayTitle}</span>`;
-            item.dataset.scenarioId = scenario.id;
-            item.addEventListener('click', () => toggleScenarioSelection(scenario, item));
-            dropdownItems.appendChild(item);
-        });
+        window._worldDropdownCache.scenarios = processed;
+        const fe = window.FilterEngine;
+        const sorted = fe ? fe.sortItems(processed, 'name', 'asc') : processed;
+        renderScenarioDropdown(sorted);
 
     } catch (error) {
         console.error('Failed to load scenarios:', error);
         dropdownItems.innerHTML = `<div class="world-dropdown-item disabled"><span class="world-dropdown-item-text">Error loading scenarios</span></div>`;
     }
+}
+
+function searchWorldScenarios(query) {
+    const cache = window._worldDropdownCache.scenarios;
+    const fe = window.FilterEngine;
+    const sortVal = document.querySelector('#scenario-dropdown .world-dropdown-sort')?.value || 'name:asc';
+    const [field, dir] = sortVal.split(':');
+    const items = fe ? fe.processItems(cache, { query, searchFields: ['name','title','description'], sortField: field, sortDirection: dir }) : cache;
+    renderScenarioDropdown(items);
 }
 
 function toggleScenarioSelection(scenario, itemElement) {
@@ -147,33 +189,59 @@ function removeScenarioSelection(scenarioId) {
 // Character Dropdown
 // ---------------------------------------------------------------------------
 
-async function loadAvailableCharacters() {
+function renderCharacterDropdown(items) {
     const dropdownItems = document.getElementById('character-dropdown-items');
     if (!dropdownItems) return;
     dropdownItems.innerHTML = '';
+
+    const ws = window.worldState;
+    if (items.length === 0) {
+        dropdownItems.innerHTML = `<div class="world-dropdown-item disabled"><span class="world-dropdown-item-text">No characters found</span></div>`;
+        return;
+    }
+
+    items.forEach((character) => {
+        const displayName = character.name || 'Unnamed';
+        const isSelected = ws.selectedCharacters.some(c => c.id === character.id);
+        const item = document.createElement('div');
+        item.className = 'world-dropdown-item' + (isSelected ? ' selected' : '');
+        item.innerHTML = `<span class="world-dropdown-item-text">${displayName}</span>`;
+        item.dataset.characterId = character.id;
+        item.addEventListener('click', () => toggleCharacterSelection(character, item));
+        dropdownItems.appendChild(item);
+    });
+}
+
+async function loadAvailableCharacters() {
+    const dropdownItems = document.getElementById('character-dropdown-items');
+    if (!dropdownItems) return;
 
     try {
         const characters = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
         if (characters.length === 0) {
             dropdownItems.innerHTML = `<div class="world-dropdown-item disabled"><span class="world-dropdown-item-text">No characters created yet</span></div>`;
+            window._worldDropdownCache.characters = [];
             return;
         }
 
-        characters.forEach((character, index) => {
-            if (!character.id) character.id = `character-${index}-${Date.now()}`;
-            const displayName = character.name || `Character ${index + 1}`;
-            const item = document.createElement('div');
-            item.className = 'world-dropdown-item';
-            item.innerHTML = `<span class="world-dropdown-item-text">${displayName}</span>`;
-            item.dataset.characterId = character.id;
-            item.addEventListener('click', () => toggleCharacterSelection(character, item));
-            dropdownItems.appendChild(item);
-        });
+        window._worldDropdownCache.characters = characters;
+        const fe = window.FilterEngine;
+        const sorted = fe ? fe.sortItems(characters, 'name', 'asc') : characters;
+        renderCharacterDropdown(sorted);
 
     } catch (error) {
         console.error('Failed to load characters:', error);
         dropdownItems.innerHTML = `<div class="world-dropdown-item disabled"><span class="world-dropdown-item-text">Error loading characters</span></div>`;
     }
+}
+
+function searchWorldCharacters(query) {
+    const cache = window._worldDropdownCache.characters;
+    const fe = window.FilterEngine;
+    const sortVal = document.querySelector('#character-dropdown .world-dropdown-sort')?.value || 'name:asc';
+    const [field, dir] = sortVal.split(':');
+    const items = fe ? fe.processItems(cache, { query, searchFields: ['name','role','description'], sortField: field, sortDirection: dir }) : cache;
+    renderCharacterDropdown(items);
 }
 
 function toggleCharacterSelection(character, itemElement) {
@@ -214,35 +282,81 @@ function removeCharacterSelection(characterId) {
 // Lorebook Dropdown
 // ---------------------------------------------------------------------------
 
-async function loadAvailableLorebooks() {
+function renderLorebookDropdown(items) {
     const dropdownItems = document.getElementById('world-lorebook-dropdown-items');
     if (!dropdownItems) return;
     dropdownItems.innerHTML = '';
+
+    const ws = window.worldState;
+    if (items.length === 0) {
+        dropdownItems.innerHTML = `<div class="world-dropdown-item disabled"><span class="world-dropdown-item-text">No lorebooks found</span></div>`;
+        return;
+    }
+
+    items.forEach((lorebook) => {
+        if (!lorebook.id) lorebook.id = ws.lorebookKey(lorebook);
+        const displayName = ws.lorebookDisplayName(lorebook);
+        const isSelected = ws.selectedLorebooks.some(l => ws.lorebookKey(l) === lorebook.id);
+        const item = document.createElement('div');
+        item.className = 'world-dropdown-item' + (isSelected ? ' selected' : '');
+        item.innerHTML = `<span class="world-dropdown-item-text">${displayName}</span>`;
+        item.dataset.lorebookId = lorebook.id;
+        item.addEventListener('click', () => toggleLorebookSelection(lorebook, item));
+        dropdownItems.appendChild(item);
+    });
+}
+
+async function loadAvailableLorebooks() {
+    const dropdownItems = document.getElementById('world-lorebook-dropdown-items');
+    if (!dropdownItems) return;
 
     try {
         const lorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
         if (lorebooks.length === 0) {
             dropdownItems.innerHTML = `<div class="world-dropdown-item disabled"><span class="world-dropdown-item-text">No lorebooks created yet</span></div>`;
+            window._worldDropdownCache.lorebooks = [];
             return;
         }
 
         const ws = window.worldState;
-        lorebooks.forEach((lorebook, index) => {
-            if (!lorebook.id) lorebook.id = ws.lorebookKey(lorebook);
-            const displayName = ws.lorebookDisplayName(lorebook);
-            const item = document.createElement('div');
-            item.className = 'world-dropdown-item';
-            item.innerHTML = `<span class="world-dropdown-item-text">${displayName}</span>`;
-            item.dataset.lorebookId = lorebook.id;
-            item.addEventListener('click', () => toggleLorebookSelection(lorebook, item));
-            dropdownItems.appendChild(item);
-        });
+        const processed = lorebooks.map(l => { if (!l.id) l.id = ws.lorebookKey(l); return l; });
+        window._worldDropdownCache.lorebooks = processed;
+        const fe = window.FilterEngine;
+        const sorted = fe ? fe.sortItems(processed, 'name', 'asc') : processed;
+        renderLorebookDropdown(sorted);
 
     } catch (error) {
         console.error('Failed to load lorebooks:', error);
         dropdownItems.innerHTML = `<div class="world-dropdown-item disabled"><span class="world-dropdown-item-text">Error loading lorebooks</span></div>`;
     }
 }
+
+function searchWorldLorebooks(query) {
+    const cache = window._worldDropdownCache.lorebooks;
+    const fe = window.FilterEngine;
+    const sortVal = document.querySelector('#world-lorebook-dropdown .world-dropdown-sort')?.value || 'name:asc';
+    const [field, dir] = sortVal.split(':');
+    const items = fe ? fe.processItems(cache, { query, searchFields: ['name','title','description'], sortField: field, sortDirection: dir }) : cache;
+    renderLorebookDropdown(items);
+}
+
+window._worldDropdownSort = (dropdownId, val) => {
+    const [field, dir] = val.split(':');
+    const fe = window.FilterEngine;
+    if (dropdownId === 'scenario-dropdown') {
+        const query = document.querySelector('#scenario-dropdown .world-dropdown-search-input')?.value || '';
+        const items = fe ? fe.processItems(window._worldDropdownCache.scenarios, { query, searchFields: ['name','title','description'], sortField: field, sortDirection: dir }) : window._worldDropdownCache.scenarios;
+        renderScenarioDropdown(items);
+    } else if (dropdownId === 'character-dropdown') {
+        const query = document.querySelector('#character-dropdown .world-dropdown-search-input')?.value || '';
+        const items = fe ? fe.processItems(window._worldDropdownCache.characters, { query, searchFields: ['name','role','description'], sortField: field, sortDirection: dir }) : window._worldDropdownCache.characters;
+        renderCharacterDropdown(items);
+    } else if (dropdownId === 'world-lorebook-dropdown') {
+        const query = document.querySelector('#world-lorebook-dropdown .world-dropdown-search-input')?.value || '';
+        const items = fe ? fe.processItems(window._worldDropdownCache.lorebooks, { query, searchFields: ['name','title','description'], sortField: field, sortDirection: dir }) : window._worldDropdownCache.lorebooks;
+        renderLorebookDropdown(items);
+    }
+};
 
 function toggleLorebookSelection(lorebook, itemElement) {
     const ws  = window.worldState;

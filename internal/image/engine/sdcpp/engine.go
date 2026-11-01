@@ -2,17 +2,28 @@ package sdcpp
 
 import (
 	"fmt"
+	"howl-chat/internal/paths"
+	"howl-chat/internal/proc"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	"howl-chat/internal/image/engine"
+	"howl-chat/internal/image/scanner"
 	"howl-chat/internal/image/types"
 )
+
+// TODO: Implement HuggingFace repo link support for image models
+// - Add HuggingFace repo URL field to ModelInfo struct
+// - Display repo link in model library UI (like professional apps)
+// - Allow users to click through to view model details, documentation, and download alternatives
+// - Consider adding model card preview or metadata fetching from HuggingFace API
+// - Reference: https://huggingface.co/docs/huggingface_hub/guides/huggingface_hub_py
 
 // Engine implements engine.ImageEngine using stable-diffusion.cpp sd-server.
 type Engine struct {
@@ -20,6 +31,18 @@ type Engine struct {
 	currentModel *types.ModelInfo
 	serverProc   *os.Process
 	httpClient   *client
+
+	// Video runs go through sd-cli rather than the HTTP server.
+	runMu     sync.Mutex
+	videoMu   sync.Mutex
+	videoProc *os.Process
+	progress  types.ProgressInfo
+
+	// sd-server stdout progress (see progress_stdout.go).
+	srvMu       sync.Mutex
+	srvProgress types.ProgressInfo
+	srvUpdated  time.Time
+	cancelled   bool
 }
 
 var _ engine.ImageEngine = (*Engine)(nil)
@@ -74,54 +97,9 @@ func (e *Engine) LoadModel(opts types.ModelLoadOptions) error {
 	if e.config.BinaryPath == "" || e.config.ModelsDir == "" {
 		return fmt.Errorf("engine config incomplete")
 	}
-	var target *types.ModelInfo
-
-	if opts.ModelPath != "" {
-		// Absolute path supplied — build ModelInfo directly, no ModelsDir scan.
-		base := filepath.Base(opts.ModelPath)
-		ext := strings.TrimPrefix(strings.ToLower(filepath.Ext(base)), ".")
-		name := opts.ModelName
-		if name == "" {
-			name = strings.TrimSuffix(base, filepath.Ext(base))
-		}
-		target = &types.ModelInfo{
-			Name:   name,
-			Path:   opts.ModelPath,
-			Family: inferFamilyFromName(base),
-			Format: ext,
-			Files:  map[string]string{"model": opts.ModelPath},
-		}
-	} else {
-		models, err := e.ListModels()
-		if err != nil {
-			return err
-		}
-		for i := range models {
-			if models[i].Name == opts.ModelName {
-				target = &models[i]
-				break
-			}
-		}
-		if target == nil {
-			return fmt.Errorf("model not found: %s (not in %s)", opts.ModelName, e.config.ModelsDir)
-		}
-	}
-
-	// Apply manual overrides if provided
-	if opts.VAEPath != "" {
-		target.Files["vae"] = opts.VAEPath
-	}
-	if opts.ClipLPath != "" {
-		target.Files["clip_l"] = opts.ClipLPath
-	}
-	if opts.ClipGPath != "" {
-		target.Files["clip_g"] = opts.ClipGPath
-	}
-	if opts.T5XXLPath != "" {
-		target.Files["t5xxl"] = opts.T5XXLPath
-	}
-	if opts.DiffusionModel != "" {
-		target.Files["diffusion_model"] = opts.DiffusionModel
+	target, err := e.resolveTarget(opts)
+	if err != nil {
+		return err
 	}
 
 	// Kill existing server
@@ -134,25 +112,34 @@ func (e *Engine) LoadModel(opts types.ModelLoadOptions) error {
 	args := e.buildServerArgs(target, opts)
 	fmt.Printf("[ImageEngine] Starting sd-server: %s %v\n", e.config.BinaryPath, args)
 	cmd := exec.Command(e.config.BinaryPath, args...)
-	cmd.Stdout = os.Stdout
+	stdoutPipe, pipeErr := cmd.StdoutPipe()
+	if pipeErr != nil {
+		return fmt.Errorf("sd-server stdout: %w", pipeErr)
+	}
 	stderrBuf := new(strings.Builder)
 	cmd.Stderr = io.MultiWriter(os.Stderr, stderrBuf)
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("failed to start sd-server: %w", err)
 	}
 	e.serverProc = cmd.Process
+	proc.Attach(cmd)
+	go e.pumpServerOutput(stdoutPipe)
 	e.currentModel = target
 
 	// Wait for server to be ready
 	if err := e.httpClient.waitForReady(120 * time.Second); err != nil {
 		stderr := stderrBuf.String()
 		if strings.Contains(stderr, "get sd version from file failed") {
+			extra := ""
+			if target.Family == "chroma" || target.Family == "sd3.5" {
+				extra = " Chroma/SD3.5-family GGUF models may not be supported by older stable-diffusion.cpp builds — try the .safetensors version or update sd-server."
+			}
 			return fmt.Errorf(
 				"model '%s' (%s) cannot be loaded: this sd-server build failed to detect the architecture from the file. "+
-					"GGUF single-file checkpoints for Flux/SD3 often use metadata formats that older sd.cpp builds cannot read. "+
-					"Solutions: (1) Use the .safetensors version of this model, (2) Update sd-server to a newer build, "+
-					"(3) Re-convert the GGUF with a sd.cpp-compatible converter: %w",
-				target.Name, target.Format, err)
+					"GGUF single-file checkpoints for Flux/SD3/SD3.5/SDXL often use metadata formats that older sd.cpp builds cannot read.%s "+
+					"Please update your sd-server binary to the latest stable-diffusion.cpp release. "+
+					"Alternative: use the .safetensors version of this model: %w",
+				target.Name, target.Format, extra, err)
 		}
 		if e.serverProc != nil {
 			e.serverProc.Kill()
@@ -217,6 +204,7 @@ func (e *Engine) GenerateTxt2Img(opts types.ImageOptions) (*types.ImageResult, e
 		fmt.Printf("[ImageEngine] GenerateTxt2Img: currentModel is nil (engine=%p, httpClient=%p)\n", e, e.httpClient)
 		return nil, fmt.Errorf("no model loaded")
 	}
+	e.resetServerProgress()
 	result, err := e.httpClient.txt2img(opts)
 	if err != nil {
 		return nil, err
@@ -250,21 +238,36 @@ func (e *Engine) GenerateInpaint(opts types.ImageOptions) (*types.ImageResult, e
 
 // GenerateVideo creates a series of frames (SVD/WAN).
 func (e *Engine) GenerateVideo(opts types.ImageOptions) (*types.ImageResult, error) {
-	if e.httpClient == nil {
-		return nil, fmt.Errorf("engine not initialized")
-	}
-	if e.currentModel == nil {
-		return nil, fmt.Errorf("no model loaded")
-	}
-	return e.httpClient.video(opts)
+	return e.generateVideo(opts)
 }
 
 // GetProgress polls the sd-server /sdapi/v1/progress endpoint.
 func (e *Engine) GetProgress() (types.ProgressInfo, error) {
+	if p, ok := e.videoProgressInfo(); ok {
+		return p, nil
+	}
 	if e.httpClient == nil {
 		return types.ProgressInfo{}, fmt.Errorf("engine not initialized")
 	}
-	return e.httpClient.progress()
+	// Two independent sources, each better at something different:
+	//   - stdout carries the real sampling step (the endpoint's step is not
+	//     reliable here)
+	//   - /sdapi/v1/progress carries the decoded TAESD frame in current_image
+	// Merging them is what makes a live preview possible; taking either one
+	// alone throws the other away.
+	httpProgress, httpErr := e.httpClient.progress()
+
+	if stdoutProgress, ok := e.recentServerProgress(); ok {
+		if httpErr == nil && httpProgress.PreviewImage != "" {
+			stdoutProgress.PreviewImage = httpProgress.PreviewImage
+		}
+		return stdoutProgress, nil
+	}
+
+	if httpErr == nil && (httpProgress.Step > 0 || httpProgress.Progress > 0 || httpProgress.PreviewImage != "") {
+		return httpProgress, nil
+	}
+	return httpProgress, httpErr
 }
 
 // GetLoadedModel returns the currently loaded model.
@@ -272,13 +275,30 @@ func (e *Engine) GetLoadedModel() *types.ModelInfo {
 	return e.currentModel
 }
 
-// Shutdown kills the server process.
+// CancelJob sends a cancellation signal to the backend for the active job.
+func (e *Engine) CancelJob() error {
+	if e.cancelVideo() {
+		return nil
+	}
+	if e.httpClient == nil {
+		return nil
+	}
+	return e.httpClient.cancelJob("")
+}
+
+// Shutdown kills the server process and resets client state.
 func (e *Engine) Shutdown() error {
+	e.cancelVideo()
 	if e.serverProc != nil {
-		e.serverProc.Kill()
-		e.serverProc.Wait()
+		proc.KillTree(e.serverProc.Pid)
+		_ = e.serverProc.Kill()
+		_, _ = e.serverProc.Wait()
 		e.serverProc = nil
 	}
+	if e.httpClient != nil {
+		e.httpClient.resetState()
+	}
+	e.currentModel = nil
 	return nil
 }
 
@@ -289,65 +309,77 @@ func (e *Engine) buildServerArgs(m *types.ModelInfo, opts types.ModelLoadOptions
 		"--threads", fmt.Sprintf("%d", defaultThreads()),
 	}
 
-	// Model path logic:
-	// --diffusion-model is used ONLY when the model is a split component
-	// (i.e. a separate diffusion transformer alongside CLIP/T5 encoders).
-	// All single-file formats (safetensors, ckpt, gguf merged checkpoints)
-	// must use -m / --model regardless of family.
-	//
-	// NOTE: Some GGUF single-file checkpoints for Flux/SD3 (e.g. from third-party
-	// converters) write metadata keys that older sd.cpp builds cannot read,
-	// causing "get sd version from file failed". --prediction does not fix this
-	// because version detection happens before prediction type is applied.
-	// The only workarounds are: use .safetensors, update sd.cpp, or re-convert.
-	if m.Files["diffusion_model"] != "" && m.Format != "gguf" {
-		// Split component bundle — use the diffusion transformer flag
-		args = append(args, "--diffusion-model", m.Files["diffusion_model"])
-	} else if m.Files["model"] != "" {
-		// Single-file checkpoint (safetensors, ckpt, or merged GGUF)
-		args = append(args, "-m", m.Files["model"])
+	// MODEL PATH LOGIC
+	switch m.Family {
+	case "flux", "chroma", "anima":
+		// These models use --diffusion-model (split component style)
+		if m.Files["model"] != "" {
+			args = append(args, "--diffusion-model", m.Files["model"])
+		}
+	default:
+		// SD3, SDXL, SD1.x, SD2.x, HiDream use standard -m flag (single-file checkpoint)
+		if m.Files["model"] != "" {
+			args = append(args, "-m", m.Files["model"])
+		}
 	}
 
-	// COMMON ADDITIONS
-	if m.Files["vae"] != "" {
-		args = append(args, "--vae", m.Files["vae"])
-	}
-	if m.Files["clip_l"] != "" {
-		args = append(args, "--clip-l", m.Files["clip_l"])
-	}
-	if m.Files["clip_g"] != "" {
-		args = append(args, "--clip-g", m.Files["clip_g"])
-	}
-	if m.Files["t5xxl"] != "" {
-		args = append(args, "--t5xxl", m.Files["t5xxl"])
+	// COMMON ADDITIONS (skip companion models for HiDream - it's self-contained)
+	// Chroma also skips CLIP-L (only uses T5XXL + VAE)
+	// SD1.5/SD2.1 don't use T5XXL
+	familyLower := strings.ToLower(m.Family)
+	if familyLower != "hidream" {
+		if m.Files["vae"] != "" {
+			args = append(args, "--vae", m.Files["vae"])
+		}
+		// Chroma doesn't use CLIP-L
+		if familyLower != "chroma" {
+			if m.Files["clip_l"] != "" {
+				args = append(args, "--clip_l", m.Files["clip_l"])
+			}
+		}
+		if m.Files["clip_g"] != "" {
+			args = append(args, "--clip_g", m.Files["clip_g"])
+		}
+		// Only add T5XXL for Flux, Chroma, SD3, SD3.5
+		if familyLower == "flux" || familyLower == "chroma" || familyLower == "sd3" || familyLower == "sd3.5" {
+			if m.Files["t5xxl"] != "" {
+				args = append(args, "--t5xxl", m.Files["t5xxl"])
+			}
+		}
 	}
 	if m.Files["clip_vision"] != "" {
-		args = append(args, "--clip-vision", m.Files["clip_vision"])
+		args = append(args, "--clip_vision", m.Files["clip_vision"])
 	}
 	if m.Files["taesd"] != "" {
 		args = append(args, "--taesd", m.Files["taesd"])
+		// TAESD is only used for step previews here: the final image must still be
+		// decoded by the real VAE or quality drops.
+		args = append(args, "--taesd-preview-only")
 	}
 	if m.Files["control_net"] != "" {
+		// sd-server spells this with hyphens; "--control_net" is rejected as an
+		// unknown argument and the server refuses to start at all.
 		args = append(args, "--control-net", m.Files["control_net"])
 	}
 
-	// PREDICTION TYPE — must be set at startup for GGUF single-file checkpoints
-	// where sd.cpp cannot auto-detect the architecture from the GGUF metadata.
-	// Explicit value from opts takes priority; otherwise infer from model family.
-	prediction := opts.Prediction
-	if prediction == "" && m.Format == "gguf" {
-		switch strings.ToLower(m.Family) {
-		case "flux":
-			prediction = "flux_flow"
-		case "flux2":
-			prediction = "flux2_flow"
-		case "sd3":
-			prediction = "sd3_flow"
+	// FAMILY-SPECIFIC FLAGS
+	if strings.ToLower(m.Family) == "chroma" {
+		args = append(args, "--chroma-disable-dit-mask")
+		args = append(args, "--clip-on-cpu")
+	}
+
+	// ANIMA-SPECIFIC: uses --llm for Qwen3 text encoder (NOT clip_l/t5xxl)
+	if strings.ToLower(m.Family) == "anima" {
+		if m.Files["llm"] != "" {
+			args = append(args, "--llm", m.Files["llm"])
 		}
 	}
-	if prediction != "" {
-		args = append(args, "--prediction", prediction)
-	}
+
+	// HIDREAM-SPECIFIC: self-contained model, no companion models needed
+	// Skip loading clip_l, t5xxl, vae for HiDream
+
+	// VRAM budget - auto-detect free VRAM at startup, offload to CPU/RAM for 8GB GPU
+	args = append(args, "--max-vram", "-1")
 
 	// STARTUP FLAGS from ModelLoadOptions
 	if opts.Backend != "" {
@@ -371,6 +403,12 @@ func (e *Engine) buildServerArgs(m *types.ModelInfo, opts types.ModelLoadOptions
 	if opts.OffloadToCPU {
 		args = append(args, "--offload-to-cpu")
 	}
+	if opts.CacheMode != "" {
+		args = append(args, "--cache-mode", opts.CacheMode)
+		if opts.CacheOption != "" {
+			args = append(args, "--cache-option", opts.CacheOption)
+		}
+	}
 	if opts.DisableMetadata {
 		args = append(args, "--disable-image-metadata")
 	}
@@ -390,12 +428,7 @@ func FindSDServer() string {
 	candidates := []string{
 		// Bundled runtime path (preferred)
 		filepath.Join(filepath.Dir(os.Args[0]), "runtime", "stablediffusion", "sd-server.exe"),
-		// Windows-specific known locations
-		`D:\StableDiffusion\sd-server.exe`,
-		`D:\stable-diffusion.cpp\build\bin\Release\sd-server.exe`,
-		`D:\stable-diffusion.cpp\build\bin\sd-server.exe`,
-		`D:\stable-diffusion.cpp\sd-server.exe`,
-		`D:\sd.cpp\sd-server.exe`,
+		filepath.Join(paths.ProjectRoot(), "sd-server.exe"),
 		// PATH / relative to executable
 		filepath.Join(filepath.Dir(os.Args[0]), "sd-server.exe"),
 		"sd-server.exe",
@@ -411,3 +444,103 @@ func FindSDServer() string {
 }
 
 func findSDServer() string { return FindSDServer() }
+
+// resolveTarget finds the model described by opts and applies manual
+// companion overrides. It starts no process, so a video run can resolve its
+// model without paying for an sd-server load first.
+func (e *Engine) resolveTarget(opts types.ModelLoadOptions) (*types.ModelInfo, error) {
+	var target *types.ModelInfo
+
+	if opts.ModelPath != "" {
+		// A directory is a bundle, not a checkpoint. sd-server must be handed the
+		// checkpoint inside it: given the folder itself it assumes a diffusers
+		// layout and dies with "init model loader from file failed", which reached
+		// the user as a generation that finished "loading" and never produced an
+		// image. Resolve bundles through the same scan the model dropdown used, so
+		// family and companion files come from one source of truth.
+		if fi, statErr := os.Stat(opts.ModelPath); statErr == nil && fi.IsDir() {
+			if models, listErr := e.ListModels(); listErr == nil {
+				for i := range models {
+					if models[i].Path == opts.ModelPath {
+						target = &models[i]
+						break
+					}
+				}
+			}
+			if target == nil {
+				if m := scanner.LoadDirManifest(opts.ModelPath); m != nil && m.Files["model"] != "" {
+					target = &types.ModelInfo{
+						Name:   m.Name,
+						Path:   opts.ModelPath,
+						Family: string(m.Family),
+						Format: m.Format,
+						Files:  m.Files,
+					}
+				}
+			}
+			if target == nil {
+				return nil, fmt.Errorf("model bundle %s has no usable checkpoint inside it", opts.ModelPath)
+			}
+			if fi, statErr := os.Stat(target.Files["model"]); statErr != nil || fi.IsDir() {
+				return nil, fmt.Errorf("model bundle %s points at %q, which is not a model file", opts.ModelPath, target.Files["model"])
+			}
+		}
+	}
+
+	if target == nil && opts.ModelPath != "" {
+		// Absolute file path supplied — build ModelInfo directly, no ModelsDir scan.
+		base := filepath.Base(opts.ModelPath)
+		ext := strings.TrimPrefix(strings.ToLower(filepath.Ext(base)), ".")
+		name := opts.ModelName
+		if name == "" {
+			name = strings.TrimSuffix(base, filepath.Ext(base))
+		}
+		target = &types.ModelInfo{
+			Name:   name,
+			Path:   opts.ModelPath,
+			Family: inferFamilyFromName(base),
+			Format: ext,
+			Files:  map[string]string{"model": opts.ModelPath},
+		}
+		// Auto-fill companions since we bypassed ListModels()
+		s := scanner.New(e.config.ModelsDir)
+		idx, _ := s.LoadIndex() // Use cached index if available
+		autoFillCompanions(target, idx)
+	} else {
+		models, err := e.ListModels()
+		if err != nil {
+			return nil, err
+		}
+		for i := range models {
+			if models[i].Name == opts.ModelName {
+				target = &models[i]
+				break
+			}
+		}
+		if target == nil {
+			return nil, fmt.Errorf("model not found: %s (not in %s)", opts.ModelName, e.config.ModelsDir)
+		}
+	}
+
+	// Apply manual overrides if provided
+	if opts.VAEPath != "" {
+		target.Files["vae"] = opts.VAEPath
+	}
+	if opts.ClipLPath != "" {
+		target.Files["clip_l"] = opts.ClipLPath
+	}
+	if opts.ClipGPath != "" {
+		target.Files["clip_g"] = opts.ClipGPath
+	}
+	if opts.T5XXLPath != "" {
+		target.Files["t5xxl"] = opts.T5XXLPath
+	}
+	if opts.LLMPath != "" {
+		target.Files["llm"] = opts.LLMPath
+	}
+	if opts.DiffusionModel != "" {
+		target.Files["diffusion_model"] = opts.DiffusionModel
+	}
+
+	return target, nil
+}

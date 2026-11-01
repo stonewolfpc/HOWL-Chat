@@ -208,7 +208,7 @@ class WorldManager {
     openItemSelector(type) {
         const modal = document.createElement('div');
         modal.className = 'item-selector-modal';
-        modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px);';
+        modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:var(--overlay-scrim);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px);';
         modal.innerHTML = this.createItemSelectorContent(type);
         document.body.appendChild(modal);
 
@@ -229,20 +229,20 @@ class WorldManager {
         const selectedIds = this.getSelectedItems(type).map(item => item.id);
 
         let content = `
-            <div style="background: rgba(30, 30, 40, 0.98); border-radius: 12px; padding: 24px; max-width: 400px; border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div style="background: var(--shell-panel-bg); border-radius: 12px; padding: 24px; max-width: 400px; border: 1px solid var(--surface-hover-strong);">
                 <h2 style="color: #fff; margin-top: 0; margin-bottom: 16px;">Select ${type.charAt(0).toUpperCase() + type.slice(1)}s</h2>
                 <div style="max-height: 300px; overflow-y: auto; margin-bottom: 16px;">
         `;
 
         if (items.length === 0) {
-            content += `<div style="color: rgba(255, 255, 255, 0.5); text-align: center; padding: 20px;">No ${type}s available</div>`;
+            content += `<div style="color: var(--surface-hover); text-align: center; padding: 20px;">No ${type}s available</div>`;
         } else {
             items.forEach(item => {
                 const isSelected = selectedIds.includes(item.id);
                 content += `
                     <div onclick="worldManager.toggleItemSelection('${type}', '${item.id}');" style="
                         padding: 12px;
-                        background: ${isSelected ? 'rgba(0, 184, 115, 0.2)' : 'rgba(255, 255, 255, 0.05)'};
+                        background: ${isSelected ? 'var(--success-bg)' : 'var(--surface-hover)'};
                         margin-bottom: 8px;
                         border-radius: 6px;
                         cursor: pointer;
@@ -263,7 +263,7 @@ class WorldManager {
                     <button onclick="this.closest('.item-selector-modal').remove();" style="
                         flex: 1;
                         padding: 10px;
-                        background: rgba(255, 255, 255, 0.1);
+                        background: var(--surface-hover-strong);
                         border: 1px solid rgba(255, 255, 255, 0.2);
                         color: #fff;
                         border-radius: 6px;
@@ -272,7 +272,7 @@ class WorldManager {
                     <button onclick="worldManager.confirmItemSelection('${type}'); this.closest('.item-selector-modal').remove();" style="
                         flex: 1;
                         padding: 10px;
-                        background: rgba(0, 184, 115, 0.2);
+                        background: var(--success-bg);
                         border: 1px solid rgba(0, 184, 115, 0.3);
                         color: #00b873;
                         border-radius: 6px;

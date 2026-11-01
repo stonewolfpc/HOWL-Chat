@@ -164,6 +164,12 @@ async function autoLoadDefaultModel() {
     }
 
     updateModelDisplay('Loading...');
+    // The image model holds VRAM this one needs; ask before pulling it out.
+    if (!(await requestVRAMArbitration('llm', modelPath))) {
+        console.log('[VRAM] chat model load cancelled by user');
+        updateModelDisplay('Load cancelled');
+        return;
+    }
     setModelLoading(true);
     try {
         await window.go.main.App.LoadModel(savedPath);
@@ -269,7 +275,10 @@ async function scanLLMDirectory() {
     if (!app) return;
     try {
         const dir = await app.OpenDirectoryPicker();
-        if (!dir) return;
+        if (!dir) {
+            if (typeof showNotification === 'function') showNotification('No folder selected.', 'error');
+            return;
+        }
         updateModelDisplay('Scanning…');
         await app.ScanLLMDir(dir);
         await populateLLMDropdown();
@@ -277,6 +286,25 @@ async function scanLLMDirectory() {
     } catch (err) {
         console.error('[LLM] Directory scan failed:', err);
         updateModelDisplay('Scan failed');
+    }
+}
+
+// VRAM arbitration before a chat model load: if a loaded image model has to go
+// first, say so and let the user decide. Returns false when the user cancels.
+async function requestVRAMArbitration(kind, path) {
+    const app = window.go?.main?.App;
+    if (!app?.CheckModelFit) return true;
+    try {
+        let fit = await app.CheckModelFit(kind, path || '');
+        if (fit.can_fit || !fit.blocking || fit.blocking.length === 0) return true;
+        if (!confirm(fit.message)) return false;
+        updateModelDisplay('Unloading the other model…');
+        fit = await app.FreeVRAMFor(kind, path || '');
+        if (!fit.can_fit) { alert(fit.message); updateModelDisplay('No model loaded'); return false; }
+        return true;
+    } catch (err) {
+        console.warn('[VRAM] arbitration check failed, continuing:', err);
+        return true;
     }
 }
 
@@ -368,17 +396,234 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let _browserModels = [];
 let _browserSelectedPath = null;
+let _browserSelectedDir = null;
 
 function openModelBrowser() {
     const modal = document.getElementById('model-browser-modal');
-    if (modal) modal.style.display = 'flex';
+    if (modal) modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
     populateModelBrowser();
 }
 
 function closeModelBrowser() {
     const modal = document.getElementById('model-browser-modal');
-    if (modal) modal.style.display = 'none';
+    if (modal) modal.classList.remove('show');
+    document.body.style.overflow = '';
     _browserSelectedPath = null;
+    _browserSelectedDir = null;
+}
+
+// ---------------------------------------------------------------------------
+// Model Browser Directory Dropdown
+// ---------------------------------------------------------------------------
+
+function _getDirsSelect() {
+    return document.getElementById('model-browser-dirs-select');
+}
+
+function _getDirsTrigger() {
+    const sel = _getDirsSelect();
+    return sel?.querySelector('.mb-dirs-trigger');
+}
+
+function _getDirsOptionsContainer() {
+    return document.getElementById('model-browser-dirs-options');
+}
+
+function _getDirsDropdown() {
+    const sel = _getDirsSelect();
+    return sel?.querySelector('.mb-dirs-dropdown');
+}
+
+function _toggleDirsDropdown() {
+    const dd = _getDirsDropdown();
+    if (!dd) return;
+    dd.classList.toggle('open');
+}
+
+function _closeDirsDropdown() {
+    const dd = _getDirsDropdown();
+    if (dd) dd.classList.remove('open');
+}
+
+function _setupDirsDropdown() {
+    const sel = _getDirsSelect();
+    if (!sel || sel.dataset.customSetup) return;
+    sel.dataset.customSetup = 'true';
+
+    const trigger = sel.querySelector('.mb-dirs-trigger');
+    if (trigger) {
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            _toggleDirsDropdown();
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (!sel.contains(e.target)) _closeDirsDropdown();
+    });
+}
+
+function _setDirsTriggerText(text) {
+    const trigger = _getDirsTrigger();
+    if (trigger) trigger.textContent = text || 'All directories';
+}
+
+function _clearDirOptions() {
+    const opts = _getDirsOptionsContainer();
+    if (opts) opts.innerHTML = '';
+}
+
+function _addDirOption(path, isActive) {
+    const opts = _getDirsOptionsContainer();
+    if (!opts) return;
+    const div = document.createElement('div');
+    div.className = 'mb-dirs-option' + (isActive ? ' active' : '');
+    div.title = path;
+    div.innerHTML = `
+        <span class="mb-dirs-option-text">${escapeHtml(path)}</span>
+        <span class="mb-dirs-remove" title="Remove directory">&times;</span>
+    `;
+    div.querySelector('.mb-dirs-option-text').addEventListener('click', () => {
+        _browserSelectedDir = path;
+        _setDirsTriggerText(path);
+        _closeDirsDropdown();
+        filterModelBrowser();
+    });
+    div.querySelector('.mb-dirs-remove').addEventListener('click', (e) => {
+        e.stopPropagation();
+        removeModelDirectory(path);
+    });
+    opts.appendChild(div);
+}
+
+async function populateModelBrowserDirs() {
+    _setupDirsDropdown();
+    const app = window.go?.main?.App;
+    if (!app?.GetRegisteredLLMDirs) return;
+    try {
+        const dirs = await app.GetRegisteredLLMDirs();
+        _clearDirOptions();
+        // "All directories" option
+        const opts = _getDirsOptionsContainer();
+        if (opts) {
+            const allDiv = document.createElement('div');
+            allDiv.className = 'mb-dirs-option' + (!_browserSelectedDir ? ' active' : '');
+            allDiv.textContent = 'All directories';
+            allDiv.addEventListener('click', () => {
+                _browserSelectedDir = null;
+                _setDirsTriggerText('All directories');
+                _closeDirsDropdown();
+                filterModelBrowser();
+            });
+            opts.appendChild(allDiv);
+        }
+        (dirs || []).forEach(d => _addDirOption(d, d === _browserSelectedDir));
+    } catch (err) {
+        console.warn('[Browser] Failed to load directories:', err);
+    }
+}
+
+async function addModelDirectory() {
+    const app = window.go?.main?.App;
+    if (!app?.OpenDirectoryPicker || !app?.ScanLLMDir) return;
+    try {
+        const dir = await app.OpenDirectoryPicker();
+        if (!dir) {
+            // The native picker returns an empty string when no folder is
+            // actually selected — for example while a search filter hides
+            // every subfolder. Point at the path box instead of failing
+            // silently, which looked like the button doing nothing.
+            const dd = _getDirsDropdown();
+            if (dd) dd.classList.add('open');
+            document.getElementById('mb-add-dir-path')?.focus();
+            if (typeof showNotification === 'function') {
+                showNotification('No folder selected. Paste the path instead.', 'error');
+            }
+            return;
+        }
+        await addModelDirectoryPath(dir);
+    } catch (err) {
+        console.warn('[Browser] Failed to add directory:', err);
+        if (typeof showNotification === 'function') {
+            showNotification('Could not add directory: ' + (err?.message || err), 'error');
+        }
+    }
+}
+
+// addModelDirectoryPath adds one directory and refreshes everything that shows
+// it. Shared by the folder picker and the path box so both behave identically.
+async function addModelDirectoryPath(dir) {
+    const app = window.go?.main?.App;
+    if (!app?.ScanLLMDir) return;
+    dir = (dir || '').trim();
+    if (!dir) {
+        if (typeof showNotification === 'function') showNotification('Enter a folder path first', 'error');
+        return;
+    }
+    await app.ScanLLMDir(dir);
+    // Reload the model list as well: this used to refresh only the directory
+    // dropdown and the chat dropdown, so the browser stayed on "No models
+    // found" until it was reopened.
+    _browserSelectedDir = null;
+    _setDirsTriggerText('All directories');
+    await populateModelBrowser();
+    await populateLLMDropdown();
+    if (typeof showNotification === 'function') showNotification('Added ' + dir, 'success');
+}
+
+async function addModelDirectoryFromInput() {
+    const input = document.getElementById('mb-add-dir-path');
+    await addModelDirectoryPath(input?.value || '');
+    if (input) input.value = '';
+}
+
+async function rescanModelDirectories() {
+    const app = window.go?.main?.App;
+    if (!app?.RescanAllDirs) return;
+    try {
+        app.RescanAllDirs();
+        await populateModelBrowser();
+        if (typeof showNotification === 'function') showNotification('Model directories rescanned', 'success');
+    } catch (err) {
+        console.warn('[Browser] Failed to rescan directories:', err);
+        if (typeof showNotification === 'function') showNotification('Rescan failed', 'error');
+    }
+}
+
+async function removeLLMModel(path, name) {
+    if (!confirm(`Remove "${name}" from the model registry?\n\nThe file will NOT be deleted from disk.`)) return;
+    const app = window.go?.main?.App;
+    if (!app?.RemoveLLMModel) return;
+    try {
+        await app.RemoveLLMModel(path);
+        _browserModels = _browserModels.filter(m => m.path !== path);
+        filterModelBrowser();
+        if (typeof showNotification === 'function') showNotification(`Removed "${name}"`, 'success');
+    } catch (err) {
+        console.warn('[Browser] Failed to remove model:', err);
+        if (typeof showNotification === 'function') showNotification('Failed to remove model', 'error');
+    }
+}
+
+async function removeModelDirectory(dir) {
+    if (!confirm(`Remove directory "${dir}" and all its models from the registry?\n\nNo files will be deleted from disk.`)) return;
+    const app = window.go?.main?.App;
+    if (!app?.UnregisterLLMDir) return;
+    try {
+        await app.UnregisterLLMDir(dir);
+        if (_browserSelectedDir === dir) {
+            _browserSelectedDir = null;
+            _setDirsTriggerText('All directories');
+        }
+        await populateModelBrowserDirs();
+        _browserModels = _browserModels.filter(m => !m.path.toLowerCase().startsWith(dir.toLowerCase()));
+        filterModelBrowser();
+        if (typeof showNotification === 'function') showNotification('Directory removed', 'success');
+    } catch (err) {
+        console.warn('[Browser] Failed to remove directory:', err);
+        if (typeof showNotification === 'function') showNotification('Failed to remove directory', 'error');
+    }
 }
 
 async function populateModelBrowser() {
@@ -398,6 +643,7 @@ async function populateModelBrowser() {
         const models = await app.GetLLMModels();
         _browserModels = models || [];
         renderModelBrowserList(_browserModels);
+        await populateModelBrowserDirs();
     } catch (err) {
         console.error('[Browser] Failed to load models:', err);
         list.innerHTML = '<div class="mb-no-selection">Error loading models</div>';
@@ -422,16 +668,29 @@ function renderModelBrowserList(models) {
 
         const sizeGB = m.size_mb > 0 ? (m.size_mb / 1024).toFixed(1) + ' GB' : '';
         item.innerHTML = `
-            <span class="mb-item-name">${escapeHtml(m.name)}</span>
-            <span class="mb-item-meta">${escapeHtml(m.format)} ${sizeGB}</span>
+            <div class="mb-item-info">
+                <span class="mb-item-name">${escapeHtml(m.name)}</span>
+                <span class="mb-item-meta">${escapeHtml(m.format)} ${sizeGB}</span>
+            </div>
+            <span class="mb-item-remove" title="Remove model from registry">&times;</span>
         `;
+        item.querySelector('.mb-item-remove').addEventListener('click', (e) => {
+            e.stopPropagation();
+            removeLLMModel(m.path, m.name);
+        });
         list.appendChild(item);
     });
 }
 
 function filterModelBrowser() {
     const query = document.getElementById('model-browser-search')?.value.toLowerCase() || '';
-    const filtered = _browserModels.filter(m => m.name.toLowerCase().includes(query));
+    let filtered = _browserModels;
+    if (_browserSelectedDir) {
+        filtered = filtered.filter(m => m.path && m.path.toLowerCase().startsWith(_browserSelectedDir.toLowerCase()));
+    }
+    if (query) {
+        filtered = filtered.filter(m => m.name.toLowerCase().includes(query));
+    }
     renderModelBrowserList(filtered);
 }
 
@@ -483,8 +742,3 @@ async function loadModelFromBrowser() {
     }
 }
 
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}

@@ -1035,6 +1035,60 @@ function setWorkflowMode(mode) {
     const activeSection = document.getElementById('ig-mode-' + mode);
     if (activeSection) activeSection.style.display = '';
 
+    // Mode-scoped options.
+    //
+    // ig-controls.css has always declared body.mode-txt2img .ig-txt2img-only,
+    // body.mode-inpaint .ig-inpaint-only and friends, but nothing ever added the
+    // body class, so every mode showed every control: options that cannot work
+    // in the current mode looked available and then did nothing.
+    document.body.classList.remove('mode-txt2img', 'mode-img2img', 'mode-inpaint',
+                                   'mode-outpaint', 'mode-upscale', 'mode-video');
+    document.body.classList.add('mode-' + mode);
+
+    // Whole panels that only make sense in some modes. Anything not listed here
+    // is common to every mode (model, sub-models, performance, DiT settings).
+    const PANEL_MODES = {
+        'Prompt': ['txt2img', 'img2img', 'inpaint', 'outpaint', 'video'],
+        'Parameters': ['txt2img', 'img2img', 'inpaint', 'outpaint', 'video'],
+        'Sampler Options': ['txt2img', 'img2img', 'inpaint', 'outpaint', 'video'],
+        'Sampler Shaping (DPM++/SDE)': ['txt2img', 'img2img', 'inpaint', 'outpaint', 'video'],
+        'Presets': ['txt2img', 'img2img', 'inpaint', 'outpaint', 'video'],
+        'ControlNet': ['txt2img', 'img2img', 'inpaint', 'outpaint'],
+        'High-Noise Fix Settings': ['txt2img']
+    };
+    document.querySelectorAll('.ig-panel').forEach(panel => {
+        const titleEl = panel.querySelector('.ig-panel-title');
+        if (!titleEl) return;
+        const allowed = PANEL_MODES[titleEl.textContent.trim()];
+        if (!allowed) return;
+        panel.style.display = allowed.includes(mode) ? '' : 'none';
+    });
+
+    // A few individual controls live inside shared panels but only mean
+    // something in some modes (batch count produces one image per run, so it is
+    // meaningless for upscale and video). Hide the whole field row, not just the
+    // input, so no orphaned label is left behind.
+    const FIELD_MODES = {
+        'ig-batch': ['txt2img', 'img2img', 'inpaint', 'outpaint']
+    };
+    Object.keys(FIELD_MODES).forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const row = el.closest('.ig-field, .ig-checkbox, label') || el;
+        row.style.display = FIELD_MODES[id].includes(mode) ? '' : 'none';
+    });
+
+    // The model list itself is mode-scoped: video families only make sense in
+    // Video mode, and still-image checkpoints cannot render video.
+    if (typeof _populateDiffusionDropdown === 'function' && typeof models !== 'undefined' && models.length) {
+        const modelEl = document.getElementById('ig-model');
+        const previous = modelEl ? modelEl.value : '';
+        _populateDiffusionDropdown();
+        if (modelEl && previous && [...modelEl.options].some(o => o.value === previous)) {
+            modelEl.value = previous;
+        }
+    }
+
     // Canvas placeholder / upload zone
     const placeholder = document.getElementById('ig-canvas-placeholder');
     const uploadZone = document.getElementById('ig-upload-zone');
@@ -1460,6 +1514,14 @@ function toggleSeedLock() {
     seedLocked = !seedLocked;
     const btn = document.getElementById('ig-seed-lock');
     if (btn) btn.classList.toggle('ig-locked', seedLocked);
+}
+
+let upscaleSeedLocked = false;
+function toggleUpscaleSeedLock() {
+    upscaleSeedLocked = !upscaleSeedLocked;
+    const btn = document.getElementById('ig-upscale-lock');
+    if (btn) btn.classList.toggle('ig-locked', upscaleSeedLocked);
+    setStatus(upscaleSeedLocked ? 'Upscale seed locked' : 'Upscale seed will be randomized');
 }
 
 function reuseLastSeed() {

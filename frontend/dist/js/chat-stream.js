@@ -228,50 +228,6 @@ function cleanupStreamListeners() {
 }
 
 // ---------------------------------------------------------------------------
-// Simulated Local Stream (dev fallback)
-// ---------------------------------------------------------------------------
-
-function streamAssistantResponse(sender, fullText) {
-    const chatHistory = document.querySelector('.chat-messages');
-    const messageDiv  = document.createElement('div');
-    messageDiv.className = 'chat-message assistant';
-
-    const bubble = document.createElement('div');
-    bubble.className = 'chat-bubble';
-    bubble.innerHTML = `
-        <div class="chat-sender">${sender}</div>
-        <div class="chat-text"></div>
-        <div class="chat-bubble-buttons">
-            <button class="bubble-button icon-button" onclick="regenerateMessage(this)" title="Regenerate">${ICONS.regenerate}</button>
-            <button class="bubble-button icon-button" onclick="previousMessage(this)" title="Previous" id="prev-btn">${ICONS.previous}</button>
-            <button class="bubble-button icon-button" onclick="nextMessage(this)" title="Next" id="next-btn">${ICONS.next}</button>
-            <button class="bubble-button icon-button" onclick="continueMessage(this)" title="Continue">${ICONS.continue}</button>
-            <button class="bubble-button icon-button" onclick="editMessage(this)" title="Edit">${ICONS.edit}</button>
-            <button class="bubble-button icon-button" onclick="copyMessage(this)" title="Copy">${ICONS.copy}</button>
-            <button class="bubble-button icon-button" onclick="undoMessage(this)" title="Undo (remove this and everything after)">${ICONS.undo}</button>
-            <button class="bubble-button icon-button" onclick="deleteMessage(this)" title="Delete">${ICONS.delete}</button>
-        </div>
-    `;
-
-    messageDiv.appendChild(bubble);
-    chatHistory.appendChild(messageDiv);
-
-    const textElement = bubble.querySelector('.chat-text');
-    let currentIndex  = 0;
-
-    const streamInterval = setInterval(() => {
-        if (currentIndex < fullText.length) {
-            textElement.textContent += fullText[currentIndex];
-            currentIndex++;
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        } else {
-            clearInterval(streamInterval);
-            updateNavigationButtons();
-        }
-    }, 30);
-}
-
-// ---------------------------------------------------------------------------
 // Multi-Character Response Orchestration
 // ---------------------------------------------------------------------------
 

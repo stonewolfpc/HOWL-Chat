@@ -29,6 +29,26 @@ function formatTime(timestamp) {
 // Memory List Flyout
 // ---------------------------------------------------------------------------
 
+async function deleteMemoryMenu(memoryId, memoryTitle) {
+    if (!confirm(`Delete memory "${memoryTitle || 'Untitled'}"?\n\nThis cannot be undone.`)) return;
+    try {
+        const deleted = window.MemoryStore?.deleteMemoryEntry
+            ? window.MemoryStore.deleteMemoryEntry(memoryId)
+            : false;
+        if (!deleted) {
+            showNotification('Memory not found', 'error');
+            return;
+        }
+        // Re-render both lists
+        loadRecentMemoriesMenu();
+        loadMemoryList();
+        showNotification('Memory deleted', 'success');
+    } catch (error) {
+        console.error('Failed to delete memory:', error);
+        showNotification('Failed to delete memory', 'error');
+    }
+}
+
 function toggleMemoryList() {
     const memoryList = document.getElementById('memory-list-flyout');
     if (!memoryList) return;
@@ -70,12 +90,24 @@ function renderMemoryList(memories) {
         container.innerHTML = '<div class="memory-empty">No memories found</div>';
         return;
     }
-    container.innerHTML = memories.map(m => `
-        <div class="memory-list-item" onclick="editMemoryEntry('${m.id}')">
-            <div class="memory-item-time">${formatTime(m.createdAt || m.created_at)}</div>
-            <div class="memory-item-title">${m.title || 'Untitled'}</div>
-        </div>
-    `).join('');
+    container.innerHTML = '';
+    memories.forEach(m => {
+        const item = document.createElement('div');
+        item.className = 'memory-list-item';
+        item.innerHTML = `
+            <div class="memory-list-item-content">
+                <div class="memory-item-time">${formatTime(m.createdAt || m.created_at)}</div>
+                <div class="memory-item-title">${m.title || 'Untitled'}</div>
+            </div>
+            <span class="memory-delete-btn" title="Delete memory"><span class="icon icon-trash"></span></span>
+        `;
+        item.querySelector('.memory-list-item-content').addEventListener('click', () => editMemoryEntry(m.id));
+        item.querySelector('.memory-delete-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteMemoryMenu(m.id, m.title);
+        });
+        container.appendChild(item);
+    });
 }
 
 function loadRecentMemoriesMenu() {
@@ -112,12 +144,24 @@ function renderRecentMemoriesMenu(memories) {
         container.innerHTML = '<div class="memory-empty">No memories</div>';
         return;
     }
-    container.innerHTML = memories.map(m => `
-        <div class="memory-entry">
-            <div class="memory-title">${m.title || 'Untitled'}</div>
-            <div class="memory-time">${formatTime(m.createdAt || m.created_at)}</div>
-        </div>
-    `).join('');
+    container.innerHTML = '';
+    memories.forEach(m => {
+        const entry = document.createElement('div');
+        entry.className = 'memory-entry';
+        entry.innerHTML = `
+            <div class="memory-entry-content">
+                <div class="memory-title">${m.title || 'Untitled'}</div>
+                <div class="memory-time">${formatTime(m.createdAt || m.created_at)}</div>
+            </div>
+            <span class="memory-delete-btn" title="Delete memory"><span class="icon icon-trash"></span></span>
+        `;
+        entry.querySelector('.memory-entry-content').addEventListener('click', () => editMemoryEntry(m.id));
+        entry.querySelector('.memory-delete-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteMemoryMenu(m.id, m.title);
+        });
+        container.appendChild(entry);
+    });
 }
 
 // ---------------------------------------------------------------------------

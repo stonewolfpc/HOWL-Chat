@@ -1,0 +1,2 @@
+{"t":"2026-10-31T15:02:17.0594485Z","c":"IMG-MODEL-LOAD","s":"high","op":"image.load","loc":"app-image-model.go","msg":"sd-server did not become ready: sd-server not ready after 2m0s"}
+{"t":"2026-10-31T19:36:06.0462676Z","c":"LLM-STREAM-BRK","s":"high","op":"llm.infer","loc":"app-prompt.go:82","msg":"scanner error: context canceled"}

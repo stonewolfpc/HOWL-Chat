@@ -37,12 +37,12 @@ const DeleteConfirm = (() => {
         overlay.id = OVERLAY_ID;
         overlay.style.cssText = `
             position: fixed; inset: 0; z-index: 10000;
-            background: rgba(0,0,0,0.7);
+            background: var(--overlay-scrim);
             display: flex; align-items: center; justify-content: center;
         `;
 
         const bodyText = body
-            ? `<p style="color:rgba(255,255,255,0.65);margin:8px 0 0;font-size:14px;">${body}</p>`
+            ? `<p style="color:var(--text-secondary);margin:8px 0 0;font-size:14px;">${body}</p>`
             : '';
 
         overlay.innerHTML = `
@@ -58,7 +58,7 @@ const DeleteConfirm = (() => {
                 </p>
                 <div style="display:flex;gap:12px;margin-top:24px;">
                     <button id="dc-cancel" style="
-                        flex:1;padding:10px;background:rgba(255,255,255,0.08);
+                        flex:1;padding:10px;background:var(--surface-hover);
                         border:1px solid rgba(255,255,255,0.15);color:#fff;
                         border-radius:8px;cursor:pointer;font-size:14px;
                     ">Cancel</button>

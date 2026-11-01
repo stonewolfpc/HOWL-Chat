@@ -16,8 +16,10 @@ const (
 	AssetControlNet AssetType = "controlnet"
 	AssetEmbedding  AssetType = "embedding"
 	AssetUpscaler   AssetType = "upscaler"
-	AssetClip       AssetType = "clip"
-	AssetT5         AssetType = "t5"
+	AssetClipL      AssetType = "clip_l"
+	AssetClipG      AssetType = "clip_g"
+	AssetT5XXL      AssetType = "t5xxl"
+	AssetLLM        AssetType = "llm" // For Anima's Qwen3 text encoder
 	AssetUnknown    AssetType = "unknown"
 )
 
@@ -27,6 +29,7 @@ type ModelFamily string
 const (
 	FamilyFlux     ModelFamily = "flux"
 	FamilySDXL     ModelFamily = "sdxl"
+	FamilySD35     ModelFamily = "sd3.5"
 	FamilySD3      ModelFamily = "sd3"
 	FamilySD15     ModelFamily = "sd1.5"
 	FamilySD21     ModelFamily = "sd2.1"
@@ -35,7 +38,13 @@ const (
 	FamilyKolors   ModelFamily = "kolors"
 	FamilyCascade  ModelFamily = "cascade"
 	FamilyChroma   ModelFamily = "chroma"
-	FamilyUnknown  ModelFamily = ""
+
+	FamilyHiDream ModelFamily = "hidream"
+	FamilyWan     ModelFamily = "wan"
+	FamilyLTX     ModelFamily = "ltx2"
+	FamilyHunyuan ModelFamily = "hunyuanvideo"
+	FamilyAnimate ModelFamily = "animatediff"
+	FamilyUnknown ModelFamily = ""
 )
 
 // modelExts is the set of file extensions that contain model weights.
@@ -62,16 +71,26 @@ func ClassifyName(name string) AssetType {
 		return AssetUpscaler
 	case contains(lower, "vae"):
 		return AssetVAE
+	case lower == "ae.safetensors", strings.HasPrefix(lower, "ae."):
+		return AssetVAE
+	case contains(lower, "first_stage_model", "first-stage-model"):
+		return AssetVAE
 	case contains(lower, "lora", "loha", "locon"):
 		return AssetLoRA
 	case contains(lower, "embed", "textual_inversion", "ti_", "hypernetwork"):
 		return AssetEmbedding
 	case contains(lower, "clip_l", "clip.l", "clip-l"):
-		return AssetClip
+		return AssetClipL
 	case contains(lower, "clip_g", "clip.g", "clip-g"):
-		return AssetClip
+		return AssetClipG
 	case contains(lower, "t5xxl", "t5-xxl", "t5_xxl"):
-		return AssetT5
+		return AssetT5XXL
+
+	case contains(lower, "qwen"):
+		// Qwen text encoders (e.g., Qwen3-0.6B-Base for Anima)
+		return AssetLLM
+	case contains(lower, "wan2", "wan_2", "ltx", "hunyuan", "animatediff", "minimax"):
+		return AssetDiffusion
 	default:
 		return AssetUnknown
 	}
@@ -100,6 +119,12 @@ func ClassifySize(nameType AssetType, sizeMB float64) AssetType {
 func GuessFamily(name string) ModelFamily {
 	lower := strings.ToLower(name)
 
+	// The Flux VAE ships as ae.safetensors (stem "ae"). Classify it as Flux so it
+	// is never attached to an SD1.5/SDXL checkpoint that carries its own VAE.
+	if lower == "ae" {
+		return FamilyFlux
+	}
+
 	// Explicit non-SD model names — skip them entirely
 	nonSD := []string{
 		"whisper", "ggml-base", "ggml-small", "ggml-medium", "ggml-large",
@@ -111,7 +136,60 @@ func GuessFamily(name string) ModelFamily {
 		}
 	}
 
+	// VAE-specific family detection
+	if strings.Contains(lower, "vae") || strings.HasPrefix(lower, "ae.") {
+		switch {
+		case contains(lower, "flux", "sdxl", "xl", "juggernaut_xl", "juggernaut-xl",
+			"realisticvision_xl", "realisticvision-xl", "dreamshaperxl", "dreamshaper-xl",
+			"flatpiecexl", "piecexl"): // Explicitly handle flatpiecexl VAEs
+			return FamilySDXL // Flux uses SDXL VAE
+		case contains(lower, "sd3", "sd_3", "stable-diffusion-3", "sd3.5", "sd_3.5", "sd35"):
+			return FamilySD3
+		case contains(lower, "sd2.1", "sd_2.1", "sd21"):
+			return FamilySD21
+
+		case contains(lower, "wan"):
+			return FamilyWan
+		case contains(lower, "sd1.5", "sd_1.5", "sd15", "v1-5"):
+			return FamilySD15
+		default:
+			return FamilySD15 // conservative default for VAEs
+		}
+	}
+
+	// CLIP-specific family detection
+	if strings.Contains(lower, "clip") {
+		switch {
+		case contains(lower, "flux", "sdxl", "xl"):
+			return FamilySDXL
+		case contains(lower, "sd3", "sd_3", "stable-diffusion-3", "sd3.5", "sd_3.5", "sd35"):
+			return FamilySD3
+		default:
+			return FamilySD15
+		}
+	}
+
+	// T5XXL-specific family detection
+	if contains(lower, "t5xxl", "t5-xxl", "t5_xxl") {
+		switch {
+		case contains(lower, "flux", "chroma"):
+			return FamilyFlux
+		case contains(lower, "sd3", "sd_3", "stable-diffusion-3", "sd3.5", "sd_3.5", "sd35"):
+			return FamilySD3
+		default:
+			return FamilyFlux // T5XXL is primarily used by Flux/Chroma/SD3
+		}
+	}
+
 	switch {
+	case contains(lower, "wan2", "wan_2", "wan-", "-wan"):
+		return FamilyWan
+	case contains(lower, "ltx"):
+		return FamilyLTX
+	case contains(lower, "hunyuan"):
+		return FamilyHunyuan
+	case contains(lower, "animatediff", "motion-module", "motion_module"):
+		return FamilyAnimate
 	case contains(lower, "flux"):
 		return FamilyFlux
 	case contains(lower, "chroma"):
@@ -121,12 +199,19 @@ func GuessFamily(name string) ModelFamily {
 		return FamilyTurbo
 	case contains(lower, "auraflow", "aura-flow", "aura_flow"):
 		return FamilyAuraFlow
+	case contains(lower, "hidream", "hi-dream", "hi_dream"):
+		return FamilyHiDream
 	case contains(lower, "kolors"):
 		return FamilyKolors
 	case contains(lower, "cascade", "wurstchen", "würstchen"):
 		return FamilyCascade
+	case contains(lower, "sd3.5", "sd_3.5", "sd35", "stable-diffusion-3.5"):
+		return FamilySD35
 	case contains(lower, "sdxl", "sd_xl", "sd-xl", "_xl_", "-xl-",
-		"juggernaut_xl", "juggernaut-xl", "realisticvision_xl", "dreamshaperxl"):
+		"juggernaut_xl", "juggernaut-xl",
+		"realisticvision_xl", "realisticvision-xl",
+		"dreamshaperxl", "dreamshaper-xl",
+		"epicrealism"):
 		return FamilySDXL
 	case contains(lower, "sd3", "sd_3", "stable-diffusion-3"):
 		return FamilySD3
@@ -143,7 +228,7 @@ func GuessFamily(name string) ModelFamily {
 // DefaultResolution returns the canonical resolution for a family.
 func DefaultResolution(family ModelFamily) int {
 	switch family {
-	case FamilyFlux, FamilySDXL, FamilySD3, FamilyTurbo:
+	case FamilyFlux, FamilySDXL, FamilySD35, FamilySD3, FamilyTurbo:
 		return 1024
 	case FamilySD21:
 		return 768
@@ -155,9 +240,9 @@ func DefaultResolution(family ModelFamily) int {
 // DefaultSampler returns a reasonable sampler for the family.
 func DefaultSampler(family ModelFamily) string {
 	switch family {
-	case FamilyFlux:
+	case FamilyFlux, FamilyWan, FamilyLTX, FamilyHunyuan, FamilyAnimate:
 		return "euler"
-	case FamilySDXL, FamilySD3, FamilyTurbo:
+	case FamilySDXL, FamilySD35, FamilySD3, FamilyTurbo:
 		return "dpmpp_2m"
 	default:
 		return "euler_a"
@@ -169,6 +254,26 @@ func CompatibleVAE(modelFamily, vaeFamily ModelFamily) bool {
 	if vaeFamily == FamilyUnknown {
 		return true // unclassified VAE — allow it
 	}
+	// SD1.5 and SD2.1 can share VAEs, but NOT with SDXL VAEs
+	if (modelFamily == FamilySD15 || modelFamily == FamilySD21) &&
+		(vaeFamily == FamilySD15 || vaeFamily == FamilySD21) {
+		return true
+	}
+	// SDXL models can use SDXL VAEs
+	if modelFamily == FamilySDXL && vaeFamily == FamilySDXL {
+		return true
+	}
+	// Flux and Chroma can share VAEs (both use SDXL VAE)
+	if (modelFamily == FamilyFlux || modelFamily == FamilyChroma) &&
+		(vaeFamily == FamilyFlux || vaeFamily == FamilyChroma || vaeFamily == FamilySDXL) {
+		return true
+	}
+	// SD3 and SD3.5 can share VAEs
+	if (modelFamily == FamilySD3 || modelFamily == FamilySD35) &&
+		(vaeFamily == FamilySD3 || vaeFamily == FamilySD35) {
+		return true
+	}
+	// Otherwise require exact match
 	return modelFamily == vaeFamily
 }
 

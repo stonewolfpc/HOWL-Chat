@@ -18,6 +18,7 @@ import (
 	"howl-chat/internal/audio/tts/melotts"
 	"howl-chat/internal/audio/tts/piper"
 	"howl-chat/internal/audio/types"
+	"howl-chat/internal/paths"
 )
 
 // Pipeline composes ASR, TTS, and optional multimodal processing.
@@ -442,25 +443,51 @@ func defaultKokoroScriptPath() string {
 	return "scripts/kokoro-tts.py"
 }
 
+// kokoroSearchDirs lists where a Kokoro model set is looked for, in priority
+// order. It is rooted at the project rather than at a fixed drive so the paths
+// survive the project moving, matching how the rest of the app resolves files.
+func kokoroSearchDirs() []string {
+	root := paths.ProjectRoot()
+	return []string{
+		filepath.Join(root, "models", "kokoro"),
+		filepath.Join(root, "models"),
+		filepath.Join(root, "runtime", "tts", "kokoro"),
+		filepath.Join(root, "runtime", "tts"),
+	}
+}
+
+// findKokoroFile returns the first existing match for name across the search
+// directories, or "" when the file is not installed. Callers surface an empty
+// path as a clear "model not found" error instead of failing on a stale path.
+func findKokoroFile(name string) string {
+	for _, dir := range kokoroSearchDirs() {
+		candidate := filepath.Join(dir, name)
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate
+		}
+	}
+	return ""
+}
+
 func defaultKokoroModelPath() string {
 	if v := os.Getenv("HOWL_TTS_KOKORO_MODEL"); v != "" {
 		return v
 	}
-	return `D:\AI GGUF\TTS\kokoro-v1.0.onnx`
+	return findKokoroFile("kokoro-v1.0.onnx")
 }
 
 func defaultKokoroVoicesPath() string {
 	if v := os.Getenv("HOWL_TTS_KOKORO_VOICES"); v != "" {
 		return v
 	}
-	return `D:\AI GGUF\TTS\voices-v1.0.bin`
+	return findKokoroFile("voices-v1.0.bin")
 }
 
 func defaultKokoroConfigPath() string {
 	if v := os.Getenv("HOWL_TTS_KOKORO_CONFIG"); v != "" {
 		return v
 	}
-	return `D:\AI GGUF\TTS\hf_cache\config.json`
+	return findKokoroFile(filepath.Join("hf_cache", "config.json"))
 }
 
 func firstVoiceOrDefault(synth types.TTSSynthesizer, fallback string) string {

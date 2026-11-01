@@ -24,6 +24,7 @@ import (
 	"howl-chat/internal/backend/model"
 	"howl-chat/internal/backend/rag"
 	"howl-chat/internal/backend/types"
+	"howl-chat/internal/paths"
 )
 
 // Service handles chat operations including message processing and AI interaction
@@ -81,7 +82,7 @@ func NewService(modelManager *model.Manager, client llama.Client, worldName, sce
 
 // LoadChatData loads all relevant lorebook and memory data for a chat session.
 func (s *Service) LoadChatData(worldName, scenarioName string, characterNames []string, chatName string) error {
-	projectRoot := "d:\\HOWL_Chat"
+	projectRoot := paths.ProjectRoot()
 	s.worldName = worldName
 	s.scenarioName = scenarioName
 	s.characterNames = characterNames
@@ -340,13 +341,13 @@ func (s *Service) GetAllLorebookEntries() []lorebook.Entry {
 
 // SaveChatData saves all relevant chat data to JSON files.
 func (s *Service) SaveChatData(chatName string, syncAutomatedLore bool) error {
-	projectRoot := "d:\\HOWL_Chat"
+	projectRoot := paths.ProjectRoot()
 
 	// Save chat.json
 	chatFilePath := filepath.Join(projectRoot, "Chats", chatName, "chat.json")
 	chatData := map[string]interface{}{
 		"chat_name":  chatName,
-		"seed":       987654321, // Placeholder for now
+		"seed":       s.currentSeed(), // -1 means random, otherwise the pinned seed
 		"world":      s.worldName,
 		"scenario":   s.scenarioName,
 		"characters": s.characterNames,

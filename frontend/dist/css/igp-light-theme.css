@@ -51,7 +51,7 @@ body.theme-light .ig-panel-toggle {
 
 body.theme-light .ig-panel-badge {
     background: var(--accent-primary);
-    color: #FFFFFF;
+    color: var(--on-accent);
 }
 
 body.theme-light .ig-btn-secondary {
@@ -170,4 +170,26 @@ body.theme-light .ig-history-item.active {
 
 body.theme-light .ig-history-placeholder {
     color: var(--text-tertiary);
+}
+
+body.theme-light .ig-modal-content {
+    border-color: var(--border-primary);
+}
+
+body.theme-light .ig-modal-header {
+    background: var(--surface-secondary);
+    border-bottom-color: var(--border-secondary);
+}
+
+body.theme-light .ig-sidebar-toggle {
+    background: var(--surface-tertiary);
+    border-color: var(--border-secondary);
+    color: var(--text-primary);
+}
+
+body.theme-light .ig-board-select,
+body.theme-light .ig-board-search {
+    background: var(--surface-tertiary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
 }

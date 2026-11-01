@@ -25,8 +25,6 @@ function openStoryTools() {
     loadRecentMemoriesMenu();
 }
 
-function openAdvancedSettings() { showNotification('Advanced settings coming soon', 'info'); }
-
 function _openAudioSettingsIframe(hash) {
     // Remove existing modal if already open
     const existing = document.getElementById('audio-settings-modal');
@@ -130,6 +128,6 @@ window.menuFunctions = {
     toggleColorblindMode, toggleHighContrastMode, setTheme,
     increaseUIScale, decreaseUIScale, resetUIScale,
     toggleSidebar, toggleCharacterPanel, toggleWorldPanel, toggleFullscreen,
-    openStoryTools, openAdvancedSettings, showKeyboardShortcuts,
+    openStoryTools, showKeyboardShortcuts,
     openAudioSettings, openTTSSettings
 };

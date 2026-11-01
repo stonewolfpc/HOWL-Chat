@@ -86,7 +86,7 @@
 .ig-panel-badge {
     font-size: 10px;
     background: var(--accent-primary);
-    color: #FFFFFF;
+    color: var(--text-secondary);
     padding: 2px 8px;
     border-radius: 10px;
     margin-left: auto;

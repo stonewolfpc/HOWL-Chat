@@ -1,0 +1,87 @@
+[startup] 21:46:11.934  +    2.1ms  image init: begin
+[startup] 21:46:11.936  +    4.8ms  image init: config ready
+[ImageEngine] Initialized: binary=C:\Users\StoneWolfPC\HOWL_Chat\sd-server.exe models=E:\HOWL_Chat\models port=8081
+[startup] 21:46:11.936  +    4.8ms  image init: engine initialized
+[ImageEngine] sd-server commit: c6dfa9d
+[ImageEngine] Restored last model: "image"
+[startup] 21:46:11.975  +   43.4ms  rescan: start
+2026/10/31 21:46:11 [harness] serving frontend/dist on http://127.0.0.1:8799
+[startup] 21:46:11.976  +   43.9ms  rescan: scanning E:\AI GGUF\GGUF
+[startup] 21:46:11.978  +   46.2ms  rescan: done E:\AI GGUF\GGUF 25 entries
+2026/10/31 21:46:12 [rpc] GetAppDiagnostics                             ok           2ms
+2026/10/31 21:46:12 [rpc] GetSDServerVersion                            ok            0s
+[proc] reaped 1 orphaned model process(es)
+2026/10/31 21:46:18 [rpc] GetSettings                                   ok            0s
+2026/10/31 21:46:18 [rpc] SetSettings                                   ok           1ms
+2026/10/31 21:46:18 [rpc] IsModelLoaded                                 ok          11ms
+[LoadModel] START path="E:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf"
+[LoadModel] path validated
+[LoadModel] checking port 8080
+[LoadModel] port 8080 free
+[LoadModel] validating llama-server binary
+[LoadModel] llama-server binary validated
+[LoadModel] reading GGUF metadata from: E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf
+[ReadProfile] final: Family=qwen35 Layers=32 Params=13759916804 Size=5366.4MB Quant=IQ2_XXS DModel=4096 Heads=16 KVHeads=4
+[LoadModel] profile: Family=qwen35 Layers=32 Params=13759916804 Size=5366.4MB Quant=IQ2_XXS ArchSpec=true
+[LoadModel] applying safe defaults
+[applySafeDefaults] enter
+[applySafeDefaults] getting hardware snapshot
+[ResourceManager] GetManager called
+[ResourceManager] initializing singleton
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] initialization complete
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[applySafeDefaults] freeVRAM=5800 freeRAM=44325
+[applySafeDefaults] reading settings
+[applySafeDefaults] settings: ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] archSpec: layers=32 dmodel=4096 heads=16 kvheads=4
+[applySafeDefaults] creating memory model
+[applySafeDefaults] calling ClampToHardware
+[applySafeDefaults] ClampToHardware returned
+[applySafeDefaults] final: GPU=4302MB RAM=2468MB ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] done
+[LoadModel] safe defaults applied
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+[LoadModel] no mmproj found — vision not available for this model
+[LoadModel] validating spawn settings
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[LoadModel] spawn params: ctx=3096 gpuLayers=22 batch=256 freeVRAM=5800 freeRAM=44325
+[LoadModel] validation result: level=0 msg="Memory OK — estimated 4302 MB GPU / 2468 MB RAM (free: 5800 / 44325 MB)"
+[LoadModel] spawn validation passed
+[LoadModel] chat template: model-native for family "qwen35" (170 bytes)
+[LoadModel] spawning llama-server
+[findMMProj] no mmproj found in E:\AI GGUF\GGUF
+INFO: No mmproj file found for model: E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf
+INFO: llama-server started (pid 21372) with model E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf
+[LoadModel] llama-server spawned (pid 21372)
+INFO: Registering model with estimated GPU:4310MB RAM:2476MB
+[ResourceManager] GetManager called
+2026/10/31 21:46:21 [rpc] LoadModel                                     ok        2.271s
+[LoadModel] monitor started (pid 21372, timeout 60s)
+0.00.120.863 I srv  llama_server: initializing ...
+0.00.120.875 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.121.211 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.137.211 I srv    load_model: loading model 'E:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf'
+2026/10/31 21:46:23 [rpc] IsModelLoaded                                 ok           1ms
+0.02.848.663 I cmn          init: llama threadpool init, n_threads = 8
+0.03.440.911 I srv    load_model: initializing, n_slots = 4, n_ctx_slot = 3328, kv_unified = 'true'
+0.03.443.723 I srv  server_run_i: model loaded
+0.03.443.733 I srv  server_on_li: listening on http://127.0.0.1:8080
+[LoadModel] monitor: server healthy, model loaded
+2026/10/31 21:46:25 [rpc] IsModelLoaded                                 ok            0s
+2026/10/31 21:46:25 [rpc] GetSettings                                   ok            0s
+2026/10/31 21:46:25 [rpc] IsModelLoaded                                 ok           1ms
+2026/10/31 21:46:25 [rpc] LoadChatData                                  ok           1ms
+2026/10/31 21:47:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/10/31 21:47:12 [rpc] GetSDServerVersion                            ok           1ms

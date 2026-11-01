@@ -32,22 +32,21 @@ async function handleKnowledgeUpload(input) {
     try {
         showLoading('Uploading document...');
 
-        // Write file to a temporary path that Go can access
-        // For Wails, we can pass the file content or path
-        // Since Wails file dialog returns paths, we use the path directly
-        const filePath = await saveFileForUpload(file);
+        // The file input gives us content, not a path, so send the text itself.
+        const text = await file.text();
+        if (!text.trim()) throw new Error('That file has no readable text.');
 
-        if (window.go?.main?.App?.UploadRAGDocument) {
-            const docID = await window.go.main.App.UploadRAGDocument(
+        if (window.go?.main?.App?.UploadRAGDocumentText) {
+            const docID = await window.go.main.App.UploadRAGDocumentText(
                 file.name,
                 scope,
                 scopeID,
                 'file',
-                filePath
+                text
             );
             console.log('Document uploaded:', docID);
         } else {
-            console.warn('UploadRAGDocument not available in Wails runtime');
+            console.warn('UploadRAGDocumentText not available in Wails runtime');
         }
 
         await refreshKnowledgeList();
@@ -57,25 +56,6 @@ async function handleKnowledgeUpload(input) {
     } finally {
         hideLoading();
         input.value = '';
-    }
-}
-
-// Save file content to a known path for Go to read
-// In Wails, we can write to the app's working directory
-async function saveFileForUpload(file) {
-    // Read file as text
-    const text = await file.text();
-    // Store in a temporary location
-    const tempPath = 'RAG/_upload_temp_' + Date.now() + '_' + file.name;
-    try {
-        // We can't directly write from JS, so we pass the content to Go
-        // But since the Go binding expects a file path, we need the user to select
-        // files via Wails OpenFileDialog instead
-        // For now, return the file name and rely on Wails file dialog
-        return file.name;
-    } catch (e) {
-        console.warn('Could not save temp file:', e);
-        return file.name;
     }
 }
 
@@ -189,54 +169,12 @@ function resolveScopeID(scope) {
 // Tab Integration
 // ---------------------------------------------------------------------------
 
-const _origSwitchMemoriesTab = window.switchMemoriesTab;
-
-window.switchMemoriesTab = function(tab) {
-    // Hide knowledge panel by default
-    const knowledgePanel = document.getElementById('knowledge-panel');
-    const memoryListCard = document.querySelector('.setting-card:nth-of-type(3)');
-    const memoryEditorCard = document.querySelector('.setting-card:nth-of-type(4)');
-
-    if (knowledgePanel) {
-        knowledgePanel.style.display = tab === 'knowledge' ? 'block' : 'none';
-    }
-    if (memoryListCard) {
-        memoryListCard.style.display = tab === 'knowledge' ? 'none' : 'block';
-    }
-    if (memoryEditorCard) {
-        memoryEditorCard.style.display = tab === 'knowledge' ? 'none' : 'block';
-    }
-
-    // Update tab active states
-    document.querySelectorAll('.memories-tab').forEach(t => t.classList.remove('active'));
-    const activeTab = document.getElementById(`memories-tab-${tab}`);
-    if (activeTab) activeTab.classList.add('active');
-
-    if (tab === 'knowledge') {
-        refreshKnowledgeList();
-    } else if (_origSwitchMemoriesTab) {
-        _origSwitchMemoriesTab(tab);
-    }
-};
+// switchMemoriesTab is owned by story-tools.js, which handles the knowledge
+// panel itself. The wrapper that re-ran a captured copy is gone.
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function showLoading(text) {
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) {
-        overlay.querySelector('.loading-text').textContent = text;
-        overlay.style.display = 'flex';
-    }
-}
 
 function hideLoading() {
     const overlay = document.getElementById('loading-overlay');

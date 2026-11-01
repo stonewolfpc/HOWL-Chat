@@ -6,12 +6,12 @@
 
 /* Sidebar Container */
 .character-sidebar {
-    background: rgba(20, 20, 30, 0.95);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--shell-panel-bg);
+    border-right: 1px solid var(--surface-hover);
     backdrop-filter: blur(10px);
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    scrollbar-color: var(--border-secondary) transparent;
 }
 
 .character-sidebar::-webkit-scrollbar {
@@ -23,12 +23,12 @@
 }
 
 .character-sidebar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--border-primary);
     border-radius: 3px;
 }
 
 .character-sidebar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--border-primary);
 }
 
 /* Panel Header */
@@ -36,9 +36,9 @@
     padding: 15px 20px;
     font-size: 14px;
     font-weight: 600;
-    color: #fff;
-    background: rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    background: var(--surface-hover);
+    border-bottom: 1px solid var(--surface-hover);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -55,18 +55,18 @@
     align-items: center;
     padding: 12px 10px;
     margin-bottom: 8px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-hover);
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--surface-hover);
     position: relative;
     text-align: center;
 }
 
 .character-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
 }
 
 .character-item.character-inactive {
@@ -76,7 +76,7 @@
 
 .character-item.character-inactive .character-name {
     text-decoration: line-through;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-secondary);
 }
 
 /* Avatar */
@@ -104,10 +104,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-hover);
     border-radius: 50%;
     font-size: 24px;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary);
 }
 
 /* Status Indicator */
@@ -118,7 +118,7 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    border: 2px solid rgba(20, 20, 30, 0.95);
+    border: 2px solid var(--shell-panel-bg);
 }
 
 .status-indicator.online {
@@ -159,7 +159,7 @@
 .character-name {
     font-size: 14px;
     font-weight: 600;
-    color: #fff;
+    color: var(--text-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -168,7 +168,7 @@
 
 .character-role {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -193,7 +193,7 @@
 .stepout-mode-btn {
     flex: 1;
     padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--surface-hover);
     border: 1px solid rgba(255, 255, 255, 0.15);
     color: rgba(255, 255, 255, 0.7);
     border-radius: 8px;
@@ -210,9 +210,9 @@
 
 /* Character Menu Button */
 .character-menu-btn {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-hover);
     border: none;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary);
     padding: 4px 8px;
     border-radius: 4px;
     cursor: pointer;
@@ -221,15 +221,15 @@
 }
 
 .character-menu-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
+    background: var(--surface-hover);
+    color: var(--text-secondary);
 }
 
 /* Empty State */
 .character-empty {
     text-align: center;
     padding: 40px 20px;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-secondary);
 }
 
 .empty-icon {
@@ -245,9 +245,9 @@
 
 /* Add Character Button */
 .add-character-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
+    background: var(--surface-hover);
+    border: 1px solid var(--border-secondary);
+    color: var(--text-secondary);
     padding: 8px 16px;
     border-radius: 6px;
     cursor: pointer;
@@ -256,6 +256,6 @@
 }
 
 .add-character-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
 }

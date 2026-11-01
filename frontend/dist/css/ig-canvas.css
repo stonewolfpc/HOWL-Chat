@@ -38,12 +38,22 @@
     background: #000;
 }
 
+/* Live TAESD step previews arrive as ~64-128 px frames and are replaced every
+   few hundred ms. They must fill the canvas box rather than paint at natural
+   size in the middle of it; result images keep the rules above. */
+.ig-canvas img.ig-live-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: auto;
+}
+
 /* Canvas Placeholder */
 .ig-canvas-placeholder {
     text-align: center;
     padding: 60px;
     color: var(--text-secondary);
-    max-width: 400px;
+    max-width: 600px;
 }
 
 .ig-canvas-icon {
@@ -146,7 +156,7 @@
 .ig-batch-thumb {
     width: 100%;
     aspect-ratio: 1;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 8px;
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.15s ease;

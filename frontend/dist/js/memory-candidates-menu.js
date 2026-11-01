@@ -40,17 +40,17 @@ function injectMemoryReviewButton() {
     btn.style.cssText = `
         display: flex; align-items: center; gap: 8px;
         width: 100%; padding: 10px 14px;
-        background: rgba(255,255,255,0.04);
+        background: var(--surface-hover);
         border: 1px solid rgba(255,255,255,0.06);
         border-radius: 10px; color: rgba(255,255,255,0.8);
         cursor: pointer; font-size: 14px; margin-top: 8px;
         transition: background 0.15s;
     `;
     btn.addEventListener('mouseenter', () => {
-        btn.style.background = 'rgba(255,255,255,0.08)';
+        btn.style.background = 'var(--surface-hover)';
     });
     btn.addEventListener('mouseleave', () => {
-        btn.style.background = 'rgba(255,255,255,0.04)';
+        btn.style.background = 'var(--surface-hover)';
     });
     btn.addEventListener('click', () => {
         if (window.MemoryCandidates) {

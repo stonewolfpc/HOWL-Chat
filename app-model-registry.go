@@ -68,18 +68,18 @@ func (a *App) ScanLLMDir(dir string) ([]LLMModelInfo, error) {
 	if a.modelRegistry == nil {
 		return nil, fmt.Errorf("model registry not initialised")
 	}
-	entries, err := scanDirForType(dir, "llm", []string{".gguf", ".bin", ".mmproj"})
+	entries, seen, err := scanDirForType(dir, registry.KindLLM, []string{".gguf", ".bin", ".mmproj"}, a.modelRegistry.Lookup)
 	if err != nil {
 		return nil, err
 	}
-	if err := a.modelRegistry.MergeEntries(entries); err != nil {
+	if _, _, err := a.modelRegistry.SyncDir(dir, entries, seen); err != nil {
 		a.logError(errors.REGModelAddFail, errors.High, "registry.llm.merge", "app-model-registry.go:74", err)
 		return nil, err
 	}
-	if err := a.modelRegistry.RegisterDir(dir, "llm"); err != nil {
-		a.logErrorSilent(errors.REGModelAddFail, errors.Medium, "registry.llm.dir", "app-model-registry.go:77", err)
+	if err := a.modelRegistry.RegisterDir(dir, registry.KindLLM); err != nil {
+		a.logErrorSilent(errors.REGModelAddFail, errors.Medium, "registry.llm.dir", "app-model-registry.go", err)
 	}
-	return llmInfos(a.modelRegistry.ByType("llm")), nil
+	return llmInfos(a.modelRegistry.ByTypeInDirs("llm", registry.KindLLM)), nil
 }
 
 // ScanTTSDir walks dir for Piper .onnx voice model files, registers them,
@@ -88,18 +88,26 @@ func (a *App) ScanTTSDir(dir string) ([]TTSModelInfo, error) {
 	if a.modelRegistry == nil {
 		return nil, fmt.Errorf("model registry not initialised")
 	}
-	entries, err := scanDirForType(dir, "tts", []string{".onnx"})
+	entries, seen, err := scanDirForType(dir, registry.KindTTS, []string{".onnx"}, a.modelRegistry.Lookup)
 	if err != nil {
 		return nil, err
 	}
-	if err := a.modelRegistry.MergeEntries(entries); err != nil {
+	if _, _, err := a.modelRegistry.SyncDir(dir, entries, seen); err != nil {
 		a.logError(errors.REGModelAddFail, errors.High, "registry.tts.merge", "app-model-registry.go:93", err)
 		return nil, err
 	}
-	if err := a.modelRegistry.RegisterDir(dir, "tts"); err != nil {
-		a.logErrorSilent(errors.REGModelAddFail, errors.Medium, "registry.tts.dir", "app-model-registry.go:96", err)
+	if err := a.modelRegistry.RegisterDir(dir, registry.KindTTS); err != nil {
+		a.logErrorSilent(errors.REGModelAddFail, errors.Medium, "registry.tts.dir", "app-model-registry.go", err)
 	}
-	return ttsInfos(a.modelRegistry.ByType("tts")), nil
+	return ttsInfos(a.modelRegistry.ByTypeInDirs("tts", registry.KindTTS)), nil
+}
+
+// GetRegisteredLLMDirs returns all directories currently registered for LLM scanning.
+func (a *App) GetRegisteredLLMDirs() ([]string, error) {
+	if a.modelRegistry == nil {
+		return []string{}, fmt.Errorf("model registry not initialised")
+	}
+	return a.modelRegistry.Directories(registry.KindLLM), nil
 }
 
 // GetLLMModels returns all registered LLM models from every known directory,
@@ -108,7 +116,25 @@ func (a *App) GetLLMModels() ([]LLMModelInfo, error) {
 	if a.modelRegistry == nil {
 		return []LLMModelInfo{}, fmt.Errorf("model registry not initialised")
 	}
-	return llmInfos(a.modelRegistry.ByType("llm")), nil
+	return llmInfos(a.modelRegistry.ByTypeInDirs("llm", registry.KindLLM)), nil
+}
+
+// RemoveLLMModel removes a single model entry from the registry by its path.
+// Does NOT delete the underlying file from disk.
+func (a *App) RemoveLLMModel(path string) error {
+	if a.modelRegistry == nil {
+		return fmt.Errorf("model registry not initialised")
+	}
+	return a.modelRegistry.Remove(path)
+}
+
+// UnregisterLLMDir removes a directory from the LLM scan list and also
+// removes all registered models whose path lives inside that directory.
+func (a *App) UnregisterLLMDir(dir string) error {
+	if a.modelRegistry == nil {
+		return fmt.Errorf("model registry not initialised")
+	}
+	return a.modelRegistry.UnregisterDir(dir)
 }
 
 // GetLLMModelDetails returns enriched metadata and memory estimates for a single model path.
@@ -166,7 +192,7 @@ func (a *App) GetTTSModels() ([]TTSModelInfo, error) {
 	if a.modelRegistry == nil {
 		return []TTSModelInfo{}, fmt.Errorf("model registry not initialised")
 	}
-	return ttsInfos(a.modelRegistry.ByType("tts")), nil
+	return ttsInfos(a.modelRegistry.ByTypeInDirs("tts", registry.KindTTS)), nil
 }
 
 // RescanAllDirs re-walks every previously registered directory and merges
@@ -176,30 +202,21 @@ func (a *App) RescanAllDirs() {
 	if a.modelRegistry == nil {
 		return
 	}
-	dirs := a.modelRegistry.RegisteredDirs()
-	for dir, assetType := range dirs {
-		if _, err := os.Stat(dir); err != nil {
-			continue // directory no longer exists — skip silently
-		}
-		var exts []string
-		switch assetType {
-		case "llm":
-			exts = []string{".gguf", ".bin", ".mmproj"}
-		case "tts":
-			exts = []string{".onnx"}
-		case "image":
-			// Image directories are rescanned via ScanImageModels; skip here.
-			continue
-		default:
-			continue
-		}
-		entries, err := scanDirForType(dir, assetType, exts)
-		if err != nil {
-			a.logErrorSilent(errors.REGModelListFail, errors.Medium, "registry.rescan.walk", "app-model-registry.go:192", err)
-			continue
-		}
-		if err := a.modelRegistry.MergeEntries(entries); err != nil {
-			a.logErrorSilent(errors.REGModelAddFail, errors.Medium, "registry.rescan.merge", "app-model-registry.go:196", err)
+	// Image directories keep their persisted entries across restarts and are
+	// rescanned on demand (ScanImageModels / RefreshModelDirectories), which
+	// keeps startup cheap for users with very large model folders.
+	startupMark("rescan: start")
+	for _, kind := range []string{registry.KindLLM, registry.KindTTS} {
+		for _, dir := range a.modelRegistry.Directories(kind) {
+			if _, err := os.Stat(dir); err != nil {
+				continue // drive unplugged or directory gone
+			}
+			startupMark("rescan: scanning " + dir)
+			n, scanErr := a.scanDirectoryIntoRegistry(dir, kind)
+			if scanErr != nil {
+				a.logErrorSilent(errors.REGModelListFail, errors.Medium, "registry.rescan.walk", "app-model-registry.go", scanErr)
+			}
+			startupMark("rescan: done " + dir + " " + fmt.Sprint(n) + " entries")
 		}
 	}
 }
@@ -223,23 +240,18 @@ func (a *App) OpenDirectoryPicker() (string, error) {
 // architecture to prevent diffusion models (flux, sd3, etc.) from being added
 // as LLMs, and skips .gguf files that are clearly LLM models when scanning
 // for image assets.
-func scanDirForType(dir, assetType string, exts []string) ([]registry.Entry, error) {
+func scanDirForType(dir, assetType string, exts []string, known func(string) (registry.Entry, bool)) ([]registry.Entry, map[string]struct{}, error) {
 	info, err := os.Stat(dir)
 	if err != nil {
-		return nil, fmt.Errorf("cannot access directory %q: %w", dir, err)
+		return nil, nil, fmt.Errorf("cannot access directory %q: %w", dir, err)
 	}
 	if !info.IsDir() {
-		return nil, fmt.Errorf("%q is not a directory", dir)
-	}
-
-	// Diffusion architectures that may be packaged as .gguf
-	diffusionFamilies := map[string]bool{
-		"flux": true, "flux1": true, "sd3": true, "sd3.5": true,
-		"sdxl": true, "stable-diffusion": true, "stable_diffusion": true,
-		"auraflow": true, "pixart": true, "lumina": true,
+		return nil, nil, fmt.Errorf("%q is not a directory", dir)
 	}
 
 	var entries []registry.Entry
+	seen := make(map[string]struct{})
+
 	err = filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
 			return nil
@@ -251,51 +263,69 @@ func scanDirForType(dir, assetType string, exts []string) ([]registry.Entry, err
 			}
 
 			info, statErr := d.Info()
+			sizeBytes := int64(0)
+			modNS := int64(0)
 			sizeMB := 0.0
 			if statErr == nil {
-				sizeMB = float64(info.Size()) / (1024 * 1024)
+				sizeBytes = info.Size()
+				modNS = info.ModTime().UnixNano()
+				sizeMB = float64(sizeBytes) / (1024 * 1024)
 			}
 			name := strings.TrimSuffix(d.Name(), filepath.Ext(d.Name()))
 
-			// For .gguf files, validate architecture to prevent cross-contamination
+			// .gguf carries its own architecture, which is authoritative. Use it
+			// to keep chat models and image models out of each other's
+			// directories instead of guessing from filenames.
 			if ext == ".gguf" || ext == ".bin" {
+				// Unchanged files are never re-parsed: when size and mtime still
+				// match the registry, the recorded entry is reused untouched.
+				if known != nil && sizeBytes > 0 {
+					if prev, ok := known(path); ok && prev.FileSize == sizeBytes && prev.ModTimeNS == modNS {
+						entries = append(entries, prev)
+						seen[path] = struct{}{}
+						return nil
+					}
+				}
 				profile, parseErr := gguf.ExtractModelProfile(path)
 				if parseErr == nil && profile != nil && profile.Family != "" {
-					family := strings.ToLower(profile.Family)
-					// If scanning for LLM but file is a diffusion model, skip it
-					if assetType == "llm" && diffusionFamilies[family] {
-						return nil // skip diffusion .gguf in LLM scan
+					kind := gguf.KindOfArch(profile.Family)
+					if assetType == registry.KindLLM && kind == gguf.KindDiffusion {
+						return nil // diffusion model in a chat directory
 					}
-					// If scanning for image but file is an LLM model, skip it
-					if assetType == "image" && !diffusionFamilies[family] {
-						return nil // skip LLM .gguf in image scan
+					if assetType == registry.KindImage && kind == gguf.KindLLM {
+						return nil // chat model in an image directory
 					}
-					// Use the actual family from metadata
 					entries = append(entries, registry.Entry{
-						Name:   name,
-						Path:   path,
-						Type:   assetType,
-						Family: profile.Family,
-						Format: strings.TrimPrefix(ext, "."),
-						SizeMB: sizeMB,
+						Name:      name,
+						Path:      path,
+						Type:      assetType,
+						Family:    profile.Family,
+						Format:    strings.TrimPrefix(ext, "."),
+						SizeMB:    sizeMB,
+						FileSize:  sizeBytes,
+						ModTimeNS: modNS,
 					})
+					seen[path] = struct{}{}
 					return nil
 				}
 			}
 
 			entries = append(entries, registry.Entry{
-				Name:   name,
-				Path:   path,
-				Type:   assetType,
-				Family: assetType,
-				Format: strings.TrimPrefix(ext, "."),
-				SizeMB: sizeMB,
+				Name:      name,
+				Path:      path,
+				Type:      assetType,
+				Family:    assetType,
+				Format:    strings.TrimPrefix(ext, "."),
+				SizeMB:    sizeMB,
+				FileSize:  sizeBytes,
+				ModTimeNS: modNS,
 			})
+			seen[path] = struct{}{}
 			break
 		}
 		return nil
 	})
-	return entries, err
+	return entries, seen, err
 }
 
 func llmInfos(entries []registry.Entry) []LLMModelInfo {

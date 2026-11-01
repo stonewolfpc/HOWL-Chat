@@ -6,7 +6,7 @@
  *
  * Depends on (must load first):
  *   settings-state.js    — currentSettings, load/save/reset
- *   settings-actions.js  — applyTheme, applyUIScale, action stubs
+ *   settings-actions.js  — applyTheme, backup/cache actions
  *   settings-controls.js — initializeSettingsControls + section inits
  *
  * @module real-settings

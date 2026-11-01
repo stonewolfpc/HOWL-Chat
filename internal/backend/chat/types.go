@@ -38,7 +38,15 @@ type CharacterContext struct {
 	Image *Image `json:"image,omitempty"`
 }
 
-// ChatMeta represents the metadata for a chat session
+// ChatMeta represents the metadata for a chat session.
+// It is the SOLE source of truth for which characters, lorebooks,
+// world and scenario are active in this chat.
+//
+// active*     = base lists set at chat creation or by explicit user action
+// removed*    = entities the user explicitly removed (override everything)
+// added*      = entities the user explicitly added (override everything)
+//
+// Final list = (active - removed) + added
 type ChatMeta struct {
 	ID             string   `json:"id"`
 	Name           string   `json:"name"`
@@ -48,6 +56,16 @@ type ChatMeta struct {
 	ScenarioName   string   `json:"scenarioName"`
 	CharacterNames []string `json:"characterNames"`
 	LorebookNames  []string `json:"lorebookNames"`
+
+	// --- Source-of-truth tracking arrays (new) ---
+	WorldID           string   `json:"worldId"`
+	ScenarioID        string   `json:"scenarioId"`
+	ActiveCharacters  []string `json:"activeCharacters"`
+	RemovedCharacters []string `json:"removedCharacters"`
+	AddedCharacters   []string `json:"addedCharacters"`
+	ActiveLorebooks   []string `json:"activeLorebooks"`
+	RemovedLorebooks  []string `json:"removedLorebooks"`
+	AddedLorebooks    []string `json:"addedLorebooks"`
 }
 
 // ChatHistory represents a single message in the chat history

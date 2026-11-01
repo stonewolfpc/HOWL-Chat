@@ -5,37 +5,49 @@
 
 /* Category Headers */
 .model-settings-flyout .category-header {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--surface-hover);
 }
 
-/* Settings Grid */
+/* Settings Grid — responsive, never squishes text */
 .model-settings-flyout .settings-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px 16px;
-    margin-bottom: 24px;
+    /* Five columns on a wide window, one on a narrow one, same as the sampler. */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+    margin-bottom: 0;
+    align-items: start;
 }
 
 /* Setting Cards */
 .model-settings-flyout .setting-card {
+    position: relative;
+    z-index: 1;
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 16px;
-    transition: all 0.2s ease;
+    border: 1px solid var(--surface-hover);
+    border-radius: 10px;
+    padding: 8px 10px 7px;
+    transition: background 0.2s ease, border-color 0.2s ease;
     display: flex;
     flex-direction: column;
+    gap: 3px;
+}
+
+/* The detail popover is positioned against the card, so it must paint above
+   the neighbouring rows while open. */
+.model-settings-flyout .setting-card:hover,
+.model-settings-flyout .setting-card:focus-within {
+    z-index: 40;
 }
 
 .model-settings-flyout .setting-card:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-hover);
     border-color: rgba(255, 255, 255, 0.12);
 }
 

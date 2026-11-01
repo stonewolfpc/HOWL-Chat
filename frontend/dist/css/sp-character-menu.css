@@ -7,7 +7,7 @@
 .character-context-menu {
     position: fixed;
     background: rgba(30, 30, 40, 0.98);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--border-secondary);
     border-radius: 8px;
     padding: 8px 0;
     min-width: 180px;
@@ -40,8 +40,8 @@
 }
 
 .menu-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    background: var(--surface-hover);
+    color: var(--text-secondary);
 }
 
 .menu-item.danger:hover {
@@ -51,6 +51,6 @@
 
 .menu-separator {
     height: 1px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--border-primary);
     margin: 4px 0;
 }

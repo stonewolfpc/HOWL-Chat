@@ -19,18 +19,6 @@
  * Open character memories viewer modal
  * @param {string} characterId - Character ID to view memories for
  */
-function viewCharacterMemories(characterId) {
-    const cd = window.sidebarState?.currentChatData;
-    const character = cd?.characters?.find(c => c.id === characterId);
-    if (!character) {
-        showNotification('Character not found', 'error');
-        return;
-    }
-
-    const memories = getCharacterMemoriesData(characterId);
-    renderCharacterMemoriesModal(character, memories);
-}
-
 // ---------------------------------------------------------------------------
 // Data Layer
 // ---------------------------------------------------------------------------
@@ -75,7 +63,7 @@ function renderCharacterMemoriesModal(character, memories) {
 
     modal.innerHTML = `
         <div class="modal-container" style="
-            background: rgba(20,20,30,0.98);
+            background: var(--shell-panel-bg);
             border-radius: 16px;
             width: min(720px, 95%);
             max-height: 85vh;
@@ -94,14 +82,14 @@ function renderCharacterMemoriesModal(character, memories) {
                     <div style="font-size: 20px; font-weight: 700; color: #fff;">
                         ${character.name}'s Memories
                     </div>
-                    <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 4px;">
+                    <div style="font-size: 13px; color: var(--surface-hover); margin-top: 4px;">
                         ${memories.length} memory${memories.length !== 1 ? 'ies' : 'y'} •
                         ${pinned.length} pinned •
                         ${active.length} active
                     </div>
                 </div>
                 <button onclick="closeCharacterMemoriesModal()" style="
-                    background: rgba(255,255,255,0.08);
+                    background: var(--surface-hover);
                     border: none;
                     color: #fff;
                     width: 36px;
@@ -133,7 +121,7 @@ function renderCharacterMemoriesModal(character, memories) {
             ">
                 <button onclick="closeCharacterMemoriesModal()" style="
                     padding: 10px 20px;
-                    background: rgba(255,255,255,0.08);
+                    background: var(--surface-hover);
                     border: 1px solid rgba(255,255,255,0.14);
                     color: #fff;
                     border-radius: 8px;
@@ -179,7 +167,7 @@ function renderMemoryCard(memory, characterId) {
         `<span style="
             font-size: 11px;
             padding: 2px 8px;
-            background: rgba(255,255,255,0.08);
+            background: var(--surface-hover);
             border-radius: 4px;
             color: rgba(255,255,255,0.7);
         ">${t}</span>`
@@ -187,14 +175,14 @@ function renderMemoryCard(memory, characterId) {
 
     return `
         <div class="memory-card" style="
-            background: rgba(255,255,255,0.03);
+            background: var(--surface-hover);
             border: 1px solid rgba(255,255,255,0.06);
             border-radius: 10px;
             padding: 14px 16px;
             cursor: pointer;
             transition: all 0.2s ease;
-        " onmouseenter="this.style.background='rgba(255,255,255,0.06)'"
-           onmouseleave="this.style.background='rgba(255,255,255,0.03)'"
+        " onmouseenter="this.style.background='var(--surface-hover)'"
+           onmouseleave="this.style.background='var(--surface-hover)'"
            onclick="editCharacterMemory('${memory.id}', '${characterId}')">
             <div style="display: flex; align-items: flex-start; gap: 12px;">
                 <div style="font-size: 20px; line-height: 1;">
@@ -226,10 +214,10 @@ function renderMemoryCard(memory, characterId) {
                         margin-top: 8px;
                         flex-wrap: wrap;
                     ">
-                        <span style="font-size: 12px; color: rgba(255,255,255,0.4);">
+                        <span style="font-size: 12px; color: var(--surface-hover);">
                             ${timeAgo}
                         </span>
-                        ${memory.confidence ? `<span style="font-size: 12px; color: rgba(255,255,255,0.4);">• ${memory.confidence}% confidence</span>` : ''}
+                        ${memory.confidence ? `<span style="font-size: 12px; color: var(--surface-hover);">• ${memory.confidence}% confidence</span>` : ''}
                         ${tagsHtml}
                     </div>
                 </div>
@@ -240,7 +228,7 @@ function renderMemoryCard(memory, characterId) {
 
 function renderEmptyState(characterName) {
     return `
-        <div style="text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.5);">
+        <div style="text-align: center; padding: 40px 20px; color: var(--surface-hover);">
             <div style="font-size: 48px; margin-bottom: 16px;">🧠</div>
             <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">
                 No memories for ${characterName}

@@ -101,6 +101,9 @@
     margin-bottom: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
 }
 
 .memory-item:hover {
@@ -108,10 +111,19 @@
     border-color: var(--accent-secondary);
 }
 
+.memory-item-content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
 .memory-item-title {
     font-weight: 500;
     color: var(--text-primary);
     margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .memory-item-summary {

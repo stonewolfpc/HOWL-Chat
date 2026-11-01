@@ -16,19 +16,19 @@
     height: 24px;
     border-radius: 50%;
     object-fit: contain;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--border-secondary);
 }
 
 .character-avatar-placeholder {
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-hover);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--border-secondary);
 }
 
 .character-name {
@@ -40,7 +40,7 @@
 /* Chat Characters Display Area */
 .chat-characters {
     background: rgba(30, 30, 40, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--surface-hover);
     border-radius: 8px;
     margin-bottom: 16px;
     padding: 12px;
@@ -61,8 +61,8 @@
 }
 
 .chat-character-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--surface-hover);
+    border: 1px solid var(--surface-hover);
     border-radius: 6px;
     padding: 8px;
     display: flex;
@@ -74,8 +74,8 @@
 }
 
 .chat-character-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: var(--surface-hover);
+    border-color: var(--border-secondary);
 }
 
 .chat-character-avatar {
@@ -100,7 +100,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-hover);
     font-size: 20px;
 }
 
@@ -127,13 +127,13 @@
 }
 
 .chat-character-status {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary);
     font-size: 12px;
     margin-bottom: 2px;
 }
 
 .chat-character-description {
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-secondary);
     font-size: 12px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -145,7 +145,7 @@
 .chat-character-remove {
     background: rgba(255, 100, 100, 0.2);
     border: 1px solid rgba(255, 100, 100, 0.3);
-    color: #fff;
+    color: var(--text-secondary);
     width: 20px;
     height: 20px;
     border-radius: 50%;
@@ -163,7 +163,7 @@
 }
 
 .chat-characters-empty {
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-secondary);
     font-style: italic;
     padding: 8px;
     text-align: center;

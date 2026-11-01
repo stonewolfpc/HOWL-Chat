@@ -11,8 +11,8 @@
  * @version 2.0.0
  */
 
-@import url('ms-flyout.css');
-@import url('ms-categories.css');
-@import url('ms-controls.css');
-@import url('ms-reset.css');
-@import url('ms-light-theme.css');
+@import url('ms-flyout.css?v=29');
+@import url('ms-categories.css?v=29');
+@import url('ms-controls.css?v=29');
+@import url('ms-reset.css?v=29');
+@import url('ms-light-theme.css?v=29');

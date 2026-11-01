@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"howl-chat/internal/paths"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -104,10 +105,10 @@ func (a *App) LoadModel(modelPath string) (err error) {
 			if a.modelSettings == nil {
 				a.modelSettings = make(map[string]interface{})
 			}
-			if _, exists := a.modelSettings["custom_jinja_template"]; !exists {
-				a.modelSettings["custom_jinja_template"] = profile.Template
-				fmt.Println("[LoadModel] using model's native chat template")
-			}
+			// The template is NOT written into the saved settings here. Doing
+			// that made the first family's template stick forever: the second
+			// family loaded with if _, exists… still true and was prompted in
+			// the wrong format. It is injected per load in spawnSettingsFor().
 		}
 		fmt.Println("[LoadModel] applying safe defaults")
 		a.applySafeDefaults(profile)
@@ -135,14 +136,50 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		ctxSize, _ := strconv.Atoi(intSetting(a.modelSettings, "context_size", 4096))
 		gpuLayers, _ := strconv.Atoi(intSetting(a.modelSettings, "gpu_layers", 0))
 		batchSize, _ := strconv.Atoi(intSetting(a.modelSettings, "batch_size", 512))
+
+		// Sanity check: if we have a GPU but detected < 1GB free VRAM, detection is likely wrong.
+		if hw.TotalVRAMBytes > 1024*1024*1024 && freeVRAM < 1024 {
+			fmt.Printf("[LoadModel] WARNING: Detected free VRAM (%d MB) is suspiciously low for a GPU with %d MB total. "+
+				"Detection may have failed. Proceeding with total*0.7 as fallback.\n",
+				freeVRAM, hw.TotalVRAMBytes/1024/1024)
+			freeVRAM = int64(float64(hw.TotalVRAMBytes) * 0.70 / 1024 / 1024)
+		}
+
 		fmt.Printf("[LoadModel] spawn params: ctx=%d gpuLayers=%d batch=%d freeVRAM=%d freeRAM=%d\n",
 			ctxSize, gpuLayers, batchSize, freeVRAM, freeRAM)
-		if err := gguf.ValidateSpawn(profile.ArchitectureSpec, ctxSize, gpuLayers, batchSize, freeVRAM, freeRAM); err != nil {
-			a.logError(errors.LLMNoModelLoaded, errors.Critical, "llm.load.validate", "app-model.go:97", err)
-			fmt.Printf("[LoadModel] FAIL: spawn validation error: %v\n", err)
-			return fmt.Errorf("spawn validation failed: %w", err)
+
+		validation := gguf.ValidateSpawn(profile.ArchitectureSpec, ctxSize, gpuLayers, batchSize, freeVRAM, freeRAM)
+		fmt.Printf("[LoadModel] validation result: level=%d msg=%q\n", validation.Level, validation.Message)
+
+		forceLoad := false
+		a.modelSettingsMu.RLock()
+		if a.modelSettings != nil {
+			if v, ok := a.modelSettings["force_load"].(bool); ok {
+				forceLoad = v
+			}
 		}
-		fmt.Println("[LoadModel] spawn validation passed")
+		a.modelSettingsMu.RUnlock()
+
+		switch validation.Level {
+		case gguf.ValidationSafe:
+			fmt.Println("[LoadModel] spawn validation passed")
+		case gguf.ValidationWarning:
+			fmt.Printf("[LoadModel] spawn validation warning: %s\n", validation.Message)
+			// Emit event so UI can show the warning, but don't block
+			a.emitEvent("model-load-warning", validation.Message+" "+validation.Suggestion)
+		case gguf.ValidationCritical:
+			if forceLoad {
+				fmt.Printf("[LoadModel] FORCE LOAD: ignoring critical validation due to force_load=true: %s\n", validation.Message)
+				a.emitEvent("model-load-warning",
+					"Force load enabled. Model may OOM or crash. "+validation.Message)
+			} else {
+				a.logError(errors.LLMNoModelLoaded, errors.Critical, "llm.load.validate", "app-model.go:97",
+					fmt.Errorf("%s %s", validation.Message, validation.Suggestion))
+				fmt.Printf("[LoadModel] FAIL: spawn validation critical: %s\n", validation.Message)
+				return fmt.Errorf("%s\n\n%s\n\nTo bypass this check, set force_load=true in model settings.",
+					validation.Message, validation.Suggestion)
+			}
+		}
 	} else {
 		fmt.Println("[LoadModel] skipping spawn validation (no profile or arch spec)")
 	}
@@ -152,9 +189,10 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		fitParams = false
 		fmt.Println("[LoadModel] SWA model detected, disabling --fit to avoid scheduler crash")
 	}
+	spawnSettings := a.spawnSettingsFor(profile)
 	fmt.Println("[LoadModel] spawning llama-server")
 	var stderrBuf bytes.Buffer
-	cmd, err := spawnLlamaServerWithModel(modelPath, a.modelSettings, &stderrBuf, fitParams)
+	cmd, err := spawnLlamaServerWithModel(modelPath, spawnSettings, &stderrBuf, fitParams)
 	if err != nil {
 		a.logLLMLoadError(err, "app-model.go:84")
 		fmt.Printf("[LoadModel] FAIL: spawn error: %v\n", err)
@@ -173,7 +211,7 @@ func (a *App) LoadModel(modelPath string) (err error) {
 			if r := recover(); r != nil {
 				a.logError(errors.SYSPanicRecovered, errors.Critical, "llm.load.monitor", "app-model.go:goroutine", fmt.Errorf("monitor goroutine panic: %v", r))
 				fmt.Printf("[LoadModel] MONITOR PANIC: %v\n", r)
-				runtime.EventsEmit(a.ctx, "model:error", "internal error during model load monitoring")
+				a.emitEvent("model:error", "internal error during model load monitoring")
 			}
 		}()
 		fmt.Printf("[LoadModel] monitor started (pid %d, timeout %ds)\n", cmd.Process.Pid, maxTicks/2)
@@ -193,7 +231,7 @@ func (a *App) LoadModel(modelPath string) (err error) {
 			default:
 				a.loadingStage.Store("Warming up")
 			}
-			runtime.EventsEmit(a.ctx, "model:progress", pct)
+			a.emitEvent("model:progress", pct)
 
 			if tick%20 == 0 && tick > 0 {
 				fmt.Printf("[LoadModel] monitor tick %d/%d (%.0f%%), stage=%s, alive=%v\n",
@@ -215,13 +253,13 @@ func (a *App) LoadModel(modelPath string) (err error) {
 					stderrBuf.Reset()
 					if !waitForPortFree("8080", 5*time.Second) {
 						a.logError(errors.LLMPortConflict, errors.Critical, "llm.load", "app-model.go:127", fmt.Errorf("port 8080 occupied after crash"))
-						runtime.EventsEmit(a.ctx, "model:error", "port 8080 occupied after crash; cannot restart llama-server")
+						a.emitEvent("model:error", "port 8080 occupied after crash; cannot restart llama-server")
 						return
 					}
-					cmd2, err2 := spawnLlamaServerWithModel(modelPath, a.modelSettings, &stderrBuf, false)
+					cmd2, err2 := spawnLlamaServerWithModel(modelPath, spawnSettings, &stderrBuf, false)
 					if err2 != nil {
 						a.logLLMLoadError(err2, "app-model.go:133")
-						runtime.EventsEmit(a.ctx, "model:error", err2.Error())
+						a.emitEvent("model:error", err2.Error())
 						return
 					}
 					a.serverProc = cmd2
@@ -245,7 +283,7 @@ func (a *App) LoadModel(modelPath string) (err error) {
 				a.logLLMCrash(fmt.Errorf("%s", errMsg), "app-model.go:146")
 				a.loadingProgress.Store(0)
 				a.loadingStage.Store("Failed")
-				runtime.EventsEmit(a.ctx, "model:error", errMsg)
+				a.emitEvent("model:error", errMsg)
 				return
 			}
 
@@ -257,8 +295,8 @@ func (a *App) LoadModel(modelPath string) (err error) {
 				fmt.Println("[LoadModel] monitor: server healthy, model loaded")
 				a.loadingProgress.Store(1000)
 				a.loadingStage.Store("Ready")
-				runtime.EventsEmit(a.ctx, "model:progress", 100)
-				runtime.EventsEmit(a.ctx, "model:loaded", modelPath)
+				a.emitEvent("model:progress", 100)
+				a.emitEvent("model:loaded", modelPath)
 				return
 			}
 		}
@@ -266,7 +304,7 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		a.logError(errors.LLMServerTimeout, errors.High, "llm.load", "app-model.go:172", fmt.Errorf("llama-server did not become ready after 60s"))
 		a.loadingProgress.Store(0)
 		a.loadingStage.Store("Timeout")
-		runtime.EventsEmit(a.ctx, "model:error", "server did not become ready after 60s")
+		a.emitEvent("model:error", "server did not become ready after 60s")
 	}()
 
 	// Register with resource manager using actual memory estimates
@@ -309,7 +347,7 @@ func (a *App) UnloadModel() error {
 	a.serverProc = nil
 	a.loadingProgress.Store(0)
 	a.loadingStage.Store("Unloaded")
-	runtime.EventsEmit(a.ctx, "model:unloaded")
+	a.emitEvent("model:unloaded")
 
 	// Unregister from resource manager
 	for _, m := range resource.GetManager().ModelsByType(resource.ResourceLLM) {
@@ -422,7 +460,7 @@ func (a *App) GetModelOptions() map[string]interface{} {
 
 // getSettingsDir returns (and creates) the config directory next to the exe.
 func (a *App) getSettingsDir() string {
-	settingsDir := filepath.Join(filepath.Dir(os.Args[0]), "config")
+	settingsDir := filepath.Join(paths.ProjectRoot(), "config")
 	_ = os.MkdirAll(settingsDir, 0755)
 	return settingsDir
 }
@@ -601,11 +639,7 @@ func (a *App) applySafeDefaults(profile *types.ModelProfile) {
 
 // GetModelsDir returns the absolute path to the models directory.
 func (a *App) GetModelsDir() string {
-	cwd, _ := os.Getwd()
-	modelsDir := filepath.Join(cwd, "models")
-	if _, err := os.Stat(modelsDir); err != nil {
-		modelsDir = filepath.Join(filepath.Dir(os.Args[0]), "models")
-	}
+	modelsDir := filepath.Join(paths.ProjectRoot(), "models")
 	_ = os.MkdirAll(modelsDir, 0755)
 	return modelsDir
 }
