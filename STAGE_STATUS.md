@@ -689,7 +689,7 @@ decorative (model-badge pastel hues, SVG escape arrows).
 | stuck-dark areas | 0 | 5 (correct) |
 | low-contrast text | 0 | 0 |
 
-## T2.1 Stage C - remaining pages verified (2026-11-02)
+## T2.1 Stage C - remaining pages verified (2026-11-01)
 
 Verification pass only: no CSS, JS or markup was changed. The instruction for
 this stage was to verify and correct the existing product, not to redesign it,
@@ -709,17 +709,31 @@ things about it matter more than the numbers:
 
 1. Theme flips go through `theme.js setThemeMode()`, never through a body-class
    toggle, so a missing entry point fails loudly instead of passing silently.
-2. Transitions are disabled and the read waits **at least 1200 ms**. theme.js
-   drives a 4 s custom-property transition; a 600 ms read returns the previous
-   theme's colours. Every earlier figure in this file used a 600 ms settle.
+2. Transitions are disabled (`*{transition:none!important}`) and the read waits
+   **at least 1200 ms**. Earlier figures in this file used a 600 ms settle, and the
+   1200 ms wait is kept as a margin, not because a long transition is known to be
+   in flight: there is no `@property` registration anywhere in the CSS, so the 4 s
+   custom-property transition declared on `:root` cannot animate these properties
+   in Chromium.
 3. Background resolution is memoised per element. Recomputing the ancestor chain
    per node blew the 10 s evaluation budget on `index` and `story-tools`.
 
-One tab at a time: each harness page holds an open `/__events` SSE stream, and
-six tabs exhaust the browser's six-connection budget, so later pages never reach
+One tab at a time: each harness page holds an open `/__events` SSE stream
+(`harness/shim.js` opens one `EventSource` per page), and six tabs exhaust the
+browser's six-connection budget, so later pages never reach
 `readyState: complete`. Two "page never loads" results were this, not a page bug.
 
-### Measured result (transitions disabled, 1200 ms settle)
+**Scope of the numeric gate.** The probe only evaluates text nodes whose element
+font-size is 16 px or larger (`audit-stageC.js` skips `fontSize < 16`), and its
+offender test is `|dL| * 255 < 60` on relative luminance - a documented
+luminance-difference heuristic, not a contrast ratio and not a WCAG or
+accessibility result (a delta of 60 sits near 1.6-2.0:1). Foreground alpha is not
+composited: colours below `a = 0.3` are skipped, everything above is scored as if
+opaque. In particular the 14 px primary-button labels (`scenario-header.css:32`,
+`input-components.css:39`) are outside the numeric gate; their appearance was
+assessed visually only.
+
+### Measured result (transitions disabled, 1200 ms settle, text >=16 px only)
 
 | page | light canvas | light low-contrast | light stuck-dark | dark low-contrast | dark stuck-dark |
 |---|---|---|---|---|---|
@@ -729,17 +743,30 @@ six tabs exhaust the browser's six-connection budget, so later pages never reach
 | story-tools | rgb(233,230,223) | 0 | 0 | 0 | 11 (expected) |
 | audio-settings | rgb(233,230,223) | 0 | 0 | 0 | 4 (expected) |
 
-Visual pass per page confirmed the filled-child case the numeric audit can miss:
-the teal primary buttons on scenario, lorebooks, story-tools and the audio footer
-all label themselves with `--on-accent` (white), so the world-page
-"dark grey on teal" failure does not repeat.
+Column notes: "low-contrast" is the heuristic above, applied to text >=16 px only;
+"stuck-dark" counts matching elements (own background opacity > 0.5, area
+> 6000 px^2, resolved luminance < 25), so nested panels can count more than once
+and the numbers are element counts rather than distinct regions.
+
+Visual pass per page covered the filled-child case the numeric gate does not
+reach: the teal primary buttons checked on scenario, lorebooks, story-tools and
+the audio footer render white labels, so the world-page "dark grey on teal"
+failure does not repeat. Qualification: that is a per-button visual observation,
+not a token sweep. `--on-accent` is what the components checked use
+(`scenario-header.css:248-252`, `theme-light-components.css:159-163`), but not
+every filled button does - `theme-light-components.css:145` labels `.send-button`
+with the literal `#FFFFFF` and `st-memories.css:141` labels
+`.memories-manage-btn` with `color: white`. Both render white today, so the claim
+is "these buttons render white", not "every filled button carries the token".
 
 ### Observed, deliberately not changed
 
-- **`Manage All Memories` is cyan, not teal.** It uses `--accent-secondary`
-  (`#06b6d4`), a defined token that flips correctly with the theme. That is a
-  secondary accent doing its job, not a theme leak. Changing it would be a
-  redesign, so it was left alone and recorded instead.
+- **`Manage All Memories` is cyan, not teal.** It uses `--accent-secondary`,
+  which is `var(--theme-secondary)`, defined as `#06b6d4` in both modes
+  (`theme.css:30,77`; `theme-light.css:18,47`). It is therefore deliberately
+  constant cyan in light and dark - not a token that changes value with the theme,
+  and not a dark value leaking into light. A secondary accent doing its job;
+  changing it would be a redesign, so it was left alone and recorded instead.
 - **Top-bar collision at narrow widths.** At a 689 px viewport
   `.loading-progress-container` (x=437, w=236) sits on top of `.menu-bar`
   (x=181, w=492), so `NO MODEL LOADED` runs into the window edge and the menu
@@ -755,28 +782,61 @@ all label themselves with `--on-accent` (white), so the world-page
 
 An intermediate reading of this pass reported the memories flyout as "stuck light
 in dark": panel `rgb(247,245,240)`, inputs `rgb(251,250,246)`, and three
-low-contrast labels. That was wrong. At a 800-1200 ms settle the same flyout
-measures panel `rgb(21,21,31)` = dark `--surface-secondary`, inputs
-`rgb(21,21,31)`, label `rgb(212,212,212)`, and **0** low-contrast nodes in both
-modes. The bad numbers were the pre-transition colours, exactly the mistake this
-file already warned about. The flyout is clean.
+low-contrast labels. The later measurement invalidates that reading. At a
+800-1200 ms settle the same flyout measures panel `rgb(21,21,31)` = dark
+`--surface-secondary`, inputs `rgb(21,21,31)`, label `rgb(212,212,212)`, and 0
+offenders at the probe's heuristic. The flyout is clean.
 
-### Ownership defect found in the evidence path (not fixed, not safe)
+What is *not* established is why the first read saw light colours. The cause
+offered at the time - theme.js's 4 s custom-property transition still running -
+is unsupported and contradicted: there is no `@property` registration anywhere in
+the CSS (0 matches), so those custom properties are not animatable in Chromium,
+and the probe overrides `transition` with `!important` on every element before
+flipping. **Cause: Unestablished.** No replacement explanation is offered here.
+What stands is the later measurement and the retraction itself.
 
-Starting the harness reaped the **live app's** `sd-server.exe` (PID 24780) at
-startup - `[proc] reaped 1 orphaned model process(es)` - even though its parent
-`howl-chat.exe` (PID 9252) was running. "Orphaned" was decided from recorded
-state, not from parent identity, so a dev tool killed a production child.
+### Ownership defect found in the evidence path (open, not fixed, not safe)
+
+`build/t21/harness-stageC.log` records `[proc] reaped 1 orphaned model
+process(es)` at 20:51:06 during harness startup. That reaping event is
+artifact-backed. The identity of the victim - `sd-server.exe` PID 24780 as a child
+of the running app `howl-chat.exe` PID 9252 - is author-observed process
+inspection from that session; the saved log names no PID, so the attribution is
+not independently established by the artifact.
+
+The mechanism is source-derived, and it is broader than this record first said.
+`internal/proc/job_windows.go:110-136` (`ReapOrphans`) enumerates
+`llama-server.exe` / `sd-server.exe` through CIM and force-stops every match whose
+`ExecutablePath` begins with the project root. It consults no parent PID, no child
+list and no recorded owner, so it does not establish orphan status at all - it
+kills by executable path, whoever owns the process. The earlier wording,
+"orphaned was decided from recorded state", was wrong; there is no recorded-state
+check to blame.
 
 Consequences, stated plainly:
 
-- The running app is now idle with no image child until a Reload; the audit did
-  not touch generation, so nothing was lost.
-- This is the same ownership class as video `stopServer`: a process is treated as
-  owned because of what a file says, not because of who its parent is.
+- The running app was left idle with no image child until a Reload; the audit did
+  not touch generation, so no work was lost.
+- This is the same ownership class as video `stopServer`, and worse: ownership is
+  inferred from where an executable lives rather than from who started it.
 - Neither the video defect nor "shared infrastructure is safe" may be claimed on
-the strength of this stage. The reaper needs parent-identity verification, which
-  belongs with the diagnostics/ownership work, not here.
+  the strength of this stage. Parent-identity verification belongs with the
+  diagnostics/ownership work, not here. **This stays open and separate from the
+  theme stage.**
+
+### Evidence limitations
+
+- **No per-page result artifact was persisted.** `build/t21` holds the probe, the
+  harness log and older worklists, but no JSON or CSV of the five pages, so the
+  table above cannot be re-derived from disk. The counts and canvas values are
+  author-reported probe output, not saved artifacts.
+- **Screenshots were inspected inline only.** Every save attempt was refused by
+  the capture path ("use a new workspace-relative .png path"), so no image of
+  these five pages exists in the repo. The visual checks are author observations.
+- **The session was not read-only with respect to application data.** The harness
+  runs the real backend against the real profile; `harness-stageC.log` shows
+  `SaveChatData` (20:55:29) and `SaveChat` (20:56:00). No source file was modified
+  by the pass, but chat state was written through the app's own bindings.
 
 ### Still open after Stage C
 
@@ -785,6 +845,24 @@ the strength of this stage. The reaper needs parent-identity verification, which
 2. Top-bar/menu collision and the fluid-layout pass (layout, not theme).
 3. `audio-settings` dark body background, decided in the layout pass.
 4. Process reaping must verify parent identity (ownership work).
+5. Stale `real-settings.html` references, cleanup only: `frontend/dist/js/theme.js:231`
+   (shipped comment), `build/t21/audit-pages.txt` ("PAGES: 9" plus its row) and
+   `build/t21/audit-worklist.txt` (its row).
+6. Persist per-page audit output (results and screenshots) so the next theme pass
+   is reproducible rather than testimony.
+
+### Closure
+
+Independent review: **PASS WITH FINDINGS, no blocking findings** (2026-11-01).
+Stage C theme verification is closed on that verdict, with no blocking findings
+and nothing to repair before closure.
+
+The review findings are preserved here as recorded limitations, not converted
+into passes: the numeric gate covers text >=16 px and is a luminance heuristic,
+the flyout cause is Unestablished, the visual checks are unpersisted observations,
+and the process-ownership defect stays open as cross-cutting work outside this
+stage. No product code, test, configuration or frontend asset changed in this
+stage or in this correction.
 
 ## The real reason pages stayed dark (root cause, fixed 2026-11-01)
 

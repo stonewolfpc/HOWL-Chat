@@ -66,6 +66,22 @@ Long-standing. The generated image does not preview. Find the cause and repair i
 This is the last blocker before the image page can be judged on layout (T2.3).
 **Evidence:** prompt → image appears in the preview panel, correct aspect, no crop.
 
+### T0.5 · Concurrent instances kill each other's model processes
+`internal/proc/job_windows.go:110-136` (`ReapOrphans`) force-stops every
+`llama-server.exe` / `sd-server.exe` whose `ExecutablePath` begins with the
+project root. It consults no parent PID, no child list and no recorded owner, so a
+second instance - or the development UI harness - takes the model child out from
+under a running app. Observed 2026-11-01: harness startup reaped a live app's image
+child (`[proc] reaped 1 orphaned model process(es)`); the victim identity (PID
+24780 under PID 9252) is author-observed process inspection, not something the
+saved log names. This is not Image-Studio-specific: any concurrently running Howl
+instance or harness shares the same executable-path space.
+**Before any repair:** a read-only audit of the ownership boundary - who may kill
+what, and how ownership is proven. Repair is not in scope for the next stage.
+**Evidence:** two instances running → starting the second leaves the first's child
+alive and reports it as left alone, or an explicit ownership check refuses the
+kill, with a test.
+
 **CHECKPOINT 0** — answer before Tier 1:
 - Did the JSON show 1 copy or 2?
 - Does the bubble render on chat-switch without restart?
@@ -274,7 +290,7 @@ Separate pass, its own stage, after everything above. Look for waste everywhere.
 Append here as stages close. One line each: date, stage, evidence, result.
 
 - 2026-11-02 · Image generation settlement guard — source review PASS; stage-recorded tests PASS; independent review PASS; real-app acceptance PASS on verified build `d7e8aacd…` (PID 9252): abort leaves child alive, next request refused as abandoned, Unload/Reload recovers, work admitted after reset. Closed with no code change; the earlier live run had tested a pre-guard 18:59 binary. Unresolved: why the old sd-server exited.
-- 2026-11-02 · T2.1 Stage C (remaining pages theme verification) — five pages measured in both themes through `setThemeMode` with transitions off: 0 low-contrast nodes and 0 stuck-dark areas in light, expected dark panels only in dark, filled buttons carry `--on-accent`. No code changed (nothing needed correcting). Corrections recorded: `real-settings.html` no longer exists (deleted by T2.2), and a "stuck light flyout" reading was retracted as a 600 ms-vs-4 s transition artifact. Open: override-sheet deletion, top-bar collision, `audio-settings` dark body background, and process reaping that trusts recorded state over parent identity.
+- 2026-11-01 · T2.1 Stage C (remaining pages theme verification) — five pages measured in both themes through `setThemeMode` with transitions off: 0 offenders at the probe's `|dL| * 255 < 60` luminance heuristic (text >=16 px only; the 14 px button labels were assessed visually), 0 stuck-dark areas in light, expected dark panels only in dark, and the buttons checked render white. No code changed. Independent review: PASS WITH FINDINGS, no blocking findings; closed. Corrections recorded: `real-settings.html` no longer exists (deleted by T2.2); `--accent-secondary` is deliberately constant cyan in both modes; the "stuck light flyout" reading was retracted, its proposed 4 s-transition cause withdrawn as unsupported and contradicted (no `@property` registration, probe overrides transitions), cause Unestablished; `ReapOrphans` kills by executable path under the project root, not by recorded state or parent identity. Evidence limits: per-page results and screenshots were not persisted, and the harness wrote chat state through real bindings. Open: override-sheet deletion, top-bar collision, `audio-settings` dark body background, stale `real-settings` references, and the cross-cutting process-ownership defect.
 
 
 ### T2.4 · Speaker identity in chat (thumbnail or initial)
