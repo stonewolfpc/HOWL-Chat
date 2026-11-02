@@ -11,10 +11,92 @@
  * @version 2.0.0
  */
 
-@import url('tu-container.css?v=29');
-@import url('tu-nav.css?v=29');
-@import url('tu-content.css?v=29');
-@import url('tu-components.css?v=29');
-@import url('tu-search.css?v=29');
-@import url('tu-light-theme.css?v=29');
-@import url('tu-responsive.css?v=29');
+@import url('tu-container.css?v=41');
+@import url('tu-nav.css?v=41');
+@import url('tu-content.css?v=41');
+@import url('tu-components.css?v=41');
+@import url('tu-search.css?v=41');
+@import url('tu-light-theme.css?v=41');
+@import url('tu-responsive.css?v=41');
+
+/* ---------------------------------------------------------------------------
+   Full-screen, resolution-aware tutorial panel
+
+   This is a reading surface, not a dialog, so it takes the whole window at
+   every size instead of floating as a 1200x800 card. On wide monitors the
+   article is held to a readable measure rather than stretching lines across
+   2560px, while screenshots keep more width than body text.
+   --------------------------------------------------------------------------- */
+
+.tutorials-overlay {
+    padding: 0;
+}
+
+.tutorials-container {
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    border: none;
+    border-radius: 0;
+}
+
+.tutorials-header {
+    padding: clamp(10px, 1.1vh, 18px) clamp(14px, 2vw, 32px);
+}
+
+.tutorials-search {
+    max-width: clamp(240px, 32vw, 560px);
+}
+
+.tutorials-nav {
+    width: clamp(200px, 15vw, 340px);
+    min-width: clamp(190px, 15vw, 340px);
+    max-width: none;
+}
+
+.tutorials-content {
+    padding: clamp(16px, 2.2vh, 36px) clamp(18px, 3.5vw, 72px);
+}
+
+.tutorials-content > * {
+    max-width: 1180px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tutorials-content > .tutorials-figure {
+    max-width: min(1600px, 100%);
+}
+
+.tutorials-content h1 {
+    font-size: clamp(26px, 1.9vw, 40px);
+}
+
+.tutorials-content h2 {
+    font-size: clamp(18px, 1.25vw, 26px);
+}
+
+@media (max-width: 768px) {
+    .tutorials-nav {
+        width: 200px;
+        min-width: 180px;
+    }
+
+    .tutorials-content > * {
+        max-width: none;
+    }
+}
+
+/* The readable-measure rule must outrank the per-element margin rules in
+   tu-content.css (h1/p carry margin shorthands), so target by id. */
+#tutorials-content > * {
+    max-width: 1180px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#tutorials-content > .tutorials-figure {
+    max-width: min(1600px, 100%);
+}

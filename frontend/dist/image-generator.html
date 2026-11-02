@@ -6,19 +6,19 @@
     <title>Image Generator - HOWL Chat</title>
     <script src="/wails/ipc.js"></script>
     <script src="/wails/runtime.js"></script>
-    <link rel="stylesheet" href="css/theme.css?v=29">
-    <link rel="stylesheet" href="css/layout.css?v=29">
-    <link rel="stylesheet" href="css/menu-components.css?v=29">
-    <link rel="stylesheet" href="css/nav-components.css?v=29">
-    <link rel="stylesheet" href="css/animations.css?v=29">
-    <link rel="stylesheet" href="css/ambient.css?v=29">
-    <link rel="stylesheet" href="css/image-generator-panels.css?v=29">
-    <link rel="stylesheet" href="css/image-generator.css?v=29">
-    <link rel="stylesheet" href="css/icons.css?v=29">
-    <link rel="stylesheet" href="css/nav-icon-images.css?v=29">
-    <link rel="stylesheet" href="css/tutorials.css?v=29">
-    <link rel="stylesheet" href="css/ig-fluid.css?v=29">
-    <link rel="stylesheet" href="css/ig-pose.css?v=29">
+    <link rel="stylesheet" href="css/theme.css?v=41">
+    <link rel="stylesheet" href="css/layout.css?v=41">
+    <link rel="stylesheet" href="css/menu-components.css?v=41">
+    <link rel="stylesheet" href="css/nav-components.css?v=41">
+    <link rel="stylesheet" href="css/animations.css?v=41">
+    <link rel="stylesheet" href="css/ambient.css?v=41">
+    <link rel="stylesheet" href="css/image-generator-panels.css?v=41">
+    <link rel="stylesheet" href="css/image-generator.css?v=41">
+    <link rel="stylesheet" href="css/icons.css?v=41">
+    <link rel="stylesheet" href="css/nav-icon-images.css?v=41">
+    <link rel="stylesheet" href="css/tutorials.css?v=41">
+    <link rel="stylesheet" href="css/ig-fluid.css?v=41">
+    <link rel="stylesheet" href="css/ig-pose.css?v=41">
 </head>
 <body>
     <!-- Ambient Background Effects -->
@@ -188,23 +188,6 @@
                             </label>
                         </div>
                     </div>
-
-                    <div class="ig-panel" data-panel="prompt">
-                        <div class="ig-panel-header">
-                            <span class="ig-panel-title">Prompt</span>
-                            <span class="ig-panel-toggle">&#x25BC;</span>
-                        </div>
-                        <div class="ig-panel-body">
-                            <textarea id="ig-prompt" class="ig-textarea ig-prompt" rows="3" placeholder="Describe the image you want to create..."></textarea>
-                            <div class="ig-prompt-tools">
-                                <button class="ig-tool-btn" title="Add weight ( )" onclick="wrapPromptWeight()">( )</button>
-                                <button class="ig-tool-btn" title="Increase weight" onclick="adjustWeight(1)">+</button>
-                                <button class="ig-tool-btn" title="Decrease weight" onclick="adjustWeight(-1)">-</button>
-                            </div>
-                            <textarea id="ig-negative" class="ig-textarea ig-negative" rows="2" placeholder="Negative prompt: things to avoid..."></textarea>
-                        </div>
-                    </div>
-
                     <div class="ig-panel" data-panel="params">
                         <div class="ig-panel-header">
                             <span class="ig-panel-title">Parameters</span>
@@ -1109,6 +1092,24 @@
                 <!-- Center: Canvas -->
                 <div class="ig-main">
                     <input type="file" id="ig-upload-input" accept="image/*" style="display:none;">
+
+                    <!-- Prompt dock: the control used on every generation, so it sits
+                         above the canvas instead of third in a scrolling sidebar. -->
+                    <div class="ig-prompt-dock">
+                        <div class="ig-field">
+                            <label class="ig-label" for="ig-prompt">Prompt</label>
+                            <textarea id="ig-prompt" class="ig-textarea ig-prompt" rows="3" placeholder="Describe the image you want to create..."></textarea>
+                        </div>
+                        <div class="ig-prompt-tools">
+                            <button class="ig-tool-btn" title="Add weight ( )" onclick="wrapPromptWeight()">( )</button>
+                            <button class="ig-tool-btn" title="Increase weight" onclick="adjustWeight(1)">+</button>
+                            <button class="ig-tool-btn" title="Decrease weight" onclick="adjustWeight(-1)">-</button>
+                        </div>
+                        <div class="ig-field">
+                            <label class="ig-label" for="ig-negative">Negative Prompt</label>
+                            <textarea id="ig-negative" class="ig-textarea ig-negative" rows="2" placeholder="Negative prompt: things to avoid..."></textarea>
+                        </div>
+                    </div>
                     <div class="ig-canvas-wrapper">
                         <div id="ig-preview-area" class="ig-canvas">
                             <div class="ig-canvas-placeholder" id="ig-canvas-placeholder">
@@ -1151,6 +1152,7 @@
                 <!-- Right: Full-Height History Gallery -->
                 <div class="ig-history-col">
                     <div class="ig-history-header">
+                        <div class="ig-history-title">Gallery</div>
                         <select id="ig-board-select" class="ig-board-select">
                             <option value="uncategorized">Uncategorized</option>
                         </select>
@@ -1296,24 +1298,26 @@
         </div>
     </div>
 
-    <script src="js/theme.js?v=29"></script>
-    <script src="js/menu.js?v=29"></script>
-    <script src="js/navigation.js?v=29"></script>
-    <script src="js/image-generator-core.js?v=29"></script>
-    <script src="js/image-generator-ui.js?v=29"></script>
-    <script src="js/image-generator.js?v=29"></script>
-    <script src="js/image-recall.js?v=29"></script>
-    <script src="js/tutorials-data-chat.js?v=29"></script>
-    <script src="js/tutorials-data-settings.js?v=29"></script>
-    <script src="js/tutorials-data-model.js?v=29"></script>
-    <script src="js/tutorials-data-content.js?v=29"></script>
-    <script src="js/tutorials-data-advanced.js?v=29"></script>
-    <script src="js/tutorials-data-app.js?v=29"></script>
-    <script src="js/tutorials-data.js?v=29"></script>
-    <script src="js/image-model-library.js?v=29"></script>
-    <script src="js/image-model-dirs.js?v=29"></script>
-    <script src="js/image-workflows.js?v=29"></script>
-    <script src="js/ig-pose.js?v=29"></script>
-    <script src="js/tutorials-ui.js?v=29"></script>
+    <script src="js/theme.js?v=41"></script>
+    <script src="js/menu.js?v=41"></script>
+    <script src="js/navigation.js?v=41"></script>
+    <script src="js/image-deps.js?v=1"></script>
+    <script src="js/image-generator-core.js?v=41"></script>
+    <script src="js/image-generator-ui.js?v=41"></script>
+    <script src="js/image-generator.js?v=41"></script>
+    <script src="js/image-recall.js?v=41"></script>
+    <script src="js/tutorials-data-chat.js?v=41"></script>
+    <script src="js/tutorials-data-settings.js?v=41"></script>
+    <script src="js/tutorials-data-model.js?v=41"></script>
+    <script src="js/tutorials-data-content.js?v=41"></script>
+    <script src="js/tutorials-data-advanced.js?v=41"></script>
+    <script src="js/tutorials-data-app.js?v=41"></script>
+    <script src="js/tutorials-data.js?v=41"></script>
+    <script src="js/image-model-library.js?v=41"></script>
+    <script src="js/image-model-dirs.js?v=41"></script>
+    <script src="js/image-workflows.js?v=41"></script>
+    <script src="js/ig-pose.js?v=41"></script>
+    <script src="js/tutorials-ui.js?v=41"></script>
+    <script src="js/tutorials-extras.js?v=41"></script>
 </body>
 </html>

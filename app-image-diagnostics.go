@@ -77,6 +77,30 @@ func (a *App) GetAppDiagnostics() map[string]interface{} {
 	return result
 }
 
+// GetImagePlacement reports where the loaded model's weights actually live.
+// On a card that cannot hold the model, sd-server keeps them in system RAM and
+// streams them per step; the app used to report "loaded" either way, so a model
+// running entirely from RAM looked the same as one resident in VRAM.
+func (a *App) GetImagePlacement() map[string]interface{} {
+	out := map[string]interface{}{"known": false}
+	e, ok := a.imageEngine.(*sdcpp.Engine)
+	if !ok {
+		return out
+	}
+	p := e.GetPlacement()
+	out["known"] = p.Known
+	out["vramMB"] = p.VRAMMB
+	out["ramMB"] = p.RAMMB
+	out["components"] = p.Components
+	out["backends"] = p.Backends
+	out["offloaded"] = p.Offloaded()
+	if model := e.GetLoadedModel(); model != nil {
+		out["model"] = model.Name
+		out["family"] = model.Family
+	}
+	return out
+}
+
 // -----------------------------------------------------------------------
 // Version checking
 // -----------------------------------------------------------------------

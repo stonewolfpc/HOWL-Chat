@@ -330,3 +330,468 @@
 09:31:20.049  +  340.9ms  rescan: start
 09:31:20.049  +  340.9ms  rescan: scanning E:\AI GGUF\GGUF
 09:31:20.053  +  344.7ms  rescan: done E:\AI GGUF\GGUF 25 entries
+10:22:00.964  +3041256.0ms  wails.Run returned
+10:25:19.728  +    0.0ms  process start
+10:25:19.732  +    3.5ms  image init: begin
+10:25:19.736  +    8.4ms  image init: config ready
+10:25:19.737  +    8.9ms  image init: engine initialized
+10:25:19.786  +   57.9ms  NewApp done
+10:25:20.026  +  298.2ms  OnStartup: webview reached backend
+10:25:20.027  +  298.8ms  OnStartup: init complete
+10:25:20.027  +  299.3ms  rescan: start
+10:25:20.028  +  299.8ms  rescan: scanning E:\AI GGUF\GGUF
+10:25:20.031  +  302.4ms  rescan: done E:\AI GGUF\GGUF 25 entries
+10:25:59.085  +39357.3ms  wails.Run returned
+10:49:30.572  +    0.0ms  process start
+10:49:30.574  +    2.1ms  image init: begin
+10:49:30.578  +    6.2ms  image init: config ready
+10:49:30.578  +    6.7ms  image init: engine initialized
+10:49:30.626  +   54.3ms  NewApp done
+10:49:30.869  +  297.7ms  OnStartup: webview reached backend
+10:49:30.870  +  298.8ms  OnStartup: init complete
+10:49:30.871  +  299.3ms  rescan: start
+10:49:30.871  +  299.3ms  rescan: scanning E:\AI GGUF\GGUF
+10:49:30.874  +  302.0ms  rescan: done E:\AI GGUF\GGUF 25 entries
+10:49:47.146  +16574.4ms  wails.Run returned
+10:52:48.456  +    0.0ms  process start
+10:52:48.459  +    2.6ms  image init: begin
+10:52:48.463  +    6.2ms  image init: config ready
+10:52:48.463  +    6.8ms  image init: engine initialized
+10:52:48.515  +   58.4ms  NewApp done
+10:52:48.771  +  314.3ms  OnStartup: webview reached backend
+10:52:48.772  +  315.4ms  OnStartup: init complete
+10:52:48.772  +  315.9ms  rescan: start
+10:52:48.773  +  316.4ms  rescan: scanning E:\AI GGUF\GGUF
+10:52:48.776  +  319.6ms  rescan: done E:\AI GGUF\GGUF 25 entries
+10:54:05.741  +77285.1ms  wails.Run returned
+11:13:34.125  +    0.0ms  process start
+11:13:34.127  +    2.6ms  image init: begin
+11:13:34.129  +    4.6ms  image init: config ready
+11:13:34.130  +    5.2ms  image init: engine initialized
+11:13:34.187  +   62.7ms  NewApp done
+11:13:34.508  +  382.9ms  OnStartup: webview reached backend
+11:13:34.509  +  384.0ms  OnStartup: init complete
+11:13:34.509  +  384.0ms  rescan: start
+11:13:34.509  +  384.5ms  rescan: scanning E:\AI GGUF\GGUF
+11:13:34.512  +  387.8ms  rescan: done E:\AI GGUF\GGUF 25 entries
+11:14:01.160  +27035.4ms  wails.Run returned
+11:14:16.944  +    0.0ms  process start
+11:14:16.946  +    2.1ms  image init: begin
+11:14:16.948  +    4.1ms  image init: config ready
+11:14:16.949  +    5.2ms  image init: engine initialized
+11:14:16.999  +   54.9ms  NewApp done
+11:14:17.236  +  291.8ms  OnStartup: webview reached backend
+11:14:17.237  +  292.8ms  OnStartup: init complete
+11:14:17.238  +  293.4ms  rescan: start
+11:14:17.238  +  293.4ms  rescan: scanning E:\AI GGUF\GGUF
+11:14:17.241  +  296.6ms  rescan: done E:\AI GGUF\GGUF 25 entries
+11:14:50.062  +33117.3ms  wails.Run returned
+11:29:01.369  +    0.0ms  process start
+11:29:01.383  +   13.6ms  image init: begin
+11:29:01.400  +   30.9ms  image init: config ready
+11:29:01.401  +   31.9ms  image init: engine initialized
+11:29:01.521  +  152.0ms  NewApp done
+11:29:01.811  +  442.1ms  OnStartup: webview reached backend
+11:29:01.812  +  443.2ms  OnStartup: init complete
+11:29:01.813  +  443.7ms  rescan: start
+11:29:01.813  +  443.7ms  rescan: scanning E:\AI GGUF\GGUF
+11:29:01.817  +  448.3ms  rescan: done E:\AI GGUF\GGUF 25 entries
+11:29:48.608  +47238.6ms  wails.Run returned
+11:56:00.688  +    2.1ms  image init: begin
+11:56:00.694  +    8.3ms  image init: config ready
+11:56:00.694  +    8.8ms  image init: engine initialized
+11:56:00.716  +   30.8ms  rescan: start
+11:56:00.717  +   31.5ms  rescan: scanning E:\AI GGUF\GGUF
+11:57:09.015  +    2.1ms  image init: begin
+11:57:09.017  +    4.2ms  image init: config ready
+11:57:09.017  +    4.7ms  image init: engine initialized
+11:57:09.035  +   21.9ms  rescan: start
+11:57:09.035  +   22.4ms  rescan: scanning E:\AI GGUF\GGUF
+11:57:09.037  +   24.0ms  rescan: done E:\AI GGUF\GGUF 25 entries
+11:58:51.362  +    2.1ms  image init: begin
+11:58:51.366  +    5.7ms  image init: config ready
+11:58:51.366  +    6.3ms  image init: engine initialized
+11:58:51.390  +   30.1ms  rescan: start
+11:58:51.391  +   30.6ms  rescan: scanning E:\AI GGUF\GGUF
+11:58:51.395  +   34.8ms  rescan: done E:\AI GGUF\GGUF 25 entries
+12:03:42.494  +    1.5ms  image init: begin
+12:03:42.499  +    6.2ms  image init: config ready
+12:03:42.499  +    6.7ms  image init: engine initialized
+12:03:42.521  +   28.7ms  rescan: start
+12:03:42.522  +   29.2ms  rescan: scanning E:\AI GGUF\GGUF
+12:03:42.524  +   31.3ms  rescan: done E:\AI GGUF\GGUF 25 entries
+12:07:01.458  +    1.6ms  image init: begin
+12:07:01.462  +    5.7ms  image init: config ready
+12:07:01.462  +    6.2ms  image init: engine initialized
+12:07:01.484  +   27.7ms  rescan: start
+12:07:01.484  +   28.3ms  rescan: scanning E:\AI GGUF\GGUF
+12:07:01.487  +   30.9ms  rescan: done E:\AI GGUF\GGUF 25 entries
+12:10:02.426  +    0.0ms  process start
+12:10:02.429  +    2.6ms  image init: begin
+12:10:02.433  +    7.3ms  image init: config ready
+12:10:02.434  +    8.3ms  image init: engine initialized
+12:10:02.490  +   63.6ms  NewApp done
+12:10:02.767  +  340.5ms  OnStartup: webview reached backend
+12:10:02.768  +  342.3ms  OnStartup: init complete
+12:10:02.769  +  342.8ms  rescan: start
+12:10:02.769  +  343.3ms  rescan: scanning E:\AI GGUF\GGUF
+12:10:02.773  +  347.2ms  rescan: done E:\AI GGUF\GGUF 25 entries
+12:21:46.896  +    1.5ms  image init: begin
+12:21:46.902  +    6.9ms  image init: config ready
+12:21:46.902  +    7.4ms  image init: engine initialized
+12:21:46.926  +   31.6ms  rescan: start
+12:21:46.927  +   32.1ms  rescan: scanning E:\AI GGUF\GGUF
+12:21:46.929  +   34.2ms  rescan: done E:\AI GGUF\GGUF 25 entries
+12:25:20.456  +    2.1ms  image init: begin
+12:25:20.462  +    7.8ms  image init: config ready
+12:25:20.462  +    8.4ms  image init: engine initialized
+12:25:20.484  +   30.0ms  rescan: start
+12:25:20.484  +   30.5ms  rescan: scanning E:\AI GGUF\GGUF
+12:25:20.487  +   33.2ms  rescan: done E:\AI GGUF\GGUF 25 entries
+12:39:44.134  +1781707.8ms  wails.Run returned
+12:52:27.368  +    2.5ms  image init: begin
+12:52:27.373  +    6.7ms  image init: config ready
+12:52:27.373  +    7.2ms  image init: engine initialized
+12:52:27.499  +  132.9ms  rescan: start
+12:52:27.499  +  133.5ms  rescan: scanning E:\AI GGUF\GGUF
+12:52:27.503  +  137.1ms  rescan: done E:\AI GGUF\GGUF 25 entries
+12:58:13.711  +    2.1ms  image init: begin
+12:58:13.716  +    7.0ms  image init: config ready
+12:58:13.716  +    7.5ms  image init: engine initialized
+12:58:13.738  +   29.5ms  rescan: start
+12:58:13.740  +   31.0ms  rescan: scanning E:\AI GGUF\GGUF
+12:58:13.743  +   33.6ms  rescan: done E:\AI GGUF\GGUF 25 entries
+13:09:01.051  +    0.0ms  process start
+13:09:01.054  +    2.6ms  image init: begin
+13:09:01.058  +    6.7ms  image init: config ready
+13:09:01.058  +    7.2ms  image init: engine initialized
+13:09:01.115  +   63.4ms  NewApp done
+13:09:01.386  +  334.8ms  OnStartup: webview reached backend
+13:09:01.388  +  336.5ms  OnStartup: init complete
+13:09:01.388  +  337.0ms  rescan: start
+13:09:01.389  +  337.6ms  rescan: scanning E:\AI GGUF\GGUF
+13:09:01.392  +  340.3ms  rescan: done E:\AI GGUF\GGUF 25 entries
+13:17:38.885  +517834.3ms  wails.Run returned
+13:18:19.343  +    1.6ms  image init: begin
+13:18:19.348  +    6.3ms  image init: config ready
+13:18:19.348  +    6.8ms  image init: engine initialized
+13:18:19.366  +   24.3ms  rescan: start
+13:18:19.366  +   24.9ms  rescan: scanning E:\AI GGUF\GGUF
+13:18:19.369  +   27.6ms  rescan: done E:\AI GGUF\GGUF 25 entries
+13:29:45.393  +    2.1ms  image init: begin
+13:29:45.397  +    6.8ms  image init: config ready
+13:29:45.398  +    7.3ms  image init: engine initialized
+13:29:45.416  +   25.5ms  rescan: start
+13:29:45.417  +   26.0ms  rescan: scanning E:\AI GGUF\GGUF
+13:29:45.419  +   28.8ms  rescan: done E:\AI GGUF\GGUF 25 entries
+13:30:43.394  +    2.1ms  image init: begin
+13:30:43.399  +    6.3ms  image init: config ready
+13:30:43.399  +    6.8ms  image init: engine initialized
+13:30:43.418  +   25.4ms  rescan: start
+13:30:43.418  +   25.9ms  rescan: scanning E:\AI GGUF\GGUF
+13:30:43.423  +   30.5ms  rescan: done E:\AI GGUF\GGUF 25 entries
+13:36:24.820  +    1.6ms  image init: begin
+13:36:24.825  +    6.1ms  image init: config ready
+13:36:24.825  +    6.6ms  image init: engine initialized
+13:36:24.847  +   28.4ms  rescan: start
+13:36:24.848  +   29.2ms  rescan: scanning E:\AI GGUF\GGUF
+13:36:24.852  +   33.2ms  rescan: done E:\AI GGUF\GGUF 25 entries
+13:44:06.681  +    1.7ms  image init: begin
+13:44:06.687  +    7.4ms  image init: config ready
+13:44:06.688  +    8.0ms  image init: engine initialized
+13:44:06.709  +   29.0ms  rescan: start
+13:44:06.709  +   29.5ms  rescan: scanning E:\AI GGUF\GGUF
+13:44:06.713  +   33.4ms  rescan: done E:\AI GGUF\GGUF 25 entries
+14:04:35.167  +    1.5ms  image init: begin
+14:04:35.172  +    6.3ms  image init: config ready
+14:04:35.173  +    6.8ms  image init: engine initialized
+14:04:35.297  +  131.6ms  rescan: start
+14:04:35.298  +  132.1ms  rescan: scanning E:\AI GGUF\GGUF
+14:04:35.301  +  135.4ms  rescan: done E:\AI GGUF\GGUF 25 entries
+14:07:15.790  +    2.1ms  image init: begin
+14:07:15.794  +    6.2ms  image init: config ready
+14:07:15.795  +    6.8ms  image init: engine initialized
+14:07:15.925  +  137.1ms  rescan: start
+14:07:15.925  +  137.6ms  rescan: scanning E:\AI GGUF\GGUF
+14:07:15.928  +  140.2ms  rescan: done E:\AI GGUF\GGUF 25 entries
+14:09:54.365  +    2.1ms  image init: begin
+14:09:54.370  +    6.8ms  image init: config ready
+14:09:54.370  +    7.3ms  image init: engine initialized
+14:09:54.392  +   28.9ms  rescan: start
+14:09:54.392  +   29.4ms  rescan: scanning E:\AI GGUF\GGUF
+14:09:54.396  +   33.0ms  rescan: done E:\AI GGUF\GGUF 25 entries
+14:28:57.739  +    9.2ms  image init: begin
+14:28:57.962  +  231.9ms  image init: config ready
+14:28:57.962  +  232.4ms  image init: engine initialized
+14:28:58.065  +  334.6ms  rescan: start
+14:28:58.066  +  335.7ms  rescan: scanning G:\AI GGUF\GGUF
+14:28:58.069  +  338.9ms  rescan: done G:\AI GGUF\GGUF 8 entries
+15:25:21.490  +    0.0ms  process start
+15:25:21.493  +    2.7ms  image init: begin
+15:25:21.496  +    6.3ms  image init: config ready
+15:25:21.497  +    6.8ms  image init: engine initialized
+15:25:21.548  +   58.0ms  NewApp done
+15:25:21.793  +  302.9ms  OnStartup: webview reached backend
+15:25:21.795  +  304.6ms  OnStartup: init complete
+15:25:21.795  +  305.1ms  rescan: start
+15:25:21.796  +  305.6ms  rescan: scanning G:\AI GGUF\GGUF
+15:25:54.060  +32570.2ms  rescan: done G:\AI GGUF\GGUF 25 entries
+15:26:29.043  +    2.1ms  image init: begin
+15:26:29.047  +    6.8ms  image init: config ready
+15:26:29.048  +    7.3ms  image init: engine initialized
+15:26:29.170  +  129.0ms  rescan: start
+15:26:29.170  +  129.6ms  rescan: scanning G:\AI GGUF\GGUF
+15:26:29.173  +  132.2ms  rescan: done G:\AI GGUF\GGUF 25 entries
+15:31:59.700  +    1.6ms  image init: begin
+15:31:59.701  +    0.0ms  process start
+15:31:59.703  +    2.1ms  image init: begin
+15:31:59.706  +    7.3ms  image init: config ready
+15:31:59.706  +    7.3ms  image init: engine initialized
+15:31:59.707  +    6.8ms  image init: config ready
+15:31:59.708  +    7.8ms  image init: engine initialized
+15:31:59.744  +   45.3ms  rescan: start
+15:31:59.744  +   45.3ms  rescan: scanning G:\AI GGUF\GGUF
+15:31:59.747  +   48.9ms  rescan: done G:\AI GGUF\GGUF 25 entries
+15:31:59.775  +   74.6ms  NewApp done
+15:32:00.050  +  349.3ms  OnStartup: webview reached backend
+15:32:00.053  +  352.7ms  OnStartup: init complete
+15:32:00.054  +  353.2ms  rescan: start
+15:32:00.055  +  353.9ms  rescan: scanning G:\AI GGUF\GGUF
+15:32:00.058  +  357.1ms  rescan: done G:\AI GGUF\GGUF 25 entries
+15:33:41.677  +    0.0ms  process start
+15:33:41.680  +    2.7ms  image init: begin
+15:33:41.681  +    2.0ms  image init: begin
+15:33:41.686  +    6.7ms  image init: config ready
+15:33:41.686  +    8.4ms  image init: config ready
+15:33:41.686  +    7.2ms  image init: engine initialized
+15:33:41.686  +    8.9ms  image init: engine initialized
+15:33:41.708  +   29.5ms  rescan: start
+15:33:41.708  +   29.5ms  rescan: scanning G:\AI GGUF\GGUF
+15:33:41.712  +   33.3ms  rescan: done G:\AI GGUF\GGUF 25 entries
+15:33:41.843  +  166.0ms  NewApp done
+15:33:42.074  +  397.1ms  OnStartup: webview reached backend
+15:33:42.075  +  397.8ms  OnStartup: init complete
+15:33:42.076  +  398.9ms  rescan: start
+15:33:42.076  +  398.9ms  rescan: scanning G:\AI GGUF\GGUF
+15:33:42.080  +  402.6ms  rescan: done G:\AI GGUF\GGUF 25 entries
+15:34:11.906  +    0.0ms  process start
+15:34:11.908  +    2.1ms  image init: begin
+15:34:11.909  +    2.1ms  image init: begin
+15:34:11.914  +    7.8ms  image init: config ready
+15:34:11.914  +    8.4ms  image init: engine initialized
+15:34:11.915  +    8.4ms  image init: config ready
+15:34:11.915  +    8.9ms  image init: engine initialized
+15:34:11.939  +   32.5ms  rescan: start
+15:34:11.940  +   33.0ms  rescan: scanning G:\AI GGUF\GGUF
+15:34:11.943  +   36.2ms  rescan: done G:\AI GGUF\GGUF 25 entries
+15:34:11.979  +   73.2ms  NewApp done
+15:34:12.224  +  317.8ms  OnStartup: webview reached backend
+15:34:12.225  +  318.9ms  OnStartup: init complete
+15:34:12.225  +  319.4ms  rescan: start
+15:34:12.226  +  319.9ms  rescan: scanning G:\AI GGUF\GGUF
+15:34:12.229  +  323.1ms  rescan: done G:\AI GGUF\GGUF 25 entries
+16:13:36.381  +    0.0ms  process start
+16:13:36.390  +    9.4ms  image init: begin
+16:13:36.390  +   14.7ms  image init: begin
+16:13:37.098  +  722.7ms  image init: config ready
+16:13:37.099  +  723.2ms  image init: engine initialized
+16:13:37.099  +  717.9ms  image init: config ready
+16:13:37.099  +  718.4ms  image init: engine initialized
+16:13:37.266  +  885.2ms  NewApp done
+16:13:37.282  +  906.6ms  rescan: start
+16:13:37.283  +  907.1ms  rescan: scanning G:\AI GGUF\GGUF
+16:13:37.285  +  909.2ms  rescan: done G:\AI GGUF\GGUF 25 entries
+16:13:37.488  + 1107.6ms  OnStartup: webview reached backend
+16:13:37.489  + 1108.1ms  OnStartup: init complete
+16:13:37.489  + 1108.7ms  rescan: start
+16:13:37.490  + 1109.2ms  rescan: scanning G:\AI GGUF\GGUF
+16:13:37.493  + 1111.9ms  rescan: done G:\AI GGUF\GGUF 25 entries
+16:22:35.864  +    1.6ms  image init: begin
+16:22:35.868  +    5.7ms  image init: config ready
+16:22:35.869  +    6.3ms  image init: engine initialized
+16:22:35.898  +   35.9ms  rescan: start
+16:22:35.899  +   36.4ms  rescan: scanning G:\AI GGUF\GGUF
+16:22:35.901  +   38.5ms  rescan: done G:\AI GGUF\GGUF 25 entries
+16:22:36.141  +    0.0ms  process start
+16:22:36.143  +    2.1ms  image init: begin
+16:22:36.149  +    7.9ms  image init: config ready
+16:22:36.149  +    8.4ms  image init: engine initialized
+16:22:36.168  +   27.0ms  NewApp done
+16:22:52.513  +16371.8ms  wails.Run returned
+16:37:47.787  +    0.0ms  process start
+16:37:47.796  +    8.9ms  image init: begin
+16:37:47.817  +   29.7ms  image init: config ready
+16:37:47.824  +   36.3ms  image init: engine initialized
+16:37:47.861  +   73.3ms  NewApp done
+16:37:48.108  +  320.7ms  OnStartup: webview reached backend
+16:37:48.120  +  333.0ms  OnStartup: init complete
+16:37:48.128  +  340.9ms  rescan: start
+16:37:48.137  +  349.7ms  rescan: scanning G:\AI GGUF\GGUF
+16:37:48.157  +  369.1ms  rescan: done G:\AI GGUF\GGUF 25 entries
+16:38:20.210  +    0.0ms  process start
+16:38:20.212  +    2.1ms  image init: begin
+16:38:20.217  +    6.2ms  image init: config ready
+16:38:20.217  +    6.8ms  image init: engine initialized
+16:38:20.263  +   52.5ms  NewApp done
+16:38:20.490  +  279.7ms  OnStartup: webview reached backend
+16:38:20.492  +  281.7ms  OnStartup: init complete
+16:38:20.493  +  282.3ms  rescan: start
+16:38:20.493  +  282.3ms  rescan: scanning G:\AI GGUF\GGUF
+16:38:20.496  +  285.4ms  rescan: done G:\AI GGUF\GGUF 25 entries
+16:50:54.677  +    1.5ms  image init: begin
+16:50:54.682  +    6.7ms  image init: config ready
+16:50:54.682  +    7.3ms  image init: engine initialized
+16:50:54.714  +   39.2ms  rescan: start
+16:50:54.715  +   39.7ms  rescan: scanning G:\AI GGUF\GGUF
+16:50:54.718  +   42.4ms  rescan: done G:\AI GGUF\GGUF 25 entries
+16:50:55.429  +    0.0ms  process start
+16:50:55.432  +    2.6ms  image init: begin
+16:50:55.436  +    6.8ms  image init: config ready
+16:50:55.436  +    7.3ms  image init: engine initialized
+16:50:55.485  +   55.5ms  NewApp done
+16:50:55.739  +  309.6ms  OnStartup: webview reached backend
+16:50:55.740  +  310.7ms  OnStartup: init complete
+16:50:55.740  +  311.2ms  rescan: start
+16:50:55.741  +  311.9ms  rescan: scanning G:\AI GGUF\GGUF
+16:50:55.744  +  315.3ms  rescan: done G:\AI GGUF\GGUF 25 entries
+17:06:10.948  +    1.6ms  image init: begin
+17:06:10.953  +    6.4ms  image init: config ready
+17:06:10.953  +    6.9ms  image init: engine initialized
+17:06:10.972  +   25.7ms  rescan: start
+17:06:10.972  +   26.2ms  rescan: scanning G:\AI GGUF\GGUF
+17:06:10.975  +   28.8ms  rescan: done G:\AI GGUF\GGUF 25 entries
+17:06:11.307  +    0.0ms  process start
+17:06:11.309  +    2.1ms  image init: begin
+17:06:11.313  +    6.2ms  image init: config ready
+17:06:11.313  +    6.8ms  image init: engine initialized
+17:06:11.363  +   55.9ms  NewApp done
+17:06:11.607  +  300.6ms  OnStartup: webview reached backend
+17:06:11.608  +  301.7ms  OnStartup: init complete
+17:06:11.609  +  302.2ms  rescan: start
+17:06:11.609  +  302.7ms  rescan: scanning G:\AI GGUF\GGUF
+17:06:11.613  +  306.0ms  rescan: done G:\AI GGUF\GGUF 25 entries
+17:38:45.189  +    1.5ms  image init: begin
+17:38:45.195  +    7.3ms  image init: config ready
+17:38:45.196  +    7.9ms  image init: engine initialized
+17:38:45.223  +   34.9ms  rescan: start
+17:38:45.224  +   35.9ms  rescan: scanning G:\AI GGUF\GGUF
+17:38:45.227  +   39.5ms  rescan: done G:\AI GGUF\GGUF 25 entries
+17:38:46.008  +    0.0ms  process start
+17:38:46.010  +    2.2ms  image init: begin
+17:38:46.014  +    6.4ms  image init: config ready
+17:38:46.015  +    6.9ms  image init: engine initialized
+17:38:46.060  +   52.5ms  NewApp done
+17:38:46.312  +  303.8ms  OnStartup: webview reached backend
+17:38:46.313  +  304.8ms  OnStartup: init complete
+17:38:46.313  +  305.4ms  rescan: start
+17:38:46.314  +  305.9ms  rescan: scanning G:\AI GGUF\GGUF
+17:38:46.317  +  308.6ms  rescan: done G:\AI GGUF\GGUF 25 entries
+17:40:53.414  +    2.1ms  image init: begin
+17:40:53.419  +    6.2ms  image init: config ready
+17:40:53.419  +    6.8ms  image init: engine initialized
+17:40:53.437  +   24.7ms  rescan: start
+17:40:53.438  +   25.2ms  rescan: scanning G:\AI GGUF\GGUF
+17:40:53.440  +   27.4ms  rescan: done G:\AI GGUF\GGUF 25 entries
+17:40:53.738  +    0.0ms  process start
+17:40:53.740  +    2.1ms  image init: begin
+17:40:53.744  +    6.3ms  image init: config ready
+17:40:53.745  +    6.8ms  image init: engine initialized
+17:40:53.802  +   64.4ms  NewApp done
+17:40:54.041  +  303.4ms  OnStartup: webview reached backend
+17:40:54.043  +  305.0ms  OnStartup: init complete
+17:40:54.043  +  305.0ms  rescan: start
+17:40:54.044  +  306.1ms  rescan: scanning G:\AI GGUF\GGUF
+17:40:54.047  +  309.4ms  rescan: done G:\AI GGUF\GGUF 25 entries
+17:50:58.414  +    2.0ms  image init: begin
+17:50:58.419  +    6.4ms  image init: config ready
+17:50:58.419  +    6.9ms  image init: engine initialized
+17:50:58.449  +   36.4ms  rescan: start
+17:50:58.449  +   37.2ms  rescan: scanning G:\AI GGUF\GGUF
+17:50:58.453  +   40.4ms  rescan: done G:\AI GGUF\GGUF 25 entries
+17:50:58.648  +    0.0ms  process start
+17:50:58.651  +    3.2ms  image init: begin
+17:50:58.655  +    7.4ms  image init: config ready
+17:50:58.656  +    7.9ms  image init: engine initialized
+17:50:58.708  +   60.6ms  NewApp done
+17:50:58.955  +  307.8ms  OnStartup: webview reached backend
+17:50:58.957  +  309.3ms  OnStartup: init complete
+17:50:58.957  +  309.3ms  rescan: start
+17:50:58.958  +  309.9ms  rescan: scanning G:\AI GGUF\GGUF
+17:50:58.960  +  312.5ms  rescan: done G:\AI GGUF\GGUF 25 entries
+17:56:02.010  +    1.8ms  image init: begin
+17:56:02.015  +    6.7ms  image init: config ready
+17:56:02.015  +    7.3ms  image init: engine initialized
+17:56:02.046  +   37.8ms  rescan: start
+17:56:02.046  +   38.3ms  rescan: scanning G:\AI GGUF\GGUF
+17:56:02.049  +   40.9ms  rescan: done G:\AI GGUF\GGUF 25 entries
+17:56:02.312  +    0.0ms  process start
+17:56:02.315  +    2.1ms  image init: begin
+17:56:02.319  +    6.8ms  image init: config ready
+17:56:02.319  +    6.8ms  image init: engine initialized
+17:56:02.373  +   60.4ms  NewApp done
+17:56:02.655  +  342.8ms  OnStartup: webview reached backend
+17:56:02.656  +  343.9ms  OnStartup: init complete
+17:56:02.657  +  344.4ms  rescan: start
+17:56:02.657  +  344.4ms  rescan: scanning G:\AI GGUF\GGUF
+17:56:02.660  +  347.6ms  rescan: done G:\AI GGUF\GGUF 25 entries
+17:56:33.797  +    1.6ms  image init: begin
+17:56:33.801  +    5.8ms  image init: config ready
+17:56:33.802  +    6.3ms  image init: engine initialized
+17:56:33.830  +   34.9ms  rescan: start
+17:56:33.831  +   35.5ms  rescan: scanning G:\AI GGUF\GGUF
+17:56:33.834  +   38.7ms  rescan: done G:\AI GGUF\GGUF 25 entries
+17:56:33.916  +    0.0ms  process start
+17:56:33.918  +    2.8ms  image init: begin
+17:56:33.925  +    9.0ms  image init: config ready
+17:56:33.925  +    9.5ms  image init: engine initialized
+17:56:34.079  +  163.5ms  NewApp done
+17:56:34.328  +  412.5ms  OnStartup: webview reached backend
+17:56:34.330  +  414.7ms  OnStartup: init complete
+17:56:34.330  +  414.7ms  rescan: start
+17:56:34.331  +  415.3ms  rescan: scanning G:\AI GGUF\GGUF
+17:56:34.335  +  419.6ms  rescan: done G:\AI GGUF\GGUF 25 entries
+18:06:15.055  +    2.1ms  image init: begin
+18:06:15.058  +    0.0ms  process start
+18:06:15.060  +    2.1ms  image init: begin
+18:06:15.061  +    7.9ms  image init: config ready
+18:06:15.061  +    8.4ms  image init: engine initialized
+18:06:15.065  +    6.8ms  image init: config ready
+18:06:15.065  +    7.4ms  image init: engine initialized
+18:06:15.102  +   49.3ms  rescan: start
+18:06:15.102  +   49.8ms  rescan: scanning G:\AI GGUF\GGUF
+18:06:15.108  +   55.3ms  rescan: done G:\AI GGUF\GGUF 25 entries
+18:06:15.134  +   75.6ms  NewApp done
+18:06:15.383  +  324.6ms  OnStartup: webview reached backend
+18:06:15.384  +  326.2ms  OnStartup: init complete
+18:06:15.385  +  326.7ms  rescan: start
+18:06:15.385  +  326.7ms  rescan: scanning G:\AI GGUF\GGUF
+18:06:15.388  +  329.8ms  rescan: done G:\AI GGUF\GGUF 25 entries
+18:28:10.270  +    2.9ms  image init: begin
+18:28:10.276  +    9.0ms  image init: config ready
+18:28:10.277  +    9.5ms  image init: engine initialized
+18:28:10.306  +   38.5ms  rescan: start
+18:28:10.306  +   39.0ms  rescan: scanning G:\AI GGUF\GGUF
+18:28:10.309  +   41.6ms  rescan: done G:\AI GGUF\GGUF 25 entries
+18:30:11.913  +    1.6ms  image init: begin
+18:30:11.918  +    6.5ms  image init: config ready
+18:30:11.918  +    7.1ms  image init: engine initialized
+18:30:12.048  +  136.6ms  rescan: start
+18:30:12.048  +  137.3ms  rescan: scanning G:\AI GGUF\GGUF
+18:30:12.051  +  139.9ms  rescan: done G:\AI GGUF\GGUF 25 entries
+20:20:43.612  +    0.0ms  process start
+20:20:43.619  +    7.6ms  image init: begin
+20:20:43.625  +   13.3ms  image init: config ready
+20:20:43.626  +   14.4ms  image init: engine initialized
+20:20:43.750  +  137.8ms  NewApp done
+20:20:43.991  +  379.6ms  OnStartup: webview reached backend
+20:20:43.993  +  380.7ms  OnStartup: init complete
+20:20:43.993  +  381.2ms  rescan: start
+20:20:43.993  +  381.2ms  rescan: scanning G:\AI GGUF\GGUF
+20:20:43.997  +  385.4ms  rescan: done G:\AI GGUF\GGUF 25 entries
+20:51:06.418  +    2.1ms  image init: begin
+20:51:06.422  +    6.4ms  image init: config ready
+20:51:06.422  +    7.0ms  image init: engine initialized
+20:51:06.446  +   30.0ms  rescan: start
+20:51:06.446  +   30.7ms  rescan: scanning G:\AI GGUF\GGUF
+20:51:06.449  +   33.9ms  rescan: done G:\AI GGUF\GGUF 25 entries
+21:03:01.392  +2537780.0ms  wails.Run returned

@@ -9,6 +9,11 @@ import (
 
 const manifestSuffix = ".howl.json"
 
+// manifestLogicVersion is bumped whenever classification improves. A sidecar
+// written by an older classifier is re-read rather than trusted, so a fixed
+// rule reaches files that were already scanned.
+const manifestLogicVersion = 5
+
 // Recommended holds generation defaults derived from the model family.
 type Recommended struct {
 	Sampler   string  `json:"sampler"`
@@ -30,6 +35,7 @@ type Manifest struct {
 	FileSize    int64             `json:"file_size,omitempty"`
 	ModTimeNS   int64             `json:"mod_time_ns,omitempty"`
 	Hash        string            `json:"hash,omitempty"`
+	Logic       int               `json:"logic,omitempty"`
 	Files       map[string]string `json:"files,omitempty"`    // sub-file role → abs path
 	VAEPath     string            `json:"vae_path,omitempty"` // suggested companion VAE
 	Recommended Recommended       `json:"recommended"`

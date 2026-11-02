@@ -1,0 +1,99 @@
+95 entries (6 diffusers bundles)
+
+sam-vit-huge                                   -           -        .download_cache\facebook_sam-vit-huge\sam-vit-huge\model.sa~
+big-lama                                       -           -        .download_cache\https__github.com_sanster_models_releases_d~
+grounding-dino-base                            -           -        .download_cache\idea-research_grounding-dino-base\grounding~
+text_encoder                                   clip_l      -        000bcce4-ccdf-4b75-9ed7-2ef764183835\text_encoder\model.saf~
+0240d8e2                                       controlnet  -        0240d8e2-394f-4a57-a541-da8fdad202ed\diffusion_pytorch_mode~
+SD1.5 061462d6                                 diffusers   sd1.5    061462d6-1a08-414b-9861-c88a47ba2830  [StableDiffusionPipeline]
+flux-2-klein-4b-Q4_K_M                         -           -        0d27a183-7d55-4be6-b31a-0f2f827cb848\flux-2-klein-4b-Q4_K_M~
+flux_schnell_flux1-schnell-bnb_nf4             diffusion   flux     0fcf9fb4-5aaf-4cf2-94f9-8003bcb0315c\flux_schnell_flux1-sch~
+100c910a                                       controlnet  -        100c910a-4645-43f4-b0f9-25ac5c50a239\diffusion_pytorch_mode~
+bnb_llm_int8_model                             t5xxl       -        1553b55d-f260-4330-b61b-6f63d4bcab16\text_encoder_2\bnb_llm~
+anima-base-v1.0                                -           -        17f909a9-3853-4e01-9e59-517715f9666b\anima-base-v1.0.safete~
+SDXL 19203d5d                                  controlnet  sdxl     19203d5d-5c1f-4be1-b9f3-39563f6f3771\diffusion_pytorch_mode~
+diffusion_pytorch_model_twins                  controlnet  sdxl     19203d5d-5c1f-4be1-b9f3-39563f6f3771\diffusion_pytorch_mode~
+SDXL 1b2b8fc7                                  controlnet  sdxl     1b2b8fc7-60b5-431d-86bb-0929a31a2d36\diffusion_pytorch_mode~
+qwen_3_06b_base                                llm         -        2207ca1c-dcfa-4fab-9e2e-1649e65d5aac\qwen_3_06b_base.safete~
+Z-Image-Turbo-Fun-Controlnet-Union-2.1-8steps  controlnet  -        24e06d11-7ac2-4cd2-92d6-18a9106371af\Z-Image-Turbo-Fun-Cont~
+Wan2.2-T2V-A14B-LowNoise-Q4_K_M                -           -        3502638c-cd7a-4ab5-a29a-94f3998d9c2a\Wan2.2-T2V-A14B-LowNoi~
+Qwen-Image-Lightning-8steps-V2.0-bf16          lora        -        395393c3-9abd-4590-9dc1-41273d5a4bf7\Qwen-Image-Lightning-8~
+face_xl_v0_1                                   lora        sdxl     3e0b92ef-7faf-40a6-b9b3-48b7dfa9cd9f\face_xl_v0_1.safetenso~
+SDXL 3e826235                                  controlnet  sdxl     3e826235-5757-45bd-b718-fb3c207a4e83\diffusion_pytorch_mode~
+412e2e4b                                       controlnet  -        412e2e4b-e4d0-4b1c-a435-be838cb6a6ab\diffusion_pytorch_mode~
+427e7e88                                       llm         -        427e7e88-a264-45ed-b7ee-e26a8f1bb663\model.safetensors
+SDXL 435d86fa                                  controlnet  sdxl     435d86fa-b1f2-4afe-8889-4624cbbb8991\diffusion_pytorch_mode~
+SDXL 439da426                                  diffusers   sdxl     439da426-b813-48c9-afd4-e124bcb2176d  [StableDiffusionXLPipeline]
+CyberRealistic_Negative_v3                     -           -        450a1ec8-a8c5-4f3d-a781-1a5745835099\CyberRealistic_Negativ~
+SDXL 4539fc37                                  diffusers   sdxl     4539fc37-98c8-4a9e-8bd6-4a3299bf1c85  [StableDiffusionXLPipeline]
+003_realSR_BSRGAN_DFOWMFC_s64w8_SwinIR-L_x4_G~ -           -        482d7331-38aa-460f-b46a-5b04bf5a2e6a\003_realSR_BSRGAN_DFOW~
+2x-AnimeSharpV4_RCAN                           -           -        501ef8cb-8125-437c-b3b9-69e1e4537213\2x-AnimeSharpV4_RCAN.s~
+ip-adapter-plus_sd15                           -           -        50c48de6-8c52-4542-bf68-0d45aab4b023\ip-adapter-plus_sd15.s~
+RealESRGAN_x2plus                              -           -        58c5cb3d-dadb-40f2-bf58-f49332d8e707\RealESRGAN_x2plus.pth
+low_noise_model                                lora        -        5e41b9d2-5c12-4739-a2b6-67802a5e9610\low_noise_model.safete~
+Wan2.2-I2V-A14B-LowNoise-Q4_K_M                -           -        5fb20f2e-1fff-4ef7-a154-aa7dc99c2ff9\Wan2.2-I2V-A14B-LowNoi~
+Wan2.2-TI2V-5B-Diffusers_diffusion_pytorch_mo~ -           -        6274c602-fd86-4fa3-aa55-35c8f25d5cd4\Wan2.2-TI2V-5B-Diffuse~
+flux1-krea-dev-Q4_K_M                          -           -        67ee0018-6c6d-4dfe-84c8-0542d7d9ac44\flux1-krea-dev-Q4_K_M.~
+Qwen-Image-Edit-2511-Lightning-8steps-V1.0-bf~ lora        -        69d34dbe-02b6-4498-8e94-d0f449aa6a6b\Qwen-Image-Edit-2511-L~
+6dfe9131                                       llm         -        6dfe9131-c2e7-4e6d-8883-1f378e45a103\model.safetensors
+71b33fcd                                       clip_g      -        71b33fcd-b4b6-4734-b2ce-158344598877\model.safetensors
+Wan2.2-T2V-A14B-HighNoise-Q4_K_M               -           -        76664103-cb79-479a-b7f2-61fcbcf1b51c\Wan2.2-T2V-A14B-HighNo~
+Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf~ lora        -        784c8acf-837e-4155-b057-89c460c9db6e\Qwen-Image-Edit-2511-L~
+7bf31271                                       controlnet  -        7bf31271-ea16-4d04-9fff-dd9e748b64a2\diffusion_pytorch_mode~
+SDXL 7decb14d                                  controlnet  sdxl     7decb14d-59e8-4434-b2d3-2e23022ecdf1\diffusion_pytorch_mode~
+sd_xl_base_1.0.safetensors                     lora        sdxl     808f1b54-cebd-4dca-89ee-7c124b8ee4f4\perfect-eyes-xl.safete~
+ip-adapter-plus-face_sd15                      -           -        829ab8fb-f3f5-4e35-a058-c98517d18466\ip-adapter-plus-face_s~
+low_noise_model                                lora        -        83497ae6-0307-4591-8ff8-c5c30b1b1c6d\low_noise_model.safete~
+flux_dev_flux1-dev-bnb_nf4                     diffusion   flux     88adb689-2c69-4574-8d2b-2a46d5c5852b\flux_dev_flux1-dev-bnb~
+qwen_image_vae                                 -           -        8a4abe8a-af1b-4929-b49e-16b9bac4a069\qwen_image_vae.safeten~
+Flux 8c89cbbe                                  -           flux     8c89cbbe-d389-4964-9516-4e46fec3aea7\diffusion_pytorch_mode~
+9210930b                                       controlnet  -        9210930b-3571-4c63-8bc0-17b1bb6ce14b\diffusion_pytorch_mode~
+krea2_turbo-Q4_K_M                             -           -        93c2615a-7a1a-4dd7-ba35-463589b87972\krea2_turbo-Q4_K_M.gguf
+Wan2.2-TI2V-5B-Q4_K_M                          -           -        94474de4-d281-4c60-b3f9-8a596b622544\Wan2.2-TI2V-5B-Q4_K_M.~
+Qwen-Image-Lightning-4steps-V2.0-bf16          lora        -        9464f789-c389-41df-9404-57fb26d054f4\Qwen-Image-Lightning-4~
+Wan2.2-T2V-A14B-Diffusers_diffusion_pytorch_m~ -           -        97f4f9a7-f86a-4bf5-987f-e8ac54bae481\Wan2.2-T2V-A14B-Diffus~
+SDXL 98332c5b                                  diffusers   sdxl     98332c5b-2bb3-4ef0-888e-fd33b92f78a4  [StableDiffusionXLPipeline]
+ip-adapter_sdxl_vit-h                          -           -        9ac493f2-a37e-4e5a-98f0-8fa5cef2893f\ip-adapter_sdxl_vit-h.~
+high_noise_model                               lora        -        9d1eaf74-9e78-42f1-94ac-0ada6a386796\high_noise_model.safet~
+ip_adapter                                     diffusion   flux     9ea0a1ab-9723-4da0-8d91-e2dbae96b7f1\ip_adapter.safetensors
+ip-adapter-plus_sdxl_vit-h                     -           -        9f45ebb1-6185-4967-8ee6-8b4ea49238c5\ip-adapter-plus_sdxl_v~
+Flux.1 Autoencoder                             -           flux     a185e8d7-f7a1-40f3-b669-65d1fa657e9b\ae.safetensors
+Deliberate_v5-inpainting                       diffusion   sd1.5    a2254dea-c6c2-417a-9c1b-7f9491a8fa34\Deliberate_v5-inpainti~
+a2f24eea                                       controlnet  -        a2f24eea-3c6f-4c88-a3a6-72fbdc04c0bd\diffusion_pytorch_mode~
+EasyNegative                                   -           -        a46451f8-a498-4915-873f-2a7db140da6f\EasyNegative.safetenso~
+z_image_turbo-Q8_0                             -           -        a5e1d3b3-5d81-4883-a435-149753fc0d10\z_image_turbo-Q8_0.gguf
+ab8e7047                                       controlnet  -        ab8e7047-39dc-4a3d-b227-bdbc569cc035\diffusion_pytorch_mode~
+Flux abd93e61                                  controlnet  flux     abd93e61-08ca-4b34-be3b-7309cbdb1b43\diffusion_pytorch_mode~
+RealESRGAN_x4plus                              -           -        afcc2b0d-a417-40e5-bd7d-4b130887eb72\RealESRGAN_x4plus.pth
+b2629c28                                       llm         -        b2629c28-ab74-430b-8b65-9fb97a978252\model.safetensors
+SD1.5 b281113b                                 diffusers   sd1.5    b281113b-d895-4ca1-b644-dc5e30a99fb4  [StableDiffusionInpaintPipeline]
+z_image_turbo-Q4_K                             -           -        b4f4d36f-ac8b-4141-80f4-47a8e089685d\z_image_turbo-Q4_K.gguf
+ba2e27a5                                       controlnet  -        ba2e27a5-eacd-4978-8e3e-501cec7dfca2\diffusion_pytorch_mode~
+c0238b8e                                       -           -        c0238b8e-ca25-4f1e-ab95-21ccc929cea3\diffusion_pytorch_mode~
+c508990c                                       -           -        c508990c-acb7-4aae-9769-04d789658e60\diffusion_pytorch_mode~
+SDXL c8c9b2cd                                  -           sdxl     c8c9b2cd-f418-4d40-bbde-781e021fe5db\diffusion_pytorch_mode~
+cafa7726                                       -           -        cafa7726-24dd-4f54-b2a0-07970daab832\diffusion_pytorch_mode~
+ce4320f4                                       -           -        ce4320f4-c628-404f-a008-11df598fb4b0\diffusion_pytorch_mode~
+Z-Image-Turbo-Fun-Controlnet-Tile-2.1-8steps   controlnet  -        d333f395-6b34-437f-8bba-a522b5e750b5\Z-Image-Turbo-Fun-Cont~
+d3b71e2f                                       controlnet  -        d3b71e2f-1729-4499-8e5b-4bfa534b8d0f\diffusion_pytorch_mode~
+flux1-kontext-dev-Q4_K_M                       -           -        d48b3263-b2d0-45ff-8763-97417299aa68\flux1-kontext-dev-Q4_K~
+d7b0ebf4                                       controlnet  -        d7b0ebf4-526c-4760-81d4-59999cb4c11b\diffusion_pytorch_mode~
+high_noise_model                               lora        -        de1e4ca9-c1dd-4001-9083-44de303c7b7d\high_noise_model.safet~
+e02466f4                                       controlnet  -        e02466f4-a222-4b55-9124-5b3fc766e463\diffusion_pytorch_mode~
+Deliberate_v5                                  diffusion   sd1.5    e16b8f35-e924-424c-86a6-9b4d76c52372\Deliberate_v5.safetens~
+Qwen-Image-Edit-2511_diffusion_pytorch_model   -           -        e20747da-6c16-40f0-b277-e31f0e0694a1\Qwen-Image-Edit-2511_d~
+anima-lllite-anytest-like-base-1r3-lr3e-4      -           -        e348d09f-4cb3-4167-acdc-db89aeb861fc\anima-lllite-any-test-~
+model-00001-of-00002                           llm         -        ee343d8d-8d99-4e86-8712-38fbfd6335f6\model-00001-of-00002.s~
+model-00002-of-00002                           llm         -        ee343d8d-8d99-4e86-8712-38fbfd6335f6\model-00002-of-00002.s~
+ef2437a2                                       controlnet  -        ef2437a2-12e2-4da1-858e-6ceda7c55c72\diffusion_pytorch_mode~
+krea2_turbo-Q8_0                               -           -        f422a798-da59-4e19-8b5c-b8ca16f169a3\krea2_turbo-Q8_0.gguf
+Qwen_3_4b-Q6_K                                 -           -        f4332aa3-70a3-42e0-bfb1-4ca0ceaba447\Qwen_3_4b-Q6_K.gguf
+SDXL f686038d                                  diffusers   sdxl     f686038d-9500-466d-9a16-72ac9e5838e9  [StableDiffusionXLImg2ImgPipeline]
+CyberRealistic_V4.1_FP16                       diffusion   sd1.5    f6aefd9d-2a0e-4e3e-9a3c-c754fcb5f3e1\CyberRealistic_V4.1_FP~
+flux-2-klein-4b-fp8                            diffusion   flux     f6b27000-ed82-421e-a028-a4d5d93079a3\flux-2-klein-4b-fp8.sa~
+SDXL fa0e6cfc                                  controlnet  sdxl     fa0e6cfc-042e-4094-acfa-9a84e0bf55aa\diffusion_pytorch_mode~
+diffusion_pytorch_model_V2                     controlnet  sdxl     fa0e6cfc-042e-4094-acfa-9a84e0bf55aa\diffusion_pytorch_mode~
+anima-lllite-inpainting-base-1                 -           -        faf037b6-2ab8-4d67-bc7c-f2481f164bf5\anima-lllite-inpaintin~
+ip-adapter_sd15                                -           -        fca48206-66da-4eac-888e-40938201eaec\ip-adapter_sd15.safete~
+
+family counts: map[-:68 flux:7 sd1.5:5 sdxl:15]

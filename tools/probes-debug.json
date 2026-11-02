@@ -1,0 +1,17 @@
+{
+  "url": "http://127.0.0.1:8799/index.html",
+  "checks": [
+    {
+      "name": "sampler-dbg",
+      "width": 1920, "height": 1080,
+      "setup": "toggleFlyout('sampler-settings-flyout');",
+      "js": "(()=>{const f=document.getElementById('sampler-settings-flyout');const r=f.getBoundingClientRect();const cs=getComputedStyle(f);const g=f.querySelector('.settings-grid');return {panel:[Math.round(r.width),Math.round(r.height)],inner:[innerWidth,innerHeight],mobileMQ:matchMedia('(max-width: 768px)').matches,cls:f.className,inline:f.getAttribute('style'),computedW:cs.width,computedH:cs.height,computedMax:cs.maxWidth,gridCols:getComputedStyle(g).gridTemplateColumns,overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth};})()"
+    },
+    {
+      "name": "sampler-dbg2",
+      "width": 1920, "height": 1080,
+      "setup": "toggleFlyout('sampler-settings-flyout');",
+      "js": "(()=>{const f=document.getElementById('sampler-settings-flyout');const r=f.getBoundingClientRect();const cs=getComputedStyle(f);return {panel:[Math.round(r.width),Math.round(r.height)],inner:[innerWidth,innerHeight],cls:f.className,inline:f.getAttribute('style'),computedW:cs.width,computedH:cs.height,overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth};})()"
+    }
+  ]
+}

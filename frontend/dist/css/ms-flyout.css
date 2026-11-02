@@ -123,3 +123,37 @@
 .model-settings-flyout .flyout-content::-webkit-scrollbar-thumb:hover {
     background: var(--border-primary);
 }
+
+/* Matches the sampler sheet: full window, fluid columns. */
+.model-settings-flyout {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
+    border: none;
+    border-radius: 0;
+}
+
+.model-settings-flyout .flyout-content {
+    padding: clamp(10px, 1.4vh, 22px) clamp(14px, 2.2vw, 48px);
+}
+
+.model-settings-flyout .settings-grid {
+    grid-template-columns: repeat(auto-fit, minmax(clamp(240px, 16vw, 320px), 1fr));
+    max-width: 2200px;
+    margin-inline: auto;
+}
+
+/* Same fix as the sampler sheet: give the grid a definite width so auto-fit
+   fits the window instead of sizing to max-content. */
+.model-settings-flyout .flyout-content {
+    align-items: stretch;
+}
+
+.model-settings-flyout .settings-grid {
+    width: 100%;
+    max-width: 2200px;
+    margin-inline: auto;
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}

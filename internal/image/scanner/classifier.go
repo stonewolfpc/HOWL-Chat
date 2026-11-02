@@ -39,6 +39,15 @@ const (
 	FamilyCascade  ModelFamily = "cascade"
 	FamilyChroma   ModelFamily = "chroma"
 
+	// Families the shipped stable-diffusion.cpp build implements but the app
+	// previously had no name for. Without them these models were refused before
+	// they could reach the engine.
+	FamilyFlux2     ModelFamily = "flux2"
+	FamilyZImage    ModelFamily = "z_image"
+	FamilyQwenImage ModelFamily = "qwen_image"
+	// Animagine-style Anima DiT: net.blocks with adaLN modulation.
+	FamilyAnima ModelFamily = "anima"
+
 	FamilyHiDream ModelFamily = "hidream"
 	FamilyWan     ModelFamily = "wan"
 	FamilyLTX     ModelFamily = "ltx2"
@@ -139,6 +148,11 @@ func GuessFamily(name string) ModelFamily {
 	// VAE-specific family detection
 	if strings.Contains(lower, "vae") || strings.HasPrefix(lower, "ae.") {
 		switch {
+		case contains(lower, "qwen_image", "qwen-image", "qwenimage"):
+			// Anima and Qwen-Image ship the same autoencoder. Without this the
+			// conservative default below labels it sd1.5, and Anima then refuses
+			// the only VAE that can decode it.
+			return FamilyQwenImage
 		case contains(lower, "flux", "sdxl", "xl", "juggernaut_xl", "juggernaut-xl",
 			"realisticvision_xl", "realisticvision-xl", "dreamshaperxl", "dreamshaper-xl",
 			"flatpiecexl", "piecexl"): // Explicitly handle flatpiecexl VAEs
@@ -190,6 +204,16 @@ func GuessFamily(name string) ModelFamily {
 		return FamilyHunyuan
 	case contains(lower, "animatediff", "motion-module", "motion_module"):
 		return FamilyAnimate
+	case contains(lower, "anima"):
+		return FamilyAnima
+	// Flux.2 and Flux.1 differ in text encoder and block layout, so the
+	// more specific name has to be tested first.
+	case contains(lower, "flux2", "flux.2", "flux-2", "flux_2"):
+		return FamilyFlux2
+	case contains(lower, "z-image", "z_image", "zimage"):
+		return FamilyZImage
+	case contains(lower, "qwen-image", "qwen_image", "qwenimage"):
+		return FamilyQwenImage
 	case contains(lower, "flux"):
 		return FamilyFlux
 	case contains(lower, "chroma"):
@@ -228,7 +252,7 @@ func GuessFamily(name string) ModelFamily {
 // DefaultResolution returns the canonical resolution for a family.
 func DefaultResolution(family ModelFamily) int {
 	switch family {
-	case FamilyFlux, FamilySDXL, FamilySD35, FamilySD3, FamilyTurbo:
+	case FamilyFlux, FamilyFlux2, FamilyZImage, FamilyQwenImage, FamilyAnima, FamilySDXL, FamilySD35, FamilySD3, FamilyTurbo:
 		return 1024
 	case FamilySD21:
 		return 768
@@ -240,12 +264,49 @@ func DefaultResolution(family ModelFamily) int {
 // DefaultSampler returns a reasonable sampler for the family.
 func DefaultSampler(family ModelFamily) string {
 	switch family {
-	case FamilyFlux, FamilyWan, FamilyLTX, FamilyHunyuan, FamilyAnimate:
+	case FamilyFlux, FamilyFlux2, FamilyZImage, FamilyQwenImage, FamilyAnima, FamilyWan, FamilyLTX, FamilyHunyuan, FamilyAnimate:
 		return "euler"
 	case FamilySDXL, FamilySD35, FamilySD3, FamilyTurbo:
 		return "dpmpp_2m"
 	default:
 		return "euler_a"
+	}
+}
+
+// DefaultSteps returns the step count a family is built for. A distilled model
+// run at the generic 20 steps and CFG 7 does not get better — it burns the image,
+// and a burned image is indistinguishable from a broken engine or a bad offload.
+func DefaultSteps(family ModelFamily) int {
+	switch family {
+	case FamilyZImage:
+		return 8 // Z-Image-Turbo: 9 scheduler steps, 8 DiT forwards
+	case FamilyFlux:
+		return 4 // FLUX.1-schnell
+	case FamilyFlux2:
+		return 20
+	case FamilyQwenImage:
+		return 20
+	case FamilyAnima:
+		return 30
+	default:
+		return 20
+	}
+}
+
+// DefaultCFG returns the classifier-free guidance a family expects. Distilled
+// models bake guidance in and must run at 1.0; anything else oversaturates.
+func DefaultCFG(family ModelFamily) float64 {
+	switch family {
+	case FamilyZImage, FamilyFlux:
+		return 1.0
+	case FamilyQwenImage:
+		return 2.5
+	case FamilyAnima:
+		return 6.0
+	case FamilyFlux2:
+		return 4.0
+	default:
+		return 7.0
 	}
 }
 
@@ -271,6 +332,12 @@ func CompatibleVAE(modelFamily, vaeFamily ModelFamily) bool {
 	// SD3 and SD3.5 can share VAEs
 	if (modelFamily == FamilySD3 || modelFamily == FamilySD35) &&
 		(vaeFamily == FamilySD3 || vaeFamily == FamilySD35) {
+		return true
+	}
+	// Anima ships the Qwen-Image autoencoder (circlestone-labs/Anima), so the two
+	// families interchange here; an sd1.5 or Flux VAE is still rejected.
+	if (modelFamily == FamilyAnima && vaeFamily == FamilyQwenImage) ||
+		(modelFamily == FamilyQwenImage && vaeFamily == FamilyAnima) {
 		return true
 	}
 	// Otherwise require exact match

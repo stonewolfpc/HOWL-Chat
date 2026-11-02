@@ -268,3 +268,168 @@
     margin-top: 4px;
     padding-top: 12px;
 }
+
+/* ---------------------------------------------------------------------------
+   T2.3 — Invoke-style organisation
+
+   Before: a 280-480px control rail and a 280-580px gallery squeezed the
+   canvas into whatever was left, and the prompt sat third in the scrolling
+   rail. Now the canvas is the flexible column, the gallery is a compact tray,
+   and the prompt dock sits directly above the preview where the Generate
+   button lives. Heights are unchanged; only the horizontal split and the
+   prompt's home moved.
+   --------------------------------------------------------------------------- */
+
+.ig-layout > .ig-main {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.ig-layout > .ig-sidebar {
+    width: clamp(280px, 19vw, 360px);
+    min-width: clamp(280px, 19vw, 360px);
+    max-width: 360px;
+}
+
+.ig-layout > .ig-history-col {
+    width: clamp(220px, 16vw, 300px);
+    min-width: 220px;
+    max-width: 300px;
+    padding-right: 0;
+}
+
+/* Prompt dock */
+.ig-prompt-dock {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+}
+
+.ig-prompt-dock .ig-prompt {
+    min-height: 64px;
+}
+
+.ig-prompt-dock .ig-negative {
+    min-height: 44px;
+}
+
+.ig-prompt-dock .ig-prompt-tools {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+/* Gallery tray: a named, denser grid */
+.ig-layout .ig-history-header {
+    padding: 10px 10px 6px;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.ig-history-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-tertiary);
+}
+
+.ig-layout .ig-history-list {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 6px;
+    padding: 8px;
+}
+
+@media (max-width: 1100px) {
+    .ig-layout > .ig-history-col {
+        width: clamp(200px, 20vw, 250px);
+        min-width: 200px;
+        max-width: 250px;
+    }
+}
+
+@media (max-width: 900px) {
+    .ig-layout > .ig-sidebar {
+        width: clamp(250px, 30vw, 300px);
+        min-width: 250px;
+        max-width: 300px;
+    }
+
+    .ig-layout > .ig-history-col {
+        width: 190px;
+        min-width: 190px;
+        max-width: 190px;
+    }
+}
+
+@media (max-width: 700px) {
+    .ig-layout > .ig-sidebar { display: none; }
+    .ig-layout > .ig-history-col { display: none; }
+    .ig-layout > .ig-main { min-width: 0; }
+}
+
+/* First paint of the rework showed two overflow defects at a 304px rail:
+   the panel status badge squeezed the title until the two overlapped, and the
+   third gallery action clipped to "Scen". Both are flex/grid sizing, not text. */
+.ig-layout .ig-panel-header {
+    min-width: 0;
+}
+
+.ig-layout .ig-panel-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ig-layout .ig-panel-status {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 52%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ig-layout .ig-history-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.ig-layout .ig-history-send-btn {
+    min-width: 0;
+    padding: 2px 4px;
+    font-size: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Ellipsising both labels side by side reads as broken ("MODEL CONFI...",
+   "AUTO-LOAD ON..."). Wrapping gives each its full text on the rail widths we
+   actually ship, and still never overlaps. */
+.ig-layout .ig-panel-header {
+    flex-wrap: wrap;
+    row-gap: 4px;
+}
+
+.ig-layout .ig-panel-title {
+    flex: 1 1 auto;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.ig-layout .ig-panel-status {
+    flex: 0 1 auto;
+    max-width: 100%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}

@@ -1,0 +1,23 @@
+{
+  "url": "http://127.0.0.1:8799/index.html",
+  "checks": [
+    {
+      "name": "grid-1366",
+      "width": 1366, "height": 768,
+      "setup": "const f=document.getElementById('sampler-settings-flyout');f.classList.add('show');document.getElementById('flyout-overlay').classList.add('show');",
+      "js": "(()=>{const f=document.getElementById('sampler-settings-flyout');const c=f.querySelector('.flyout-content');const g=f.querySelector('.settings-grid');const cs=getComputedStyle(c);const cards=[...g.querySelectorAll('.setting-card')];const last=cards[cards.length-1].getBoundingClientRect();const cr=c.getBoundingClientRect();return {panel:[Math.round(cr.width),Math.round(cr.height)],pane:true,cols:getComputedStyle(g).gridTemplateColumns.split(' ').length,gridW:Math.round(g.getBoundingClientRect().width),contentW:Math.round(cr.width-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)),gridScroll:g.scrollWidth,clipped:Math.round(last.right-cr.right),overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth};})()"
+    },
+    {
+      "name": "grid-1920",
+      "width": 1920, "height": 1080,
+      "setup": "const f=document.getElementById('sampler-settings-flyout');f.classList.add('show');document.getElementById('flyout-overlay').classList.add('show');",
+      "js": "(()=>{const f=document.getElementById('sampler-settings-flyout');const c=f.querySelector('.flyout-content');const g=f.querySelector('.settings-grid');const cs=getComputedStyle(c);const cards=[...g.querySelectorAll('.setting-card')];const last=cards[cards.length-1].getBoundingClientRect();const cr=c.getBoundingClientRect();return {panel:[Math.round(cr.width),Math.round(cr.height)],pane:true,cols:getComputedStyle(g).gridTemplateColumns.split(' ').length,gridW:Math.round(g.getBoundingClientRect().width),contentW:Math.round(cr.width-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)),gridScroll:g.scrollWidth,clipped:Math.round(last.right-cr.right),overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth};})()"
+    },
+    {
+      "name": "grid-1024",
+      "width": 1024, "height": 768,
+      "setup": "const f=document.getElementById('sampler-settings-flyout');f.classList.add('show');document.getElementById('flyout-overlay').classList.add('show');",
+      "js": "(()=>{const f=document.getElementById('sampler-settings-flyout');const c=f.querySelector('.flyout-content');const g=f.querySelector('.settings-grid');const cs=getComputedStyle(c);const cards=[...g.querySelectorAll('.setting-card')];const last=cards[cards.length-1].getBoundingClientRect();const cr=c.getBoundingClientRect();return {panel:[Math.round(cr.width),Math.round(cr.height)],pane:true,cols:getComputedStyle(g).gridTemplateColumns.split(' ').length,gridW:Math.round(g.getBoundingClientRect().width),contentW:Math.round(cr.width-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)),gridScroll:g.scrollWidth,clipped:Math.round(last.right-cr.right),overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth};})()"
+    }
+  ]
+}

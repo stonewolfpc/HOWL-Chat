@@ -424,6 +424,14 @@ async function setModel(name) {
         updateDiagnostics('error', 'Model requires newer sd-server');
         return;
     }
+    // A split-component model cannot load without its text encoder and VAE.
+    // Ask for consent before going online, and stop quietly if the user says no.
+    if (window.ImageDeps && !(await window.ImageDeps.ensureReady(name))) {
+        const depsStatus = document.getElementById('ig-model-status');
+        if (depsStatus) { depsStatus.textContent = 'Not loaded — dependencies missing'; depsStatus.className = 'ig-panel-status ig-status-error'; }
+        setStatus('Load cancelled — the model is missing required files.');
+        return;
+    }
     const statusEl = document.getElementById('ig-model-status');
     if (statusEl) { statusEl.textContent = 'Loading...'; statusEl.className = 'ig-panel-status ig-status-loading'; }
     updateDiagnostics('loadStart');
@@ -602,6 +610,13 @@ async function onGenerate() {
     if (model && model.compat === 'unsupported') {
         setStatus('⚠ This model requires a newer sd-server binary. Please update and try again.');
         updateDiagnostics('error', 'Model requires newer sd-server');
+        generationInFlight = false;
+        return;
+    }
+
+    // Generating auto-loads the model, so check its files before the run starts.
+    if (window.ImageDeps && !(await window.ImageDeps.ensureReady(modelSel.value))) {
+        setStatus('Generation cancelled — the model is missing required files.');
         generationInFlight = false;
         return;
     }
@@ -911,6 +926,12 @@ async function onGenerate() {
                         clearInterval(pollInterval);
                         pollInterval = null;
                         reject(new Error('Cancelled'));
+                    } else if (job.status === 'loading') {
+                        // Loading is a phase of the job now. A model can take minutes
+                        // to come off disk, and saying so is the difference between a
+                        // working app and one that looks hung.
+                        setStatus('Loading model...');
+                        updateProgressBar(0, 'Loading model...');
                     } else if (job.status === 'generating') {
                         const step = job.step || 0;
                         const total = job.total_steps || 1;

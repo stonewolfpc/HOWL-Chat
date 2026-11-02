@@ -80,5 +80,6 @@ func (e *Engine) pumpServerOutput(r io.Reader) {
 			fmt.Println(line)
 		}
 		e.recordServerProgress(line)
+		e.recordPlacement(line)
 	}
 }

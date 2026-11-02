@@ -1,6 +1,8 @@
 package sdcpp
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"howl-chat/internal/paths"
 	"howl-chat/internal/proc"
@@ -30,19 +32,53 @@ type Engine struct {
 	config       types.EngineConfig
 	currentModel *types.ModelInfo
 	serverProc   *os.Process
-	httpClient   *client
+
+	// The goroutine in supervisor.go owns Wait() for serverProc; these carry its
+	// verdict to everything that needs to know whether the engine is alive.
+	procMu   sync.Mutex
+	procDone chan struct{}
+	procExit error
+
+	// loadRun serializes loads: two jobs asking for different models would
+	// otherwise kill and replace each other's process mid-read.
+	loadRun sync.Mutex
+	// loadMu guards loading/aborting, which tell CancelJob whether stopping the
+	// child cancels a load or interrupts a finished generation.
+	loadMu    sync.Mutex
+	loading   bool
+	aborting  bool
+	loadOwner string
+
+	// Generation ownership (see generation.go): one request at a time per process.
+	genMu     sync.Mutex
+	genState  generationState
+	genOwner  string
+	genCancel context.CancelFunc
+	genSeq    uint64
+	// genHandle is the generation that currently owns the slot. The close reason
+	// lives on the generation, so the next request cannot rewrite it.
+	genHandle *genHandle
+
+	httpClient *client
 
 	// Video runs go through sd-cli rather than the HTTP server.
 	runMu     sync.Mutex
 	videoMu   sync.Mutex
 	videoProc *os.Process
-	progress  types.ProgressInfo
+	// videoOwner is the job whose sd-cli render is running. Cancellation is
+	// routed by it; the process handling itself is unchanged.
+	videoOwner string
+	progress   types.ProgressInfo
 
 	// sd-server stdout progress (see progress_stdout.go).
 	srvMu       sync.Mutex
 	srvProgress types.ProgressInfo
 	srvUpdated  time.Time
 	cancelled   bool
+
+	// placement is where sd-server put this model's weights (see placement.go).
+	placement   Placement
+	placementMu sync.Mutex
 }
 
 var _ engine.ImageEngine = (*Engine)(nil)
@@ -97,16 +133,44 @@ func (e *Engine) LoadModel(opts types.ModelLoadOptions) error {
 	if e.config.BinaryPath == "" || e.config.ModelsDir == "" {
 		return fmt.Errorf("engine config incomplete")
 	}
+
+	// One load at a time. Loading now runs in a job's goroutine instead of in the
+	// RPC, so two callers can genuinely overlap here.
+	e.loadRun.Lock()
+	defer e.loadRun.Unlock()
+
+	e.beginLoad(opts.JobID)
+	defer e.endLoad()
+
 	target, err := e.resolveTarget(opts)
 	if err != nil {
 		return err
 	}
 
-	// Kill existing server
-	if e.serverProc != nil {
-		e.serverProc.Kill()
-		e.serverProc.Wait()
-		e.serverProc = nil
+	// Stop the previous server. The observer goroutine owns Wait(), so this waits
+	// for its signal instead of calling Wait() on the same command twice.
+	if prev := e.getServerProc(); prev != nil {
+		_ = prev.Kill()
+		e.reapStoppedProcess(5 * time.Second)
+		e.setServerProc(nil)
+		// The process that could have owned a generation is gone, which is the one
+		// completion this engine can confirm without the backend's help.
+		e.resetGeneration(closeForReload)
+	}
+
+	// Fail fast on a checkpoint sd-server cannot identify, instead of spending
+	// the whole readiness timeout and then blaming the binary version.
+	if err := validateCheckpoint(target); err != nil {
+		return err
+	}
+
+	// A new model gets new numbers; the previous model's placement would be a lie.
+	e.resetPlacement()
+
+	// The user may have cancelled during the disk work above, before a process
+	// existed to kill.
+	if e.loadAborted() {
+		return errLoadCancelled
 	}
 
 	args := e.buildServerArgs(target, opts)
@@ -121,13 +185,18 @@ func (e *Engine) LoadModel(opts types.ModelLoadOptions) error {
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("failed to start sd-server: %w", err)
 	}
-	e.serverProc = cmd.Process
+	e.setServerProc(cmd.Process)
 	proc.Attach(cmd)
+	// Exactly one goroutine reaps this child; everything else reads its verdict.
+	e.startProcessReaper(cmd)
 	go e.pumpServerOutput(stdoutPipe)
 	e.currentModel = target
 
-	// Wait for server to be ready
-	if err := e.httpClient.waitForReady(120 * time.Second); err != nil {
+	// Wait for the server to answer, or for it to die trying. Polling readiness
+	// alone meant a dead child was waited on for the entire load timeout: the
+	// failed krea2 load burned 10m0.405s after printing the real error in seconds.
+	timeout := loadTimeoutFor(target.Files)
+	if err := e.waitReadyOrExit(timeout); err != nil {
 		stderr := stderrBuf.String()
 		if strings.Contains(stderr, "get sd version from file failed") {
 			extra := ""
@@ -141,29 +210,49 @@ func (e *Engine) LoadModel(opts types.ModelLoadOptions) error {
 					"Alternative: use the .safetensors version of this model: %w",
 				target.Name, target.Format, extra, err)
 		}
-		if e.serverProc != nil {
-			e.serverProc.Kill()
+		if cur := e.getServerProc(); cur != nil {
+			_ = cur.Kill()
 		}
-		e.serverProc = nil
+		e.setServerProc(nil)
 		e.currentModel = nil
-		return fmt.Errorf("sd-server did not become ready: %w", err)
+		// A cancelled load is not a broken one: say so before the error text tries
+		// to explain an exit that only happened because we asked for it.
+		if e.loadAborted() {
+			return errLoadCancelled
+		}
+		// A child that exited already said why. Reporting that as "did not become
+		// ready in 10m0s" sent the reader looking for a slow load instead of at
+		// the error in the stderr tail printed beside it.
+		if errors.Is(err, errProcessExited) {
+			return fmt.Errorf("%s failed to load: %w%s", target.Name, err, stderrTail(stderrBuf, 900))
+		}
+		return fmt.Errorf("sd-server did not become ready in %s: %w%s",
+			timeout.Round(time.Second), err, stderrTail(stderrBuf, 900))
 	}
 	return nil
 }
 
-// IsRunning returns true if the sd-server subprocess is alive.
+// IsRunning reports whether the sd-server child still exists. This is a process
+// question, not a readiness question: it used to run a three-second HTTP probe,
+// which the job poller called twice a second and which answered "not running"
+// for a server that was merely busy loading weights.
 func (e *Engine) IsRunning() bool {
-	if e.serverProc == nil {
-		return false
-	}
 	if e.httpClient == nil {
 		return false
 	}
-	// Quick health check via HTTP
-	if err := e.httpClient.waitForReady(3 * time.Second); err != nil {
+	if e.getServerProc() == nil {
 		return false
 	}
-	return true
+	done := e.processDone()
+	if done == nil {
+		return true // started, but not yet watched
+	}
+	select {
+	case <-done:
+		return false
+	default:
+		return true
+	}
 }
 
 // EnsureReady starts the engine and loads the model if needed.
@@ -204,9 +293,13 @@ func (e *Engine) GenerateTxt2Img(opts types.ImageOptions) (*types.ImageResult, e
 		fmt.Printf("[ImageEngine] GenerateTxt2Img: currentModel is nil (engine=%p, httpClient=%p)\n", e, e.httpClient)
 		return nil, fmt.Errorf("no model loaded")
 	}
-	e.resetServerProgress()
-	result, err := e.httpClient.txt2img(opts)
+	h, err := e.beginGeneration(opts.JobID)
 	if err != nil {
+		return nil, err
+	}
+	e.resetServerProgress()
+	result, err := e.httpClient.txt2img(h.ctx, opts)
+	if err := e.settleGeneration(h, err); err != nil {
 		return nil, err
 	}
 	result.Metadata.Model = e.currentModel.Name
@@ -222,7 +315,15 @@ func (e *Engine) GenerateImg2Img(opts types.ImageOptions) (*types.ImageResult, e
 	if e.currentModel == nil {
 		return nil, fmt.Errorf("no model loaded")
 	}
-	return e.httpClient.img2img(opts)
+	h, err := e.beginGeneration(opts.JobID)
+	if err != nil {
+		return nil, err
+	}
+	result, err := e.httpClient.img2img(h.ctx, opts)
+	if err := e.settleGeneration(h, err); err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // GenerateInpaint fills a masked region of an image.
@@ -233,7 +334,15 @@ func (e *Engine) GenerateInpaint(opts types.ImageOptions) (*types.ImageResult, e
 	if e.currentModel == nil {
 		return nil, fmt.Errorf("no model loaded")
 	}
-	return e.httpClient.inpaint(opts)
+	h, err := e.beginGeneration(opts.JobID)
+	if err != nil {
+		return nil, err
+	}
+	result, err := e.httpClient.inpaint(h.ctx, opts)
+	if err := e.settleGeneration(h, err); err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // GenerateVideo creates a series of frames (SVD/WAN).
@@ -275,26 +384,43 @@ func (e *Engine) GetLoadedModel() *types.ModelInfo {
 	return e.currentModel
 }
 
-// CancelJob sends a cancellation signal to the backend for the active job.
-func (e *Engine) CancelJob() error {
-	if e.cancelVideo() {
+// CancelJob cancels the work belonging to jobID.
+//
+// Routing follows ownership, not "what happens to be running": a job that owns a
+// generation gets its request closed even while another job is loading a model,
+// and a cancel for a job that owns nothing changes nothing. A load is cancelled
+// by stopping the child that is loading it; a generation by closing its request.
+// The backend is never claimed to have stopped: backend interruption is
+// unestablished for this build.
+func (e *Engine) CancelJob(jobID string) error {
+	// Identity is required. The legacy direct callers (GenerateImage,
+	// SetActiveImageModel) have no job, and an empty id must not mean "whichever
+	// job is active".
+	if jobID == "" {
 		return nil
 	}
-	if e.httpClient == nil {
+	if e.cancelVideoOwned(jobID) {
 		return nil
 	}
-	return e.httpClient.cancelJob("")
+	if e.abortLoad(jobID) {
+		return nil
+	}
+	e.cancelGeneration(jobID)
+	return nil
 }
 
 // Shutdown kills the server process and resets client state.
 func (e *Engine) Shutdown() error {
 	e.cancelVideo()
-	if e.serverProc != nil {
-		proc.KillTree(e.serverProc.Pid)
-		_ = e.serverProc.Kill()
-		_, _ = e.serverProc.Wait()
-		e.serverProc = nil
+	if cur := e.getServerProc(); cur != nil {
+		proc.KillTree(cur.Pid)
+		_ = cur.Kill()
+		e.reapStoppedProcess(5 * time.Second)
+		e.setServerProc(nil)
 	}
+	// Reset only after the child is gone, matching the load path: releasing the
+	// slot first would briefly advertise an engine whose process is being killed.
+	e.resetGeneration(closeForShutdown)
 	if e.httpClient != nil {
 		e.httpClient.resetState()
 	}
@@ -309,44 +435,47 @@ func (e *Engine) buildServerArgs(m *types.ModelInfo, opts types.ModelLoadOptions
 		"--threads", fmt.Sprintf("%d", defaultThreads()),
 	}
 
-	// MODEL PATH LOGIC
-	switch m.Family {
-	case "flux", "chroma", "anima":
-		// These models use --diffusion-model (split component style)
-		if m.Files["model"] != "" {
+	// Loading contract for this architecture: which flag carries the weights,
+	// which companion roles it needs, and any flags it always requires. One
+	// table entry, shared with the discovery pass and the validator.
+	cap, known := Capability(m.Family)
+	if !known {
+		cap = DefaultCapability
+	}
+	if m.Files["model"] != "" {
+		if cap.SplitComponents {
 			args = append(args, "--diffusion-model", m.Files["model"])
-		}
-	default:
-		// SD3, SDXL, SD1.x, SD2.x, HiDream use standard -m flag (single-file checkpoint)
-		if m.Files["model"] != "" {
+		} else {
 			args = append(args, "-m", m.Files["model"])
 		}
 	}
-
-	// COMMON ADDITIONS (skip companion models for HiDream - it's self-contained)
-	// Chroma also skips CLIP-L (only uses T5XXL + VAE)
-	// SD1.5/SD2.1 don't use T5XXL
-	familyLower := strings.ToLower(m.Family)
-	if familyLower != "hidream" {
-		if m.Files["vae"] != "" {
-			args = append(args, "--vae", m.Files["vae"])
+	emittedRole := map[string]bool{}
+	for _, role := range cap.Roles() {
+		p := m.Files[role]
+		flag := companionFlag[role]
+		if p == "" || flag == "" {
+			continue
 		}
-		// Chroma doesn't use CLIP-L
-		if familyLower != "chroma" {
-			if m.Files["clip_l"] != "" {
-				args = append(args, "--clip_l", m.Files["clip_l"])
+		args = append(args, flag, p)
+		emittedRole[role] = true
+	}
+	// A companion the caller supplied is never silently dropped by a family this
+	// build knows nothing about: it has no role list, so without this a fully
+	// equipped model reached sd-server without its text encoder. It is scoped to
+	// unknown families on purpose — a declared family states which encoders it
+	// reads, and passing the rest put --t5xxl and --clip_l on Anima and Z-Image,
+	// which never open them (and would have handed them a half-downloaded file).
+	if !known {
+		for _, role := range []string{"llm", "t5xxl", "clip_l", "clip_g", "vae"} {
+			if emittedRole[role] {
+				continue
 			}
-		}
-		if m.Files["clip_g"] != "" {
-			args = append(args, "--clip_g", m.Files["clip_g"])
-		}
-		// Only add T5XXL for Flux, Chroma, SD3, SD3.5
-		if familyLower == "flux" || familyLower == "chroma" || familyLower == "sd3" || familyLower == "sd3.5" {
-			if m.Files["t5xxl"] != "" {
-				args = append(args, "--t5xxl", m.Files["t5xxl"])
+			if p, flag := m.Files[role], companionFlag[role]; p != "" && flag != "" {
+				args = append(args, flag, p)
 			}
 		}
 	}
+	args = append(args, cap.ExtraFlags...)
 	if m.Files["clip_vision"] != "" {
 		args = append(args, "--clip_vision", m.Files["clip_vision"])
 	}
@@ -362,23 +491,14 @@ func (e *Engine) buildServerArgs(m *types.ModelInfo, opts types.ModelLoadOptions
 		args = append(args, "--control-net", m.Files["control_net"])
 	}
 
-	// FAMILY-SPECIFIC FLAGS
-	if strings.ToLower(m.Family) == "chroma" {
-		args = append(args, "--chroma-disable-dit-mask")
-		args = append(args, "--clip-on-cpu")
-	}
+	// Family flags (Chroma's DiT-mask switches) come from the table above.
 
-	// ANIMA-SPECIFIC: uses --llm for Qwen3 text encoder (NOT clip_l/t5xxl)
-	if strings.ToLower(m.Family) == "anima" {
-		if m.Files["llm"] != "" {
-			args = append(args, "--llm", m.Files["llm"])
-		}
-	}
-
-	// HIDREAM-SPECIFIC: self-contained model, no companion models needed
-	// Skip loading clip_l, t5xxl, vae for HiDream
-
-	// VRAM budget - auto-detect free VRAM at startup, offload to CPU/RAM for 8GB GPU
+	// Placement is left to sd-server's auto-fit, which puts weights on the
+	// compute GPU, then RAM, then disk in that order and only takes what fits.
+	// In this build --max-vram is a per-device budget in GiB and a negative value
+	// reserves that much free VRAM, so -1 keeps 1 GiB back for sampling buffers.
+	// An explicit --params-backend would disable auto-fit, which is why it is
+	// only sent when the user asks for it.
 	args = append(args, "--max-vram", "-1")
 
 	// STARTUP FLAGS from ModelLoadOptions
@@ -398,7 +518,8 @@ func (e *Engine) buildServerArgs(m *types.ModelInfo, opts types.ModelLoadOptions
 		args = append(args, "--circular")
 	}
 	if opts.FlashAttention {
-		args = append(args, "--fa")
+		// --fa is a deprecated alias in current sd.cpp builds.
+		args = append(args, "--flash-attn", "on")
 	}
 	if opts.OffloadToCPU {
 		args = append(args, "--offload-to-cpu")
@@ -488,23 +609,46 @@ func (e *Engine) resolveTarget(opts types.ModelLoadOptions) (*types.ModelInfo, e
 	}
 
 	if target == nil && opts.ModelPath != "" {
-		// Absolute file path supplied — build ModelInfo directly, no ModelsDir scan.
 		base := filepath.Base(opts.ModelPath)
 		ext := strings.TrimPrefix(strings.ToLower(filepath.Ext(base)), ".")
 		name := opts.ModelName
 		if name == "" {
 			name = strings.TrimSuffix(base, filepath.Ext(base))
 		}
-		target = &types.ModelInfo{
-			Name:   name,
-			Path:   opts.ModelPath,
-			Family: inferFamilyFromName(base),
-			Format: ext,
-			Files:  map[string]string{"model": opts.ModelPath},
-		}
-		// Auto-fill companions since we bypassed ListModels()
 		s := scanner.New(e.config.ModelsDir)
 		idx, _ := s.LoadIndex() // Use cached index if available
+		// Prefer the scanner's record for this exact path: it carries the
+		// architecture parsed from the file and the bundle's companion files.
+		// A filename guess carries neither, so a registered Z-Image checkpoint
+		// reached sd-server as a bare -m with no --diffusion-model, --llm or
+		// --vae, and could not load for a reason nothing in the UI explained.
+		for i := range idx.Models {
+			m := idx.Models[i]
+			if !samePath(m.Path, opts.ModelPath) {
+				continue
+			}
+			files := m.Files
+			if files == nil || files["model"] == "" {
+				files = map[string]string{"model": m.Path}
+			}
+			target = &types.ModelInfo{
+				Name:   name,
+				Path:   m.Path,
+				Family: string(m.Family),
+				Format: m.Format,
+				Files:  files,
+			}
+			break
+		}
+		if target == nil {
+			target = &types.ModelInfo{
+				Name:   name,
+				Path:   opts.ModelPath,
+				Family: inferFamilyFromName(base),
+				Format: ext,
+				Files:  map[string]string{"model": opts.ModelPath},
+			}
+		}
 		autoFillCompanions(target, idx)
 	} else {
 		models, err := e.ListModels()
@@ -520,6 +664,16 @@ func (e *Engine) resolveTarget(opts types.ModelLoadOptions) (*types.ModelInfo, e
 		if target == nil {
 			return nil, fmt.Errorf("model not found: %s (not in %s)", opts.ModelName, e.config.ModelsDir)
 		}
+	}
+
+	// The app resolved this family from the image registry, which covers every
+	// scanned directory; the engine only sees its own ModelsDir. Prefer that over
+	// the filename guess made above, because the family decides whether the file
+	// is passed as --diffusion-model (split components) or as -m (full
+	// checkpoint). Getting that wrong fails architecture detection before a
+	// single byte of weights is read.
+	if target != nil && opts.Family != "" {
+		target.Family = opts.Family
 	}
 
 	// Apply manual overrides if provided
@@ -543,4 +697,10 @@ func (e *Engine) resolveTarget(opts types.ModelLoadOptions) (*types.ModelInfo, e
 	}
 
 	return target, nil
+}
+
+// samePath compares two file paths the way Windows does: case-insensitively and
+// after cleaning.
+func samePath(a, b string) bool {
+	return strings.EqualFold(filepath.Clean(a), filepath.Clean(b))
 }

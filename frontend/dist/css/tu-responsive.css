@@ -61,3 +61,24 @@
         display: flex;
     }
 }
+
+/* The nav toggle is injected by openTutorials() on every platform, but it only
+   belongs in the header on narrow screens. Above that it rendered as a stray
+   grey square next to the title. */
+.tutorials-nav-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+    background: var(--surface-hover);
+    color: var(--text-secondary);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+@media (max-width: 560px) {
+    .tutorials-nav-toggle { display: flex; }
+}

@@ -60,7 +60,7 @@ Opens the full settings modal (General, Storage, Network, Privacy, Audio).
 
 **File → Advanced**
 
-Opens the Sampler Settings flyout directly.
+Reserved for power-user overrides. Until those controls ship, it opens the Sampler Settings sheet.
 
 ## Exit
 
@@ -185,12 +185,6 @@ Opens the Model Settings flyout. Controls model loading and performance.
 
 Opens the Story Tools flyout. Access memories, lorebooks, and knowledge documents.
 
-## Advanced / Experimental
-
-**Settings → Advanced / Experimental**
-
-Placeholder for upcoming features.
-
 ## Keyboard Shortcuts
 
 **Settings → Keyboard Shortcuts**
@@ -260,7 +254,7 @@ The TTS voice dropdown shows:
 **Power User (Multiple Voice Collections):**
 1. Scan \`F:\\Voices\\Piper-English\` (50 English voices)
 2. Scan \`F:\\Voices\\Piper-Multilingual\` (30 other languages)
-3. Scan \`E:\\Work\\Voices\` (10 custom voices)
+3. Scan \`G:\\Work\\Voices\` (10 custom voices)
 4. All 90 voices appear in the dropdown
 5. Next week, download 5 new voices to \`F:\\Voices\\Piper-English\`
 6. Restart HOWL → the 5 new voices appear automatically
@@ -378,10 +372,10 @@ Anima requires Qwen3-0.6B-Base as its text encoder, NOT clip_l or t5xxl. Using t
 
 **Power User (Multiple Collections):**
 1. Scan \`D:\\AI GGUF\\Image\\SDXL\` (20 SDXL models)
-2. Scan \`E:\\Work\\Models\\Flux\` (15 Flux models)
+2. Scan \`G:\\Work\\Models\\Flux\` (15 Flux models)
 3. Scan \`F:\\Experimental\\New\` (10 experimental models)
 4. All 45 models appear in the Model dropdown together
-5. Next week, download 5 new Flux models to \`E:\\Work\\Models\\Flux\`
+5. Next week, download 5 new Flux models to \`G:\\Work\\Models\\Flux\`
 6. Restart HOWL → the 5 new models appear automatically in the dropdown
 
 ## Cross-Directory Generation
@@ -390,9 +384,9 @@ The registry enables a powerful workflow: **generate with models from any direct
 
 **Example:**
 - Your configured \`ModelsDir\` is \`D:\\AI GGUF\\Image\\SDXL\`
-- You also scanned \`E:\\Work\\Models\\Flux\`
+- You also scanned \`G:\\Work\\Models\\Flux\`
 - In the Model dropdown, you see models from BOTH directories
-- Select a Flux model from \`E:\\Work\\Models\\Flux\`
+- Select a Flux model from \`G:\\Work\\Models\\Flux\`
 - Click Generate → HOWL loads it from its original path
 - No file copying required — the engine loads directly from wherever the file lives
 

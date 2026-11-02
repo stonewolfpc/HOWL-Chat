@@ -1,0 +1,15 @@
+{
+  "url": "http://127.0.0.1:8799/image-generator.html",
+  "outDir": "build",
+  "width": 1600,
+  "height": 1000,
+  "scale": 1,
+  "shots": [
+    {
+      "name": "t23-image-page",
+      "setup": "void 0;",
+      "selector": ".ig-layout",
+      "settle": 900
+    }
+  ]
+}

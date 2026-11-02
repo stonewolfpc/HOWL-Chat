@@ -1,0 +1,33 @@
+ggml_cuda_init: found 1 CUDA devices (Total VRAM: 8191 MiB):
+  Device 0: NVIDIA GeForce GTX 1080, compute capability 6.1, VMM: yes, VRAM: 8191 MiB
+load_backend: loaded CUDA backend from C:\Users\StoneWolfPC\HOWL_Chat\ggml-cuda.dll
+load_backend: loaded CPU backend from C:\Users\StoneWolfPC\HOWL_Chat\ggml-cpu-haswell.dll
+[I] loading diffusion model from 'E:\AI GGUF\Image models\z-image-turbo-Q4_K_M.gguf' --- diffusion_engine.cpp:692
+[I] load E:\AI GGUF\Image models\z-image-turbo-Q4_K_M.gguf using gguf format --- model_loader.cpp:216
+[I] loading llm from 'H:\InvokeAI\models\2207ca1c-dcfa-4fab-9e2e-1649e65d5aac\qwen_3_06b_base.safetensors' --- diffusion_engine.cpp:749
+[I] load H:\InvokeAI\models\2207ca1c-dcfa-4fab-9e2e-1649e65d5aac\qwen_3_06b_base.safetensors using safetensors format --- model_loader.cpp:222
+[I] loading vae from 'E:\AI GGUF\Image models\ae.safetensors' --- diffusion_engine.cpp:763
+[I] load E:\AI GGUF\Image models\ae.safetensors using safetensors format --- model_loader.cpp:222
+[I] Version: Z-Image  --- diffusion_engine.cpp:975
+[I] auto-fit plan: --- backend_fit.cpp:323
+[I]   devices: --- backend_fit.cpp:324
+[I]     CUDA0        NVIDIA GeForce GTX 1080          free   7185 MiB, budget   6161 MiB --- backend_fit.cpp:328
+[I]     RAM          free  47832 MiB, params budget  43049 MiB --- backend_fit.cpp:334
+[I]   compute-device weight cache priority: diffusion > te > vae --- backend_fit.cpp:336
+[I]   components (params: compute device -> RAM -> other GPU -> disk): --- backend_fit.cpp:337
+[I]     DiT          params   4785 MiB, compute reserve  2048 MiB -> compute CUDA0, params cpu --- backend_fit.cpp:348
+[I]     Conditioner  params   1136 MiB, compute reserve  2048 MiB -> compute CUDA0, params cpu --- backend_fit.cpp:348
+[I]     VAE          params    319 MiB, compute reserve  1024 MiB -> compute CUDA0, params cpu --- backend_fit.cpp:348
+[I] auto-fit: --backend "diffusion=CUDA0,te=CUDA0,vae=CUDA0" --params-backend "diffusion=cpu,te=cpu,vae=cpu" --- backend_fit.cpp:477
+[I] Weight type stat:                      f32: 489  |    q4_K: 112  |    q5_K: 36   |    q6_K: 32   |    bf16: 338   --- diffusion_engine.cpp:1548
+[I] Conditioner weight type stat:         bf16: 310   --- diffusion_engine.cpp:1549
+[I] Diffusion model weight type stat:      f32: 245  |    q4_K: 112  |    q5_K: 36   |    q6_K: 32   |    bf16: 28    --- diffusion_engine.cpp:1550
+[I] VAE weight type stat:                  f32: 244   --- diffusion_engine.cpp:1551
+[I] using VAE for encoding / decoding --- model_builders.cpp:210
+[I] vae decoder: ch = 128 --- auto_encoder_kl.hpp:529
+[I] flash attention auto: CUDA0 -> on (probe: normal 1.625 ms, flash 1.320 ms) --- flash_attn.cpp:95
+[I] conv2d direct auto: CUDA0 -> off (no implicit GEMM path) --- conv_direct.cpp:90
+[I] conv3d direct auto: CUDA0 -> on (implicit GEMM) --- conv_direct.cpp:87
+[I] total params memory size = 6083.61MB (VRAM 0.00MB, RAM 6083.61MB): text_encoders 1137.00MB(RAM), diffusion_model 4786.61MB(RAM), vae 160.00MB(RAM), controlnet 0.00MB(N/A), extensions 0.00MB(N/A) --- diffusion_engine.cpp:1438
+[I] running in FLOW mode --- diffusion_engine.cpp:1478
+[I] listening on: http://127.0.0.1:8099 --- main.cpp:170

@@ -20,14 +20,18 @@ import (
 // -----------------------------------------------------------------------
 
 // StartImageJob queues an async generation job and returns the job ID.
+//
+// Engine initialization and model loading run inside the job, not here. When
+// they ran in this call, a slow load blocked the RPC for as long as the model
+// took to load, the UI could not tell loading from a hang, and the user could
+// not cancel it.
 func (a *App) StartImageJob(opts imagetypes.ImageOptions) (string, error) {
 	if a.jobManager == nil {
 		return "", fmt.Errorf("job manager not initialized")
 	}
-	if err := a.ensureEngineReady(opts.ModelName, opts); err != nil {
-		return "", fmt.Errorf("engine ready failed: %w", err)
-	}
-	id := a.jobManager.Start(opts)
+	id := a.jobManager.Start(opts, func(jobID string) error {
+		return a.ensureEngineReady(opts.ModelName, jobID, opts)
+	})
 	return id, nil
 }
 
@@ -44,7 +48,14 @@ func (a *App) GetImageJobStatus(id string) (*imagetypes.ImageJob, error) {
 }
 
 // CancelImageJob marks a job as cancelled.
+//
+// The id is required. Generation started directly through GenerateImage has no
+// job identity, so there is nothing for a cancel to address; an empty id must
+// never be read as "whatever is running".
 func (a *App) CancelImageJob(id string) error {
+	if strings.TrimSpace(id) == "" {
+		return fmt.Errorf("CancelImageJob needs a job id: generation started directly with GenerateImage cannot be cancelled")
+	}
 	if a.jobManager == nil {
 		return fmt.Errorf("job manager not initialized")
 	}
@@ -55,8 +66,12 @@ func (a *App) CancelImageJob(id string) error {
 }
 
 // GenerateImage creates an image using the active model (lazy-loads if needed).
+//
+// This binding is synchronous and deliberately not cancellable: it carries no job
+// identity, so CancelImageJob cannot address it. The cancellable path is
+// StartImageJob; callers that need cancellation must use it instead of this one.
 func (a *App) GenerateImage(opts imagetypes.ImageOptions) (*imagetypes.ImageResult, error) {
-	if err := a.ensureEngineReady(opts.ModelName, opts); err != nil {
+	if err := a.ensureEngineReady(opts.ModelName, "", opts); err != nil {
 		return nil, fmt.Errorf("engine ready failed: %w", err)
 	}
 

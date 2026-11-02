@@ -476,7 +476,7 @@ func assetCompat(family, format string) string {
 		compat = "verified"
 	case "gguf":
 		compat = "supported"
-	case "bundle":
+	case "bundle", "diffusers":
 		compat = "supported"
 	}
 	return compat

@@ -1,0 +1,23 @@
+{
+  "url": "http://127.0.0.1:8799/image-generator.html",
+  "checks": [
+    {
+      "name": "image-1280",
+      "width": 1280, "height": 900,
+      "setup": "void 0;",
+      "js": "(()=>{const main=document.querySelector('.ig-main');const canvas=document.querySelector('.ig-canvas-wrapper');const side=document.querySelector('.ig-sidebar');const hist=document.querySelector('.ig-history-col');const dock=document.querySelector('.ig-prompt-dock');const mr=main.getBoundingClientRect();const cr=canvas.getBoundingClientRect();const sr=side.getBoundingClientRect();const hr=hist.getBoundingClientRect();const dr=dock?dock.getBoundingClientRect():null;return {panel:[Math.round(mr.width),Math.round(mr.height)],pane:true,overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth,canvas:[Math.round(cr.width),Math.round(cr.height)],side:Math.round(sr.width),hist:Math.round(hr.width),canvasShare:Math.round(cr.width/innerWidth*100),promptInMain:!!document.querySelector('.ig-main #ig-prompt'),promptAboveCanvas:dr?dr.top<cr.top:null};})()"
+    },
+    {
+      "name": "image-1600",
+      "width": 1600, "height": 1000,
+      "setup": "void 0;",
+      "js": "(()=>{const main=document.querySelector('.ig-main');const canvas=document.querySelector('.ig-canvas-wrapper');const side=document.querySelector('.ig-sidebar');const hist=document.querySelector('.ig-history-col');const dock=document.querySelector('.ig-prompt-dock');const mr=main.getBoundingClientRect();const cr=canvas.getBoundingClientRect();const sr=side.getBoundingClientRect();const hr=hist.getBoundingClientRect();const dr=dock?dock.getBoundingClientRect():null;return {panel:[Math.round(mr.width),Math.round(mr.height)],pane:true,overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth,canvas:[Math.round(cr.width),Math.round(cr.height)],side:Math.round(sr.width),hist:Math.round(hr.width),canvasShare:Math.round(cr.width/innerWidth*100),promptInMain:!!document.querySelector('.ig-main #ig-prompt'),promptAboveCanvas:dr?dr.top<cr.top:null};})()"
+    },
+    {
+      "name": "image-1920",
+      "width": 1920, "height": 1080,
+      "setup": "void 0;",
+      "js": "(()=>{const main=document.querySelector('.ig-main');const canvas=document.querySelector('.ig-canvas-wrapper');const side=document.querySelector('.ig-sidebar');const hist=document.querySelector('.ig-history-col');const dock=document.querySelector('.ig-prompt-dock');const mr=main.getBoundingClientRect();const cr=canvas.getBoundingClientRect();const sr=side.getBoundingClientRect();const hr=hist.getBoundingClientRect();const dr=dock?dock.getBoundingClientRect():null;return {panel:[Math.round(mr.width),Math.round(mr.height)],pane:true,overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth,canvas:[Math.round(cr.width),Math.round(cr.height)],side:Math.round(sr.width),hist:Math.round(hr.width),canvasShare:Math.round(cr.width/innerWidth*100),promptInMain:!!document.querySelector('.ig-main #ig-prompt'),promptAboveCanvas:dr?dr.top<cr.top:null};})()"
+    }
+  ]
+}

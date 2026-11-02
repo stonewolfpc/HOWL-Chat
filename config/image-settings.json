@@ -1,20 +1,21 @@
 {
   "engine_config": {
     "binary_path": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\sd-server.exe",
-    "models_dir": "E:\\HOWL_Chat\\models",
+    "models_dir": "G:\\AI GGUF\\Image models",
     "output_dir": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\images\\gallery",
     "temp_dir": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\images\\tmp",
     "port": 8081
   },
-  "last_model": "unholyDesireMixSinister_v90",
+  "last_model": "z-image-turbo-Q4_K_M",
   "last_model_opts": {
-    "model": "unholyDesireMixSinister_v90",
-    "model_path": "E:\\AI GGUF\\Image models\\unholyDesireMixSinister_v90.safetensors",
-    "vae": "",
-    "clip_l": "",
+    "model": "z-image-turbo-Q4_K_M",
+    "model_path": "G:\\AI GGUF\\Image models\\z-image-turbo-Q4_K_M.gguf",
+    "family": "z_image",
+    "vae": "G:\\AI GGUF\\Image models\\ae.safetensors",
+    "clip_l": "G:\\AI GGUF\\Image models\\clip_l.safetensors",
     "clip_g": "",
-    "t5xxl": "",
-    "llm": "",
+    "t5xxl": "G:\\AI GGUF\\Image models\\t5xxl_fp8_e4m3fn.safetensors",
+    "llm": "G:\\AI GGUF\\Image models\\qwen_3_4b.safetensors",
     "diffusion_model": ""
   }
 }

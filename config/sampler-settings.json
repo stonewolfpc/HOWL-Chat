@@ -17,7 +17,7 @@
   "repeat_last_n": 64,
   "repeat_penalty": 1.1,
   "seed": 0,
-  "temperature": 1.07,
+  "temperature": 0.2,
   "top_k": 40,
   "top_p": 1,
   "top_p_enabled": false,

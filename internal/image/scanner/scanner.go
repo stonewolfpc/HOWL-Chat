@@ -175,7 +175,22 @@ func (s *Scanner) scanFile(path string, d os.DirEntry) *AssetEntry {
 	sizeMB := float64(info.Size()) / (1024 * 1024)
 	name := d.Name()
 	stem := strings.TrimSuffix(name, filepath.Ext(name))
+	// Read the weights first: an Invoke AI export is called model.safetensors
+	// inside a UUID folder, so the filename knows nothing about it.
+	probe := ProbeWeight(path)
 	nameType := ClassifyName(name)
+	probeType, probeKnowsType := probe.AssetType()
+	// For these two verdicts the contents outrank the filename. A language
+	// model dropped in an image folder was listed as an SD1.5 checkpoint, and
+	// a VAE whose name said nothing was offered as a diffusion model; both
+	// only failed once the engine tried to load them. Family selection has
+	// always trusted the weights first, and the asset type now agrees.
+	if probeKnowsType && (probeType == AssetLLM || probeType == AssetVAE) {
+		nameType = probeType
+	}
+	if nameType == AssetUnknown && probeKnowsType {
+		nameType = probeType
+	}
 	if nameType == AssetUnknown {
 		nameType = ClassifySafetensorsHeader(path)
 	}
@@ -183,7 +198,7 @@ func (s *Scanner) scanFile(path string, d os.DirEntry) *AssetEntry {
 	// Reuse the sidecar only while it still describes this exact file. A model
 	// replaced under the same name has a new size or mtime, so its stale
 	// classification is discarded instead of being shown as truth.
-	if m := LoadManifest(path); m != nil {
+	if m := LoadManifest(path); m != nil && m.Logic == manifestLogicVersion {
 		fresh := m.FileSize == info.Size() && m.ModTimeNS == info.ModTime().UnixNano() && m.FileSize != 0
 		if fresh && (nameType == AssetUnknown || m.Type == nameType) {
 			return manifestToEntry(m, path)
@@ -195,20 +210,32 @@ func (s *Scanner) scanFile(path string, d os.DirEntry) *AssetEntry {
 	var family ModelFamily
 	switch assetType {
 	case AssetDiffusion:
-		family = GuessFamily(stem)
-		if family == FamilyUnknown {
-			return nil // not a diffusion model we can handle
+		// The weights are the authority: a file can be renamed, but its tensor
+		// layout still says Flux or SDXL. The filename is only a fallback for
+		// formats whose contents we cannot read.
+		if f, ok := probe.Family(); ok {
+			family = f
+		} else {
+			family = GuessFamily(stem)
+			if family == FamilyUnknown {
+				return nil // not a diffusion model we can handle
+			}
+			family = upgradeLargeCheckpoint(family, sizeMB)
 		}
-		family = upgradeLargeCheckpoint(family, sizeMB)
 	case AssetLoRA, AssetControlNet, AssetVAE:
-		family = GuessFamily(stem) // best-effort; FamilyUnknown is acceptable
+		if f, ok := probe.Family(); ok {
+			family = f
+		} else {
+			family = GuessFamily(stem) // best-effort; FamilyUnknown is acceptable
+		}
 	default:
 		family = FamilyUnknown
 	}
 
 	rec := buildRecommended(assetType, family)
 	m := &Manifest{
-		Name:        stem,
+		Name:        DisplayName(stem, filepath.Dir(path), probe, family),
+		Logic:       manifestLogicVersion,
 		Type:        assetType,
 		Family:      family,
 		Format:      strings.TrimPrefix(strings.ToLower(filepath.Ext(name)), "."),
@@ -262,6 +289,18 @@ func ClassifySafetensorsHeader(path string) AssetType {
 // ---- directory bundle classification ---------------------------------------
 
 func (s *Scanner) scanDirBundle(dir string) (AssetEntry, bool) {
+	// A Diffusers pipeline is one model made of component folders, not a pile
+	// of loose unet/vae/text_encoder fragments.
+	if pipeline := loadModelIndexClass(dir); pipeline != "" {
+		return s.scanDiffusersBundle(dir, pipeline)
+	}
+
+	// One weight and no companions is a single model that happens to live in a
+	// folder. Calling it a bundle hid its real format and named it after the
+	// folder, which for Invoke is a UUID. Let the walker classify the file.
+	if !hasBundleShape(dir) {
+		return AssetEntry{}, false
+	}
 	// Reuse existing manifest if present
 	if m := LoadDirManifest(dir); m != nil {
 		e := manifestToEntry(m, dir)
@@ -375,9 +414,16 @@ func (s *Scanner) scanDirBundle(dir string) (AssetEntry, bool) {
 		}
 	}
 
+	// The bundle's own weights override component-name guesses.
+	probe := ProbeWeight(fileMap["model"])
+	if f, ok := probe.Family(); ok {
+		family = f
+	}
+
 	rec := buildRecommended(AssetDiffusion, family)
 	m := &Manifest{
-		Name:        dirName,
+		Name:        DisplayName(dirName, dir, probe, family),
+		Logic:       manifestLogicVersion,
 		Type:        AssetDiffusion,
 		Family:      family,
 		Format:      "bundle",
@@ -446,8 +492,8 @@ func buildRecommended(t AssetType, family ModelFamily) Recommended {
 	return Recommended{
 		Sampler:   DefaultSampler(family),
 		Scheduler: "karras",
-		Steps:     20,
-		CFG:       7.0,
+		Steps:     DefaultSteps(family),
+		CFG:       DefaultCFG(family),
 		Width:     res,
 		Height:    res,
 	}

@@ -19,33 +19,36 @@ type LoRAStrength struct {
 
 // ImageOptions describes a single generation request.
 type ImageOptions struct {
-	Prompt            string         `json:"prompt"`
-	NegativePrompt    string         `json:"negative_prompt"`
-	Width             int            `json:"width"`
-	Height            int            `json:"height"`
-	Steps             int            `json:"steps"`
-	Seed              int64          `json:"seed"`
-	Sampler           string         `json:"sampler"`
-	Scheduler         string         `json:"scheduler"`
-	CfgScale          float64        `json:"cfg_scale"`
-	Guidance          float64        `json:"guidance"`  // distilled guidance (SD3/Flux)
-	SlgScale          float64        `json:"slg_scale"` // skip layer guidance
-	SkipLayerStart    float64        `json:"skip_layer_start"`
-	SkipLayerEnd      float64        `json:"skip_layer_end"`
-	Eta               float64        `json:"eta"`             // noise multiplier
-	Strength          float64        `json:"strength"`        // img2img / inpaint
-	InitImagePath     string         `json:"init_image_path"` // img2img / inpaint
-	MaskPath          string         `json:"mask_path"`       // inpaint only
-	ModelName         string         `json:"model_name"`
-	VAEPath           string         `json:"vae_path"`           // standalone VAE
-	ClipLPath         string         `json:"clip_l_path"`        // CLIP-L
-	ClipGPath         string         `json:"clip_g_path"`        // CLIP-G
-	T5XXLPath         string         `json:"t5xxl_path"`         // T5XXL
-	ControlNetPath    string         `json:"control_net_path"`   // ControlNet model
-	ControlImagePath  string         `json:"control_image_path"` // ControlNet image
-	ControlStrength   float64        `json:"control_strength"`   // ControlNet strength
-	BatchCount        int            `json:"batch_count"`
-	Mode              string         `json:"mode"` // "txt2img", "img2img", "inpaint", "outpaint", "upscale", "video"
+	Prompt           string  `json:"prompt"`
+	NegativePrompt   string  `json:"negative_prompt"`
+	Width            int     `json:"width"`
+	Height           int     `json:"height"`
+	Steps            int     `json:"steps"`
+	Seed             int64   `json:"seed"`
+	Sampler          string  `json:"sampler"`
+	Scheduler        string  `json:"scheduler"`
+	CfgScale         float64 `json:"cfg_scale"`
+	Guidance         float64 `json:"guidance"`  // distilled guidance (SD3/Flux)
+	SlgScale         float64 `json:"slg_scale"` // skip layer guidance
+	SkipLayerStart   float64 `json:"skip_layer_start"`
+	SkipLayerEnd     float64 `json:"skip_layer_end"`
+	Eta              float64 `json:"eta"`             // noise multiplier
+	Strength         float64 `json:"strength"`        // img2img / inpaint
+	InitImagePath    string  `json:"init_image_path"` // img2img / inpaint
+	MaskPath         string  `json:"mask_path"`       // inpaint only
+	ModelName        string  `json:"model_name"`
+	VAEPath          string  `json:"vae_path"`           // standalone VAE
+	ClipLPath        string  `json:"clip_l_path"`        // CLIP-L
+	ClipGPath        string  `json:"clip_g_path"`        // CLIP-G
+	T5XXLPath        string  `json:"t5xxl_path"`         // T5XXL
+	ControlNetPath   string  `json:"control_net_path"`   // ControlNet model
+	ControlImagePath string  `json:"control_image_path"` // ControlNet image
+	ControlStrength  float64 `json:"control_strength"`   // ControlNet strength
+	BatchCount       int     `json:"batch_count"`
+	Mode             string  `json:"mode"` // "txt2img", "img2img", "inpaint", "outpaint", "upscale", "video"
+	// JobID identifies the job that owns this request, so a cancellation can be
+	// scoped to it. Empty for callers that are not running a job.
+	JobID             string         `json:"job_id,omitempty"`
 	OutpaintMargin    int            `json:"outpaint_margin,omitempty"`
 	OutpaintDirection string         `json:"outpaint_direction,omitempty"` // "all", "left", "right", "up", "down"
 	UpscaleFactor     int            `json:"upscale_factor,omitempty"`     // 2 or 4
@@ -109,8 +112,16 @@ type ImageOptions struct {
 
 // ModelLoadOptions describes how to load a model, including modular sub-models.
 type ModelLoadOptions struct {
-	ModelName       string `json:"model"`
-	ModelPath       string `json:"model_path,omitempty"` // absolute path; when set, skips directory scan
+	ModelName string `json:"model"`
+	ModelPath string `json:"model_path,omitempty"` // absolute path; when set, skips directory scan
+	// JobID identifies the job that needs this load, so one job's cancellation
+	// cannot abort another job's load. Empty for a load started by the UI.
+	JobID string `json:"job_id,omitempty"`
+	// Family is the architecture the image registry resolved for this model.
+	// The engine can only see its own ModelsDir, so without it a checkpoint that
+	// lives in another scanned folder loses its family and is guessed from the
+	// filename — which is how a Z-Image GGUF was passed as a full checkpoint.
+	Family          string `json:"family,omitempty"`
 	VAEPath         string `json:"vae"`
 	ClipLPath       string `json:"clip_l"`
 	ClipGPath       string `json:"clip_g"`
@@ -208,7 +219,7 @@ type ProgressInfo struct {
 // ImageJob tracks an async generation job.
 type ImageJob struct {
 	ID           string       `json:"id"`
-	Status       string       `json:"status"`                  // "queued", "generating", "completed", "failed", "cancelled"
+	Status       string       `json:"status"`                  // "queued", "loading", "generating", "completed", "failed", "cancelled"
 	Progress     float64      `json:"progress"`                // 0.0 .. 1.0
 	Step         int          `json:"step"`                    // current sampling step
 	TotalSteps   int          `json:"total_steps"`             // total sampling steps

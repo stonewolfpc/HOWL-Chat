@@ -206,6 +206,10 @@ function _renderContent() {
 
     contentEl.innerHTML = breadcrumb + _parseContent(topic.content);
 
+    if (typeof decorateTutorialTopic === 'function') {
+        decorateTutorialTopic(contentEl, topic);
+    }
+
     // Scroll to top
     contentEl.scrollTop = 0;
 }
@@ -220,6 +224,11 @@ function _parseContent(content) {
     // Un-escape our custom tags
     html = html.replace(/&lt;info&gt;(.*?)&lt;\/info&gt;/gs, '<div class="tutorials-info-box"><div class="info-title"><span class="icon icon-info"></span>Note</div><p>$1</p></div>');
     html = html.replace(/&lt;warning&gt;(.*?)&lt;\/warning&gt;/gs, '<div class="tutorials-warning-box"><div class="warning-title"><span class="icon icon-alert"></span>Important</div><p>$1</p></div>');
+
+    // Screenshots and paired examples (tutorials-extras.js).
+    if (typeof extendTutorialMarkdown === 'function') {
+        html = extendTutorialMarkdown(html);
+    }
 
     // Code blocks
     html = html.replace(/```(\w+)?\n(.*?)```/gs, (match, lang, code) => {
@@ -246,7 +255,8 @@ function _parseContent(content) {
 
     // Tables
     html = html.replace(/\|(.+)\|\n\|[-:\s|]+\|\n((?:\|.+)\n?)+/g, (match) => {
-        const lines = match.trim().split('\n').filter(l => l.trim());
+        const NL = String.fromCharCode(10);
+        const lines = match.trim().split(NL).filter(l => l.trim() && !/^[-:| ]+$/.test(l.trim()));
         if (lines.length < 2) return match;
         let tableHtml = '<table class="tutorials-table">';
         lines.forEach((line, i) => {
@@ -277,7 +287,9 @@ function _parseContent(content) {
         if (!trimmed) return '';
         // Skip if already wrapped in a tag
         if (trimmed.startsWith('<h') || trimmed.startsWith('<ul') || trimmed.startsWith('<ol') ||
-            trimmed.startsWith('<table') || trimmed.startsWith('<div') || trimmed.startsWith('<pre')) {
+            trimmed.startsWith('<table') || trimmed.startsWith('<div') || trimmed.startsWith('<pre') ||
+
+            trimmed.startsWith('<figure')) {
             return trimmed;
         }
         return '<p>' + trimmed.replace(/\n/g, ' ') + '</p>';

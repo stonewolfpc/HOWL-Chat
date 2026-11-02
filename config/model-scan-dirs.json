@@ -1,6 +1,5 @@
 {
-  "E:\\AI GGUF\\GGUF": "llm",
-  "E:\\AI GGUF\\Image models": "image",
-  "E:\\HOWL_Chat\\models": "image",
+  "G:\\AI GGUF\\GGUF": "llm",
+  "G:\\AI GGUF\\Image models": "image",
   "H:\\InvokeAI\\models": "image"
 }

@@ -120,3 +120,192 @@
     font-size: 13px;
     color: var(--text-secondary);
 }
+
+/* ---------------------------------------------------------------------------
+   Screenshots, paired examples, on-this-page strip, pager, zoom
+   --------------------------------------------------------------------------- */
+
+.tutorials-content .tutorials-figure {
+    margin: 18px 0;
+}
+
+.tutorials-content .tutorials-figure img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 10px;
+    border: 1px solid var(--border-primary);
+    background: var(--surface-secondary);
+    cursor: zoom-in;
+    transition: border-color 0.15s ease;
+}
+
+.tutorials-content .tutorials-figure img:hover {
+    border-color: var(--theme-color, #14b8a6);
+}
+
+.tutorials-content .tutorials-figure figcaption {
+    margin-top: 8px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--text-tertiary);
+}
+
+/* Paired examples */
+.tutorials-content .tutorials-example {
+    border: 1px solid var(--border-primary);
+    border-radius: 10px;
+    padding: 12px 14px 0;
+    margin: 16px 0;
+    background: var(--surface-secondary);
+}
+
+.tutorials-content .tutorials-example-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.tutorials-content .tutorials-example.good { border-left: 3px solid #22c55e; }
+.tutorials-content .tutorials-example.good .tutorials-example-label { color: #22c55e; }
+.tutorials-content .tutorials-example.bad { border-left: 3px solid #ef4444; }
+.tutorials-content .tutorials-example.bad .tutorials-example-label { color: #ef4444; }
+
+.tutorials-content .tutorials-example-body p:last-child {
+    margin-bottom: 10px;
+}
+
+/* On this page */
+.tutorials-toc {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 14px 0 18px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-primary);
+    border-radius: 10px;
+    background: var(--surface-secondary);
+}
+
+.tutorials-toc-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-tertiary);
+    margin-right: 4px;
+}
+
+.tutorials-toc-link {
+    font-size: 12.5px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: var(--surface-tertiary);
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+
+.tutorials-toc-link:hover {
+    color: var(--static-text, var(--text-primary));
+    background: var(--surface-hover);
+    text-decoration: none;
+}
+
+/* Prev / next */
+.tutorials-pager {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 32px 0 8px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border-primary);
+}
+
+.tutorials-pager-btn {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: flex-start;
+    max-width: 48%;
+    padding: 10px 14px;
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 10px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    text-align: left;
+}
+
+.tutorials-pager-btn.next {
+    align-items: flex-end;
+    text-align: right;
+    margin-left: auto;
+}
+
+.tutorials-pager-btn:hover {
+    border-color: var(--theme-color, #14b8a6);
+    color: var(--static-text, var(--text-primary));
+}
+
+.tutorials-pager-dir {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-tertiary);
+}
+
+.tutorials-pager-name {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Screenshot zoom */
+.tutorials-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    background: rgba(0, 0, 0, 0.88);
+    cursor: zoom-out;
+}
+
+.tutorials-lightbox.show {
+    display: flex;
+}
+
+.tutorials-lightbox figure {
+    margin: 0;
+    max-width: 96vw;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tutorials-lightbox img {
+    max-width: 96vw;
+    max-height: 84vh;
+    object-fit: contain;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.tutorials-lightbox figcaption {
+    font-size: 13px;
+    color: #d4d4dd;
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    .tutorials-pager { flex-direction: column; }
+    .tutorials-pager-btn { max-width: 100%; }
+    .tutorials-pager-btn.next { margin-left: 0; }
+}

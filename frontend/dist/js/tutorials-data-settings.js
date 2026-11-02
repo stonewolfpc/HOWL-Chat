@@ -43,44 +43,55 @@ All sampler settings apply **per token**. The model recalculates everything for 
             title: 'Temperature',
             content: `# Temperature
 
-**Slider**: 0.0 to 2.0 | **Step**: 0.01 | **Default**: 0.7
+**Range** 0.0 – 2.0 · **Step** 0.01 · **Default** 0.7
+**Where** Settings → Sampler Settings → Core Settings
 
-Temperature scales the model's confidence before it picks a token. It is applied to the raw "logit" scores the model outputs.
+Temperature rescales every token's score before the sampler picks one. Below 1.0 the model keeps choosing the words it already expects; above 1.0 the long shots get a real chance.
 
-## How It Works
+![Sampler Settings with Temperature at 0.2](img/tutorials/sampler-sheet.png "Settings → Sampler Settings. Temperature is the first card in Core Settings; the slider and the number box hold the same value.")
 
-- **Low temperature** (0.0–0.3) → The model strongly favors the most likely token. Output is focused, factual, and repetitive.
-- **Medium temperature** (0.5–0.9) → Balanced creativity. Good for general chat and storytelling.
-- **High temperature** (1.0–2.0) → The model explores unlikely tokens. Output becomes more random, creative, and sometimes incoherent.
+## What it actually changes
 
-## What the Numbers Mean
+The model does not choose a word. It scores every token in its vocabulary, then the sampler picks one. Temperature bends those scores before the pick:
 
-| Value | Effect |
-|-------|--------|
-| **0.0** | Greedy — always picks the highest-probability token. Deterministic. |
-| **0.3** | Very focused. Good for code, math, and strict instruction following. |
-| **0.7** | Balanced. Default for most creative writing and chat. |
-| **1.0** | No scaling. The model uses its raw probabilities. |
-| **1.5** | Highly creative. Unexpected word choices, surprising dialogue. |
-| **2.0** | Maximum randomness. Often produces surreal or broken text. |
+- **Below 1.0** — the gap between the best token and the rest widens. Focused, safe, and eventually repetitive.
+- **At 1.0** — the model's own probabilities, untouched.
+- **Above 1.0** — the gap narrows until unlikely words stay in the running.
 
-## Example
+Same weights, same prompt, same history. Only the dice change.
 
-Prompt: *"The wizard opened the door and saw a"*
+## The same prompt, three settings
 
-- **Temp 0.3**: "dragon sitting on a pile of gold."
-- **Temp 0.7**: "strange glowing portal swirling with purple energy."
-- **Temp 1.5**: "melon made of clockwork, ticking softly in the moonlight."
+Prompt: *"The innkeeper slides the key across the counter and says"*
 
-## Conflicts & Warnings
+<bad>**0.2** — “The innkeeper slides the key across the counter and says, ‘Your room is ready.’ She slides the key across the counter and says, ‘Your room is ready.’ The innkeeper slides the key across the counter and says…” — grammatically perfect and completely stuck. At 0.2 the most probable continuation wins almost every time, so the scene repeats instead of advancing. This is the “very very very” loop people blame on the model.</bad>
 
-- **Overridden by Mirostat**: If Mirostat Mode is enabled (> 0), temperature is ignored entirely. Mirostat dynamically controls its own temperature.
-- **Interacts with Dynamic Temperature**: If Dynamic Temperature Range is enabled, the base temperature is modified per-token based on probability.
+<good>**0.7** — “The innkeeper slides the key across the counter and says, ‘Third door on the left. Don't mind the scratching — that's the pipes.’ She doesn't look up from the glass she's drying.” — a concrete detail, a hook, and something the next message can build on. This is what the default is for.</good>
+
+<bad>**1.6** — “The innkeeper slides the key across the counter and says, ‘The marmalade remembers your grandmother's violin, third door on the left of Thursday.’ The pipes begin to spell her name in gravy.” — vivid, and unusable: nothing here can be followed up without the story losing its thread.</bad>
+
+## Reading the result
+
+| What you see | What it usually means |
+|---|---|
+| Scenes loop or paraphrase themselves | Too low — raise by 0.1 |
+| Character voice flattens into narration | Too low, or repetition penalties are fighting it |
+| Vivid details that contradict two lines later | Too high — lower by 0.1–0.2 |
+| Fine output, then a burst of nonsense | Too high, or the context is nearly full |
+
+## Interactions
+
+- **Mirostat overrides it.** With Mirostat Mode above 0, temperature is ignored entirely — Mirostat sets its own.
+- **Dynamic Temperature bends it per token.** With a range set, the base value becomes a floor or ceiling rather than a fixed number.
+- **Top-P and Min-P pick the shortlist first.** Temperature cannot rescue tokens those filters already removed.
+- **Repetition penalties act separately.** A loop at 0.7 is usually a penalty problem, not a temperature problem.
 
 <info>
-Temperature appears in both **Core Settings** and **Advanced Controls**. Both sliders control the same backend value. The Core slider (step 0.01) gives finer control.
-</info>`
+Change one sampler value at a time and re-run the same prompt. Moving three at once makes it impossible to tell which one helped.
+</info>
+`
         },
+
         {
             id: 'sampler-top-p',
             title: 'Top-P (Nucleus Sampling)',

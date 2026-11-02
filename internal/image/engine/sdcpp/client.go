@@ -2,6 +2,7 @@ package sdcpp
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -184,19 +185,35 @@ func safePrefix(s string) string {
 	return s
 }
 
+// controlTimeout bounds the requests that ask the engine what it is doing.
+// Generation itself stays unbounded, because a 1024x1024 run legitimately takes
+// minutes — but a status probe that never returns is how the job poller lost
+// contact with a dead engine and left the UI spinning on "Generating...".
+const controlTimeout = 3 * time.Second
+
 // client talks to sd-server over HTTP.
 type client struct {
-	baseURL     string
-	http        *http.Client
-	mu          sync.Mutex
-	activeJobID string
-	cancelled   bool
+	baseURL   string
+	http      *http.Client
+	httpShort *http.Client
+	mu        sync.Mutex
+	// activeJobID is the async job the progress poller should query, and
+	// activeJobToken is the ownership token of whoever set it. A request that
+	// finishes late can only clear the id it actually owns.
+	activeJobID    string
+	activeJobToken uint64
+	// pollTimeout bounds how long an async job may stay unfinished before the
+	// request gives up. It is a field, not a constant, so tests can exercise the
+	// timeout path without waiting ten minutes.
+	pollTimeout time.Duration
 }
 
 func newClient(baseURL string) *client {
 	return &client{
-		baseURL: baseURL,
-		http:    &http.Client{Timeout: 0}, // No timeout for long generations
+		baseURL:     baseURL,
+		http:        &http.Client{Timeout: 0}, // No timeout for long generations
+		httpShort:   &http.Client{Timeout: controlTimeout},
+		pollTimeout: 600 * time.Second,
 	}
 }
 
@@ -205,14 +222,43 @@ func (c *client) resetState() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.activeJobID = ""
-	c.cancelled = false
+	c.activeJobToken++
+}
+
+// setActiveJob records the async job this request owns for progress purposes and
+// returns its ownership token.
+func (c *client) setActiveJob(id string) uint64 {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.activeJobID = id
+	c.activeJobToken++
+	return c.activeJobToken
+}
+
+// resetActiveJob clears the id the progress poller queries, but only when the
+// token still belongs to the request doing the clearing. Without the token an
+// abandoned request unwinding after a newer one had claimed progress would wipe
+// the newer job's id.
+func (c *client) resetActiveJob(token uint64) {
+	c.mu.Lock()
+	if c.activeJobToken == token {
+		c.activeJobID = ""
+	}
+	c.mu.Unlock()
+}
+
+// activeJob reports the async job progress should be read from, if any.
+func (c *client) activeJob() string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.activeJobID
 }
 
 // generateSequentialBatch splits a multi-image batch into sequential
 // single-image requests to avoid CUDA OOM. sd-server allocates all
 // batch latents simultaneously in a true batch, which exceeds VRAM.
 // Each image is saved immediately upon completion.
-func (c *client) generateSequentialBatch(singleGen func(types.ImageOptions) (*types.ImageResult, error), opts types.ImageOptions) (*types.ImageResult, error) {
+func (c *client) generateSequentialBatch(ctx context.Context, singleGen func(context.Context, types.ImageOptions) (*types.ImageResult, error), opts types.ImageOptions) (*types.ImageResult, error) {
 	var firstResult *types.ImageResult
 	var firstSeed = opts.Seed
 	var allImages []string
@@ -220,12 +266,11 @@ func (c *client) generateSequentialBatch(singleGen func(types.ImageOptions) (*ty
 	fmt.Printf("[ImageEngine] Batch: generating %d images sequentially (initial seed=%d)\n", opts.BatchCount, firstSeed)
 
 	for i := 0; i < opts.BatchCount; i++ {
-		c.mu.Lock()
-		cancelled := c.cancelled
-		c.mu.Unlock()
-		if cancelled {
+		// The batch stops between items once its request is cancelled; items already
+		// generated are kept.
+		if ctx.Err() != nil {
 			if firstResult == nil {
-				return nil, fmt.Errorf("batch cancelled")
+				return nil, ctx.Err()
 			}
 			fmt.Printf("[ImageEngine] Batch interrupted by cancellation at item %d/%d\n", i+1, opts.BatchCount)
 			break
@@ -243,7 +288,7 @@ func (c *client) generateSequentialBatch(singleGen func(types.ImageOptions) (*ty
 			singleOpts.Seed = firstSeed + int64(i)
 		}
 
-		result, err := singleGen(singleOpts)
+		result, err := singleGen(ctx, singleOpts)
 		if err != nil {
 			if firstResult == nil {
 				return nil, fmt.Errorf("batch item %d/%d failed: %w", i+1, opts.BatchCount, err)
@@ -276,12 +321,22 @@ func (c *client) generateSequentialBatch(singleGen func(types.ImageOptions) (*ty
 	return firstResult, nil
 }
 
+// probe asks the engine once whether it answers, under a bounded timeout. A
+// single request the caller can interleave with a process-liveness check, which
+// a blocking readiness loop cannot do: it cannot notice the child has died.
+func (c *client) probe() error {
+	resp, err := c.httpShort.Get(c.baseURL + "/sdapi/v1/samplers")
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
+}
+
 func (c *client) waitForReady(timeout time.Duration) error {
 	deadline := time.Now().Add(timeout)
 	for time.Now().Before(deadline) {
-		resp, err := c.http.Get(c.baseURL + "/sdapi/v1/samplers")
-		if err == nil {
-			resp.Body.Close()
+		if err := c.probe(); err == nil {
 			return nil
 		}
 		time.Sleep(500 * time.Millisecond)
@@ -395,12 +450,9 @@ type txt2imgResponse struct {
 	Info       string   `json:"info"`
 }
 
-func (c *client) txt2img(opts types.ImageOptions) (*types.ImageResult, error) {
+func (c *client) txt2img(ctx context.Context, opts types.ImageOptions) (*types.ImageResult, error) {
 	if opts.BatchCount > 1 {
-		return c.generateSequentialBatch(func(o types.ImageOptions) (*types.ImageResult, error) {
-			o.BatchCount = 1
-			return c.txt2img(o)
-		}, opts)
+		return c.generateSequentialBatch(ctx, c.txt2img, opts)
 	}
 	var ctrlImgB64 string
 	if opts.ControlImagePath != "" {
@@ -516,7 +568,7 @@ func (c *client) txt2img(opts types.ImageOptions) (*types.ImageResult, error) {
 
 	jsonData, err := json.Marshal(reqBody)
 	if err != nil {
-		return nil, fmt.Errorf("marshal request: %w", err)
+		return nil, notDispatched(fmt.Errorf("marshal request: %w", err))
 	}
 
 	fmt.Printf("[DEBUG] txt2img request JSON: %s\n", string(jsonData))
@@ -524,7 +576,14 @@ func (c *client) txt2img(opts types.ImageOptions) (*types.ImageResult, error) {
 	// Use synchronous API (/sdapi/v1/txt2img) because async job API has critical limitations:
 	// 1. Does not respect steps parameter (always uses default 20)
 	// 2. Does not return progress/preview data for live preview
-	resp, err := c.http.Post(c.baseURL+"/sdapi/v1/txt2img", "application/json", bytes.NewBuffer(jsonData))
+	// The context is what makes cancellation real on this path: http.Post builds a
+	// request nothing can abort, so a cancelled job used to leave its goroutine
+	// blocked in the call until the server answered.
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/sdapi/v1/txt2img", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, notDispatched(fmt.Errorf("build txt2img request: %w", err))
+	}
+	resp, err := c.http.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("sd-server txt2img request failed: %w", err)
 	}
@@ -561,45 +620,29 @@ func (c *client) txt2img(opts types.ImageOptions) (*types.ImageResult, error) {
 	}, nil
 }
 
-func (c *client) cancelJob(jobID string) error {
-	c.mu.Lock()
-	if jobID == "" {
-		jobID = c.activeJobID
-	}
-	c.cancelled = true
-	c.mu.Unlock()
-	if jobID == "" {
-		return nil
-	}
-	req, err := http.NewRequest(http.MethodDelete, c.baseURL+"/sdcpp/v1/jobs/"+jobID, nil)
-	if err != nil {
-		return err
-	}
-	resp, err := c.http.Do(req)
-	if err != nil {
-		return err
-	}
-	resp.Body.Close()
-	return nil
-}
+// This client deliberately has no cancel-endpoint call.
+//
+// A DELETE /sdcpp/v1/jobs/{id} used to be sent for async jobs, but whether this
+// build honours it is unestablished
+// (build/logs/cancelled-generation-contract-audit.md). Calling a guessed endpoint
+// is how an app comes to tell a user that work stopped when it did not.
+// Cancellation closes the client request; ownership of what the server may still
+// be doing lives in generation.go.
 
-func (c *client) resetCancel() {
-	c.mu.Lock()
-	c.cancelled = false
-	c.mu.Unlock()
-}
-
-func (c *client) pollJob(jobID string) (*sdcppJob, error) {
-	deadline := time.Now().Add(600 * time.Second)
-	for time.Now().Before(deadline) {
-		c.mu.Lock()
-		cancelled := c.cancelled
-		c.mu.Unlock()
-		if cancelled {
-			return nil, fmt.Errorf("job cancelled")
+func (c *client) pollJob(ctx context.Context, jobID string) (*sdcppJob, error) {
+	deadline := time.NewTimer(c.pollTimeout)
+	defer deadline.Stop()
+	tick := time.NewTicker(500 * time.Millisecond)
+	defer tick.Stop()
+	for {
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
 		}
-
-		resp, err := c.http.Get(c.baseURL + "/sdcpp/v1/jobs/" + jobID)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+"/sdcpp/v1/jobs/"+jobID, nil)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.http.Do(req)
 		if err != nil {
 			return nil, err
 		}
@@ -632,11 +675,18 @@ func (c *client) pollJob(jobID string) (*sdcppJob, error) {
 		case "failed":
 			return nil, fmt.Errorf("job failed: %s", job.Error)
 		case "cancelled":
-			return nil, fmt.Errorf("job cancelled")
+			// The server reported it stopped this one, which is a backend statement
+			// this client can pass on.
+			return nil, fmt.Errorf("job cancelled by the engine")
 		}
-		time.Sleep(500 * time.Millisecond)
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-deadline.C:
+			return nil, fmt.Errorf("job poll timeout")
+		case <-tick.C:
+		}
 	}
-	return nil, fmt.Errorf("job poll timeout")
 }
 
 type img2imgRequest struct {
@@ -709,20 +759,17 @@ type img2imgRequest struct {
 	HighNoiseSkipLayerEnd   float64       `json:"high_noise_skip_layer_end,omitempty"`
 }
 
-func (c *client) img2img(opts types.ImageOptions) (*types.ImageResult, error) {
+func (c *client) img2img(ctx context.Context, opts types.ImageOptions) (*types.ImageResult, error) {
 	if opts.BatchCount > 1 {
-		return c.generateSequentialBatch(func(o types.ImageOptions) (*types.ImageResult, error) {
-			o.BatchCount = 1
-			return c.img2img(o)
-		}, opts)
+		return c.generateSequentialBatch(ctx, c.img2img, opts)
 	}
 	if opts.InitImagePath == "" {
-		return nil, fmt.Errorf("img2img requires an init image path")
+		return nil, notDispatched(fmt.Errorf("img2img requires an init image path"))
 	}
 
 	imgData, err := os.ReadFile(opts.InitImagePath)
 	if err != nil {
-		return nil, fmt.Errorf("read init image: %w", err)
+		return nil, notDispatched(fmt.Errorf("read init image: %w", err))
 	}
 	b64Img := base64.StdEncoding.EncodeToString(imgData)
 
@@ -841,11 +888,15 @@ func (c *client) img2img(opts types.ImageOptions) (*types.ImageResult, error) {
 
 	jsonData, err := json.Marshal(reqBody)
 	if err != nil {
-		return nil, fmt.Errorf("marshal img2img request: %w", err)
+		return nil, notDispatched(fmt.Errorf("marshal img2img request: %w", err))
 	}
 
 	// Use async job API for live preview support
-	resp, err := c.http.Post(c.baseURL+"/sdcpp/v1/img_gen", "application/json", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/sdcpp/v1/img_gen", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, notDispatched(fmt.Errorf("build img_gen request: %w", err))
+	}
+	resp, err := c.http.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("sd-server img_gen request failed: %w", err)
 	}
@@ -865,13 +916,12 @@ func (c *client) img2img(opts types.ImageOptions) (*types.ImageResult, error) {
 		return nil, fmt.Errorf("no job ID in response")
 	}
 
-	// Store active job ID for progress polling
-	c.mu.Lock()
-	c.activeJobID = jobResp.ID
-	c.mu.Unlock()
+	// Own the progress id with a token: a late cleanup may only clear its own.
+	token := c.setActiveJob(jobResp.ID)
 
-	// Poll job until completion
-	job, err := c.pollJob(jobResp.ID)
+	// Poll job until completion.
+	job, err := c.pollJob(ctx, jobResp.ID)
+	c.resetActiveJob(token)
 	if err != nil {
 		return nil, err
 	}
@@ -899,27 +949,24 @@ func (c *client) img2img(opts types.ImageOptions) (*types.ImageResult, error) {
 	}, nil
 }
 
-func (c *client) inpaint(opts types.ImageOptions) (*types.ImageResult, error) {
+func (c *client) inpaint(ctx context.Context, opts types.ImageOptions) (*types.ImageResult, error) {
 	if opts.BatchCount > 1 {
-		return c.generateSequentialBatch(func(o types.ImageOptions) (*types.ImageResult, error) {
-			o.BatchCount = 1
-			return c.inpaint(o)
-		}, opts)
+		return c.generateSequentialBatch(ctx, c.inpaint, opts)
 	}
 	if opts.InitImagePath == "" {
-		return nil, fmt.Errorf("inpaint requires an init image path")
+		return nil, notDispatched(fmt.Errorf("inpaint requires an init image path"))
 	}
 	if opts.MaskPath == "" {
-		return nil, fmt.Errorf("inpaint requires a mask path")
+		return nil, notDispatched(fmt.Errorf("inpaint requires a mask path"))
 	}
 
 	imgData, err := os.ReadFile(opts.InitImagePath)
 	if err != nil {
-		return nil, fmt.Errorf("read init image: %w", err)
+		return nil, notDispatched(fmt.Errorf("read init image: %w", err))
 	}
 	maskData, err := os.ReadFile(opts.MaskPath)
 	if err != nil {
-		return nil, fmt.Errorf("read mask: %w", err)
+		return nil, notDispatched(fmt.Errorf("read mask: %w", err))
 	}
 	b64Img := base64.StdEncoding.EncodeToString(imgData)
 	b64Mask := base64.StdEncoding.EncodeToString(maskData)
@@ -1034,11 +1081,15 @@ func (c *client) inpaint(opts types.ImageOptions) (*types.ImageResult, error) {
 
 	jsonData, err := json.Marshal(reqBody)
 	if err != nil {
-		return nil, fmt.Errorf("marshal inpaint request: %w", err)
+		return nil, notDispatched(fmt.Errorf("marshal inpaint request: %w", err))
 	}
 
 	// Use async job API for live preview support
-	resp, err := c.http.Post(c.baseURL+"/sdcpp/v1/img_gen", "application/json", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/sdcpp/v1/img_gen", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, notDispatched(fmt.Errorf("build img_gen request: %w", err))
+	}
+	resp, err := c.http.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("sd-server img_gen request failed: %w", err)
 	}
@@ -1058,13 +1109,12 @@ func (c *client) inpaint(opts types.ImageOptions) (*types.ImageResult, error) {
 		return nil, fmt.Errorf("no job ID in response")
 	}
 
-	// Store active job ID for progress polling
-	c.mu.Lock()
-	c.activeJobID = jobResp.ID
-	c.mu.Unlock()
+	// Own the progress id with a token: a late cleanup may only clear its own.
+	token := c.setActiveJob(jobResp.ID)
 
-	// Poll job until completion
-	job, err := c.pollJob(jobResp.ID)
+	// Poll job until completion.
+	job, err := c.pollJob(ctx, jobResp.ID)
+	c.resetActiveJob(token)
 	if err != nil {
 		return nil, err
 	}
@@ -1127,17 +1177,16 @@ type sdcppJob struct {
 }
 
 func (c *client) progress() (types.ProgressInfo, error) {
-	c.mu.Lock()
-	jobID := c.activeJobID
-	c.mu.Unlock()
+	jobID := c.activeJob()
 
 	// /sdapi/v1/progress is job-agnostic and is the only place a decoded
 	// preview frame shows up (current_image), so it has to be queried even
 	// when no async job id exists. The id is only needed by the fallback.
 	fmt.Printf("[DEBUG] progress() called (jobID=%q)", jobID)
 
-	// Try legacy /sdapi/v1/progress endpoint first (may have preview data)
-	resp, err := c.http.Get(c.baseURL + "/sdapi/v1/progress")
+	// Try legacy /sdapi/v1/progress endpoint first (may have preview data).
+	// Bounded, so a stalled engine hands control back to the job poller.
+	resp, err := c.httpShort.Get(c.baseURL + "/sdapi/v1/progress")
 	if err == nil {
 		defer resp.Body.Close()
 		if resp.StatusCode == http.StatusOK {
@@ -1165,7 +1214,7 @@ func (c *client) progress() (types.ProgressInfo, error) {
 	}
 
 	// Fallback to async job endpoint
-	resp, err = c.http.Get(c.baseURL + "/sdcpp/v1/jobs/" + jobID)
+	resp, err = c.httpShort.Get(c.baseURL + "/sdcpp/v1/jobs/" + jobID)
 	if err != nil {
 		fmt.Printf("[DEBUG] progress() HTTP error: %v\n", err)
 		return types.ProgressInfo{}, err

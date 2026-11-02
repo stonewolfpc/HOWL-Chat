@@ -1,0 +1,32 @@
+{
+  "url": "http://127.0.0.1:8799/index.html",
+  "outDir": "frontend/dist/img/tutorials",
+  "width": 1600,
+  "height": 1000,
+  "scale": 2,
+  "shots": [
+    {
+      "name": "sampler-sheet",
+      "setup": "if (typeof openTutorials === 'function' && document.getElementById('tutorials-overlay')?.classList.contains('show')) closeTutorials(); toggleFlyout('sampler-settings-flyout');",
+      "selector": "#sampler-settings-flyout"
+    },
+    {
+      "name": "model-sheet",
+      "setup": "const sf=document.getElementById('sampler-settings-flyout');if(sf)sf.classList.remove('show');const ov=document.getElementById('flyout-overlay');if(ov)ov.classList.remove('show');toggleModelSettingsFlyout();",
+      "selector": "#model-settings-flyout",
+      "settle": 600
+    },
+    {
+      "name": "tutorial-temperature",
+      "setup": "const sf=document.getElementById('sampler-settings-flyout');if(sf)sf.classList.remove('show');const mf=document.getElementById('model-settings-flyout');if(mf)mf.classList.remove('show');openTutorials('sampler-temperature');",
+      "selector": ".tutorials-container",
+      "settle": 900
+    },
+    {
+      "name": "tutorial-examples",
+      "setup": "openTutorials('sampler-temperature');const c=document.getElementById('tutorials-content');const g=c.querySelector('.tutorials-example.good');if(g){c.scrollTop += g.getBoundingClientRect().top - c.getBoundingClientRect().top - 60;}",
+      "selector": "#tutorials-content",
+      "settle": 900
+    }
+  ]
+}

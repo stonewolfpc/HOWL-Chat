@@ -170,3 +170,55 @@
 #sampler-settings-flyout .flyout-content::-webkit-scrollbar-thumb:hover {
     background: #3a3f46;
 }
+
+/* Full-screen at every resolution: the sheet tracks the window, the grid
+   reflows by available width, and the columns stop growing on 4K displays. */
+#sampler-settings-flyout.flyout {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
+    border: none;
+    border-radius: 0;
+}
+
+#sampler-settings-flyout .flyout-content {
+    padding: clamp(10px, 1.4vh, 22px) clamp(14px, 2.2vw, 48px);
+}
+
+#sampler-settings-flyout .settings-grid {
+    grid-template-columns: repeat(auto-fit, minmax(clamp(240px, 16vw, 320px), 1fr));
+    max-width: 2200px;
+    margin-inline: auto;
+}
+
+/* The other two .flyout workspaces (story tools, memories) follow the same
+   rule: edge to edge at any window size, only their content scrolls. */
+#story-tools-flyout.flyout,
+#memories-flyout.flyout {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+/* auto-fit was sizing the grid to max-content inside the flex column, so it
+   stayed 6 x 250 + gaps = 1550px wide at every window and the last column was
+   clipped once the window was narrower. A definite width makes auto-fit track
+   the real container instead, and min(240px, 100%) keeps it safe when the
+   container itself is narrower than one card. */
+#sampler-settings-flyout .flyout-content {
+    align-items: stretch;
+}
+
+#sampler-settings-flyout .settings-grid {
+    width: 100%;
+    max-width: 2200px;
+    margin-inline: auto;
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}

@@ -273,6 +273,9 @@ Separate pass, its own stage, after everything above. Look for waste everywhere.
 
 Append here as stages close. One line each: date, stage, evidence, result.
 
+- 2026-11-02 · Image generation settlement guard — source review PASS; stage-recorded tests PASS; independent review PASS; real-app acceptance PASS on verified build `d7e8aacd…` (PID 9252): abort leaves child alive, next request refused as abandoned, Unload/Reload recovers, work admitted after reset. Closed with no code change; the earlier live run had tested a pre-guard 18:59 binary. Unresolved: why the old sd-server exited.
+- 2026-11-02 · T2.1 Stage C (remaining pages theme verification) — five pages measured in both themes through `setThemeMode` with transitions off: 0 low-contrast nodes and 0 stuck-dark areas in light, expected dark panels only in dark, filled buttons carry `--on-accent`. No code changed (nothing needed correcting). Corrections recorded: `real-settings.html` no longer exists (deleted by T2.2), and a "stuck light flyout" reading was retracted as a 600 ms-vs-4 s transition artifact. Open: override-sheet deletion, top-bar collision, `audio-settings` dark body background, and process reaping that trusts recorded state over parent identity.
+
 
 ### T2.4 · Speaker identity in chat (thumbnail or initial)
 **Gap:** names alone are too slow to parse in a hurry — the eye locks onto an

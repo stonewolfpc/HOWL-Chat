@@ -1,0 +1,111 @@
+{
+  "url": "http://127.0.0.1:8799/index.html",
+  "checks": [
+    {
+      "name": "tutorials",
+      "width": 1024,
+      "height": 768,
+      "setup": "openTutorials('sampler-temperature');",
+      "js": "(()=>{const c=document.querySelector('.tutorials-container');const r=c.getBoundingClientRect();return {panel:[Math.round(r.width),Math.round(r.height)],overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth,nav:Math.round(document.getElementById('tutorials-nav').getBoundingClientRect().width)};})()"
+    },
+    {
+      "name": "tutorials",
+      "width": 1280,
+      "height": 720,
+      "setup": "openTutorials('sampler-temperature');",
+      "js": "(()=>{const c=document.querySelector('.tutorials-container');const r=c.getBoundingClientRect();return {panel:[Math.round(r.width),Math.round(r.height)],overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth,nav:Math.round(document.getElementById('tutorials-nav').getBoundingClientRect().width)};})()"
+    },
+    {
+      "name": "tutorials",
+      "width": 1600,
+      "height": 900,
+      "setup": "openTutorials('sampler-temperature');",
+      "js": "(()=>{const c=document.querySelector('.tutorials-container');const r=c.getBoundingClientRect();return {panel:[Math.round(r.width),Math.round(r.height)],overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth,nav:Math.round(document.getElementById('tutorials-nav').getBoundingClientRect().width)};})()"
+    },
+    {
+      "name": "tutorials",
+      "width": 1920,
+      "height": 1080,
+      "setup": "openTutorials('sampler-temperature');",
+      "js": "(()=>{const c=document.getElementById('tutorials-content');const h=c.querySelector('h1');const cr=c.getBoundingClientRect();const hr=h.getBoundingClientRect();const cs=getComputedStyle(c);const boxL=cr.left+parseFloat(cs.paddingLeft),boxR=cr.right-parseFloat(cs.paddingRight);return {panel:[Math.round(cr.width),Math.round(cr.height)],pane:true,overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth,colWidth:Math.round(hr.width),leftGap:Math.round(hr.left-boxL),rightGap:Math.round(boxR-hr.right)};})()",
+      "pane": true
+    },
+    {
+      "name": "tutorials",
+      "width": 2560,
+      "height": 1440,
+      "setup": "openTutorials('sampler-temperature');",
+      "js": "(()=>{const c=document.querySelector('.tutorials-container');const r=c.getBoundingClientRect();return {panel:[Math.round(r.width),Math.round(r.height)],overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth,nav:Math.round(document.getElementById('tutorials-nav').getBoundingClientRect().width)};})()"
+    },
+    {
+      "name": "sampler",
+      "width": 1366,
+      "height": 768,
+      "setup": "toggleFlyout('sampler-settings-flyout');",
+      "js": "(()=>{const f=document.getElementById('sampler-settings-flyout');const r=f.getBoundingClientRect();const g=f.querySelector('.settings-grid');return {panel:[Math.round(r.width),Math.round(r.height)],overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth,cols:getComputedStyle(g).gridTemplateColumns.split(' ').length};})()"
+    },
+    {
+      "name": "sampler",
+      "width": 1920,
+      "height": 1080,
+      "setup": "toggleFlyout('sampler-settings-flyout');",
+      "js": "(()=>{const f=document.getElementById('sampler-settings-flyout');const r=f.getBoundingClientRect();const g=f.querySelector('.settings-grid');return {panel:[Math.round(r.width),Math.round(r.height)],overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth,cols:getComputedStyle(g).gridTemplateColumns.split(' ').length};})()"
+    },
+    {
+      "name": "sampler",
+      "width": 2560,
+      "height": 1440,
+      "setup": "toggleFlyout('sampler-settings-flyout');",
+      "js": "(()=>{const f=document.getElementById('sampler-settings-flyout');const r=f.getBoundingClientRect();const g=f.querySelector('.settings-grid');return {panel:[Math.round(r.width),Math.round(r.height)],overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth,cols:getComputedStyle(g).gridTemplateColumns.split(' ').length};})()"
+    },
+    {
+      "name": "model",
+      "width": 1600,
+      "height": 900,
+      "setup": "toggleModelSettingsFlyout();",
+      "js": "(()=>{const f=document.getElementById('model-settings-flyout');const r=f.getBoundingClientRect();const g=f.querySelector('.settings-grid');return {panel:[Math.round(r.width),Math.round(r.height)],overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth,cols:getComputedStyle(g).gridTemplateColumns.split(' ').length};})()"
+    },
+    {
+      "name": "model",
+      "width": 2560,
+      "height": 1440,
+      "setup": "toggleModelSettingsFlyout();",
+      "js": "(()=>{const f=document.getElementById('model-settings-flyout');const r=f.getBoundingClientRect();const g=f.querySelector('.settings-grid');return {panel:[Math.round(r.width),Math.round(r.height)],overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth,cols:getComputedStyle(g).gridTemplateColumns.split(' ').length};})()"
+    },
+    {
+      "name": "settings",
+      "width": 1366,
+      "height": 768,
+      "setup": "openRealSettings();",
+      "js": "(()=>{const f=document.querySelector('.real-settings-container');const r=f.getBoundingClientRect();return {panel:[Math.round(r.width),Math.round(r.height)],overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth};})()"
+    },
+    {
+      "name": "settings",
+      "width": 1920,
+      "height": 1080,
+      "setup": "openRealSettings();",
+      "js": "(()=>{const f=document.querySelector('.real-settings-container');const r=f.getBoundingClientRect();return {panel:[Math.round(r.width),Math.round(r.height)],overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth};})()"
+    },
+    {
+      "name": "storytools",
+      "width": 1024,
+      "height": 768,
+      "setup": "const f=document.getElementById('story-tools-flyout');f.classList.add('show');document.getElementById('flyout-overlay').classList.add('show');",
+      "js": "(()=>{const f=document.getElementById('story-tools-flyout');const r=f.getBoundingClientRect();return {panel:[Math.round(r.width),Math.round(r.height)],overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth};})()"
+    },
+    {
+      "name": "storytools",
+      "width": 1600,
+      "height": 900,
+      "setup": "const f=document.getElementById('story-tools-flyout');f.classList.add('show');document.getElementById('flyout-overlay').classList.add('show');",
+      "js": "(()=>{const f=document.getElementById('story-tools-flyout');const r=f.getBoundingClientRect();return {panel:[Math.round(r.width),Math.round(r.height)],overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth};})()"
+    },
+    {
+      "name": "storytools",
+      "width": 2560,
+      "height": 1440,
+      "setup": "const f=document.getElementById('story-tools-flyout');f.classList.add('show');document.getElementById('flyout-overlay').classList.add('show');",
+      "js": "(()=>{const f=document.getElementById('story-tools-flyout');const r=f.getBoundingClientRect();return {panel:[Math.round(r.width),Math.round(r.height)],overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth};})()"
+    }
+  ]
+}

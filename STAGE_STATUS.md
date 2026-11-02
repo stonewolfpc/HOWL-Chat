@@ -294,6 +294,38 @@ with the budget message. Worth watching in beta.
 Limit: the UI now displays effective values via `GetEffectiveSampler()`, but that was
 not re-checked visually in the browser after the change.
 
+## Generation settlement guard (closed 2026-11-02)
+
+Closes the image-generation settlement item opened by the ownership/lifecycle reviews.
+No product code changed in the closing pass: the guard was already in the working tree
+(`sdcpp/generation.go`, `sdcpp/settlement_guard_test.go`, 19:08); what was missing was
+evidence from the real application.
+
+| Gate | Result | Evidence |
+|---|---|---|
+| Source review | PASS | `image-generation-settlement-guard-review.md` |
+| Regression tests | PASS (reported in stage record) | `image-generation-settlement-guard-stage.md` |
+| Independent review | PASS | `image-lifecycle-followup-r1-r2-r4-r5-r6-review.md` |
+| Real application acceptance | PASS on a verified build | `image-generation-abort-500-discrepancy-investigation.md`, addendum |
+
+Live checks on the verified binary (sha256 `d7e8aacd…`, PID 9252, start 20:20:42, path
+`build/bin/howl-chat.exe`): cold auto-load spawned the child and reached "Step 1 of 8";
+abort reported "Aborted" and **left the child alive**; the next request was **refused** with
+`errEngineUnavailable` naming the abandoned owner; Unload closed the child and Reload
+brought up a new one ("Model ready"); a generation was then admitted on that child and
+aborted, leaving the app idle with no orphans.
+
+**Build-identity lesson (process, not code).** The first acceptance ran an 18:59 binary
+that predated the guard by nine minutes, so its results described the old behaviour (the
+post-abort request was *admitted*, which is how it reached the backend and returned the
+500). Any future acceptance must record revision + worktree diff hash + binary hash +
+running PID/start time before interpreting a failure.
+
+**Deliberately still open, not part of this item:** the status-line elision (UI repair
+pass), the unexplained sd-server exit (logging/diagnostics audit), video `stopServer`
+shared-process ownership (separate defect), and Image Studio's broader lifecycle and
+model-compatibility work. The settlement guard is closed; Image Studio is not.
+
 ## UI conventions (apply to every future change)
 
 - Menu and panel icons must be **real icons from the theme**, never ASCII/emoji text.
@@ -656,6 +688,103 @@ decorative (model-badge pastel hues, SVG escape arrows).
 | page heading | rgb(13,148,136) = --accent-primary | rgb(212,212,212) |
 | stuck-dark areas | 0 | 5 (correct) |
 | low-contrast text | 0 | 0 |
+
+## T2.1 Stage C - remaining pages verified (2026-11-02)
+
+Verification pass only: no CSS, JS or markup was changed. The instruction for
+this stage was to verify and correct the existing product, not to redesign it,
+so nothing was "improved" on the way past.
+
+### Scope correction
+
+The Stage B/C worklists name six remaining pages including `real-settings`. That
+page no longer exists: it was the orphan copy of the settings surface deleted by
+the T2.2 sweep (`index.html` holds the live inline modal). The real remaining set
+is five pages, and all five are now measured.
+
+### Method
+
+`build/t21/audit-stageC.js` holds the probe verbatim with its rationale. Three
+things about it matter more than the numbers:
+
+1. Theme flips go through `theme.js setThemeMode()`, never through a body-class
+   toggle, so a missing entry point fails loudly instead of passing silently.
+2. Transitions are disabled and the read waits **at least 1200 ms**. theme.js
+   drives a 4 s custom-property transition; a 600 ms read returns the previous
+   theme's colours. Every earlier figure in this file used a 600 ms settle.
+3. Background resolution is memoised per element. Recomputing the ancestor chain
+   per node blew the 10 s evaluation budget on `index` and `story-tools`.
+
+One tab at a time: each harness page holds an open `/__events` SSE stream, and
+six tabs exhaust the browser's six-connection budget, so later pages never reach
+`readyState: complete`. Two "page never loads" results were this, not a page bug.
+
+### Measured result (transitions disabled, 1200 ms settle)
+
+| page | light canvas | light low-contrast | light stuck-dark | dark low-contrast | dark stuck-dark |
+|---|---|---|---|---|---|
+| index | rgb(233,230,223) = --app-bg | 0 | 0 | 0 | 13 (expected) |
+| scenario | rgb(233,230,223) | 0 | 0 | 0 | 5 (expected) |
+| lorebooks | rgb(233,230,223) | 0 | 0 | 0 | 6 (expected) |
+| story-tools | rgb(233,230,223) | 0 | 0 | 0 | 11 (expected) |
+| audio-settings | rgb(233,230,223) | 0 | 0 | 0 | 4 (expected) |
+
+Visual pass per page confirmed the filled-child case the numeric audit can miss:
+the teal primary buttons on scenario, lorebooks, story-tools and the audio footer
+all label themselves with `--on-accent` (white), so the world-page
+"dark grey on teal" failure does not repeat.
+
+### Observed, deliberately not changed
+
+- **`Manage All Memories` is cyan, not teal.** It uses `--accent-secondary`
+  (`#06b6d4`), a defined token that flips correctly with the theme. That is a
+  secondary accent doing its job, not a theme leak. Changing it would be a
+  redesign, so it was left alone and recorded instead.
+- **Top-bar collision at narrow widths.** At a 689 px viewport
+  `.loading-progress-container` (x=437, w=236) sits on top of `.menu-bar`
+  (x=181, w=492), so `NO MODEL LOADED` runs into the window edge and the menu
+  labels are overprinted. Positions and colours are identical in both modes, so
+  this is the already-open layout item (Stage A, "Still open" 3), not a theme
+  defect. Not fixed here; it belongs to the layout pass.
+- **`audio-settings` body has no background in dark** (`rgba(0,0,0,0)`), while
+  every other page paints `rgb(10,10,15)`. The overlay and its own containers
+  cover the viewport, so no white area was observed, but nothing guarantees that
+  during load. Recorded for the layout pass rather than patched here.
+
+### Corrected claim (mine, retracted)
+
+An intermediate reading of this pass reported the memories flyout as "stuck light
+in dark": panel `rgb(247,245,240)`, inputs `rgb(251,250,246)`, and three
+low-contrast labels. That was wrong. At a 800-1200 ms settle the same flyout
+measures panel `rgb(21,21,31)` = dark `--surface-secondary`, inputs
+`rgb(21,21,31)`, label `rgb(212,212,212)`, and **0** low-contrast nodes in both
+modes. The bad numbers were the pre-transition colours, exactly the mistake this
+file already warned about. The flyout is clean.
+
+### Ownership defect found in the evidence path (not fixed, not safe)
+
+Starting the harness reaped the **live app's** `sd-server.exe` (PID 24780) at
+startup - `[proc] reaped 1 orphaned model process(es)` - even though its parent
+`howl-chat.exe` (PID 9252) was running. "Orphaned" was decided from recorded
+state, not from parent identity, so a dev tool killed a production child.
+
+Consequences, stated plainly:
+
+- The running app is now idle with no image child until a Reload; the audit did
+  not touch generation, so nothing was lost.
+- This is the same ownership class as video `stopServer`: a process is treated as
+  owned because of what a file says, not because of who its parent is.
+- Neither the video defect nor "shared infrastructure is safe" may be claimed on
+the strength of this stage. The reaper needs parent-identity verification, which
+  belongs with the diagnostics/ownership work, not here.
+
+### Still open after Stage C
+
+1. Delete the parallel override sheets (`theme-light-components`, `theme-overrides`,
+   per-feature `*-light-theme.css`) - measured before removal, as before.
+2. Top-bar/menu collision and the fluid-layout pass (layout, not theme).
+3. `audio-settings` dark body background, decided in the layout pass.
+4. Process reaping must verify parent identity (ownership work).
 
 ## The real reason pages stayed dark (root cause, fixed 2026-11-01)
 

@@ -181,7 +181,7 @@ func (e *Engine) generateVideo(opts types.ImageOptions) (*types.ImageResult, err
 	e.stopServer()
 
 	fmt.Printf("[ImageEngine] sd-cli %s\n", strings.Join(args, " "))
-	err = e.runVideoCLI(cli, args, outPath)
+	err = e.runVideoCLI(cli, args, outPath, opts.JobID)
 	if e.consumeCancel() {
 		return nil, fmt.Errorf("video generation cancelled")
 	}
@@ -325,7 +325,7 @@ func (e *Engine) buildVideoArgs(opts types.ImageOptions, frames, fps, width, hei
 
 // runVideoCLI executes sd-cli, streaming progress and keeping the tail of the
 // log so a failure can be explained to the user.
-func (e *Engine) runVideoCLI(cli string, args []string, outPath string) error {
+func (e *Engine) runVideoCLI(cli string, args []string, outPath string, owner string) error {
 	cmd := exec.Command(cli, args...)
 	cmd.Dir = filepath.Dir(cli)
 	proc.HideWindow(cmd)
@@ -341,6 +341,7 @@ func (e *Engine) runVideoCLI(cli string, args []string, outPath string) error {
 
 	e.videoMu.Lock()
 	e.videoProc = cmd.Process
+	e.videoOwner = owner
 	e.cancelled = false
 	e.progress = types.ProgressInfo{}
 	e.videoMu.Unlock()
@@ -370,6 +371,7 @@ func (e *Engine) runVideoCLI(cli string, args []string, outPath string) error {
 
 	e.videoMu.Lock()
 	e.videoProc = nil
+	e.videoOwner = ""
 	e.videoMu.Unlock()
 
 	if waitErr != nil {
@@ -403,6 +405,28 @@ func (e *Engine) recordVideoProgress(line string) {
 		TotalSteps: total,
 	}
 	e.videoMu.Unlock()
+}
+
+// cancelVideoOwned kills the sd-cli render only when jobID owns it, so one job's
+// cancel cannot stop another job's video. This is cancellation identity only:
+// the process handling below is unchanged.
+func (e *Engine) cancelVideoOwned(jobID string) bool {
+	if jobID == "" {
+		return false
+	}
+	e.videoMu.Lock()
+	procRef := e.videoProc
+	owned := procRef != nil && e.videoOwner == jobID
+	if owned {
+		e.cancelled = true
+	}
+	e.videoMu.Unlock()
+	if !owned {
+		return false
+	}
+	proc.KillTree(procRef.Pid)
+	_ = procRef.Kill()
+	return true
 }
 
 // cancelVideo kills a running sd-cli render. Returns true when one was active.

@@ -323,6 +323,8 @@ func buildModelIndex(entries []Entry) scanner.ModelIndex {
 			idx.ClipLs = append(idx.ClipLs, ae)
 		case scanner.AssetClipG:
 			idx.ClipGs = append(idx.ClipGs, ae)
+		case scanner.AssetLLM:
+			idx.LLMs = append(idx.LLMs, ae)
 		}
 	}
 	return idx
@@ -428,5 +430,9 @@ func collectEntries(idx scanner.ModelIndex) []scanner.AssetEntry {
 	out = append(out, idx.T5XXLs...)
 	out = append(out, idx.ClipLs...)
 	out = append(out, idx.ClipGs...)
+	// Language models belong here too: a file can be reclassified from
+	// checkpoint to text encoder, and the merge must rewrite its stored
+	// type or the image dropdown keeps listing it forever.
+	out = append(out, idx.LLMs...)
 	return out
 }

@@ -6,18 +6,18 @@
  * Do NOT add rules directly here; use the appropriate module file.
  */
 
-@import url('theme-base.css?v=29');
-@import url('theme-light.css?v=29');
-@import url('theme-light-layout.css?v=29');
-@import url('theme-light-components.css?v=29');
-@import url('theme-overrides.css?v=29');
-@import url('theme-nav.css?v=29');
-@import url('theme-chat.css?v=29');
-@import url('theme-entities.css?v=29');
-@import url('theme-settings.css?v=29');
-@import url('theme-image-generator.css?v=29');
-@import url('theme-story-tools.css?v=29');
-@import url('theme-scrollbars.css?v=29');
+@import url('theme-base.css?v=41');
+@import url('theme-light.css?v=41');
+@import url('theme-light-layout.css?v=41');
+@import url('theme-light-components.css?v=41');
+@import url('theme-overrides.css?v=41');
+@import url('theme-nav.css?v=41');
+@import url('theme-chat.css?v=41');
+@import url('theme-entities.css?v=41');
+@import url('theme-settings.css?v=41');
+@import url('theme-image-generator.css?v=41');
+@import url('theme-story-tools.css?v=41');
+@import url('theme-scrollbars.css?v=41');
 
 :root {
     /* Artherius Theme Colors */
