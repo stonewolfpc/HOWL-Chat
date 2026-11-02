@@ -152,6 +152,63 @@ there working. We've already hit one of these (`ig-negative-prompt` vs `ig-negat
 Sweep every element lookup target against the actual DOM.
 **Evidence:** zero write-to-missing-ID, zero duplicate IDs, no orphaned markup.
 
+**Status 2026-11-02: inventory complete, stage OPEN, nothing repaired.** Read-only
+classification of every lookup in `frontend/dist/js` against the nine pages.
+Full record in `STAGE_STATUS.md` → "T2.2 · Ghost-ID inventory (evidence revision)".
+The inventory counts *references*, not read-versus-write operations, so this stage's
+own acceptance bar — zero write-to-missing-ID — **cannot yet be scored**; 30 reference
+sites remain, and they are not claims that all 30 are writes or runtime failures.
+Nothing here authorises a repair.
+
+**Reconciled baseline (this working copy at `1477530`, source-derived; no page loaded):**
+372 ids named by literal `getElementById`, 601 ids in static markup, 325 provided
+by markup, **47 absent**, 29 of those created by script before use, **18 never
+created anywhere (ghosts)** over **30 reference sites**. Distinct creation ids 50
+(21 never looked up); selector-based lookups 33 raw / 31 distinct / 27 leading
+tokens. Identities: 325 + 47 = 372, 29 + 18 = 47.
+
+**Superseded figures — do not reuse.** An earlier pass reported 75 absent ids as
+18 ghosts + 51 runtime-created + 4 dynamic prefixes + 10 compound fragments,
+which sums to 83; the same pass reported **400 lookup ids** where the corrected
+count is 372. All five figures — **75, 400, 51, 4, 10** — are withdrawn and must
+not be reused as the corrected baseline: 51 exceeds the entire created-id set (50),
+so it cannot be a subset count; the 4 prefixes and 10 fragments were selector
+strings and template prefixes, not ids; 75 counted distinct *strings*, not distinct
+*ids*; and 400 is superseded by the regenerated 372. None of the old figures is
+reproducible — the original regex was not retained — so they are not reconciled
+against; they are replaced by the measurements above (325 provided + 47 absent =
+372; 29 created-before-use + 18 never created = 47).
+
+**Four candidate findings, none repaired, none authorised:**
+
+1. **Audio composer id is conditional, not a quick fix.** `audio-service.js:158`
+targets `#chat-input`; the composer is `index.html:1164` `id="message-input"`
+(class `.input-field`), which `chat-input.js:207` reads and `index.html:1157`
+already addresses by id for TTS. But upstream, `saveBlobToTempFile` returns
+`URL.createObjectURL(blob)` and passes it to `TranscribeAudio`, which expects a
+path — so the transcript may never exist. Repairing the id alone may fix a path
+that still cannot produce a transcript. Audit the handoff contract first.
+2. **Two write-only character properties.** `first_mes` and `scenario` are collected
+at `character-form.js:61-62` (always `''`, missing fields) and restored at
+`character-grid.js:127` (guarded no-op). Neither has a consumer anywhere in the
+frontend. Recorded, not deleted, not remapped: whether they belong to the intended
+character schema is a product decision.
+3. **Three manager modules have no discovered load path** (`character-manager.js`,
+`scenario-manager.js`, `world-manager.js`) — no script tag, no import, no dynamic
+loader, no worker, no cross-file reference, no inline handler, and no Go-side
+reference, though `//go:embed all:frontend/dist` packages them into the binary.
+Their element contracts do not match the live forms and they contain selector-modal
+code with no live counterpart found by name. **Not redundant by proof and not safe
+to delete**; behavioural equivalence is unestablished.
+4. **Three parallel form/manager pairs** (`character-form`/`character-manager`,
+`scenario-form`/`scenario-manager`, `world-form`/`world-manager`) share function
+names while differing in structure. Candidate structural finding only.
+
+**Carried limitations:** 16 template-literal lookups are outside the inventory;
+the selector-token figure has one valid extraction method (an earlier attempt
+returned 0 because its `sed` failed — do not reuse it); creation detection covers
+`id="X"` and `.id = 'X'` only; all reachability is static inference, not observation.
+
 ### T2.3 · Image page layout — target Invoke AI organisation
 Rework toward Invoke AI's structure: preview prominent, controls grouped, history
 organised. Reference it (look it up) but don't chase parity — take the parts that
@@ -290,6 +347,7 @@ Separate pass, its own stage, after everything above. Look for waste everywhere.
 Append here as stages close. One line each: date, stage, evidence, result.
 
 - 2026-11-02 · Image generation settlement guard — source review PASS; stage-recorded tests PASS; independent review PASS; real-app acceptance PASS on verified build `d7e8aacd…` (PID 9252): abort leaves child alive, next request refused as abandoned, Unload/Reload recovers, work admitted after reset. Closed with no code change; the earlier live run had tested a pre-guard 18:59 binary. Unresolved: why the old sd-server exited.
+- 2026-11-02 · T2.2 ghost-ID inventory (evidence revision, no code change) — 18 ghost ids over 30 sites confirmed against a regenerated accounting: 372 literal `getElementById` ids, 601 markup ids, 325 provided by markup, 47 absent, 29 created before use, 18 never created. Withdrawn as superseded: 75 absent ids / 400 lookup ids / 51 runtime-created / 4 prefixes / 10 compound fragments (summed to 83; 51 exceeded the 50-id creation set; 75 counted strings, not ids). Recorded, none repaired: the audio `chat-input` vs `message-input` mismatch is conditional on an upstream `blob:` URL handoff (`saveBlobToTempFile` returns `createObjectURL`), so it is not yet a one-line fix; character `first_mes`/`scenario` are persisted write-only empty strings with no consumer; three manager modules have no discovered load path but unestablished behavioural equivalence, so they are legacy-looking, not provably redundant; the three form/manager pairs are parallel implementations, not duplicates. Limits: 16 template-literal lookups unclassified, one valid selector-extraction method, static inference only. Checkpoint `1477530` untouched.
 - 2026-11-01 · T2.1 Stage C (remaining pages theme verification) — five pages measured in both themes through `setThemeMode` with transitions off: 0 offenders at the probe's `|dL| * 255 < 60` luminance heuristic (text >=16 px only; the 14 px button labels were assessed visually), 0 stuck-dark areas in light, expected dark panels only in dark, and the buttons checked render white. No code changed. Independent review: PASS WITH FINDINGS, no blocking findings; closed. Corrections recorded: `real-settings.html` no longer exists (deleted by T2.2); `--accent-secondary` is deliberately constant cyan in both modes; the "stuck light flyout" reading was retracted, its proposed 4 s-transition cause withdrawn as unsupported and contradicted (no `@property` registration, probe overrides transitions), cause Unestablished; `ReapOrphans` kills by executable path under the project root, not by recorded state or parent identity. Evidence limits: per-page results and screenshots were not persisted, and the harness wrote chat state through real bindings. Open: override-sheet deletion, top-bar collision, `audio-settings` dark body background, stale `real-settings` references, and the cross-cutting process-ownership defect.
 
 

@@ -1334,3 +1334,216 @@ viewport, so captures render the one-column layout and cannot show the five-colu
 result. The five-column claim rests on computed layout, which is what is recorded
 above.
 
+## T2.2 · Ghost-ID inventory (evidence revision, read-only, 2026-11-02)
+
+Nothing under `frontend/dist` was modified. No build, test or app launch. This
+section **supersedes figures from the earlier inventory pass, which had not
+previously been recorded in these project documents**; the 18 ghost ids and their
+30 reference sites survive it, the population counts around them do not.
+
+All numbers below describe **this working copy at `1477530`** and are derived from
+source text only. They are machine-specific measurements. The structural findings
+are candidates about the product, not measurements, and none has been repaired.
+
+### Stage status
+
+**T2.2 is OPEN.** The inventory exercise is complete; the stage is not. Thirty
+reference sites remain. This record counts *references*, not read-versus-write
+operations, so the stage's acceptance criterion — zero write-to-missing-ID —
+**cannot yet be scored**. Nothing below implies that all 30 sites are writes or
+runtime failures, and nothing here authorises a repair.
+
+### Units, stated explicitly
+
+A count without a unit is what produced the first, wrong table. Three different
+things were being called "ids": element ids passed to `getElementById`, selector
+strings that happen to start with `#`, and template-built id prefixes.
+
+| Unit | Count |
+|---|---|
+| Distinct ids named by literal `getElementById('X')` | **372** |
+| Distinct ids present in static page markup (`id="X"` in the 9 pages) | **601** |
+| Lookup ids that markup provides | **325** |
+| Lookup ids markup does not provide | **47** |
+| …of those 47: created by script before use | **29** |
+| …of those 47: never created anywhere — **true ghosts** | **18** |
+| Distinct ids created in JS (`id="X"` or `.id = 'X'`) | **50** |
+| …of those 50: never looked up by id | **21** |
+| Distinct selector-based lookups — raw strings / distinct selectors / distinct leading tokens | **33 / 31 / 27** |
+| …of those 27 leading tokens: real markup ids / runtime-created | **12 / 15** |
+| Reference **sites** for the 18 ghosts | **30** |
+| Template-literal lookups `getElementById(\`…\`)` — excluded from every count above | 16 occurrences |
+
+Identities that hold exactly: **325 + 47 = 372**, **29 + 18 = 47**, and
+**15 + 15 = 30 sites** (6 ghost ids / 15 sites in files with no load path, 12 ids /
+15 sites in loaded files).
+
+A "site" is an occurrence of the id as a literal `getElementById` argument, or
+`#id` followed by `'`, `,` or `)`. It is a text measure, not an execution count.
+
+### Why the first numbers could not sum
+
+An earlier pass reported 75 absent ids, split into 18 ghosts + 51 runtime-created +
+4 dynamic prefixes + 10 compound fragments — which is 83, not 75. All five figures
+are withdrawn, for three independent reasons:
+
+- **51 was impossible on its face.** Only 50 ids are created anywhere in the JS,
+  and only 29 of those are both created and looked up. A subset cannot exceed its
+  superset.
+- **The 14 artifacts were never ids.** Compound entries were whole selector strings
+  (`#character-dropdown .world-dropdown-sort`); tokenising yields
+  `character-dropdown`, which markup does provide. Prefix entries (`dep-bar-${i}`)
+  are template fragments that never match a literal-string extractor.
+- **75 counted strings, not ids.** 47 + 28 ≈ 75: the gap matches selector strings
+  counted as if they were element ids.
+
+75 cannot be regenerated — the original regex was not retained — so it is recorded
+here as unreproducible and replaced by 47 rather than reconciled against it.
+
+Separately, the first re-run reported **0 selector tokens**. That reading was a
+failure, not a finding: its `sed` exited with "unterminated `s' command". The
+figures above come from an `awk` tokeniser. Do not reuse the broken method.
+
+### The 18 ghosts
+
+Source-level findings. **Thirteen** of the eighteen have a guard, so most are
+silent; the other **five are unguarded** and would throw if executed. An unguarded
+reference is still a source-level finding, not a demonstrated runtime failure:
+none of the eighteen was observed failing, and three of the five sit in a file no
+page loads.
+
+| id | sites | file | page loads it? | guard | effect |
+|---|---|---|---|---|---|
+| `world-image-preview` | 4 | world-manager.js | no | **none** — `.src`, `.style` | would throw if executed |
+| `world-image-placeholder` | 2 | world-manager.js | no | **none** — `.style` | would throw if executed |
+| `world-image-remove` | 2 | world-manager.js | no | **none** — `.style` | would throw if executed |
+| `character-backstory` | 3 | character-manager.js | no | `if (el)` | read no-ops |
+| `selected-character-lorebooks` | 1 | character-manager.js | no | early return | read no-ops |
+| `scenario-objective` | 3 | scenario-manager.js | no | `if (el)` | read no-ops |
+| `chat-input` | 1 | audio-service.js | yes | `if (input)` | transcript written nowhere |
+| `character-intro` | 1 | character-form.js | yes | `?.` | `first_mes` always `''` |
+| `character-scenario` | 1 | character-form.js | yes | `?.` | `scenario` always `''` |
+| `settings-panel` | 2 | error-settings.js | yes | early return | section never injected |
+| `sidebar-menu` | 1 | memory-candidates-menu.js | yes | early return | memory menu never mounts |
+| `image-status` | 3 | error-handler.js | yes | `if (st)` | image messages never shown |
+| `ig-history-status` | 1 | image-generator.js | yes | guarded | filter feedback dropped |
+| `world-selector` | 1 | context-data.js | yes | `if (el)` | click never binds |
+| `scenario-selector` | 1 | context-data.js | yes | `if (el)` | click never binds |
+| `character-selector` | 1 | context-data.js | yes | `if (el)` | click never binds |
+| `world-auto-switch` | 1 | sidebar-context-world.js | yes | **none** — `.checked` | would throw; no caller found |
+| `scenario-auto-switch` | 1 | sidebar-context-scenario.js | yes | **none** — `.checked` | would throw; no caller found |
+
+### Finding 1 · The audio defect is conditional, so it is not a one-line repair
+
+- Lookup: `audio-service.js:158`, inside `insertTranscriptIntoChat(text)`, guarded
+  `if (input)`; sets `.value`, calls `.focus()`, dispatches `new Event('input',
+  { bubbles: true })` with the comment "Trigger input event for any listeners".
+- The composer: `index.html:1164` `<input ... id="message-input" class="input-field">`.
+  No page defines `id="chat-input"`, no script creates that id, and there is exactly
+  one lookup of that id — this one. The other occurrences of the string refer to
+  the `chat-input.js` module (`index.html:60`, `story-tools.html:50`), its
+  `[chat-input]` log tag (`chat-input.js:227`), or comments (`chat.js:9`), which is
+  why the name reads as if it were in use.
+- Intent is not inferred from the name alone: `chat-input.js:207` reads the composer
+  as `document.querySelector('.input-field')`, and `index.html:1157` already uses
+  `getElementById('message-input')` for TTS. The transcription code meant the same
+  element, by id instead of class.
+- **The blocking unknown is upstream.** The caller at `:129` runs after
+  `window.go.main.App.TranscribeAudio(tempPath)`, where `tempPath` comes from
+  `saveBlobToTempFile`, which returns `URL.createObjectURL(blob)` with the comments
+  "Wails runtime doesn't give us direct file access from JS" and "Backend will need
+  to handle this". A `blob:` URL is not a filesystem path. If that boundary fails,
+  no transcript is ever returned and the id mismatch is unreachable.
+
+Evidence class: id absence is source-derived and certain; the user-visible failure
+is an inference from guards and comments, untested. Changing the id first would
+risk reporting a repair for a path that still cannot produce input.
+
+### Finding 2 · Two character properties are persisted, written-only, and empty
+
+- Written at `character-form.js:61-62` in `collectCharacterData()`:
+  `scenario: getElementById('character-scenario')?.value || ''` and
+  `first_mes: getElementById('character-intro')?.value || ''`.
+- Restored at `character-grid.js:127` as `set('character-intro', …)`, where the
+  helper at `:118` is `const el = document.getElementById(id); if (el) el.value = val`.
+  Both directions target an element that does not exist.
+- `character.html` offers name, age, role, priority, description, personality,
+  background and dialogue-examples. No intro, no scenario.
+- **No consumer:** `first_mes` occurs exactly twice in the frontend — this write and
+  this restore. Every `.scenario` reference in `js/` is the chat's scenario object
+  (`chat-state-bridge.js`, `chat-session.js:37`, `context-data.js:164`), not a
+  character record's string field.
+
+Recorded as two write-only properties that persist as `''`. Not deleted, not
+mapped to description or personality, no replacement field invented: whether they
+are still part of the intended character schema is a product decision.
+
+### Finding 3 · The manager modules look legacy; that is not proof they are unused
+
+Checks run, all negative for loading:
+
+| Mechanism | Result |
+|---|---|
+| Literal `<script src>` in the 9 pages | absent |
+| ESM `import` / `import()` / `require(` | 0 in `dist/js` — all classic scripts |
+| `createElement('script')`, `.src = '…js'`, `document.write`, `getScript`, `loadScript`, `insertAdjacentHTML` | 0 |
+| Service worker / `new Worker(` | 0 |
+| Global registration | top-level `const xManager = new XManager()` + `DOMContentLoaded` init; **no `window.` assignment** |
+| Cross-file use of `characterManager`/`worldManager`/`scenarioManager`/class names | only inside the three files |
+| Inline `on*=` handler names in all 9 pages → defining file | none resolves to a `*-manager.js` |
+| Top-level function names defined in the three files, referenced elsewhere | none |
+| Repo-wide (Go, JSON, YAML, scripts, docs) | only self-references plus `T1_NOTES.md:45` |
+| Other copies of the files | one each, under `frontend/dist/js` |
+| Packaging | `main.go:13` `//go:embed all:frontend/dist` — shipped in the binary, never executed |
+
+Two apparent holes in that audit are artifacts, recorded so they are not mistaken
+for defects: the inline-handler map's unresolved rows for `AudioService`,
+`document`, `event`, `if` and `window` are attribute-expression fragments, and
+`newChat` is real (`chat.js:29` assigns `window.newChat`).
+
+What this supports: *no load path found*. What it does not support: redundancy.
+The manager versions carry selector-modal behaviour (`removeSelectedItem`,
+`toggleItemSelection`, `confirmItemSelection`) with no live counterpart found by
+name, and their element contracts (`world-image-*`) do not match the live forms.
+Whether that behaviour was abandoned or never migrated is unestablished, so the
+files stay.
+
+### Finding 4 · The form/manager pairs are parallel implementations (candidate only)
+
+`world-form.js` (loaded by `world.html` and `story-tools.html`) and
+`world-manager.js` (never loaded) both define `clearWorldForm`, `saveWorld` and
+`populateEditForm`, but one is procedural over `window.worldState` and
+`world-images-list` while the other is class-based over `this.*` and the ghost
+`world-image-*` ids. `character-form`/`character-manager` and
+`scenario-form`/`scenario-manager` have the same shape. Overlapping names in
+parallel implementations are not evidence that either side is redundant; the live
+forms use `character-lorebooks.js` / `world-dropdowns.js` / `scenario-dropdowns.js`
+for selection instead. No behavioural equivalence audit was performed.
+
+### Limitations that stay with this record
+
+1. **16 template-literal lookups are unclassified** (`getElementById(\`…\`)`). A
+   ghost built from a template is invisible to this method.
+2. **The selector-token figure has one valid method.** The earlier run returned 0
+   because its `sed` failed; that method must not be reused or cited.
+3. **Creation detection covers two patterns only** — `id="X"` and `.id = 'X'`.
+   Creations via `setAttribute('id', …)` or a template literal would be miscounted
+   as ghosts.
+4. **Reachability is static.** No page was loaded, so "never executed" means "no
+   load path found", not "observed unexecuted". A Go-side or string-concatenated
+   script injection would evade every pattern used.
+5. **The prior figures are unreproducible**, so this correction rests on the new
+   measurements plus the impossibility argument (51 > 50), not on recovering the
+   old pipeline.
+
+### Next decisions, none authorised
+
+1. **Documentation (this entry)** — done.
+2. **Audio handoff contract audit** — trace recording → blob → temp-file/backend →
+   transcription → composer, read-only, before authorising any id change.
+3. **Manager retirement review** — behavioural inventory of the three modules first;
+   no deletion until their missing functionality is accounted for.
+
+Checkpoint `1477530` remains the restore point and the working tree was not changed
+by this audit.
+
