@@ -551,5 +551,8 @@ function filterHistoryBySearch(value) {
         if (match) shown++;
     });
     const status = document.getElementById('ig-history-status');
-    if (status && term) status.textContent = shown + ' match' + (shown === 1 ? '' : 'es') + ' for "' + value + '"';
+    if (status) {
+        if (term) status.textContent = shown + ' match' + (shown === 1 ? '' : 'es') + ' for "' + value + '"';
+        else status.textContent = '';
+    }
 }

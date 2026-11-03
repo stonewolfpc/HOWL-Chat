@@ -105,6 +105,31 @@ First-pass observations to verify (from code review)
 - Behavior now: the count text still appears in the dropdown as a greyed label, but it is not focusable and cannot be selected. The model dropdown correctly opens with a "Select a model..." placeholder followed by real models.
 - Verified: page reloaded after edit, dropdown opened, the hidden-files count appears as an optgroup label (not a selectable option).
 
+### T0.4 · Image preview displays, but result looks blurry/pixelated (INVESTIGATED, model-side)
+- File: verified across `frontend/dist/js/image-generator-core.js` (`displayResult`), `frontend/dist/css/ig-canvas.css`, and live via browser console.
+- What I did: after the generation completed, inspected the displayed image via the browser console.
+  - Image natural size: **1024×1024** (full resolution).
+  - Image displayed size: **924×616** (letterboxed in a 967×658 canvas via `object-fit: contain`).
+  - Source MIME: `image/png` (correct, detected from `iVBOR` header).
+  - Source data length: ~1.25 MB (consistent with a full-res 1024×1024 PNG).
+  - `image-rendering`: `auto` (correct — the `pixelated` rule only applies to JPEG TAESD preview frames).
+  - PNG metadata embedded in the file confirms the prompt, steps, sampler, etc.
+- Code looked fine, broke on click: **did not break.** The image is the correct full-resolution result, displayed correctly. The "blurry/pixelated" appearance is most likely the natural output quality of `z-image-turbo-Q4_K_M` at **30 Euler A steps** for a simple prompt (red cube on white table). 30 steps is on the low side for this model; higher step counts (50–80) usually sharpen the result.
+- Behavior now: the generation path is correct end to end. The image is not being downscaled, mis-MIME-typed, or otherwise corrupted in transit or display. The perceived softness is model output quality, not a bug in the preview pipeline.
+- What remains open: if the user wants consistently sharper results, the likely levers are (a) higher default step count for z-image-turbo, (b) a different sampler/scheduler combo, or (c) a post-generation upscaler. None of those are image-page display bugs; they are generation-parameter choices. Record for follow-up, not a display fix.
+- Screenshot: `build/screenshots/image-gen-final.png` (final result, "Done!" state).
+
+### T2.2 · Ghost ID `ig-history-status` (FIXED — gallery search feedback)
+- Files: `frontend/dist/image-generator.html` (added element), `frontend/dist/css/igp-layout.css` (added styling), `frontend/dist/js/image-generator.js` (clears status on empty search).
+- Code looked fine, broke on click: a static ID audit of 174 `getElementById` references on the image page found 4 IDs not present in the DOM at page load. Three were dynamically-created elements with proper null guards (`ig-canvas-placeholder` removed after generation, `ig-init-image` created in img2img mode, `ig-board-context-menu` created on right-click). The fourth — `ig-history-status` — was a **real ghost**: referenced at `image-generator.js:553` inside `filterHistoryBySearch()` but present in neither the HTML nor any JS creation path, and had no CSS rule either.
+- What I did: 
+  1. Added `<span id="ig-history-status" class="ig-history-status"></span>` to the gallery toolbar in `image-generator.html` (between the search input and the Add Board button).
+  2. Added CSS for `.ig-history-status` in `igp-layout.css` (11px, secondary text color, ellipsis on overflow).
+  3. Fixed `filterHistoryBySearch()` so clearing the search also clears the status text (previously it only set text when `term` was non-empty, leaving stale match counts on screen).
+  4. Bumped `image-generator-panels.css?v=41` → `?v=42`, `igp-layout.css?v=41` → `?v=42`, `igp-light-theme.css?v=41` → `?v=42` in the HTML to bust cache.
+- Behavior now: typing in the gallery search box shows match counts in the new status element (e.g. "0 matches for \"test\""); clearing the search clears the status. Before the fix, the search filtered items silently with no feedback.
+- Verification: element confirmed in DOM after reload; search typed via JS evaluation; status text updates correctly; clearing search clears status. Screenshot: `build/screenshots/image-ghosts-fixed.png`.
+
 Next action
-- Continue through remaining image-page concerns: T0.4 (image preview broken) is the big one, then T2.3 (layout).
+- Continue through remaining image-page concerns: T2.3 (layout) and any others on the list.
 

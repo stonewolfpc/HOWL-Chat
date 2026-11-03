@@ -214,6 +214,16 @@
     color: var(--text-secondary, #888);
 }
 
+.ig-history-status {
+    font-size: 11px;
+    color: var(--text-secondary, #888);
+    white-space: nowrap;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 0 0 auto;
+}
+
 .ig-add-board-btn {
     padding: 6px 12px;
     font-size: 16px;
