@@ -275,10 +275,13 @@ function _populateDiffusionDropdown() {
     ph.textContent = usable.length === 0 ? 'No compatible models found' : 'Select a model...';
     sel.appendChild(ph);
     if (split.hidden > 0) {
-        const note = document.createElement('option');
-        note.disabled = true;
-        note.textContent = '(' + split.hidden + ' incompatible file' + (split.hidden === 1 ? '' : 's') + ' hidden)';
-        sel.appendChild(note);
+        // Use an optgroup label so the count is visible but never selectable.
+        // A disabled <option> can still be selected in some browsers via click
+        // or script, which sends the literal label string to the backend and
+        // produces a confusing "model not found" error.
+        const og = document.createElement('optgroup');
+        og.label = '(' + split.hidden + ' incompatible file' + (split.hidden === 1 ? '' : 's') + ' hidden)';
+        sel.appendChild(og);
     }
     usable.forEach(m => {
         const opt = document.createElement('option');
