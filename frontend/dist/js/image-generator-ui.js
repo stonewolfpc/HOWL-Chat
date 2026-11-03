@@ -1447,6 +1447,14 @@ function onReloadModel() {
     setModel(name);
 }
 
+// Ctrl+L / "Load Model" button handler.
+// Explicitly triggers a backend model load for the currently selected model.
+async function onLoadModelClick() {
+    const name = document.getElementById('ig-model').value;
+    if (!name) { setStatus('No model selected to load.'); return; }
+    await setModel(name);
+}
+
 // ---------------------------------------------------------------------------
 // Presets
 // ---------------------------------------------------------------------------
