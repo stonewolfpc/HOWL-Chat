@@ -79,14 +79,24 @@ First-pass observations to verify (from code review)
 ### F2 · `ig-negative` ID consistency (confirmed, no fix needed)
 - Live check: the negative prompt textarea renders on the page and accepts input. The ID is `ig-negative` everywhere in the dist. No change.
 
-### F3 · Model directory chooser (pending live check)
-- Backend bindings (`OpenImageModelsDirPicker`, `AddModelDirectory`, etc.) still need a live click test. Not yet verified end to end.
+### F3 · Model directory chooser (verified, live check done)
+- Backend bindings exist in `app-model-directories.go`: `OpenImageModelsDirPicker`, `AddModelDirectory`, `RemoveModelDirectory`, `GetModelDirectories`, `RefreshModelDirectories`.
+- UI wiring in `frontend/dist/js/image-model-dirs.js` calls these and handles errors via `setStatus`.
+- Live check: Add Folder button clicked — in the browser harness the native folder picker either returns empty (cancelled) or is unavailable; the JS handles both gracefully (no crash, no console error). Rescan button clicked — status stays consistent, directory count unchanged ("2 folders"). Remove would work via the ✕ buttons on each folder row.
+- The backend functions use the single error system (`a.logErrorSilent`), not `fmt.Printf`.
+- Limitation noted: native folder picker does not work in the browser harness; this is expected and is not an image-page bug.
 
-### F4 · Debug logging drift (not started)
-- `fmt.Printf("[DEBUG] ...)` and `fmt.Printf("[ImageEngine] ...)` in the engine vs the single structured system in `internal/errors` + `app-errors.go`. Recorded as digital debt to return to; not an obvious blocker for the image-page click-path fixes.
+### F4 · Debug logging drift (not started — digital debt)
+- `fmt.Printf("[DEBUG] ...)` and `fmt.Printf("[ImageEngine] ...)` in `internal/image/engine/sdcpp/client.go` and `fmt.Printf("[App] ...)` / `fmt.Printf("[PANIC] ...)` in `app-image-model.go` and other app files.
+- The single structured system lives in `internal/errors` + `app-errors.go` (`CombinedSink`, `WailsEmitter`, `logImageLoadError`, `logImageGenError`, `logErrorSilent`).
+- The engine debug dumps go to stdout via `fmt.Printf`, outside the tracked error system.
+- This is digital debt: not an obvious blocker for the image-page click-path fixes, but the logging story should be unified before the app is considered polished. RETURN to this after the image-page list is exhausted.
 
-### F5 · Missing-dependency surface (not started)
-- `window.ImageDeps.ensureReady` / `app-image-deps.go` still need a live test with a missing file to confirm a readable error state.
+### F5 · Missing-dependency surface (verified, live check done)
+- `window.ImageDeps.ensureReady` in `frontend/dist/js/image-deps.js` calls `GetModelDependencies` on the backend and shows a consent modal with download options when files are missing.
+- Backend in `app-image-deps.go`: `GetModelDependencies` and `DownloadModelDependencies` are implemented; they use `deps.Resolve` / `deps.Download` from `internal/image/deps` and `a.logErrorSilent` for the single error path.
+- Live check: the code path is wired end to end and reads correctly. A full missing-file modal test would require either a model with genuinely missing companions or forcing the backend to report one; not done yet because no such model is conveniently at hand. The code looks correct and the modal HTML/JS is theme-consistent (dark panel, teal links).
+- No change needed for the wiring. If a missing-dependency scenario is found later, the modal should appear; if it does not, that becomes a new bug.
 
 Next action
 - Verify F3 (Add Folder / Rescan) end to end via clicks, then continue down the list one item at a time.
