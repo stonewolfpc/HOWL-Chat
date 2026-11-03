@@ -98,6 +98,13 @@ First-pass observations to verify (from code review)
 - Live check: the code path is wired end to end and reads correctly. A full missing-file modal test would require either a model with genuinely missing companions or forcing the backend to report one; not done yet because no such model is conveniently at hand. The code looks correct and the modal HTML/JS is theme-consistent (dark panel, teal links).
 - No change needed for the wiring. If a missing-dependency scenario is found later, the modal should appear; if it does not, that becomes a new bug.
 
+### F6 · '(N incompatible files hidden)' dropdown option was selectable (FIXED)
+- File: `frontend/dist/js/image-generator-core.js`, `_populateDiffusionDropdown()` (~line 427).
+- Code looked fine, broke on click: the dropdown listed '(' + split.hidden + ' incompatible file(s) hidden)' as a disabled `<option>`. In Chromium a disabled option can still be selected by click or by script, so picking it sent the literal label string to the backend and produced a confusing 'model not found' error (logged in STAGE_STATUS.md under T1.2).
+- What I did: replaced the disabled `<option>` with an `<optgroup>` label. An optgroup label is semantically a non-selectable group header — it shows the count but can never be chosen.
+- Behavior now: the count text still appears in the dropdown as a greyed label, but it is not focusable and cannot be selected. The model dropdown correctly opens with a "Select a model..." placeholder followed by real models.
+- Verified: page reloaded after edit, dropdown opened, the hidden-files count appears as an optgroup label (not a selectable option).
+
 Next action
-- Verify F3 (Add Folder / Rescan) end to end via clicks, then continue down the list one item at a time.
+- Continue through remaining image-page concerns: T0.4 (image preview broken) is the big one, then T2.3 (layout).
 
