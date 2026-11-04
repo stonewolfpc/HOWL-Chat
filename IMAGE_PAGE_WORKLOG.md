@@ -130,6 +130,23 @@ First-pass observations to verify (from code review)
 - Behavior now: typing in the gallery search box shows match counts in the new status element (e.g. "0 matches for \"test\""); clearing the search clears the status. Before the fix, the search filtered items silently with no feedback.
 - Verification: element confirmed in DOM after reload; search typed via JS evaluation; status text updates correctly; clearing search clears status. Screenshot: `build/screenshots/image-ghosts-fixed.png`.
 
+### Model name discovery — InvokeAI UUID models and Civitai hash lookup (INVESTIGATED, implemented)
+- Files: `internal/image/scanner/civitai.go` (new), `internal/image/scanner/scanner.go` (modified), `internal/image/scanner/manifest.go` (added `CivitaiName` field).
+- Code looked fine, broke on click: N/A (offline investigation). The model registry shows many InvokeAI models with names like "SD1.5 ba2e27a5", "SDXL f686038d", "SD1.5 061462d6" — UUID-based names from InvokeAI's folder structure. The scanner's `DisplayName()` already reads safetensors `__metadata__` for `modelspec.title`/`ss_sd_model_name`/`general.name`, but InvokeAI's bare exports have NO metadata at all.
+- What I did:
+  1. **Researched** model identification methods: safetensors metadata fields (`modelspec.title`, `ss_sd_model_name`, `general.name`), `config.json` sidecars, `model_index.json` pipeline descriptors, and **Civitai's public hash-lookup API** (`GET /api/v1/model-versions/by-hash/{SHA256}`, no auth required).
+  2. **Tested** Civitai lookup on two real InvokeAI files from this machine:
+     - `diffusion_pytorch_model.safetensors` (fa0e6cfc folder) → **"xinsir-canny"** (SDXL ControlNet Canny by xinsir)
+     - `diffusion_pytorch_model_V2.safetensors` (fa0e6cfc folder) → **"xinsir-cannyv2"** (SDXL ControlNet Canny v2)
+     Both identified successfully despite having zero metadata.
+  3. **Implemented** `civitai.go` with `LookupByHash()`, `HashFile()`, and `IdentifyFromFile()` (with manifest caching).
+  4. **Modified** `scanner.go` to call Civitai when `DisplayName()` produces a generic fallback name (UUID or "Family + id") — both on fresh scans AND when reusing cached manifests.
+  5. **Fixed** bundle scanner to use `ProbeWeight.AssetType()` for model slot assignment, so folders containing only ControlNet safetensors (like fa0e6cfc) are classified as individual ControlNets instead of one misclassified diffusion bundle.
+  6. **Added** `CivitaiName` and `Hash` fields to the manifest for caching.
+- Behavior now: on next scan, UUID-named models will get real names from Civitai where available (e.g., "SD1.5 ba2e27a5" → "xinsir-canny" or whatever Civitai returns). Models not on Civitai keep their existing fallback names. The fa0e6cfc folder's two ControlNets will be correctly classified as ControlNet assets instead of one diffusion bundle.
+- All scanner tests pass. Full project builds clean.
+- **Note**: The existing `.howl.json` manifests in the InvokeAI models folder will be re-queried on next scan since the Civitai lookup now runs in the manifest-reuse path when the name is generic.
+
 Next action
 - Continue through remaining image-page concerns: T2.3 (layout) and any others on the list.
 
