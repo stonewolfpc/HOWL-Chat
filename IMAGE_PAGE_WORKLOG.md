@@ -130,10 +130,10 @@ First-pass observations to verify (from code review)
 - Behavior now: typing in the gallery search box shows match counts in the new status element (e.g. "0 matches for \"test\""); clearing the search clears the status. Before the fix, the search filtered items silently with no feedback.
 - Verification: element confirmed in DOM after reload; search typed via JS evaluation; status text updates correctly; clearing search clears status. Screenshot: `build/screenshots/image-ghosts-fixed.png`.
 
-### Model name discovery — InvokeAI UUID models and Civitai hash lookup (INVESTIGATED, implemented)
-- Files: `internal/image/scanner/civitai.go` (new), `internal/image/scanner/scanner.go` (modified), `internal/image/scanner/manifest.go` (added `CivitaiName` field).
+### Model name discovery — InvokeAI UUID models and Civitai hash lookup (INVESTIGATED, implemented, enhanced)
+- Files: `internal/image/scanner/civitai.go` (new), `internal/image/scanner/scanner.go` (modified), `internal/image/scanner/manifest.go` (added `CivitaiName` field), `internal/image/scanner/bundle.go` (modified).
 - Code looked fine, broke on click: N/A (offline investigation). The model registry shows many InvokeAI models with names like "SD1.5 ba2e27a5", "SDXL f686038d", "SD1.5 061462d6" — UUID-based names from InvokeAI's folder structure. The scanner's `DisplayName()` already reads safetensors `__metadata__` for `modelspec.title`/`ss_sd_model_name`/`general.name`, but InvokeAI's bare exports have NO metadata at all.
-- What I did:
+- What I did (pass 1 — initial implementation):
   1. **Researched** model identification methods: safetensors metadata fields (`modelspec.title`, `ss_sd_model_name`, `general.name`), `config.json` sidecars, `model_index.json` pipeline descriptors, and **Civitai's public hash-lookup API** (`GET /api/v1/model-versions/by-hash/{SHA256}`, no auth required).
   2. **Tested** Civitai lookup on two real InvokeAI files from this machine:
      - `diffusion_pytorch_model.safetensors` (fa0e6cfc folder) → **"xinsir-canny"** (SDXL ControlNet Canny by xinsir)
@@ -145,8 +145,46 @@ First-pass observations to verify (from code review)
   6. **Added** `CivitaiName` and `Hash` fields to the manifest for caching.
 - Behavior now: on next scan, UUID-named models will get real names from Civitai where available (e.g., "SD1.5 ba2e27a5" → "xinsir-canny" or whatever Civitai returns). Models not on Civitai keep their existing fallback names. The fa0e6cfc folder's two ControlNets will be correctly classified as ControlNet assets instead of one diffusion bundle.
 - All scanner tests pass. Full project builds clean.
-- **Note**: The existing `.howl.json` manifests in the InvokeAI models folder will be re-queried on next scan since the Civitai lookup now runs in the manifest-reuse path when the name is generic.
+
+- What I did (pass 2 — this session, commit d2e994b):
+  1. **Added `looksLikeRawWeightName()` helper** — detects auto-generated weight filenames (diffusion_pytorch_model.safetensors, model.safetensors, etc.) that carry no model identity. These are the filenames produced by the ControlNet split path that do NOT match the existing `isGenericName()` patterns (UUID, family+id) but are still useless as display names.
+  2. **Wired `looksLikeRawWeightName` into the ControlNet split path** — the split block now calls Civitai lookup for split ControlNets when the filename looks like a raw weight name, not just when `isGenericName()` returns true. This fixes the fa0e6cfc case where the split ControlNets got names like "diffusion_pytorch_model.safetensors" instead of "xinsir-canny".
+  3. **Added manifest-cache-before-hash optimization** in three places:
+     - `scanFile()` — checks for existing manifest with cached CivitaiName before hashing
+     - ControlNet split path in `scanDirBundle()` — checks for existing file manifest with cached CivitaiName before hashing
+     - `scanDiffusersBundle()` — checks for existing file manifest with cached CivitaiName before hashing
+     This means the first scan pays the SHA-256 cost, but all subsequent scans skip hashing entirely and reuse cached names.
+  4. **Verified** the code compiles cleanly (`go build -tags uiharness` succeeds).
+  5. **Verified** the harness starts and serves the image page (HTTP 200, no console errors).
+  6. **Verified** the image page loads without crashes; the scan starts automatically.
+- Performance note: The first scan of a large model folder (e.g. H:/InvokeAI/models with many 2.5GB+ files) is slow because each file needing Civitai lookup requires a full-file SHA-256 hash + HTTP request. This is expected and inherent to the hash-lookup approach. The manifest-cache optimization ensures subsequent scans are fast. For the fa0e6cfc folder specifically, the two 2.5GB safetensors files will each take ~1-2 minutes to hash on first scan, then be instant on repeat scans.
+- **Verification status**: Code changes verified (compile + harness start + no errors). Full live verification of Civitai name resolution for fa0e6cfc awaits completion of the background scan (the scan is still in progress as of this writing — G: drive done, H: drive scanning).
+
+### Model name discovery — pass 3 (this session, continuing from d2e994b)
+- Files: `internal/image/scanner/civitai.go` (debug logging added then removed), `internal/image/scanner/scanner.go` (unchanged from pass 2), `internal/image/scanner/bundle.go` (unchanged from pass 2).
+- **What I did this pass:**
+  1. Verified the Civitai API is reachable from this machine via curl (HTTP 200, returns `"name": "xinsir-canny"` for fa0e6cfc's hash).
+  2. Verified the Go scanner's Civitai lookup code works standalone (wrote a test that hashes the file, calls the API, gets "xinsir-canny" — all correct).
+  3. Added temporary debug logging to `civitai.go` to trace whether `IdentifyFromFile` is called during the scan.
+  4. Rebuilt the harness and restarted with a cleared registry.
+  5. Monitored the scan progress — no Civitai log messages appeared, no registry entries were created, no manifests were written.
+  6. Removed the debug logging (keeping the code clean — no digital debt).
+- **Findings:**
+  - The Civitai API works perfectly from command-line curl and from a standalone Go test.
+  - The `looksLikeRawWeightName()` helper correctly identifies fa0e6cfc's filenames as raw weight names.
+  - The split block in `scanDirBundle()` correctly wires the Civitai lookup for raw weight names.
+  - **The scan is NOT completing in a reasonable time.** No registry entries are being written, no manifests are being created, and no Civitai lookups are being attempted during the scan.
+  - The browser shows cached/old data ("37 model(s)" from a previous session) — the new scan hasn't updated the UI.
+- **Root cause (suspected):** The scan started during harness startup but appears stuck or is running without writing progress. The scanner doesn't emit progress logs by default, so it's unclear whether it's iterating files, hashing, or blocked on something.
+- **Verification status:** Code changes verified (compile + standalone Civitai test works). Full live verification of Civitai name resolution for the InvokeAI/models folder is BLOCKED by the scan not completing.
+
+### Load-time errors observed (for investigation)
+- **Wails IPC scripts returning 404 with wrong MIME type** — `frontend/dist/wails/ipc.js` and `wails/runtime.js` return `text/plain` instead of `application/javascript`, causing Chrome to refuse to execute them. These are pre-existing issues with the browser harness (it's a simple HTTP server, not a full Wails app). Not a blocker for the image page functionality, but noted for completeness.
+- **ERR_CONNECTION_RESET** — One RPC call to `http://127.0.0.1:8799/__rpc` failed with connection reset. Transient? Needs monitoring.
+- **Scan not progressing** — The most critical issue: the scan starts but doesn't write registry entries or manifests. The InvokeAI/models folder shows "0 assets" in the UI despite having 94 entries in the previous session's registry.
 
 Next action
+- Investigate why the scan isn't completing (file access issues? scanner bug? network block on Civitai requests?)
+- If the scan can be made to complete, verify fa0e6cfc ControlNets show "xinsir-canny" / "xinsir-cannyv2" in the model dropdown.
 - Continue through remaining image-page concerns: T2.3 (layout) and any others on the list.
 
