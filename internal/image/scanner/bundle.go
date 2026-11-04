@@ -156,8 +156,13 @@ func (s *Scanner) scanDiffusersBundle(dir, pipeline string) (AssetEntry, bool) {
 	// When the Diffusers bundle's name is a generic fallback (UUID folder or
 	// "Family + id"), try Civitai hash lookup on the model file to find a real
 	// name. This covers UUID-named Diffusers bundles such as SD1.5 061462d6.
-	if isGenericName(m.Name) {
-		if civitaiName, err := IdentifyFromFile(modelPath, m); err == nil && civitaiName != "" {
+	// First check for a pre-existing manifest with a cached Civitai name.
+	if isGenericName(m.Name) && m.CivitaiName == "" {
+		if cached := LoadManifest(modelPath); cached != nil && cached.CivitaiName != "" {
+			m.Name = cached.CivitaiName
+			m.CivitaiName = cached.CivitaiName
+			m.Hash = cached.Hash
+		} else if civitaiName, err := IdentifyFromFile(modelPath, m); err == nil && civitaiName != "" {
 			m.Name = civitaiName
 			_ = SaveDirManifest(dir, m)
 		}

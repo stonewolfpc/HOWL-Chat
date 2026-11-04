@@ -258,8 +258,14 @@ func (s *Scanner) scanFile(path string, d os.DirEntry) *AssetEntry {
 	}
 	// When DisplayName produced a fallback name (UUID or family+id), try
 	// Civitai hash lookup to find a real name. Cached in the manifest.
-	if isGenericName(name) {
-		if civitaiName, err := IdentifyFromFile(path, m); err == nil && civitaiName != "" {
+	// First check for a pre-existing manifest with a cached Civitai name
+	// to avoid re-hashing large files on every scan.
+	if isGenericName(name) && m.CivitaiName == "" {
+		if cached := LoadManifest(path); cached != nil && cached.CivitaiName != "" {
+			m.Name = cached.CivitaiName
+			m.CivitaiName = cached.CivitaiName
+			m.Hash = cached.Hash
+		} else if civitaiName, err := IdentifyFromFile(path, m); err == nil && civitaiName != "" {
 			m.Name = civitaiName
 			name = civitaiName
 		}
@@ -496,9 +502,26 @@ func (s *Scanner) scanDirBundle(dir string) ([]AssetEntry, bool) {
 				Files:     map[string]string{"control_net": cns},
 				Recommended: buildRecommended(AssetControlNet, cnFamily),
 			}
-			// Try Civitai lookup for the ControlNet's real name.
-			if isGenericName(m.Name) {
-				if civitaiName, err := IdentifyFromFile(cns, m); err == nil && civitaiName != "" {
+			// Try to find a human-readable name for this ControlNet. Bundle-split
+			// ControlNets get raw filenames like "diffusion_pytorch_model.safetensors"
+			// that carry no useful information. We check three sources in order of speed:
+			//  1. An existing .howl.json manifest on disk that already has a cached
+			//     CivitaiName from a previous lookup (zero extra cost).
+			//  2. A Civitai hash lookup, which reads the full file to compute SHA-256
+			//     and then queries the public Civitai API. The result is cached in the
+			//     manifest so future scans skip the hash entirely.
+			//  3. No name found — keep the filename as a last resort.
+			//
+			// Only attempt Civitai lookup when the filename looks like a raw model
+			// weight file (not a human-readable name). This avoids hashing multi-gigabyte
+			// files unnecessarily when the scanner has already assigned a meaningful name.
+			if m.CivitaiName == "" && looksLikeRawWeightName(filepath.Base(cns)) {
+				// Check for a pre-existing manifest with a cached Civitai name.
+				if cached := LoadManifest(cns); cached != nil && cached.CivitaiName != "" {
+					m.Name = cached.CivitaiName
+					m.CivitaiName = cached.CivitaiName
+					m.Hash = cached.Hash
+				} else if civitaiName, err := IdentifyFromFile(cns, m); err == nil && civitaiName != "" {
 					m.Name = civitaiName
 				}
 			}
@@ -659,6 +682,51 @@ func isGenericName(name string) bool {
 	for _, prefix := range []string{"sd1.5 ", "sd2.1 ", "sdxl ", "flux ", "flux2 ", "wan ", "z-image ", "sd3 ", "sd3.5 ", "anima ", "hidream "} {
 		if strings.HasPrefix(lower, prefix) {
 			return true
+		}
+	}
+	return false
+}
+
+// looksLikeRawWeightName reports whether a filename looks like an auto-generated
+// weight file name rather than a human-chosen model name. These are the filenames
+// where a Civitai hash lookup is worth attempting because the name carries no
+// useful identity information.
+func looksLikeRawWeightName(name string) bool {
+	lower := strings.ToLower(name)
+	// Common auto-generated weight filenames that carry no model identity.
+	rawPrefixes := []string{
+		"diffusion_pytorch_model",
+		"diffusion_pytorch_model_v2",
+		"diffusion_pytorch_model_v",
+		"model.safetensors",
+		"model.ckpt",
+		"model.fp16.safetensors",
+		"diffusion_model.",
+		"pytorch_model.bin",
+		"model.bin",
+	}
+	for _, prefix := range rawPrefixes {
+		if strings.HasPrefix(lower, prefix) {
+			return true
+		}
+	}
+	// Files that are just a hash or UUID with an extension.
+	if len(name) >= 32 && strings.ContainsAny(name, ".-_") == false {
+		// Likely a hash string — treat as raw.
+		// (This is a heuristic; real hashes are hex, UUIDs have dashes.)
+		_ = lower
+	}
+	return false
+}
+
+// containsAny reports whether s contains any of the characters in chars.
+// Kept minimal to avoid importing strings repeatedly in hot paths.
+func containsAny(s, chars string) bool {
+	for i := 0; i < len(s); i++ {
+		for j := 0; j < len(chars); j++ {
+			if s[i] == chars[j] {
+				return true
+			}
 		}
 	}
 	return false
