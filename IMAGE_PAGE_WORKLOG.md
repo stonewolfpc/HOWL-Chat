@@ -183,8 +183,63 @@ First-pass observations to verify (from code review)
 - **ERR_CONNECTION_RESET** — One RPC call to `http://127.0.0.1:8799/__rpc` failed with connection reset. Transient? Needs monitoring.
 - **Scan not progressing** — The most critical issue: the scan starts but doesn't write registry entries or manifests. The InvokeAI/models folder shows "0 assets" in the UI despite having 94 entries in the previous session's registry.
 
+### Pass 3 diagnosis — root cause of stalled scan (identified 2026-11-03)
+**Finding:** The scan is not stalled. It was never started for image directories.
+
+**Root cause:** `RescanAllDirs()` in `app-model-registry.go:201-218` only scans `KindLLM` and `KindTTS` directories. Image directories are explicitly excluded from the startup rescan loop:
+
+```go
+// app-model-registry.go:201-218
+func (a *App) RescanAllDirs() {
+    ...
+    for _, kind := range []string{registry.KindLLM, registry.KindTTS} {  // ← image is NOT here
+        for _, dir := range a.modelRegistry.Directories(kind) {
+            ...
+        }
+    }
+}
+```
+
+The comment at line 206 claims image directories are "rescanned on demand (ScanImageModels / RefreshModelDirectories)". In reality:
+
+1. `ScanImageModels()` is never called during startup. It exists in `app-image-scan.go:122` but is not wired into any startup path.
+2. `RefreshModelDirectories()` (the user-facing "Rescan" button handler) is only called when the user clicks the UI button — not automatically.
+3. The model registry was deleted this session to test the scanner, so there is no cached index to fall back on.
+
+**What the user sees:** The image page loads, calls `loadModels()` → `ScanImageModels()` → scans both G: and H: drives. But `ScanImageModels()` is only called when the frontend explicitly invokes it. Looking at the page load sequence: `image-model-dirs.js` calls `refreshImageModelDirs()` on DOMContentLoaded (400ms delay), which populates the folder list from the registry. Then `image-generator-core.js` calls `loadModels()` which calls `ScanImageModels()`. But with the registry empty and no cache, `ScanImageModels()` walks both drives fresh — and the H: drive alone has 32 model folders containing ~28 multi-gigabyte safetensors files.
+
+**Why it appeared stalled:** The scanner has no progress logging by default. It was likely hashing the first multi-GB file on the H: drive (or walking the G: drive's gguf files), but with no log output the user sees a frozen UI. The scanner's `fmt.Printf` at `scanner.go:138` only fires when `Scan()` completes — which won't happen until ALL files in ALL directories are processed.
+
+**Correct diagnosis:** Two separate problems:
+
+- **Problem A (orchestration):** `RescanAllDirs()` does not scan image directories. This is fine by design IF `ScanImageModels()` is called elsewhere on startup — but the startup path doesn't call it. The image page's `loadModels()` is the only caller, and it runs after DOMContentLoaded.
+
+- **Problem B (user experience):** Even when `ScanImageModels()` runs, it blocks the UI thread (well, the goroutine, but the UI doesn't get updated until it completes) because the scanner is synchronous and has no progress callbacks. For the H: drive with 28+ multi-GB files, this means the model dropdown stays on "Loading models..." or the last cached state for a very long time.
+
+**The user's three concerns, properly separated:**
+
+1. **Cold-cache performance:** First scan must hash multi-GB files. The manifest-cache optimization from pass 2 only helps after a successful first scan. This is inherent to SHA-256-based identification.
+
+2. **Sequential scanning:** `ScanImageModels()` iterates directories sequentially (`app-image-scan.go:128-145`). If H: drive is slow, G: drive results don't appear until H: finishes. This is a UX problem independent of the scanner's correctness.
+
+3. **Unresolved scan failure:** The "scan not completing" observation was actually Problem A — the scan was never started for image dirs during the session where the registry was deleted. The standalone Go test confirmed the scanner works; it just wasn't being invoked.
+
+**Why the previous session's registry had 94 entries:** Those were from a previous successful scan that wrote manifests and registry entries. When the registry was deleted this session, those entries were lost. The scan needs to re-run to recreate them.
+
+### Pass 3 findings summary
+- **Code changes this pass:** None. No digital debt. The scanner code from d2e994b is correct.
+- **Civitai API:** Verified working (curl + standalone Go test).
+- **Scanner:** Verified working as a library (standalone test). Not the problem.
+- **Orchestration:** ROOT CAUSE IDENTIFIED — `RescanAllDirs()` skips image dirs; `ScanImageModels()` is not called on startup.
+- **Live verification:** BLOCKED until `ScanImageModels()` is invoked and completes.
+
+### Load-time errors observed (for investigation)
+- **Wails IPC scripts returning 404 with wrong MIME type** — `frontend/dist/wails/ipc.js` and `wails/runtime.js` return `text/plain` instead of `application/javascript`, causing Chrome to refuse to execute them. Pre-existing harness limitation. Not a blocker for image page functionality.
+- **ERR_CONNECTION_RESET** — One RPC call to `http://127.0.0.1:8799/__rpc` failed with connection reset. Possibly transient; needs monitoring.
+
 Next action
-- Investigate why the scan isn't completing (file access issues? scanner bug? network block on Civitai requests?)
-- If the scan can be made to complete, verify fa0e6cfc ControlNets show "xinsir-canny" / "xinsir-cannyv2" in the model dropdown.
-- Continue through remaining image-page concerns: T2.3 (layout) and any others on the list.
+- Fix Problem A: ensure image directories are scanned on startup (either wire `ScanImageModels()` into the startup sequence, or call it from `initImageEngine()` after the engine is ready).
+- Then address Problem B: implement staged discovery so the UI gets model entries as soon as metadata is available, with SHA-256/Civitai identification happening asynchronously.
+- Live-verify the fix by restarting the harness with a cleared registry, opening the image page, and confirming models appear in the dropdown.
+- Then verify fa0e6cfc ControlNets show "xinsir-canny" / "xinsir-cannyv2".
 
