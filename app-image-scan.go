@@ -137,7 +137,15 @@ func (a *App) ScanImageModels() (ScanResult, error) {
 			continue
 		}
 		scanned++
-		a.mergeIntoRegistry(idx)
+		// SyncIndex merges the scanned entries AND prunes stale entries under
+		// this directory (e.g. a diffusion bundle that is now split into
+		// individual ControlNet entries). Without pruning the old bundle entry
+			// would persist alongside the new ControlNets.
+		if a.modelRegistry != nil {
+			if _, _, err := a.modelRegistry.SyncIndex(dir, idx); err != nil {
+				a.logErrorSilent(errors.REGModelAddFail, errors.Medium, "registry.sync", "app-image-scan.go", err)
+			}
+		}
 	}
 	if scanned == 0 {
 		if lastErr != nil {
@@ -247,7 +255,12 @@ func (a *App) InstallAssets(move bool) (InstallSummary, error) {
 		a.logError(errors.IMGRegistryFail, errors.High, "image.install", "app-image-scan.go:178", err)
 		return InstallSummary{}, fmt.Errorf("install failed: %w", err)
 	}
-	a.mergeIntoRegistry(idx)
+	// SyncIndex merges the scanned entries AND prunes stale entries.
+	if a.modelRegistry != nil {
+		if _, _, err := a.modelRegistry.SyncIndex(cfg.ModelsDir, idx); err != nil {
+			a.logErrorSilent(errors.REGModelAddFail, errors.Medium, "registry.sync", "app-image-scan.go", err)
+		}
+	}
 	return convertInstallResult(res), nil
 }
 

@@ -88,10 +88,12 @@ func (s *Scanner) Scan() (ModelIndex, error) {
 
 		// If this is a sub-directory (not the root), try to treat it as a model bundle
 		if d.IsDir() && path != s.modelsDir {
-			entry, ok := s.scanDirBundle(path)
-			if ok {
+			entries, ok := s.scanDirBundle(path)
+			if ok && len(entries) > 0 {
 				dirBundles[path] = true
-				appendEntry(&idx, entry)
+				for _, e := range entries {
+					appendEntry(&idx, e)
+				}
 				return filepath.SkipDir // don't recurse into handled bundles
 			}
 			return nil // recurse into unrecognised dirs
@@ -305,83 +307,77 @@ func ClassifySafetensorsHeader(path string) AssetType {
 
 // ---- directory bundle classification ---------------------------------------
 
-func (s *Scanner) scanDirBundle(dir string) (AssetEntry, bool) {
+func (s *Scanner) scanDirBundle(dir string) ([]AssetEntry, bool) {
 	// A Diffusers pipeline is one model made of component folders, not a pile
 	// of loose unet/vae/text_encoder fragments.
 	if pipeline := loadModelIndexClass(dir); pipeline != "" {
-		return s.scanDiffusersBundle(dir, pipeline)
+		entry, ok := s.scanDiffusersBundle(dir, pipeline)
+		if ok {
+			return []AssetEntry{entry}, true
+		}
+		return nil, false
 	}
 
 	// One weight and no companions is a single model that happens to live in a
 	// folder. Calling it a bundle hid its real format and named it after the
 	// folder, which for Invoke is a UUID. Let the walker classify the file.
 	if !hasBundleShape(dir) {
-		return AssetEntry{}, false
+		return nil, false
 	}
-	// Reuse existing manifest if present
-	if m := LoadDirManifest(dir); m != nil {
+	// Reuse existing manifest ONLY when the name is not a generic fallback.
+	// Generic names (UUIDs, "Family + id") mean this entry was created by an
+	// older classifier that did not probe Civitai, so re-scan to (a) split
+	// ControlNet-only bundles like fa0e6cfc and (b) get a real Civitai name.
+	if m := LoadDirManifest(dir); m != nil && !isGenericName(m.Name) {
 		e := manifestToEntry(m, dir)
 		if e != nil {
-			return *e, true
+			return []AssetEntry{*e}, true
 		}
 	}
 
 	files, err := os.ReadDir(dir)
 	if err != nil {
-		return AssetEntry{}, false
+		return nil, false
 	}
 
-// For each file, use content-based classification (ProbeWeight) in
-// addition to the name-based rules. This catches Invoke AI exports
-// that are ControlNets but whose filenames say "diffusion_pytorch_model".
-fileMap := make(map[string]string)
-var totalMB float64
-var modelCandidates []string // files that might be the "model" slot
+	// For each file, use content-based classification (ProbeWeight) in
+	// addition to the name-based rules. This catches Invoke AI exports
+	// that are ControlNets but whose filenames say "diffusion_pytorch_model".
+	fileMap := make(map[string]string)
+	var totalMB float64
+	var modelCandidates []string    // files that might be the "model" slot
+	var controlNetFiles []string    // ControlNet safetensors found in this bundle
 
-for _, f := range files {
-	if f.IsDir() || !IsModelFile(f.Name()) {
-		continue
-	}
-	info, err := f.Info()
-	if err != nil {
-		continue
-	}
-	totalMB += float64(info.Size()) / (1024 * 1024)
-	fp := filepath.Join(dir, f.Name())
-	lower := strings.ToLower(f.Name())
-
-	switch ClassifyName(f.Name()) {
-	case AssetVAE:
-		fileMap["vae"] = fp
-	case AssetT5XXL:
-		fileMap["t5xxl"] = fp
-	case AssetClipL:
-		fileMap["clip_l"] = fp
-	case AssetClipG:
-		fileMap["clip_g"] = fp
-	case AssetLLM:
-		fileMap["llm"] = fp
-	case AssetControlNet:
-		fileMap["control_net"] = fp
-	case AssetLoRA:
-		// LoRAs are indexed on their own, never as bundle components.
-		continue
-	case AssetDiffusion:
-		modelCandidates = append(modelCandidates, fp)
-		if _, exists := fileMap["model"]; !exists || info.Size() > func() int64 {
-			if fi, e := os.Stat(fp); e == nil { return fi.Size() }
-			return 0
-		}() {
-			fileMap["model"] = fp
+	for _, f := range files {
+		if f.IsDir() || !IsModelFile(f.Name()) {
+			continue
 		}
-	default:
-		switch {
-		case strings.Contains(lower, "taesd"):
-			fileMap["taesd"] = fp
-		case strings.HasPrefix(lower, "diffusion_model"),
-			strings.HasPrefix(lower, "model") && strings.Contains(lower, "diffusion"):
-			fileMap["diffusion_model"] = fp
-		default:
+		info, err := f.Info()
+		if err != nil {
+			continue
+		}
+		totalMB += float64(info.Size()) / (1024 * 1024)
+		fp := filepath.Join(dir, f.Name())
+		lower := strings.ToLower(f.Name())
+
+		switch ClassifyName(f.Name()) {
+		case AssetVAE:
+			fileMap["vae"] = fp
+		case AssetT5XXL:
+			fileMap["t5xxl"] = fp
+		case AssetClipL:
+			fileMap["clip_l"] = fp
+		case AssetClipG:
+			fileMap["clip_g"] = fp
+		case AssetLLM:
+			fileMap["llm"] = fp
+		case AssetControlNet:
+			fileMap["control_net"] = fp
+			controlNetFiles = append(controlNetFiles, fp)
+		case AssetLoRA:
+			// LoRAs are indexed on their own, never as bundle components.
+			continue
+		case AssetDiffusion:
 			modelCandidates = append(modelCandidates, fp)
 			if _, exists := fileMap["model"]; !exists || info.Size() > func() int64 {
 				if fi, e := os.Stat(fp); e == nil { return fi.Size() }
@@ -389,128 +385,202 @@ for _, f := range files {
 			}() {
 				fileMap["model"] = fp
 			}
-		}
-	}
-}
-
-// Content-based override: probe each model candidate. If it reads as a
-// ControlNet or other non-diffusion asset, move it to its proper slot.
-// This fixes Invoke AI bundles that are just collections of ControlNets.
-for _, candidate := range modelCandidates {
-	if _, exists := fileMap["model"]; !exists {
-		continue
-	}
-	if candidate != fileMap["model"] {
-		continue
-	}
-	probe := ProbeWeight(candidate)
-	if at, knows := probe.AssetType(); knows && at != AssetDiffusion {
-		delete(fileMap, "model")
-		switch at {
-		case AssetControlNet:
-			fileMap["control_net"] = candidate
-		case AssetVAE:
-			fileMap["vae"] = candidate
-		case AssetT5XXL:
-			fileMap["t5xxl"] = candidate
-		case AssetClipL:
-			fileMap["clip_l"] = candidate
-		case AssetClipG:
-			fileMap["clip_g"] = candidate
-		case AssetLLM:
-			fileMap["llm"] = candidate
-		}
-		// Pick the next largest diffusion candidate as model.
-		var nextModel string
-		var nextSize int64
-		for _, c := range modelCandidates {
-			if c == candidate {
-				continue
-			}
-			if fi, err := os.Stat(c); err == nil {
-				p2 := ProbeWeight(c)
-				if at2, knows2 := p2.AssetType(); !knows2 || at2 == AssetDiffusion {
-					if fi.Size() > nextSize {
-						nextSize = fi.Size()
-						nextModel = c
-					}
+		default:
+			switch {
+			case strings.Contains(lower, "taesd"):
+				fileMap["taesd"] = fp
+			case strings.HasPrefix(lower, "diffusion_model"),
+				strings.HasPrefix(lower, "model") && strings.Contains(lower, "diffusion"):
+				fileMap["diffusion_model"] = fp
+			default:
+				modelCandidates = append(modelCandidates, fp)
+				if _, exists := fileMap["model"]; !exists || info.Size() > func() int64 {
+					if fi, e := os.Stat(fp); e == nil { return fi.Size() }
+					return 0
+				}() {
+					fileMap["model"] = fp
 				}
 			}
 		}
-		if nextModel != "" {
-			fileMap["model"] = nextModel
+	}
+
+	// Content-based override: probe each model candidate. If it reads as a
+	// ControlNet or other non-diffusion asset, move it out of the model slot.
+	// ControlNets found here are added to controlNetFiles so the split logic
+	// below can emit one entry per ControlNet. Multiple ControlNets in one
+	// bundle are all collected.
+	for _, candidate := range modelCandidates {
+		if _, exists := fileMap["model"]; !exists {
+			// The model slot was already taken by a different candidate.
+			// Check if THIS candidate is also non-diffusion and collect it.
+			probe := ProbeWeight(candidate)
+			if at, knows := probe.AssetType(); knows && at != AssetDiffusion {
+				switch at {
+				case AssetControlNet:
+					controlNetFiles = append(controlNetFiles, candidate)
+					if fileMap["control_net"] == "" {
+						fileMap["control_net"] = candidate
+					}
+				}
+			}
+			continue
+		}
+		if candidate != fileMap["model"] {
+			continue
+		}
+		probe := ProbeWeight(candidate)
+		if at, knows := probe.AssetType(); knows && at != AssetDiffusion {
+			delete(fileMap, "model")
+			switch at {
+			case AssetControlNet:
+				fileMap["control_net"] = candidate // last ControlNet wins in bundle
+				controlNetFiles = append(controlNetFiles, candidate)
+			case AssetVAE:
+				fileMap["vae"] = candidate
+			case AssetT5XXL:
+				fileMap["t5xxl"] = candidate
+			case AssetClipL:
+				fileMap["clip_l"] = candidate
+			case AssetClipG:
+				fileMap["clip_g"] = candidate
+			case AssetLLM:
+				fileMap["llm"] = candidate
+			}
+			// Pick the next largest diffusion candidate as model.
+			var nextModel string
+			var nextSize int64
+			for _, c := range modelCandidates {
+				if c == candidate {
+					continue
+				}
+				if fi, err := os.Stat(c); err == nil {
+					p2 := ProbeWeight(c)
+					if at2, knows2 := p2.AssetType(); !knows2 || at2 == AssetDiffusion {
+						if fi.Size() > nextSize {
+							nextSize = fi.Size()
+							nextModel = c
+						}
+					}
+				}
+			}
+			if nextModel != "" {
+				fileMap["model"] = nextModel
+			}
 		}
 	}
-}
 
-if len(fileMap) == 0 {
-	return AssetEntry{}, false
-}
-
-// Determine family from the component files, then the model filename.
-dirName := filepath.Base(dir)
-modelBase := dirName
-if p := fileMap["model"]; p != "" {
-	modelBase = strings.TrimSuffix(filepath.Base(p), filepath.Ext(p))
-}
-guessed := GuessFamily(modelBase)
-var family ModelFamily
-switch {
-case hasKey(fileMap, "clip_g") && !hasKey(fileMap, "t5xxl"):
-	family = FamilySDXL
-case guessed == FamilyWan || guessed == FamilyLTX || guessed == FamilyHunyuan || guessed == FamilyAnimate:
-	family = guessed
-case hasKey(fileMap, "diffusion_model") && hasKey(fileMap, "t5xxl"):
-	family = FamilyFlux
-case guessed != FamilyUnknown:
-	family = guessed
-default:
-	family = FamilySD15
-}
-
-// Same rule as single-file checkpoints: a multi-GB bundle whose model name
-// carries no architecture hint is SDXL, not SD1.5.
-if modelPath := fileMap["model"]; modelPath != "" {
-	if fi, err := os.Stat(modelPath); err == nil {
-		family = upgradeLargeCheckpoint(family, float64(fi.Size())/(1024*1024))
+	if len(fileMap) == 0 {
+		return nil, false
 	}
-}
 
-// A bundle is just a directory, so a Flux VAE sitting beside an SDXL
-// checkpoint would otherwise be attached to it and render garbage.
-if vaePath := fileMap["vae"]; vaePath != "" {
-	vaeFamily := GuessFamily(strings.TrimSuffix(filepath.Base(vaePath), filepath.Ext(vaePath)))
-	if !CompatibleVAE(family, vaeFamily) {
-		delete(fileMap, "vae")
+	// ControlNet-only bundles (e.g. Invoke AI exports that are collections of
+	// ControlNets with no diffusion model) must be split into individual
+	// ControlNet entries rather than shown as a single diffusion bundle.
+	if len(controlNetFiles) > 0 && fileMap["model"] == "" {
+		var entries []AssetEntry
+		for _, cns := range controlNetFiles {
+			probe := ProbeWeight(cns)
+			cnFamily := FamilyUnknown
+			if f, ok := probe.Family(); ok {
+				cnFamily = f
+			} else {
+				cnFamily = GuessFamily(strings.TrimSuffix(filepath.Base(cns), filepath.Ext(cns)))
+			}
+			m := &Manifest{
+				Name:      DisplayName(filepath.Base(cns), filepath.Dir(cns), probe, cnFamily),
+				Logic:     manifestLogicVersion,
+				Type:      AssetControlNet,
+				Family:    cnFamily,
+				Format:    "safetensors",
+				SizeMB:    0,
+				Files:     map[string]string{"control_net": cns},
+				Recommended: buildRecommended(AssetControlNet, cnFamily),
+			}
+			// Try Civitai lookup for the ControlNet's real name.
+			if isGenericName(m.Name) {
+				if civitaiName, err := IdentifyFromFile(cns, m); err == nil && civitaiName != "" {
+					m.Name = civitaiName
+				}
+			}
+			_ = SaveManifest(cns, m)
+			if e := manifestToEntry(m, cns); e != nil {
+				entries = append(entries, *e)
+			}
+		}
+		if len(entries) > 0 {
+			return entries, true
+		}
+		return nil, false
 	}
-}
 
-// The bundle's own weights override component-name guesses.
-probe := ProbeWeight(fileMap["model"])
-if f, ok := probe.Family(); ok {
-	family = f
-}
+	// Determine family from the component files, then the model filename.
+	dirName := filepath.Base(dir)
+	modelBase := dirName
+	if p := fileMap["model"]; p != "" {
+		modelBase = strings.TrimSuffix(filepath.Base(p), filepath.Ext(p))
+	}
+	guessed := GuessFamily(modelBase)
+	var family ModelFamily
+	switch {
+	case hasKey(fileMap, "clip_g") && !hasKey(fileMap, "t5xxl"):
+		family = FamilySDXL
+	case guessed == FamilyWan || guessed == FamilyLTX || guessed == FamilyHunyuan || guessed == FamilyAnimate:
+		family = guessed
+	case hasKey(fileMap, "diffusion_model") && hasKey(fileMap, "t5xxl"):
+		family = FamilyFlux
+	case guessed != FamilyUnknown:
+		family = guessed
+	default:
+		family = FamilySD15
+	}
 
-rec := buildRecommended(AssetDiffusion, family)
-m := &Manifest{
-	Name:        DisplayName(dirName, dir, probe, family),
-	Logic:       manifestLogicVersion,
-	Type:        AssetDiffusion,
-	Family:      family,
-	Format:      "bundle",
-	SizeMB:      totalMB,
-	Files:       fileMap,
-	Recommended: rec,
-}
-if civitaiName, err := IdentifyFromFile(fileMap["model"], m); err == nil && civitaiName != "" {
-	m.Name = civitaiName
-}
-_ = SaveDirManifest(dir, m)
-entry := manifestToEntry(m, dir)
-if entry == nil {
-	return AssetEntry{}, false
-}
-return *entry, true
+	// Same rule as single-file checkpoints: a multi-GB bundle whose model name
+	// carries no architecture hint is SDXL, not SD1.5.
+	if modelPath := fileMap["model"]; modelPath != "" {
+		if fi, err := os.Stat(modelPath); err == nil {
+			family = upgradeLargeCheckpoint(family, float64(fi.Size())/(1024*1024))
+		}
+	}
+
+	// A bundle is just a directory, so a Flux VAE sitting beside an SDXL
+	// checkpoint would otherwise be attached to it and render garbage.
+	if vaePath := fileMap["vae"]; vaePath != "" {
+		vaeFamily := GuessFamily(strings.TrimSuffix(filepath.Base(vaePath), filepath.Ext(vaePath)))
+		if !CompatibleVAE(family, vaeFamily) {
+			delete(fileMap, "vae")
+		}
+	}
+
+	// The bundle's own weights override component-name guesses.
+	probe := ProbeWeight(fileMap["model"])
+	if f, ok := probe.Family(); ok {
+		family = f
+	}
+
+	rec := buildRecommended(AssetDiffusion, family)
+	m := &Manifest{
+		Name:        DisplayName(dirName, dir, probe, family),
+		Logic:       manifestLogicVersion,
+		Type:        AssetDiffusion,
+		Family:      family,
+		Format:      "bundle",
+		SizeMB:      totalMB,
+		Files:       fileMap,
+		Recommended: rec,
+	}
+	// When the bundle's name is a generic fallback, try Civitai hash lookup
+	// on the model file to find a real name.
+	if isGenericName(m.Name) {
+		if civitaiName, err := IdentifyFromFile(fileMap["model"], m); err == nil && civitaiName != "" {
+			m.Name = civitaiName
+		}
+	}
+	_ = SaveDirManifest(dir, m)
+	entry := manifestToEntry(m, dir)
+	if entry == nil {
+		return nil, false
+	}
+	return []AssetEntry{*entry}, true
 }
 
 // ---- helpers ---------------------------------------------------------------
@@ -579,7 +649,7 @@ func hasKey(m map[string]string, k string) bool {
 }
 
 // isGenericName reports whether a display name is a fallback that carries no
-// human-readable information -- a UUID folder id or a family+id combo. These
+// human-readable information — a UUID folder id or a family+id combo. These
 // are the names where a Civitai hash lookup is worth attempting.
 func isGenericName(name string) bool {
 	lower := strings.ToLower(name)
@@ -592,4 +662,4 @@ func isGenericName(name string) bool {
 		}
 	}
 	return false
-}
+}
