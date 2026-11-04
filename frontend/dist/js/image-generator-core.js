@@ -194,11 +194,18 @@ async function loadModels() {
     if (!app) { console.warn('[IG] Wails runtime not available'); return; }
     setStatus('Scanning models...');
     try {
-        if (app.ScanImageModels) {
+        // Try the fast cached registry first (no disk scan), then fall back
+        // to a full scan only if the fast path is unavailable or empty.
+        if (app.GetRegisteredModels) {
+            scanIndex = await app.GetRegisteredModels();
+        }
+        if (!scanIndex || (!scanIndex.models || scanIndex.models.length === 0) && app.ScanImageModels) {
             scanIndex = await app.ScanImageModels();
-        } else if (app.GetModelIndex) {
+        }
+        if (!scanIndex || (!scanIndex.models || scanIndex.models.length === 0) && app.GetModelIndex) {
             scanIndex = await app.GetModelIndex();
-        } else {
+        }
+        if (!scanIndex) {
             // Legacy fallback
             const legacy = await app.ListImageModels();
             scanIndex = { models: legacy || [], vaes: [], loras: [], controlnets: [], embeddings: [], upscalers: [], t5xxls: [], clip_ls: [], clip_gs: [] };
@@ -1207,7 +1214,10 @@ function displayResult(result) {
         // Batch result: show grid of all images
         let gridHtml = '<div class="ig-batch-grid">';
         result.images.forEach((b64, idx) => {
-            gridHtml += `<img src="data:image/png;base64,${b64}" alt="Generated ${idx+1}" class="ig-batch-thumb" data-idx="${idx}" onclick="window.viewBatchImage(${idx})">`;
+            let mime = 'image/png';
+            if (b64.startsWith('/9j/')) mime = 'image/jpeg';
+            else if (b64.startsWith('UklGR')) mime = 'image/webp';
+            gridHtml += `<img src="data:${mime};base64,${b64}" alt="Generated ${idx+1}" class="ig-batch-thumb" data-idx="${idx}" onclick="window.viewBatchImage(${idx})">`;
         });
         gridHtml += '</div>';
         area.innerHTML = gridHtml;
@@ -1218,7 +1228,13 @@ function displayResult(result) {
             area.innerHTML = `<video controls autoplay loop style="max-width:100%;height:auto;border-radius:8px;" src="data:${result.video_mime || 'video/webm'};base64,${result.video_data}"></video>`;
         }
     } else if (result?.image_data) {
-        area.innerHTML = `<img src="data:image/png;base64,${result.image_data}" alt="Generated">`;
+        // Detect MIME from base64 magic bytes, same as showPreviewImage.
+        // sd-server can return PNG or JPEG depending on output_format; assume PNG
+        // only if the magic bytes match, otherwise probe for JPEG/WebP.
+        let mime = 'image/png';
+        if (result.image_data.startsWith('/9j/')) mime = 'image/jpeg';
+        else if (result.image_data.startsWith('UklGR')) mime = 'image/webp';
+        area.innerHTML = `<img src="data:${mime};base64,${result.image_data}" alt="Generated">`;
     } else if (result?.metadata) {
         area.innerHTML = `<div class="ig-canvas-placeholder"><div class="ig-canvas-text">Image saved to gallery</div></div>`;
     } else {
@@ -1253,7 +1269,11 @@ function displayResult(result) {
 window.viewBatchImage = function(idx) {
     if (!currentResult?.images?.[idx]) return;
     const area = document.getElementById('ig-preview-area');
-    area.innerHTML = `<img src="data:image/png;base64,${currentResult.images[idx]}" alt="Generated ${idx+1}">`;
+    let mime = 'image/png';
+    const b64 = currentResult.images[idx];
+    if (b64.startsWith('/9j/')) mime = 'image/jpeg';
+    else if (b64.startsWith('UklGR')) mime = 'image/webp';
+    area.innerHTML = `<img src="data:${mime};base64,${b64}" alt="Generated ${idx+1}">`;
 };
 
 // ---------------------------------------------------------------------------
