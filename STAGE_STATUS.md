@@ -347,10 +347,41 @@ must not be touched until the earlier tiers are closed.
    character's colour; the user bubble should carry the same treatment in the
    user's own colour instead of the current neutral edge.
 
+### Deferred product requirements (documented, not authorized)
+
+Separate from the polish backlog: model dependency discovery, a curated model
+collection, and transparent per-connection disclosure are captured as future
+product requirements in
+[`docs/deferred-model-ecosystem.md`](docs/deferred-model-ecosystem.md).
+That note is documentation only. It creates no stage, branch or acceptance
+criterion and does not interrupt the current completion sequence.
+
 ## Still open
 - Other pages (chat, characters, worlds, lorebooks, settings) still need the fluid-layout
   pass.
 - Inpaint / Outpaint / Upscale end-to-end runs.
+
+## Image Page Repair Mission (2026-11-04)
+
+**Status:** `in_progress`
+
+### Completed this session
+1. **Model dropdown fix** — `loadModels()` was stuck calling `ScanImageModels()` (full disk scan, times out) instead of `GetRegisteredModels()` (cached, instant). Fixed by trying cached registry first. Dropdown now populates in ~1s with 34 models.
+2. **Scheduler verified** — Two constant-seed (42) generations with Deliberate_v5 (sd1.5): Karras (28.25s) vs Discrete (15.46s) produced visually different outputs. Scheduler IS honored end-to-end.
+3. **Right-click menu verified** — `image-recall.js` contextmenu listener opens custom recall menu with all field buttons (Prompt, Seed, Steps, CFG, Sampler, Scheduler, Model, etc.).
+
+### Verified working
+- SD1.5 family (Deliberate_v5): generates successfully
+- All 12 scheduler UI options match sd-server supported values
+- Family defaults appropriate: sd1.5→karras, sdxl→karras, flux→simple
+- Model dropdown shows correct families: sd1.5, sdxl, flux, flux2, z_image, qwen_image, anima
+
+### Remaining
+- Test SDXL model generation (6 SDXL models available)
+- Test img2img/inpaint/outpaint workflows
+- Video mode feasibility research
+- IP functionality research
+- Preview hang investigation (not reproduced — generation completed OK)
 
 ## Group chat verification - three characters, click-built (2026-10-31)
 
@@ -1546,4 +1577,443 @@ for selection instead. No behavioural equivalence audit was performed.
 
 Checkpoint `1477530` remains the restore point and the working tree was not changed
 by this audit.
+
+## T2.9.2 - Manager: leases, generations, builds, drain, panics (closed 2026-11-02)
+
+Manager core implementation is closed after independent review. Scope was limited to
+`internal/audio/manager.go` and `internal/audio/manager_test.go`; no App, pipeline,
+provider, resolver, transport, UI, or design change was made.
+
+| Artifact | SHA-256 | Size |
+|---|---|---|
+| `internal/audio/manager.go` | `ae24e296c5799f0591267bba40a45d35ec059200d4adbfb5a260756862f0014e` | 26,795 bytes / 1,103 lines |
+| `internal/audio/manager_test.go` | `d0ed6dca7e586c5946d1c94b5eea21ec285cc350f95d79315e5cfa7e857e74a7` | 37,973 bytes / 1,257 lines |
+| `docs/asr-repair-design.md` | `38393d7e351f053bb770865a0bdfd37fc95761482d1392bc444754aac48165e9` | 61,599 bytes / 1,166 lines |
+
+Execution evidence, from the implementation run and not rerun by the read-only audit:
+
+```text
+go test -race -p=1 -timeout=180s ./internal/audio -count=1
+ok  howl-chat/internal/audio  2.513s
+
+go test -race -p=1 -timeout=180s ./internal/audio -run '^TestManagerM' -count=1
+ok  howl-chat/internal/audio  1.541s
+
+go vet -p=1 ./internal/audio
+exit 0
+```
+
+`gofmt` was clean. M1-M14 passed under the race detector, including the F1
+exactly-once checks for M5, M7, and M11 and the F2 deterministic drain barriers in
+M6, M7, and `TestManagerOperationDrain`.
+
+Independent review: **PASS**, with the qualification that the audit was read-only
+and did not rerun the tests. F1 and F2 were resolved against the current `Close`
+control flow. The audit's three optional observations are hardening opportunities,
+not closure blockers, and are deliberately not folded into T2.9.3:
+
+1. Assert that the test context has a deadline before using the drain-wait helper.
+2. Add stronger sustained-blocking evidence beyond the bounded point-in-time check.
+3. Add an M5 case overlapping `Close` with an Apply-initiated retirement.
+
+No staging, commit, tag, branch, remote, push, reset, or destructive cleanup was
+performed. T2.9.2 is closed; T2.9.3 remains a separate stage with its own scope and
+exit gate.
+
+## T2.9.3/T2.9.4 scope amendment (frozen 2026-11-02)
+
+The ASR repair design was amended to correct the stage boundary before T2.9.3
+implementation. No provider, pipeline, loader, interface, or test code was
+changed.
+
+| Artifact | SHA-256 | Size |
+|---|---|---|
+| `docs/asr-repair-design.md` | `ec9a58fd79cc6539940d85e26e732359c340a13d9ef5603114b50d1f36076b2b` | 66,435 bytes / 1,217 lines |
+| Previous T2.9.2 reference | `38393d7e351f053bb770865a0bdfd37fc95761482d1392bc444754aac48165e9` | 61,599 bytes / 1,166 lines |
+
+The previous hash in the T2.9.2 closure record is the design as it stood at that
+closure; it is not the current reference. T2.9.2 remains closed.
+
+The amendment records:
+
+- T2.9.3 owns provider serialization, temp ownership, loader-only release, and
+  P1-P5, including Qwen and concrete TTS conformance tests.
+- T2.9.4 owns the context-aware loader, pipeline transaction, P6, and lazy TTS
+  replacement ownership, with R1-R8 plus P6.
+- T2.9.1 ownership assertions use the exact `T2.9.3 (P5)` prerequisite and are
+  strengthened before T2.9.4 performs the signature-only helper update.
+- Whisper initialization no longer downloads or builds `whisper-cli`.
+- Superseded TTS synthesizers remain tracked under unique loader ids until
+  shutdown; that retention is deliberate.
+- Qwen serialization is provider-contract hardening only; remote ASR remains
+  out of scope and is not offered or selected.
+
+No tests were run for this documentation-only change. No staging, commit, tag,
+branch, remote, push, reset, or cleanup was performed. T2.9.3 remains blocked
+pending implementation authorization; T2.9.4 has not started.
+
+## T2.9.3 - Provider serialization, temp ownership, loader-only release, P1-P5 (closed 2026-11-02)
+
+T2.9.3 is **CLOSED / ACCEPTED**. Scope was provider serialization,
+recognizer/synthesizer temp ownership, loader-only release, and P1-P5 acceptance.
+No T2.9.4 implementation was included in this stage.
+
+| Artifact | SHA-256 | Size |
+|---|---|---|
+| `docs/asr-repair-design.md` | `ec9a58fd79cc6539940d85e26e732359c340a13d9ef5603114b50d1f36076b2b` | 66,435 bytes / 1,217 lines |
+| Historical T2.9.2 design reference (preserved) | `38393d7e351f053bb770865a0bdfd37fc95761482d1392bc444754aac48165e9` | 61,599 bytes / 1,166 lines |
+
+The current design hash and size were rechecked at closure. The design was not
+amended. The historical T2.9.2 reference remains the design as it stood at that
+closure; it is not the current reference.
+
+### Verification evidence
+
+DeepSeek implementation verification reported:
+
+- `gofmt` clean.
+- `go vet -p=1 ./internal/audio/...` passed.
+- `go test -race -p=1 -count=1 -timeout=300s ./internal/audio/...` passed.
+- Repeated race-test runs for the ASR/TTS packages passed.
+- `git diff --check` passed.
+
+These are reported implementation-run results, not independently audited test
+execution. The independent Muse audit verdict was **PASS WITH NONBLOCKING
+FINDINGS**. Muse performed read-only source review and did not execute tests. Its
+verdict is a source-review finding, distinct from the reported test results above.
+
+P1-P5 are accepted on the reported implementation evidence and the independent
+source audit. No T2.9.4 implementation was included in this stage.
+
+### Nonblocking findings
+
+**F1 - Whisper repeated initialization: deferred, confirmed defect.**
+
+- Repeated `Initialize` on the same Whisper recognizer is not a supported
+  lifecycle transition.
+- No current production path was found that calls it twice on the same instance.
+- The current implementation permits it and can orphan the prior temporary
+  directory.
+- This does not fail P1's explicit acceptance condition.
+- It is a latent D8 resource-ownership/configuration-immutability defect.
+- Disposition: deferred nonblocking issue. The proposed future correction is a
+  one-shot initialization guard before creating a new temporary directory. No
+  correction is authorized or implemented as part of this closure.
+
+**F2 - MeloTTS coverage asymmetry.**
+
+- Missing dedicated Initialize-versus-GetVoices serialization test.
+- Implementation locking was present in the reviewed source.
+- Disposition: nonblocking coverage note.
+
+**F3 - Whisper BinaryDownloader.**
+
+- Unreferenced downloader code remains in the tree.
+- Reviewed initialization and operational paths do not invoke it.
+- Disposition: informational; no removal authorized.
+
+**F4 - Progress callback reentrancy.**
+
+- Callbacks occur while the provider call lock is held.
+- Callback reentry could self-deadlock.
+- This is a pre-existing pattern and outside the present acceptance requirements.
+- Disposition: informational.
+
+**F5 - Qwen lock duration.**
+
+- `Transcribe` holds the call lock across submission and polling.
+- `Release` consequently waits for that operation.
+- Disposition: informational; consistent with the authorized serialization
+  behavior.
+
+**F6 - Fallback chain readiness validation.**
+
+- Chain initialization records readiness without validating providers.
+- This is consistent with T2.9.3's P5 ownership requirements.
+- Broader validation belongs to T2.9.4/R7.
+- Disposition: informational; do not expand T2.9.3 scope.
+
+### Stage boundary
+
+- T2.9.3 is closed and accepted.
+- F1-F6 remain documented with the dispositions above.
+- T2.9.4 has **not started**.
+- T2.9.4 remains unauthorized.
+- No T2.9.4 work is implied or approved by this closure.
+
+This closure operation was documentation-only in this file. No source, test,
+frozen-design, or other record was changed. No tests, builds, benchmarks, or
+application execution were run by the closure. No staging, commit, push, reset,
+branch, tag, or cleanup was performed.
+
+## T2.9.4 - Historical reconciliation (recorded 2026-11-03)
+
+T2.9.4 was accepted as **PASS WITH CAVEATS** in the working record, but its
+closure entry was missing from this file. This is a clearly labelled historical
+reconciliation, not a new closure and not a reopening of the stage. It
+supersedes, for chronology only, the earlier "T2.9.4 has not started" statement
+in the T2.9.3 closure; that statement was accurate when written.
+
+The verdict remains **PASS WITH CAVEATS**:
+
+- Manager-mediated panic cleanup and the pipeline transaction were proven by the
+  T2.9.4 tests through the test factory.
+- Production App integration was **not** proven at T2.9.4 closure. That work is
+  assigned to the T2.9.5A manager ownership migration and the T2.9.6 final App
+  wiring; this reconciliation does not claim it.
+- The independent audit was read-only and **did not rerun** the race suite. Its
+  PASS WITH CAVEATS verdict is a source-review finding, not independent test
+  execution.
+
+| Artifact | SHA-256 | Size |
+|---|---|---|
+| `internal/audio/pipeline.go` | `d3dd7ad3fb07b6a0c3079e38a9fe07f0fe6d7bc8d7e0ae5eca11d9236e3cbbdc` | 17,319 bytes / 609 lines |
+| `internal/audio/runtime/loader.go` | `a1c9cb0fc5483c8491a32e18e861df5c6fa5540e4767b6cfdf6e0dc97fc6ae59` | 6,764 bytes / 233 lines |
+| `internal/audio/runtime/loader_test.go` | `6f87d49cd721b1ceeb10bbe0c58583bd7d932c0d7dbbdd51b821facf5660b38a` | 10,651 bytes / 314 lines |
+| `internal/audio/types/interfaces.go` | `6bf166286cd501ab28a8299f1b099f40ff3bbbc059cf00a2f357b1dc116673f2` | 10,866 bytes / 401 lines |
+| `internal/audio/pipeline_test.go` | `4542cd724d7dcb229701a3d3f7ce3e98d63280b743c094aef2f65ee9d8647da1` | 21,643 bytes / 680 lines |
+| `internal/audio/asr/fallback/chain_test.go` | `37af38e561be27de99d4b0003fe6465667b44a9e32a045a7aa611a0efff6e330` | 5,931 bytes / 179 lines |
+| `docs/asr-repair-design.md` at T2.9.4 closure (historical) | `ec9a58fd79cc6539940d85e26e732359c340a13d9ef5603114b50d1f36076b2b` | 66,435 bytes / 1,217 lines |
+
+The implementation run reported, not independently audited by this
+reconciliation:
+
+```text
+gofmt -l  (clean)
+git diff --check  (exit 0)
+go vet -p=1 ./internal/audio/...  (exit 0)
+go test -race -p=1 -count=1 -timeout=300s ./internal/audio/...  (all packages ok)
+```
+
+No source or test file was changed by this reconciliation. The hashes were
+rechecked at reconciliation and the tests were not rerun for this entry. No
+staging, commit, push, reset, branch, tag, or cleanup was performed. T2.9.4
+remains closed as PASS WITH CAVEATS.
+
+## T2.9.5A/T2.9.5B scope amendment (frozen 2026-11-03)
+
+The ASR repair design was amended to split T2.9.5 into a sequential manager
+foundation and transport stage, and to make the imported-file and shutdown
+failure contracts explicit. No source, test, frontend, generated binding, or
+implementation file was changed by this amendment.
+
+| Artifact | SHA-256 | Size |
+|---|---|---|
+| `docs/asr-repair-design.md` (current reference) | `d290df9955349090c2b0071492acbec26abaf314a427f6a33f3c7bc5380af0b8` | 73,569 bytes / 1,300 lines |
+| Previous design reference (superseded) | `ec9a58fd79cc6539940d85e26e732359c340a13d9ef5603114b50d1f36076b2b` | 66,435 bytes / 1,217 lines |
+| `docs/t2.9.4-implementation-plan.md` (historical note) | `505cb0e482405738a17a4371c699106062af94174357d85376fe8667a3c823c5` | 8,738 bytes / 184 lines |
+
+The design was an untracked worktree artifact before this amendment. It was
+inspected and preserved; it was not recreated, staged, cleaned, or removed.
+
+This amendment records:
+
+- T2.9.5A owns the single App manager, the production pipeline factory, and the
+  migration of every direct App pipeline access, including status, voices, TTS,
+  enable/disable, and the temporary old ASR bridge.
+- T2.9.5B follows T2.9.5A sequentially. It owns D1 transport, ordered limits,
+  full WAV validation, temp cleanup, the legacy file path, request leases, and
+  request-panic cleanup.
+- 5A introduces no 15-minute request timeout. TTS, voice enumeration, status,
+  enable/disable, and the temporary ASR bridge use manager state, a lease, or a
+  zero-timeout operation; `Manager.Close` is their cancellation boundary.
+- 5B applies the 15-minute `audioTranscriptionTimeout` only to
+  `TranscribeAudio` and `TranscribeAudioFile`. TTS and voice enumeration do not
+  inherit it.
+- Imported transcription accepts only PCM WAV at or below 600 seconds and
+  19,200,044 bytes. Non-WAV imports fail closed because no bundled or verified
+  duration probe exists; they cannot bypass the duration ceiling.
+- The 5A enable/disable/status bridge is temporary. 5B must not expand it into
+  D5 settings, persistence, full status, `ApplyResult`, or startup
+  reconciliation. T2.9.6 replaces it.
+- L6 is 5B regression verification of the TTS/voice lease migration already
+  completed in 5A; it is not duplicate implementation.
+- T2.9.6 prerequisites are 2, 4, 5A, and 5B; 5B cannot begin before 5A closes,
+  and 6 cannot begin before 5B closes.
+- T2.9.5A preserves `Manager.Close(ctx context.Context) error` unchanged. With
+  no caller deadline it supplies the existing five-second default; a blocked
+  drain returns `ErrDrainTimeout`, leaves the manager `closing`, and does not
+  forcibly release a lease. The App reports the error. A7 is the acceptance
+  test and must be executed in 5A; lifecycle behavior is not changed to avoid
+  it. The five-second behavior is source-verified, not execution-tested.
+- T2.9.5B may close with a documented T6 **BLOCKED** gate, but must not claim
+  packaged-runtime readiness until the payload ceiling is measured.
+
+No tests were run for this documentation-only amendment. No source, test,
+build, benchmark, generated binding, or application execution was performed.
+No staging, commit, push, reset, branch, tag, or cleanup was performed.
+
+T2.9.4 remains closed as PASS WITH CAVEATS. T2.9.5A, T2.9.5B, and T2.9.6 have
+not started and are not authorized by this record.
+
+## T2.9.5A - Production manager foundation and ownership migration (closed 2026-11-03)
+
+T2.9.5A is **CLOSED** with verdict **PASS WITH CAVEATS**. This entry supersedes,
+for chronology only, the preceding amendment's statement that T2.9.5A had not
+started; that statement was accurate when written.
+
+Disposition:
+
+- T2.9.5A is closed. No implementation rework is required before closure.
+- The independent read-only audit found no Critical or High findings.
+- The two Medium findings are accepted temporary limitations. They are carried
+  forward as downstream requirements below.
+- The four Low/Informational findings are accepted and remain visible in this
+  record.
+- This closure does **not** authorize T2.9.5B.
+
+The independent audit verified source and test code but did **not execute** tests.
+The implementation's reported test, race, vet, formatting, and diff-check results
+below remain implementation-reported; they were not independently reproduced by
+the auditor.
+
+| Artifact | SHA-256 | Size |
+|---|---|---|
+| `app.go` | `df8f85c137b768258b4e2d273036e0acde78af26ef088b6259e4b56dce037914` | 10,516 bytes / 309 lines |
+| `app-audio.go` | `b6575b359cfd7f3ed0badd1abafd95a69763c32f6e9207db7984435728af1890` | 8,223 bytes / 258 lines |
+| `app_audio_ownership_test.go` | `9304475c049409b3b351623658f32e013502ba4fd42a76ffd26f0f35a5c3c54b` | 12,844 bytes / 418 lines |
+| `internal/audio/manager_factory.go` | `827e9c5b66aafe9f281551b58ca3d49c391950bba8354a93427675252fc8fec6` | 1,777 bytes / 62 lines |
+| `internal/audio/manager_factory_test.go` | `cc208e3aed585b84280d494b33d5aef01507c74db042da7dbd86f536bc3d54af` | 1,964 bytes / 65 lines |
+| `docs/asr-repair-design.md` (unchanged reference) | `d290df9955349090c2b0071492acbec26abaf314a427f6a33f3c7bc5380af0b8` | 73,569 bytes / 1,300 lines |
+
+### Evidence basis
+
+**Source-observed:**
+
+- App ownership is through one `*audio.Manager`; no `audioPipeline` identifier
+  remains in production code. The only remaining identifier match is the
+  ownership test that asserts the old field is absent.
+- Production manager construction is provider-free. `NewApp` constructs the
+  manager without initializing a provider or performing model I/O.
+- The production factory assigns `candidate.Pipeline` before `Initialize` and
+  maps the private per-capability initialization outcomes.
+- App ASR/TTS operations use Manager operations and leases. Voice enumeration
+  acquires and releases a lease. Status comes from the Manager snapshot.
+- `OnShutdown` delegates to `Manager.Close` and reports its error. The Manager's
+  close/drain behavior and lifecycle semantics are unchanged.
+- The A8 scope guard is source-inspection based: no D1 transport, WAV encoder or
+  validation, imported-file path, request limit, 15-minute timeout, D5
+  persistence/status, startup reconciliation, or T2.9.7 behavior was introduced.
+  No standalone A8 test was added.
+- T2.9.4 artifacts were rechecked and match their T2.9.4 closure hashes:
+  `internal/audio/pipeline.go` `d3dd7ad3fb07b6a0c3079e38a9fe07f0fe6d7bc8d7e0ae5eca11d9236e3cbbdc`,
+  `internal/audio/runtime/loader.go` `a1c9cb0fc5483c8491a32e18e861df5c6fa5540e4767b6cfdf6e0dc97fc6ae59`,
+  `internal/audio/runtime/loader_test.go` `6f87d49cd721b1ceeb10bbe0c58583bd7d932c0d7dbbdd51b821facf5660b38a`,
+  `internal/audio/types/interfaces.go` `6bf166286cd501ab28a8299f1b099f40ff3bbbc059cf00a2f357b1dc116673f2`,
+  `internal/audio/pipeline_test.go` `4542cd724d7dcb229701a3d3f7ce3e98d63280b743c094aef2f65ee9d8647da1`,
+  and `internal/audio/asr/fallback/chain_test.go`
+  `37af38e561be27de99d4b0003fe6465667b44a9e32a045a7aa611a0efff6e330`.
+- The Manager artifacts also match their T2.9.2 closure hashes:
+  `internal/audio/manager.go`
+  `ae24e296c5799f0591267bba40a45d35ec059200d4adbfb5a260756862f0014e`
+  (26,795 bytes / 1,103 lines) and `internal/audio/manager_test.go`
+  `d0ed6dca7e586c5946d1c94b5eea21ec285cc350f95d79315e5cfa7e857e74a7`
+  (37,973 bytes / 1,257 lines).
+
+**Test-code-inspected:**
+
+- A1 checks App struct shape: one manager field and no direct pipeline field.
+  Absence of production paths holding `*Pipeline` is established by source
+  inspection, not by reflection alone (see F6).
+- A2 checks candidate assignment before initialization and capability outcome
+  mapping. A3 checks the temporary Apply bridge and failed-replacement
+  preservation. A4 checks status and the one-lease voice path. A5 checks TTS and
+  legacy ASR operation-plus-lease use with no artificial deadline. A6 checks
+  `OnShutdown` close wiring and error reporting.
+- A7 genuinely exercises the Manager's real five-second default close, the
+  `ErrDrainTimeout` result, the `closing` state, no forced lease release, and
+  finalization after a later close. It calls `Manager.Close` directly rather
+  than `App.OnShutdown` (see F2).
+
+**Implementation-reported execution, not independently reproduced by the audit:**
+
+```text
+gofmt -l  (no files listed)
+git diff --check  (exit 0)
+go vet -p=1 ./internal/audio/... .  (exit 0)
+go test -race -p=1 -count=1 -timeout=300s ./internal/audio/...  (all packages ok)
+go test -race . -run 'TestA[1-7]' -count=1 -timeout=120s  (ok, 7.773s)
+```
+
+**Inferred:** The combination of the factory assignment/panic test and disposal
+coverage supports the panic-disposal conclusion, but was not exercised as one
+end-to-end test through a real Manager (see F5).
+
+**Not established:** Real model execution and packaged-runtime readiness.
+
+### Findings
+
+**F1 - Medium - Temporary enable/disable bridge desired-state behavior.**
+
+Location: `app-audio.go` `EnableAudioASR`/`EnableAudioTTS` (audit location
+168-199).
+
+- Enable paths apply one capability, while `Manager.Apply` replaces the complete
+  desired state. Enabling ASR can schedule TTS desired-off and retire an existing
+  TTS generation.
+- Disable paths read status and then apply it. Concurrent changes can make this a
+  check-then-act race and potentially resurrect a capability that was just
+  disabled.
+- Disposition: accepted as a temporary 5A bridge limitation. Do not fix it in
+  5A.
+- **Carry-forward requirement (T2.9.6):** replace the bridge; preserve sibling
+  desired state; eliminate the check-then-act/concurrent-intent hazard; add tests
+  that assert the actual desired-state mapping, including relevant
+  concurrent-intent cases.
+
+**F2 - Medium - App-level blocked-drain shutdown coverage.**
+
+Location: `app_audio_ownership_test.go`, `TestA7FiveSecondCloseTimeout`.
+
+- The test exercises the Manager's real five-second default and drain timeout,
+  but calls `Manager.Close` directly rather than `App.OnShutdown` with a blocked
+  drain.
+- Disposition: accepted for 5A. Do not rework 5A.
+- **Carry-forward requirement:** before relying on this shutdown contract for
+  transport leases in later work, add an App-level blocked-drain test through
+  `App.OnShutdown`.
+
+**F3 - Low - Nil candidate factory branch.**
+
+Location: `internal/audio/manager_factory.go` nil-candidate branches (audit
+location 36-44).
+
+- A nil candidate could leave an initialized pipeline without an owner. The D3
+  contract supplies a non-nil candidate, so this is unreachable through the
+  intended production path.
+- Disposition: accepted; optional future defensive early return. No 5A rework.
+
+**F4 - Low - `error_count` semantics.**
+
+Location: `app-audio.go` `GetAudioStatus` (audit location 130-143).
+
+- The compatibility field now represents a capability-error count rather than the
+  former provider error counter.
+- Disposition: accepted as temporary status compatibility. T2.9.6/D5 status work
+  replaces this shape. Do not expand scope now.
+
+**F5 - Informational - Compositional panic-disposal proof.**
+
+Factory assignment-before-panic and disposal behavior are covered by separate
+tests rather than one end-to-end test through a real Manager. Accepted at 5A.
+
+**F6 - Informational - A1 reflection-test limitation.**
+
+The reflection test proves App struct shape. The absence of production paths
+holding `*Pipeline` is established by source inspection, not by that test alone.
+The combined source and test evidence supports the audit verdict.
+
+### Stage boundary
+
+- T2.9.5A is closed as PASS WITH CAVEATS; F1-F6 remain documented with the
+  dispositions above.
+- T2.9.5B has **not started** and is **not authorized** by this closure.
+- T2.9.6 has not started and is not authorized by this record.
+- This closure operation was documentation-only in this file. It did not modify
+  source code, tests, dependencies, configuration, frontend assets, generated
+  bindings, the frozen design, or unrelated project records. It did not overwrite
+  or remove pre-existing dirty or untracked work.
+- No tests, builds, benchmarks, or application execution were run by this
+  closure. Hashes were rechecked read-only. No staging, commit, push, reset,
+  branch, tag, stash, clean, or other Git mutation was performed.
 
