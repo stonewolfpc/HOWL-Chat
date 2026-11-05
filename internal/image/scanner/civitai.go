@@ -12,8 +12,13 @@ import (
 )
 
 // civitaiClient is a long-lived HTTP client for Civitai API calls.
+// A Browser-like User-Agent is required because Civitai blocks the default
+// Go-http-client/1.1 agent with HTTP 403.
 var civitaiClient = &http.Client{
 	Timeout: 15 * time.Second,
+	Transport: &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+	},
 }
 
 // LookupByHash queries Civitai's public API to identify a model by its SHA256.
@@ -22,7 +27,12 @@ var civitaiClient = &http.Client{
 // This is a public, no-auth endpoint suitable for offline model identification.
 func LookupByHash(hash string) (string, error) {
 	url := "https://civitai.com/api/v1/model-versions/by-hash/" + hash
-	resp, err := civitaiClient.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return "", fmt.Errorf("civitai request: %w", err)
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+	resp, err := civitaiClient.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("civitai request: %w", err)
 	}

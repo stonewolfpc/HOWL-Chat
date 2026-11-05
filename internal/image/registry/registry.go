@@ -25,6 +25,11 @@ import (
 const registryFile = "model-registry.json"
 const dirsFile = "model-scan-dirs.json"
 
+// AdmissionCacheVersion versions the cached GGUF admission facts stored on an
+// entry. Bump it whenever AdmitModel's rules change, so entries classified by
+// an older rule set are re-read exactly once instead of trusting stale facts.
+const AdmissionCacheVersion = 1
+
 // Entry is one record in the global registry.
 type Entry struct {
 	Name         string              `json:"name"`
@@ -38,6 +43,17 @@ type Entry struct {
 	Files        map[string]string   `json:"files,omitempty"`
 	Recommended  scanner.Recommended `json:"recommended"`
 	RegisteredAt time.Time           `json:"registered_at"`
+
+	// Cached GGUF admission facts, recorded once when the file was classified.
+	// Picker reads and later scans reuse them instead of parsing the same
+	// multi-gigabyte header again; AdmissionV marks which classifier rules
+	// produced them.
+	AdmissionClass string   `json:"admission,omitempty"`
+	Arch           string   `json:"arch,omitempty"`
+	ModelName      string   `json:"model_name,omitempty"`
+	ModelTags      []string `json:"model_tags,omitempty"`
+	EmbeddingLen   int      `json:"embedding_length,omitempty"`
+	AdmissionV     int      `json:"admission_version,omitempty"`
 }
 
 // Registry is the in-memory + on-disk store.
@@ -126,7 +142,31 @@ func (r *Registry) SyncDir(dir string, entries []Entry, seen map[string]struct{}
 		// Only drop entries whose file is actually gone. A file the scanner
 		// chose not to classify (unknown family, unreadable header) is still on
 		// disk and must stay listed rather than silently disappearing.
-		if _, err := os.Stat(path); err == nil {
+		if info, err := os.Stat(path); err == nil {
+			// If the path is a directory, it was a bundle entry. Prune it if the
+			// scanner no longer produces an entry for this exact path (e.g. the
+			// bundle was split into individual ControlNet files).
+			if info.IsDir() {
+				// Check if any scanned entry has this exact path (a bundle that
+				// was NOT split). If not, prune the stale directory entry.
+				if _, ok := seen[path]; !ok {
+					delete(r.entries, path)
+					removed++
+				}
+				continue
+			}
+			// The file still exists but the scanner produced no entry for it.
+			// If its identity changed, it was re-classified out (a chat model
+			// replaced by a projector/component, or by an unreadable file).
+			// Keeping the old entry would leave it advertised with a stale
+			// classification, so the picker would still offer it. A file whose
+			// identity is unchanged (locked, temporarily unreadable) keeps its
+			// place.
+			if prev, ok := r.entries[path]; ok && prev.FileSize != 0 &&
+				(prev.FileSize != info.Size() || prev.ModTimeNS != info.ModTime().UnixNano()) {
+				delete(r.entries, path)
+				removed++
+			}
 			continue
 		}
 		delete(r.entries, path)

@@ -36,10 +36,16 @@ func (a *App) SendMessageStreamWithImage(message string, imageData string) error
 		}
 		// Check if the loaded model supports vision
 		if a.currentModelProfile == nil || !a.currentModelProfile.HasVision {
-			errMsg := "This model does not support image input. Vision models require an mmproj file in the same directory."
+			errMsg := "This model does not support image input. Image input requires a projector whose metadata declares a vision encoder."
 			if a.currentModelProfile != nil && a.currentModelProfile.MMPProjPath == "" {
-				errMsg = fmt.Sprintf("No mmproj file found for %s in %s. Vision models require an mmproj projection file alongside the model.",
+				errMsg = fmt.Sprintf("No projector found for %s in %s. Image input requires a projector that declares a vision encoder alongside the model.",
 					a.currentModelProfile.Family, filepath.Dir(a.currentModelProfile.Path))
+			} else if kind := a.currentModelProfile.ProjectorKind; kind == "hybrid" || kind == "vision" {
+				errMsg = fmt.Sprintf("The projector beside %s declares %q, but image input has not been verified for this model and is not advertised.",
+					a.currentModelProfile.Family, kind)
+			} else {
+				errMsg = fmt.Sprintf("The projector beside %s declares %q, not a vision encoder, so image input is unavailable.",
+					a.currentModelProfile.Family, a.currentModelProfile.ProjectorKind)
 			}
 			a.emitEvent("chat:error", errMsg)
 			return fmt.Errorf("%s", errMsg)

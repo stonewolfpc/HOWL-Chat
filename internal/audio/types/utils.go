@@ -13,7 +13,7 @@ import (
 // DetectAudioFormat identifies format from file extension and header
 func DetectAudioFormat(path string) (AudioFormat, error) {
 	ext := strings.ToLower(filepath.Ext(path))
-	
+
 	switch ext {
 	case ".wav":
 		return FormatWAV, nil
@@ -119,7 +119,7 @@ func GetAudioMetadata(path string) (*AudioMetadata, error) {
 	// Parse output
 	metadata := &AudioMetadata{}
 	lines := strings.Split(string(output), "\n")
-	
+
 	for _, line := range lines {
 		if strings.HasPrefix(line, "duration=") {
 			fmt.Sscanf(line, "duration=%f", &metadata.Duration)
@@ -185,7 +185,7 @@ func ValidateAudioFile(path string) error {
 		}
 	}
 	if !found {
-		return NewAudioError(ErrCodeFormatNotSupported, 
+		return NewAudioError(ErrCodeFormatNotSupported,
 			fmt.Sprintf("format %s not in supported list", format), nil)
 	}
 
@@ -211,7 +211,7 @@ func CalculateAudioTokens(duration float64, modelType string) int {
 	switch modelType {
 	case string(ASRWhisperTiny), string(ASRWhisperBase):
 		tokensPerSecond = 50
-	case string(ASRWhisperSmall), string(ASRWhisperMed):
+	case string(ASRWhisperSmall):
 		tokensPerSecond = 75
 	case string(ASRQwen3ASR06B), string(ASRQwen3ASR17B):
 		tokensPerSecond = 100

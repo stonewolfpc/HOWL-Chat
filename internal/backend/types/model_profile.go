@@ -65,11 +65,22 @@ type ModelProfile struct {
 	// It is the authoritative source for memory estimation.
 	ArchitectureSpec *ArchitectureSpec
 
-	// HasVision is true if the model supports multimodal image input.
-	// Detected from mmproj file presence alongside the model.
+	// HasVision is true only when the chat task policy has verified image
+	// input. A projector declaration alone is not enough: an audio projector
+	// sits beside the model under the same mmproj name, and an unverified
+	// vision declaration is not advertised.
 	HasVision bool
 
-	// MMPProjPath is the path to the mmproj file if found alongside the model.
+	// HasAudioInput is true only when the chat task policy has verified audio
+	// input. A projector declaration alone is not advertised.
+	HasAudioInput bool
+
+	// ProjectorKind records what the projector declares itself to be
+	// ("vision", "audio", "hybrid", "unknown").
+	ProjectorKind string
+
+	// MMPProjPath is the path to the projector file if one was found alongside
+	// the model.
 	MMPProjPath string
 }
 

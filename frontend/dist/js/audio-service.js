@@ -22,6 +22,8 @@ window.AudioService = {
     playTTS,
     stopTTS,
     getStatus,
+    syncFromSettings,
+    getASRReadiness,
     enableASR,
     enableTTS,
     isTTSEnabled,
@@ -32,20 +34,112 @@ window.AudioService = {
 // State
 // ---------------------------------------------------------------------------
 
-let _mediaRecorder = null;
+let _audioContext = null;
+let _mediaStream = null;
+let _sourceNode = null;
+let _processorNode = null;
 let _recordedChunks = [];
+let _recordingSampleRate = 16000;
 let _recording = false;
+let _starting = false;
+let _processing = false;
+let _maxRecordingTimer = null;
 let _ttsAudio = null;
 let _asrEnabled = window.settingsState?.current?.audio?.asrEnabled || false;
 let _ttsEnabled = window.settingsState?.current?.audio?.ttsEnabled || false;
+let _asrReadiness = _asrEnabled ? 'not-ready' : 'disabled';
+let _asrReadinessDetail = '';
+
+const MAX_RECORDING_SECONDS = 120;
+const REMOTE_ASR_ENGINES = new Set(['qwen3-asr-0.6b', 'qwen3-asr-1.7b']);
+
+let _restoreApplied = false;
+
+function syncFromSettings() {
+    const s = window.settingsState?.current?.audio;
+    if (!s) return;
+    _asrEnabled = !!s.asrEnabled;
+    _ttsEnabled = !!s.ttsEnabled;
+    if (!_asrEnabled) {
+        _asrReadiness = 'disabled';
+        _asrReadinessDetail = 'ASR is disabled.';
+    } else if (_asrReadiness === 'disabled') {
+        _asrReadiness = 'not-ready';
+        _asrReadinessDetail = '';
+    }
+}
+
+async function _refreshASRReadiness() {
+    const app = window.go?.main?.App;
+    if (typeof app?.GetAudioStatus !== 'function') return;
+    try {
+        const status = await app.GetAudioStatus();
+        _asrReadiness = _readinessFromStatus(status);
+        _asrReadinessDetail = status.asr_error || (_asrReadiness === 'remote-unverified' ?
+            'remote engine availability is not locally verified' : '');
+    } catch (err) {
+        console.warn('GetAudioStatus failed while refreshing ASR readiness:', err);
+    }
+}
+
+function _readinessFromStatus(status) {
+    if (status?.asr_readiness === 'disabled') return 'disabled';
+    const engine = window.settingsState?.current?.audio?.asrEngine;
+    if (REMOTE_ASR_ENGINES.has(engine)) return 'remote-unverified';
+    if (status?.asr_readiness) return status.asr_readiness;
+    return status?.asr_ready ? 'local-initialized' : 'not-ready';
+}
+
+// Re-apply the persisted engine choices once settings have loaded. Without this
+// the dropdowns could restore an engine the backend had never been told about.
+async function restorePersistedAudio() {
+    if (_restoreApplied) return;
+    const s = window.settingsState?.current?.audio;
+    const app = window.go?.main?.App;
+    if (!s || (!s.asrEnabled && !s.ttsEnabled)) return;
+    if (typeof app?.ApplyAudioSettings !== 'function') return;
+    _restoreApplied = true;
+    try {
+        await app.ApplyAudioSettings(
+            !!s.asrEnabled,
+            !!s.ttsEnabled,
+            s.asrEngine || 'auto',
+            s.ttsEngine || 'auto'
+        );
+        await _refreshASRReadiness();
+    } catch (err) {
+        console.warn('Audio settings restore failed:', err);
+        _asrReadiness = 'apply-failed';
+        _asrReadinessDetail = String(err);
+    }
+}
 
 // Sync with persisted settings whenever they change
 window.addEventListener('DOMContentLoaded', () => {
-    const s = window.settingsState?.current?.audio;
-    if (s) {
-        _asrEnabled = s.asrEnabled;
-        _ttsEnabled = s.ttsEnabled;
+    syncFromSettings();
+    restorePersistedAudio();
+});
+window.addEventListener('howl:settings-loaded', () => {
+    syncFromSettings();
+    restorePersistedAudio();
+});
+
+// The audio-settings iframe saves and applies in one user action. Receive the
+// result immediately so the parent microphone button does not need a reload to
+// see the new enabled state or readiness scope.
+window.addEventListener('howl:audio-settings-applied', (event) => {
+    const detail = event?.detail;
+    if (!detail?.audio) return;
+    if (window.settingsState?.current?.audio) {
+        Object.assign(window.settingsState.current.audio, detail.audio);
     }
+    syncFromSettings();
+    _restoreApplied = true;
+    _asrReadiness = detail.readiness || 'not-ready';
+    _asrReadinessDetail = detail.detail || '';
+    window.dispatchEvent(new CustomEvent('howl:audio-readiness-changed', {
+        detail: { state: _asrReadiness, detail: _asrReadinessDetail }
+    }));
 });
 
 // ---------------------------------------------------------------------------
@@ -57,46 +151,135 @@ function isRecording() {
 }
 
 async function startRecording() {
-    if (_recording) return;
+    if (_recording || _starting || _processing) return;
+    if (!_asrEnabled) {
+        showNotification('Speech recognition is disabled', 'warning');
+        return;
+    }
+    const blocked = _asrBlockedReason();
+    if (blocked) {
+        showNotification(blocked, 'warning');
+        return;
+    }
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         showNotification('Microphone not supported in this browser', 'error');
         return;
     }
+    if (!window.AudioWav || typeof window.AudioWav.encodeWav16 !== 'function') {
+        showNotification('WAV encoder is unavailable', 'error');
+        return;
+    }
 
+    _starting = true;
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        _mediaRecorder = new MediaRecorder(stream);
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                channelCount: 1,
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+            }
+        });
+        _mediaStream = stream;
+
+        const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextCtor) throw new Error('Web Audio is not available');
+
+        let context;
+        try {
+            context = new AudioContextCtor({ sampleRate: 16000 });
+        } catch (_) {
+            context = new AudioContextCtor();
+        }
+
+        _audioContext = context;
+        _sourceNode = context.createMediaStreamSource(stream);
+        _processorNode = context.createScriptProcessor(4096, 1, 1);
         _recordedChunks = [];
+        _recordingSampleRate = context.sampleRate || 16000;
 
-        _mediaRecorder.ondataavailable = (e) => {
-            if (e.data.size > 0) _recordedChunks.push(e.data);
+        _processorNode.onaudioprocess = (event) => {
+            if (!_recording) return;
+            const channel = event.inputBuffer.getChannelData(0);
+            _recordedChunks.push(new Float32Array(channel));
         };
 
-        _mediaRecorder.onstop = async () => {
-            _recording = false;
-            updateMicButtonState(false);
-            const blob = new Blob(_recordedChunks, { type: 'audio/webm' });
-            await processRecordedAudio(blob);
-            // Stop all tracks to release mic
-            stream.getTracks().forEach(t => t.stop());
-        };
+        _sourceNode.connect(_processorNode);
+        _processorNode.connect(context.destination);
+        await context.resume();
 
-        _mediaRecorder.start();
         _recording = true;
         updateMicButtonState(true);
         showNotification('Recording started...', 'info');
+        _maxRecordingTimer = window.setTimeout(() => {
+            if (_recording) {
+                showNotification('Recording limit reached', 'info');
+                stopRecording();
+            }
+        }, MAX_RECORDING_SECONDS * 1000);
     } catch (err) {
         console.error('Failed to start recording:', err);
-        showNotification('Microphone access denied or unavailable', 'error');
+        releaseCapture();
         _recording = false;
         updateMicButtonState(false);
+        showNotification('Microphone access denied or unavailable', 'error');
+    } finally {
+        _starting = false;
     }
 }
 
+function _asrBlockedReason() {
+    if (_asrReadiness === 'local-initialized' || _asrReadiness === 'remote-unverified') return '';
+    if (_asrReadiness === 'not-ready') {
+        return 'Speech recognition is saved but not ready' +
+            (_asrReadinessDetail ? ': ' + _asrReadinessDetail : '');
+    }
+    if (_asrReadiness === 'apply-failed') {
+        return 'Speech recognition settings could not be applied' +
+            (_asrReadinessDetail ? ': ' + _asrReadinessDetail : '');
+    }
+    if (_asrReadiness === 'unconfigured') {
+        return 'Speech recognition needs an explicit ASR engine';
+    }
+    if (_asrReadiness === 'unchecked') {
+        return 'Speech recognition readiness has not been checked';
+    }
+    return '';
+}
+
 function stopRecording() {
-    if (!_recording || !_mediaRecorder) return;
-    _mediaRecorder.stop();
+    if (!_recording) return;
+
+    _recording = false;
+    updateMicButtonState(false);
+    if (_maxRecordingTimer) {
+        clearTimeout(_maxRecordingTimer);
+        _maxRecordingTimer = null;
+    }
+
+    const chunks = _recordedChunks;
+    const sampleRate = _recordingSampleRate;
+    _recordedChunks = [];
+    releaseCapture();
+
     showNotification('Processing speech...', 'info');
+    _processing = true;
+    (async () => {
+        try {
+            const samples = mergeSamples(chunks);
+            if (!hasSignal(samples)) {
+                showNotification('No speech detected', 'warning');
+                return;
+            }
+            const wav = window.AudioWav.encodeWav16(samples, sampleRate);
+            await processRecordedAudio(wav);
+        } catch (err) {
+            console.error('Microphone processing error:', err);
+            showNotification('Transcription failed: ' + err, 'error');
+        } finally {
+            _processing = false;
+        }
+    })();
 }
 
 function toggleRecording() {
@@ -104,27 +287,67 @@ function toggleRecording() {
     else startRecording();
 }
 
-async function processRecordedAudio(blob) {
-    try {
-        // Convert blob to file and save temporarily
-        const arrayBuffer = await blob.arrayBuffer();
-        const bytes = new Uint8Array(arrayBuffer);
+function releaseCapture() {
+    if (_processorNode) {
+        _processorNode.onaudioprocess = null;
+        try { _processorNode.disconnect(); } catch (_) {}
+        _processorNode = null;
+    }
+    if (_sourceNode) {
+        try { _sourceNode.disconnect(); } catch (_) {}
+        _sourceNode = null;
+    }
+    if (_audioContext) {
+        const context = _audioContext;
+        _audioContext = null;
+        if (context.state !== 'closed') context.close().catch(() => {});
+    }
+    if (_mediaStream) {
+        _mediaStream.getTracks().forEach((track) => {
+            try { track.stop(); } catch (_) {}
+        });
+        _mediaStream = null;
+    }
+}
 
-        // Try to send to backend via Wails
-        if (!window.go?.main?.App?.TranscribeAudio) {
+function mergeSamples(chunks) {
+    let length = 0;
+    for (const chunk of chunks) length += chunk.length;
+    const merged = new Float32Array(length);
+    let offset = 0;
+    for (const chunk of chunks) {
+        merged.set(chunk, offset);
+        offset += chunk.length;
+    }
+    return merged;
+}
+
+function hasSignal(samples) {
+    if (!samples || samples.length === 0) return false;
+    let sum = 0;
+    for (let i = 0; i < samples.length; i++) sum += samples[i] * samples[i];
+    return Math.sqrt(sum / samples.length) > 0.002;
+}
+
+function bytesToDataURL(bytes) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(reader.error || new Error('failed to read audio'));
+        reader.readAsDataURL(new Blob([bytes], { type: 'audio/wav' }));
+    });
+}
+
+async function processRecordedAudio(wavBytes) {
+    try {
+        const app = window.go?.main?.App;
+        if (!app?.TranscribeAudioData) {
             showNotification('ASR not available - backend binding missing', 'warning');
             return;
         }
 
-        // Write blob to a temp file path that Go can read
-        // We use a Data URI approach - let the backend handle it
-        const tempPath = await saveBlobToTempFile(bytes, 'recording.webm');
-        if (!tempPath) {
-            showNotification('Failed to save audio for transcription', 'error');
-            return;
-        }
-
-        const transcript = await window.go.main.App.TranscribeAudio(tempPath);
+        const dataURL = await bytesToDataURL(wavBytes);
+        const transcript = await app.TranscribeAudioData(dataURL);
         if (transcript && transcript.trim()) {
             insertTranscriptIntoChat(transcript.trim());
             showNotification('Transcription complete', 'success');
@@ -137,31 +360,14 @@ async function processRecordedAudio(blob) {
     }
 }
 
-// Saves blob bytes to a temporary file path accessible by the backend.
-// On Wails, we can write to the app's working directory.
-async function saveBlobToTempFile(bytes, filename) {
-    // Wails runtime doesn't give us direct file access from JS.
-    // We return a data URL that the backend can decode, or rely on
-    // the frontend sending the audio data directly.
-    // For now, we create an Object URL and pass it.
-    try {
-        const blob = new Blob([bytes]);
-        const url = URL.createObjectURL(blob);
-        return url; // Backend will need to handle this
-    } catch (e) {
-        console.error('Failed to create audio URL:', e);
-        return null;
-    }
-}
-
 function insertTranscriptIntoChat(text) {
-    const input = document.getElementById('chat-input');
-    if (input) {
-        input.value = text;
-        input.focus();
-        // Trigger input event for any listeners
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-    }
+    const input = document.getElementById('message-input') || document.querySelector('.input-field');
+    if (!input) return;
+    // Preserve the existing composer semantics: transcription fills the draft;
+    // the user still reviews and sends it explicitly.
+    input.value = text;
+    input.focus();
+    input.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
 function updateMicButtonState(recording) {
@@ -292,7 +498,10 @@ async function getStatus() {
         return { asr_ready: false, tts_ready: false, active: false };
     }
     try {
-        return await window.go.main.App.GetAudioStatus();
+        const status = await window.go.main.App.GetAudioStatus();
+        _asrReadiness = _readinessFromStatus(status);
+        _asrReadinessDetail = status.asr_error || '';
+        return status;
     } catch (err) {
         console.warn('GetAudioStatus failed:', err);
         return { asr_ready: false, tts_ready: false, active: false };
@@ -300,13 +509,21 @@ async function getStatus() {
 }
 
 async function enableASR(enabled) {
-    _asrEnabled = enabled;
-    if (!window.go?.main?.App?.EnableAudioASR) return;
+    const app = window.go?.main?.App;
+    if (!app?.EnableAudioASR) {
+        _asrEnabled = enabled;
+        _asrReadiness = enabled ? 'not-ready' : 'disabled';
+        return;
+    }
     try {
-        await window.go.main.App.EnableAudioASR(enabled);
+        await app.EnableAudioASR(enabled);
+        _asrEnabled = enabled;
+        await _refreshASRReadiness();
         showNotification(enabled ? 'Speech recognition enabled' : 'Speech recognition disabled', 'info');
     } catch (err) {
         console.error('EnableAudioASR failed:', err);
+        _asrReadiness = 'apply-failed';
+        _asrReadinessDetail = String(err);
         showNotification('Failed to toggle ASR: ' + err, 'error');
     }
 }
@@ -329,6 +546,10 @@ function isTTSEnabled() {
 
 function isASREnabled() {
     return _asrEnabled;
+}
+
+function getASRReadiness() {
+    return { state: _asrReadiness, detail: _asrReadinessDetail };
 }
 
 // ---------------------------------------------------------------------------

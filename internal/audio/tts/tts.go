@@ -2,6 +2,7 @@ package tts
 
 import (
 	"fmt"
+	"sync"
 
 	"howl-chat/internal/audio/types"
 )
@@ -9,8 +10,13 @@ import (
 // BaseSynthesizer provides shared behavior for TTS implementations.
 type BaseSynthesizer struct {
 	modelType   types.TTSModelType
-	config      types.TTSConfig
 	initialized bool
+
+	// callMu serializes operations on the underlying synthesizer resource.
+	// It is acquired before stateMu; never the other way around.
+	callMu  sync.Mutex
+	stateMu sync.RWMutex
+	config  types.TTSConfig
 }
 
 // NewBaseSynthesizer creates a base synthesizer wrapper.
@@ -25,24 +31,46 @@ func (b *BaseSynthesizer) GetModelType() types.TTSModelType {
 	return b.modelType
 }
 
+// LockCalls acquires the provider operation lock.
+func (b *BaseSynthesizer) LockCalls() { b.callMu.Lock() }
+
+// UnlockCalls releases the provider operation lock.
+func (b *BaseSynthesizer) UnlockCalls() { b.callMu.Unlock() }
+
 // IsInitialized checks if the synthesizer has been initialized.
 func (b *BaseSynthesizer) IsInitialized() bool {
+	b.stateMu.RLock()
+	defer b.stateMu.RUnlock()
 	return b.initialized
 }
 
 // SetInitialized marks the synthesizer as initialized.
 func (b *BaseSynthesizer) SetInitialized(config types.TTSConfig) {
+	b.stateMu.Lock()
+	defer b.stateMu.Unlock()
 	b.initialized = true
 	b.config = config
 }
 
+// ClearInitialized returns the synthesizer to its uninitialized state.
+func (b *BaseSynthesizer) ClearInitialized() {
+	b.stateMu.Lock()
+	defer b.stateMu.Unlock()
+	b.initialized = false
+	b.config = types.TTSConfig{}
+}
+
 // GetConfig returns the active synthesizer configuration.
 func (b *BaseSynthesizer) GetConfig() types.TTSConfig {
+	b.stateMu.RLock()
+	defer b.stateMu.RUnlock()
 	return b.config
 }
 
 // CheckInitialized verifies the synthesizer is ready.
 func (b *BaseSynthesizer) CheckInitialized() error {
+	b.stateMu.RLock()
+	defer b.stateMu.RUnlock()
 	if !b.initialized {
 		return types.NewAudioError(
 			types.ErrCodeModelNotFound,
@@ -103,4 +131,3 @@ func (f *SynthesizerFactory) ListAvailable() []types.TTSModelType {
 func RecommendForHardware(tier types.MemoryTier) types.TTSModelType {
 	return types.RecommendTTS(tier)
 }
-

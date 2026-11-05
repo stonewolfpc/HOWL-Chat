@@ -19,13 +19,38 @@
     text-align: center;
     margin-bottom: 8px;
     border: 1px solid var(--surface-hover);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Custom model dropdown */
 .model-select-custom {
     position: relative;
     width: 100%;
+    min-width: 0;
     margin-bottom: 8px;
+}
+
+/* The sidebar is only 200px wide: the selected model gets the full row and
+   the two actions share the next row instead of each taking a full block. */
+.model-picker-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 6px;
+    align-items: stretch;
+}
+
+.model-picker-row .model-select-custom {
+    grid-column: 1 / -1;
+    margin-bottom: 0;
+}
+
+.model-picker-row .model-button {
+    width: 100%;
+    margin-bottom: 0;
+    padding: 7px 8px;
+    white-space: nowrap;
 }
 
 .model-select-trigger {
@@ -38,6 +63,9 @@
     cursor: pointer;
     user-select: none;
     transition: all 0.2s ease;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .model-select-trigger:hover {
@@ -90,6 +118,17 @@
     cursor: pointer;
     transition: background 0.15s ease;
     border-bottom: 1px solid var(--border-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.model-select-empty {
+    padding: 10px 12px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-style: italic;
+    line-height: 1.4;
 }
 
 .model-select-option:last-child {

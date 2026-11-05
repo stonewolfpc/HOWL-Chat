@@ -22,6 +22,11 @@ type Synthesizer struct {
 	voicesPath string
 	configPath string
 	outputDir  string
+
+	// Test seams for interpreter discovery, process execution, and output reads.
+	resolvePython func() (string, error)
+	runCommand    func(context.Context, string, []string, string) ([]byte, error)
+	readFile      func(string) ([]byte, error)
 }
 
 // New returns a Kokoro synthesizer instance.
@@ -33,6 +38,9 @@ func New() *Synthesizer {
 
 // Initialize prepares Kokoro model, voices, config, and output directories.
 func (s *Synthesizer) Initialize(ctx context.Context, config types.TTSConfig) error {
+	s.LockCalls()
+	defer s.UnlockCalls()
+
 	if config.ModelPath == "" {
 		return types.NewAudioError(types.ErrCodeModelNotFound, "kokoro model path is required", nil)
 	}
@@ -48,7 +56,11 @@ func (s *Synthesizer) Initialize(ctx context.Context, config types.TTSConfig) er
 		return types.NewAudioError(types.ErrCodeModelNotFound, "kokoro-tts.py script not found", err)
 	}
 
-	pythonPath, err := resolvePythonBinary()
+	resolver := resolvePythonBinary
+	if s.resolvePython != nil {
+		resolver = s.resolvePython
+	}
+	pythonPath, err := resolver()
 	if err != nil {
 		return types.NewAudioError(types.ErrCodeModelNotFound, "python binary not found in PATH", err)
 	}
@@ -92,6 +104,12 @@ func (s *Synthesizer) Initialize(ctx context.Context, config types.TTSConfig) er
 
 // Synthesize converts text to a WAV file via the Python bridge.
 func (s *Synthesizer) Synthesize(ctx context.Context, req types.SynthesisRequest, callback types.ProgressCallback) (*types.SynthesisResult, error) {
+	s.LockCalls()
+	defer s.UnlockCalls()
+	return s.synthesizeLocked(ctx, req, callback)
+}
+
+func (s *Synthesizer) synthesizeLocked(ctx context.Context, req types.SynthesisRequest, callback types.ProgressCallback) (*types.SynthesisResult, error) {
 	if err := s.CheckInitialized(); err != nil {
 		return nil, err
 	}
@@ -150,11 +168,14 @@ func (s *Synthesizer) Synthesize(ctx context.Context, req types.SynthesisRequest
 func (s *Synthesizer) SynthesizeStream(ctx context.Context, req types.SynthesisRequest, chunks chan<- types.AudioChunk) error {
 	defer close(chunks)
 
-	result, err := s.Synthesize(ctx, req, nil)
+	s.LockCalls()
+	result, err := s.synthesizeLocked(ctx, req, nil)
 	if err != nil {
+		s.UnlockCalls()
 		return err
 	}
-	data, err := os.ReadFile(result.AudioPath)
+	data, err := s.readOutput(result.AudioPath)
+	s.UnlockCalls()
 	if err != nil {
 		return types.NewAudioError(types.ErrCodeSynthesisFailed, "failed to read synthesized audio", err)
 	}
@@ -181,6 +202,9 @@ func (s *Synthesizer) SynthesizeStream(ctx context.Context, req types.SynthesisR
 
 // GetVoices returns available voices from the voices archive.
 func (s *Synthesizer) GetVoices() []types.Voice {
+	s.LockCalls()
+	defer s.UnlockCalls()
+
 	if s.voicesPath == "" {
 		return nil
 	}
@@ -206,11 +230,29 @@ func (s *Synthesizer) SupportsSSML() bool {
 
 // Release performs synthesizer cleanup.
 func (s *Synthesizer) Release() error {
+	s.LockCalls()
+	defer s.UnlockCalls()
 	return nil
 }
 
 func (s *Synthesizer) runKokoro(ctx context.Context, text, voice string, speed float64, outPath string) error {
-	cmd := exec.CommandContext(ctx, s.pythonPath, s.scriptPath,
+	args := []string{
+		s.scriptPath,
+		"--text", text,
+		"--voice", voice,
+		"--speed", fmt.Sprintf("%.2f", speed),
+		"--output", outPath,
+		"--model", s.modelPath,
+		"--voices", s.voicesPath,
+		"--config", s.configPath,
+	}
+	if s.runCommand != nil {
+		_, err := s.runCommand(ctx, s.pythonPath, args, "")
+		return err
+	}
+
+	cmd := exec.CommandContext(ctx, s.pythonPath,
+		s.scriptPath,
 		"--text", text,
 		"--voice", voice,
 		"--speed", fmt.Sprintf("%.2f", speed),
@@ -231,15 +273,27 @@ func (s *Synthesizer) runKokoro(ctx context.Context, text, voice string, speed f
 }
 
 func (s *Synthesizer) listVoices() ([]string, error) {
-	cmd := exec.Command(s.pythonPath, s.scriptPath, "--list-voices",
-		"--voices", s.voicesPath,
-	)
-	output, err := cmd.Output()
+	args := []string{s.scriptPath, "--list-voices", "--voices", s.voicesPath}
+	var output []byte
+	var err error
+	if s.runCommand != nil {
+		output, err = s.runCommand(context.Background(), s.pythonPath, args, "")
+	} else {
+		cmd := exec.Command(s.pythonPath, args...)
+		output, err = cmd.Output()
+	}
 	if err != nil {
 		return nil, err
 	}
 	lines := strings.Split(strings.TrimSpace(string(output)), "\n")
 	return lines, nil
+}
+
+func (s *Synthesizer) readOutput(path string) ([]byte, error) {
+	if s.readFile != nil {
+		return s.readFile(path)
+	}
+	return os.ReadFile(path)
 }
 
 func resolvePythonBinary() (string, error) {

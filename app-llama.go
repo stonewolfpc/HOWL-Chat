@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"howl-chat/internal/backend/loader"
 	"howl-chat/internal/proc"
 	"io"
 	"net"
@@ -35,84 +36,6 @@ func findLlamaServer() string {
 			return c
 		}
 	}
-	return ""
-}
-
-// findMMProj searches for an mmproj file next to the model file.
-// It tries specific naming patterns first, then falls back to a directory scan.
-func findMMProj(modelPath string) string {
-	dir := filepath.Dir(modelPath)
-	baseName := filepath.Base(modelPath)
-	modelName := strings.TrimSuffix(baseName, filepath.Ext(baseName))
-
-	patterns := []string{
-		// Quant-matched names (most common: mmproj uses same quant as model)
-		filepath.Join(dir, "mmproj-IQ4_XS.gguf"),
-		filepath.Join(dir, "mmproj-IQ3_XXS.gguf"),
-		filepath.Join(dir, "mmproj-IQ2_XS.gguf"),
-		filepath.Join(dir, "mmproj-IQ2_XXS.gguf"),
-		filepath.Join(dir, "mmproj-IQ2_S.gguf"),
-		filepath.Join(dir, "mmproj-Q2_K.gguf"),
-		filepath.Join(dir, "mmproj-Q3_K.gguf"),
-		filepath.Join(dir, "mmproj-Q3_K_S.gguf"),
-		filepath.Join(dir, "mmproj-Q3_K_M.gguf"),
-		filepath.Join(dir, "mmproj-Q3_K_L.gguf"),
-		filepath.Join(dir, "mmproj-Q4_0.gguf"),
-		filepath.Join(dir, "mmproj-Q4_K.gguf"),
-		filepath.Join(dir, "mmproj-Q4_K_S.gguf"),
-		filepath.Join(dir, "mmproj-Q4_K_M.gguf"),
-		filepath.Join(dir, "mmproj-Q4_K_L.gguf"),
-		filepath.Join(dir, "mmproj-Q5_0.gguf"),
-		filepath.Join(dir, "mmproj-Q5_K.gguf"),
-		filepath.Join(dir, "mmproj-Q5_K_S.gguf"),
-		filepath.Join(dir, "mmproj-Q5_K_M.gguf"),
-		filepath.Join(dir, "mmproj-Q6_K.gguf"),
-		filepath.Join(dir, "mmproj-Q8_0.gguf"),
-		filepath.Join(dir, "mmproj-F16.gguf"),
-		filepath.Join(dir, "mmproj-F32.gguf"),
-		filepath.Join(dir, "mmproj-BF16.gguf"),
-		// Lowercase variants
-		filepath.Join(dir, "mmproj-iq4_xs.gguf"),
-		filepath.Join(dir, "mmproj-iq3_xxs.gguf"),
-		filepath.Join(dir, "mmproj-q4_k_m.gguf"),
-		filepath.Join(dir, "mmproj-q5_k_m.gguf"),
-		filepath.Join(dir, "mmproj-q8_0.gguf"),
-		filepath.Join(dir, "mmproj-f16.gguf"),
-		filepath.Join(dir, "mmproj-bf16.gguf"),
-		// Generic
-		filepath.Join(dir, "mmproj.gguf"),
-		filepath.Join(dir, "mmproj-model.gguf"),
-		filepath.Join(dir, "mmproj-vision.gguf"),
-		filepath.Join(dir, "mmproj-image.gguf"),
-		filepath.Join(dir, "mmproj-proj.gguf"),
-		// Model-specific
-		filepath.Join(dir, modelName+"-mmproj.gguf"),
-		filepath.Join(dir, modelName+".mmproj.gguf"),
-	}
-	for _, pattern := range patterns {
-		if _, err := os.Stat(pattern); err == nil {
-			fmt.Printf("[findMMProj] found: %s\n", pattern)
-			return pattern
-		}
-	}
-
-	// Fallback: scan directory for any file starting with "mmproj" and ending with ".gguf"
-	entries, err := os.ReadDir(dir)
-	if err == nil {
-		for _, entry := range entries {
-			if entry.IsDir() {
-				continue
-			}
-			name := strings.ToLower(entry.Name())
-			if strings.HasPrefix(name, "mmproj") && strings.HasSuffix(name, ".gguf") {
-				found := filepath.Join(dir, entry.Name())
-				fmt.Printf("[findMMProj] found via wildcard scan: %s\n", found)
-				return found
-			}
-		}
-	}
-
-	fmt.Printf("[findMMProj] no mmproj found in %s\n", dir)
 	return ""
 }
 
@@ -168,17 +91,10 @@ func strSetting(m map[string]interface{}, key string, def string) string {
 // llama-server lifecycle
 // ---------------------------------------------------------------------------
 
-// spawnLlamaServerWithModel starts llama-server with a model and settings.
-// stderrW, if non-nil, tees the process's stderr for diagnostic capture.
-// fitParams controls the --fit flag; when false, "--fit off" is appended to
-// bypass the automatic parameter-fitting phase that can crash with
-// GGML_ASSERT(n_inputs < GGML_SCHED_MAX_SPLIT_INPUTS) on complex models.
-func spawnLlamaServerWithModel(modelPath string, settings map[string]interface{}, stderrW io.Writer, fitParams bool) (*exec.Cmd, error) {
-	serverPath := findLlamaServer()
-	if serverPath == "" {
-		return nil, fmt.Errorf("llama-server.exe not found")
-	}
-
+// buildLlamaServerArgs assembles the llama-server command line. The projector
+// is passed only when the caller resolved one by exact identity; this function
+// never searches the directory.
+func buildLlamaServerArgs(modelPath, mmprojPath string, settings map[string]interface{}, fitParams bool) []string {
 	args := []string{
 		"--host", "127.0.0.1",
 		"--port", "8080",
@@ -193,11 +109,8 @@ func spawnLlamaServerWithModel(modelPath string, settings map[string]interface{}
 		args = append(args, "--fit", "off")
 	}
 
-	if mmprojPath := findMMProj(modelPath); mmprojPath != "" {
+	if mmprojPath != "" {
 		args = append(args, "--mmproj", mmprojPath)
-		fmt.Printf("INFO: Auto-detected mmproj file: %s\n", mmprojPath)
-	} else {
-		fmt.Printf("INFO: No mmproj file found for model: %s\n", modelPath)
 	}
 
 	if rs := strSetting(settings, "rope_mode", ""); rs != "" && rs != "auto" {
@@ -239,15 +152,44 @@ func spawnLlamaServerWithModel(modelPath string, settings map[string]interface{}
 		args = append(args, "--reasoning", "auto")
 	}
 
+	return args
+}
+
+// spawnLlamaServerWithModel starts llama-server with a model and settings.
+//
+// output receives both stdout and stderr. It is the primary destination, so a
+// packaged GUI whose console handles are unavailable still captures the
+// process's diagnostics: the console is only a mirrored copy and its write
+// failures are ignored (see internal/backend/loader).
+//
+// fitParams controls the --fit flag; when false, "--fit off" is appended to
+// bypass the automatic parameter-fitting phase that can crash with
+// GGML_ASSERT(n_inputs < GGML_SCHED_MAX_SPLIT_INPUTS) on complex models.
+func spawnLlamaServerWithModel(modelPath, mmprojPath string, settings map[string]interface{}, output io.Writer, fitParams bool) (*exec.Cmd, error) {
+	serverPath := findLlamaServer()
+	if serverPath == "" {
+		return nil, fmt.Errorf("llama-server.exe not found")
+	}
+
+	args := buildLlamaServerArgs(modelPath, mmprojPath, settings, fitParams)
+
+	if mmprojPath != "" {
+		fmt.Printf("INFO: using paired mmproj file: %s\n", mmprojPath)
+	} else {
+		fmt.Printf("INFO: no paired mmproj file for model: %s\n", modelPath)
+	}
+
 	cmd := exec.Command(serverPath, args...)
 	applyHidden(cmd)
 	cmd.Dir = filepath.Dir(serverPath)
-	cmd.Stdout = os.Stdout
-	if stderrW != nil {
-		cmd.Stderr = io.MultiWriter(os.Stderr, stderrW)
-	} else {
-		cmd.Stderr = os.Stderr
+
+	capture := output
+	if capture == nil {
+		capture = io.Discard
 	}
+	cmd.Stdout = io.MultiWriter(capture, loader.SafeConsole(os.Stdout))
+	cmd.Stderr = io.MultiWriter(capture, loader.SafeConsole(os.Stderr))
+
 	if err := cmd.Start(); err != nil {
 		return nil, fmt.Errorf("failed to start llama-server: %w", err)
 	}

@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"howl-chat/internal/audio/asr"
@@ -23,18 +24,38 @@ type Recognizer struct {
 
 	// Runtime state
 	tempDir string
+	limiter *Limiter
+
+	// Test seams for process discovery, execution, and hardware checks.
+	cliSearchPaths []string
+	runCLI         func(context.Context, []string) ([]byte, error)
+	checkHardware  func() error
 }
 
-// New creates a new Whisper recognizer for the specified model type
+// New creates a new Whisper recognizer for the specified model type.
 func New(modelType types.ASRModelType) *Recognizer {
+	return NewWithLimiter(modelType, defaultLimiter)
+}
+
+// NewWithLimiter creates a recognizer with an isolated limiter. It is intended
+// for tests and explicit startup wiring; callers must not mutate the package
+// default from tests.
+func NewWithLimiter(modelType types.ASRModelType, limiter *Limiter) *Recognizer {
+	if limiter == nil {
+		limiter = defaultLimiter
+	}
 	return &Recognizer{
 		BaseRecognizer: asr.NewBaseRecognizer(modelType),
+		limiter:        limiter,
 	}
 }
 
-// Initialize prepares the recognizer for use
-// Downloads whisper-cli binary and model if not present
+// Initialize prepares the recognizer for use. It never downloads or builds
+// whisper-cli; a missing binary is a model-not-found error.
 func (r *Recognizer) Initialize(ctx context.Context, config types.ASRConfig) error {
+	r.LockCalls()
+	defer r.UnlockCalls()
+
 	// Validate model path
 	if config.ModelPath == "" {
 		return types.NewAudioError(
@@ -53,37 +74,48 @@ func (r *Recognizer) Initialize(ctx context.Context, config types.ASRConfig) err
 		)
 	}
 
-	r.modelPath = config.ModelPath
-
-	cliPath, err := r.findOrInstallWhisperCLI(ctx)
+	cliPath, err := r.findWhisperCLI()
 	if err != nil {
 		return err
 	}
-	r.whisperCliPath = cliPath
 
-	// Create temp directory for outputs
-	r.tempDir = filepath.Join(os.TempDir(), "howl-whisper")
-	if err := os.MkdirAll(r.tempDir, 0755); err != nil {
+	tempDir, err := os.MkdirTemp("", "howl-whisper-*")
+	if err != nil {
 		return types.NewAudioError(
 			types.ErrCodeModelLoadFailed,
 			"Failed to create temp directory",
 			err,
 		)
 	}
+	r.tempDir = tempDir
+
+	keepTempDir := false
+	defer func() {
+		if !keepTempDir {
+			_ = os.RemoveAll(tempDir)
+			if r.tempDir == tempDir {
+				r.tempDir = ""
+			}
+		}
+	}()
 
 	// Validate hardware compatibility
-	if err := r.CheckHardwareCompatibility(); err != nil {
+	if err := r.checkHardwareCompatibility(); err != nil {
 		return err
 	}
 
-	// Mark as initialized
+	r.modelPath = config.ModelPath
+	r.whisperCliPath = cliPath
 	r.SetInitialized(config)
-
+	keepTempDir = true
 	return nil
 }
 
 // Transcribe converts audio file to text using whisper-cli
 func (r *Recognizer) Transcribe(ctx context.Context, audioPath string, callback types.ProgressCallback) (*types.RecognitionResult, error) {
+	r.LockCalls()
+	defer r.UnlockCalls()
+
 	// Ensure initialized
 	if err := r.CheckInitialized(); err != nil {
 		return nil, err
@@ -98,6 +130,17 @@ func (r *Recognizer) Transcribe(ctx context.Context, audioPath string, callback 
 	config := r.GetConfig()
 	if err := r.ValidateLanguage(config.Language); err != nil {
 		return nil, err
+	}
+
+	if r.limiter != nil {
+		if err := r.limiter.Acquire(ctx); err != nil {
+			return nil, types.NewAudioError(
+				types.ErrCodeCancelled,
+				"transcription cancelled while waiting for whisper capacity",
+				err,
+			)
+		}
+		defer r.limiter.Release()
 	}
 
 	// Report progress - starting
@@ -160,14 +203,16 @@ func (r *Recognizer) TranscribeStream(ctx context.Context, chunks <-chan types.A
 
 // Release frees resources and cleans up temp files
 func (r *Recognizer) Release() error {
-	// Clean up temp directory
-	if r.tempDir != "" {
-		if err := os.RemoveAll(r.tempDir); err != nil {
-			return err
-		}
-		r.tempDir = ""
-	}
+	r.LockCalls()
+	defer r.UnlockCalls()
 
+	if r.tempDir != "" {
+		dir := r.tempDir
+		r.tempDir = ""
+		r.ClearInitialized()
+		return os.RemoveAll(dir)
+	}
+	r.ClearInitialized()
 	return nil
 }
 
@@ -178,16 +223,29 @@ func whisperInstallDir() string {
 	return filepath.Join("bin", "whisper")
 }
 
-// findOrInstallWhisperCLI locates whisper-cli or builds or downloads official binaries.
-func (r *Recognizer) findOrInstallWhisperCLI(ctx context.Context) (string, error) {
-	// Search in standard locations
-	searchPaths := []string{
-		"whisper-cli.exe",                       // Current directory (Windows)
-		"whisper-cli",                           // Current directory (Unix)
-		filepath.Join("bin", "whisper-cli.exe"), // bin/ subdirectory
-		filepath.Join("bin", "whisper-cli"),
-		"C:\\Program Files\\whisper\\whisper-cli.exe", // Windows install path
-		"/usr/local/bin/whisper-cli",                  // Unix install path
+// findWhisperCLI locates an existing whisper-cli. It never downloads or builds
+// one.
+func (r *Recognizer) findWhisperCLI() (string, error) {
+	var searchPaths []string
+	if r.cliSearchPaths != nil {
+		searchPaths = r.cliSearchPaths
+	} else {
+		if path, err := exec.LookPath("whisper-cli"); err == nil {
+			searchPaths = append(searchPaths, path)
+		}
+		if path, err := exec.LookPath("whisper-cli.exe"); err == nil {
+			searchPaths = append(searchPaths, path)
+		}
+		searchPaths = append(searchPaths,
+			"whisper-cli.exe",
+			"whisper-cli",
+			filepath.Join("bin", "whisper-cli.exe"),
+			filepath.Join("bin", "whisper-cli"),
+			filepath.Join(whisperInstallDir(), "whisper-cli.exe"),
+			filepath.Join(whisperInstallDir(), "whisper-cli"),
+			"C:\\Program Files\\whisper\\whisper-cli.exe",
+			"/usr/local/bin/whisper-cli",
+		)
 	}
 
 	for _, path := range searchPaths {
@@ -199,19 +257,18 @@ func (r *Recognizer) findOrInstallWhisperCLI(ctx context.Context) (string, error
 		}
 	}
 
-	dl := NewBinaryDownloader(whisperInstallDir())
-	bins, err := dl.Acquire(ctx)
-	if err != nil {
-		return "", types.NewAudioError(
-			types.ErrCodeModelNotFound,
-			fmt.Sprintf("%s\n%s", err.Error(), GetInstallationInstructions()),
-			err,
-		)
+	return "", types.NewAudioError(
+		types.ErrCodeModelNotFound,
+		"whisper-cli not found; install it or put it on PATH\n"+GetInstallationInstructions(),
+		nil,
+	)
+}
+
+func (r *Recognizer) checkHardwareCompatibility() error {
+	if r.checkHardware != nil {
+		return r.checkHardware()
 	}
-	if bins == nil || bins.CliPath == "" {
-		return "", types.NewAudioError(types.ErrCodeModelNotFound, "whisper-cli acquisition returned no binary", nil)
-	}
-	return bins.CliPath, nil
+	return r.CheckHardwareCompatibility()
 }
 
 // ensureWAVFormat converts audio to 16kHz mono WAV if needed
@@ -274,35 +331,34 @@ func (r *Recognizer) runWhisperCLI(ctx context.Context, audioPath string, callba
 	// Suppress tokens (standard set for speech)
 	args = append(args, "--suppress-non-speech-tokens")
 
-	// Execute command with context support
-	cmd := execCommand(r.whisperCliPath, args...)
-
-	// Run command with context cancellation support
-	type result struct {
-		err error
-	}
-
-	resultChan := make(chan result, 1)
-	go func() {
-		_, err := cmd.CombinedOutput()
-		resultChan <- result{err}
-	}()
-
 	var err error
+	if r.runCLI != nil {
+		_, err = r.runCLI(ctx, args)
+	} else {
+		// Execute command with context support
+		cmd := execCommand(r.whisperCliPath, args...)
 
-	select {
-	case <-ctx.Done():
-		// Context cancelled - kill process
-		if cmd.Process != nil {
-			cmd.Process.Kill()
+		// Run command with context cancellation support
+		resultChan := make(chan error, 1)
+		go func() {
+			_, runErr := cmd.CombinedOutput()
+			resultChan <- runErr
+		}()
+
+		select {
+		case <-ctx.Done():
+			// Context cancelled - kill process
+			if cmd.Process != nil {
+				cmd.Process.Kill()
+			}
+			return "", types.NewAudioError(
+				types.ErrCodeTimeout,
+				"Transcription cancelled by user",
+				ctx.Err(),
+			)
+		case runErr := <-resultChan:
+			err = runErr
 		}
-		return "", types.NewAudioError(
-			types.ErrCodeTimeout,
-			"Transcription cancelled by user",
-			ctx.Err(),
-		)
-	case res := <-resultChan:
-		err = res.err
 	}
 
 	if err != nil {
@@ -343,6 +399,92 @@ func copyFile(src, dst string) error {
 		return err
 	}
 	return os.WriteFile(dst, input, 0644)
+}
+
+// Limiter bounds how many whisper-cli processes may run at once. It is a
+// resource limit, not the provider correctness lock.
+type Limiter struct {
+	mu      sync.Mutex
+	limit   int
+	sem     chan struct{}
+	waiters int
+}
+
+// NewLimiter creates an isolated limiter with the requested concurrency.
+func NewLimiter(limit int) *Limiter {
+	if limit < 1 {
+		limit = 1
+	}
+	return &Limiter{
+		limit: limit,
+		sem:   make(chan struct{}, limit),
+	}
+}
+
+// Acquire reserves one slot. It returns ctx.Err() if the context ends first.
+func (l *Limiter) Acquire(ctx context.Context) error {
+	l.mu.Lock()
+	l.waiters++
+	sem := l.sem
+	l.mu.Unlock()
+
+	select {
+	case sem <- struct{}{}:
+		l.mu.Lock()
+		l.waiters--
+		l.mu.Unlock()
+		return nil
+	case <-ctx.Done():
+		l.mu.Lock()
+		l.waiters--
+		l.mu.Unlock()
+		return ctx.Err()
+	}
+}
+
+// Release returns one slot. A caller must only release an acquired slot.
+func (l *Limiter) Release() {
+	l.mu.Lock()
+	sem := l.sem
+	l.mu.Unlock()
+	select {
+	case <-sem:
+	default:
+	}
+}
+
+// SetLimit changes the limit only while no call is active or waiting.
+func (l *Limiter) SetLimit(limit int) error {
+	if limit < 1 {
+		return fmt.Errorf("whisper concurrency limit must be at least 1")
+	}
+
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	if l.limit == limit {
+		return nil
+	}
+	if len(l.sem) > 0 || l.waiters > 0 {
+		return fmt.Errorf("whisper concurrency limit cannot change while calls are active")
+	}
+	l.limit = limit
+	l.sem = make(chan struct{}, limit)
+	return nil
+}
+
+// Limit returns the configured concurrency.
+func (l *Limiter) Limit() int {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	return l.limit
+}
+
+var defaultLimiter = NewLimiter(1)
+
+// SetDefaultConcurrencyLimit configures the package default at startup. It
+// rejects changes while any recognizer is using the default limiter.
+func SetDefaultConcurrencyLimit(limit int) error {
+	return defaultLimiter.SetLimit(limit)
 }
 
 // execCommand is a helper to create exec.Command for testing purposes

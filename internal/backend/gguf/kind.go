@@ -49,6 +49,10 @@ var llmArchs = map[string]bool{
 	"starcoder": true, "starcoder2": true, "mllama": true, "llava": true,
 	"command-r": true, "dbrx": true, "jamba": true, "nemotron": true,
 	"cohere2": true, "seed_oss": true,
+	// Families registered by the shipped model inventory that were missing
+	// here, which made them look unknown to every architecture consumer.
+	"gemma4": true, "qwen35": true, "gpt-oss": true,
+	"lfm2": true, "lfm2moe": true,
 }
 
 // KindOfArch maps a general.architecture value to a Kind.

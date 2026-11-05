@@ -36,6 +36,9 @@ func NewClient(apiKey string) *Client {
 
 // Initialize sets up the client configuration
 func (c *Client) Initialize(ctx context.Context, config types.ASRConfig) error {
+	c.LockCalls()
+	defer c.UnlockCalls()
+
 	// Validate API key
 	if c.apiKey == "" {
 		return types.NewAudioError(
@@ -56,6 +59,9 @@ func (c *Client) Initialize(ctx context.Context, config types.ASRConfig) error {
 
 // Transcribe performs speech recognition using Qwen-ASR HTTP API
 func (c *Client) Transcribe(ctx context.Context, audioPath string, callback types.ProgressCallback) (*types.RecognitionResult, error) {
+	c.LockCalls()
+	defer c.UnlockCalls()
+
 	// Ensure initialized
 	if err := c.CheckInitialized(); err != nil {
 		return nil, err
@@ -97,6 +103,8 @@ func (c *Client) TranscribeStream(ctx context.Context, chunks <-chan types.Audio
 
 // Release cleans up resources
 func (c *Client) Release() error {
+	c.LockCalls()
+	defer c.UnlockCalls()
 	// No resources to clean up for HTTP client
 	return nil
 }

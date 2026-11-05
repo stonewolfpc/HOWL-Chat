@@ -69,6 +69,11 @@ type ModelProfile struct {
 	GGUFAvailable  bool     `json:"gguf_available"`
 
 	// Capabilities
+	//
+	// SupportsStreaming describes what the adapter actually implements, not an
+	// aspiration: it is false wherever TranscribeStream/SynthesizeStream
+	// returns unsupported, because the planner must not offer a mode no adapter
+	// can serve.
 	SupportsStreaming bool `json:"supports_streaming"`
 	SupportsGPU       bool `json:"supports_gpu"`
 	SupportsCPU       bool `json:"supports_cpu"`
@@ -84,7 +89,57 @@ type ModelProfile struct {
 
 	// Integration
 	Backend string `json:"backend"` // "local", "http", "grpc"
+
+	// Runtime names the adapter that serves this profile (RuntimeWhisperCLI,
+	// RuntimeDashScopeASR, RuntimeLlamaServerASR).
+	Runtime string `json:"runtime,omitempty"`
+
+	// Verification records how far this capability has actually been proven.
+	Verification Verification `json:"verification,omitempty"`
+
+	// Local is true when inference runs on this machine.
+	Local bool `json:"local"`
+
+	// ApprovedLocal is true only when this model is admitted for local use. A
+	// model that is not admitted is reported as unavailable, never selected
+	// automatically, and never presented as supported.
+	ApprovedLocal bool `json:"approved_local"`
+
+	// LocalFile is the file name the ASR resolver looks for in the model
+	// inventory. ProjectorFile is the matching audio projector, when required.
+	LocalFile     string `json:"local_file,omitempty"`
+	ProjectorFile string `json:"projector_file,omitempty"`
+
+	// ProjectorKind names the projector the model requires (ProjectorKindAudio,
+	// "vision", or empty when none is needed).
+	ProjectorKind string `json:"projector_kind,omitempty"`
 }
+
+// Verification records how far a capability has been proven. It is a grade, not
+// a boolean: "declared" and "works here" are different claims.
+type Verification string
+
+const (
+	// VerificationUnverified means no evidence beyond a registry entry.
+	VerificationUnverified Verification = "unverified"
+	// VerificationImplementation means an adapter exists and is wired, but this
+	// pass did not run it against real assets on this host.
+	VerificationImplementation Verification = "implementation"
+	// VerificationEndToEnd means the task was executed successfully with real
+	// model assets and a known input.
+	VerificationEndToEnd Verification = "end_to_end"
+)
+
+// Runtime identifiers name the adapter that serves a model profile.
+const (
+	RuntimeWhisperCLI     = "whisper-cli"
+	RuntimeDashScopeASR   = "dashscope-asr-http"
+	RuntimeLlamaServerASR = "llama-server-transcriptions"
+)
+
+// ProjectorKindAudio marks a model that requires an audio projector. It is not
+// a vision projector, and the two are never inferred from a file name.
+const ProjectorKindAudio = "audio"
 
 // TTSModelProfile extends ModelProfile for TTS-specific configs
 type TTSModelProfile struct {
@@ -126,6 +181,7 @@ var ModelRegistry = struct {
 				Languages:         []string{"en", "de", "es", "fr", "it", "nl", "pl", "pt", "ru", "zh"},
 				License:           "MIT",
 				SourceURL:         "https://github.com/rhasspy/piper",
+				Verification:      VerificationImplementation,
 				GGUFAvailable:     false,
 				SupportsStreaming: true,
 				SupportsGPU:       false, // CPU-only
@@ -156,6 +212,7 @@ var ModelRegistry = struct {
 				Languages:         []string{"en", "zh", "ja", "ko", "es", "fr", "de", "it"},
 				License:           "MIT",
 				SourceURL:         "https://github.com/myshell-ai/MeloTTS",
+				Verification:      VerificationImplementation,
 				GGUFAvailable:     false,
 				SupportsStreaming: false,
 				SupportsGPU:       true,
@@ -186,6 +243,7 @@ var ModelRegistry = struct {
 				Languages:         []string{"en", "en-gb", "fr", "ja", "ko", "zh", "it", "pt", "hi", "pl", "es", "de"},
 				License:           "Apache-2.0",
 				SourceURL:         "https://github.com/hexgrad/kokoro",
+				Verification:      VerificationImplementation,
 				GGUFAvailable:     false,
 				SupportsStreaming: false,
 				SupportsGPU:       false,
@@ -258,26 +316,26 @@ func RecommendASR(tier MemoryTier, languages []string) ASRModelType {
 		return true
 	}
 
-	// Tier-based recommendations with language filter
+	// Only models admitted for local use are ever recommended. Remote API
+	// entries and unadmitted local candidates are excluded rather than offered
+	// as if they could run here.
+	ordered := []ASRModelType{ASRWhisperTiny, ASRWhisperBase, ASRWhisperSmall}
 	switch tier {
 	case TierTiny, TierSmall:
-		if supportsLang(ASRModelRegistry[ASRQwen3ASR06B].Languages) {
-			return ASRQwen3ASR06B
-		}
-		return ASRWhisperBase
-	case TierMedium:
-		if supportsLang(ASRModelRegistry[ASRQwen3ASR17B].Languages) {
-			return ASRQwen3ASR17B
-		}
-		return ASRWhisperSmall
-	case TierLarge:
-		if supportsLang(ASRModelRegistry[ASRQwen3ASR17B].Languages) {
-			return ASRQwen3ASR17B
-		}
-		return ASRWhisperLarge
-	default:
-		return ASRWhisperBase
+		ordered = ordered[:2]
+	case TierMedium, TierLarge:
+		// keep all three
 	}
+	for _, candidate := range ordered {
+		profile, ok := ASRModelRegistry[candidate]
+		if !ok || !profile.Local || !profile.ApprovedLocal {
+			continue
+		}
+		if supportsLang(profile.Languages) {
+			return candidate
+		}
+	}
+	return ASRWhisperBase
 }
 
 // RecommendTTS suggests best TTS model for hardware tier

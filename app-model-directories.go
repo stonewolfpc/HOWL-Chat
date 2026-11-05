@@ -135,7 +135,7 @@ func (a *App) scanDirectoryIntoRegistry(dir, kind string) (int, error) {
 	}
 	switch kind {
 	case registry.KindLLM, registry.KindTTS:
-		exts := []string{".gguf", ".bin", ".mmproj"}
+		exts := []string{".gguf"}
 		if kind == registry.KindTTS {
 			exts = []string{".onnx"}
 		}

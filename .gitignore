@@ -53,6 +53,7 @@ llama-server.exe
 
 # Server logs
 server-test*.log
+logs/
 
 # Temporary files
 *.tmp

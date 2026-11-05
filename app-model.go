@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"howl-chat/internal/paths"
@@ -11,7 +10,9 @@ import (
 	"strings"
 	"time"
 
+	"howl-chat/internal/backend/chatpolicy"
 	"howl-chat/internal/backend/gguf"
+	"howl-chat/internal/backend/loader"
 	"howl-chat/internal/backend/types"
 	"howl-chat/internal/errors"
 	"howl-chat/internal/resource"
@@ -48,6 +49,103 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		return fmt.Errorf("model path is a directory, not a file: %s", modelPath)
 	}
 	fmt.Println("[LoadModel] path validated")
+
+	// Admission is decided from the file's own GGUF metadata before any
+	// running server is stopped. A rejected asset must not cost the user the
+	// model that is currently loaded.
+	admission := gguf.AdmitModel(modelPath)
+	fmt.Printf("[LoadModel] admission: class=%s arch=%q projector=%q evidence=%v\n",
+		admission.Class, admission.Arch, admission.Projector, admission.Evidence)
+	if !admission.AllowedAsChat() {
+		rec := loader.FailureRecord{
+			Stage:     loader.StageAdmission,
+			ModelPath: modelPath,
+			ModelName: filepath.Base(modelPath),
+			Arch:      admission.Arch,
+			Detail:    admission.ChatRejectionMessage(),
+		}
+		if path, writeErr := loader.WriteFailureRecord(a.loaderLogDir(), rec); writeErr == nil {
+			rec.RecordPath = path
+		} else {
+			fmt.Printf("[LoadModel] WARN: could not persist diagnostics: %v\n", writeErr)
+		}
+		userMsg := rec.UserMessage()
+		a.logError(errors.LLMArchRejected, errors.Critical, "llm.load.admission", "app-model.go:LoadModel", fmt.Errorf("%s", userMsg))
+		a.loadingProgress.Store(0)
+		a.loadingStage.Store("Rejected")
+		a.emitEvent("model:error", userMsg)
+		fmt.Printf("[LoadModel] FAIL: %s\n", userMsg)
+		return fmt.Errorf("%s", userMsg)
+	}
+
+	// Architecture admission is not task eligibility. Qwen3-ASR and
+	// Ultravox/Voxtral share chat architectures but have different intended
+	// tasks (ASR and audio understanding), and their chat path is not
+	// implemented or verified. Refuse them before projector resolution and
+	// before the running server is stopped.
+	eligibility := chatpolicy.Evaluate(modelPath, admission)
+	fmt.Printf("[LoadModel] chat eligibility: task=%s eligible=%t basis=%s identity=%q aliases=%v text=%t vision=%s audio=%s\n",
+		eligibility.Task, eligibility.Eligible, eligibility.Basis, eligibility.Identity, eligibility.Aliases,
+		eligibility.TextChat, eligibility.Vision, eligibility.AudioInput)
+	if !eligibility.Eligible {
+		rec := loader.FailureRecord{
+			Stage:     loader.StageAdmission,
+			ModelPath: modelPath,
+			ModelName: filepath.Base(modelPath),
+			Arch:      admission.Arch,
+			Detail:    eligibility.RejectionMessage(modelPath),
+		}
+		if path, writeErr := loader.WriteFailureRecord(a.loaderLogDir(), rec); writeErr == nil {
+			rec.RecordPath = path
+		} else {
+			fmt.Printf("[LoadModel] WARN: could not persist diagnostics: %v\n", writeErr)
+		}
+		userMsg := rec.UserMessage()
+		a.logError(errors.LLMChatTaskRejected, errors.Critical, "llm.load.task", "app-model.go:LoadModel", fmt.Errorf("%s", userMsg))
+		a.loadingProgress.Store(0)
+		a.loadingStage.Store("Rejected")
+		a.emitEvent("model:error", userMsg)
+		fmt.Printf("[LoadModel] FAIL: %s\n", userMsg)
+		return fmt.Errorf("%s", userMsg)
+	}
+
+	// The companion projector is resolved by exact identity before the current
+	// model is stopped, so a pairing failure also leaves the running model
+	// alone.
+	pairing, pairErr := gguf.ResolveProjector(gguf.PairingRequest{
+		ModelPath:        modelPath,
+		Arch:             admission.Arch,
+		EmbeddingLength:  admission.EmbeddingLength,
+		Require:          admission.RequiresProjector(),
+		RequiredModality: admission.RequiredModality(),
+	})
+	if pairErr != nil {
+		rec := loader.FailureRecord{
+			Stage:     loader.StageProjector,
+			ModelPath: modelPath,
+			ModelName: filepath.Base(modelPath),
+			Arch:      admission.Arch,
+			Detail:    pairErr.Error(),
+		}
+		if path, writeErr := loader.WriteFailureRecord(a.loaderLogDir(), rec); writeErr == nil {
+			rec.RecordPath = path
+		} else {
+			fmt.Printf("[LoadModel] WARN: could not persist diagnostics: %v\n", writeErr)
+		}
+		userMsg := rec.UserMessage()
+		a.logError(errors.LLMProjectorPairing, errors.Critical, "llm.load.projector", "app-model.go:LoadModel", fmt.Errorf("%s", userMsg))
+		a.loadingProgress.Store(0)
+		a.loadingStage.Store("Rejected")
+		a.emitEvent("model:error", userMsg)
+		fmt.Printf("[LoadModel] FAIL: %s\n", userMsg)
+		return fmt.Errorf("%s", userMsg)
+	}
+	if pairing.Path != "" {
+		fmt.Printf("[LoadModel] projector paired by identity: %s (kind=%s identity=%q projection_dim=%d model_embedding=%d mismatch=%t notes=%v)\n",
+			pairing.Path, pairing.Info.Kind, pairing.Identity, pairing.ProjectionDim, pairing.ModelEmbedding, pairing.DimensionMismatch, pairing.Notes)
+	} else {
+		fmt.Println("[LoadModel] no companion projector required or matched")
+	}
 
 	// Prevent redundant reloads: if the same model is already loaded, skip.
 	if a.serverProc != nil && a.serverProc.Process != nil {
@@ -114,15 +212,33 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		a.applySafeDefaults(profile)
 		fmt.Println("[LoadModel] safe defaults applied")
 
-		// Detect vision capability from mmproj file presence
-		mmprojPath := findMMProj(modelPath)
-		if mmprojPath != "" {
-			profile.HasVision = true
-			profile.MMPProjPath = mmprojPath
-			fmt.Printf("[LoadModel] vision support detected: %s\n", mmprojPath)
+		// Projector capability is read from the projector's own GGUF metadata.
+		// The companion itself was resolved by identity above; directory order
+		// is never consulted. Presence must never enable image input on its own:
+		// an audio projector and a vision projector share the mmproj file name
+		// (DEBT-T1).
+		// A projector declaration is not a verified chat capability. Advertise
+		// image/audio input only when the task policy marks it verified; until
+		// then the projector remains loaded for diagnostics and future use but
+		// the request path does not claim the capability.
+		profile.HasVision = eligibility.AllowsVision()
+		profile.HasAudioInput = eligibility.AllowsAudio()
+		profile.ProjectorKind = string(gguf.ProjectorUnknown)
+		if pairing.Path == "" {
+			fmt.Println("[LoadModel] no companion projector for this model")
 		} else {
-			profile.HasVision = false
-			fmt.Println("[LoadModel] no mmproj found — vision not available for this model")
+			info := pairing.Info
+			profile.MMPProjPath = pairing.Path
+			profile.ProjectorKind = string(info.Kind)
+			fmt.Printf("[LoadModel] projector %s declares %q (declared_vision=%t declared_audio=%t advertised_vision=%t advertised_audio=%t dim=%d type=%s",
+				pairing.Path, info.Kind, info.HasVision(), info.HasAudio(), profile.HasVision, profile.HasAudioInput, info.ProjectionDim, info.ProjectorType)
+			if len(info.Evidence) > 0 {
+				fmt.Printf(" evidence=%s", strings.Join(info.Evidence, ","))
+			}
+			if info.Err != "" {
+				fmt.Printf(" error=%q", info.Err)
+			}
+			fmt.Println(")")
 		}
 		a.currentModelProfile = profile
 	}
@@ -191,13 +307,33 @@ func (a *App) LoadModel(modelPath string) (err error) {
 	}
 	spawnSettings := a.spawnSettingsFor(profile)
 	fmt.Println("[LoadModel] spawning llama-server")
-	var stderrBuf bytes.Buffer
-	cmd, err := spawnLlamaServerWithModel(modelPath, spawnSettings, &stderrBuf, fitParams)
+	serverOutput := loader.NewCapture(loader.DefaultCaptureBytes)
+	cmd, err := spawnLlamaServerWithModel(modelPath, pairing.Path, spawnSettings, serverOutput, fitParams)
 	if err != nil {
-		a.logLLMLoadError(err, "app-model.go:84")
+		rec := loader.FailureRecord{
+			Stage:      loader.StageSpawn,
+			ModelPath:  modelPath,
+			ModelName:  filepath.Base(modelPath),
+			Arch:       admission.Arch,
+			Projector:  pairing.Path,
+			Executable: findLlamaServer(),
+			Args:       buildLlamaServerArgs(modelPath, pairing.Path, spawnSettings, fitParams),
+			Detail:     err.Error(),
+		}
+		if path, writeErr := loader.WriteFailureRecord(a.loaderLogDir(), rec); writeErr == nil {
+			rec.RecordPath = path
+		} else {
+			fmt.Printf("[LoadModel] WARN: could not persist diagnostics: %v\n", writeErr)
+		}
+		userMsg := rec.UserMessage()
+		a.logLLMLoadError(fmt.Errorf("%s", userMsg), "app-model.go:84")
 		fmt.Printf("[LoadModel] FAIL: spawn error: %v\n", err)
+		a.loadingProgress.Store(0)
+		a.loadingStage.Store("Failed")
+		a.emitEvent("model:error", userMsg)
 		return fmt.Errorf("failed to spawn llama-server: %w", err)
 	}
+	activeCmd := cmd
 	fmt.Printf("[LoadModel] llama-server spawned (pid %d)\n", cmd.Process.Pid)
 	a.serverProc = cmd
 	pm := waitMonitor(cmd)
@@ -239,9 +375,9 @@ func (a *App) LoadModel(modelPath string) (err error) {
 			}
 
 			if !pm.isAlive() {
-				stderr := stderrBuf.String()
-				fmt.Printf("[LoadModel] monitor: process died at tick %d, stderr len=%d\n", tick, len(stderr))
-				if strings.Contains(stderr, "GGML_SCHED_MAX_SPLIT_INPUTS") && fitRetries < maxFitRetries && tick < maxTicks-20 {
+				captured := serverOutput.Tail(0)
+				fmt.Printf("[LoadModel] monitor: process died at tick %d, captured output len=%d\n", tick, len(captured))
+				if strings.Contains(captured, "GGML_SCHED_MAX_SPLIT_INPUTS") && fitRetries < maxFitRetries && tick < maxTicks-20 {
 					fitRetries++
 					fmt.Printf("[LoadModel] monitor: GGML_SCHED_MAX_SPLIT_INPUTS crash, retry %d/%d\n", fitRetries, maxFitRetries)
 					a.logLLMCrash(fmt.Errorf("GGML_SCHED_MAX_SPLIT_INPUTS crash, retry %d/%d", fitRetries, maxFitRetries), "app-model.go:118")
@@ -250,36 +386,59 @@ func (a *App) LoadModel(modelPath string) (err error) {
 						_ = a.serverProc.Wait()
 					}
 					a.serverProc = nil
-					stderrBuf.Reset()
+					serverOutput.Reset()
 					if !waitForPortFree("8080", 5*time.Second) {
 						a.logError(errors.LLMPortConflict, errors.Critical, "llm.load", "app-model.go:127", fmt.Errorf("port 8080 occupied after crash"))
 						a.emitEvent("model:error", "port 8080 occupied after crash; cannot restart llama-server")
 						return
 					}
-					cmd2, err2 := spawnLlamaServerWithModel(modelPath, spawnSettings, &stderrBuf, false)
+					cmd2, err2 := spawnLlamaServerWithModel(modelPath, pairing.Path, spawnSettings, serverOutput, false)
 					if err2 != nil {
-						a.logLLMLoadError(err2, "app-model.go:133")
-						a.emitEvent("model:error", err2.Error())
+						rec := loader.FailureRecord{
+							Stage:      loader.StageSpawn,
+							ModelPath:  modelPath,
+							ModelName:  filepath.Base(modelPath),
+							Arch:       admission.Arch,
+							Projector:  pairing.Path,
+							Executable: findLlamaServer(),
+							Args:       buildLlamaServerArgs(modelPath, pairing.Path, spawnSettings, false),
+							Detail:     "retry after GGML_SCHED_MAX_SPLIT_INPUTS: " + err2.Error(),
+						}
+						if path, writeErr := loader.WriteFailureRecord(a.loaderLogDir(), rec); writeErr == nil {
+							rec.RecordPath = path
+						}
+						userMsg := rec.UserMessage()
+						a.logLLMLoadError(fmt.Errorf("%s", userMsg), "app-model.go:133")
+						a.emitEvent("model:error", userMsg)
 						return
 					}
+					activeCmd = cmd2
 					a.serverProc = cmd2
 					pm = waitMonitor(cmd2)
 					tick = -1
 					continue
 				}
 
-				errMsg := "llama-server exited unexpectedly"
-				if stderr != "" {
-					lines := strings.Split(stderr, "\n")
-					if len(lines) > 4 {
-						lines = lines[len(lines)-4:]
-					}
-					errMsg += ": " + strings.TrimSpace(strings.Join(lines, " | "))
-					fmt.Printf("[LoadModel] monitor: stderr tail: %s\n", strings.TrimSpace(strings.Join(lines, " | ")))
-				} else if pm.exitErr != nil {
-					errMsg += ": " + pm.exitErr.Error()
-					fmt.Printf("[LoadModel] monitor: exit error: %v\n", pm.exitErr)
+				rec := loader.FailureRecord{
+					Stage:      loader.StageStartup,
+					ModelPath:  modelPath,
+					ModelName:  filepath.Base(modelPath),
+					Arch:       admission.Arch,
+					Projector:  pairing.Path,
+					Executable: activeCmd.Path,
+					Args:       activeCmd.Args,
+					ExitStatus: loader.ExitStatus(pm.exitErr),
+					Output:     serverOutput.Tail(loader.FailureTailBytes),
+					Detail:     "llama-server exited before becoming healthy",
 				}
+				rec.OutputBytes, _, rec.OutputTruncated = serverOutput.Stats()
+				if path, writeErr := loader.WriteFailureRecord(a.loaderLogDir(), rec); writeErr == nil {
+					rec.RecordPath = path
+				} else {
+					fmt.Printf("[LoadModel] WARN: could not persist diagnostics: %v\n", writeErr)
+				}
+				errMsg := rec.UserMessage()
+				fmt.Printf("[LoadModel] monitor: %s\n", rec.Format())
 				a.logLLMCrash(fmt.Errorf("%s", errMsg), "app-model.go:146")
 				a.loadingProgress.Store(0)
 				a.loadingStage.Store("Failed")
@@ -301,10 +460,28 @@ func (a *App) LoadModel(modelPath string) (err error) {
 			}
 		}
 		fmt.Println("[LoadModel] monitor: timeout after 60s")
-		a.logError(errors.LLMServerTimeout, errors.High, "llm.load", "app-model.go:172", fmt.Errorf("llama-server did not become ready after 60s"))
+		rec := loader.FailureRecord{
+			Stage:      loader.StageTimeout,
+			ModelPath:  modelPath,
+			ModelName:  filepath.Base(modelPath),
+			Arch:       admission.Arch,
+			Projector:  pairing.Path,
+			Executable: activeCmd.Path,
+			Args:       activeCmd.Args,
+			Output:     serverOutput.Tail(loader.FailureTailBytes),
+			Detail:     "llama-server did not become ready after 60s",
+		}
+		rec.OutputBytes, _, rec.OutputTruncated = serverOutput.Stats()
+		if path, writeErr := loader.WriteFailureRecord(a.loaderLogDir(), rec); writeErr == nil {
+			rec.RecordPath = path
+		} else {
+			fmt.Printf("[LoadModel] WARN: could not persist diagnostics: %v\n", writeErr)
+		}
+		userMsg := rec.UserMessage()
+		a.logError(errors.LLMServerTimeout, errors.High, "llm.load", "app-model.go:172", fmt.Errorf("%s", userMsg))
 		a.loadingProgress.Store(0)
 		a.loadingStage.Store("Timeout")
-		a.emitEvent("model:error", "server did not become ready after 60s")
+		a.emitEvent("model:error", userMsg)
 	}()
 
 	// Register with resource manager using actual memory estimates
@@ -636,6 +813,14 @@ func (a *App) applySafeDefaults(profile *types.ModelProfile) {
 // ---------------------------------------------------------------------------
 // Model directory + file pickers
 // ---------------------------------------------------------------------------
+
+// loaderLogDir returns where model-load failure records are written.
+func (a *App) loaderLogDir() string {
+	if a.loaderDiagnosticsDir != "" {
+		return a.loaderDiagnosticsDir
+	}
+	return loader.LogDir(paths.ProjectRoot())
+}
 
 // GetModelsDir returns the absolute path to the models directory.
 func (a *App) GetModelsDir() string {

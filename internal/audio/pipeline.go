@@ -2,6 +2,7 @@ package audio
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,8 +11,10 @@ import (
 	"time"
 
 	"howl-chat/internal/audio/asr/fallback"
+	"howl-chat/internal/audio/asr/llama"
 	"howl-chat/internal/audio/asr/qwen"
 	"howl-chat/internal/audio/asr/whisper"
+	"howl-chat/internal/audio/capability"
 	"howl-chat/internal/audio/runtime"
 	"howl-chat/internal/audio/tts/cache"
 	"howl-chat/internal/audio/tts/kokoro"
@@ -23,17 +26,50 @@ import (
 
 // Pipeline composes ASR, TTS, and optional multimodal processing.
 type Pipeline struct {
-	mu      sync.RWMutex
-	config  types.PipelineConfig
-	status  types.PipelineStatus
-	loader  *runtime.ModelLoader
-	planner runtime.Constraints
+	lifecycleMu   sync.RWMutex
+	replacementMu sync.Mutex
+	mu            sync.RWMutex
+	config        types.PipelineConfig
+	status        types.PipelineStatus
+	loader        *runtime.ModelLoader
+	planner       runtime.Constraints
 
-	asrRecognizer types.ASRRecognizer
-	ttsSynth      types.TTSSynthesizer
-	multimodal    types.MultimodalBridge
-	ttsCache      types.AudioCache
-	loadedVoice   string // Currently loaded TTS voice model name
+	asrRecognizer  types.ASRRecognizer
+	ttsSynth       types.TTSSynthesizer
+	multimodal     types.MultimodalBridge
+	ttsCache       types.AudioCache
+	loadedVoice    string // Currently loaded TTS voice model name
+	initialization initOutcome
+}
+
+type capabilityInit struct {
+	requested bool
+	ready     bool
+	err       error
+}
+
+type initOutcome struct {
+	asr capabilityInit
+	tts capabilityInit
+}
+
+func (o initOutcome) aggregateError() error {
+	var errs []error
+	if o.asr.requested && !o.asr.ready {
+		err := o.asr.err
+		if err == nil {
+			err = ErrCapabilityNotReady
+		}
+		errs = append(errs, fmt.Errorf("ASR: %w", err))
+	}
+	if o.tts.requested && !o.tts.ready {
+		err := o.tts.err
+		if err == nil {
+			err = ErrCapabilityNotReady
+		}
+		errs = append(errs, fmt.Errorf("TTS: %w", err))
+	}
+	return errors.Join(errs...)
 }
 
 // NewPipeline creates an empty pipeline with modular runtime loader.
@@ -47,39 +83,79 @@ func NewPipeline() *Pipeline {
 
 // Initialize resolves and loads configured capability providers.
 func (p *Pipeline) Initialize(ctx context.Context, config types.PipelineConfig) error {
-	p.mu.Lock()
-	defer p.mu.Unlock()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	p.lifecycleMu.Lock()
+	defer p.lifecycleMu.Unlock()
 
-	p.config = config
-	p.status = types.PipelineStatus{}
-	p.ttsCache = cache.NewManager(100)
-
-	tier := parseTier(config.HardwareTier)
-	p.planner = runtime.Constraints{
-		Tier:             tier,
+	constraints := runtime.Constraints{
+		Tier:             parseTier(config.HardwareTier),
 		RequireStreaming: config.RealtimeEnabled,
 		RequireGPU:       false,
 		PreferredBackend: "local",
 	}
 
-	plan := runtime.BuildSelectionPlan(p.planner)
+	p.mu.Lock()
+	p.config = config
+	p.status = types.PipelineStatus{}
+	p.ttsCache = cache.NewManager(100)
+	p.planner = constraints
+	p.initialization = initOutcome{
+		asr: capabilityInit{requested: config.ASREnabled},
+		tts: capabilityInit{requested: config.TTSEnabled},
+	}
+	p.mu.Unlock()
+
+	plan := runtime.BuildSelectionPlan(constraints)
 	if config.ASREnabled {
-		if err := p.initASR(ctx, plan.ASR); err != nil {
-			return err
+		var recognizer types.ASRRecognizer
+		outcome := capabilityInit{requested: true}
+		candidates, selectionErr := asrCandidatesFor(plan.ASR, config.ASREngine)
+		if selectionErr != nil {
+			outcome.err = selectionErr
+		} else {
+			recognizer, outcome = p.initASR(ctx, candidates, config)
 		}
+		p.mu.Lock()
+		p.initialization.asr = outcome
+		p.asrRecognizer = nil
+		p.status.ASRReady = false
+		if outcome.ready {
+			p.asrRecognizer = recognizer
+			p.status.ASRReady = true
+		}
+		p.mu.Unlock()
 	}
 	if config.TTSEnabled {
-		if err := p.initTTS(ctx, plan.TTS); err != nil {
-			return err
+		var synth types.TTSSynthesizer
+		var loadedVoice string
+		outcome := capabilityInit{requested: true}
+		candidates, selectionErr := ttsCandidatesFor(plan.TTS, config.TTSEngine)
+		if selectionErr != nil {
+			outcome.err = selectionErr
+		} else {
+			synth, loadedVoice, outcome = p.initTTS(ctx, candidates)
 		}
+		p.mu.Lock()
+		p.initialization.tts = outcome
+		p.ttsSynth = nil
+		p.loadedVoice = ""
+		p.status.TTSReady = false
+		if outcome.ready {
+			p.ttsSynth = synth
+			p.loadedVoice = loadedVoice
+			p.status.TTSReady = true
+		}
+		p.mu.Unlock()
 	}
 	if config.MultimodalEnabled {
 		if err := p.initMultimodal(ctx, plan.Multimodal); err != nil {
-			return err
+			return errors.Join(p.initializationResult().aggregateError(), err)
 		}
 	}
 
-	return nil
+	return p.initializationResult().aggregateError()
 }
 
 // ProcessAudioMessage runs the configured flow for incoming messages.
@@ -105,14 +181,6 @@ func (p *Pipeline) ProcessAudioMessage(ctx context.Context, msg types.AudioMessa
 		response.TranscribedText = strings.TrimSpace(result.Text)
 		response.ResponseText = response.TranscribedText
 
-		if ttsSynth != nil && response.ResponseText != "" {
-			audioPath, err := p.synthesizeWithCache(ctx, cacheStore, ttsSynth, response.ResponseText, nil)
-			if err != nil {
-				p.recordError()
-				return nil, err
-			}
-			response.AudioOutputPath = audioPath
-		}
 	case "audio_output":
 		if ttsSynth == nil {
 			return nil, types.NewAudioError(types.ErrCodeModelNotFound, "tts is not enabled", nil)
@@ -186,11 +254,14 @@ func (p *Pipeline) GetTTSVoices() []types.Voice {
 // Shutdown releases loaded resources through loader lifecycle.
 func (p *Pipeline) Shutdown(ctx context.Context) error {
 	_ = ctx
+	p.lifecycleMu.Lock()
+	defer p.lifecycleMu.Unlock()
+
 	ids := p.loader.GetLoadedModels()
-	var errs []string
+	var errs []error
 	for _, id := range ids {
 		if err := p.loader.Unload(id); err != nil {
-			errs = append(errs, err.Error())
+			errs = append(errs, fmt.Errorf("unload %s: %w", id, err))
 		}
 	}
 
@@ -198,84 +269,197 @@ func (p *Pipeline) Shutdown(ctx context.Context) error {
 	p.asrRecognizer = nil
 	p.ttsSynth = nil
 	p.multimodal = nil
+	p.loadedVoice = ""
 	p.status.ASRReady = false
 	p.status.TTSReady = false
 	p.status.MultimodalReady = false
 	p.mu.Unlock()
 
-	if len(errs) > 0 {
-		return fmt.Errorf("shutdown errors: %s", strings.Join(errs, "; "))
-	}
-	return nil
+	return errors.Join(errs...)
 }
 
-func (p *Pipeline) initASR(ctx context.Context, candidates []types.ASRModelType) error {
+// pipelineCapabilityCatalog is the contract the pipeline enforces for both
+// automatic and explicit selection. Package tests replace it so lifecycle and
+// provider outcomes can be exercised without installed audio assets;
+// production always reads the probed environment.
+var pipelineCapabilityCatalog = func() []capability.Record {
+	return capability.Catalog(capability.ProductionEnv(ASRModelPathFor, ASRProjectorPathFor, TTSModelPathFor))
+}
+
+// asrCandidatesFor resolves the engines one Apply may load.
+//
+// Automatic selection stays inside local, admitted models: a remote API must
+// never be reached because a local model was missing. An explicit engine is
+// honoured exactly, or refused with the capability contract's blockers; it is
+// never replaced by a different provider.
+func asrCandidatesFor(planned []types.ASRModelType, engine string) ([]types.ASRModelType, error) {
+	return asrCandidatesForRecords(planned, engine, pipelineCapabilityCatalog())
+}
+
+func asrCandidatesForRecords(planned []types.ASRModelType, engine string, records []capability.Record) ([]types.ASRModelType, error) {
+	engine = strings.TrimSpace(engine)
+	if engine == "" || engine == "auto" {
+		filtered := make([]capability.Record, 0, len(planned))
+		reasons := make([]string, 0, len(planned))
+		for _, candidate := range planned {
+			profile, ok := types.GetASRProfile(candidate)
+			if !ok || !profile.Local || !profile.ApprovedLocal {
+				continue
+			}
+			record, found := findCapabilityRecord(records, capability.TaskFileTranscription, string(candidate))
+			if !found {
+				reasons = append(reasons, string(candidate)+": no capability record")
+				continue
+			}
+			filtered = append(filtered, record)
+			if !record.Selectable() {
+				reasons = append(reasons, string(candidate)+": "+strings.Join(record.Blockers(), "; "))
+			}
+		}
+		primary, err := capability.AutoSelect(filtered, capability.TaskFileTranscription)
+		if err != nil {
+			if len(reasons) == 0 {
+				return nil, fmt.Errorf("no local admitted ASR engine matches the current constraints")
+			}
+			return nil, fmt.Errorf("no selectable local ASR engine: %s", strings.Join(reasons, " | "))
+		}
+		out := []types.ASRModelType{types.ASRModelType(primary.ID)}
+		for _, fallback := range capability.Fallbacks(filtered, primary) {
+			out = append(out, types.ASRModelType(fallback.ID))
+		}
+		return out, nil
+	}
+
+	record, err := capability.Select(records, capability.TaskFileTranscription, engine)
+	if err != nil {
+		return nil, fmt.Errorf("explicit ASR engine %q cannot be used: %w", engine, err)
+	}
+	return []types.ASRModelType{types.ASRModelType(record.ID)}, nil
+}
+
+func findCapabilityRecord(records []capability.Record, task capability.Task, id string) (capability.Record, bool) {
+	for _, record := range records {
+		if record.Task == task && record.ID == id {
+			return record, true
+		}
+	}
+	return capability.Record{}, false
+}
+
+// ttsCandidatesFor resolves the synthesis engines one Apply may load. An
+// explicit engine goes through the same capability contract as ASR: it is
+// honoured with its evidence or refused with its blockers, never swapped for
+// the planner's first choice.
+func ttsCandidatesFor(planned []types.TTSModelType, engine string) ([]types.TTSModelType, error) {
+	return ttsCandidatesForRecords(planned, engine, pipelineCapabilityCatalog())
+}
+
+func ttsCandidatesForRecords(planned []types.TTSModelType, engine string, records []capability.Record) ([]types.TTSModelType, error) {
+	engine = strings.TrimSpace(engine)
+	if engine == "" || engine == "auto" {
+		return planned, nil
+	}
+	record, err := capability.Select(records, capability.TaskSpeechSynthesis, engine)
+	if err != nil {
+		return nil, fmt.Errorf("explicit TTS engine %q cannot be used: %w", engine, err)
+	}
+	return []types.TTSModelType{types.TTSModelType(record.ID)}, nil
+}
+
+func (p *Pipeline) initASR(ctx context.Context, candidates []types.ASRModelType, config types.PipelineConfig) (types.ASRRecognizer, capabilityInit) {
+	out := capabilityInit{requested: true}
 	if len(candidates) == 0 {
-		return types.NewAudioError(types.ErrCodeModelNotFound, "no ASR candidates for current constraints", nil)
+		out.err = types.NewAudioError(types.ErrCodeModelNotFound, "no ASR candidates for current constraints", nil)
+		return nil, out
 	}
 	selected := chooseASR(candidates)
 	recognizers := make([]types.ASRRecognizer, 0, len(selected))
 	recMap := make(map[types.ASRModelType]types.ASRRecognizer)
+	ownedIDs := make([]string, 0, len(selected))
+	var errs []error
 	for _, modelType := range selected {
-		rec, err := p.loader.LoadASR(string(modelType), types.ASRConfig{
-			ModelPath: defaultASRModelPath(modelType),
-			Language:  "auto",
+		rec, err := p.loader.LoadASR(ctx, string(modelType), types.ASRConfig{
+			ModelPath:     ASRModelPathFor(modelType),
+			ProjectorPath: ASRProjectorPathFor(modelType),
+			ServerPath:    ASRServerPathFor(),
+			Language:      "auto",
+			NumThreads:    6,
 		})
 		if err != nil {
+			errs = append(errs, fmt.Errorf("load ASR %s: %w", modelType, err))
 			continue
 		}
+		ownedIDs = append(ownedIDs, asrLoaderID(string(modelType)))
 		recognizers = append(recognizers, rec)
 		recMap[modelType] = rec
 	}
 	if len(recognizers) == 0 {
-		return types.NewAudioError(types.ErrCodeModelLoadFailed, "failed to initialize any ASR recognizer", nil)
+		out.err = errors.Join(errs...)
+		if out.err == nil {
+			out.err = types.NewAudioError(types.ErrCodeModelLoadFailed, "failed to initialize any ASR recognizer", nil)
+		}
+		return nil, out
 	}
 	chain := fallback.NewChain(fallback.ChainConfig{
 		Recognizers:          recognizers,
 		RecognizerMap:        recMap,
 		MaxAttempts:          1,
 		AutoSelectByHardware: true,
-		MinMemoryTier:        parseTier(p.config.HardwareTier),
+		MinMemoryTier:        parseTier(config.HardwareTier),
 		Language:             "auto",
 	})
 	if err := chain.Initialize(ctx, types.ASRConfig{Language: "auto"}); err != nil {
-		return err
+		cleanupErrs := []error{fmt.Errorf("initialize ASR chain: %w", err)}
+		for _, id := range ownedIDs {
+			if unloadErr := p.loader.Unload(id); unloadErr != nil {
+				cleanupErrs = append(cleanupErrs, fmt.Errorf("unload %s: %w", id, unloadErr))
+			}
+		}
+		out.err = errors.Join(cleanupErrs...)
+		return nil, out
 	}
-	p.asrRecognizer = chain
-	p.status.ASRReady = true
-	return nil
+	out.ready = true
+	return chain, out
 }
 
-func (p *Pipeline) initTTS(ctx context.Context, candidates []types.TTSModelType) error {
-	_ = ctx
+func (p *Pipeline) initTTS(ctx context.Context, candidates []types.TTSModelType) (types.TTSSynthesizer, string, capabilityInit) {
+	out := capabilityInit{requested: true}
 	if len(candidates) == 0 {
-		return types.NewAudioError(types.ErrCodeModelNotFound, "no TTS candidates for current constraints", nil)
+		out.err = types.NewAudioError(types.ErrCodeModelNotFound, "no TTS candidates for current constraints", nil)
+		return nil, "", out
 	}
 	cacheDir := defaultTTSCacheDir()
-	var errs []string
+	var errs []error
 	for _, candidate := range candidates {
 		cfg := ttsConfigForModel(candidate, cacheDir)
-		synth, err := p.loader.LoadTTS(string(candidate), cfg)
+		synth, err := p.loader.LoadTTS(ctx, string(candidate), cfg)
 		if err != nil {
-			errs = append(errs, fmt.Sprintf("%s: %v", candidate, err))
+			errs = append(errs, fmt.Errorf("load TTS %s: %w", candidate, err))
 			continue
 		}
-		p.ttsSynth = synth
-		p.status.TTSReady = true
-		p.loadedVoice = cfg.ModelPath
-		return nil
+		out.ready = true
+		return synth, cfg.ModelPath, out
 	}
-	return types.NewAudioError(types.ErrCodeModelLoadFailed,
-		fmt.Sprintf("failed to initialise any configured TTS engine; attempts: %s", strings.Join(errs, "; ")), nil)
+	out.err = errors.Join(errs...)
+	if out.err == nil {
+		out.err = types.NewAudioError(types.ErrCodeModelLoadFailed, "failed to initialize any configured TTS engine", nil)
+	}
+	return nil, "", out
 }
 
 // ensureTTSVoice lazily loads a different Piper voice model if the requested
 // voice differs from the currently loaded one. Returns nil if already loaded.
 func (p *Pipeline) ensureTTSVoice(ctx context.Context, voiceName string) error {
-	p.mu.Lock()
-	defer p.mu.Unlock()
+	p.lifecycleMu.RLock()
+	defer p.lifecycleMu.RUnlock()
+	p.replacementMu.Lock()
+	defer p.replacementMu.Unlock()
 
-	if p.ttsSynth == nil || p.loadedVoice == voiceName {
+	p.mu.RLock()
+	synth := p.ttsSynth
+	loadedVoice := p.loadedVoice
+	p.mu.RUnlock()
+	if synth == nil || loadedVoice == voiceName {
 		return nil
 	}
 
@@ -291,15 +475,27 @@ func (p *Pipeline) ensureTTSVoice(ctx context.Context, voiceName string) error {
 		CacheDir:     cacheDir,
 		CacheEnabled: true,
 	}
-	synth, err := p.loader.LoadTTS(string(types.TTSPiper), cfg)
+	newSynth, err := p.loader.LoadTTS(ctx, string(types.TTSPiper), cfg)
 	if err != nil {
 		return types.NewAudioError(types.ErrCodeModelLoadFailed,
 			fmt.Sprintf("failed to load voice %s", voiceName), err)
 	}
-	p.ttsSynth = synth
+	p.mu.Lock()
+	p.ttsSynth = newSynth
 	p.loadedVoice = voiceName
+	p.mu.Unlock()
 	fmt.Printf("INFO: loaded TTS voice: %s\n", voiceName)
 	return nil
+}
+
+func (p *Pipeline) initializationResult() initOutcome {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	return p.initialization
+}
+
+func asrLoaderID(modelType string) string {
+	return "asr:" + modelType
 }
 
 func (p *Pipeline) initMultimodal(ctx context.Context, candidates []types.MultimodalModelType) error {
@@ -353,6 +549,7 @@ func registerBuiltins(loader *runtime.ModelLoader) {
 	loader.RegisterASR(types.ASRWhisperSmall, func() types.ASRRecognizer { return whisper.New(types.ASRWhisperSmall) })
 	loader.RegisterASR(types.ASRQwen3ASR06B, func() types.ASRRecognizer { return qwen.NewClient(os.Getenv("HOWL_QWEN_API_KEY")) })
 	loader.RegisterASR(types.ASRQwen3ASR17B, func() types.ASRRecognizer { return qwen.NewClient(os.Getenv("HOWL_QWEN_API_KEY")) })
+	loader.RegisterASR(types.ASRQwen3ASR17BLocal, func() types.ASRRecognizer { return llama.New() })
 	loader.RegisterTTS(types.TTSPiper, func() types.TTSSynthesizer { return piper.New() })
 	loader.RegisterTTS(types.TTSMeloTTS, func() types.TTSSynthesizer { return melotts.New() })
 	loader.RegisterTTS(types.TTSKokoro, func() types.TTSSynthesizer { return kokoro.New() })
@@ -515,6 +712,10 @@ func defaultASRModelPath(model types.ASRModelType) string {
 		return "models/whisper/ggml-small.bin"
 	case types.ASRWhisperBase:
 		return "models/whisper/ggml-base.bin"
+	case types.ASRQwen3ASR06B, types.ASRQwen3ASR17B:
+		// Remote DashScope adapters keep their own model name; there is no
+		// local file to point at.
+		return ""
 	default:
 		return string(model)
 	}

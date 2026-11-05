@@ -470,6 +470,10 @@ export function TranscribeAudio(arg1) {
   return window['go']['main']['App']['TranscribeAudio'](arg1);
 }
 
+export function TranscribeAudioData(arg1) {
+  return window['go']['main']['App']['TranscribeAudioData'](arg1);
+}
+
 export function UnloadImageModel() {
   return window['go']['main']['App']['UnloadImageModel']();
 }
@@ -512,4 +516,24 @@ export function WipeAllData() {
 
 export function UploadRAGDocumentText(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['main']['App']['UploadRAGDocumentText'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function BrowseModelDirectory(path) {
+  return window['go']['main']['App']['BrowseModelDirectory'](path);
+}
+
+export function DeferDiscoveredDirectory(path) {
+  return window['go']['main']['App']['DeferDiscoveredDirectory'](path);
+}
+
+export function GetModelDiscoveryState() {
+  return window['go']['main']['App']['GetModelDiscoveryState']();
+}
+
+export function ScanDiscoveredDirectory(path) {
+  return window['go']['main']['App']['ScanDiscoveredDirectory'](path);
+}
+
+export function SetDirectoryDiscovery(enabled) {
+  return window['go']['main']['App']['SetDirectoryDiscovery'](enabled);
 }

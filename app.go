@@ -10,7 +10,6 @@ import (
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"howl-chat/internal/audio"
-	audiotypes "howl-chat/internal/audio/types"
 	"howl-chat/internal/backend/chat"
 	"howl-chat/internal/backend/llama"
 	"howl-chat/internal/backend/lorebook"
@@ -63,8 +62,8 @@ type App struct {
 	// RAG Service Integration
 	ragService *rag.Service
 
-	// Audio Pipeline Integration
-	audioPipeline *audio.Pipeline
+	// Audio Manager Integration
+	audioManager *audio.Manager
 
 	// Image Generation Engine
 	imageEngine    imageengine.ImageEngine
@@ -78,6 +77,14 @@ type App struct {
 	lastImageModelOpts imagetypes.ModelLoadOptions
 	imgSettingsStore   *imgsettings.Store
 	modelRegistry      *registry.Registry
+
+	// loaderDiagnosticsDir overrides where model-load failure records are
+	// written. Empty means <project root>/logs.
+	loaderDiagnosticsDir string
+
+	// discoveryDirOverride redirects directory-discovery records for tests.
+	// Empty means the normal settings directory.
+	discoveryDirOverride string
 
 	// Error Tracking System
 	errorLogger   *errors.Logger
@@ -181,6 +188,7 @@ func NewApp() *App {
 		chatService:     chatService,
 		memoryService:   memoryService,
 		ragService:      ragService,
+		audioManager:    audio.NewProductionManager(),
 	}
 
 	// Initialize unified settings store
@@ -237,32 +245,15 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 	a.initErrorSystem()
 	a.bindErrorEmitter()
-	a.initAudioPipeline()
 	startupMark("OnStartup: init complete")
 
 	// Model scanning is background work: the window is already visible and the
 	// user can interact, so a slow or unplugged model directory must never
 	// delay the first paint.
 	go a.RescanAllDirs()
-}
-
-// initAudioPipeline creates and initializes the audio pipeline if binaries are available.
-// It is best-effort: if whisper-cli or piper are not installed, audio stays disabled.
-func (a *App) initAudioPipeline() {
-	pipe := audio.NewPipeline()
-	cfg := audiotypes.PipelineConfig{
-		ASREnabled:        false, // User must enable via settings
-		TTSEnabled:        false, // User must enable via settings
-		MultimodalEnabled: false,
-		RealtimeEnabled:   false,
-		HardwareTier:      "auto",
-	}
-	if err := pipe.Initialize(context.Background(), cfg); err != nil {
-		fmt.Printf("Audio pipeline init skipped: %v\n", err)
-		return
-	}
-	a.audioPipeline = pipe
-	fmt.Println("Audio pipeline initialized successfully")
+	// "Never show again" means silent discovery, not no discovery: keep the
+	// pickers accurate in the background without interrupting the user.
+	go a.RunSilentModelDiscovery()
 }
 
 // OnShutdown is called when the application is shutting down
@@ -287,9 +278,12 @@ func (a *App) OnShutdown(ctx context.Context) {
 		_ = a.imageEngine.Shutdown()
 	}
 
-	// Shutdown audio pipeline if initialized
-	if a.audioPipeline != nil {
-		_ = a.audioPipeline.Shutdown(ctx)
+	// Shut down the manager-owned audio generation. The manager applies its
+	// bounded drain policy; a timeout or shutdown failure must be visible.
+	if a.audioManager != nil {
+		if err := a.audioManager.Close(ctx); err != nil {
+			fmt.Printf("Audio manager shutdown error: %v\n", err)
+		}
 	}
 
 	// Reap anything still attached to the job object, so llama-server and

@@ -7,9 +7,19 @@ import (
 )
 
 func TestBuildSelectionPlanTinyTier(t *testing.T) {
-	plan := BuildSelectionPlan(Constraints{
+	// DEBT-T2: no adapter can stream, so a streaming requirement must produce
+	// no ASR candidates instead of offering a mode nothing implements.
+	streaming := BuildSelectionPlan(Constraints{
 		Tier:             types.TierTiny,
 		RequireStreaming: true,
+		PreferredBackend: "local",
+	})
+	if len(streaming.ASR) != 0 {
+		t.Fatalf("streaming requirement planned %v, but no adapter streams", streaming.ASR)
+	}
+
+	plan := BuildSelectionPlan(Constraints{
+		Tier:             types.TierTiny,
 		PreferredBackend: "local",
 	})
 

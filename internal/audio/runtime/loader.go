@@ -2,13 +2,14 @@ package runtime
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 	"sync"
 
 	"howl-chat/internal/audio/asr"
-	"howl-chat/internal/audio/types"
 	ttsruntime "howl-chat/internal/audio/tts"
+	"howl-chat/internal/audio/types"
 )
 
 type multimodalConstructor func() types.MultimodalBridge
@@ -23,6 +24,47 @@ type ModelLoader struct {
 	mu          sync.RWMutex
 	loaded      map[string]func() error
 	loadedKinds map[string]string
+	nextTTSID   uint64
+}
+
+// ProviderInitPanic records a provider initialization panic after the loader
+// has released the provider. CleanupErr and CleanupPanic preserve failures that
+// occurred while releasing the panicking provider.
+type ProviderInitPanic struct {
+	ProviderID   string
+	Value        any
+	CleanupErr   error
+	CleanupPanic any
+}
+
+func (e *ProviderInitPanic) Error() string {
+	if e == nil {
+		return "<nil>"
+	}
+	message := fmt.Sprintf("provider %s initialization panicked: %v", e.ProviderID, e.Value)
+	if e.CleanupErr != nil {
+		message += fmt.Sprintf("; cleanup failed: %v", e.CleanupErr)
+	}
+	if e.CleanupPanic != nil {
+		message += fmt.Sprintf("; cleanup panicked: %v", e.CleanupPanic)
+	}
+	return message
+}
+
+// Unwrap exposes the original panic when it is an error and the cleanup error
+// when one was observed. The cleanup panic remains available directly.
+func (e *ProviderInitPanic) Unwrap() []error {
+	if e == nil {
+		return nil
+	}
+	errs := make([]error, 0, 2)
+	if original, ok := e.Value.(error); ok {
+		errs = append(errs, original)
+	}
+	if e.CleanupErr != nil {
+		errs = append(errs, e.CleanupErr)
+	}
+	return errs
 }
 
 // NewModelLoader creates an empty, production-safe loader registry.
@@ -52,30 +94,47 @@ func (l *ModelLoader) RegisterMultimodal(modelType types.MultimodalModelType, co
 }
 
 // LoadASR initializes an ASR model and tracks it for lifecycle management.
-func (l *ModelLoader) LoadASR(modelType string, config types.ASRConfig) (types.ASRRecognizer, error) {
+func (l *ModelLoader) LoadASR(ctx context.Context, modelType string, config types.ASRConfig) (types.ASRRecognizer, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	recognizer, err := l.asrFactory.Create(types.ASRModelType(modelType))
 	if err != nil {
 		return nil, err
 	}
-	if err := recognizer.Initialize(context.Background(), config); err != nil {
-		return nil, err
-	}
 	id := "asr:" + modelType
+	if err := initializeProvider(id, func() error {
+		return recognizer.Initialize(ctx, config)
+	}, recognizer.Release); err != nil {
+		releaseErr := recognizer.Release()
+		return nil, errors.Join(err, releaseErr)
+	}
 	l.trackLoaded(id, "asr", recognizer.Release)
 	return recognizer, nil
 }
 
 // LoadTTS initializes a TTS model and tracks it for lifecycle management.
-func (l *ModelLoader) LoadTTS(modelType string, config types.TTSConfig) (types.TTSSynthesizer, error) {
+func (l *ModelLoader) LoadTTS(ctx context.Context, modelType string, config types.TTSConfig) (types.TTSSynthesizer, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	synth, err := l.ttsFactory.Create(types.TTSModelType(modelType))
 	if err != nil {
 		return nil, err
 	}
-	if err := synth.Initialize(context.Background(), config); err != nil {
-		return nil, err
+	if err := initializeProvider("tts:"+modelType, func() error {
+		return synth.Initialize(ctx, config)
+	}, synth.Release); err != nil {
+		releaseErr := synth.Release()
+		return nil, errors.Join(err, releaseErr)
 	}
-	id := "tts:" + modelType
-	l.trackLoaded(id, "tts", synth.Release)
+	l.trackTTSLoaded(modelType, synth.Release)
 	return synth, nil
 }
 
@@ -137,4 +196,38 @@ func (l *ModelLoader) trackLoaded(id, kind string, releaseFn func() error) {
 	l.loaded[id] = releaseFn
 	l.loadedKinds[id] = kind
 	l.mu.Unlock()
+}
+
+func (l *ModelLoader) trackTTSLoaded(modelType string, releaseFn func() error) string {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.nextTTSID++
+	id := fmt.Sprintf("tts:%s:%d", modelType, l.nextTTSID)
+	l.loaded[id] = releaseFn
+	l.loadedKinds[id] = "tts"
+	return id
+}
+
+func initializeProvider(providerID string, init func() error, release func() error) (err error) {
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			cleanupErr, cleanupPanic := safeRelease(release)
+			panic(&ProviderInitPanic{
+				ProviderID:   providerID,
+				Value:        recovered,
+				CleanupErr:   cleanupErr,
+				CleanupPanic: cleanupPanic,
+			})
+		}
+	}()
+	return init()
+}
+
+func safeRelease(release func() error) (err error, recovered any) {
+	defer func() {
+		if r := recover(); r != nil {
+			recovered = r
+		}
+	}()
+	return release(), nil
 }

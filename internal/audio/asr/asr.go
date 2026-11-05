@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"howl-chat/internal/audio/hw"
@@ -14,9 +15,14 @@ import (
 // BaseRecognizer provides common functionality for all ASR implementations
 type BaseRecognizer struct {
 	modelType   types.ASRModelType
-	config      types.ASRConfig
 	initialized bool
 	info        types.ASRModelInfo
+
+	// callMu serializes operations on the underlying recognizer resource.
+	// It is acquired before stateMu; never the other way around.
+	callMu  sync.Mutex
+	stateMu sync.RWMutex
+	config  types.ASRConfig
 }
 
 // NewBaseRecognizer creates a base recognizer with model metadata
@@ -45,19 +51,39 @@ func (b *BaseRecognizer) GetModelType() types.ASRModelType {
 	return b.modelType
 }
 
+// LockCalls acquires the provider operation lock.
+func (b *BaseRecognizer) LockCalls() { b.callMu.Lock() }
+
+// UnlockCalls releases the provider operation lock.
+func (b *BaseRecognizer) UnlockCalls() { b.callMu.Unlock() }
+
 // IsInitialized checks if recognizer has been initialized
 func (b *BaseRecognizer) IsInitialized() bool {
+	b.stateMu.RLock()
+	defer b.stateMu.RUnlock()
 	return b.initialized
 }
 
 // SetInitialized marks recognizer as initialized
 func (b *BaseRecognizer) SetInitialized(config types.ASRConfig) {
+	b.stateMu.Lock()
+	defer b.stateMu.Unlock()
 	b.initialized = true
 	b.config = config
 }
 
+// ClearInitialized returns the recognizer to its uninitialized state.
+func (b *BaseRecognizer) ClearInitialized() {
+	b.stateMu.Lock()
+	defer b.stateMu.Unlock()
+	b.initialized = false
+	b.config = types.ASRConfig{}
+}
+
 // GetConfig returns the current configuration
 func (b *BaseRecognizer) GetConfig() types.ASRConfig {
+	b.stateMu.RLock()
+	defer b.stateMu.RUnlock()
 	return b.config
 }
 
@@ -81,6 +107,8 @@ func (b *BaseRecognizer) SupportsLanguage(lang string) bool {
 
 // CheckInitialized verifies recognizer is ready for use
 func (b *BaseRecognizer) CheckInitialized() error {
+	b.stateMu.RLock()
+	defer b.stateMu.RUnlock()
 	if !b.initialized {
 		return NewModelNotLoadedError(string(b.modelType))
 	}

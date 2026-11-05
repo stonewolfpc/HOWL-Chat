@@ -33,11 +33,12 @@
     <link rel="stylesheet" href="css/chat-session-list.css?v=41">
     <link rel="stylesheet" href="css/chat-session-modal.css?v=41">
     <link rel="stylesheet" href="css/real-settings.css?v=41">
-    <link rel="stylesheet" href="css/sidebar-panels.css?v=41">
+    <link rel="stylesheet" href="css/sidebar-panels.css?v=42">
     <link rel="stylesheet" href="css/loading-progress.css?v=41">
     <link rel="stylesheet" href="css/sampler-settings.css?v=41">
     <link rel="stylesheet" href="css/model-settings.css?v=41">
-    <link rel="stylesheet" href="css/model-browser.css?v=41">
+    <link rel="stylesheet" href="css/model-browser.css?v=42">
+    <link rel="stylesheet" href="css/model-directory.css?v=1">
     <link rel="stylesheet" href="css/story-tools.css?v=41">
     <link rel="stylesheet" href="css/icons.css?v=41">
     <link rel="stylesheet" href="css/tutorials.css?v=41">
@@ -58,13 +59,15 @@
     <script src="js/chat-think.js?v=41"></script>
     <script src="js/chat-actions.js?v=41"></script>
     <script src="js/chat-input.js?v=41"></script>
-    <script src="js/chat-model.js?v=41"></script>
+    <script src="js/chat-model.js?v=42"></script>
     <script src="js/chat.js?v=41"></script>
-    <script src="js/audio-service.js?v=41"></script>
+    <script src="js/audio-wav.js?v=42"></script>
+    <script src="js/audio-service.js?v=42"></script>
     <script src="js/settings-state.js?v=41"></script>
     <script src="js/settings-actions.js?v=41"></script>
     <script src="js/settings-controls.js?v=41"></script>
     <script src="js/real-settings.js?v=41"></script>
+    <script src="js/model-directory.js?v=1"></script>
     <script src="js/chat-session.js?v=41"></script>
     <script src="js/loading-progress.js?v=41"></script>
     <script src="js/error-system.js?v=41"></script>
@@ -81,6 +84,7 @@
     <script src="js/menu-view.js?v=41"></script>
     <script src="js/menu-memory.js?v=41"></script>
     <script src="js/memory-candidates.js?v=41"></script>
+    <script src="js/iframe-bridge-host.js?v=1"></script>
     <script src="js/menu-functions.js?v=41"></script>
     <script src="js/app-wipe.js?v=41"></script>
     <script src="js/tutorials-data-chat.js?v=41"></script>
@@ -1358,6 +1362,17 @@
                 <div class="real-settings-panel" id="storage-panel">
                     <div class="settings-category-header"><span class="icon icon-folder"></span> File & Storage Settings</div>
                     <div class="settings-grid">
+                        <!-- New model folder prompts -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="discovery-prompts">New Folder Prompts</label>
+                            <div class="setting-description">Ask before scanning a newly found model folder. When off, discovery keeps running silently so the model pickers stay accurate.</div>
+                            <div class="setting-control">
+                                <label class="setting-toggle">
+                                    <input type="checkbox" id="discovery-prompts" checked>
+                                    <span class="setting-toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
                         <!-- Chat Auto-save Toggle -->
                         <div class="setting-card">
                             <label class="setting-label" for="chat-autosave">Chat Auto-save</label>
@@ -1667,6 +1682,68 @@
                         <button class="model-button load-button" onclick="loadModelFromBrowser()">Load Model</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <!-- ==================== MODEL DIRECTORY LOCATOR ==================== -->
+    <div id="md-locator-overlay" class="md-overlay" role="dialog" aria-modal="true" aria-labelledby="md-locator-title">
+        <div class="md-dialog">
+            <div class="md-header">
+                <div>
+                    <h2 id="md-locator-title">Choose a model folder</h2>
+                    <p class="md-subtitle">Directory locator</p>
+                </div>
+                <button type="button" class="md-close" id="md-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="md-locator-body">
+                <div class="md-mounts" id="md-mounts"></div>
+                <div class="md-pathrow">
+                    <button type="button" class="md-up" id="md-up" title="Parent folder" aria-label="Parent folder">↑</button>
+                    <input type="text" class="md-path" id="md-path" spellcheck="false" autocomplete="off" aria-label="Folder path">
+                    <button type="button" class="md-go" id="md-go">Go</button>
+                </div>
+                <div class="md-list" id="md-folders" role="listbox" aria-label="Folders"></div>
+                <div class="md-status" id="md-status">
+                    <span id="md-status-text">Looking for model files…</span>
+                    <span>Scanning reads metadata only</span>
+                </div>
+            </div>
+            <div class="md-footer">
+                <button type="button" class="md-btn" id="md-cancel">Cancel</button>
+                <button type="button" class="md-btn md-btn--primary" id="md-select">Select this folder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== NEW MODEL FOLDER PROMPT ==================== -->
+    <div id="md-prompt-overlay" class="md-overlay" role="dialog" aria-modal="true" aria-labelledby="md-prompt-title">
+        <div class="md-dialog md-dialog--prompt">
+            <div class="md-header">
+                <div>
+                    <h2 id="md-prompt-title">New model folder detected</h2>
+                    <p class="md-subtitle">First scan</p>
+                </div>
+                <button type="button" class="md-close" id="md-prompt-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="md-prompt-body">
+                <p>Howl Chat found a model directory that hasn't been scanned before.</p>
+                <p><strong>What happens when you scan?</strong></p>
+                <ul>
+                    <li>Finds model files in this folder.</li>
+                    <li>Identifies their architectures and capabilities.</li>
+                    <li>Determines which models are usable for chat, voice, image generation, and other supported tasks.</li>
+                    <li>Organizes them into the appropriate model pickers.</li>
+                </ul>
+                <span class="md-field-label">New directory</span>
+                <code class="md-field-value" id="md-prompt-path">—</code>
+                <p class="md-status" id="md-prompt-summary"></p>
+                <p class="md-note">Scanning inspects model files. It does not load models into memory, start inference, or reserve VRAM.</p>
+            </div>
+            <div class="md-footer">
+                <span class="md-prompt-footer-note">You can change this preference later in Settings.</span>
+                <button type="button" class="md-btn md-btn--quiet" id="md-prompt-never">Never show again</button>
+                <button type="button" class="md-btn" id="md-prompt-later">Not now</button>
+                <button type="button" class="md-btn md-btn--primary" id="md-prompt-scan">Scan directory</button>
             </div>
         </div>
     </div>

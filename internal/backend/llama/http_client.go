@@ -7,10 +7,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"howl-chat/internal/backend/chatpolicy"
+	"howl-chat/internal/backend/gguf"
 	"howl-chat/internal/backend/types"
 	"io"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -274,6 +275,13 @@ func min(a, b int) int {
 
 // LoadModel loads a model into llama.cpp (implements Client interface)
 func (c *HTTPClient) LoadModel(modelPath string, options *LoadOptions) error {
+	return c.loadModelWithProjector(modelPath, "")
+}
+
+// loadModelWithProjector loads a model and, when the model requires one,
+// passes the exact companion projector. It never searches the directory for
+// the first mmproj: directory order is not evidence of pairing.
+func (c *HTTPClient) loadModelWithProjector(modelPath, explicitMMProj string) error {
 	if !c.enabled {
 		return fmt.Errorf("llama.cpp HTTP client is not enabled")
 	}
@@ -285,13 +293,34 @@ func (c *HTTPClient) LoadModel(modelPath string, options *LoadOptions) error {
 		"model": modelPath, // full absolute path
 	}
 
-	// Auto-detect mmproj file in the same directory
-	mmprojPath := findMMProj(modelPath)
+	admission := gguf.AdmitModel(modelPath)
+	if !admission.AllowedAsChat() {
+		return fmt.Errorf("%s", admission.ChatRejectionMessage())
+	}
+	eligibility := chatpolicy.Evaluate(modelPath, admission)
+	if !eligibility.Eligible {
+		return fmt.Errorf("%s", eligibility.RejectionMessage(modelPath))
+	}
+
+	mmprojPath := explicitMMProj
+	if mmprojPath == "" {
+		pairing, err := gguf.ResolveProjector(gguf.PairingRequest{
+			ModelPath:        modelPath,
+			Arch:             admission.Arch,
+			EmbeddingLength:  admission.EmbeddingLength,
+			Require:          admission.RequiresProjector(),
+			RequiredModality: admission.RequiredModality(),
+		})
+		if err != nil {
+			return fmt.Errorf("cannot pair a companion projector for %s: %w", filepath.Base(modelPath), err)
+		}
+		mmprojPath = pairing.Path
+	}
 	if mmprojPath != "" {
 		requestBody["mmproj"] = mmprojPath
-		fmt.Printf("INFO: Auto-detected mmproj file: %s\n", mmprojPath)
+		fmt.Printf("INFO: using paired mmproj file: %s\n", mmprojPath)
 	} else {
-		fmt.Printf("INFO: No mmproj file found for model: %s\n", modelPath)
+		fmt.Printf("INFO: no paired mmproj file for model: %s\n", modelPath)
 	}
 
 	jsonBody, err := json.Marshal(requestBody)
@@ -315,85 +344,9 @@ func (c *HTTPClient) LoadModel(modelPath string, options *LoadOptions) error {
 	return nil
 }
 
-// findMMProj searches for an mmproj file in the same directory as the model.
-// Tries specific naming patterns first, then falls back to a wildcard scan.
-func findMMProj(modelPath string) string {
-	dir := filepath.Dir(modelPath)
-	baseName := filepath.Base(modelPath)
-	modelName := strings.TrimSuffix(baseName, filepath.Ext(baseName))
-
-	patterns := []string{
-		filepath.Join(dir, "mmproj-IQ4_XS.gguf"),
-		filepath.Join(dir, "mmproj-IQ3_XXS.gguf"),
-		filepath.Join(dir, "mmproj-IQ2_XS.gguf"),
-		filepath.Join(dir, "mmproj-IQ2_XXS.gguf"),
-		filepath.Join(dir, "mmproj-IQ2_S.gguf"),
-		filepath.Join(dir, "mmproj-Q2_K.gguf"),
-		filepath.Join(dir, "mmproj-Q3_K.gguf"),
-		filepath.Join(dir, "mmproj-Q3_K_S.gguf"),
-		filepath.Join(dir, "mmproj-Q3_K_M.gguf"),
-		filepath.Join(dir, "mmproj-Q3_K_L.gguf"),
-		filepath.Join(dir, "mmproj-Q4_0.gguf"),
-		filepath.Join(dir, "mmproj-Q4_K.gguf"),
-		filepath.Join(dir, "mmproj-Q4_K_S.gguf"),
-		filepath.Join(dir, "mmproj-Q4_K_M.gguf"),
-		filepath.Join(dir, "mmproj-Q4_K_L.gguf"),
-		filepath.Join(dir, "mmproj-Q5_0.gguf"),
-		filepath.Join(dir, "mmproj-Q5_K.gguf"),
-		filepath.Join(dir, "mmproj-Q5_K_S.gguf"),
-		filepath.Join(dir, "mmproj-Q5_K_M.gguf"),
-		filepath.Join(dir, "mmproj-Q6_K.gguf"),
-		filepath.Join(dir, "mmproj-Q8_0.gguf"),
-		filepath.Join(dir, "mmproj-F16.gguf"),
-		filepath.Join(dir, "mmproj-F32.gguf"),
-		filepath.Join(dir, "mmproj-BF16.gguf"),
-		filepath.Join(dir, "mmproj-iq4_xs.gguf"),
-		filepath.Join(dir, "mmproj-iq3_xxs.gguf"),
-		filepath.Join(dir, "mmproj-q4_k_m.gguf"),
-		filepath.Join(dir, "mmproj-q5_k_m.gguf"),
-		filepath.Join(dir, "mmproj-q8_0.gguf"),
-		filepath.Join(dir, "mmproj-f16.gguf"),
-		filepath.Join(dir, "mmproj-bf16.gguf"),
-		filepath.Join(dir, "mmproj.gguf"),
-		filepath.Join(dir, "mmproj-model.gguf"),
-		filepath.Join(dir, "mmproj-vision.gguf"),
-		filepath.Join(dir, "mmproj-image.gguf"),
-		filepath.Join(dir, "mmproj-proj.gguf"),
-		filepath.Join(dir, modelName+"-mmproj.gguf"),
-		filepath.Join(dir, modelName+".mmproj.gguf"),
-	}
-
-	for _, pattern := range patterns {
-		if _, err := os.Stat(pattern); err == nil {
-			fmt.Printf("[findMMProj] found: %s\n", pattern)
-			return pattern
-		}
-	}
-
-	// Fallback: scan directory for any file starting with "mmproj" and ending with ".gguf"
-	entries, err := os.ReadDir(dir)
-	if err == nil {
-		for _, entry := range entries {
-			if entry.IsDir() {
-				continue
-			}
-			name := strings.ToLower(entry.Name())
-			if strings.HasPrefix(name, "mmproj") && strings.HasSuffix(name, ".gguf") {
-				found := filepath.Join(dir, entry.Name())
-				fmt.Printf("[findMMProj] found via wildcard: %s\n", found)
-				return found
-			}
-		}
-	}
-
-	fmt.Printf("[findMMProj] no mmproj found in %s\n", dir)
-	return ""
-}
-
-// LoadModelWithMMProj loads a model with optional mmproj file for vision models
+// LoadModelWithMMProj loads a model with an explicitly paired mmproj file.
 func (c *HTTPClient) LoadModelWithMMProj(modelPath string, mmprojPath string) error {
-	// For HTTP client, this is the same as LoadModel since llama-server handles mmproj auto-discovery
-	return c.LoadModel(modelPath, nil)
+	return c.loadModelWithProjector(modelPath, mmprojPath)
 }
 
 // GetLoadedModel returns information about the currently loaded model

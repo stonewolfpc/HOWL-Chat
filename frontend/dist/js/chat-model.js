@@ -82,6 +82,7 @@ function _setModelSelectValue(path, text) {
     if (!trigger) return;
     trigger.dataset.value = path || '';
     trigger.textContent = text || (path ? path : '— select model —');
+    trigger.title = path ? `${text || path}\n${path}` : 'Select a registered LLM model';
     const opts = _getModelSelectOptionsContainer();
     if (!opts) return;
     opts.querySelectorAll('.model-select-option').forEach(opt => {
@@ -94,17 +95,27 @@ function _clearModelSelectOptions() {
     if (opts) opts.innerHTML = '';
 }
 
-function _addModelSelectOption(path, text) {
+function _addModelSelectOption(path, text, title) {
     const opts = _getModelSelectOptionsContainer();
     if (!opts) return;
     const div = document.createElement('div');
     div.className = 'model-select-option';
     div.dataset.value = path;
     div.textContent = text;
+    div.title = title || path || text;
     div.addEventListener('click', () => {
         _setModelSelectValue(path, text);
         _closeModelSelect();
     });
+    opts.appendChild(div);
+}
+
+function _addModelSelectEmpty(text) {
+    const opts = _getModelSelectOptionsContainer();
+    if (!opts) return;
+    const div = document.createElement('div');
+    div.className = 'model-select-empty';
+    div.textContent = text;
     opts.appendChild(div);
 }
 
@@ -220,17 +231,38 @@ function checkModelStatus() {
 // Registry-based LLM dropdown
 // ---------------------------------------------------------------------------
 
+// A chat picker must only offer files llama-server can actually load. The
+// registry also stores vision projectors and, from older scans, non-GGUF
+// assets; those used to appear as selectable "models" and then fail on Load.
+function _isChatModel(m) {
+    if (!m || !m.path || !/\.(gguf|bin)$/i.test(m.path)) return false;
+    const file = String(m.path.split(/[\\/]/).pop() || '').toLowerCase();
+    const base = String(m.name || file).toLowerCase();
+    return !/^mmproj(?:[-_.]|$)/.test(base) && !/^mmproj(?:[-_.]|$)/.test(file);
+}
+
+function _chatModels(models) {
+    return (models || [])
+        .filter(_isChatModel)
+        .sort((a, b) => String(a.name || '').localeCompare(
+            String(b.name || ''), undefined, { numeric: true, sensitivity: 'base' }
+        ));
+}
+
 async function populateLLMDropdown() {
     const app = window.go?.main?.App;
     _setupModelSelect();
     if (!app?.GetLLMModels) return;
     try {
-        const models = await app.GetLLMModels();
+        const models = _chatModels(await app.GetLLMModels());
         const prev = _getModelSelectValue();
         _clearModelSelectOptions();
-        (models || []).forEach(m => {
+        if (models.length === 0) {
+            _addModelSelectEmpty('No chat models registered');
+        }
+        models.forEach(m => {
             const sizeTxt = m.size_mb > 0 ? ` (${(m.size_mb / 1024).toFixed(1)} GB)` : '';
-            _addModelSelectOption(m.path, `${m.name}${sizeTxt}`);
+            _addModelSelectOption(m.path, `${m.name}${sizeTxt}`, m.path);
         });
         if (prev && _modelSelectHasOption(prev)) {
             const opt = [..._getModelSelectOptionsContainer().children].find(c => c.dataset.value === prev);
@@ -274,7 +306,11 @@ async function scanLLMDirectory() {
     const app = window.go?.main?.App;
     if (!app) return;
     try {
-        const dir = await app.OpenDirectoryPicker();
+        // The themed locator is the product path; the native dialog only backs
+        // a build where the locator binding is unavailable.
+        const dir = typeof openDirectoryLocator === 'function'
+            ? await openDirectoryLocator('')
+            : await app.OpenDirectoryPicker();
         if (!dir) {
             if (typeof showNotification === 'function') showNotification('No folder selected.', 'error');
             return;
@@ -526,9 +562,11 @@ async function populateModelBrowserDirs() {
 
 async function addModelDirectory() {
     const app = window.go?.main?.App;
-    if (!app?.OpenDirectoryPicker || !app?.ScanLLMDir) return;
+    if (!app?.ScanLLMDir) return;
     try {
-        const dir = await app.OpenDirectoryPicker();
+        const dir = typeof openDirectoryLocator === 'function'
+            ? await openDirectoryLocator('')
+            : await app.OpenDirectoryPicker();
         if (!dir) {
             // The native picker returns an empty string when no folder is
             // actually selected — for example while a search filter hides
@@ -641,7 +679,7 @@ async function populateModelBrowser() {
             return;
         }
         const models = await app.GetLLMModels();
-        _browserModels = models || [];
+        _browserModels = _chatModels(models);
         renderModelBrowserList(_browserModels);
         await populateModelBrowserDirs();
     } catch (err) {
@@ -667,10 +705,13 @@ function renderModelBrowserList(models) {
         item.onclick = () => selectModelBrowserItem(m.path);
 
         const sizeGB = m.size_mb > 0 ? (m.size_mb / 1024).toFixed(1) + ' GB' : '';
+        const folder = String(m.path || '').replace(/[\\/][^\\/]+$/, '');
+        item.title = m.path || m.name;
         item.innerHTML = `
             <div class="mb-item-info">
                 <span class="mb-item-name">${escapeHtml(m.name)}</span>
                 <span class="mb-item-meta">${escapeHtml(m.format)} ${sizeGB}</span>
+                <span class="mb-item-path" title="${escapeHtml(m.path)}">${escapeHtml(folder)}</span>
             </div>
             <span class="mb-item-remove" title="Remove model from registry">&times;</span>
         `;

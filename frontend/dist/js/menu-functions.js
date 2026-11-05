@@ -25,10 +25,36 @@ function openStoryTools() {
     loadRecentMemoriesMenu();
 }
 
+let _audioSettingsEscHandler = null;
+
+function _removeAudioSettingsModal(modal) {
+    const iframeEl = modal?.querySelector('iframe');
+    if (iframeEl && window.howlBridgeHost?.detach) {
+        try { window.howlBridgeHost.detach(iframeEl); } catch (e) { /* bridge already gone */ }
+    }
+    if (modal?.parentNode) modal.remove();
+    if (_audioSettingsEscHandler) {
+        document.removeEventListener('keydown', _audioSettingsEscHandler);
+        _audioSettingsEscHandler = null;
+    }
+}
+
+function _requestAudioSettingsClose(modal) {
+    try {
+        const iframe = modal?.querySelector('iframe');
+        const close = iframe?.contentWindow?.AudioSettings?.close;
+        if (typeof close === 'function') {
+            close();
+            return;
+        }
+    } catch (e) { /* fall back to removing the modal */ }
+    _removeAudioSettingsModal(modal);
+}
+
 function _openAudioSettingsIframe(hash) {
     // Remove existing modal if already open
     const existing = document.getElementById('audio-settings-modal');
-    if (existing) existing.remove();
+    if (existing) _removeAudioSettingsModal(existing);
 
     const modal = document.createElement('div');
     modal.className = 'real-settings-overlay show';
@@ -40,10 +66,26 @@ function _openAudioSettingsIframe(hash) {
         </div>
     `;
     document.body.appendChild(modal);
-    modal.addEventListener('click', e => { if (e.target === modal) { modal.remove(); } });
-    const onEsc = e => { if (e.key === 'Escape') { modal.remove(); document.removeEventListener('keydown', onEsc); } };
-    document.addEventListener('keydown', onEsc);
+    const iframeEl = modal.querySelector('iframe');
+    if (iframeEl && window.howlBridgeHost?.attach) {
+        try { window.howlBridgeHost.attach(iframeEl); } catch (e) { console.error('[audio-settings] bridge attach failed:', e); }
+    }
+    modal.addEventListener('click', e => {
+        if (e.target === modal) _requestAudioSettingsClose(modal);
+    });
+    if (_audioSettingsEscHandler) document.removeEventListener('keydown', _audioSettingsEscHandler);
+    _audioSettingsEscHandler = e => {
+        if (e.key === 'Escape') _requestAudioSettingsClose(modal);
+    };
+    document.addEventListener('keydown', _audioSettingsEscHandler);
 }
+
+// The iframe closes itself after saving/applying. Remove the matching parent
+// key handler and modal without adding a second close path.
+document.addEventListener('howl:audio-settings-closed', () => {
+    const modal = document.getElementById('audio-settings-modal');
+    if (modal) _removeAudioSettingsModal(modal);
+});
 
 function openAudioSettings() { _openAudioSettingsIframe('general'); }
 function openTTSSettings()   { _openAudioSettingsIframe('tts'); }

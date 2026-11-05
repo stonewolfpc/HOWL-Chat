@@ -27,6 +27,15 @@ const (
 	LLMStreamInterrupted   Code = "LLM-STREAM-BRK"
 	LLMModelAlreadyLoading Code = "LLM-LOAD-DUP"
 	LLMConfigApplyFail     Code = "LLM-CFG-APPLY"
+	// LLMArchRejected is a model whose GGUF architecture is a component or is
+	// not a verified chat architecture. It is refused before llama-server runs.
+	LLMArchRejected Code = "LLM-ARCH-REJECT"
+	// LLMProjectorPairing is a missing, ambiguous or mismatched companion
+	// projector, refused before the current model is stopped.
+	LLMProjectorPairing Code = "LLM-PROJ-PAIR"
+	// LLMChatTaskRejected is a known non-chat task (ASR, audio-only) or an
+	// unestablished multimodal task, refused before projector resolution.
+	LLMChatTaskRejected Code = "LLM-CHAT-TASK"
 )
 
 // Image Generation Pipeline (Critical/High)

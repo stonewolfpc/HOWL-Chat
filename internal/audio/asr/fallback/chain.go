@@ -47,21 +47,22 @@ func NewChain(config ChainConfig) *FallbackChain {
 	}
 }
 
-// Initialize sets up the fallback chain
+// Initialize sets up the fallback chain. The loader owns recognizer
+// initialization, so the chain records its own state without touching the
+// providers.
 func (c *FallbackChain) Initialize(ctx context.Context, config types.ASRConfig) error {
-	// Initialize all recognizers
-	for _, recognizer := range c.config.Recognizers {
-		if err := recognizer.Initialize(ctx, config); err != nil {
-			return fmt.Errorf("failed to initialize recognizer: %w", err)
-		}
-	}
-
+	_ = ctx
+	c.LockCalls()
+	defer c.UnlockCalls()
 	c.SetInitialized(config)
 	return nil
 }
 
 // Transcribe performs speech recognition with fallback chain
 func (c *FallbackChain) Transcribe(ctx context.Context, audioPath string, callback types.ProgressCallback) (*types.RecognitionResult, error) {
+	c.LockCalls()
+	defer c.UnlockCalls()
+
 	// Ensure initialized
 	if err := c.CheckInitialized(); err != nil {
 		return nil, err
@@ -113,20 +114,11 @@ func (c *FallbackChain) TranscribeStream(ctx context.Context, chunks <-chan type
 	)
 }
 
-// Release cleans up all recognizers
+// Release is intentionally a no-op. The loader is the single owner and
+// releases every provider it loaded.
 func (c *FallbackChain) Release() error {
-	var errors []error
-
-	for _, recognizer := range c.config.Recognizers {
-		if err := recognizer.Release(); err != nil {
-			errors = append(errors, err)
-		}
-	}
-
-	if len(errors) > 0 {
-		return fmt.Errorf("errors releasing recognizers: %v", errors)
-	}
-
+	c.LockCalls()
+	defer c.UnlockCalls()
 	return nil
 }
 

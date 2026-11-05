@@ -19,6 +19,11 @@ type Synthesizer struct {
 	piperPath string
 	modelPath string
 	outputDir string
+
+	// Test seams for binary discovery, process execution, and output reads.
+	resolveBinary func() (string, error)
+	runCommand    func(context.Context, string, []string, string) ([]byte, error)
+	readFile      func(string) ([]byte, error)
 }
 
 // New returns a Piper synthesizer instance.
@@ -30,6 +35,9 @@ func New() *Synthesizer {
 
 // Initialize prepares Piper binary/model and output directories.
 func (s *Synthesizer) Initialize(ctx context.Context, config types.TTSConfig) error {
+	s.LockCalls()
+	defer s.UnlockCalls()
+
 	if config.ModelPath == "" {
 		return types.NewAudioError(types.ErrCodeModelNotFound, "piper model path is required", nil)
 	}
@@ -37,7 +45,11 @@ func (s *Synthesizer) Initialize(ctx context.Context, config types.TTSConfig) er
 		return types.NewAudioError(types.ErrCodeModelNotFound, "piper model not found", err)
 	}
 
-	piperPath, err := resolvePiperBinary()
+	resolver := resolvePiperBinary
+	if s.resolveBinary != nil {
+		resolver = s.resolveBinary
+	}
+	piperPath, err := resolver()
 	if err != nil {
 		return types.NewAudioError(types.ErrCodeModelNotFound, "piper binary not found in PATH", err)
 	}
@@ -59,6 +71,12 @@ func (s *Synthesizer) Initialize(ctx context.Context, config types.TTSConfig) er
 
 // Synthesize converts text to a WAV file.
 func (s *Synthesizer) Synthesize(ctx context.Context, req types.SynthesisRequest, callback types.ProgressCallback) (*types.SynthesisResult, error) {
+	s.LockCalls()
+	defer s.UnlockCalls()
+	return s.synthesizeLocked(ctx, req, callback)
+}
+
+func (s *Synthesizer) synthesizeLocked(ctx context.Context, req types.SynthesisRequest, callback types.ProgressCallback) (*types.SynthesisResult, error) {
 	if err := s.CheckInitialized(); err != nil {
 		return nil, err
 	}
@@ -103,11 +121,14 @@ func (s *Synthesizer) Synthesize(ctx context.Context, req types.SynthesisRequest
 func (s *Synthesizer) SynthesizeStream(ctx context.Context, req types.SynthesisRequest, chunks chan<- types.AudioChunk) error {
 	defer close(chunks)
 
-	result, err := s.Synthesize(ctx, req, nil)
+	s.LockCalls()
+	result, err := s.synthesizeLocked(ctx, req, nil)
 	if err != nil {
+		s.UnlockCalls()
 		return err
 	}
-	data, err := os.ReadFile(result.AudioPath)
+	data, err := s.readOutput(result.AudioPath)
+	s.UnlockCalls()
 	if err != nil {
 		return types.NewAudioError(types.ErrCodeSynthesisFailed, "failed to read synthesized audio", err)
 	}
@@ -135,6 +156,9 @@ func (s *Synthesizer) SynthesizeStream(ctx context.Context, req types.SynthesisR
 
 // GetVoices returns profile voices from model registry.
 func (s *Synthesizer) GetVoices() []types.Voice {
+	s.LockCalls()
+	defer s.UnlockCalls()
+
 	profile, ok := types.GetTTSProfile(types.TTSPiper)
 	if !ok {
 		return nil
@@ -157,6 +181,8 @@ func (s *Synthesizer) SupportsSSML() bool {
 
 // Release performs synthesizer cleanup.
 func (s *Synthesizer) Release() error {
+	s.LockCalls()
+	defer s.UnlockCalls()
 	return nil
 }
 
@@ -168,6 +194,11 @@ func (s *Synthesizer) runPiper(ctx context.Context, req types.SynthesisRequest, 
 	if req.Speed > 0 {
 		ls := 1.0 / clampSpeed(req.Speed)
 		args = append(args, "--length_scale", fmt.Sprintf("%.4f", ls))
+	}
+
+	if s.runCommand != nil {
+		_, err := s.runCommand(ctx, s.piperPath, args, req.Text)
+		return err
 	}
 
 	cmd := exec.CommandContext(ctx, s.piperPath, args...)
@@ -206,6 +237,13 @@ func resolvePiperBinary() (string, error) {
 		}
 	}
 	return "", fmt.Errorf("piper binary not found in PATH or project bin/ directory")
+}
+
+func (s *Synthesizer) readOutput(path string) ([]byte, error) {
+	if s.readFile != nil {
+		return s.readFile(path)
+	}
+	return os.ReadFile(path)
 }
 
 func clampSpeed(speed float64) float64 {

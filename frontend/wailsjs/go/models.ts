@@ -432,6 +432,88 @@ export namespace main {
 	        this.triggerWords = source["triggerWords"];
 	    }
 	}
+	export class DependencyItem {
+	    role: string;
+	    label: string;
+	    state: string;
+	    path?: string;
+	    fileName?: string;
+	    url?: string;
+	    source?: string;
+	    sizeMB?: number;
+	    note?: string;
+	    mismatch?: string;
+	    error?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new DependencyItem(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.role = source["role"];
+	        this.label = source["label"];
+	        this.state = source["state"];
+	        this.path = source["path"];
+	        this.fileName = source["fileName"];
+	        this.url = source["url"];
+	        this.source = source["source"];
+	        this.sizeMB = source["sizeMB"];
+	        this.note = source["note"];
+	        this.mismatch = source["mismatch"];
+	        this.error = source["error"];
+	    }
+	}
+	export class DependencyReport {
+	    model: string;
+	    family: string;
+	    known: boolean;
+	    items: DependencyItem[];
+	    missing: string[];
+	    downloadDir: string;
+	    totalSizeMB: number;
+	    canDownload: boolean;
+	    offline: boolean;
+	    message?: string;
+	    consentText: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new DependencyReport(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.model = source["model"];
+	        this.family = source["family"];
+	        this.known = source["known"];
+	        this.items = this.convertValues(source["items"], DependencyItem);
+	        this.missing = source["missing"];
+	        this.downloadDir = source["downloadDir"];
+	        this.totalSizeMB = source["totalSizeMB"];
+	        this.canDownload = source["canDownload"];
+	        this.offline = source["offline"];
+	        this.message = source["message"];
+	        this.consentText = source["consentText"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class FilteredAssets {
 	    vaes: AssetInfo[];
 	    loras: AssetInfo[];
@@ -465,6 +547,28 @@ export namespace main {
 		    }
 		    return a;
 		}
+	}
+	export class ImageWorkflowInfo {
+	    name: string;
+	    file_name: string;
+	    mode: string;
+	    model: string;
+	    saved_at: string;
+	    has_pose: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new ImageWorkflowInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.file_name = source["file_name"];
+	        this.mode = source["mode"];
+	        this.model = source["model"];
+	        this.saved_at = source["saved_at"];
+	        this.has_pose = source["has_pose"];
+	    }
 	}
 	export class InstalledAssetInfo {
 	    name: string;
@@ -690,6 +794,66 @@ export namespace main {
 	        this.resolverVersion = source["resolverVersion"];
 	        this.version = source["version"];
 	    }
+	}
+	export class ModelDirectory {
+	    path: string;
+	    kind: string;
+	    exists: boolean;
+	    models: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ModelDirectory(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.path = source["path"];
+	        this.kind = source["kind"];
+	        this.exists = source["exists"];
+	        this.models = source["models"];
+	    }
+	}
+	export class ModelFitResult {
+	    kind: string;
+	    can_fit: boolean;
+	    required_mb: number;
+	    free_vram_mb: number;
+	    total_vram_mb: number;
+	    blocking: LoadedModelInfo[];
+	    message: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ModelFitResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.kind = source["kind"];
+	        this.can_fit = source["can_fit"];
+	        this.required_mb = source["required_mb"];
+	        this.free_vram_mb = source["free_vram_mb"];
+	        this.total_vram_mb = source["total_vram_mb"];
+	        this.blocking = this.convertValues(source["blocking"], LoadedModelInfo);
+	        this.message = source["message"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	
 	export class ResourceSnapshot {
@@ -1068,6 +1232,8 @@ export namespace types {
 	    metadata: ImageMetadata;
 	    image_data?: string;
 	    images?: string[];
+	    video_data?: string;
+	    video_mime?: string;
 	    image_metadatas?: ImageMetadata[];
 	
 	    static createFrom(source: any = {}) {
@@ -1081,6 +1247,8 @@ export namespace types {
 	        this.metadata = this.convertValues(source["metadata"], ImageMetadata);
 	        this.image_data = source["image_data"];
 	        this.images = source["images"];
+	        this.video_data = source["video_data"];
+	        this.video_mime = source["video_mime"];
 	        this.image_metadatas = this.convertValues(source["image_metadatas"], ImageMetadata);
 	    }
 	
@@ -1146,6 +1314,7 @@ export namespace types {
 	    control_strength: number;
 	    batch_count: number;
 	    mode: string;
+	    job_id?: string;
 	    outpaint_margin?: number;
 	    outpaint_direction?: string;
 	    upscale_factor?: number;
@@ -1236,6 +1405,7 @@ export namespace types {
 	        this.control_strength = source["control_strength"];
 	        this.batch_count = source["batch_count"];
 	        this.mode = source["mode"];
+	        this.job_id = source["job_id"];
 	        this.outpaint_margin = source["outpaint_margin"];
 	        this.outpaint_direction = source["outpaint_direction"];
 	        this.upscale_factor = source["upscale_factor"];
@@ -1416,6 +1586,8 @@ export namespace types {
 	export class ModelLoadOptions {
 	    model: string;
 	    model_path?: string;
+	    job_id?: string;
+	    family?: string;
 	    vae: string;
 	    clip_l: string;
 	    clip_g: string;
@@ -1444,6 +1616,8 @@ export namespace types {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.model = source["model"];
 	        this.model_path = source["model_path"];
+	        this.job_id = source["job_id"];
+	        this.family = source["family"];
 	        this.vae = source["vae"];
 	        this.clip_l = source["clip_l"];
 	        this.clip_g = source["clip_g"];
@@ -1484,6 +1658,8 @@ export namespace types {
 	    BitsPerWeight: number;
 	    ArchitectureSpec?: ArchitectureSpec;
 	    HasVision: boolean;
+	    HasAudioInput: boolean;
+	    ProjectorKind: string;
 	    MMPProjPath: string;
 	
 	    static createFrom(source: any = {}) {
@@ -1510,6 +1686,8 @@ export namespace types {
 	        this.BitsPerWeight = source["BitsPerWeight"];
 	        this.ArchitectureSpec = this.convertValues(source["ArchitectureSpec"], ArchitectureSpec);
 	        this.HasVision = source["HasVision"];
+	        this.HasAudioInput = source["HasAudioInput"];
+	        this.ProjectorKind = source["ProjectorKind"];
 	        this.MMPProjPath = source["MMPProjPath"];
 	    }
 	

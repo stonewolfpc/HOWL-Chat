@@ -35,6 +35,14 @@
         .info-text { color: #60a5fa; font-size: 11px; margin-top: 4px; }
         .setting-btn { background: rgba(96,165,250,0.1); border: 1px solid rgba(96,165,250,0.3); color: var(--theme-color, #60a5fa); padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
         .setting-btn:hover { background: rgba(96,165,250,0.2); }
+        .audio-outcome { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+        .audio-outcome-item { padding: 2px 7px; border-radius: 999px; background: rgba(255,255,255,0.06); color: var(--text-secondary, #999); font-size: 11px; }
+        .audio-outcome-item.ok { background: rgba(34,197,94,0.14); color: #86efac; }
+        .audio-outcome-item.warn { background: rgba(251,146,60,0.14); color: #fdba74; }
+        .audio-outcome-item.error { background: rgba(248,113,113,0.14); color: #fca5a5; }
+        .audio-outcome-item.busy { background: rgba(96,165,250,0.14); color: #93c5fd; }
+        .audio-outcome-detail { color: var(--text-secondary, #999); font-size: 11px; line-height: 1.4; margin-bottom: 4px; max-width: 560px; }
+        .settings-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
     <script src="js/theme.js?v=41"></script>
 </head>
@@ -92,9 +100,9 @@
                     <div class="settings-grid">
                         <div class="setting-card">
                             <label class="setting-label" for="asr-engine">ASR Engine</label>
-                            <div class="setting-description">Select the speech recognition backend. Auto picks based on available hardware.</div>
-                            <div class="setting-control"><select class="setting-select" id="asr-engine"><option value="auto">Auto-Select (Recommended)</option><option value="whisper-tiny">Whisper Tiny (fastest, less accurate)</option><option value="whisper-base">Whisper Base</option><option value="whisper-small">Whisper Small (balanced)</option><option value="whisper-medium">Whisper Medium (accurate, slower)</option><option value="whisper-large">Whisper Large (most accurate, slowest)</option><option value="qwen-asr">Qwen ASR (API-based)</option></select></div>
-                            <div class="warning-text" id="asr-engine-warning">Large models require 8+ GB VRAM or 16+ GB RAM.</div>
+                            <div class="setting-description">Select the speech recognition backend. Auto uses a local, admitted engine. An explicit engine is used exactly or reported as unavailable — it is never swapped for another provider.</div>
+                            <div class="setting-control"><select class="setting-select" id="asr-engine"><option value="auto">Auto-Select (local engines)</option><option value="whisper-tiny">Whisper Tiny (fastest, less accurate)</option><option value="whisper-base">Whisper Base (balanced)</option><option value="whisper-small">Whisper Small (higher accuracy)</option><option value="qwen3-asr-0.6b">Qwen3 ASR 0.6B (DashScope API, remote)</option><option value="qwen3-asr-1.7b">Qwen3 ASR 1.7B (DashScope API, remote)</option><option value="qwen3-asr-1.7b-local">Qwen3 ASR 1.7B (local llama.cpp)</option></select></div>
+                            <div class="warning-text" id="asr-engine-warning">Checking available engines…</div>
                         </div>
                         <div class="setting-card">
                             <label class="setting-label" for="asr-language">Spoken Language</label>
@@ -265,14 +273,24 @@
                 </div>
             </div>
             <div class="real-settings-footer">
-                <div class="settings-info">Settings persist automatically across sessions</div>
+                <div class="settings-info">
+                    <div class="audio-outcome" id="audio-outcome" role="status" aria-live="polite">
+                        <span class="audio-outcome-item" id="audio-save-state">Not saved</span>
+                        <span class="audio-outcome-item" id="audio-apply-state">Not applied</span>
+                        <span class="audio-outcome-item" id="audio-ready-state">Readiness unchecked</span>
+                    </div>
+                    <div class="audio-outcome-detail" id="audio-outcome-detail" hidden></div>
+                    <div>Saved, applied, and ready are reported independently.</div>
+                </div>
                 <div class="settings-actions">
+                    <button class="settings-reset-btn" id="audio-retry-activation" onclick="retryAudioActivation()" hidden>Retry activation</button>
                     <button class="settings-reset-btn" onclick="resetAudioSettings()">Reset Audio Defaults</button>
-                    <button class="settings-save-btn" onclick="saveAudioSettings()">Save & Close</button>
+                    <button class="settings-save-btn" id="audio-settings-save" onclick="saveAudioSettings()" disabled>Save & Close</button>
                 </div>
             </div>
         </div>
     </div>
+    <script src="js/wails-bridge-iframe.js?v=1"></script>
     <script src="js/settings-state.js?v=41"></script>
     <script src="js/audio-settings.js?v=41"></script>
 </body>

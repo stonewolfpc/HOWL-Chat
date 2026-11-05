@@ -1,0 +1,447 @@
+/**
+ * Model Directory UI
+ *
+ * Two dialogs share one visual language:
+ *   - the folder locator that replaces the native Windows picker
+ *   - the "new model folder detected" prompt
+ *
+ * Everything is built from the theme tokens so light and dark both work, and
+ * sizes use clamp()/min() so the dialogs stay usable from 1280x720 laptops to
+ * 4K displays without hardcoded pixel heights.
+ */
+
+/* ---------- shared shell ---------- */
+
+.md-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(8px, 2vh, 32px);
+    background: var(--overlay-scrim, rgba(0, 0, 0, 0.7));
+    backdrop-filter: blur(4px);
+    z-index: 2600;
+}
+
+.md-overlay.show {
+    display: flex;
+}
+
+.md-dialog {
+    display: flex;
+    flex-direction: column;
+    width: min(720px, 94vw);
+    max-height: min(86vh, 760px);
+    min-height: 0;
+    background: var(--shell-panel-bg, #15151f);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    color: var(--text-primary);
+    font-size: clamp(12px, 0.95vw, 14px);
+}
+
+.md-dialog--prompt {
+    width: min(560px, 94vw);
+    max-height: min(88vh, 720px);
+}
+
+.md-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: clamp(12px, 1.6vh, 18px) clamp(14px, 1.6vw, 22px);
+    border-bottom: 1px solid var(--border-primary);
+    background: var(--surface-tertiary);
+}
+
+.md-header h2 {
+    margin: 0;
+    font-size: clamp(15px, 1.15vw, 19px);
+    font-weight: 700;
+    color: var(--theme-color, #14b8a6);
+    text-shadow: 0 0 10px var(--theme-glow, rgba(20, 184, 166, 0.3));
+}
+
+.md-subtitle {
+    margin: 2px 0 0;
+    font-size: clamp(11px, 0.8vw, 12.5px);
+    color: var(--text-tertiary);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.md-close {
+    flex: 0 0 auto;
+    background: transparent;
+    border: none;
+    color: var(--static-text, var(--text-primary));
+    font-size: 26px;
+    line-height: 1;
+    padding: 2px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.md-close:hover {
+    color: var(--theme-color, #14b8a6);
+    background: var(--surface-hover);
+}
+
+/* ---------- folder locator ---------- */
+
+.md-locator-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+    padding: clamp(10px, 1.4vh, 16px) clamp(14px, 1.6vw, 20px);
+    gap: 10px;
+}
+
+.md-mounts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.md-mount {
+    padding: 4px 10px;
+    font-size: clamp(11px, 0.8vw, 12.5px);
+    color: var(--text-secondary);
+    background: var(--surface-subtle, rgba(255, 255, 255, 0.03));
+    border: 1px solid var(--border-primary);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.md-mount:hover,
+.md-mount.active {
+    color: var(--theme-color, #14b8a6);
+    border-color: var(--theme-border, rgba(20, 184, 166, 0.3));
+    background: var(--accent-bg, rgba(20, 184, 166, 0.15));
+}
+
+.md-pathrow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.md-up {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    background: var(--input-bg, rgba(21, 21, 31, 0.6));
+    color: var(--text-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.md-up:hover:not(:disabled) {
+    color: var(--theme-color, #14b8a6);
+    border-color: var(--theme-border);
+}
+
+.md-up:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.md-path {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 6px 10px;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: clamp(11px, 0.8vw, 12.5px);
+    color: var(--text-primary);
+    background: var(--input-bg, rgba(21, 21, 31, 0.6));
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+}
+
+.md-path:focus {
+    outline: none;
+    border-color: var(--theme-border, rgba(20, 184, 166, 0.3));
+    box-shadow: 0 0 0 2px var(--theme-glow, rgba(20, 184, 166, 0.2));
+}
+
+.md-go {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    font-size: clamp(11px, 0.8vw, 12.5px);
+    font-weight: 600;
+    color: var(--theme-color, #14b8a6);
+    background: var(--accent-bg, rgba(20, 184, 166, 0.15));
+    border: 1px solid var(--theme-border, rgba(20, 184, 166, 0.3));
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.md-list {
+    flex: 1 1 auto;
+    min-height: 120px;
+    max-height: min(46vh, 420px);
+    overflow-y: auto;
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    background: var(--surface-secondary);
+}
+
+.md-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: clamp(6px, 0.8vh, 9px) 10px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    text-align: left;
+    cursor: pointer;
+    font-size: inherit;
+}
+
+.md-row:last-child {
+    border-bottom: none;
+}
+
+.md-row:hover {
+    background: var(--surface-hover);
+}
+
+.md-row-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.md-badge {
+    flex: 0 0 auto;
+    padding: 1px 8px;
+    font-size: clamp(10px, 0.72vw, 11.5px);
+    border-radius: 999px;
+    color: var(--theme-color, #14b8a6);
+    background: var(--accent-bg, rgba(20, 184, 166, 0.15));
+    border: 1px solid var(--theme-border, rgba(20, 184, 166, 0.3));
+    white-space: nowrap;
+}
+
+.md-empty {
+    padding: 18px;
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: clamp(11px, 0.85vw, 13px);
+}
+
+.md-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: clamp(11px, 0.82vw, 12.5px);
+    color: var(--text-secondary);
+}
+
+.md-status strong {
+    color: var(--theme-color, #14b8a6);
+}
+
+.md-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: clamp(10px, 1.3vh, 14px) clamp(14px, 1.6vw, 20px);
+    border-top: 1px solid var(--border-primary);
+    background: var(--surface-tertiary);
+}
+
+/* ---------- prompt ---------- */
+
+.md-prompt-body {
+    padding: clamp(14px, 1.8vh, 20px) clamp(16px, 1.8vw, 24px);
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.md-prompt-body p {
+    margin: 0 0 10px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.md-prompt-body ul {
+    margin: 0 0 12px;
+    padding-left: 18px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+}
+
+.md-prompt-body li::marker {
+    color: var(--theme-color, #14b8a6);
+}
+
+.md-field-label {
+    display: block;
+    margin: 12px 0 4px;
+    font-size: clamp(10px, 0.75vw, 11.5px);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+}
+
+.md-field-value {
+    display: block;
+    padding: 8px 10px;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: clamp(11px, 0.82vw, 12.5px);
+    color: var(--text-primary);
+    background: var(--input-bg, rgba(21, 21, 31, 0.6));
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    overflow-wrap: anywhere;
+}
+
+.md-note {
+    margin: 12px 0 0;
+    padding: 10px 12px;
+    font-size: clamp(11px, 0.82vw, 12.5px);
+    line-height: 1.45;
+    color: var(--text-secondary);
+    background: var(--surface-subtle, rgba(255, 255, 255, 0.03));
+    border: 1px solid var(--border-primary);
+    border-left: 3px solid var(--theme-color, #14b8a6);
+    border-radius: 6px;
+}
+
+.md-prompt-footer-note {
+    flex: 1 1 100%;
+    font-size: clamp(10px, 0.75vw, 11.5px);
+    color: var(--text-tertiary);
+    line-height: 1.4;
+}
+
+/* ---------- buttons ---------- */
+
+.md-btn {
+    padding: clamp(6px, 0.8vh, 9px) clamp(12px, 1.2vw, 18px);
+    font-size: clamp(11px, 0.85vw, 13px);
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 1px solid var(--border-secondary);
+    background: transparent;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.md-btn:hover:not(:disabled) {
+    color: var(--text-primary);
+    background: var(--surface-hover);
+}
+
+.md-btn--primary {
+    color: #03201c;
+    background: var(--theme-color, #14b8a6);
+    border-color: var(--theme-color, #14b8a6);
+}
+
+.md-btn--primary:hover:not(:disabled) {
+    filter: brightness(1.08);
+    color: #03201c;
+}
+
+.md-btn--quiet {
+    border-color: transparent;
+    background: transparent;
+    color: var(--text-tertiary);
+}
+
+.md-btn--quiet:hover:not(:disabled) {
+    color: var(--text-primary);
+    background: var(--surface-hover);
+}
+
+.md-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* ---------- light theme ---------- */
+
+body.theme-light .md-dialog {
+    background: var(--shell-panel-bg);
+    box-shadow: 0 18px 50px rgba(38, 36, 32, 0.22);
+}
+
+body.theme-light .md-list {
+    background: var(--surface-primary);
+}
+
+/* ---------- resolution awareness ---------- */
+
+@media (max-width: 900px) {
+    .md-dialog {
+        width: 96vw;
+        max-height: 90vh;
+    }
+
+    .md-list {
+        max-height: 40vh;
+    }
+}
+
+@media (max-width: 560px) {
+    .md-overlay {
+        padding: 0;
+        align-items: stretch;
+    }
+
+    .md-dialog {
+        width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .md-footer {
+        justify-content: stretch;
+    }
+
+    .md-btn {
+        flex: 1 1 auto;
+    }
+
+    .md-promopt-footer-note,
+    .md-prompt-footer-note {
+        flex-basis: 100%;
+    }
+}
+
+@media (max-height: 640px) {
+    .md-list {
+        max-height: 34vh;
+        min-height: 90px;
+    }
+
+    .md-prompt-body {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+}

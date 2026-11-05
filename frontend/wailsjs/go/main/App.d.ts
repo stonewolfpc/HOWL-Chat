@@ -242,6 +242,8 @@ export function SynthesizeSpeechWithVoice(arg1:string,arg2:string):Promise<strin
 
 export function TranscribeAudio(arg1:string):Promise<string>;
 
+export function TranscribeAudioData(arg1:string):Promise<string>;
+
 export function UnloadImageModel():Promise<void>;
 
 export function UnloadModel():Promise<void>;
@@ -263,3 +265,9 @@ export function UploadRAGDocument(arg1:string,arg2:string,arg3:string,arg4:strin
 export function WipeAllData():Promise<void>;
 
 export function UploadRAGDocumentText(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string):Promise<string>;
+
+export function BrowseModelDirectory(path:string):Promise<any>;
+export function DeferDiscoveredDirectory(path:string):Promise<void>;
+export function GetModelDiscoveryState():Promise<any>;
+export function ScanDiscoveredDirectory(path:string):Promise<main.ModelDirectory>;
+export function SetDirectoryDiscovery(enabled:boolean):Promise<void>;

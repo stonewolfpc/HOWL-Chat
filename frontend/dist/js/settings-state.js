@@ -161,26 +161,50 @@ async function loadSettings() {
 
 let saveDebounceTimer = null;
 
-async function saveSettings() {
-    // 1. Always write to localStorage immediately (cheap, synchronous)
+function _writeLocalSettings() {
     try {
         localStorage.setItem('howl-chat-settings', JSON.stringify(currentSettings));
     } catch (e) {
         console.warn('[settingsState] localStorage save failed:', e);
     }
+}
+
+async function _writeBackendSettings() {
+    const app = window.go?.main?.App;
+    if (typeof app?.SetSettings !== 'function') {
+        // Never return silently: a missing backend must fail the save path so
+        // the caller cannot report "Saved" for a write that never happened.
+        throw new Error('settings backend unavailable');
+    }
+    await app.SetSettings(currentSettings);
+}
+
+// saveSettingsNow is the explicit save path. It clears any pending debounce and
+// awaits the backend write, so callers that are about to destroy their document
+// (the audio-settings iframe) can prove the preference reached disk first.
+async function saveSettingsNow() {
+    _writeLocalSettings();
+    if (saveDebounceTimer) {
+        clearTimeout(saveDebounceTimer);
+        saveDebounceTimer = null;
+    }
+    await _writeBackendSettings();
+}
+
+async function saveSettings() {
+    // 1. Always write to localStorage immediately (cheap, synchronous)
+    _writeLocalSettings();
 
     // 2. Debounce backend sync — batch rapid changes (e.g. slider drags)
     //    into a single call 150ms after the user pauses.
     if (saveDebounceTimer) clearTimeout(saveDebounceTimer);
     saveDebounceTimer = setTimeout(async () => {
         saveDebounceTimer = null;
-        if (window.go?.main?.App?.SetSettings) {
-            try {
-                await window.go.main.App.SetSettings(currentSettings);
-                console.log('[settingsState] saved to backend');
-            } catch (e) {
-                console.warn('[settingsState] backend save failed:', e);
-            }
+        try {
+            await _writeBackendSettings();
+            console.log('[settingsState] saved to backend');
+        } catch (e) {
+            console.warn('[settingsState] backend save failed:', e);
         }
     }, 150);
 }
@@ -228,6 +252,10 @@ function resetAllSettings() {
 
 (async function _initSettings() {
     await loadSettings();
+    // Announce completion so audio-service can re-apply a saved engine after
+    // the persisted settings are actually in memory. DOMContentLoaded alone can
+    // fire before the backend settings promise resolves.
+    window.dispatchEvent(new CustomEvent('howl:settings-loaded'));
 })();
 
 // ---------------------------------------------------------------------------
@@ -238,6 +266,7 @@ window.settingsState = {
     get current() { return currentSettings; },
     loadSettings,
     saveSettings,
+    flushSettings: saveSettingsNow,
     set: setSetting,
     get: getSetting,
     resetAllSettings

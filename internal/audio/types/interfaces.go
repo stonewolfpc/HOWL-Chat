@@ -92,13 +92,15 @@ type ASRRecognizer interface {
 
 // ASRConfig contains recognizer configuration
 type ASRConfig struct {
-	ModelPath   string
-	Language    string // "auto" or specific code
-	Device      string // "cpu", "cuda", "auto"
-	NumThreads  int
-	BeamSize    int
-	BestOf      int
-	Temperature float64
+	ModelPath     string
+	ProjectorPath string // audio projector paired with ModelPath (llama-server ASR)
+	ServerPath    string // llama-server executable (llama-server ASR)
+	Language      string // "auto" or specific code
+	Device        string // "cpu", "cuda", "auto"
+	NumThreads    int
+	BeamSize      int
+	BestOf        int
+	Temperature   float64
 }
 
 // ASRModelInfo describes recognizer capabilities
@@ -269,6 +271,12 @@ type PipelineConfig struct {
 	MultimodalEnabled bool
 	RealtimeEnabled   bool
 	HardwareTier      string
+
+	// ASREngine and TTSEngine carry an explicit provider selection. "" and
+	// "auto" mean automatic selection; any other value must name a capability
+	// the contract can select, and is never silently replaced.
+	ASREngine string
+	TTSEngine string
 }
 
 // VoiceOverride carries per-request TTS voice settings (e.g. per-character).
@@ -328,10 +336,10 @@ type FormatConverter interface {
 // ModelLoader handles audio model lifecycle
 type ModelLoader interface {
 	// LoadASR initializes an ASR model
-	LoadASR(modelType string, config ASRConfig) (ASRRecognizer, error)
+	LoadASR(ctx context.Context, modelType string, config ASRConfig) (ASRRecognizer, error)
 
 	// LoadTTS initializes a TTS model
-	LoadTTS(modelType string, config TTSConfig) (TTSSynthesizer, error)
+	LoadTTS(ctx context.Context, modelType string, config TTSConfig) (TTSSynthesizer, error)
 
 	// LoadMultimodal initializes multimodal model
 	LoadMultimodal(modelType string, config MultimodalConfig) (MultimodalBridge, error)

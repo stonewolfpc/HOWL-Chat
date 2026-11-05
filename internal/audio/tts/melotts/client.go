@@ -32,6 +32,10 @@ type Client struct {
 	httpClient *http.Client
 	baseURL    *url.URL
 	apiKey     string
+
+	// readFile is a test seam for proving the stream holds the call lock
+	// through the output read.
+	readFile func(string) ([]byte, error)
 }
 
 // New allocates a synthesizer wired for MeloTTS HTTP backends.
@@ -45,6 +49,9 @@ func New() *Client {
 
 // Initialize validates the remote endpoint and caches directories.
 func (c *Client) Initialize(ctx context.Context, cfg types.TTSConfig) error {
+	c.LockCalls()
+	defer c.UnlockCalls()
+
 	raw := strings.TrimSpace(cfg.ModelPath)
 	if raw == "" {
 		raw = strings.TrimSpace(os.Getenv("HOWL_MELOTTS_URL"))
@@ -76,6 +83,12 @@ func (c *Client) Initialize(ctx context.Context, cfg types.TTSConfig) error {
 
 // Synthesize calls the configured Melo HTTP server and stores returned audio as WAV bytes on disk.
 func (c *Client) Synthesize(ctx context.Context, req types.SynthesisRequest, callback types.ProgressCallback) (*types.SynthesisResult, error) {
+	c.LockCalls()
+	defer c.UnlockCalls()
+	return c.synthesizeLocked(ctx, req, callback)
+}
+
+func (c *Client) synthesizeLocked(ctx context.Context, req types.SynthesisRequest, callback types.ProgressCallback) (*types.SynthesisResult, error) {
 	if err := c.CheckInitialized(); err != nil {
 		return nil, err
 	}
@@ -138,11 +151,14 @@ func (c *Client) Synthesize(ctx context.Context, req types.SynthesisRequest, cal
 func (c *Client) SynthesizeStream(ctx context.Context, req types.SynthesisRequest, chunks chan<- types.AudioChunk) error {
 	defer close(chunks)
 
-	res, err := c.Synthesize(ctx, req, nil)
+	c.LockCalls()
+	res, err := c.synthesizeLocked(ctx, req, nil)
 	if err != nil {
+		c.UnlockCalls()
 		return err
 	}
-	data, err := os.ReadFile(res.AudioPath)
+	data, err := c.readOutput(res.AudioPath)
+	c.UnlockCalls()
 	if err != nil {
 		return types.NewAudioError(types.ErrCodeSynthesisFailed, "read synthesized melotts audio", err)
 	}
@@ -164,6 +180,9 @@ func (c *Client) SynthesizeStream(ctx context.Context, req types.SynthesisReques
 
 // GetVoices maps registry entries for UX surfaces.
 func (c *Client) GetVoices() []types.Voice {
+	c.LockCalls()
+	defer c.UnlockCalls()
+
 	prof, ok := types.GetTTSProfile(types.TTSMeloTTS)
 	if !ok {
 		return nil
@@ -180,7 +199,18 @@ func (c *Client) GetVoices() []types.Voice {
 func (c *Client) SupportsSSML() bool { return false }
 
 // Release is a noop for HTTP client state.
-func (c *Client) Release() error { return nil }
+func (c *Client) Release() error {
+	c.LockCalls()
+	defer c.UnlockCalls()
+	return nil
+}
+
+func (c *Client) readOutput(path string) ([]byte, error) {
+	if c.readFile != nil {
+		return c.readFile(path)
+	}
+	return os.ReadFile(path)
+}
 
 func (c *Client) outputDir() string {
 	if d := strings.TrimSpace(c.GetConfig().CacheDir); d != "" {
@@ -193,10 +223,10 @@ func (c *Client) tryLegacySynth(ctx context.Context, req types.SynthesisRequest)
 	u := cloneURL(*c.baseURL)
 	u.Path = strings.TrimSuffix(u.Path, "/") + "/synthesize"
 	body := map[string]any{
-		"text":        req.Text,
-		"language":    normalizeMeloLanguage(req.Language),
-		"speaker_id":  normalizeSpeakerID(req.Voice),
-		"speed":       req.Speed,
+		"text":         req.Text,
+		"language":     normalizeMeloLanguage(req.Language),
+		"speaker_id":   normalizeSpeakerID(req.Voice),
+		"speed":        req.Speed,
 		"length_scale": invertSpeed(req.Speed),
 	}
 	payload, err := json.Marshal(body)
