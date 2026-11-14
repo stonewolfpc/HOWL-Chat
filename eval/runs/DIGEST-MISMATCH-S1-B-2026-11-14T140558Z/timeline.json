@@ -1,0 +1,72 @@
+{
+  "control": {
+    "file": "G:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+    "matched_baseline": true,
+    "scope_of_meaning": "one other file on the same volume read consistently; this does not certify the volume",
+    "sha256": "f820ef3f78704ffcaaeed061f29a28b398c1d348d69aca43a142b63e4d1c5c7e"
+  },
+  "distinct_digests_observed": 4,
+  "mtime": "2026-09-04 20:53:48",
+  "note": "All four digests below were observed before this file was preserved. No further reads were taken after the owner's stop instruction; the file has NOT been rehashed since 14:05.",
+  "observations": [
+    {
+      "context": "baseline manifest created (server idle, no model loaded)",
+      "matched_baseline": true,
+      "seq": 1,
+      "sha256": "b5b1913e44aa64d2c12b6159bb782774dd98362528211ac830860595d293ede0",
+      "time_local": "2026-11-14T13:45Z"
+    },
+    {
+      "context": "S1-B qualification v1 (server running, 36 layers / 8192 ctx)",
+      "matched_baseline": true,
+      "seq": 2,
+      "sha256": "b5b1913e44aa64d2c12b6159bb782774dd98362528211ac830860595d293ede0",
+      "time_local": "2026-11-14T13:50Z"
+    },
+    {
+      "context": "requalification attempt; server running at 20 layers / 20480 ctx; RECORDER REFUSED",
+      "matched_baseline": false,
+      "seq": 3,
+      "sha256": "f46b1049a2687acbee7562efdd7df053063b3b9dd3e9d309c2ca142b1b9ddcd2",
+      "time_local": "2026-11-14T14:03Z"
+    },
+    {
+      "context": "immediate second read, server still running",
+      "matched_baseline": false,
+      "seq": 4,
+      "sha256": "e6dca6ebce96a7095115ef15fb4b3abeb976387ce2b11d6d8701ddb4d7a51e23",
+      "time_local": "2026-11-14T14:03Z"
+    },
+    {
+      "context": "first read after server termination",
+      "matched_baseline": false,
+      "seq": 5,
+      "sha256": "e6dca6ebce96a7095115ef15fb4b3abeb976387ce2b11d6d8701ddb4d7a51e23",
+      "time_local": "2026-11-14T14:04Z"
+    },
+    {
+      "context": "second consecutive read, server stopped",
+      "matched_baseline": false,
+      "seq": 6,
+      "sha256": "e6dca6ebce96a7095115ef15fb4b3abeb976387ce2b11d6d8701ddb4d7a51e23",
+      "time_local": "2026-11-14T14:04Z"
+    },
+    {
+      "context": "later read, server stopped; digest changed again after two identical reads",
+      "matched_baseline": false,
+      "seq": 7,
+      "sha256": "eac8960a8b8da5dea837b766ada7061a71fb26c6c711e34adc03f18aa282e3d0",
+      "time_local": "2026-11-14T14:05Z"
+    }
+  ],
+  "preserved_at": "2026-11-14T14:09:30Z",
+  "size_bytes_constant": 5335285728,
+  "subject": "G:\\AI GGUF\\GGUF\\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
+  "what_this_does_not_establish": [
+    "that the storage device is failing",
+    "that a process modified the file",
+    "which of the observed contents (if any) is the original",
+    "whether the loaded model in the 14:03 cycle corresponded to any recorded digest"
+  ],
+  "what_this_establishes": "The bytes read from this path were not constant across reads. It does NOT establish failing hardware, and it does NOT establish a writer."
+}

@@ -1,0 +1,19 @@
+{
+  "control_lfm": {
+    "baseline_matches": true,
+    "baseline_sha256": "f820ef3f78704ffcaaeed061f29a28b398c1d348d69aca43a142b63e4d1c5c7e",
+    "path": "G:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+    "sha256": "f820ef3f78704ffcaaeed061f29a28b398c1d348d69aca43a142b63e4d1c5c7e"
+  },
+  "event": "S1-B requalification refused: file digest no longer matches frozen baseline",
+  "gemma": {
+    "baseline_matches": false,
+    "baseline_sha256": "b5b1913e44aa64d2c12b6159bb782774dd98362528211ac830860595d293ede0",
+    "bytes": 5335285728,
+    "hash_after_server_stopped_a": "eac8960a8b8da5dea837b766ada7061a71fb26c6c711e34adc03f18aa282e3d0",
+    "hash_while_server_running": "f46b1049a2687acbee7562efdd7df053063b3b9dd3e9d309c2ca142b1b9ddcd2",
+    "mtime": "2026-09-04 20:53:48",
+    "path": "G:\\AI GGUF\\GGUF\\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf"
+  },
+  "recorded_at": "2026-11-14T14:05:37Z"
+}

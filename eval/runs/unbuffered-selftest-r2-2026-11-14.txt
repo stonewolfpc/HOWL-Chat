@@ -1,0 +1,90 @@
+=== self-test, revised reader (file-identity + per-transfer validation) 2026-11-14T19:13:17Z ===
+cmd: sha256sum eval/runs/unbuf-selftest.bin
+d1c0a6a2250ef7562a1b5d8dffb246fc13be6760a38a005af981d8af4ebdf726 *eval/runs/unbuf-selftest.bin
+cmd: python eval/harness/unbuffered_digest.py eval/runs/unbuf-selftest.bin --sector 4096
+{
+  "path": "eval/runs/unbuf-selftest.bin",
+  "size": 8388731,
+  "sector": 4096,
+  "block": 4194304,
+  "aligned_len": 8388608,
+  "tail_len": 123,
+  "unbuffered_bytes": 8388608,
+  "buffered_bytes": 123,
+  "read_calls": 2,
+  "short_sector_aligned_reads": 0,
+  "sha256": "d1c0a6a2250ef7562a1b5d8dffb246fc13be6760a38a005af981d8af4ebdf726",
+  "identity": {
+    "volume_serial": "885a56435a562de6",
+    "file_id": "f92e0f0000000c000000000000000000"
+  },
+  "identity_body_stable": true,
+  "identity_body_matches_tail": true,
+  "identity_tail_stable": true,
+  "identity_final_matches_body": true,
+  "identity_stable_after_read": true,
+  "size_before": 8388731,
+  "size_after": 8388731,
+  "mtime_ns_before": 1794682270509569100,
+  "mtime_ns_after": 1794682270509569100,
+  "path_metadata_consistent": true,
+  "unchanged_during_read": true,
+  "io": {
+    "read_ops_delta": 3,
+    "read_bytes_delta": 8388731
+  },
+  "elapsed_s": 0.022
+}
+exit=0
+cmd: python eval/harness/unbuffered_digest.py eval/runs/unbuf-selftest.bin --sector 512
+{
+  "path": "eval/runs/unbuf-selftest.bin",
+  "size": 8388731,
+  "sector": 512,
+  "block": 4194304,
+  "aligned_len": 8388608,
+  "tail_len": 123,
+  "unbuffered_bytes": 8388608,
+  "buffered_bytes": 123,
+  "read_calls": 2,
+  "short_sector_aligned_reads": 0,
+  "sha256": "d1c0a6a2250ef7562a1b5d8dffb246fc13be6760a38a005af981d8af4ebdf726",
+  "identity": {
+    "volume_serial": "885a56435a562de6",
+    "file_id": "f92e0f0000000c000000000000000000"
+  },
+  "identity_body_stable": true,
+  "identity_body_matches_tail": true,
+  "identity_tail_stable": true,
+  "identity_final_matches_body": true,
+  "identity_stable_after_read": true,
+  "size_before": 8388731,
+  "size_after": 8388731,
+  "mtime_ns_before": 1794682270509569100,
+  "mtime_ns_after": 1794682270509569100,
+  "path_metadata_consistent": true,
+  "unchanged_during_read": true,
+  "io": {
+    "read_ops_delta": 3,
+    "read_bytes_delta": 8388731
+  },
+  "elapsed_s": 0.021
+}
+exit=0
+cmd: ... --buffer-offset 1
+{
+  "path": "eval/runs/unbuf-selftest.bin",
+  "error": 87,
+  "message": "[Errno 87] ReadFile failed at offset 0 len 4194304 (last error 87)",
+  "winerror": 87
+}
+exit=2
+cmd: ... --length-delta -1
+{
+  "path": "eval/runs/unbuf-selftest.bin",
+  "error": 87,
+  "message": "[Errno 87] ReadFile failed at offset 0 len 4194303 (last error 87)",
+  "winerror": 87
+}
+exit=2
+

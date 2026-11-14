@@ -1,0 +1,66 @@
+{
+  "claim_ceiling": "compatibility of this file with this build on this machine; NOTHING about MEMORY-09",
+  "configuration": {
+    "context": 8192,
+    "frozen_at_qualification": true,
+    "gpu_layers": 36,
+    "host": "127.0.0.1",
+    "quantkv": "q8_0"
+  },
+  "generations": 0,
+  "hardware": {
+    "after_load": {
+      "available": true,
+      "captured_at": "2026-11-14T13:50:31Z",
+      "gpu_util_percent": "12 %",
+      "temperature_c": "29",
+      "vram_free_mib": "3637 MiB",
+      "vram_used_mib": "4423 MiB"
+    },
+    "before_load": {
+      "temperature_c": "28",
+      "vram_free_mib": "6815 MiB",
+      "vram_used_mib": "1245 MiB"
+    }
+  },
+  "identity": {
+    "expected_stem": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1)",
+    "match_rule": "normalised substring (casefold, alphanumerics only)",
+    "matches": true,
+    "reported": "koboldcpp/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M1"
+  },
+  "model": {
+    "bytes": 5335285728,
+    "bytes_match_baseline": true,
+    "digest_matches_baseline": true,
+    "expected_bytes": 5335285728,
+    "expected_sha256": "b5b1913e44aa64d2c12b6159bb782774dd98362528211ac830860595d293ede0",
+    "path": "G:\\AI GGUF\\GGUF\\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
+    "sha256": "b5b1913e44aa64d2c12b6159bb782774dd98362528211ac830860595d293ede0"
+  },
+  "record_sha256": "b5dc8ed642d41184fd5e0a09a889631f01f9dceae1319405f16fe2d17b1b2d2d",
+  "record_type": "slot_qualification",
+  "report_id": "WO-SLOT-QUAL-01",
+  "request_kinds": "identity GETs only",
+  "requests_issued": [
+    "/api/extra/true_max_context_length",
+    "/api/extra/version",
+    "/api/v1/model"
+  ],
+  "server": {
+    "endpoint": "http://127.0.0.1:5001",
+    "identity_block_sha256": "5d712ece02b21a86905e870801e84c066a230cae908fde9753b62f81f92d36dd",
+    "log_evidence": {
+      "cpu_buffer_mib": 3173.18,
+      "gpu_buffer_mib": 2424.87,
+      "n_layer": 42,
+      "offloaded_layers": "36/43",
+      "tensors": 720
+    },
+    "log_path": "eval/runs/kobold-S1B-qual.log",
+    "name": "KoboldCpp",
+    "version": "1.120"
+  },
+  "slot": "S1-B",
+  "timestamp": "2026-11-14T13:50:31Z"
+}

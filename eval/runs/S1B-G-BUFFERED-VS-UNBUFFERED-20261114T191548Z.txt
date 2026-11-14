@@ -1,0 +1,26 @@
+=== S1-B G: buffered vs unbuffered, single run 20261114T191548Z ===
+target: G:\AI GGUF\GGUF\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf
+reader: eval/harness/unbuffered_digest.py (sector 4096, 4 MiB blocks)
+baseline sha256 (v1.1, for reference only - not a gate): b5b1913e44aa64d2c12b6159bb782774dd98362528211ac830860595d293ede0
+
+--- 1. usage check: generation/server processes and port 5001 ---
+port 5001: no listener
+no inference server process found
+
+--- 2. pre-read metadata, identity, and exclusive-open usage probe ---
+{
+  "size": 5335285728,
+  "mtime_ns": 1788573228448965700,
+  "mtime_iso": "1788573228.4489658",
+  "volume_serial": "880ecbb30ecb9918",
+  "file_id": "914f0100000003000000000000000000",
+  "in_use": false,
+  "in_use_error": 0
+}
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/s1b_m1.json'
+
+ABORT: pre-read usage or size gate failed
+RESULT: ABORTED - no valid comparison
+log: eval/runs/S1B-G-BUFFERED-VS-UNBUFFERED-20261114T191548Z.txt

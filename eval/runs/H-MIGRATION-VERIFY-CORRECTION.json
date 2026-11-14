@@ -1,0 +1,19 @@
+{
+  "after_recopy_matches_source": true,
+  "copy_stable_after_recopy_over_2_reads": true,
+  "copy_stable_over_3_reads": true,
+  "correction": "one file mismatched after copy and was re-copied",
+  "corrupted_copy_sha256": "714858cdb63540c6ac434c5c9bc062c15a2d6b17281f332699082319377a8dcd",
+  "file": "llama.cpp-prism-b9596-cuda12/runtime/cublas64_12.dll",
+  "note": "A silent copy error: same size, same mtime, different bytes, no robocopy failure reported. Recorded because it means a single copy pass cannot certify a tree on this machine.",
+  "report": "eval/runs/H-MIGRATION-VERIFY-2026-11-14.json",
+  "source_sha256": "e40202fe4223c1cd2d2dce7beec59e1ed61c7801bd827309183be9b50e358f4c",
+  "source_stable_over_3_reads": true,
+  "totals": {
+    "files_hashed": 78259,
+    "mismatches_after_correction": 0,
+    "missing": 0,
+    "read_errors": 0,
+    "size_mismatches": 0
+  }
+}

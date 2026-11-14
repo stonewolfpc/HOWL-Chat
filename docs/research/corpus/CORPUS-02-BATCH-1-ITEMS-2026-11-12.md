@@ -1,0 +1,285 @@
+# Memory Evaluation Corpus — Batch 1 Items
+
+> **The objective is not to remember everything. It is to remember the right things, at the right times, in the right places.**
+
+**Status:** `G1` — 22 authored items. Synthetic only. No model executed. No result claimed.
+**Schema, split rules, and coverage:** `docs/research/corpus/CORPUS-01-SPECIFICATION-AND-INDEX-2026-11-12.md`
+**Format:** each item lists scenario, the turns that carry the information, the required and forbidden evidence sets, the reference answer, and the failure classes expected if the item is failed.
+
+All scenarios, characters, personas, and worlds below are synthetic.
+
+---
+
+## F-1 — Long-running relationships
+
+### `F1-01` — The promise at the ferry
+- **Split:** tuning · **Abstention:** no · **Restraint:** `R-2`
+- **Scenario:** Single character (Mira, a harbour pilot), one user persona, ~340 messages of shared history. Around message 90 the persona promised to be back before the spring tide. They left and returned without ever mentioning it again.
+- **Turns:** *Persona:* "I'm back. The dock looks smaller than I remember." *Mira:* (does not mention the promise) "You cut it close. The tide turns in an hour."
+- **Required:** the promise, its giver, and that it was **not** kept; Mira's current attitude (wary, not hostile).
+- **Forbidden:** any detail from other characters' histories; the persona's later travel plans.
+- **Reference:** `acceptable_range` · **Mandatory:** the unkept promise is present in tone or consequence · **Variation:** coolness; a remark about the tide; a quiet acknowledgement · **Never scored:** warmth level, sentence length · **Prohibited:** quoting the promise verbatim; treating it as kept · **Over-exposure:** naming the tide deadline explicitly as a reminder
+- **If failed:** `not retrieved` (silent about it), `presented poorly` (recites it), `misunderstood` (friendly as though nothing happened).
+- **Notes:** This is the reference item for natural use in a long relationship. `P-04` generalises it.
+
+### `F1-02` — What changed between them
+- **Split:** held-out · **Abstention:** no · **Restraint:** `R-2`
+- **Scenario:** Two characters, Kade and Sera, went from open hostility to guarded cooperation across ~200 messages, ending with a shared watch on a roof.
+- **Turns:** *Persona:* "Should I leave you two alone?" *Kade:* …
+- **Required:** the direction of the change (hostile → guarded cooperation) and its turning point.
+- **Forbidden:** the earlier hostility presented as current; a romantic reading (never established).
+- **Reference:** `acceptable_range` · **Mandatory:** guarded warmth; no regression to hostility · **Variation:** any phrasing that shows the current stage · **Never scored:** how explicit the change is made · **Prohibited:** hostility presented as current; invented romance · **Over-exposure:** summarising the arc aloud
+- **If failed:** `mis-scoped` (wrong relationship stage), `misunderstood` (flirts), `presented poorly` (summarises the arc aloud).
+- **Notes:** Tests temporal direction, not just content.
+
+---
+
+## F-2 — Multi-character knowledge boundaries
+
+### `F2-01` — Told in private
+- **Split:** tuning · **Abstention:** no · **Restraint:** `R-5`
+- **Scenario:** Three characters. In a two-person scene, Wren told the persona that her brother is alive. The third character, Ilya, was absent and has never been told.
+- **Turns:** *Persona, in a group scene:* "Wren's been quiet lately." *Ilya:* …
+- **Required:** Wren's secret, the fact that only the persona and Wren know it.
+- **Forbidden:** the secret reaching Ilya's dialogue or being confirmed in front of him.
+- **Reference:** `acceptable_range` · **Mandatory:** the secret stays with the two who know it · **Variation:** Ilya noticing mood or being puzzled · **Never scored:** tone, brevity · **Prohibited:** Ilya asserting or quoting the secret · **Over-exposure:** any hint Ilya already knows
+- **If failed:** **`mis-scoped` — a scope failure, which is a blocking gate, not a score deduction.**
+- **Notes:** The canonical leakage item.
+
+### `F2-02` — The meeting they missed
+- **Split:** held-out · **Abstention:** no · **Restraint:** `R-5`
+- **Scenario:** A council meeting where the persona and two characters agreed to divert the caravan. A fourth character, Pell, was travelling and missed it entirely.
+- **Turns:** *Pell:* "So where are we taking the caravan?" *Persona:* …
+- **Required:** the decision and who attended.
+- **Forbidden:** Pell speaking as a participant; the persona addressing Pell as though he had agreed.
+- **Reference:** `acceptable_range` · **Mandatory:** Pell is outside the decision · **Variation:** any way of conveying he was absent · **Never scored:** bluntness · **Prohibited:** Pell speaking as a participant · **Over-exposure:** recapping the whole council to him
+- **If failed:** `mis-scoped`, `misunderstood`.
+- **Notes:** Distinguishes *knowing the fact* from *knowing who knows it*.
+
+---
+
+## F-3 — Long conversations
+
+### `F3-01` — Four hundred messages of weather
+- **Split:** tuning · **Abstention:** no · **Restraint:** `R-3`
+- **Scenario:** ~420 messages. At message 18 the persona mentioned, once, that their hands ache in cold rain. Nothing since.
+- **Turns:** *Character:* "It's going to rain. Take the inner road." *Persona:* "Why?"
+- **Required:** the ache-in-rain detail.
+- **Forbidden:** any invented medical diagnosis; any detail never stated.
+- **Reference:** `acceptable_range` · **Mandatory:** rain is connected to aching hands · **Variation:** any warning or practical suggestion · **Never scored:** how much concern is shown · **Prohibited:** a medical diagnosis; a cause never stated · **Over-exposure:** a full history of the ache
+- **If failed:** `not retrieved`, `incorrectly formed` (invents a diagnosis).
+- **Notes:** Distance is the variable, not subtlety.
+
+### `F3-02` — Which fire
+- **Split:** tuning · **Abstention:** no · **Restraint:** `none`
+- **Scenario:** Two fires, 250 messages apart: one in the granary (arson, unresolved), one in the stable (accident, resolved). Characters often say "the fire".
+- **Turns:** *Persona:* "Do you still think about the fire?" *Character:* …
+- **Required:** both events distinguished, with the arson one unresolved.
+- **Forbidden:** conflating them; declaring the arson solved.
+- **Reference:** `acceptable_range` · **Mandatory:** the two fires are distinguished · **Variation:** asking which fire; naming both · **Never scored:** length · **Prohibited:** merging them; declaring the arson solved · **Over-exposure:** a single narrative that folds both fires together
+- **If failed:** `stored incorrectly` (merged records), `misunderstood`.
+- **Notes:** Tests duplicate-truth and disambiguation, not recall volume.
+
+---
+
+## F-4 — Changing circumstances
+
+### `F4-01` — He doesn't work there any more
+- **Split:** tuning · **Abstention:** no · **Restraint:** `none`
+- **Scenario:** Character (Dov) was a smith for 60 messages, then lost the shop and became a carter 120 messages ago. Both facts exist in history.
+- **Turns:** *Persona:* "Can you fix this hinge?" *Dov:* …
+- **Required:** current occupation (carter); the loss of the shop as history.
+- **Forbidden:** the smith present-tense claim; any implication the shop still exists.
+- **Reference:** `expected_correction` · **Mandatory:** the forge is gone; he is a carter now · **Variation:** offering an alternative; regret; briskness · **Never scored:** emotional framing · **Prohibited:** present-tense claim to run the forge · **Over-exposure:** a full account of how the shop was lost
+- **If failed:** `not retrieved` (claims the forge), `stored incorrectly` (no validity interval).
+- **Notes:** `expected_correction` requires stating both the change and the current truth.
+
+### `F4-02` — The bridge is gone
+- **Split:** held-out · **Abstention:** no · **Restraint:** `none`
+- **Scenario:** The east bridge collapsed at message 210. The persona has not crossed since.
+- **Turns:** *Persona:* "I'll take the east road." *Character:* …
+- **Required:** the collapse and its date relative to now.
+- **Forbidden:** the bridge described as usable; invented repair timelines.
+- **Reference:** `acceptable_range` · **Mandatory:** the bridge is out · **Variation:** suggesting the ford; asking when it fell · **Never scored:** urgency · **Prohibited:** the bridge as usable; an invented repair date · **Over-exposure:** a recital of the collapse
+- **If failed:** `not retrieved`, `incorrectly formed` (invents a repair).
+- **Notes:** Paired with `F4-01` to separate state change from location change.
+
+---
+
+## F-5 — World and scenario changes
+
+### `F5-01` — Same face, other world
+- **Split:** tuning · **Abstention:** no · **Restraint:** `R-5`
+- **Scenario:** The same character card is used in world A (a flooded city) and world B (a mountain monastery). World B's conversation contains no flood.
+- **Turns:** *Persona (world B):* "How did you sleep?" *Character:* …
+- **Required:** only world-B history.
+- **Forbidden:** every world-A fact, including the flood, the harbour, and world-A relationships.
+- **Reference:** `acceptable_range` · **Mandatory:** consistency with the monastery world only · **Variation:** anything that world permits · **Never scored:** detail level · **Prohibited:** any flood or harbour reference · **Over-exposure:** explaining that they come from elsewhere
+- **If failed:** **`mis-scoped` — blocking.**
+- **Notes:** Characters are reusable; their memories are not. This is the item that catches global (non-scoped) storage.
+
+### `F5-02` — Two backstories
+- **Split:** held-out · **Abstention:** no · **Restraint:** `R-5`
+- **Scenario:** The same persona is attached to two conversations with the same character, each with a different stated backstory (siblings in one, strangers in the other).
+- **Turns:** *Character (strangers chat):* "You remind me of someone." *Persona:* "Who?" …
+- **Required:** the strangers framing.
+- **Forbidden:** the siblings framing from the other chat.
+- **Reference:** `acceptable_range` · **Mandatory:** no assumption of kinship · **Variation:** curiosity; a question; silence · **Never scored:** warmth · **Prohibited:** the sibling framing · **Over-exposure:** recounting the other conversation
+- **If failed:** **`mis-scoped` — blocking.**
+- **Notes:** Personas are first-class objects (`UP-01`–`UP-14`); this tests that the attachment is scoped, not global.
+
+---
+
+## F-6 — Casual conversations
+
+### `F6-01` — The almond thing
+- **Split:** tuning · **Abstention:** no · **Restraint:** `R-2`
+- **Scenario:** 80 messages of jokes and gossip. At message 44, mid-laugh, the persona said they can't eat almonds. It is never mentioned again.
+- **Turns:** *Character, serving food:* "There's honey cake." *Persona:* "Sounds good." *Character:* …
+- **Required:** the almond restriction.
+- **Forbidden:** invented restrictions; a medical lecture.
+- **Reference:** `acceptable_range` · **Mandatory:** the almond restriction is respected · **Variation:** a substitution; a brief warning · **Never scored:** how brief the mention is · **Prohibited:** a long disclosure; invented restrictions · **Over-exposure:** a safety lecture in a light scene
+- **If failed:** `never formed` (the detail was never kept), `presented poorly` (long allergy disclosure in a light scene).
+- **Notes:** The signal is one clause inside noise. Being right quietly is the pass.
+
+### `F6-02` — The song she hates
+- **Split:** tuning · **Abstention:** no · **Restraint:** `R-1`
+- **Scenario:** In passing, the persona said a particular marching song reminds them of a bad year. Said once, casually, 200 messages ago.
+- **Turns:** *Character, humming:* "Do you know this one?" *Persona:* …
+- **Required:** the aversion.
+- **Forbidden:** the underlying "bad year" details (never given).
+- **Reference:** `acceptable_range` · **Mandatory:** the song is not pushed · **Variation:** changing the subject; asking · **Never scored:** tact · **Prohibited:** inventing the bad year · **Over-exposure:** explaining why the song upsets them
+- **If failed:** `not retrieved`, `incorrectly formed` (invents the bad year).
+- **Notes:** Tests restraint about incomplete knowledge.
+
+---
+
+## F-7 — Contradictory information
+
+### `F7-01` — Two versions of the same night
+- **Split:** tuning · **Abstention:** no · **Restraint:** `R-6`
+- **Scenario:** Two characters give incompatible accounts: **Halla** says she saw the gate standing open at dusk and told no one; **Bren** says he closed it himself at dusk and found it open at dawn. Neither account is corroborated, both persist, and no third witness exists.
+- **Turns:** *Persona:* "So who left the gate open?" *Character:* …
+- **Required:** both accounts; the unresolved status.
+- **Forbidden:** a single culprit asserted as fact; a fourth account.
+- **Reference:** `acceptable_range` · **Mandatory:** both accounts survive; the question stays open · **Variation:** declining to settle it; presenting both · **Never scored:** how uncomfortable the open question is · **Prohibited:** a single culprit asserted as fact; a fourth account · **Over-exposure:** recounting both accounts in full rather than holding them
+- **If failed:** `stored incorrectly` (silent overwrite), `misunderstood` (invents a resolution).
+- **Notes:** Conflict must survive storage. A store that keeps one version cannot pass.
+
+### `F7-02` — She corrected herself
+- **Split:** held-out · **Abstention:** no · **Restraint:** `none`
+- **Scenario:** Character said the shipment leaves Thursday, then corrected: "No — Friday. I keep doing that."
+- **Turns:** *Persona:* "When does it leave?" *Character:* …
+- **Required:** Friday, with the correction as history.
+- **Forbidden:** Thursday as current.
+- **Reference:** `expected_correction` · **Mandatory:** Friday is current · **Variation:** acknowledging the earlier slip · **Never scored:** brevity · **Prohibited:** Thursday as current · **Over-exposure:** explaining the mistake at length
+- **If failed:** `not retrieved` (says Thursday), `stored incorrectly`.
+- **Notes:** Contrast with `F7-01`: here the conflict *is* resolved, and resolving it is correct.
+
+---
+
+## F-8 — Irrelevant information
+
+### `F8-01` — Ninety messages about nothing
+- **Split:** tuning · **Abstention:** no · **Restraint:** `R-4`
+- **Scenario:** ~90 messages of small talk: weather, a cat, a broken cup, opinions on stew. No event, commitment, or relationship change.
+- **Turns:** (later, unrelated scene) *Persona:* "Good morning." *Character:* …
+- **Required:** nothing durable.
+- **Forbidden:** formed records for the cat, the cup, the stew, or the weather; any reference to them as significant.
+- **Reference:** `acceptable_range` · **Mandatory:** nothing durable is used · **Variation:** any ordinary greeting · **Never scored:** warmth · **Prohibited:** trivia callbacks treated as significant · **Over-exposure:** a summary of the conversation so far
+- **If failed:** `presented poorly`, or a formation-volume breach if durable records were created for every trivia line.
+- **Notes:** Success here is measured partly by **absence**: what reached durable memory.
+
+### `F8-02` — Out of character
+- **Split:** tuning · **Abstention:** no · **Restraint:** `none`
+- **Scenario:** A scene is explicitly set outside continuity ("let's do a silly one — dragons in a bakery"). Mid-scene, the character declares the persona is a duke.
+- **Turns:** (back in continuity) *Persona:* "Where were we?" *Character:* …
+- **Required:** continuity as it stood before the side scene.
+- **Forbidden:** the duke title; anything from the bakery scene.
+- **Reference:** `acceptable_range` · **Mandatory:** continuity resumes where it stood · **Variation:** any resumption of the prior thread · **Never scored:** how quickly the scene settles · **Prohibited:** the duke title appearing as real · **Over-exposure:** referencing the side scene at all
+- **If failed:** `mis-scoped`, `stored incorrectly`.
+- **Notes:** Requires an explicit exclusion boundary, which is an application responsibility.
+
+---
+
+## F-9 — No-retrieval cases
+
+### `F9-01` — Real memory, irrelevant moment
+- **Split:** tuning · **Abstention:** **yes** · **Restraint:** `R-4`
+- **Scenario:** Rich history exists about a siege. The current scene is a quiet morning about a neighbour's dog.
+- **Turns:** *Persona:* "The dog's been howling all night." *Character:* …
+- **Required:** nothing from the siege.
+- **Forbidden:** the siege, its casualties, its lessons, or a "this reminds me of…" bridge.
+- **Reference:** `expected_abstention` · **Mandatory:** no siege material reaches the reply · **Variation:** any remark about the dog · **Never scored:** length · **Prohibited:** a siege callback; a "this reminds me" bridge · **Over-exposure:** explaining that they have relevant history but are choosing not to use it
+- **If failed:** `presented poorly`; if the system injects it, the abstention gate fails.
+- **Notes:** Distinguishes *availability* from *relevance*. The memory must be **correctly withheld**, not "not retrieved".
+
+### `F9-02` — Not yours to know
+- **Split:** held-out · **Abstention:** **yes** · **Restraint:** `R-5`
+- **Scenario:** The persona told a third party, in a scene the character was not in, that they are leaving the city.
+- **Turns:** *Character:* "Any plans?" *Persona:* "Not really." *Character:* …
+- **Required:** nothing about the departure.
+- **Forbidden:** the departure, or any hint the character knows.
+- **Reference:** `expected_abstention` · **Mandatory:** the character shows no knowledge of the departure · **Variation:** any ordinary answer about plans · **Never scored:** curiosity · **Prohibited:** any hint of knowing · **Over-exposure:** probing for the secret
+- **If failed:** **`mis-scoped` — blocking.**
+- **Notes:** Presence is not entitlement (`ARCHITECTURE-DECISION` §4). This item tests that the principle is implemented, not just written.
+
+---
+
+## P — Principle cases (mandatory members)
+
+### `P-01` — Less is better
+- **Split:** tuning · **Abstention:** no · **Principle:** less-is-better · **Restraint:** `R-1`
+- **Scenario:** Six true facts are available about a character's recent loss: **(1)** the sibling's name, **(2)** the month of the loss, **(3)** where it happened, **(4)** who was present, **(5)** the last thing said, **(6)** the borrowed coat. Their sibling has just arrived and asked a single gentle question.
+- **Turns:** *Sibling:* "How are you holding up?" *Character:* …
+- **Required:** the loss, at the level the moment allows.
+- **Forbidden:** the six-fact inventory, the timeline, the names of everyone involved.
+- **Reference:** `acceptable_range` · **Mandatory:** the loss is acknowledged — or met with a silence that registers it — at the scale of one gentle question, using **at most one** of the facts listed in the scenario · **Variation:** one sentence; a silence; a gesture · **Never scored:** length beyond the ceiling · **Prohibited:** enumerating the facts; the timeline · **Over-exposure:** more than one listed fact, or any timing detail beyond the month
+- **If failed:** `presented poorly` (the item is designed so that *more accurate information makes the reply worse*).
+- **Notes:** This is the item that a "complete memory" configuration is expected to **lose**. If no configuration can lose it, the item is badly built.
+
+### `P-02` — Nothing is correct
+- **Split:** tuning · **Abstention:** **yes** · **Principle:** nothing-is-correct · **Restraint:** `none`
+- **Scenario:** A stranger asks the character what the persona's mother is like. The character has never met her and the persona has never mentioned her.
+- **Turns:** *Stranger:* "And her mother — difficult woman?" *Character:* …
+- **Required:** nothing.
+- **Forbidden:** any claim about the mother; any implication of knowledge.
+- **Reference:** `expected_abstention` · **Mandatory:** the character says plainly that they do not know · **Variation:** any in-voice phrasing of not knowing · **Never scored:** warmth · **Prohibited:** any claim about the mother · **Over-exposure:** a hedged claim that implies knowledge
+- **If failed:** `incorrectly formed` (invents), `misunderstood` (hedges into a claim anyway).
+- **Notes:** The only item where inventing a *plausible* memory is the specific failure being probed.
+
+### `P-03` — Accurate, and must not be said
+- **Split:** held-out · **Abstention:** **yes** · **Principle:** accurate-but-contextually-wrong · **Restraint:** `R-5`
+- **Scenario:** The persona privately told a third character about a surprise they are planning. The character now speaking was told the surprise **in confidence** by that third character.
+- **Turns:** *Persona:* "Do you think she'll like the place?" *Character:* …
+- **Required:** the surprise, and the confidentiality of how the character learned it.
+- **Forbidden:** naming the surprise plainly; revealing who told them.
+- **Reference:** `acceptable_range` · **Mandatory:** the secret is kept · **Variation:** deflecting; teasing; answering obliquely · **Never scored:** how playful the deflection is · **Prohibited:** naming the surprise; revealing who told them · **Over-exposure:** explaining that they know but cannot say
+- **If failed:** `presented poorly` (states it), `mis-scoped` (attributes it to the wrong source).
+- **Notes:** Factually correct, socially wrong. This is the item that proves link 1 correctness does not excuse links 2–4.
+
+### `P-04` — Remembered, not recited
+- **Split:** held-out · **Abstention:** no · **Principle:** natural-use · **Restraint:** `R-3`
+- **Scenario:** Long history; the persona once described being trapped in a cellar as a child. They are now standing at a cellar door, saying nothing about it.
+- **Turns:** *Character:* "After you." *Persona:* (silence) …
+- **Required:** the cellar fear.
+- **Forbidden:** the phrase "you told me you're afraid of cellars"; any explicit statement of the memory.
+- **Reference:** `acceptable_range` · **Mandatory:** the discomfort is accommodated without being stated · **Variation:** going first; offering a lamp; opening the door · **Never scored:** how visible the accommodation is · **Prohibited:** "you told me you are afraid of cellars" · **Over-exposure:** explaining why they are being careful
+- **If failed:** `presented poorly` (recites), `not retrieved` (no accommodation at all).
+- **Notes:** The clearest single test of guiding over commanding.
+
+---
+
+## Authoring status
+
+| Check | Result |
+|---|---|
+| Items authored | 22 |
+| Complete reference answers | 22 / 22 |
+| Forbidden sets defined | 22 / 22 |
+| Required sets defined | 22 / 22 |
+| Abstention items | 4 (`F9-01`, `F9-02`, `P-02`, `P-03`) |
+| Tuning / held-out | 14 / 8 |
+| Blocking-gate items (scope) | 5 |
+| Model executed | **no** |
+| Results claimed | **none** |

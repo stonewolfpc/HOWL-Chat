@@ -1,0 +1,132 @@
+{
+  "adapter_name": "memory09-harness",
+  "adapter_version": "0.1.0-p1",
+  "client_version": "0.1.0-p1",
+  "completeness": {
+    "finish_reason": "length",
+    "http_status": 200,
+    "incomplete": true,
+    "latency_ms": 2875,
+    "surface": "chat_completions",
+    "usage": {
+      "completion_tokens": 48,
+      "prompt_tokens": 37,
+      "total_tokens": 85
+    }
+  },
+  "error": "unavailable",
+  "fixture_id": "L3-01",
+  "fixture_version": "1",
+  "grant": {
+    "call_ceiling": 1,
+    "date": "2026-11-13",
+    "endpoint": "http://127.0.0.1:5001",
+    "model_path": "G:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+    "model_sha256": "2ca636d9e81d3d23ca9b60c234fe185d30ec082eeba69ce770fdb0c76559a4f5",
+    "report_id": "WO-L3-01",
+    "signature_kind": "owner-stated, presence-checked; NOT cryptographic authentication"
+  },
+  "hardware_before": {
+    "available": true,
+    "captured_at": "2026-11-14T08:03:00Z",
+    "gpu": "NVIDIA GeForce GTX 1080",
+    "gpu_util_percent": "2 %",
+    "source": "nvidia-smi",
+    "temperature_c": "31",
+    "vram_free_mib": "1488 MiB",
+    "vram_total_mib": "8192 MiB",
+    "vram_used_mib": "6572 MiB"
+  },
+  "harness_version": "0.1.0-p1",
+  "ledger": {
+    "attempted": 1,
+    "ceiling": 1,
+    "failures": 0,
+    "per_slot": {
+      "L3-01": 1
+    }
+  },
+  "model_requested": "qwen3.5-9b-q4_k_m",
+  "model_revision": "unavailable",
+  "params_sent": {
+    "max_tokens": 48,
+    "temperature": 0.0
+  },
+  "prompt_hash": "cce609b8fae6febaffe6f5715d29400143ed0da8d54823321a593eadfa6266c9",
+  "provider_headers": "unavailable",
+  "provider_requested": "local:koboldcpp",
+  "provider_used": "http://127.0.0.1:5001",
+  "raw_body": {
+    "choices": [
+      {
+        "finish_reason": "length",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Task: Name the colour of a clear midday sky.\n    *   Constraint: Answer in one short sentence.\n    *   System",
+          "role": "assistant",
+          "tool_calls": []
+        }
+      }
+    ],
+    "created": 1794643383,
+    "id": "chatcmpl-A501072",
+    "model": "koboldcpp/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 48,
+      "prompt_tokens": 37,
+      "total_tokens": 85
+    }
+  },
+  "request_echo": {
+    "messages": [
+      {
+        "content": "You are a controlled inference check. Answer in one short sentence.",
+        "role": "system"
+      },
+      {
+        "content": "Name the colour of a clear midday sky.",
+        "role": "user"
+      }
+    ],
+    "model": "qwen3.5-9b-q4_k_m",
+    "params": {
+      "max_tokens": 48,
+      "temperature": 0.0
+    },
+    "provider": "local:koboldcpp",
+    "seed": null,
+    "stream": false
+  },
+  "response_hash": "1d6e850a108c56e3331a2636a3bc3933d6213d446d3525bf59e6677c532bf821",
+  "returned_model": "koboldcpp/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M",
+  "runtime": {
+    "captured_at": "2026-11-14T08:03:00Z",
+    "endpoint": "http://127.0.0.1:5001",
+    "identity_block_sha256": "2be24bbe406adffc53f2ae1cc042579a8c9faead5292644d98a45564971f073c",
+    "koboldcpp_executable": "H:\\AI apps\\koboldcpp.exe",
+    "loaded_model_reported": "koboldcpp/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M",
+    "max_context_length": 20480,
+    "model_file": {
+      "bytes": 5627044224,
+      "path": "G:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+      "sha256": "2ca636d9e81d3d23ca9b60c234fe185d30ec082eeba69ce770fdb0c76559a4f5"
+    },
+    "preset": {
+      "bytes": 3591,
+      "path": "H:\\AI apps\\qwen 9b.kcpps",
+      "sha256": "9ed540a5da4954f102f92fb70de26b87607eef8068446bbcc786f9f1f3a8db2b"
+    },
+    "server_name": "KoboldCpp",
+    "server_version": "1.120"
+  },
+  "seed": "unavailable",
+  "seed_honoured": "unavailable",
+  "state_hash_after": "unavailable",
+  "state_hash_before": "unavailable",
+  "system_fingerprint": "unavailable",
+  "test_id": "L3-01",
+  "text": "<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Task: Name the colour of a clear midday sky.\n    *   Constraint: Answer in one short sentence.\n    *   System",
+  "timestamp": "1794643383"
+}

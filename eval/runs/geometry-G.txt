@@ -1,0 +1,34 @@
+LogicalBytesPerSector :                                 512
+PhysicalBytesPerSectorForAtomicity :                    4096
+PhysicalBytesPerSectorForPerformance :                  4096
+FileSystemEffectivePhysicalBytesPerSectorForAtomicity : 4096
+Device Alignment :                                      Aligned (0x000)
+Partition alignment on device :                         Aligned (0x000)
+Performs Normal Seeks
+Trim Not Supported
+Not DAX capable
+Not Thinly-Provisioned
+NTFS Volume Serial Number :        0x880ecbb30ecb9918
+NTFS Version      :                3.1
+LFS Version       :                2.0
+Total Sectors     :                1,914,241,023  (912.8 GB)
+Total Clusters    :                  239,280,127  (912.8 GB)
+Free Clusters     :                   54,696,015  (208.6 GB)
+Total Reserved Clusters :                  4,830  ( 18.9 MB)
+Reserved For Storage Reserve :                 0  (  0.0 KB)
+Bytes Per Sector  :                512
+Bytes Per Physical Sector :        4096
+Bytes Per Cluster :                4096  (4 KB)
+Bytes Per FileRecord Segment    :  1024
+Clusters Per FileRecord Segment :  0
+Mft Valid Data Length :            306.00 MB
+Mft Start Lcn  :                   0x00000000000c0000
+Mft2 Start Lcn :                   0x0000000000000002
+Mft Zone Start :                   0x000000000c143380
+Mft Zone End   :                   0x000000000c14fb80
+MFT Zone Size  :                   200.00 MB
+Max Device Trim Extent Count :     0
+Max Device Trim Byte Count :       0
+Max Volume Trim Extent Count :     62
+Max Volume Trim Byte Count :       0x40000000
+Resource Manager Identifier :      6F97C3BB-9BEC-11EA-A4C8-7085C22E3F65

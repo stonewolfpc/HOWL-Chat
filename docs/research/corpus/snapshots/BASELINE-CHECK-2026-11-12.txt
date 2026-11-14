@@ -1,0 +1,16 @@
+scored units: 45
+split: tuning=19 heldout=26
+declared in CORPUS-01: {'units': 45, 'tuning': 19, 'heldout': 26}
+TOTALS MATCH
+FAIL missing over-exposure: 15 ['F1-03', 'F2-03', 'F3-03', 'F3-04', 'F4-03', 'F5-03', 'F5-04', 'F6-03', 'F7-03', 'F7-04', 'F8-03', 'F8-04', 'F9-03', 'F9-04', 'F9-05']
+FAIL C-1 F6-04: restraint R-3 requires a perceptible response but `mandatory` is 'nothing â€” this item may be passed by not'
+UNVERIFIABLE U-1 P-01: `mandatory` refers to 'the six facts' â€” evidence presence not decidable from the item text
+UNVERIFIABLE U-1 F3-03: `mandatory` refers to 'the name' â€” evidence presence not decidable from the item text
+
+UNVERIFIABLE (whole-corpus):
+  semantic Required<->Variation / Over-exposure conflicts â€” not decidable from field text
+  evidence sufficiency (C-5) â€” scenario prose is not machine-parseable
+  proper-noun check (C-2) is WARN only; no warning is NOT a pass
+
+RESULT: FAIL (2 fail, 0 warn, 2 unverifiable)
+This check reports only; no file was modified.

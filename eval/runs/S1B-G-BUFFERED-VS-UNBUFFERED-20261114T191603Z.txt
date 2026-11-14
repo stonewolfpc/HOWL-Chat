@@ -1,0 +1,97 @@
+=== S1-B G: buffered vs unbuffered, single run 20261114T191603Z ===
+target: G:\AI GGUF\GGUF\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf
+reader: eval/harness/unbuffered_digest.py (sector 4096, 4 MiB blocks)
+baseline sha256 (v1.1, for reference only - not a gate): b5b1913e44aa64d2c12b6159bb782774dd98362528211ac830860595d293ede0
+
+--- 1. usage check: generation/server processes and port 5001 ---
+port 5001: no listener
+no inference server process found
+
+--- 2. pre-read metadata, identity, and exclusive-open usage probe ---
+{
+  "size": 5335285728,
+  "mtime_ns": 1788573228448965700,
+  "mtime_iso": "1788573228.4489658",
+  "volume_serial": "880ecbb30ecb9918",
+  "file_id": "914f0100000003000000000000000000",
+  "in_use": false,
+  "in_use_error": 0
+}
+gate: not in use, size matches manifest
+
+--- 3. buffered SHA-256 (GNU sha256sum) ---
+341fb28ccaa52b57a50b7704476449703f3814338094ff1ab85b7c0d42f67c35 */g/AI GGUF/GGUF/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf
+start: 2026-11-14T19:16:04Z  end: 2026-11-14T19:16:23Z  wall_s: 19  exit: 0
+
+--- 4. post-buffered recheck ---
+{
+  "size": 5335285728,
+  "mtime_ns": 1788573228448965700,
+  "mtime_iso": "1788573228.4489658",
+  "volume_serial": "880ecbb30ecb9918",
+  "file_id": "914f0100000003000000000000000000",
+  "in_use": false,
+  "in_use_error": 0
+}
+after buffered read: IDENTITY/METADATA STABLE
+
+--- 5. unbuffered SHA-256 (sector 4096) ---
+{
+  "path": "G:/AI GGUF/GGUF/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
+  "size": 5335285728,
+  "sector": 4096,
+  "block": 4194304,
+  "aligned_len": 5335281664,
+  "tail_len": 4064,
+  "unbuffered_bytes": 5335281664,
+  "buffered_bytes": 4064,
+  "read_calls": 1273,
+  "short_sector_aligned_reads": 0,
+  "sha256": "d0027dd3a9128d9323e9f282c8bf010a8526c46477584535991dc1a869b56e96",
+  "identity": {
+    "volume_serial": "880ecbb30ecb9918",
+    "file_id": "914f0100000003000000000000000000"
+  },
+  "identity_body_stable": true,
+  "identity_body_matches_tail": true,
+  "identity_tail_stable": true,
+  "identity_final_matches_body": true,
+  "identity_stable_after_read": true,
+  "size_before": 5335285728,
+  "size_after": 5335285728,
+  "mtime_ns_before": 1788573228448965700,
+  "mtime_ns_after": 1788573228448965700,
+  "path_metadata_consistent": true,
+  "unchanged_during_read": true,
+  "io": {
+    "read_ops_delta": 1274,
+    "read_bytes_delta": 5335285728
+  },
+  "elapsed_s": 48.856
+}
+start: 2026-11-14T19:16:23Z  end: 2026-11-14T19:17:12Z  wall_s: 49  exit: 0
+
+--- 6. post-unbuffered recheck ---
+{
+  "size": 5335285728,
+  "mtime_ns": 1788573228448965700,
+  "mtime_iso": "1788573228.4489658",
+  "volume_serial": "880ecbb30ecb9918",
+  "file_id": "914f0100000003000000000000000000",
+  "in_use": false,
+  "in_use_error": 0
+}
+after unbuffered read: IDENTITY/METADATA STABLE
+
+--- 7. byte accounting and verdict ---
+buffered  sha256: 341fb28ccaa52b57a50b7704476449703f3814338094ff1ab85b7c0d42f67c35
+unbuffered sha256: d0027dd3a9128d9323e9f282c8bf010a8526c46477584535991dc1a869b56e96
+size: 5335285728  unbuffered_bytes: 5335281664  buffered_tail_bytes: 4064  read_calls: 1273
+accounting: 5335281664 + 4064 = 5335285728 (COMPLETE)
+identity_stable_after_read: True
+short_sector_aligned_reads: 0
+
+RESULT: DIFFERENT - the two read paths delivered different byte streams in this run.
+        Significant observation, not a root-cause diagnosis.
+
+log: eval/runs/S1B-G-BUFFERED-VS-UNBUFFERED-20261114T191603Z.txt

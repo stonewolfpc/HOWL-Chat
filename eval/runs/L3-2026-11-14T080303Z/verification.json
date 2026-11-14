@@ -1,0 +1,30 @@
+{
+  "hardware_after": {
+    "available": true,
+    "captured_at": "2026-11-14T08:03:03Z",
+    "gpu": "NVIDIA GeForce GTX 1080",
+    "gpu_util_percent": "57 %",
+    "source": "nvidia-smi",
+    "temperature_c": "38",
+    "vram_free_mib": "1487 MiB",
+    "vram_total_mib": "8192 MiB",
+    "vram_used_mib": "6573 MiB"
+  },
+  "parsed_detail": "",
+  "parsed_matches_raw": true,
+  "record_hash_detail": "",
+  "record_hash_matches": true,
+  "verification": {
+    "admissible": [
+      "state_hash_before not recorded",
+      "state_hash_after not recorded"
+    ],
+    "finish_reason_recorded": true,
+    "latency_recorded": true,
+    "no_hosted_route": false,
+    "one_call_respected": true,
+    "raw_body_present": true,
+    "text_present": true,
+    "usage_marked": true
+  }
+}

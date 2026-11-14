@@ -1,0 +1,100 @@
+{
+  "checks": [
+    {
+      "check": "S1-A: digest vs manifest",
+      "detail": "2ca636d9e81d3d23\u2026 confirmed from L3 record L3-2026-11-14T080303Z (not a qualification record) (file rehashed)",
+      "result": "PASS"
+    },
+    {
+      "check": "S1-B: digest vs manifest",
+      "detail": "b5b1913e44aa64d2\u2026 confirmed from SLOT-QUAL-S1-B-2026-11-14T135031Z (file rehashed)",
+      "result": "PASS"
+    },
+    {
+      "check": "S1-C: digest vs manifest",
+      "detail": "f820ef3f78704ffc\u2026 confirmed from SLOT-QUAL-S1-C-2026-11-14T135147Z (file rehashed)",
+      "result": "PASS"
+    },
+    {
+      "check": "S1-A: runtime configuration",
+      "detail": "from L3: context 20480, GPU layers not recorded \u2014 this slot has no qualification record",
+      "result": "FLAG"
+    },
+    {
+      "check": "S1-B: runtime configuration",
+      "detail": "context 8192, GPU layers 36, KV q8_0",
+      "result": "PASS"
+    },
+    {
+      "check": "S1-C: runtime configuration",
+      "detail": "context 8192, GPU layers 20, KV q8_0",
+      "result": "PASS"
+    },
+    {
+      "check": "S1-A: offload evidence",
+      "detail": "no qualification log: the server's own offload line was never captured for this slot",
+      "result": "FLAG"
+    },
+    {
+      "check": "S1-B: offload evidence",
+      "detail": "36/43 layers, GPU 2424.87 MiB, CPU 3173.18 MiB",
+      "result": "PASS"
+    },
+    {
+      "check": "S1-C: offload evidence",
+      "detail": "20/25 layers, GPU 4215.99 MiB, CPU 897.98 MiB",
+      "result": "PASS"
+    },
+    {
+      "check": "qualification directories: zero generations",
+      "detail": "sum of generations across filed qualification records = 0",
+      "result": "PASS"
+    },
+    {
+      "check": "abort thresholds carried into the procedure",
+      "detail": "{\"abort 78 \\u00b0C\": true, \"VRAM floor 400 MiB\": true, \"RAM floor 8 GB\": true, \"recovery tolerance 250 MiB\": true, \"per-component thresholds\": true}",
+      "result": "PASS"
+    },
+    {
+      "check": "recovery gates recorded",
+      "detail": "{\"S1-A\": \"no recovery file\", \"S1-B\": \"pass\", \"S1-C\": \"pass\"}",
+      "result": "FLAG"
+    },
+    {
+      "check": "18-call schedule, 30-call ceiling unchanged",
+      "detail": "plan reports planned=18, retry=12, hard=30",
+      "result": "PASS"
+    },
+    {
+      "check": "truncation is data, no reruns",
+      "detail": "rule stated as ['never retried', 'No retry of a truncated reply']; finish_reason recorded=True; adapter has no retry loop=True",
+      "result": "PASS"
+    }
+  ],
+  "configs": {
+    "S1-A": {
+      "context": 20480,
+      "gpu_layers": "not recorded",
+      "source": "L3-2026-11-14T080303Z"
+    },
+    "S1-B": {
+      "context": 8192,
+      "gpu_layers": 36,
+      "quantkv": "q8_0",
+      "source": "SLOT-QUAL-S1-B-2026-11-14T135031Z"
+    },
+    "S1-C": {
+      "context": 8192,
+      "gpu_layers": 20,
+      "quantkv": "q8_0",
+      "source": "SLOT-QUAL-S1-C-2026-11-14T135147Z"
+    }
+  },
+  "counts": {
+    "fail": 0,
+    "flag": 3,
+    "pass": 11
+  },
+  "preflight": "S1-execution-preflight-1",
+  "verdict": "PASS WITH FLAGS"
+}

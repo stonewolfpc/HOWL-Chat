@@ -1,0 +1,23 @@
+{
+  "block_sha256": "e9df1876add012f127b78a4263968905beb9a7c7e393bc9111a034ee5c9adeca",
+  "endpoint": "http://127.0.0.1:5001",
+  "listening": true,
+  "loaded_model": "inactive",
+  "max_context_length": 12288,
+  "probe": {
+    "/api/extra/true_max_context_length": {
+      "body": "{\"value\": 12288}",
+      "status": 200
+    },
+    "/api/extra/version": {
+      "body": "{\"result\": \"KoboldCpp\", \"version\": \"1.120\", \"protected\": false, \"llm\": false, \"txt2img\": false, \"vision\": false, \"audio\": false, \"transcribe\": false, \"multiplayer\": false, \"websearch\": false, \"tts\": false, \"embeddings\": false, \"music\": false, \"savedata\": false, \"admin\": 0, \"router\": false, \"guidance\": false, \"jinja\": false, \"mcp\": false}",
+      "status": 200
+    },
+    "/api/v1/model": {
+      "body": "{\"result\": \"inactive\"}",
+      "status": 200
+    }
+  },
+  "server_name": "KoboldCpp",
+  "server_version": "1.120"
+}

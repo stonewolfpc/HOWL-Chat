@@ -1,0 +1,23 @@
+{
+  "block_sha256": "09811f4c4be5b8281c44e16f2d7e956dd1d2c92902d4993c6d65f637391ea8dd",
+  "conclusion": "no local inference server answered. The harness does not start servers; starting one is a separate decision.",
+  "endpoint": "http://127.0.0.1:5001",
+  "listening": false,
+  "loaded_model": "unavailable",
+  "max_context_length": "unavailable",
+  "probe": {
+    "/api/extra/true_max_context_length": {
+      "body": "not listening: [WinError 10061] No connection could be made because the target machine actively refused it",
+      "status": 0
+    },
+    "/api/extra/version": {
+      "body": "not listening: [WinError 10061] No connection could be made because the target machine actively refused it",
+      "status": 0
+    },
+    "/api/v1/model": {
+      "body": "not listening: [WinError 10061] No connection could be made because the target machine actively refused it",
+      "status": 0
+    }
+  },
+  "server_version": "unavailable"
+}

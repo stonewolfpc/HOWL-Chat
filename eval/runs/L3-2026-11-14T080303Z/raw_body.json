@@ -1,0 +1,23 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Task: Name the colour of a clear midday sky.\n    *   Constraint: Answer in one short sentence.\n    *   System",
+        "role": "assistant",
+        "tool_calls": []
+      }
+    }
+  ],
+  "created": 1794643383,
+  "id": "chatcmpl-A501072",
+  "model": "koboldcpp/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 48,
+    "prompt_tokens": 37,
+    "total_tokens": 85
+  }
+}

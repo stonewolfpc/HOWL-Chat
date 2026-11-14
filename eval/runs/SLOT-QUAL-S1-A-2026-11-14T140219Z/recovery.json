@@ -1,0 +1,18 @@
+{
+  "after_unload": {
+    "available": true,
+    "captured_at": "2026-11-14T14:02:32Z",
+    "gpu_util_percent": "17 %",
+    "temperature_c": "30",
+    "vram_free_mib": "6743 MiB",
+    "vram_used_mib": "1317 MiB"
+  },
+  "baseline_vram_used_mib": "1372 MiB",
+  "delta_mib": -55,
+  "generations": 0,
+  "port_closed": true,
+  "record_type": "qualification_recovery",
+  "recovery_gate": "pass",
+  "recovery_tolerance_mib": 250,
+  "timestamp": "2026-11-14T14:02:32Z"
+}

@@ -1,0 +1,203 @@
+=== volume validation, revised reader 2026-11-14T19:13:18Z ===
+geometry (elevated fsutil, measured per volume):
+  G: logical 512 / physical 4096 / effective 4096 / device aligned 0x000
+  H: logical 512 / physical 512  / effective 512  / device aligned 0x000
+
+########## VOLUME G (/g) ##########
+created G:/_reader_selftest.tmp 1048713 bytes (1 MiB + 137)
+--- before ---
+size=1048713 mtime=2026-11-14 13:13:18.085844100 -0600
+--- independent file id (fsutil file queryfileid) ---
+File ID is 0x00000000000000000007000000014f9f
+--- buffered reference (GNU sha256sum 8.32) ---
+bd80b30495d0f641a18fd9e33a47eb57790421043623ef67488fccedb18c9ec8 */g/_reader_selftest.tmp
+--- revised reader, sector=4096 ---
+{
+  "path": "G:/_reader_selftest.tmp",
+  "size": 1048713,
+  "sector": 4096,
+  "block": 4194304,
+  "aligned_len": 1048576,
+  "tail_len": 137,
+  "unbuffered_bytes": 1048576,
+  "buffered_bytes": 137,
+  "read_calls": 1,
+  "short_sector_aligned_reads": 0,
+  "sha256": "bd80b30495d0f641a18fd9e33a47eb57790421043623ef67488fccedb18c9ec8",
+  "identity": {
+    "volume_serial": "880ecbb30ecb9918",
+    "file_id": "9f4f0100000007000000000000000000"
+  },
+  "identity_body_stable": true,
+  "identity_body_matches_tail": true,
+  "identity_tail_stable": true,
+  "identity_final_matches_body": true,
+  "identity_stable_after_read": true,
+  "size_before": 1048713,
+  "size_after": 1048713,
+  "mtime_ns_before": 1794683598085844100,
+  "mtime_ns_after": 1794683598085844100,
+  "path_metadata_consistent": true,
+  "unchanged_during_read": true,
+  "io": {
+    "read_ops_delta": 2,
+    "read_bytes_delta": 1048713
+  },
+  "elapsed_s": 0.464
+}
+exit=0
+--- revised reader, sector=512 ---
+{
+  "path": "G:/_reader_selftest.tmp",
+  "size": 1048713,
+  "sector": 512,
+  "block": 4194304,
+  "aligned_len": 1048576,
+  "tail_len": 137,
+  "unbuffered_bytes": 1048576,
+  "buffered_bytes": 137,
+  "read_calls": 1,
+  "short_sector_aligned_reads": 0,
+  "sha256": "bd80b30495d0f641a18fd9e33a47eb57790421043623ef67488fccedb18c9ec8",
+  "identity": {
+    "volume_serial": "880ecbb30ecb9918",
+    "file_id": "9f4f0100000007000000000000000000"
+  },
+  "identity_body_stable": true,
+  "identity_body_matches_tail": true,
+  "identity_tail_stable": true,
+  "identity_final_matches_body": true,
+  "identity_stable_after_read": true,
+  "size_before": 1048713,
+  "size_after": 1048713,
+  "mtime_ns_before": 1794683598085844100,
+  "mtime_ns_after": 1794683598085844100,
+  "path_metadata_consistent": true,
+  "unchanged_during_read": true,
+  "io": {
+    "read_ops_delta": 2,
+    "read_bytes_delta": 1048713
+  },
+  "elapsed_s": 0.006
+}
+exit=0
+--- NEGATIVE CONTROL on G: buffer misaligned by 1 ---
+{
+  "path": "G:/_reader_selftest.tmp",
+  "error": 87,
+  "message": "[Errno 87] ReadFile failed at offset 0 len 1048576 (last error 87)",
+  "winerror": 87
+}
+exit=2
+--- NEGATIVE CONTROL on G: length not sector-multiple ---
+{
+  "path": "G:/_reader_selftest.tmp",
+  "error": 87,
+  "message": "[Errno 87] ReadFile failed at offset 0 len 1048575 (last error 87)",
+  "winerror": 87
+}
+exit=2
+--- after ---
+size=1048713 mtime=2026-11-14 13:13:18.085844100 -0600
+--- cleanup ---
+cleanup ok: /g/_reader_selftest.tmp removed
+
+########## VOLUME H (/h) ##########
+created H:/_reader_selftest.tmp 1048713 bytes (1 MiB + 137)
+--- before ---
+size=1048713 mtime=2026-11-14 13:13:19.191765800 -0600
+--- independent file id (fsutil file queryfileid) ---
+File ID is 0x00000000000000000002000000016117
+--- buffered reference (GNU sha256sum 8.32) ---
+bd80b30495d0f641a18fd9e33a47eb57790421043623ef67488fccedb18c9ec8 */h/_reader_selftest.tmp
+--- revised reader, sector=4096 ---
+{
+  "path": "H:/_reader_selftest.tmp",
+  "size": 1048713,
+  "sector": 4096,
+  "block": 4194304,
+  "aligned_len": 1048576,
+  "tail_len": 137,
+  "unbuffered_bytes": 1048576,
+  "buffered_bytes": 137,
+  "read_calls": 1,
+  "short_sector_aligned_reads": 0,
+  "sha256": "bd80b30495d0f641a18fd9e33a47eb57790421043623ef67488fccedb18c9ec8",
+  "identity": {
+    "volume_serial": "3c3871ba3871742c",
+    "file_id": "17610100000002000000000000000000"
+  },
+  "identity_body_stable": true,
+  "identity_body_matches_tail": true,
+  "identity_tail_stable": true,
+  "identity_final_matches_body": true,
+  "identity_stable_after_read": true,
+  "size_before": 1048713,
+  "size_after": 1048713,
+  "mtime_ns_before": 1794683599191765800,
+  "mtime_ns_after": 1794683599191765800,
+  "path_metadata_consistent": true,
+  "unchanged_during_read": true,
+  "io": {
+    "read_ops_delta": 2,
+    "read_bytes_delta": 1048713
+  },
+  "elapsed_s": 0.031
+}
+exit=0
+--- revised reader, sector=512 ---
+{
+  "path": "H:/_reader_selftest.tmp",
+  "size": 1048713,
+  "sector": 512,
+  "block": 4194304,
+  "aligned_len": 1048576,
+  "tail_len": 137,
+  "unbuffered_bytes": 1048576,
+  "buffered_bytes": 137,
+  "read_calls": 1,
+  "short_sector_aligned_reads": 0,
+  "sha256": "bd80b30495d0f641a18fd9e33a47eb57790421043623ef67488fccedb18c9ec8",
+  "identity": {
+    "volume_serial": "3c3871ba3871742c",
+    "file_id": "17610100000002000000000000000000"
+  },
+  "identity_body_stable": true,
+  "identity_body_matches_tail": true,
+  "identity_tail_stable": true,
+  "identity_final_matches_body": true,
+  "identity_stable_after_read": true,
+  "size_before": 1048713,
+  "size_after": 1048713,
+  "mtime_ns_before": 1794683599191765800,
+  "mtime_ns_after": 1794683599191765800,
+  "path_metadata_consistent": true,
+  "unchanged_during_read": true,
+  "io": {
+    "read_ops_delta": 2,
+    "read_bytes_delta": 1048713
+  },
+  "elapsed_s": 0.007
+}
+exit=0
+--- NEGATIVE CONTROL on H: buffer misaligned by 1 ---
+{
+  "path": "H:/_reader_selftest.tmp",
+  "error": 87,
+  "message": "[Errno 87] ReadFile failed at offset 0 len 1048576 (last error 87)",
+  "winerror": 87
+}
+exit=2
+--- NEGATIVE CONTROL on H: length not sector-multiple ---
+{
+  "path": "H:/_reader_selftest.tmp",
+  "error": 87,
+  "message": "[Errno 87] ReadFile failed at offset 0 len 1048575 (last error 87)",
+  "winerror": 87
+}
+exit=2
+--- after ---
+size=1048713 mtime=2026-11-14 13:13:19.191765800 -0600
+--- cleanup ---
+cleanup ok: /h/_reader_selftest.tmp removed
+

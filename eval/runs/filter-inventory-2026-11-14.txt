@@ -1,0 +1,204 @@
+
+Filter Name                     Num Instances    Altitude    Frame
+------------------------------  -------------  ------------  -----
+bindflt                                 1       409800         0
+UCPD                                   25       385250.5       0
+WdFilter                               25       328010         0
+storqosflt                              0       244000         0
+wcifs                                   0       189900         0
+gameflt                                11       189850         0
+CldFlt                                 10       180451         0
+bfs                                    27       150000         0
+FileCrypt                               0       141100         0
+luafv                                   1       135000         0
+UnionFS                                 0       130850         0
+npsvctrig                               1        46000         0
+Wof                                    20        40700         0
+FileInfo                               25        40500         0
+Filter                Volume Name                              Altitude        Instance Name       Frame   SprtFtrs  VlStatus
+--------------------  -------------------------------------  ------------  ----------------------  -----   --------  --------
+CldFlt                C:                                        180451     CldFlt                    0     0000000f  
+CldFlt                \Device\HarddiskVolumeShadowCopy10        180451     CldFlt                    0     0000000f  
+CldFlt                \Device\HarddiskVolumeShadowCopy11        180451     CldFlt                    0     0000000f  
+CldFlt                \Device\HarddiskVolumeShadowCopy3         180451     CldFlt                    0     0000000f  
+CldFlt                \Device\HarddiskVolumeShadowCopy4         180451     CldFlt                    0     0000000f  
+CldFlt                \Device\HarddiskVolumeShadowCopy5         180451     CldFlt                    0     0000000f  
+CldFlt                \Device\HarddiskVolumeShadowCopy6         180451     CldFlt                    0     0000000f  
+CldFlt                \Device\HarddiskVolumeShadowCopy7         180451     CldFlt                    0     0000000f  
+CldFlt                \Device\HarddiskVolumeShadowCopy8         180451     CldFlt                    0     0000000f  
+CldFlt                \Device\HarddiskVolumeShadowCopy9         180451     CldFlt                    0     0000000f  
+FileInfo                                                         40500     FileInfo                  0     0000000f  
+FileInfo                                                         40500     FileInfo                  0     0000000f  
+FileInfo              C:                                         40500     FileInfo                  0     0000000f  
+FileInfo                                                         40500     FileInfo                  0     0000000f  
+FileInfo              H:                                         40500     FileInfo                  0     0000000f  
+FileInfo              J:                                         40500     FileInfo                  0     0000000f  
+FileInfo              I:                                         40500     FileInfo                  0     0000000f  
+FileInfo              K:                                         40500     FileInfo                  0     0000000f  
+FileInfo              \Device\HarddiskVolume2                    40500     FileInfo                  0     0000000f  
+FileInfo                                                         40500     FileInfo                  0     0000000f  
+FileInfo              G:                                         40500     FileInfo                  0     0000000f  
+FileInfo                                                         40500     FileInfo                  0     0000000f  
+FileInfo                                                         40500     FileInfo                  0     0000000f  
+FileInfo              D:                                         40500     FileInfo                  0     0000000f  
+FileInfo              F:                                         40500     FileInfo                  0     0000000f  
+FileInfo              \Device\HarddiskVolumeShadowCopy10         40500     FileInfo                  0     0000000f  
+FileInfo              \Device\HarddiskVolumeShadowCopy11         40500     FileInfo                  0     0000000f  
+FileInfo              \Device\HarddiskVolumeShadowCopy3          40500     FileInfo                  0     0000000f  
+FileInfo              \Device\HarddiskVolumeShadowCopy4          40500     FileInfo                  0     0000000f  
+FileInfo              \Device\HarddiskVolumeShadowCopy5          40500     FileInfo                  0     0000000f  
+FileInfo              \Device\HarddiskVolumeShadowCopy6          40500     FileInfo                  0     0000000f  
+FileInfo              \Device\HarddiskVolumeShadowCopy7          40500     FileInfo                  0     0000000f  
+FileInfo              \Device\HarddiskVolumeShadowCopy8          40500     FileInfo                  0     0000000f  
+FileInfo              \Device\HarddiskVolumeShadowCopy9          40500     FileInfo                  0     0000000f  
+FileInfo              \Device\Mup                                40500     FileInfo                  0     0000000f  
+UCPD                                                            385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                                                            385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  C:                                        385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                                                            385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  H:                                        385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  J:                                        385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  I:                                        385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  K:                                        385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  \Device\HarddiskVolume2                   385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                                                            385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  G:                                        385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                                                            385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                                                            385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  D:                                        385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  F:                                        385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  \Device\HarddiskVolumeShadowCopy10        385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  \Device\HarddiskVolumeShadowCopy11        385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  \Device\HarddiskVolumeShadowCopy3         385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  \Device\HarddiskVolumeShadowCopy4         385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  \Device\HarddiskVolumeShadowCopy5         385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  \Device\HarddiskVolumeShadowCopy6         385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  \Device\HarddiskVolumeShadowCopy7         385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  \Device\HarddiskVolumeShadowCopy8         385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  \Device\HarddiskVolumeShadowCopy9         385250.5   UCPD - Top Instance       0     0000000f  
+UCPD                  \Device\Mup                               385250.5   UCPD - Top Instance       0     0000000f  
+WdFilter                                                        328010     WdFilter Instance         0     0000000f  
+WdFilter                                                        328010     WdFilter Instance         0     0000000f  
+WdFilter              C:                                        328010     WdFilter Instance         0     0000000f  
+WdFilter                                                        328010     WdFilter Instance         0     0000000f  
+WdFilter              H:                                        328010     WdFilter Instance         0     0000000f  
+WdFilter              J:                                        328010     WdFilter Instance         0     0000000f  
+WdFilter              I:                                        328010     WdFilter Instance         0     0000000f  
+WdFilter              K:                                        328010     WdFilter Instance         0     0000000f  
+WdFilter              \Device\HarddiskVolume2                   328010     WdFilter Instance         0     0000000f  
+WdFilter                                                        328010     WdFilter Instance         0     0000000f  
+WdFilter              G:                                        328010     WdFilter Instance         0     0000000f  
+WdFilter                                                        328010     WdFilter Instance         0     0000000f  
+WdFilter                                                        328010     WdFilter Instance         0     0000000f  
+WdFilter              D:                                        328010     WdFilter Instance         0     0000000f  
+WdFilter              F:                                        328010     WdFilter Instance         0     0000000f  
+WdFilter              \Device\HarddiskVolumeShadowCopy10        328010     WdFilter Instance         0     0000000f  
+WdFilter              \Device\HarddiskVolumeShadowCopy11        328010     WdFilter Instance         0     0000000f  
+WdFilter              \Device\HarddiskVolumeShadowCopy3         328010     WdFilter Instance         0     0000000f  
+WdFilter              \Device\HarddiskVolumeShadowCopy4         328010     WdFilter Instance         0     0000000f  
+WdFilter              \Device\HarddiskVolumeShadowCopy5         328010     WdFilter Instance         0     0000000f  
+WdFilter              \Device\HarddiskVolumeShadowCopy6         328010     WdFilter Instance         0     0000000f  
+WdFilter              \Device\HarddiskVolumeShadowCopy7         328010     WdFilter Instance         0     0000000f  
+WdFilter              \Device\HarddiskVolumeShadowCopy8         328010     WdFilter Instance         0     0000000f  
+WdFilter              \Device\HarddiskVolumeShadowCopy9         328010     WdFilter Instance         0     0000000f  
+WdFilter              \Device\Mup                               328010     WdFilter Instance         0     0000000f  
+Wof                   C:                                         40700     Wof Instance              0     0000000f  
+Wof                                                              40700     Wof Instance              0     0000000f  
+Wof                   H:                                         40700     Wof Instance              0     0000000f  
+Wof                   I:                                         40700     Wof Instance              0     0000000f  
+Wof                   K:                                         40700     Wof Instance              0     0000000f  
+Wof                                                              40700     Wof Instance              0     0000000f  
+Wof                   G:                                         40700     Wof Instance              0     0000000f  
+Wof                                                              40700     Wof Instance              0     0000000f  
+Wof                                                              40700     Wof Instance              0     0000000f  
+Wof                   D:                                         40700     Wof Instance              0     0000000f  
+Wof                   F:                                         40700     Wof Instance              0     0000000f  
+Wof                   \Device\HarddiskVolumeShadowCopy10         40700     Wof Instance              0     0000000f  
+Wof                   \Device\HarddiskVolumeShadowCopy11         40700     Wof Instance              0     0000000f  
+Wof                   \Device\HarddiskVolumeShadowCopy3          40700     Wof Instance              0     0000000f  
+Wof                   \Device\HarddiskVolumeShadowCopy4          40700     Wof Instance              0     0000000f  
+Wof                   \Device\HarddiskVolumeShadowCopy5          40700     Wof Instance              0     0000000f  
+Wof                   \Device\HarddiskVolumeShadowCopy6          40700     Wof Instance              0     0000000f  
+Wof                   \Device\HarddiskVolumeShadowCopy7          40700     Wof Instance              0     0000000f  
+Wof                   \Device\HarddiskVolumeShadowCopy8          40700     Wof Instance              0     0000000f  
+Wof                   \Device\HarddiskVolumeShadowCopy9          40700     Wof Instance              0     0000000f  
+bfs                                                             150000     bfs                       0     0000000f  
+bfs                                                             150000     bfs                       0     0000000f  
+bfs                   C:                                        150000     bfs                       0     0000000f  
+bfs                                                             150000     bfs                       0     0000000f  
+bfs                   H:                                        150000     bfs                       0     0000000f  
+bfs                   J:                                        150000     bfs                       0     0000000f  
+bfs                   I:                                        150000     bfs                       0     0000000f  
+bfs                   K:                                        150000     bfs                       0     0000000f  
+bfs                   \Device\HarddiskVolume2                   150000     bfs                       0     0000000f  
+bfs                                                             150000     bfs                       0     0000000f  
+bfs                   G:                                        150000     bfs                       0     0000000f  
+bfs                                                             150000     bfs                       0     0000000f  
+bfs                                                             150000     bfs                       0     0000000f  
+bfs                   D:                                        150000     bfs                       0     0000000f  
+bfs                   F:                                        150000     bfs                       0     0000000f  
+bfs                   \Device\HarddiskVolumeShadowCopy10        150000     bfs                       0     0000000f  
+bfs                   \Device\HarddiskVolumeShadowCopy11        150000     bfs                       0     0000000f  
+bfs                   \Device\HarddiskVolumeShadowCopy3         150000     bfs                       0     0000000f  
+bfs                   \Device\HarddiskVolumeShadowCopy4         150000     bfs                       0     0000000f  
+bfs                   \Device\HarddiskVolumeShadowCopy5         150000     bfs                       0     0000000f  
+bfs                   \Device\HarddiskVolumeShadowCopy6         150000     bfs                       0     0000000f  
+bfs                   \Device\HarddiskVolumeShadowCopy7         150000     bfs                       0     0000000f  
+bfs                   \Device\HarddiskVolumeShadowCopy8         150000     bfs                       0     0000000f  
+bfs                   \Device\HarddiskVolumeShadowCopy9         150000     bfs                       0     0000000f  
+bfs                   \Device\Mailslot                          150000     bfs                       0     0000000f  
+bfs                   \Device\Mup                               150000     bfs                       0     0000000f  
+bfs                   \Device\NamedPipe                         150000     bfs                       0     0000000f  
+bindflt               C:                                        409800     bindflt Instance          0     0000000f  
+gameflt               C:                                        189850     gameflt Instance          0     0000000b  
+gameflt                                                         189850     gameflt Instance          0     0000000b  
+gameflt               H:                                        189850     gameflt Instance          0     0000000b  
+gameflt               I:                                        189850     gameflt Instance          0     0000000b  
+gameflt               K:                                        189850     gameflt Instance          0     0000000b  
+gameflt                                                         189850     gameflt Instance          0     0000000b  
+gameflt               G:                                        189850     gameflt Instance          0     0000000b  
+gameflt                                                         189850     gameflt Instance          0     0000000b  
+gameflt                                                         189850     gameflt Instance          0     0000000b  
+gameflt               D:                                        189850     gameflt Instance          0     0000000b  
+gameflt               F:                                        189850     gameflt Instance          0     0000000b  
+luafv                 C:                                        135000     luafv                     0     0000000f  
+npsvctrig             \Device\NamedPipe                          46000     npsvctrig                 0     00000008  
+Dos Name                        Volume Name                              FileSystem   Status
+------------------------------  ---------------------------------------  ----------  --------
+                                \Device\Mup                              Remote      
+C:                              \Device\HarddiskVolume12                 NTFS        
+                                \Device\NamedPipe                        NamedPipe   
+                                \Device\Mailslot                         Mailslot    
+                                \Device\HarddiskVolumeShadowCopy10       NTFS        
+                                \Device\HarddiskVolume10                 FAT         
+F:                              \Device\HarddiskVolume9                  NTFS        
+D:                              \Device\HarddiskVolume8                  NTFS        
+K:                              \Device\HarddiskVolume17                 NTFS        
+                                \Device\HarddiskVolume4                  NTFS        
+                                \Device\HarddiskVolume7                  NTFS        
+                                \Device\HarddiskVolume1                  FAT         
+                                \Device\HarddiskVolume13                 NTFS        
+G:                              \Device\HarddiskVolume5                  NTFS        
+I:                              \Device\HarddiskVolume16                 NTFS        
+J:                              \Device\HarddiskVolume15                 FAT         
+                                \Device\HarddiskVolume6                  NTFS        
+                                \Device\HarddiskVolume2                  FAT         
+                                \Device\HarddiskVolumeShadowCopy11       NTFS        
+                                \Device\HarddiskVolumeShadowCopy5        NTFS        
+                                \Device\HarddiskVolumeShadowCopy8        NTFS        
+                                \Device\HarddiskVolumeShadowCopy3        NTFS        
+                                \Device\HarddiskVolumeShadowCopy4        NTFS        
+                                \Device\HarddiskVolumeShadowCopy9        NTFS        
+                                \Device\HarddiskVolumeShadowCopy6        NTFS        
+                                \Device\HarddiskVolumeShadowCopy7        NTFS        
+H:                              \Device\HarddiskVolume14                 NTFS        
+
+INFO: The system global flag 'maintain objects list' needs
+      to be enabled to see local opened files.
+      See Openfiles /? for more information.
+
+
+Files opened remotely via local share points:
+---------------------------------------------
+
+INFO: No shared open files found.

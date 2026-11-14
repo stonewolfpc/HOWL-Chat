@@ -1,0 +1,100 @@
+{
+  "purpose": "bounded operational smoke tests, S1-A and S1-B, both drive copies, after failed content verification",
+  "status": "functional test only; NOT S1 observations, not citable about MEMORY-09, outside the 18/30 call budget",
+  "runtime": {
+    "binary": "H:\\AI apps\\koboldcpp.exe",
+    "version": "1.120",
+    "profile": "S1-v1.1: 20 gpu layers, 20480 ctx, threads 8, batch 512, quantkv q8_0, usemmap, usecuda 0"
+  },
+  "prompt": "throwaway completion prompt (deliberately not a frozen S1 prompt); max_length 64, temp 0.7, top_p 0.9, rep_pen 1.1",
+  "slots": {
+    "S1-A": {
+      "model": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+      "baseline_recorded_prefix": "2ca636d9",
+      "G": {
+        "sha256_prefix": "0e124fab",
+        "load_ok": true,
+        "n_layer": 32,
+        "n_embd": 4096,
+        "model_type": "9B",
+        "ready_s": 110,
+        "vram_mib": 5740,
+        "temp_c": 35,
+        "gen_s": 7.53,
+        "gen_chars": 256,
+        "finish_reason": "length",
+        "coherent": true
+      },
+      "H": {
+        "sha256_prefix": "de3b8d28",
+        "load_ok": true,
+        "n_layer": 32,
+        "n_embd": 4096,
+        "model_type": "9B",
+        "ready_s": 40,
+        "vram_mib": 5747,
+        "temp_c": 39,
+        "gen_s": 7.65,
+        "gen_chars": 284,
+        "finish_reason": "length",
+        "coherent": true
+      },
+      "neither_copy_matches_baseline": true,
+      "structure_identical": true
+    },
+    "S1-B": {
+      "model": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
+      "baseline_recorded_prefix": "b5b1913e",
+      "G": {
+        "sha256_prefix": "290f7ead",
+        "load_ok": true,
+        "n_layer": 42,
+        "n_embd": 2560,
+        "model_type": "E4B",
+        "ready_s": 70,
+        "vram_mib": 3986,
+        "temp_c": 37,
+        "gen_s": 5.72,
+        "gen_chars": 304,
+        "finish_reason": "length",
+        "coherent": true
+      },
+      "H": {
+        "sha256_prefix": "6ff1b33f",
+        "load_ok": true,
+        "n_layer": 42,
+        "n_embd": 2560,
+        "model_type": "E4B",
+        "ready_s": 30,
+        "vram_mib": 3987,
+        "temp_c": 37,
+        "gen_s": 4.55,
+        "gen_chars": 273,
+        "finish_reason": "stop",
+        "coherent": true
+      },
+      "neither_copy_matches_baseline": true,
+      "structure_identical": true
+    }
+  },
+  "observations": [
+    "all four loads reported Load Text Model OK with zero load errors",
+    "each pair parsed to identical GGUF structure (S1-A 32/4096/9B, S1-B 42/2560/E4B)",
+    "all four generated grammatical, on-prompt prose in 4.5-7.7 s",
+    "S1-B on H: ended with finish_reason=stop (natural EOS) rather than length; not treated as a difference",
+    "S1-A output on both copies contains a stray U+FFFD replacement character, so it is a runtime/encoding artifact rather than a copy-specific defect",
+    "VRAM 3986-5753 MiB (49-70 percent of 8 GiB) and 35-42 C, inside the 90 percent / 78 C gates",
+    "all models parsed as file type 'guessed unknown' on both copies, as they did before the migration"
+  ],
+  "conclusion": "all three S1 candidates load and generate from both drives; hash discrepancies remain unexplained and are not evidenced as functional damage by these tests",
+  "artifacts": [
+    "eval/runs/kobold-S1A-G-smoke.log",
+    "eval/runs/kobold-S1A-H-smoke.log",
+    "eval/runs/kobold-S1B-G-smoke.log",
+    "eval/runs/kobold-S1B-H-smoke.log",
+    "eval/runs/smoke-S1A-G.json",
+    "eval/runs/smoke-S1A-H.json",
+    "eval/runs/smoke-S1B-G.json",
+    "eval/runs/smoke-S1B-H.json"
+  ]
+}

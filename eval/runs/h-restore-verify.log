@@ -1,0 +1,11 @@
+{
+  "files_hashed": 78259,
+  "mismatched": 0,
+  "missing": 0,
+  "size_mismatches": 0,
+  "read_errors": 0,
+  "verdict": "RESTORE IDENTICAL"
+}
+AI apps: backup 25744 restored 25744 hashed 25744 mismatched 0 missing 0 read_errors 0
+InvokeAI: backup 52515 restored 52515 hashed 52515 mismatched 0 missing 0 read_errors 0
+report: C:\Users\StoneWolfPC\HOWL_Chat\eval\runs\H-RESTORE-VERIFY-2026-11-14.json

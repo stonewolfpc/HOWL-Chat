@@ -1,0 +1,73 @@
+{
+  "baseline_id": "S1-readiness-baseline-1",
+  "frozen_at": "2026-11-14",
+  "note": "Frozen S1 readiness baseline. Full 64-character SHA-256 values and exact byte counts: identity verification requires the whole digest, never an abbreviation. Any change here is a new version (S1-v2), never an edit.",
+  "fixture": {
+    "id": "F-ST-01-S1",
+    "version": "1",
+    "sha256": "3dd41c8ea03c4101295e1bded40824cc3c41de99c154a285ef7fe5af0966412d"
+  },
+  "state_sha256": "aa98d95faf1d18d910c4ba124c0e8d3bf688d3a6d5feee4ca5ff05d30b9d5700",
+  "prompts": {
+    "A": "076de19e9087bb4a3b3d39464516c3417495aa82e27c7efccb971283cd075af7",
+    "B": "97213346a4ac7ec9a0f3f363ee8f9c15fb73cc0667bdfcc80c03bdb8e385b998"
+  },
+  "params": {
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "max_tokens": 256
+  },
+  "plan": {
+    "path": "docs/research/corpus/MEMORY-09-LOCAL-S1-EXECUTION-PLAN-2026-11-14.md",
+    "sha256": "d15ebacea5fe3408fc40117ffbf781f82042fcd9a01293abafab270f7fdac9e9",
+    "bytes": 12074
+  },
+  "models": [
+    {
+      "slot": "S1-A",
+      "file": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+      "path": "G:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+      "bytes": 5627044224,
+      "sha256": "2ca636d9e81d3d23ca9b60c234fe185d30ec082eeba69ce770fdb0c76559a4f5",
+      "arch": "qwen35",
+      "layers": 32,
+      "advertised_context": 262144,
+      "status": "verified: loaded and generated once under L3"
+    },
+    {
+      "slot": "S1-B",
+      "file": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
+      "path": "G:\\AI GGUF\\GGUF\\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
+      "bytes": 5335285728,
+      "sha256": "b5b1913e44aa64d2c12b6159bb782774dd98362528211ac830860595d293ede0",
+      "arch": "gemma4",
+      "layers": 42,
+      "advertised_context": 131072,
+      "status": "conditional: qualification required, never loaded"
+    },
+    {
+      "slot": "S1-C",
+      "file": "LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+      "path": "G:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+      "bytes": 5155565440,
+      "sha256": "f820ef3f78704ffcaaeed061f29a28b398c1d348d69aca43a142b63e4d1c5c7e",
+      "arch": "lfm2moe",
+      "layers": 24,
+      "advertised_context": 128000,
+      "status": "conditional: qualification required, never loaded"
+    }
+  ],
+  "preset_reference": {
+    "path": "H:\\AI apps\\qwen 9b.kcpps",
+    "bytes": 3591,
+    "sha256": "9ed540a5da4954f102f92fb70de26b87607eef8068446bbcc786f9f1f3a8db2b",
+    "note": "L3 reference only; its model path is stale and its sampler keys are absent"
+  },
+  "offline_checks_at_freeze": 88,
+  "suite_note": "Suite was 87 at freeze; check 88 verifies this manifest itself and was added before any execution. No baseline value changed.",
+  "qualification": {
+    "generations": 0,
+    "counts_against_ceiling": false,
+    "citable_about_memory_09": false
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "claim_ceiling": "compatibility of this file with this build on this machine; NOTHING about MEMORY-09",
+  "configuration": {
+    "context": 8192,
+    "frozen_at_qualification": true,
+    "gpu_layers": 20,
+    "host": "127.0.0.1",
+    "quantkv": "q8_0"
+  },
+  "generations": 0,
+  "hardware": {
+    "after_load": {
+      "available": true,
+      "captured_at": "2026-11-14T13:51:47Z",
+      "gpu_util_percent": "3 %",
+      "temperature_c": "32",
+      "vram_free_mib": "2164 MiB",
+      "vram_used_mib": "5896 MiB"
+    },
+    "before_load": {
+      "temperature_c": "29",
+      "vram_free_mib": "6815 MiB",
+      "vram_used_mib": "1245 MiB"
+    }
+  },
+  "identity": {
+    "expected_stem": "LFM2.5-8B-A1B-heretic.Q4_K_M",
+    "match_rule": "normalised substring (casefold, alphanumerics only)",
+    "matches": true,
+    "reported": "koboldcpp/LFM2.5-8B-A1B-heretic.Q4_K_M"
+  },
+  "model": {
+    "bytes": 5155565440,
+    "bytes_match_baseline": true,
+    "digest_matches_baseline": true,
+    "expected_bytes": 5155565440,
+    "expected_sha256": "f820ef3f78704ffcaaeed061f29a28b398c1d348d69aca43a142b63e4d1c5c7e",
+    "path": "G:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+    "sha256": "f820ef3f78704ffcaaeed061f29a28b398c1d348d69aca43a142b63e4d1c5c7e"
+  },
+  "record_sha256": "97029f386b861d95ca455a75de658fbedbe80bb2c277c6b276ea1a2ae3443dc4",
+  "record_type": "slot_qualification",
+  "report_id": "WO-SLOT-QUAL-01",
+  "request_kinds": "identity GETs only",
+  "requests_issued": [
+    "/api/extra/true_max_context_length",
+    "/api/extra/version",
+    "/api/v1/model"
+  ],
+  "server": {
+    "endpoint": "http://127.0.0.1:5001",
+    "identity_block_sha256": "b31e14f220af66566721038b7ed918701beeb590bfeb4e8f351f964f79fb8edd",
+    "log_evidence": {
+      "cpu_buffer_mib": 897.98,
+      "gpu_buffer_mib": 4215.99,
+      "n_layer": 24,
+      "offloaded_layers": "20/25",
+      "tensors": 256
+    },
+    "log_path": "eval/runs/kobold-S1C-qual.log",
+    "name": "KoboldCpp",
+    "version": "1.120"
+  },
+  "slot": "S1-C",
+  "timestamp": "2026-11-14T13:51:47Z"
+}

@@ -1,0 +1,634 @@
+diff --git a/app-prompt.go b/app-prompt.go
+index 63c0a85..f06bc83 100644
+--- a/app-prompt.go
++++ b/app-prompt.go
+@@ -23,6 +23,9 @@ import (
+ 
+ // SendMessageStreamWithImage streams an LLM response, optionally with an image.
+ func (a *App) SendMessageStreamWithImage(message string, imageData string) error {
++	if err := a.ensureAcceptingWork("send message"); err != nil {
++		return err
++	}
+ 	if a.httpClient == nil {
+ 		return fmt.Errorf("llama client not initialized")
+ 	}
+@@ -58,7 +61,8 @@ func (a *App) SendMessageStreamWithImage(message string, imageData string) error
+ 	opts := a.buildInferenceOptions()
+ 
+ 	streamCtx, cancel := context.WithCancel(context.Background())
+-	a.streamCancel = cancel
++	streamToken := a.beginStream(cancel)
++	defer a.endStream(streamToken)
+ 
+ 	// Thinking goes to its own channel: it is shown (or not) but never becomes
+ 	// the reply, never enters history and is never sent back next turn.
+@@ -112,8 +116,6 @@ func (a *App) SendMessageStreamWithImage(message string, imageData string) error
+ 	}
+ 	splitter.Flush()
+ 
+-	a.streamCancel = nil
+-
+ 	if streamErr != nil {
+ 		// A user abort is normal and must never surface as an error. AbortStream
+ 		// cancels the stream context we own, and the HTTP client reports the
+@@ -150,6 +152,9 @@ func (a *App) SendMessageStreamWithImage(message string, imageData string) error
+ // GenerateCharacterResponse generates a response for a specific character and emits
+ // character-scoped events: chat:chunk:<id>, chat:complete:<id>, chat:error:<id>.
+ func (a *App) GenerateCharacterResponse(message string, characterID string) error {
++	if err := a.ensureAcceptingWork("character response"); err != nil {
++		return err
++	}
+ 	if a.httpClient == nil {
+ 		return fmt.Errorf("llama client not initialized")
+ 	}
+@@ -202,7 +207,8 @@ func (a *App) GenerateCharacterResponse(message string, characterID string) erro
+ 
+ 	opts := a.buildInferenceOptions()
+ 	streamCtx, cancel := context.WithCancel(context.Background())
+-	a.streamCancel = cancel
++	streamToken := a.beginStream(cancel)
++	defer a.endStream(streamToken)
+ 
+ 	eventChunk := fmt.Sprintf("chat:chunk:%s", characterID)
+ 	eventComplete := fmt.Sprintf("chat:complete:%s", characterID)
+@@ -242,18 +248,15 @@ func (a *App) GenerateCharacterResponse(message string, characterID string) erro
+ 		select {
+ 		case <-streamCtx.Done():
+ 			a.emitEvent(eventAborted)
+-			a.streamCancel = nil
+ 			return nil
+ 		default:
+ 			a.logError(errors.LLMStreamInterrupted, errors.High, "llm.infer.character", "app-prompt.go:165", err)
+ 			a.emitEvent(eventError, err.Error())
+-			a.streamCancel = nil
+ 			return err
+ 		}
+ 	}
+ 
+-	a.streamCancel = nil
+-	_ = a.AppendChatMessage("assistant", stripThinkBlocks(response.String()), character.Name)
++	_ = a.appendChatMessage("assistant", stripThinkBlocks(response.String()), character.Name, characterID)
+ 	a.emitEvent("chat:complete", map[string]interface{}{
+ 		"message":     response.String(),
+ 		"characterId": characterID,
+@@ -268,16 +271,27 @@ func (a *App) GenerateCharacterResponse(message string, characterID string) erro
+ 
+ // AppendChatMessage records a message in the in-memory history and appends it
+ // to history.ndjson — O(1) disk write, no full file rewrite.
++//
++// This public binding is used for user/system turns, which have no character
++// owner. Character responses use appendChatMessage with an explicit ID.
+ func (a *App) AppendChatMessage(role, content, sender string) error {
++	return a.appendChatMessage(role, content, sender, "")
++}
++
++func (a *App) appendChatMessage(role, content, sender, characterID string) error {
+ 	if strings.TrimSpace(content) == "" {
+ 		return nil
+ 	}
+-	a.chatMessages = append(a.chatMessages, map[string]interface{}{
++	message := map[string]interface{}{
+ 		"role":      role,
+ 		"content":   content,
+ 		"sender":    sender,
+-		"timestamp": time.Now().Unix(),
+-	})
++		"timestamp": time.Now().Format(time.RFC3339),
++	}
++	if characterID != "" {
++		message["characterId"] = characterID
++	}
++	a.chatMessages = append(a.chatMessages, message)
+ 	chatID := ""
+ 	if a.chatPersistence != nil {
+ 		chatID = a.chatPersistence.GetLastChatID()
+@@ -286,11 +300,12 @@ func (a *App) AppendChatMessage(role, content, sender string) error {
+ 		return nil
+ 	}
+ 	entry := chat.ChatHistory{
+-		ID:        fmt.Sprintf("%d", len(a.chatMessages)-1),
+-		Sender:    sender,
+-		Text:      content,
+-		Role:      role,
+-		Timestamp: time.Now().Format(time.RFC3339),
++		ID:          fmt.Sprintf("%d", len(a.chatMessages)-1),
++		Sender:      sender,
++		Text:        content,
++		Role:        role,
++		Timestamp:   time.Now().Format(time.RFC3339),
++		CharacterID: characterID,
+ 	}
+ 	return a.chatPersistence.AppendHistoryEntry(chatID, entry)
+ }
+@@ -335,20 +350,31 @@ func (a *App) ReplaceChatHistory(entries []map[string]interface{}) error {
+ 		if timestamp == "" {
+ 			timestamp = now
+ 		}
++		characterID := historyFieldString(entry, "characterId", "CharacterId")
++		hasImage, _ := entry["hasImage"].(bool)
+ 
+ 		history = append(history, chat.ChatHistory{
+-			ID:        fmt.Sprintf("%d", i),
+-			Sender:    sender,
+-			Text:      text,
+-			Role:      role,
+-			Timestamp: timestamp,
++			ID:          fmt.Sprintf("%d", i),
++			Sender:      sender,
++			Text:        text,
++			Role:        role,
++			Timestamp:   timestamp,
++			HasImage:    hasImage,
++			CharacterID: characterID,
+ 		})
+-		messages = append(messages, map[string]interface{}{
++		message := map[string]interface{}{
+ 			"role":      role,
+ 			"content":   text,
+ 			"sender":    sender,
+-			"timestamp": time.Now().Unix(),
+-		})
++			"timestamp": timestamp,
++		}
++		if hasImage {
++			message["hasImage"] = true
++		}
++		if characterID != "" {
++			message["characterId"] = characterID
++		}
++		messages = append(messages, message)
+ 	}
+ 
+ 	a.chatMessages = messages
+@@ -385,7 +411,7 @@ func (a *App) AddSystemMessage(content string) error {
+ 	a.chatMessages = append(a.chatMessages, map[string]interface{}{
+ 		"role":      "system",
+ 		"content":   content,
+-		"timestamp": time.Now().Unix(),
++		"timestamp": time.Now().Format(time.RFC3339),
+ 	})
+ 	return nil
+ }
+@@ -395,10 +421,7 @@ func (a *App) AbortStream() error {
+ 	if a.httpClient != nil {
+ 		a.httpClient.CancelRequest()
+ 	}
+-	if a.streamCancel != nil {
+-		a.streamCancel()
+-		a.streamCancel = nil
+-	}
++	a.cancelActiveStream()
+ 	a.emitEvent("chat:aborted")
+ 	return nil
+ }
+@@ -418,7 +441,10 @@ func (a *App) SetLorebooks(entries []map[string]interface{}) error {
+ 		}
+ 		parsed = append(parsed, entry)
+ 	}
+-	a.lorebooks = parsed
++	// After cutover the canonical files own the text; a chat's saved snapshot is
++	// only the selection. Resolve against canonical content so an edited lorebook
++	// reaches the prompt without waiting for a new chat.
++	a.lorebooks = a.mergeCanonicalLore(parsed, true)
+ 	return nil
+ }
+ 
+@@ -431,6 +457,25 @@ func (a *App) UpdateLorebookContext(activeIDs []string) error {
+ 	for i := range a.lorebooks {
+ 		a.lorebooks[i].Enabled = active[a.lorebooks[i].ID]
+ 	}
++
++	// A lorebook created after this chat was saved is not in the chat snapshot yet.
++	// Enabling it must attach the canonical entry rather than silently doing nothing.
++	known := make(map[string]bool, len(a.lorebooks))
++	for _, entry := range a.lorebooks {
++		known[entry.ID] = true
++	}
++	for _, id := range activeIDs {
++		if known[id] {
++			continue
++		}
++		entry, ok := a.canonicalLorebook(id)
++		if !ok {
++			continue
++		}
++		entry.Enabled = true
++		a.lorebooks = append(a.lorebooks, entry)
++		known[id] = true
++	}
+ 	return nil
+ }
+ 
+@@ -756,12 +801,13 @@ func (a *App) resolveLorePromptBlock() string {
+ }
+ 
+ // resolveCharacterLorePromptBlock resolves lorebooks scoped to a specific character.
+-func (a *App) resolveCharacterLorePromptBlock(characterName string) string {
+-	return a.resolveLore(characterName)
++// characterID is the durable character.id; a display name is not an identity.
++func (a *App) resolveCharacterLorePromptBlock(characterID string) string {
++	return a.resolveLore(characterID)
+ }
+ 
+-// resolveLore is the shared implementation behind both lore resolution paths.
+-func (a *App) resolveLore(characterName string) string {
++// resolveLore is the shared implementation behind the general prompt path.
++func (a *App) resolveLore(characterID string) string {
+ 	if len(a.lorebooks) == 0 || len(a.chatMessages) == 0 {
+ 		return ""
+ 	}
+@@ -801,6 +847,38 @@ func (a *App) resolveLore(characterName string) string {
+ 		history = append(history, lorebook.Message{Role: role, Content: content})
+ 	}
+ 
++	return a.resolveLoreBlock(characterID, lastMessage, history)
++}
++
++// BuildCharacterLoreBlock is the one lore policy for character turns. The
++// frontend composer calls it with the turn it is about to send, so ownership,
++// visibility, activation, deleted and stale-entry rules are applied by the same
++// resolver as the general prompt path instead of being rebuilt in JavaScript.
++func (a *App) BuildCharacterLoreBlock(characterID string, message string) string {
++	if len(a.lorebooks) == 0 || strings.TrimSpace(message) == "" {
++		return ""
++	}
++
++	history := make([]lorebook.Message, 0, 6)
++	start := len(a.chatMessages) - 6
++	if start < 0 {
++		start = 0
++	}
++	for _, msg := range a.chatMessages[start:] {
++		role, _ := msg["role"].(string)
++		content, _ := msg["content"].(string)
++		if strings.TrimSpace(content) == "" {
++			continue
++		}
++		history = append(history, lorebook.Message{Role: role, Content: content})
++	}
++
++	return a.resolveLoreBlock(characterID, message, history)
++}
++
++// resolveLoreBlock applies the budget, resolved-entry bookkeeping and scope
++// routing. Callers differ only in where the turn text comes from.
++func (a *App) resolveLoreBlock(characterID, lastMessage string, history []lorebook.Message) string {
+ 	// Lore budget scales with the window instead of a fixed byte count: roughly a
+ 	// quarter of the context, which is the share the SillyTavern defaults and the
+ 	// community guides converge on. Characters are ~4x tokens, so a cap of `ctx`
+@@ -841,7 +919,7 @@ func (a *App) resolveLore(characterName string) string {
+ 	if a.world != nil {
+ 		worldName = a.world.Name
+ 	}
+-	routed := lorebook.RouteResolvedEntries(resolved, characterName, scenarioName, worldName)
++	routed := lorebook.RouteResolvedEntries(resolved, characterID, scenarioName, worldName)
+ 	return lorebook.BuildPromptBlock(routed)
+ }
+ 
+diff --git a/frontend/dist/js/chat-stream.js b/frontend/dist/js/chat-stream.js
+index 8bb0ac7..1243580 100644
+--- a/frontend/dist/js/chat-stream.js
++++ b/frontend/dist/js/chat-stream.js
+@@ -32,6 +32,13 @@ async function syncLorebooks() {
+         console.error('Wails runtime not available');
+         return;
+     }
++    if (window.LorebookRepo && typeof window.LorebookRepo.hydrate === 'function') {
++        try {
++            await window.LorebookRepo.hydrate();
++        } catch (error) {
++            console.error('Lorebook library refresh failed:', error);
++        }
++    }
+     try {
+         const lorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+         window.go.main.App.SetLorebooks(Array.isArray(lorebooks) ? lorebooks : []).catch(error => {
+@@ -95,7 +102,23 @@ function buildCharacterContext() {
+     return context;
+ }
+ 
+-function buildCharacterSpecificMessage(userMessage, character, priorResponses = []) {
++// Ask the backend for this character's lore block. The shared resolver applies
++// ownership, visibility, activation and stale-root rules; the page must not
++// reconstruct them from localStorage.
++async function requestCharacterLoreBlock(characterID, userMessage) {
++    const app = window.go?.main?.App;
++    if (!app || typeof app.BuildCharacterLoreBlock !== 'function') {
++        // Fail loudly: sending the turn without lore would silently bypass the
++        // ownership and visibility policy, which is exactly the W18 defect.
++        throw new Error('The lorebook resolver is not available in this window.');
++    }
++    // The stable character.id authorizes ownership. The display name is only a
++    // label and must not cross the resolver boundary as an identity.
++    const block = await app.BuildCharacterLoreBlock(characterID, userMessage);
++    return typeof block === 'string' ? block : '';
++}
++
++function buildCharacterSpecificMessage(userMessage, character, priorResponses = [], loreBlock = '') {
+     let msg = `You are ${character.name}, a distinct participant in a group roleplay conversation.\n`;
+     msg += `You speak only when someone addresses you directly by name, role, or context, or when it is naturally your turn to respond.\n`;
+     msg += `If others are speaking to each other, you listen quietly and stay in character, reacting only when your involvement makes sense.\n\n`;
+@@ -134,24 +157,11 @@ function buildCharacterSpecificMessage(userMessage, character, priorResponses =
+         }
+     }
+ 
+-    // Scoped lorebook entries: world → all; scenario → all; character → owner only
+-    const lorebooks = (() => {
+-        try { return JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]'); }
+-        catch (_) { return []; }
+-    })();
+-    const activeLore = lorebooks.filter(e => e.enabled !== false);
+-    const worldLore   = activeLore.filter(e => e.scope === 'world'   || e.type === 'world');
+-    const scenarioLore= activeLore.filter(e => e.scope === 'scenario'|| e.type === 'scenario');
+-    const charLore    = activeLore.filter(e =>
+-        (e.scope === 'character' || e.type === 'character') &&
+-        (e.linkedCharacters?.includes?.(character.id) || e.ownerId === character.id || e.ownerId === character.name)
+-    );
+-    const scopedLore = [...worldLore, ...scenarioLore, ...charLore];
+-    if (scopedLore.length > 0) {
+-        msg += `\n[RELEVANT LORE]\n`;
+-        for (const entry of scopedLore.slice(0, 6)) {
+-            msg += `- ${entry.title || 'Untitled'}: ${entry.content?.slice?.(0, 300) || entry.content || ''}\n`;
+-        }
++    // Lore comes from the backend resolver (BuildCharacterLoreBlock): one policy
++    // for visibility, ownership, activation and stale roots across both prompt
++    // paths. The browser store is a cache, not a second policy.
++    if (loreBlock) {
++        msg += `\n${loreBlock}\n`;
+     }
+ 
+     // Automated memories: character-scoped memories for this character only
+@@ -278,7 +288,17 @@ async function streamMultiCharacterResponses(userMessage) {
+     let character = window.CharacterQueue.getCurrentCharacter();
+     while (character) {
+         console.log(`Generating response for: ${character.name} (priority ${character.metadata?.priority ?? 3})`);
+-        const characterSpecificMessage = buildCharacterSpecificMessage(userMessage, character, priorResponses);
++        let loreBlock = '';
++        try {
++            loreBlock = await requestCharacterLoreBlock(character.id, userMessage);
++        } catch (error) {
++            console.error(`Lore resolution failed for ${character.name}:`, error);
++            if (typeof showNotification === 'function') {
++                showNotification(`Lore lookup failed for ${character.name}; response skipped.`, 'error', 8000);
++            }
++            break;
++        }
++        const characterSpecificMessage = buildCharacterSpecificMessage(userMessage, character, priorResponses, loreBlock);
+         let responseText;
+         try {
+             responseText = await streamSingleCharacterResponse(characterSpecificMessage, character);
+diff --git a/frontend/dist/js/memory-store.js b/frontend/dist/js/memory-store.js
+index 470255a..fa177ce 100644
+--- a/frontend/dist/js/memory-store.js
++++ b/frontend/dist/js/memory-store.js
+@@ -63,6 +63,7 @@ function createMemoryEntry(data) {
+         content:     data.content || data.summary || '',
+         scope:       data.scope || 'global',
+         ownerId:     data.ownerId || '',
++        ownerKind:   data.ownerKind || '',
+         tags:        data.tags || [],
+         pinned:      data.pinned || false,
+         status:      'active',
+@@ -87,6 +88,7 @@ function createMemoryEntry(data) {
+             rawText:         entry.content,
+             scope:           entry.scope,
+             scopeId:         entry.ownerId,
++            ownerKind:       entry.ownerKind,
+             tags:            entry.tags,
+             pinned:          entry.pinned,
+             status:          entry.status,
+@@ -199,7 +201,11 @@ function deleteMemoryEntry(id) {
+  * @returns {Object[]}
+  */
+ function getCharacterMemories(characterId) {
+-    return getMemoryEntries({ scope: 'character' }).filter(m => m.ownerId === characterId);
++    // Only stable-ID-owned records are character-private. Legacy name-owned or
++    // unmarked records stay in storage but fail closed here and in the backend.
++    return getMemoryEntries({ scope: 'character' }).filter(m =>
++        m.ownerKind === 'character_id' && m.ownerId === characterId
++    );
+ }
+ 
+ /**
+diff --git a/internal/backend/chat/persistence.go b/internal/backend/chat/persistence.go
+index bc4c632..d2a8e69 100644
+--- a/internal/backend/chat/persistence.go
++++ b/internal/backend/chat/persistence.go
+@@ -8,6 +8,8 @@ import (
+ 	"os"
+ 	"path/filepath"
+ 	"time"
++
++	"howl-chat/internal/paths"
+ )
+ 
+ // PersistenceManager handles chat persistence with the specified directory structure
+@@ -16,6 +18,15 @@ type PersistenceManager struct {
+ 	config  AppConfig
+ }
+ 
++// RootDir reports the application-owned chat root. Callers must use this
++// instead of guessing an executable-relative "chats" directory.
++func (pm *PersistenceManager) RootDir() string {
++	if pm == nil {
++		return ""
++	}
++	return pm.rootDir
++}
++
+ // NewPersistenceManagerWithDir creates a persistence manager rooted at an arbitrary directory.
+ // Intended for tests; production code should use NewPersistenceManager.
+ func NewPersistenceManagerWithDir(rootDir string) (*PersistenceManager, error) {
+@@ -49,6 +60,11 @@ func NewPersistenceManager() (*PersistenceManager, error) {
+ 
+ // getAppDataDir returns the app data directory based on OS
+ func getAppDataDir() (string, error) {
++	// An isolated native test run keeps this legacy store inside its own root.
++	if paths.IsolationActive() {
++		return paths.StatePath("persisted-chats"), nil
++	}
++
+ 	// For Windows: C:\Users\<User>\AppData\Roaming\HOWLChat
+ 	homeDir, err := os.UserHomeDir()
+ 	if err != nil {
+@@ -412,13 +428,9 @@ func (pm *PersistenceManager) migrateLegacyMeta(chatData *ChatData) {
+ 		}
+ 	}
+ 
+-	// World / Scenario IDs (fallback to names for now)
+-	if meta.WorldID == "" && meta.WorldName != "" {
+-		meta.WorldID = meta.WorldName
+-	}
+-	if meta.ScenarioID == "" && meta.ScenarioName != "" {
+-		meta.ScenarioID = meta.ScenarioName
+-	}
++	// World / Scenario IDs stay unresolved when the record carries only a
++	// display name. Copying the name into an ID field invents identity and lets a
++	// legacy chat look canonical; the consumer must report it unset instead.
+ }
+ 
+ // SaveChatAs creates a copy of the current chat with a new name
+diff --git a/internal/backend/lorebook/lorebook.go b/internal/backend/lorebook/lorebook.go
+index ed8aec2..111eabf 100644
+--- a/internal/backend/lorebook/lorebook.go
++++ b/internal/backend/lorebook/lorebook.go
+@@ -41,16 +41,35 @@ const (
+ 	FrequencyOncePerMessage TriggerFrequency = "once_per_message"
+ )
+ 
++// Visibility values as written by the Lorebooks page. "hidden" entries never
++// enter a prompt; "private" character entries stay with their owner.
++const (
++	VisibilityPublic  = "public"
++	VisibilityPrivate = "private"
++	VisibilityHidden  = "hidden"
++)
++
++// OriginLegacyGeneratedUnattributed marks generated lore imported from a file
++// that carried no chat identity. It stays prompt-eligible but must be shown as
++// unattributed, and nothing may invent a chat owner for it.
++const OriginLegacyGeneratedUnattributed = "legacy_generated_unattributed"
++
+ type Entry struct {
+-	ID                string           `json:"id"`
+-	Name              string           `json:"name"`
+-	Title             string           `json:"title"`
+-	Description       string           `json:"description"`
+-	Content           string           `json:"content"`
+-	Tags              []string         `json:"tags"`
+-	Scope             Scope            `json:"scope"`
+-	Type              Scope            `json:"type"`
+-	OwnerID           string           `json:"ownerId,omitempty"`
++	ID          string   `json:"id"`
++	Name        string   `json:"name"`
++	Title       string   `json:"title"`
++	Description string   `json:"description"`
++	Content     string   `json:"content"`
++	Tags        []string `json:"tags"`
++	Scope       Scope    `json:"scope"`
++	Type        Scope    `json:"type"`
++	OwnerID     string   `json:"ownerId,omitempty"`
++	// OwnerName is descriptive metadata for display and audit. It never
++	// authorizes delivery; OwnerID is the sole authorization identity.
++	OwnerName string `json:"ownerName,omitempty"`
++	// OwnerKind records memory provenance (for example character_id). It is
++	// descriptive routing metadata, never an authorization substitute for OwnerID.
++	OwnerKind         string           `json:"ownerKind,omitempty"`
+ 	Enabled           bool             `json:"enabled"`
+ 	TriggerPhrases    []string         `json:"triggerPhrases"`
+ 	SecondaryTriggers []string         `json:"secondaryTriggers"`
+@@ -62,24 +81,31 @@ type Entry struct {
+ 	VisibleToUser     bool             `json:"visibleToUser"`
+ 	VisibleToOthers   bool             `json:"visibleToOthers"`
+ 	Visibility        string           `json:"visibility"`
+-	RevealCondition   string           `json:"revealCondition"`
+-	InjectionStyle    string           `json:"injectionStyle"`
+-	InjectionPosition string           `json:"injectionPosition"`
+-	MaxLength         string           `json:"maxLength"`
+-	ContextBudget     int              `json:"contextBudget"`
+-	ScanWindow        int              `json:"scanWindow"`
+-	Recursion         string           `json:"recursion"`
+-	LinkedCharacters  []string         `json:"linkedCharacters"`
+-	LinkedLoreEntries []string         `json:"linkedLoreEntries"`
+-	Inheritance       string           `json:"inheritance"`
+-	Automated         bool             `json:"automated"`
+-	MemoryType        string           `json:"memoryType"`
+-	TriggerConfidence string           `json:"triggerConfidence"`
+-	DecayRate         string           `json:"decayRate"`
+-	TriggerCount      int              `json:"triggerCount"` // Reinforcement tracking
+-	CreatedAt         string           `json:"createdAt"`
+-	LastTriggeredAt   string           `json:"lastTriggeredAt,omitempty"`
+-	UpdatedAt         string           `json:"updatedAt"`
++	// Stale marks last-known content whose canonical root is unavailable. It is
++	// derived at sync time, never persisted, and never injected into a prompt.
++	Stale             bool     `json:"-"`
++	RevealCondition   string   `json:"revealCondition"`
++	InjectionStyle    string   `json:"injectionStyle"`
++	InjectionPosition string   `json:"injectionPosition"`
++	MaxLength         string   `json:"maxLength"`
++	ContextBudget     int      `json:"contextBudget"`
++	ScanWindow        int      `json:"scanWindow"`
++	Recursion         string   `json:"recursion"`
++	LinkedCharacters  []string `json:"linkedCharacters"`
++	LinkedLoreEntries []string `json:"linkedLoreEntries"`
++	Inheritance       string   `json:"inheritance"`
++	Automated         bool     `json:"automated"`
++	// OriginKind labels imported content whose generation cannot be attributed to
++	// a chat. User-authored entries leave it empty. It is descriptive provenance,
++	// never authorization: OwnerID remains the sole ownership identity.
++	OriginKind        string `json:"originKind,omitempty"`
++	MemoryType        string `json:"memoryType"`
++	TriggerConfidence string `json:"triggerConfidence"`
++	DecayRate         string `json:"decayRate"`
++	TriggerCount      int    `json:"triggerCount"` // Reinforcement tracking
++	CreatedAt         string `json:"createdAt"`
++	LastTriggeredAt   string `json:"lastTriggeredAt,omitempty"`
++	UpdatedAt         string `json:"updatedAt"`
+ }
+ 
+ type ResolveRequest struct {
+@@ -224,6 +250,14 @@ func canConsider(entry Entry, req ResolveRequest) bool {
+ 	if !entry.Enabled {
+ 		return false
+ 	}
++	// Last-known content from an unavailable root must not be presented as canon.
++	if entry.Stale {
++		return false
++	}
++	// "Hidden" means the entry must never enter a prompt, whatever its scope.
++	if strings.EqualFold(strings.TrimSpace(entry.Visibility), VisibilityHidden) {
++		return false
++	}
+ 	if entry.TriggerDirection != TriggerBoth && entry.TriggerDirection != req.Actor {
+ 		return false
+ 	}
+@@ -310,8 +344,10 @@ func keywordWeight(value string) int {
+ // RouteResolvedEntries filters resolved lorebook entries for a specific recipient.
+ // World entries → all characters.
+ // Scenario entries → all characters in the active scenario.
+-// Character entries → only the matching owner character.
+-func RouteResolvedEntries(entries []ResolvedEntry, characterName, scenarioName, worldName string) []ResolvedEntry {
++// Character entries → only the character whose stable ID matches OwnerID.
++// characterID must be the durable character.id, never a display name: names are
++// labels and are neither unique nor stable across renames.
++func RouteResolvedEntries(entries []ResolvedEntry, characterID, scenarioName, worldName string) []ResolvedEntry {
+ 	filtered := make([]ResolvedEntry, 0, len(entries))
+ 	for _, entry := range entries {
+ 		switch entry.Scope {
+@@ -320,7 +356,16 @@ func RouteResolvedEntries(entries []ResolvedEntry, characterName, scenarioName,
+ 		case ScopeScenario:
+ 			filtered = append(filtered, entry)
+ 		case ScopeCharacter:
+-			if entry.OwnerID == "" || entry.OwnerID == characterName {
++			if entry.OwnerID == "" {
++				// Entries created before ownership was recorded have no owner. They keep
++				// working only when they are explicitly shareable; otherwise private
++				// character lore would leak into every character's prompt.
++				if shareableWithoutOwner(entry.Entry) {
++					filtered = append(filtered, entry)
++				}
++				continue
++			}
++			if characterID != "" && entry.OwnerID == characterID {
+ 				filtered = append(filtered, entry)
+ 			}
+ 		default:
+@@ -330,6 +375,18 @@ func RouteResolvedEntries(entries []ResolvedEntry, characterName, scenarioName,
+ 	return filtered
+ }
+ 
++// shareableWithoutOwner reports whether an unowned character entry may reach a
++// character other than its (missing) owner. Only public (or unlabelled legacy)
++// entries qualify; private and hidden ones must not cross the boundary.
++func shareableWithoutOwner(entry Entry) bool {
++	switch strings.ToLower(strings.TrimSpace(entry.Visibility)) {
++	case "", VisibilityPublic:
++		return true
++	default:
++		return false
++	}
++}
++
+ func scopeRank(scope Scope) int {
+ 	switch scope {
+ 	case ScopeCharacter:

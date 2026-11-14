@@ -1,0 +1,33 @@
+{
+  "captured_at": "2026-11-14T14:09:30Z",
+  "interpretation": "Volume/disk health fields are firmware-reported metadata, not a read-integrity test. 'Healthy' here means no flagged condition, not 'proven stable'.",
+  "method": "read-only, narrowly scoped: no rehash of the subject, no CHKDSK, no surface scan, no benchmark, no repair",
+  "open_questions": [
+    "Does the volume label 'Second backup' imply backup software writes here periodically?",
+    "Is G: inside any OneDrive-synced or indexed path?",
+    "Would a handle enumeration show a holder of this file?"
+  ],
+  "physical_disk": {
+    "bus": "SATA",
+    "health_status": "Healthy",
+    "model": "WDC WD10SPCX-75KHST0",
+    "number": 2,
+    "operational_status": "Online"
+  },
+  "processes_referencing_model_store": {
+    "caveat": "process command lines do not reveal open file handles; a writer that does not mention the path would not appear",
+    "note": "Sysinternals handle.exe was not available, so a true handle enumeration was not performed",
+    "result": "none (only this session's own bash/powershell matched their own command text)"
+  },
+  "sync_or_client_processes_running": [
+    "OneDrive (15848)",
+    "OneDrive.Sync.Service (21552)"
+  ],
+  "volume": {
+    "drive": "G:",
+    "filesystem": "NTFS",
+    "health_status": "Healthy",
+    "label": "Second backup",
+    "type": "Fixed"
+  }
+}

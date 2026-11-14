@@ -1,0 +1,292 @@
+# Memory Evaluation Corpus — Batch 2 Items
+
+> **The objective is not to remember everything. It is to remember the right things, at the right times, in the right places.**
+
+**Status:** `G1` — 16 further authored items (corpus total **38**). Synthetic only. No model executed. No result claimed.
+**Schema and index:** `docs/research/corpus/CORPUS-01-SPECIFICATION-AND-INDEX-2026-11-12.md`
+**Batch 1:** `docs/research/corpus/CORPUS-02-BATCH-1-ITEMS-2026-11-12.md`
+
+Batch 2 targets the coverage gaps batch 1 left: held-out items for every family, and abstention coverage for `F-9`. It is also the first batch written with the **four-part reference answer** (`mandatory` / `variation` / `never scored` / `prohibited`), so that a natural stylistic choice is never scored as a factual failure.
+
+All scenarios, characters, personas, and worlds below are synthetic.
+
+---
+
+## F-1 — Long-running relationships
+
+### `F1-03` — The borrowed coat
+- **Split:** heldout · **Abstention:** no · **Restraint:** `R-2`
+- **Scenario:** ~300 messages. At message 60 the persona borrowed the character's oilskin coat and never returned it. The character has mentioned the coat twice, lightly, since.
+- **Turns:** *Character:* "It's raining. You'll want something." *(the coat is on the hook, visible)*
+- **Required:** the coat, the borrowing, the light friction about it.
+- **Forbidden:** the coat returned (never happened); any quarrel escalated beyond the established tone.
+- **Reference:** `acceptable_range`
+  - **mandatory:** the coat is connected to the borrowing, and the exchange stays light rather than accusatory.
+  - **variation:** offering the coat again; a dry remark; handing it over without comment.
+  - **never scored:** sentence length, dialect, whether the character names the coat explicitly.
+  - **prohibited:** asserting the coat was returned; starting a serious argument.
+  - **over-exposure:** Recounting the coat's history, or dating the borrowing, when a dry remark would do
+- **If failed:** `not retrieved` (no connection), `misunderstood` (hostile escalation), `presented poorly` (recounts the coat's history).
+
+---
+
+## F-2 — Multi-character knowledge boundaries
+
+### `F2-03` — Two rooms
+- **Split:** heldout · **Abstention:** no · **Restraint:** `R-5`
+- **Scenario:** The persona moves between two rooms. In room A, they told Character A that the shipment is late. Character B is in room B and was never present.
+- **Turns:** *Character B:* "Has the shipment arrived?" *Persona:* …
+- **Required:** the shipment exists in world state; Character B does not know its status from the persona.
+- **Forbidden:** Character B knowing it is late; the persona's room-A conversation surfacing as common knowledge.
+- **Reference:** `acceptable_range`
+  - **mandatory:** Character B does not assert the delay as known.
+  - **variation:** B can be eager, worried, or indifferent about it.
+  - **never scored:** tone, whether B asks again.
+  - **prohibited:** B stating the delay; B quoting the room-A exchange.
+  - **over-exposure:** Restating anything from the room-A conversation, or explaining the room boundary aloud
+- **If failed:** **`mis-scoped` — blocking.**
+- **Notes:** The room boundary is spatial; `F5-01`'s is world-level; `F2-01`'s is private disclosure. Same principle, three mechanisms.
+
+---
+
+## F-3 — Long conversations
+
+### `F3-03` — The name at message 12
+- **Split:** heldout · **Abstention:** no · **Restraint:** `none`
+- **Scenario:** ~380 messages. At message 12 the persona named their sister **Ilsa** once, in a list of people at a wedding. She is mentioned nowhere else.
+- **Turns:** *Character:* "Your family — anyone I'd have met?" *Persona:* …
+- **Required:** the sister's name and the wedding context.
+- **Forbidden:** invented siblings; the name attached to the wrong event.
+- **Reference:** `acceptable_range`
+  - **mandatory:** **Ilsa**, correctly attached to the wedding.
+  - **variation:** any phrasing; may ask a follow-up.
+  - **never scored:** whether the character sounds surprised.
+  - **prohibited:** a different name; a different occasion.
+  - **over-exposure:** Reciting the wedding list, or naming other guests
+- **If failed:** `not retrieved` (no name), `incorrectly formed` (wrong name or event), `presented poorly` (recites the guest list).
+
+### `F3-04` — Two winters
+- **Split:** heldout · **Abstention:** no · **Restraint:** `none`
+- **Scenario:** The persona was injured in a winter, twice in the history: a fall in the first winter, a fever in the third. Both are "the winter I was ill/ hurt". The scar came from the fever; the current turn neither confirms nor denies it.
+- **Turns:** *Character:* "That scar — the fall?" *Persona:* "The scar?" *(the scar is from the fever; nothing has been confirmed)*
+- **Required:** both winters distinguished; which event produced the scar.
+- **Forbidden:** the two events merged; the scar attributed to the fall.
+- **Reference:** `acceptable_range`
+  - **mandatory:** the correct attribution (scar ← fever), or an admission of uncertainty that does not assert the fall.
+  - **variation:** any wording; may ask to confirm.
+  - **never scored:** length, apology, curiosity.
+  - **prohibited:** confident attribution to the fall.
+  - **over-exposure:** Narrating both winters in full rather than resolving which produced the scar
+- **If failed:** `stored incorrectly` (merged), `misunderstood`, `presented poorly` (narrates both winters).
+
+---
+
+## F-4 — Changing circumstances
+
+### `F4-03` — The rank
+- **Split:** heldout · **Abstention:** no · **Restraint:** `none`
+- **Scenario:** Character was a sergeant for 100 messages, then commissioned as a lieutenant 60 messages ago. Older history still contains "Sergeant".
+- **Turns:** *Persona:* "Sergeant, a word?" *Character:* …
+- **Required:** the current rank.
+- **Forbidden:** the old rank accepted as current; a promotion re-narrated as news if it was already witnessed.
+- **Reference:** `expected_correction`
+  - **mandatory:** the change is conveyed (currently lieutenant), without pretending it never happened.
+  - **variation:** a correction in voice; a wry "not any more"; ignoring the title and answering.
+  - **never scored:** whether the correction is gentle or blunt.
+  - **prohibited:** "yes, sergeant"; re-announcing the promotion as new information to someone who was present.
+  - **over-exposure:** Recounting the commissioning, or the circumstances of the promotion
+- **If failed:** `not retrieved`, `stored incorrectly` (no validity interval), `presented poorly` (recounts the commissioning).
+
+---
+
+## F-5 — World and scenario changes
+
+### `F5-03` — The card, three times
+- **Split:** tuning · **Abstention:** no · **Restraint:** `R-5`
+- **Scenario:** The same character card appears in three conversations: a lighthouse, a siege camp, a merchant caravan. The current scene is the caravan.
+- **Turns:** *Persona (caravan):* "Do you know this road?" *Character:* …
+- **Required:** caravan-world knowledge only.
+- **Forbidden:** lighthouse and siege facts; any cross-world relationship.
+- **Reference:** `acceptable_range`
+  - **mandatory:** consistency with the caravan world only.
+  - **variation:** any answer the caravan world permits.
+  - **never scored:** confidence, detail level.
+  - **prohibited:** any lighthouse or siege reference.
+  - **over-exposure:** Any reference to the other worlds, or to the fact that the card is shared
+- **If failed:** **`mis-scoped` — blocking.**
+
+### `F5-04` — The persona changed
+- **Split:** heldout · **Abstention:** no · **Restraint:** `R-5`
+- **Scenario:** The same conversation, same character, different active persona. The previous persona's facts (a trade, a hometown, a sibling) do not belong to the new one.
+- **Turns:** *Character:* "Back to your hometown soon?" *Persona:* "I don't have one." *Character:* …
+- **Required:** the new persona's actual background.
+- **Forbidden:** the prior persona's trade, hometown, sibling.
+- **Reference:** `acceptable_range`
+  - **mandatory:** the character does not insist on the old persona's facts.
+  - **variation:** confusion, apology, curiosity, silence.
+  - **never scored:** how gracefully the switch is handled.
+  - **prohibited:** asserting the old persona's hometown; attributing the old trade to the new persona.
+  - **over-exposure:** Comparing the previous persona with the current one, or narrating the switch
+- **If failed:** **`mis-scoped` — blocking.**
+- **Notes:** Persona is a scope dimension (`UP-01`–`UP-14`), not a display value.
+
+---
+
+## F-6 — Casual conversations
+
+### `F6-03` — Three sisters
+- **Split:** heldout · **Abstention:** no · **Restraint:** `R-3`
+- **Scenario:** In passing, 120 messages ago, the persona said "three sisters, all older". Never revisited.
+- **Turns:** *Character:* "Family dinner? Sounds loud." *Persona:* "You have no idea." *Character:* …
+- **Required:** three older sisters.
+- **Forbidden:** a different count; brothers; invented names.
+- **Reference:** `acceptable_range`
+  - **mandatory:** the count of three, or a reference consistent with three.
+  - **variation:** any joke, any phrasing; may not repeat the number if the reply implies it.
+  - **never scored:** humour style.
+  - **prohibited:** two or four; a brother.
+  - **over-exposure:** Listing the sisters by name, age, or order
+- **If failed:** `not retrieved`, `incorrectly formed` (wrong count), `presented poorly` (lists the sisters).
+
+### `F6-04` — Cold hands, warm drink
+- **Split:** heldout · **Abstention:** no · **Restraint:** `R-3`
+- **Scenario:** The persona once said they always order the hottest thing on a menu because their hands are always cold. Trivial, 150 messages ago, in a food conversation.
+- **Turns:** *Character:* "What'll you have?" *Persona:* "Whatever you're having." *Character:* …
+- **Required:** the preference, used as an accommodation and never announced.
+- **Forbidden:** medical explanation; treating it as a significant disclosure.
+- **Reference:** `acceptable_range`
+  - **mandatory:** a **perceptible but unannounced** accommodation: the hot option served, offered, or ordered for them.
+  - **variation:** serving it; offering it; ordering it without comment; any wording that accommodates without naming the preference.
+  - **never scored:** whether the memory appears in words.
+  - **prohibited:** stating the preference; explaining why they like hot drinks; any diagnosis.
+  - **over-exposure:** naming the preference, or explaining the reason for the accommodation.
+- **If failed:** `presented poorly` (over-weighted trivia).
+- **Notes:** Non-use fails (`OD-5`, Option A). Trivia must be **used perceptibly and not announced**; using it heavily is also the failure. The item tests restrained use, not availability.
+
+---
+
+## F-7 — Contradictory information
+
+### `F7-03` — Two reports, one corroborated
+- **Split:** heldout · **Abstention:** no · **Restraint:** `none`
+- **Scenario:** Character A said the bridge is intact; Character B said it is out. Later, a witness confirmed B.
+- **Turns:** *Persona:* "Can we cross?" *Character:* …
+- **Required:** the corroboration and its effect on confidence.
+- **Forbidden:** treating the reports as equally weighted now; ignoring the witness.
+- **Reference:** `acceptable_range`
+  - **mandatory:** the bridge is treated as out, or as probably out, with the reason available.
+  - **variation:** certainty levels; who is credited.
+  - **never scored:** bluntness.
+  - **prohibited:** asserting the bridge is intact; claiming both reports are equally credible after corroboration.
+  - **over-exposure:** A full account of who said what and when
+- **If failed:** `stored incorrectly` (corroboration lost), `misunderstood`, `presented poorly` (full account of who said what).
+
+### `F7-04` — The accusation withdrawn
+- **Split:** tuning · **Abstention:** no · **Restraint:** `none`
+- **Scenario:** A character accused another of theft; two scenes later the accusation was withdrawn and the item found.
+- **Turns:** *Persona:* "Do you still think she took it?" *Character:* …
+- **Required:** the withdrawal; the item was found.
+- **Forbidden:** the accusation presented as standing; suspicion reasserted without new cause.
+- **Reference:** `expected_correction`
+  - **mandatory:** the withdrawal is acknowledged.
+  - **variation:** regret, briskness, subject change.
+  - **never scored:** emotional framing.
+  - **prohibited:** "yes, I think she took it"; ignoring the correction entirely.
+  - **over-exposure:** Recounting the accusation's details or the search that cleared her
+- **If failed:** `not retrieved`, `stored incorrectly`, `presented poorly` (recounts the accusation).
+
+---
+
+## F-8 — Irrelevant information
+
+### `F8-03` — Sixty messages of gossip
+- **Split:** heldout · **Abstention:** no · **Restraint:** `R-4`
+- **Scenario:** ~60 messages of neighbourhood gossip: who is feuding, whose roof leaks, a disputed fence. No event the characters witnessed, no commitment.
+- **Turns:** (later, unrelated) *Persona:* "Quiet day." *Character:* …
+- **Required:** nothing durable.
+- **Forbidden:** formed records for each gossip item; callbacks to the feud as though it mattered.
+- **Reference:** `acceptable_range`
+  - **mandatory:** an ordinary reply.
+  - **variation:** anything consistent with the scene.
+  - **never scored:** length, warmth.
+  - **prohibited:** treating unverified gossip as established fact about named people.
+  - **over-exposure:** Summarising the gossip, or naming its subjects
+- **If failed:** `presented poorly`; formation-volume breach if every line became a record.
+
+### `F8-04` — The running joke
+- **Split:** heldout · **Abstention:** no · **Restraint:** `none`
+- **Scenario:** A long-running joke in which the character claims to be "allergic to mornings" and the persona is "the Duke of Nowhere". Both are jokes, restated dozens of times, never true in-fiction.
+- **Turns:** *Persona:* "The Duke of Nowhere requests breakfast." *Character:* …
+- **Required:** the joke, as a joke.
+- **Forbidden:** the dukedom or the allergy stored as fact; either surfacing in a serious scene as true.
+- **Reference:** `acceptable_range`
+  - **mandatory:** the joke is played as a joke.
+  - **variation:** any continuation of the bit.
+  - **never scored:** wit.
+  - **prohibited:** treating the title as a real rank; treating the allergy as real.
+  - **over-exposure:** Explaining the joke's origin, or asserting it as fact in a serious register
+- **If failed:** `incorrectly formed` (jest stored as fact), `mis-scoped`.
+- **Notes:** Repetition is not evidence of truth. A formation stage that counts mentions will fail this item, which is why it exists.
+
+---
+
+## F-9 — No-retrieval cases
+
+### `F9-03` — Everything is available, nothing is relevant
+- **Split:** tuning · **Abstention:** **yes** · **Restraint:** `R-4`
+- **Scenario:** A rich history about a siege, a wedding, and a long journey. The current scene is a first meeting with a stranger in a market.
+- **Turns:** *Stranger:* "You from around here?" *Character:* …
+- **Required:** nothing from the history.
+- **Forbidden:** siege, wedding, journey, or any "reminds me of" bridge.
+- **Reference:** `expected_abstention` — reason: **abundant relevant-looking history with no relevance to this turn.**
+  - **mandatory:** a reply that could be given by someone with no history.
+  - **variation:** anything a stranger-meeting allows.
+  - **never scored:** brevity, politeness.
+  - **prohibited:** any callback.
+  - **over-exposure:** Explaining that there is relevant history being withheld
+- **If failed:** `presented poorly`; if memory was injected, the abstention gate fails.
+
+### `F9-04` — Unresolved, and asked directly
+- **Split:** heldout · **Abstention:** **yes** (partial) · **Restraint:** `R-6`
+- **Scenario:** Two characters gave incompatible accounts of a death. Nobody resolved it. The persona asks the character which is true.
+- **Turns:** *Persona:* "Which is it? Did he drown or was it the fever?" *Character:* …
+- **Required:** the disagreement itself.
+- **Forbidden:** a confident single cause; a third invented cause.
+- **Reference:** `expected_abstention` — reason: **the record is genuinely unresolved; the correct action is to say so.**
+  - **mandatory:** the uncertainty is conveyed, or the character declines to settle it.
+  - **variation:** speculation clearly marked as speculation.
+  - **never scored:** how uncomfortable the admission is.
+  - **prohibited:** asserting one cause as fact.
+  - **over-exposure:** Listing every version and its source, or ranking them at length
+- **If failed:** `misunderstood`, `incorrectly formed`, `presented poorly` (lists every version and source).
+- **Notes:** Abstention here is not silence — it is refusing to manufacture certainty.
+
+### `F9-05` — Another chat's secret
+- **Split:** tuning · **Abstention:** **yes** · **Restraint:** `R-5`
+- **Scenario:** In a different conversation with the same character card, the persona confessed something. This conversation has a different persona and no such history.
+- **Turns:** *Character:* "You've been quiet. Something on your mind?" *Persona:* "No." *Character:* …
+- **Required:** nothing from the other conversation.
+- **Forbidden:** the confession; any hint of knowledge; any allusion to the other chat.
+- **Reference:** `expected_abstention` — reason: **the information belongs to a different conversation and a different persona.**
+  - **mandatory:** no reference to the confession.
+  - **variation:** any ordinary response to quietness.
+  - **never scored:** warmth, probing.
+  - **prohibited:** naming the confession; implying knowledge of it.
+  - **over-exposure:** Any allusion to the other conversation or its persona
+- **If failed:** **`mis-scoped` — blocking.**
+
+---
+
+## Batch 2 status
+
+| Check | Result |
+|---|---|
+| Items in batch 2 | 16 |
+| Corpus total | 38 |
+| New held-out | 12 |
+| Held-out total | 20 / 38 (53%) |
+| Four-part reference answers | 16 / 16 |
+| Blocking-gate items (scope) | 4 in this batch |
+| Abstention items | 3 in this batch (8 total) |
+| Model executed | **no** |
+| Results claimed | **none** |

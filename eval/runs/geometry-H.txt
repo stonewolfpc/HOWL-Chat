@@ -1,0 +1,24 @@
+NTFS Volume Serial Number :        0x3c3871ba3871742c
+NTFS Version      :                3.1
+LFS Version       :                2.0
+Total Sectors     :                1,025,543,183  (489.0 GB)
+Total Clusters    :                  128,192,897  (489.0 GB)
+Free Clusters     :                   12,333,293  ( 47.0 GB)
+Total Reserved Clusters :                  1,024  (  4.0 MB)
+Reserved For Storage Reserve :                 0  (  0.0 KB)
+Bytes Per Sector  :                512
+Bytes Per Physical Sector :        512
+Bytes Per Cluster :                4096  (4 KB)
+Bytes Per FileRecord Segment    :  1024
+Clusters Per FileRecord Segment :  0
+Mft Valid Data Length :            88.50 MB
+Mft Start Lcn  :                   0x00000000000c0000
+Mft2 Start Lcn :                   0x0000000000000002
+Mft Zone Start :                   0x00000000000c0000
+Mft Zone End   :                   0x00000000000cc820
+MFT Zone Size  :                   200.13 MB
+Max Device Trim Extent Count :     512
+Max Device Trim Byte Count :       0xffffffff
+Max Volume Trim Extent Count :     62
+Max Volume Trim Byte Count :       0x40000000
+Resource Manager Identifier :      8EEC2D18-E033-11F1-8A97-E8FB1C3F7F2E

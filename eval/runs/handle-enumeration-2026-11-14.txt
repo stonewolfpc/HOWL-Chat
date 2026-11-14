@@ -1,0 +1,16 @@
+=== exclusive-open sharing probe (GENERIC_READ, dwShareMode = 0) ===
+G:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf
+   exclusive open OK - no other handle open at this instant
+G:\AI GGUF\GGUF\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf
+   exclusive open OK - no other handle open at this instant
+G:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf
+   exclusive open OK - no other handle open at this instant
+H:\AI GGUF\GGUF\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf
+   exclusive open OK - no other handle open at this instant
+H:\AI GGUF\GGUF\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf
+   exclusive open OK - no other handle open at this instant
+H:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf
+   exclusive open OK - no other handle open at this instant
+
+summary: 6 files exclusively opened, 0 blocked
+timestamp: 2026-11-14 13:03:38

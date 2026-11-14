@@ -1,0 +1,4 @@
+G: f820ef3f78704ffcaaeed061f29a28b398c1d348d69aca43a142b63e4d1c5c7e
+H: 7fca804a0f488a5b2b2529f5b36ece303b092b8d0a498e932a2bf457f1a12895
+cmp:
+/g/AI GGUF/GGUF/LFM2.5-8B-A1B-heretic.Q4_K_M.gguf /h/AI GGUF/GGUF/LFM2.5-8B-A1B-heretic.Q4_K_M.gguf differ: char 58444208, line 259959

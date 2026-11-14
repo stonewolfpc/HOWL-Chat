@@ -1,0 +1,80 @@
+{
+  "purpose": "bounded operational smoke test of the S1-C (LFM2.5-8B-A1B) copies on G: and H: after the failed content verification",
+  "status": "functional test only; NOT an S1 observation, not citable about MEMORY-09, outside the 18/30 call budget",
+  "runtime": {
+    "binary": "H:\\AI apps\\koboldcpp.exe",
+    "profile": "S1-v1.1 (20 gpu layers, 20480 ctx, threads 8, batch 512, quantkv q8_0, usemmap, usecuda 0)"
+  },
+  "model": "LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+  "files": {
+    "G": {
+      "path": "G:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+      "bytes": 5155565440,
+      "sha256": "f820ef3f78704ffcaaeed061f29a28b398c1d348d69aca43a142b63e4d1c5c7e",
+      "matches_frozen_baseline": true
+    },
+    "H": {
+      "path": "H:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+      "bytes": 5155565440,
+      "sha256": "7fca804a0f488a5b2b2529f5b36ece303b092b8d0a498e932a2bf457f1a12895",
+      "matches_frozen_baseline": false
+    }
+  },
+  "load": {
+    "G": {
+      "http_200": true,
+      "load_text_model_ok": true,
+      "n_layer": 24,
+      "n_embd": 2048,
+      "model_type": "8B.A1B",
+      "file_type": "guessed unknown (identical on both copies)",
+      "vram_used_mib": 6448,
+      "vram_pct_of_8192": 78.7,
+      "temp_c": 37
+    },
+    "H": {
+      "http_200": true,
+      "load_text_model_ok": true,
+      "n_layer": 24,
+      "n_embd": 2048,
+      "model_type": "8B.A1B",
+      "file_type": "guessed unknown (identical on both copies)",
+      "vram_used_mib": 6431,
+      "vram_pct_of_8192": 78.5,
+      "temp_c": 38
+    }
+  },
+  "generation": {
+    "prompt": "throwaway completion prompt (deliberately not a frozen S1 prompt)",
+    "max_length": 64,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "rep_pen": 1.1,
+    "G": {
+      "http_200": true,
+      "seconds": 1.52,
+      "chars": 296,
+      "finish_reason": "length"
+    },
+    "H": {
+      "http_200": true,
+      "seconds": 1.43,
+      "chars": 258,
+      "finish_reason": "length"
+    }
+  },
+  "observations": [
+    "both copies load with byte-identical GGUF structure (24 layers, 2048 embd, same model type, same file-type guess)",
+    "both served HTTP 200 and produced 64-token completions in ~1.5s",
+    "neither showed load errors, crashes or token garbage",
+    "output text differs, which is expected for two different byte streams; both drift into meta/quiz text, consistent with feeding a chat-tuned model a raw completion prompt rather than corruption",
+    "VRAM stayed at ~78.5% of 8 GiB and temperature at 40 C, inside the 90% / 78 C gates"
+  ],
+  "conclusion": "both S1-C copies are operationally loadable and generate; the hash discrepancy remains unexplained and is not evidenced as functional damage by this test",
+  "artifacts": [
+    "eval/runs/kobold-S1C-G-smoke.log",
+    "eval/runs/kobold-S1C-H-smoke.log",
+    "eval/runs/smoke-S1C-G.json",
+    "eval/runs/smoke-S1C-H.json"
+  ]
+}

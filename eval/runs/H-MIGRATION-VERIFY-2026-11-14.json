@@ -1,0 +1,46 @@
+{
+  "summary": {
+    "files_checked_by_hash": 78259,
+    "hash_mismatches": 1,
+    "missing": 0,
+    "read_errors": 0,
+    "size_mismatches": 0,
+    "verdict": "DIFFERENCES FOUND"
+  },
+  "trees": [
+    {
+      "destination": "D:\\H-MIGRATION-2026-11-14\\AI apps",
+      "extra_count": 0,
+      "files_destination": 25744,
+      "files_source": 25744,
+      "hash_checked": 25744,
+      "hash_mismatch": [
+        "llama.cpp-prism-b9596-cuda12\\runtime\\cublas64_12.dll"
+      ],
+      "hash_mismatch_count": 1,
+      "missing": [],
+      "missing_count": 0,
+      "read_error_count": 0,
+      "read_errors": [],
+      "size_mismatch_count": 0,
+      "source": "H:\\AI apps",
+      "tree": "AI apps"
+    },
+    {
+      "destination": "D:\\H-MIGRATION-2026-11-14\\InvokeAI",
+      "extra_count": 0,
+      "files_destination": 52515,
+      "files_source": 52515,
+      "hash_checked": 52515,
+      "hash_mismatch": [],
+      "hash_mismatch_count": 0,
+      "missing": [],
+      "missing_count": 0,
+      "read_error_count": 0,
+      "read_errors": [],
+      "size_mismatch_count": 0,
+      "source": "H:\\InvokeAI",
+      "tree": "InvokeAI"
+    }
+  ]
+}

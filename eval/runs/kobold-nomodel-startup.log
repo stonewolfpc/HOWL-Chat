@@ -1,0 +1,27 @@
+***
+Welcome to KoboldCpp - Version 1.120
+Loading Chat Completions Adapter: C:\Users\STONEW~1\AppData\Local\Temp\_MEI110322\kcpp_adapters\AutoGuess.json
+Chat Completions Adapter Loaded
+No GPU or CPU backend was selected. Trying to assign one for you automatically...
+Auto Selected CUDA Backend (flag=0)
+
+System: Windows 10.0.26200 AMD64 Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
+Detected Available GPU Memory: 8192 MB
+Detected Available RAM: 52847 MB
+Initializing dynamic library: koboldcpp_cublas.dll
+==========
+Namespace(admin=False, admindir='', adminpassword=None, adminunloadtimeout=0, allow_config_onready=False, analyze='', autofit=False, autofitpadding=1024, autoswapmode=False, baseconfig='', batchsize=512, benchmark=None, blasthreads=0, chatcompletionsadapter='AutoGuess', cli=False, config=None, contextsize=12288, debugmode=0, defaultgenamt=2048, device='', downloaddir='', draftamount=4, draftgpulayers=999, draftgpusplit=None, draftmodel='', embeddingsgpu=False, embeddingsmaxctx=4096, embeddingsmodel='', enableguidance=False, exportconfig='', exporttemplate='', failsafe=False, flashattention=False, forceversion=False, foreground=False, gendefaults='', gendefaultsoverwrite=False, genlimit=0, gpulayers=-1, highpriority=False, hordeconfig=None, hordegenlen=0, hordekey='', hordemaxctx=0, hordemodelname='', hordeworkername='', host='127.0.0.1', ignoremissing=False, jinja=False, jinja_kwargs='', jinja_tools=False, jinjatemplate='', jinjathink='default', launch=False, lora=None, loramult=1.0, lowvram=False, maingpu=-1, maxrequestsize=32, mcpfile='', mmproj='', mmprojcpu=False, model=[], model_param=None, moecpu=0, moeexperts=-1, multiplayer=False, multiuser=10, musicdiffusion='', musicembeddings='', musicllm='', musiclowvram=False, musicvae='', noavx2=False, noblas=False, nobostoken=False, nocertify=False, nofastforward=False, noflashattention=False, nommap=False, nommq=False, nomodel=True, nopipelineparallel=False, noshift=False, noswa=False, onready='', overridekv='', overridenativecontext=0, overridetensors='', parallelrequests=1, password=None, pipelineparallel=False, port=5001, port_param=5001, preloadstory='', prompt='', proxy_port=None, quantkv='f16', quiet=True, ratelimit=0, reasoningeffort='default', remotetunnel=False, reqtimeout=600, ropeconfig=[0.0, 10000.0], routermode=False, rpcdevice='', rpchost='0.0.0.0', rpcmode='disabled', rpcport=5551, rpctargets='', savedatafile='', sdaudiovae='', sdclamped=0, sdclampedsoft=0, sdclip1='', sdclip2='', sdclipdevice=-2, sdclipgpu=False, sdconfig=None, sdconvdirect='off', sdflashattention=False, sdgendefaults=False, sdlora=[], sdloramult=[1.0], sdmaingpu=None, sdmodel='', sdnotile=False, sdoffloadcpu=False, sdphotomaker='', sdquant=0, sdt5xxl='', sdthreads=0, sdtiledvae=640, sdupscaler='', sdvae='', sdvaeauto=False, sdvaecpu=False, sdvaedevice=-1, sdvramlimit=0, showgui=False, singleinstance=False, skiplauncher=True, smartcache=0, smartcontext=False, splitmode='layer', ssl=None, swapadding=0, tensor_split=None, testmemory=False, threads=7, ttsdir='', ttsgpu=False, ttsmaxlen=4096, ttsmodel='', ttsthreads=0, ttswavtokenizer='', unpack='', usecpu=False, usecuda=['normal', 'mmq'], usedirectio=False, usemlock=False, usemmap=False, usemtp=False, useswa=False, usevulkan=None, version=False, visionmaxres=1024, visionmaxtokens=-1, visionmintokens=-1, websearch=False, whispermodel='')
+==========
+Embedded KoboldAI Lite loaded.
+Embedded API docs loaded.
+Llama.cpp UI loaded.
+======
+Active Modules: 
+Inactive Modules: TextGeneration ImageGeneration VoiceRecognition MultimodalVision MultimodalAudio NetworkMultiplayer ApiKeyPassword WebSearchProxy TextToSpeech VectorEmbeddings AdminControl MCPBridge MusicGen RouterMode
+Enabled APIs: KoboldCppApi
+Note: For third party Ollama API Emulation, you should set the port to 11434.
+Starting Kobold API on port 5001 at http://127.0.0.1:5001/api/
+Starting OpenAI Compatible API on port 5001 at http://127.0.0.1:5001/v1/
+Starting llama.cpp secondary WebUI at http://127.0.0.1:5001/lcpp/
+======
+Please connect to custom endpoint at http://127.0.0.1:5001

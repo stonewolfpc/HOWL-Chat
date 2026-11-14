@@ -1,0 +1,40 @@
+{
+  "S1-A": {
+    "G_matches_H": false,
+    "G_sha256": "0e124fab7ac19865a0b8cc590b24d04003c4b9ad511a3597e0053bc38e31683f",
+    "H_sha256_runs": [
+      "de3b8d28ecd99b8264cc8a481b7f4ca907bc963cf0761f5fd9ef0f1f30df53b4"
+    ],
+    "H_stable": true,
+    "file": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+    "recorded_matches_G": false,
+    "recorded_matches_H": false,
+    "recorded_prefix": "2ca636d9"
+  },
+  "S1-B": {
+    "G_matches_H": false,
+    "G_sha256": "290f7ead08a650b1c47c230e92952a4666a857c42532858a478323eb226ec2d4",
+    "H_sha256_runs": [
+      "6ff1b33f238000a90ed0cc6fe9c1484ab9221df95d36ba710fe934423038f2f6",
+      "6ff1b33f238000a90ed0cc6fe9c1484ab9221df95d36ba710fe934423038f2f6",
+      "6ff1b33f238000a90ed0cc6fe9c1484ab9221df95d36ba710fe934423038f2f6"
+    ],
+    "H_stable": true,
+    "file": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
+    "recorded_matches_G": false,
+    "recorded_matches_H": false,
+    "recorded_prefix": "b5b1913e"
+  },
+  "S1-C": {
+    "G_matches_H": false,
+    "G_sha256": "f820ef3f78704ffcaaeed061f29a28b398c1d348d69aca43a142b63e4d1c5c7e",
+    "H_sha256_runs": [
+      "7fca804a0f488a5b2b2529f5b36ece303b092b8d0a498e932a2bf457f1a12895"
+    ],
+    "H_stable": true,
+    "file": "LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+    "recorded_matches_G": true,
+    "recorded_matches_H": false,
+    "recorded_prefix": "f820ef3f"
+  }
+}

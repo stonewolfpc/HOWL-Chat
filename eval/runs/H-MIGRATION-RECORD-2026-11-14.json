@@ -1,0 +1,167 @@
+{
+  "title": "H: volume migration and model-copy integrity checks",
+  "date": "2026-11-14",
+  "status": "migration complete and operational; model content integrity unresolved and deliberately parked",
+  "boundaries_observed": [
+    "no model file was overwritten, converted, renamed or deleted on either drive",
+    "G:\\AI GGUF preserved intact at 149 files / 460,561,564,548 bytes",
+    "no Defender setting was changed, no exclusion added, no scan disabled",
+    "no full-disk or surface scan was run",
+    "no S1 behavioural run was performed; smoke tests are not S1 observations"
+  ],
+  "volume": {
+    "drive": "H:",
+    "hardware": "Crucial_CT525MX300SSD1, SATA, disk 0, partition 1, not the boot disk",
+    "before": {
+      "filesystem": "exFAT",
+      "health_status": "Warning",
+      "operational_status": "Full Repair Needed",
+      "disk_smart_status": "OK",
+      "used_bytes": 27272937472
+    },
+    "action": "quick format to NTFS, label Crucial",
+    "after": {
+      "filesystem": "NTFS",
+      "health_status": "Healthy",
+      "operational_status": "OK",
+      "disk_smart_status": "OK"
+    },
+    "interpretation": "the warning was a filesystem state (consistent with unclean shutdowns of an exFAT volume), never a SMART fault; the disk reported OK before and after"
+  },
+  "apps": {
+    "trees": [
+      "AI apps",
+      "InvokeAI"
+    ],
+    "files": 78259,
+    "bytes": 13385936341,
+    "staging": "D:\\H-MIGRATION-2026-11-14",
+    "copy_result": "robocopy reported 78259 files, 0 failed",
+    "first_verification": {
+      "files_hashed": 78259,
+      "mismatches": 1,
+      "mismatched_file": "AI apps/llama.cpp-prism-b9596-cuda12/runtime/cublas64_12.dll",
+      "detail": "same size (100033536), same mtime, different sha256; both sides stable over 3 reads; no robocopy failure reported",
+      "corrupted_copy_sha256": "714858cdb63540c6ac434c5c9bc062c15a2d6b17281f332699082319377a8dcd",
+      "source_sha256": "e40202fe4223c1cd2d2dce7beec59e1ed61c7801bd827309183be9b50e358f4c",
+      "resolution": "re-copied; matched source and stayed stable over 2 further reads"
+    },
+    "restore": {
+      "files": 78259,
+      "bytes": 13385936341,
+      "hashed": 78259,
+      "mismatches": 0,
+      "missing": 0,
+      "read_errors": 0,
+      "verdict": "RESTORE IDENTICAL"
+    }
+  },
+  "models": {
+    "source": "G:\\AI GGUF",
+    "destination": "H:\\AI GGUF",
+    "file_count": 149,
+    "gguf_count": 60,
+    "bytes": 460561564548,
+    "copy_result": "robocopy 149 files, 428.931 GiB, 0 failed, 1h30m at ~85 MB/s",
+    "structure": "identical relative path lists on both sides (zero differences), identical total bytes",
+    "candidate_hashes": {
+      "S1-A": {
+        "file": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+        "bytes": 5627044224,
+        "recorded_baseline_prefix": "2ca636d9",
+        "G_sha256": "0e124fab7ac19865a0b8cc590b24d04003c4b9ad511a3597e0053bc38e31683f",
+        "H_sha256": "de3b8d28ecd99b8264cc8a481b7f4ca907bc963cf0761f5fd9ef0f1f30df53b4",
+        "matches_baseline": "neither copy"
+      },
+      "S1-B": {
+        "file": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
+        "bytes": 5335285728,
+        "recorded_baseline_prefix": "b5b1913e",
+        "G_sha256": "290f7ead08a650b1c47c230e92952a4666a857c42532858a478323eb226ec2d4",
+        "H_sha256": "6ff1b33f238000a90ed0cc6fe9c1484ab9221df95d36ba710fe934423038f2f6",
+        "H_stable_over_3_reads": true,
+        "matches_baseline": "neither copy"
+      },
+      "S1-C": {
+        "file": "LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+        "bytes": 5155565440,
+        "recorded_baseline_prefix": "f820ef3f",
+        "G_sha256": "f820ef3f78704ffcaaeed061f29a28b398c1d348d69aca43a142b63e4d1c5c7e",
+        "H_sha256": "7fca804a0f488a5b2b2529f5b36ece303b092b8d0a498e932a2bf457f1a12895",
+        "matches_baseline": "G: only",
+        "first_difference_offset": 58444208,
+        "confirmation": "independent coreutils sha256sum plus cmp; not the Python harness alone"
+      }
+    },
+    "full_tree_sweep": {
+      "status": "stopped deliberately, not completed",
+      "reason": "read-only forensic sweep on a 5400 rpm HDD; operational evidence was sufficient without it",
+      "progress_at_stop": {
+        "G": "20/149",
+        "H": "140/149"
+      },
+      "partial_log": "eval/runs/h-model-fullverify-partial-2026-11-14.log"
+    }
+  },
+  "functional_smoke_tests": {
+    "purpose": "operational fitness only: does each copy load and generate under the intended profile",
+    "not": "not S1 observations, not citable about MEMORY-09, outside the 18/30 call budget",
+    "runtime": "KoboldCpp 1.120 at H:\\AI apps\\koboldcpp.exe",
+    "profile": "20 gpu layers, 20480 ctx, threads 8, batch 512, quantkv q8_0, usemmap, usecuda 0",
+    "prompt": "single throwaway completion prompt, max_length 64, temp 0.7, top_p 0.9, rep_pen 1.1, deliberately not a frozen S1 prompt",
+    "results": {
+      "S1-A": {
+        "G": "load OK 110s, 5740 MiB, 35 C, 7.53s, coherent",
+        "H": "load OK 40s, 5747 MiB, 39 C, 7.65s, coherent",
+        "structure": "32 layers / 4096 embd / 9B on both"
+      },
+      "S1-B": {
+        "G": "load OK 70s, 3986 MiB, 37 C, 5.72s, coherent",
+        "H": "load OK 30s, 3987 MiB, 37 C, 4.55s, coherent (finish_reason=stop)",
+        "structure": "42 layers / 2560 embd / E4B on both"
+      },
+      "S1-C": {
+        "G": "load OK 90s, 6448 MiB, 37 C, 1.52s",
+        "H": "load OK 40s, 6431 MiB, 38 C, 1.43s",
+        "structure": "24 layers / 2048 embd / 8B.A1B on both"
+      }
+    },
+    "totals": {
+      "loads": "6/6 OK",
+      "generations": "6/6 HTTP 200",
+      "load_errors": 0,
+      "crashes": 0
+    },
+    "gates": "VRAM 49-70 percent of 8 GiB, temperature 35-42 C, inside the 90 percent / 78 C limits",
+    "minor_observations": [
+      "S1-A emitted a stray U+FFFD on both copies, so it is a runtime/encoding artifact rather than a copy-specific defect",
+      "S1-B on H: ended with natural EOS while G: ran to the token cap; one sample, not a behavioural difference",
+      "all six parse as 'file type = guessed unknown', exactly as before the migration"
+    ]
+  },
+  "defender": {
+    "question_asked": "did Defender identify a specific file or the whole application directory",
+    "answer": "specific files",
+    "threat": "Trojan:Win32/Bearfoos.A!ml (machine-learning heuristic, not a signature match)",
+    "action": "Quarantine",
+    "files": [
+      "C:\\Users\\StoneWolfPC\\HOWL_Chat\\build\\bin\\howl-chat.exe",
+      "C:\\Howl-Security-Analysis\\evidence\\howl-chat-20261105-flagged.exe",
+      "C:\\Howl-Security-Analysis\\control\\control-copy.exe",
+      "C:\\Howl-Security-Analysis\\mutants\\m1-exact-bytes.dat"
+    ],
+    "during_migration": "no 1116/1117 detections and no 1123 Controlled Folder Access blocks on 2026-11-13 or 2026-11-14",
+    "historical_cfa_blocks": "7 total, 2026-09-16 to 2026-10-21, against Documents and Pictures by Powershell, mkdir.exe, Fallout3.exe, The Sims 4 and Invoke",
+    "conclusion": "Defender is not the mechanism behind the byte differences; Controlled Folder Access denies access rather than substituting content"
+  },
+  "open_items": [
+    "the reason three multi-gigabyte files differ between G: and H: is still unexplained; both copies are internally stable and functionally usable",
+    "S1-A and S1-B have no copy matching their recorded baseline; a fresh official download with its hash recorded as the new baseline is the clean path if one is ever needed",
+    "the full 149-file content comparison was deliberately not completed"
+  ],
+  "if_this_needs_revisiting": [
+    "do not delete G:\\AI GGUF until a replacement copy exists whose hash is recorded and verified",
+    "when a fresh model is downloaded, record its hash as the new baseline rather than treating it as proof of historical identity",
+    "re-run the tree sweep only if a functional failure appears"
+  ]
+}

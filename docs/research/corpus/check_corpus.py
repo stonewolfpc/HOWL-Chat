@@ -1,0 +1,227 @@
+#!/usr/bin/env python3
+"""Memory evaluation corpus check: required fields + structural consistency.
+
+Reports. It never repairs, normalises, or writes to any corpus file.
+
+Usage:  python docs/research/corpus/check_corpus.py
+Exit:   0 = no FAIL findings
+        1 = at least one FAIL finding
+
+Outcomes are three, never two:
+  FAIL          a registered invariant is violated
+  WARN          a suspicious condition requiring human examination
+  UNVERIFIABLE  the checker lacks the semantic information to decide, so it
+                neither passes nor fails the unit
+
+Two layers:
+
+  PRESENCE (FAIL)    every scored unit has: unique ID, Split, Restraint,
+                     Required, Forbidden, and all five reference-answer parts.
+
+  CONSISTENCY        structural rules that presence checks cannot catch:
+    C-1 (FAIL)  A graded restraint mode that requires a perceptible response
+                (R-2 influence tone, R-3 natural use)
+                must not have a purely negative or empty `mandatory`. Reproduces
+                the F6-04 defect mechanically.
+    C-2 (WARN)  A proper noun used in a scored field but absent from the
+                scenario text. Candidate for an unsupported mandatory fact
+                (the F3-03 class). Heuristic: names can legitimately be
+                introduced in the reference fields, so this warns rather than
+                fails.
+    C-3 (WARN)  A restraint item whose over-exposure boundary is `none`
+                (`M-2` expects a scored boundary for restraint items).
+
+Semantic conflicts between `Required` and `Variation` / `Over-exposure`
+cannot be mechanised. C-2 and C-3 surface candidates for human review; the
+three registered conflicts (F3-01, F7-02, R6-01) are tracked in CORPUS-07.
+"""
+import io
+import os
+import re
+import sys
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_FILES = [
+    "CORPUS-02-BATCH-1-ITEMS-2026-11-12.md",
+    "CORPUS-03-BATCH-2-ITEMS-2026-11-12.md",
+    "CORPUS-04-R6-UNCERTAINTY-ITEMS-2026-11-12.md",
+]
+# Optional explicit paths (fixture validation). Explicit runs never compare
+# against the CORPUS-01 declared totals, because fixtures are not the corpus.
+FILES = sys.argv[1:] or DEFAULT_FILES
+PARTS = ["mandatory", "variation", "never scored", "prohibited", "over-exposure"]
+HEADING = re.compile(r"^#{2,3} `([A-Za-z0-9-]+)`")
+SPLIT = re.compile(r"\*\*Split:\*\*\s*(held-?out|tuning)", re.I)
+RESTRAINT = re.compile(r"\*\*Restraint:\*\*\s*`((?:R-\d)|none)`")
+POSITIVE_MODES = {"R-2", "R-3"}
+STOP = {
+    "The", "A", "An", "No", "Not", "Any", "If", "It", "This", "That", "They",
+    "He", "She", "His", "Her", "Their", "Its", "And", "But", "Or", "At", "In",
+    "On", "To", "Two", "Three", "Four", "One", "None", "Both", "Each", "Same",
+    "Item", "Restraint", "Split", "Reference", "Mandatory", "Variation",
+    "Prohibited", "Never", "Over", "Exposure", "Required", "Forbidden",
+    "Scenario", "Turns", "Notes", "Family", "Abstention",
+}
+
+
+def parse(path):
+    units, cur = [], None
+
+    def close():
+        if cur and cur["is_test"]:
+            units.append(cur)
+
+    for line in open(path, encoding="utf-8").read().split("\n"):
+        m = HEADING.match(line)
+        if m:
+            close()
+            cur = {"id": m.group(1), "is_test": False, "split": None, "restraint": None,
+                   "req": False, "req_text": "", "forb": False, "parts": {}, "scenario": [],
+                   "reference": []}
+            continue
+        if cur is None:
+            continue
+        if "**Reference:**" in line:
+            cur["is_test"] = True
+        if "**Split:**" in line:
+            mm = SPLIT.search(line)
+            if mm:
+                cur["split"] = "heldout" if mm.group(1).lower().startswith("held") else "tuning"
+        if "**Restraint:**" in line:
+            mm = RESTRAINT.search(line)
+            if mm:
+                cur["restraint"] = mm.group(1)
+        if re.search(r"\*\*Required( evidence)?:\*\*", line):
+            cur["req"] = True
+            cur["req_text"] = line.split(":**", 1)[1].strip()
+        if re.search(r"\*\*Forbidden( evidence)?:\*\*", line):
+            cur["forb"] = True
+        for part in PARTS:
+            mm = re.search(r"\*\*" + re.escape(part) + r":\*\*(.*)", line, re.I)
+            if mm:
+                cur["parts"][part] = mm.group(1)
+        if re.search(r"\*\*(Scenario|Turns|Provenance|Notes):\*\*", line, re.I):
+            cur["scenario"].append(line)
+    close()
+    return units
+
+
+def main():
+    units = []
+    for name in FILES:
+        path = name if (os.path.isabs(name) or os.path.exists(name)) else os.path.join(HERE, name)
+        if not os.path.exists(path):
+            print("MISSING FILE:", path)
+            return 1
+        units += parse(path)
+
+    failures, warnings = [], []
+    ids = [u["id"] for u in units]
+    dupes = sorted({i for i in ids if ids.count(i) > 1})
+    if dupes:
+        failures.append(f"duplicate IDs: {dupes}")
+
+    for field in ("split", "restraint", "req", "forb"):
+        who = [u["id"] for u in units if u[field] in (None, False)]
+        if who:
+            failures.append(f"missing {field}: {len(who)} {who}")
+    for part in PARTS:
+        who = [u["id"] for u in units if part not in u["parts"]]
+        if who:
+            failures.append(f"missing {part}: {len(who)} {who}")
+
+    # C-1: positive mode must not be scored by a negative-only mandatory
+    for u in units:
+        if u["restraint"] in POSITIVE_MODES:
+            mand = (u["parts"].get("mandatory") or "").strip().lower()
+            if mand.startswith("nothing") or mand in ("", "none"):
+                failures.append(
+                    f"C-1 {u['id']}: restraint {u['restraint']} requires a perceptible "
+                    f"response but `mandatory` is '{mand[:40]}'")
+
+    # C-2: proper noun in scored fields absent from the scenario
+    for u in units:
+        scen = " ".join(u["scenario"]).lower()
+        scored = " ".join([u["parts"].get(p, "") for p in ("mandatory", "prohibited")])
+        for tok in set(re.findall(r"\b[A-Z][a-z]{2,}\b", scored)):
+            if tok in STOP:
+                continue
+            if tok.lower() not in scen:
+                warnings.append(f"C-2 {u['id']}: '{tok}' used in a scored field, absent from scenario")
+
+    # C-4: the record contradicts itself. `Required` says nothing is needed
+    # while `mandatory` demands a positive behaviour (the F6-04 class).
+    NEG = re.compile(r"^(nothing|none)(\W|$)|if it is used at all|need not be used", re.I)
+    for u in units:
+        rt = u.get("req_text", "")
+        mand = (u["parts"].get("mandatory") or "").strip()
+        # Only modes that require a perceptible response: for R-1/R-4/R-5 a
+        # "nothing" requirement is legitimate, not a contradiction.
+        if u["restraint"] in ("R-2", "R-3") and rt and NEG.search(rt) and mand and not NEG.search(mand):
+            failures.append(f"C-4 {u['id']}: `Required` permits non-use but `mandatory` "
+                            f"requires '{mand[:40]}' — record contradicts itself")
+
+    # U-1: scored fields that refer to an entity generically, so no check can
+    # confirm the evidence exists. Absence of a finding here is NOT a pass.
+    unverifiable = []
+    GENERIC = ("the name", "the detail", "the fact", "the six facts", "the accounts")
+    for u in units:
+        mand = (u["parts"].get("mandatory") or "").lower()
+        for g in GENERIC:
+            if g in mand and g != "the fact":
+                unverifiable.append(f"U-1 {u['id']}: `mandatory` refers to '{g}' — "
+                                    f"evidence presence not decidable from the item text")
+                break
+
+    # C-3: restraint item with no over-exposure boundary
+    for u in units:
+        if u["restraint"] in {"R-1", "R-2", "R-3", "R-4", "R-5", "R-6"}:
+            oe = (u["parts"].get("over-exposure") or "").lower()
+            if oe.strip().startswith("none"):
+                warnings.append(f"C-3 {u['id']}: restraint item declares over-exposure `none`")
+
+    split = {"tuning": sum(1 for u in units if u["split"] == "tuning"),
+             "heldout": sum(1 for u in units if u["split"] == "heldout")}
+    print(f"scored units: {len(units)}")
+    print(f"split: tuning={split['tuning']} heldout={split['heldout']}")
+
+    custom = bool(sys.argv[1:])
+    if custom:
+        print("mode: explicit paths (declared-total comparison skipped)")
+    idx = "" if custom else os.path.join(HERE, "CORPUS-01-SPECIFICATION-AND-INDEX-2026-11-12.md")
+    declared = None
+    if os.path.exists(idx):
+        m = re.search(r"\| \*\*Total\*\* \| \*\*(\d+)\*\* \| \*\*(\d+)\*\* \| \*\*(\d+)\*\*",
+                      open(idx, encoding="utf-8").read())
+        if m:
+            declared = dict(units=int(m.group(1)), tuning=int(m.group(2)), heldout=int(m.group(3)))
+    if declared:
+        ok = (declared["units"] == len(units) and declared["tuning"] == split["tuning"]
+              and declared["heldout"] == split["heldout"])
+        print(f"declared in CORPUS-01: {declared}")
+        print("TOTALS MATCH" if ok else "TOTALS DO NOT MATCH")
+        if not ok:
+            failures.append("declared totals are not reproducible from the files")
+
+    for f in failures:
+        print("FAIL", f)
+    for w in warnings:
+        print("WARN", w)
+    for v in unverifiable:
+        print("UNVERIFIABLE", v)
+    print("")
+    print("UNVERIFIABLE (whole-corpus):")
+    print("  semantic Required<->Variation / Over-exposure conflicts — not decidable from field text")
+    print("  evidence sufficiency (C-5) — scenario prose is not machine-parseable")
+    print("  proper-noun check (C-2) is WARN only; no warning is NOT a pass")
+    print("")
+    print("RESULT: %s (%d fail, %d warn, %d unverifiable)"
+          % ("FAIL" if failures else "PASS", len(failures), len(warnings), len(unverifiable)))
+    print("This check reports only; no file was modified.")
+    return 1 if failures else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

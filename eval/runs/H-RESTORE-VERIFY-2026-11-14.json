@@ -1,0 +1,34 @@
+{
+  "files_hashed": 78259,
+  "mismatched": 0,
+  "missing": 0,
+  "read_errors": 0,
+  "size_mismatches": 0,
+  "trees": [
+    {
+      "files_backup": 25744,
+      "files_restored": 25744,
+      "hashed": 25744,
+      "mismatched": [],
+      "mismatched_count": 0,
+      "missing_count": 0,
+      "read_error_count": 0,
+      "read_errors": [],
+      "size_mismatch_count": 0,
+      "tree": "AI apps"
+    },
+    {
+      "files_backup": 52515,
+      "files_restored": 52515,
+      "hashed": 52515,
+      "mismatched": [],
+      "mismatched_count": 0,
+      "missing_count": 0,
+      "read_error_count": 0,
+      "read_errors": [],
+      "size_mismatch_count": 0,
+      "tree": "InvokeAI"
+    }
+  ],
+  "verdict": "RESTORE IDENTICAL"
+}

@@ -1,0 +1,11 @@
+{
+  "files_checked_by_hash": 78259,
+  "hash_mismatches": 1,
+  "missing": 0,
+  "size_mismatches": 0,
+  "read_errors": 0,
+  "verdict": "DIFFERENCES FOUND"
+}
+AI apps: src 25744 dst 25744 hashed 25744 mismatches 1 missing 0 read_errors 0
+InvokeAI: src 52515 dst 52515 hashed 52515 mismatches 0 missing 0 read_errors 0
+report: C:\Users\StoneWolfPC\HOWL_Chat\eval\runs\H-MIGRATION-VERIFY-2026-11-14.json
