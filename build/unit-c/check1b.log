@@ -1,0 +1,28 @@
+=== STOP STRAY RECORDING ===
+INVOKED invoke-pattern index=0
+[0] Button cls="input-icon mic-button" id="" name="???" rect=1026,1091,36,42 enabled=True offscreen=False
+---MATCHES=1---
+=== ROUTE STIMULUS TO PHYSICAL SPEAKERS ===
+SWITCH Headphones (WH-1000XM4)|{0.0.0.00000000}.{9460d508-20ce-4ade-8b76-e405f9ab758a} => Speakers (Realtek(R) Audio)
+VOLUME=100%
+=== START RECORDING (state before) ===
+[0] Button cls="input-icon mic-button" id="" name="???" rect=1026,1091,36,42 enabled=True offscreen=False
+---MATCHES=1---
+INVOKED invoke-pattern index=0
+=== STATE DURING CAPTURE ===
+[0] Button cls="input-icon mic-button recording" id="" name="??" rect=1026,1091,36,42 enabled=True offscreen=False
+---MATCHES=1---
+SAVED build/unit-c/check1b-recording.png 1400x900 window=960,253
+=== PLAY PHYSICAL STIMULUS ===
+PLAYED build/unit-c/stimulus.wav in 5.57s
+=== STOP CAPTURE (state before stop) ===
+[0] Button cls="input-icon mic-button recording" id="" name="??" rect=1026,1091,36,42 enabled=True offscreen=False
+---MATCHES=1---
+INVOKED invoke-pattern index=0
+SAVED build/unit-c/check1b-stopped.png 1400x900 window=960,253
+=== COMPOSER VALUE ===
+VALUE=If it decides to open it up while I'm not paying attention, it still hears me. Jesus! Yeah.
+SAVED build/unit-c/check1b-transcribed.png 1400x900 window=960,253
+=== RESTORE OUTPUT ===
+SWITCH Speakers (Realtek(R) Audio)|{0.0.0.00000000}.{73b46750-0008-4166-99c4-0e281059a9d5} => Headphones (WH-1000XM4)
+DEFAULT_RENDER=Headphones (WH-1000XM4)|{0.0.0.00000000}.{9460d508-20ce-4ade-8b76-e405f9ab758a}

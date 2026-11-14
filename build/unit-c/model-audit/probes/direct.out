@@ -1,0 +1,8 @@
+0.00.125.376 I srv  llama_server: initializing ...
+0.00.125.388 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.125.739 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.134.728 I srv    load_model: loading model 'G:\AI GGUF\GGUF\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf'
+0.01.086.902 I cmn          init: llama threadpool init, n_threads = 4
+0.01.520.760 I srv    load_model: initializing, n_slots = 4, n_ctx_slot = 256, kv_unified = 'true'
+0.01.526.144 I srv  server_run_i: model loaded
+0.01.526.153 I srv  server_on_li: listening on http://127.0.0.1:18098

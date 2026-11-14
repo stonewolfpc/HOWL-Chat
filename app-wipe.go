@@ -1,84 +1,147 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"howl-chat/internal/backend/chat"
 	"howl-chat/internal/backend/lorebook"
 )
 
-// WipeAllData removes ALL user data and resets the application to a blank slate.
-// This includes: chats, characters, worlds, scenarios, memories, lorebooks,
-// gallery images, settings, and IndexedDB references.
+// These are variables so failure-injection tests can exercise the wipe
+// transaction without touching real user content.
+var (
+	wipeRename    = os.Rename
+	wipeRemoveAll = os.RemoveAll
+)
+
+// WipeAllData removes the application-owned content roots it can identify:
+// the configured chat root and the generated gallery. It does not scan or
+// delete arbitrary drives, external content-library roots, or user files.
+// Settings reset is a separate contract and is never invoked here.
+//
+// The two roots are staged to same-filesystem sibling paths before any logical
+// state is reset. If the second stage fails, the first is restored. If staging
+// succeeds, the active chat pointer and inventory cache are reset before the
+// staged data is removed, so a completed logical wipe cannot leave a stale
+// active chat or stale cached cards behind.
 func (a *App) WipeAllData() error {
-	fmt.Println("[Wipe] Starting full data wipe...")
+	fmt.Println("[Wipe] Starting application content wipe...")
 
-	exeDir := filepath.Dir(os.Args[0])
+	if a.chatPersistence == nil {
+		return fmt.Errorf("content wipe not started: chat persistence is not initialized")
+	}
+	if a.gallerySvc == nil {
+		return fmt.Errorf("content wipe not started: gallery service is not initialized")
+	}
+	chatRoot := a.chatPersistence.RootDir()
+	galleryDir := a.gallerySvc.BaseDir()
+	if chatRoot == "" || galleryDir == "" {
+		return fmt.Errorf("content wipe not started: application content root is empty")
+	}
 
-	// 1. Clear backend chat persistence
-	if a.chatPersistence != nil {
-		chatsDir := filepath.Join(exeDir, "chats")
-		if err := os.RemoveAll(chatsDir); err != nil {
-			fmt.Printf("[Wipe] Warning: failed to remove chats dir: %v\n", err)
-		} else {
-			fmt.Println("[Wipe] Chats directory cleared")
+	chatsDir := filepath.Join(chatRoot, "chats")
+	oldLastChatID := a.chatPersistence.GetLastChatID()
+
+	chatStage, err := stageContentRoot(chatsDir)
+	if err != nil {
+		return fmt.Errorf("content wipe not started: stage chat root: %w", err)
+	}
+	galleryStage, err := stageContentRoot(galleryDir)
+	if err != nil {
+		if restoreErr := restoreContentRoot(chatStage, chatsDir); restoreErr != nil {
+			return fmt.Errorf("content wipe not started: stage gallery root: %w; chat restore failed: %v", err, restoreErr)
+		}
+		return fmt.Errorf("content wipe not started: stage gallery root: %w", err)
+	}
+
+	// At this point both roots are recoverable if a state reset fails.
+	if err := a.chatPersistence.SetLastChatID(""); err != nil {
+		restoreErr := restoreStagedRoots(chatStage, chatsDir, galleryStage, galleryDir)
+		if restoreErr != nil {
+			return fmt.Errorf("content wipe not completed: reset active chat: %w; root restore: %v", err, restoreErr)
+		}
+		return fmt.Errorf("content wipe not completed: reset active chat: %w", err)
+	}
+	if a.contentInventory != nil {
+		if err := a.contentInventory.Clear(); err != nil {
+			pointerErr := a.chatPersistence.SetLastChatID(oldLastChatID)
+			restoreErr := restoreStagedRoots(chatStage, chatsDir, galleryStage, galleryDir)
+			return fmt.Errorf("content wipe not completed: clear inventory: %w; pointer restore: %v; root restore: %v", err, pointerErr, restoreErr)
 		}
 	}
 
-	// 2. Clear gallery images
-	galleryDir := a.getGalleryDir()
-	if err := os.RemoveAll(galleryDir); err != nil {
-		fmt.Printf("[Wipe] Warning: failed to remove gallery dir: %v\n", err)
-	} else {
-		fmt.Println("[Wipe] Gallery directory cleared")
-	}
-	_ = os.MkdirAll(galleryDir, 0755)
-
-	// 3. Clear entity folders (Characters, Worlds, Scenarios)
-	entityDirs := []string{
-		filepath.Join(exeDir, "Characters"),
-		filepath.Join(exeDir, "Worlds"),
-		filepath.Join(exeDir, "Scenarios"),
-	}
-	for _, dir := range entityDirs {
-		entries, err := os.ReadDir(dir)
-		if err != nil {
-			continue // Directory may not exist
-		}
-		for _, entry := range entries {
-			if entry.IsDir() {
-				path := filepath.Join(dir, entry.Name())
-				if err := os.RemoveAll(path); err != nil {
-					fmt.Printf("[Wipe] Warning: failed to remove %s: %v\n", path, err)
-				}
-			}
-		}
-		fmt.Printf("[Wipe] Cleared: %s\n", dir)
-	}
-
-	// 4. Clear image subdirectories
-	imageSubDirs := []string{"characters", "scenarios", "worlds"}
-	for _, sub := range imageSubDirs {
-		subDir := filepath.Join(exeDir, "images", sub)
-		_ = os.RemoveAll(subDir)
-		_ = os.MkdirAll(subDir, 0755)
-	}
-
-	// 5. Reset in-memory state
+	// The logical wipe has succeeded. Reset in-memory state only now.
 	a.characters = []*chat.CharacterContext{}
 	a.world = nil
 	a.scenario = nil
 	a.lorebooks = []lorebook.Entry{}
 	a.chatMessages = []map[string]interface{}{}
 	a.triggeredLore = make(map[string]bool)
-
-	// 6. Reset memory service chat ID
 	if a.memoryService != nil {
 		a.memoryService.SetChatID("")
 	}
 
-	fmt.Println("[Wipe] Complete. Application is now a blank slate.")
+	var cleanupFailures []error
+	if chatStage != "" {
+		if err := wipeRemoveAll(chatStage); err != nil {
+			cleanupFailures = append(cleanupFailures, fmt.Errorf("chat data remains staged at %s: %w", chatStage, err))
+		}
+	}
+	if galleryStage != "" {
+		if err := wipeRemoveAll(galleryStage); err != nil {
+			cleanupFailures = append(cleanupFailures, fmt.Errorf("gallery data remains staged at %s: %w", galleryStage, err))
+		}
+	}
+	if err := os.MkdirAll(galleryDir, 0755); err != nil {
+		cleanupFailures = append(cleanupFailures, fmt.Errorf("recreate gallery root %s: %w", galleryDir, err))
+	}
+
+	if len(cleanupFailures) > 0 {
+		return fmt.Errorf("content wipe completed, but cleanup is incomplete: %w", errors.Join(cleanupFailures...))
+	}
+	fmt.Println("[Wipe] Complete.")
+	return nil
+}
+
+func stageContentRoot(path string) (string, error) {
+	info, err := os.Lstat(path)
+	if os.IsNotExist(err) {
+		return "", nil
+	}
+	if err != nil {
+		return "", err
+	}
+	if !info.IsDir() {
+		return "", fmt.Errorf("%s is not a directory", path)
+	}
+	staged := filepath.Join(filepath.Dir(path), fmt.Sprintf(".%s.howl-wipe-%d", filepath.Base(path), time.Now().UnixNano()))
+	if err := wipeRename(path, staged); err != nil {
+		return "", err
+	}
+	return staged, nil
+}
+
+func restoreContentRoot(staged, original string) error {
+	if staged == "" {
+		return nil
+	}
+	return wipeRename(staged, original)
+}
+
+func restoreStagedRoots(chatStage, chatsDir, galleryStage, galleryDir string) error {
+	var failures []error
+	if err := restoreContentRoot(chatStage, chatsDir); err != nil {
+		failures = append(failures, fmt.Errorf("restore chat root: %w", err))
+	}
+	if err := restoreContentRoot(galleryStage, galleryDir); err != nil {
+		failures = append(failures, fmt.Errorf("restore gallery root: %w", err))
+	}
+	if len(failures) > 0 {
+		return errors.Join(failures...)
+	}
 	return nil
 }

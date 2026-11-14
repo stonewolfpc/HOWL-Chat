@@ -51,10 +51,10 @@ func (a *App) initImageEngine() {
 		cfg.ModelsDir = filepath.Join(paths.ProjectRoot(), "models")
 	}
 	if cfg.OutputDir == "" {
-		cfg.OutputDir = filepath.Join(paths.ProjectRoot(), "images", "gallery")
+		cfg.OutputDir = paths.StatePath("images", "gallery")
 	}
 	if cfg.TempDir == "" {
-		cfg.TempDir = filepath.Join(os.TempDir(), "howl-image-temp")
+		cfg.TempDir = filepath.Join(paths.TempDir(), "howl-image-temp")
 	}
 	if cfg.Port == 0 {
 		cfg.Port = 8081

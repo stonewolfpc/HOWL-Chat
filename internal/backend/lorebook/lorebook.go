@@ -41,16 +41,35 @@ const (
 	FrequencyOncePerMessage TriggerFrequency = "once_per_message"
 )
 
+// Visibility values as written by the Lorebooks page. "hidden" entries never
+// enter a prompt; "private" character entries stay with their owner.
+const (
+	VisibilityPublic  = "public"
+	VisibilityPrivate = "private"
+	VisibilityHidden  = "hidden"
+)
+
+// OriginLegacyGeneratedUnattributed marks generated lore imported from a file
+// that carried no chat identity. It stays prompt-eligible but must be shown as
+// unattributed, and nothing may invent a chat owner for it.
+const OriginLegacyGeneratedUnattributed = "legacy_generated_unattributed"
+
 type Entry struct {
-	ID                string           `json:"id"`
-	Name              string           `json:"name"`
-	Title             string           `json:"title"`
-	Description       string           `json:"description"`
-	Content           string           `json:"content"`
-	Tags              []string         `json:"tags"`
-	Scope             Scope            `json:"scope"`
-	Type              Scope            `json:"type"`
-	OwnerID           string           `json:"ownerId,omitempty"`
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Content     string   `json:"content"`
+	Tags        []string `json:"tags"`
+	Scope       Scope    `json:"scope"`
+	Type        Scope    `json:"type"`
+	OwnerID     string   `json:"ownerId,omitempty"`
+	// OwnerName is descriptive metadata for display and audit. It never
+	// authorizes delivery; OwnerID is the sole authorization identity.
+	OwnerName string `json:"ownerName,omitempty"`
+	// OwnerKind records memory provenance (for example character_id). It is
+	// descriptive routing metadata, never an authorization substitute for OwnerID.
+	OwnerKind         string           `json:"ownerKind,omitempty"`
 	Enabled           bool             `json:"enabled"`
 	TriggerPhrases    []string         `json:"triggerPhrases"`
 	SecondaryTriggers []string         `json:"secondaryTriggers"`
@@ -62,24 +81,31 @@ type Entry struct {
 	VisibleToUser     bool             `json:"visibleToUser"`
 	VisibleToOthers   bool             `json:"visibleToOthers"`
 	Visibility        string           `json:"visibility"`
-	RevealCondition   string           `json:"revealCondition"`
-	InjectionStyle    string           `json:"injectionStyle"`
-	InjectionPosition string           `json:"injectionPosition"`
-	MaxLength         string           `json:"maxLength"`
-	ContextBudget     int              `json:"contextBudget"`
-	ScanWindow        int              `json:"scanWindow"`
-	Recursion         string           `json:"recursion"`
-	LinkedCharacters  []string         `json:"linkedCharacters"`
-	LinkedLoreEntries []string         `json:"linkedLoreEntries"`
-	Inheritance       string           `json:"inheritance"`
-	Automated         bool             `json:"automated"`
-	MemoryType        string           `json:"memoryType"`
-	TriggerConfidence string           `json:"triggerConfidence"`
-	DecayRate         string           `json:"decayRate"`
-	TriggerCount      int              `json:"triggerCount"` // Reinforcement tracking
-	CreatedAt         string           `json:"createdAt"`
-	LastTriggeredAt   string           `json:"lastTriggeredAt,omitempty"`
-	UpdatedAt         string           `json:"updatedAt"`
+	// Stale marks last-known content whose canonical root is unavailable. It is
+	// derived at sync time, never persisted, and never injected into a prompt.
+	Stale             bool     `json:"-"`
+	RevealCondition   string   `json:"revealCondition"`
+	InjectionStyle    string   `json:"injectionStyle"`
+	InjectionPosition string   `json:"injectionPosition"`
+	MaxLength         string   `json:"maxLength"`
+	ContextBudget     int      `json:"contextBudget"`
+	ScanWindow        int      `json:"scanWindow"`
+	Recursion         string   `json:"recursion"`
+	LinkedCharacters  []string `json:"linkedCharacters"`
+	LinkedLoreEntries []string `json:"linkedLoreEntries"`
+	Inheritance       string   `json:"inheritance"`
+	Automated         bool     `json:"automated"`
+	// OriginKind labels imported content whose generation cannot be attributed to
+	// a chat. User-authored entries leave it empty. It is descriptive provenance,
+	// never authorization: OwnerID remains the sole ownership identity.
+	OriginKind        string `json:"originKind,omitempty"`
+	MemoryType        string `json:"memoryType"`
+	TriggerConfidence string `json:"triggerConfidence"`
+	DecayRate         string `json:"decayRate"`
+	TriggerCount      int    `json:"triggerCount"` // Reinforcement tracking
+	CreatedAt         string `json:"createdAt"`
+	LastTriggeredAt   string `json:"lastTriggeredAt,omitempty"`
+	UpdatedAt         string `json:"updatedAt"`
 }
 
 type ResolveRequest struct {
@@ -224,6 +250,14 @@ func canConsider(entry Entry, req ResolveRequest) bool {
 	if !entry.Enabled {
 		return false
 	}
+	// Last-known content from an unavailable root must not be presented as canon.
+	if entry.Stale {
+		return false
+	}
+	// "Hidden" means the entry must never enter a prompt, whatever its scope.
+	if strings.EqualFold(strings.TrimSpace(entry.Visibility), VisibilityHidden) {
+		return false
+	}
 	if entry.TriggerDirection != TriggerBoth && entry.TriggerDirection != req.Actor {
 		return false
 	}
@@ -310,8 +344,10 @@ func keywordWeight(value string) int {
 // RouteResolvedEntries filters resolved lorebook entries for a specific recipient.
 // World entries → all characters.
 // Scenario entries → all characters in the active scenario.
-// Character entries → only the matching owner character.
-func RouteResolvedEntries(entries []ResolvedEntry, characterName, scenarioName, worldName string) []ResolvedEntry {
+// Character entries → only the character whose stable ID matches OwnerID.
+// characterID must be the durable character.id, never a display name: names are
+// labels and are neither unique nor stable across renames.
+func RouteResolvedEntries(entries []ResolvedEntry, characterID, scenarioName, worldName string) []ResolvedEntry {
 	filtered := make([]ResolvedEntry, 0, len(entries))
 	for _, entry := range entries {
 		switch entry.Scope {
@@ -320,7 +356,16 @@ func RouteResolvedEntries(entries []ResolvedEntry, characterName, scenarioName, 
 		case ScopeScenario:
 			filtered = append(filtered, entry)
 		case ScopeCharacter:
-			if entry.OwnerID == "" || entry.OwnerID == characterName {
+			if entry.OwnerID == "" {
+				// Entries created before ownership was recorded have no owner. They keep
+				// working only when they are explicitly shareable; otherwise private
+				// character lore would leak into every character's prompt.
+				if shareableWithoutOwner(entry.Entry) {
+					filtered = append(filtered, entry)
+				}
+				continue
+			}
+			if characterID != "" && entry.OwnerID == characterID {
 				filtered = append(filtered, entry)
 			}
 		default:
@@ -328,6 +373,18 @@ func RouteResolvedEntries(entries []ResolvedEntry, characterName, scenarioName, 
 		}
 	}
 	return filtered
+}
+
+// shareableWithoutOwner reports whether an unowned character entry may reach a
+// character other than its (missing) owner. Only public (or unlabelled legacy)
+// entries qualify; private and hidden ones must not cross the boundary.
+func shareableWithoutOwner(entry Entry) bool {
+	switch strings.ToLower(strings.TrimSpace(entry.Visibility)) {
+	case "", VisibilityPublic:
+		return true
+	default:
+		return false
+	}
 }
 
 func scopeRank(scope Scope) int {

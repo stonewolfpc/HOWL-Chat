@@ -16,7 +16,34 @@ const DIST = path.resolve(__dirname, '../../../frontend/dist');
 const FIXTURE = `<!doctype html>
 <html><body>
 <script>
-window.__be = { calls: [], applied: null, inProgress: false, fail: false, delay: 0, publishApplied: true };
+window.__be = { calls: [], applied: null, settings: null, inProgress: false, fail: false, delay: 0, publishApplied: true };
+function contractReport(audio, applied) {
+  const backend = { asrEnabled: 'asr_enabled', ttsEnabled: 'tts_enabled', asrEngine: 'asr_engine', ttsEngine: 'tts_engine' };
+  const speedEngines = ['piper', 'kokoro', 'melotts'];
+  if (['whisper-tiny', 'whisper-base', 'whisper-small'].includes(audio && audio.asrEngine)) {
+    Object.assign(backend, { asrLanguage: 'asr_language', asrThreads: 'asr_threads', asrBeamSize: 'asr_beam_size', asrBestOf: 'asr_best_of' });
+  }
+  if (audio && audio.ttsEnabled && speedEngines.includes(audio.ttsEngine)) {
+    backend.ttsSpeed = 'tts_speed';
+  }
+  const renderer = { ttsVolume: true, ttsAutoplayMessage: true };
+  const statuses = {};
+  Object.keys(audio || {}).forEach(key => {
+    if (backend[key]) {
+      const want = audio[key];
+      const got = applied ? applied[backend[key]] : undefined;
+      const match = !!applied && (typeof want === 'boolean' ? !!got === want : String(got || '') === String(want || ''));
+      statuses[key] = { key, owner: 'backend', state: match ? 'applied' : 'rejected', reason: match ? '' : 'not effective' };
+    } else if (renderer[key]) {
+      statuses[key] = { key, owner: 'renderer', state: 'renderer' };
+    } else if (key === 'ttsSpeed') {
+      statuses[key] = { key, owner: 'backend', state: 'unavailable', reason: 'speed requires an explicit TTS engine' };
+    } else {
+      statuses[key] = { key, owner: 'none', state: 'unsupported', reason: 'not implemented in fixture' };
+    }
+  });
+  return { statuses };
+}
 window.go = { main: { App: {
   GetSettings: async () => ({ audio: { asrEnabled: true, asrEngine: 'whisper-base', ttsEngine: 'piper' } }),
   SetSettings: async () => {},
@@ -25,17 +52,31 @@ window.go = { main: { App: {
     asr_ready: true,
     tts_ready: false,
     apply_in_progress: window.__be.inProgress,
-    applied: window.__be.applied
+    applied: window.__be.applied,
+    settings: window.__be.settings
   }, window.__be.status || {}),
-  ApplyAudioSettings: async (...args) => {
-    window.__be.calls.push(args);
+  ApplyAudioSettings: async (audio) => {
+    audio = audio || {};
+    window.__be.calls.push(audio);
     if (window.__be.delay) await new Promise(r => setTimeout(r, window.__be.delay));
     if (window.__be.fail) throw new Error('activation failed');
     if (window.__be.publishApplied) {
       window.__be.applied = {
-        asr_enabled: !!args[0], tts_enabled: !!args[1],
-        asr_engine: args[2], tts_engine: args[3]
+        asr_enabled: !!audio.asrEnabled, tts_enabled: !!audio.ttsEnabled,
+        asr_engine: audio.asrEngine, tts_engine: audio.ttsEngine
       };
+      if (['whisper-tiny', 'whisper-base', 'whisper-small'].includes(audio.asrEngine)) {
+        Object.assign(window.__be.applied, {
+          asr_language: audio.asrLanguage, asr_threads: audio.asrThreads,
+          asr_beam_size: audio.asrBeamSize, asr_best_of: audio.asrBestOf
+        });
+      }
+      if (audio.ttsEnabled && ['piper', 'kokoro', 'melotts'].includes(audio.ttsEngine)) {
+        Object.assign(window.__be.applied, { tts_speed: audio.ttsSpeed });
+      }
+      window.__be.settings = contractReport(audio, window.__be.applied);
+    } else {
+      window.__be.settings = null;
     }
   },
   GetTTSModels: async () => [{ name: 'voice-a', size_mb: 12 }],
@@ -102,7 +143,7 @@ test('handshake completes and all seven authorized methods work through the brid
     const status = await panel.evaluate(() => window.go.main.App.GetAudioStatus());
     expect(status.asr_readiness).toBe('local-initialized');
 
-    await panel.evaluate(() => window.go.main.App.ApplyAudioSettings(true, false, 'whisper-base', 'piper'));
+    await panel.evaluate(() => window.go.main.App.ApplyAudioSettings({ asrEnabled: true, ttsEnabled: false, asrEngine: 'whisper-base', ttsEngine: 'piper' }));
     expect(await page.evaluate(() => window.__be.calls.length)).toBe(1);
 
     const voices = await panel.evaluate(() => window.go.main.App.GetTTSModels());
@@ -142,6 +183,7 @@ test('honest Applied: mismatched effective configuration renders Indeterminate',
     // Non-closeable readiness keeps the panel mounted so the label can be read.
     await page.evaluate(() => {
         window.__be.applied = null;
+        window.__be.settings = null;
         window.__be.publishApplied = false;   // uncomparable effective state
         window.__be.status = { asr_readiness: 'not-ready', asr_ready: false };
     });
@@ -157,8 +199,48 @@ test('Applied appears only when the active generation matches the request', asyn
 
     await page.evaluate(() => { window.__be.status = { asr_readiness: 'not-ready', asr_ready: false }; });
     await panel.evaluate(() => window.AudioSettings.saveAudioSettings());
-    await expect(panel.locator('#audio-apply-state')).toHaveText('Applied');
+    await expect(panel.locator('#audio-apply-state')).toHaveText('Applied (supported)');
     await expect(panel.locator('#audio-save-state')).toHaveText('Saved');
+    // The aggregate is scoped to supported settings; the persisted-only fields
+    // are named instead of being silently counted as applied.
+    await expect(panel.locator('#audio-outcome-detail')).toContainText('8 of 8 backend settings applied');
+    await expect(panel.locator('#audio-outcome-detail')).toContainText('23 unsupported settings saved but not applied');
+});
+
+test('explicit TTS speed is included in the supported backend aggregate', async ({ page }) => {
+    const panel = await openFixture(page);
+
+    await panel.evaluate(() => {
+        const audio = window.settingsState.current.audio;
+        audio.ttsEnabled = true;
+        audio.ttsEngine = 'piper';
+        audio.ttsSpeed = 1.25;
+    });
+    await panel.evaluate(() => window.AudioSettings.saveAudioSettings());
+
+    await expect(panel.locator('#audio-apply-state')).toHaveText('Applied (supported)');
+    await expect(panel.locator('#audio-outcome-detail')).toContainText('9 of 9 backend settings applied');
+});
+
+test('legacy four-field applied map alone cannot produce Applied', async ({ page }) => {
+    const panel = await openFixture(page);
+
+    await page.evaluate(() => {
+        // Simulate an older backend that publishes only the four compatibility
+        // fields and no per-setting report.
+        window.__be.applied = {
+            asr_enabled: true, tts_enabled: false,
+            asr_engine: 'whisper-base', tts_engine: 'piper'
+        };
+        window.__be.settings = null;
+        window.__be.publishApplied = false;
+        window.__be.status = { asr_readiness: 'not-ready', asr_ready: false };
+    });
+    await panel.evaluate(() => window.AudioSettings.saveAudioSettings());
+
+    const label = panel.locator('#audio-apply-state');
+    await expect(label).toContainText('Indeterminate');
+    await expect(label).not.toHaveText('Applied (supported)');
 });
 
 test('apply_in_progress keeps activation gated', async ({ page }) => {

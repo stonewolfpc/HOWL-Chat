@@ -25,6 +25,7 @@ func selectableCatalogForTests() []capability.Record {
 		{string(types.ASRWhisperTiny), capability.TaskFileTranscription},
 		{string(types.ASRWhisperBase), capability.TaskFileTranscription},
 		{string(types.ASRWhisperSmall), capability.TaskFileTranscription},
+		{string(types.ASRQwen3ASR17BLocal), capability.TaskFileTranscription},
 		{string(types.TTSPiper), capability.TaskSpeechSynthesis},
 		{string(types.TTSMeloTTS), capability.TaskSpeechSynthesis},
 		{string(types.TTSKokoro), capability.TaskSpeechSynthesis},

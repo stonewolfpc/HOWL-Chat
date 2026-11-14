@@ -30,9 +30,13 @@ start "" "%ROOT%build\bin\howl-chat.exe"
 exit /b 0
 
 :devmode
-rem Live-reload mode. The Wails CLI installs into GOPATH\bin.
-for /f "usebackq delims=" %%G in (`go env GOPATH`) do set "GOPATH=%%G"
-if exist "%GOPATH%\bin\wails.exe" set "PATH=%GOPATH%\bin;%PATH%"
+rem Live-reload mode through the project-local CLI (build\tools\wails.exe),
+rem which also pins the Go toolchain this module requires. No global wails.exe.
+if not exist "%ROOT%build\wails.cmd" (
+    echo [ERROR] build\wails.cmd not found - cannot start dev mode.
+    pause
+    exit /b 1
+)
 set GOFLAGS=-buildvcs=false
-wails dev
+call "%ROOT%build\wails.cmd" dev
 if errorlevel 1 pause

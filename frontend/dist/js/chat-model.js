@@ -765,10 +765,41 @@ async function selectModelBrowserItem(path) {
         document.getElementById('mb-detail-size').textContent = d.size_mb ? d.size_mb.toFixed(1) + ' MB' : '—';
         document.getElementById('mb-detail-vram').textContent = d.gpu_mb ? d.gpu_mb + ' MB' : '—';
         document.getElementById('mb-detail-ram').textContent = d.ram_mb ? d.ram_mb + ' MB' : '—';
+		await populateModelIntelligence(path);
     } catch (err) {
         console.error('[Browser] Failed to get model details:', err);
         document.getElementById('mb-detail-name').textContent = 'Error loading details';
     }
+}
+
+async function populateModelIntelligence(path) {
+	const app = window.go?.main?.App;
+	const set = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value || '—'; };
+	if (typeof app?.GetModelIntelligence !== 'function') {
+		set('mb-detail-evidence', 'Unavailable');
+		set('mb-detail-capabilities', '—');
+		set('mb-detail-runtimes', '—');
+		set('mb-detail-tokenizer', '—');
+		return;
+	}
+	try {
+		const profile = await app.GetModelIntelligence(path);
+		set('mb-detail-evidence', evidenceLabel(profile.evidence));
+		set('mb-detail-capabilities', (profile.capabilities || []).join(', '));
+		set('mb-detail-runtimes', (profile.runtimes || []).join(', '));
+		set('mb-detail-tokenizer', profile.tokenizer || 'Not found');
+		const source = document.getElementById('mb-detail-source');
+		if (source) source.textContent = profile.source ? 'Identification source: ' + profile.source : '';
+		const notes = document.getElementById('mb-detail-notes');
+		if (notes) notes.textContent = (profile.notes || []).join(' · ');
+	} catch (err) {
+		console.warn('[Browser] Model intelligence unavailable:', err);
+		set('mb-detail-evidence', 'Unavailable');
+	}
+}
+
+function evidenceLabel(value) {
+	return ({ verified: 'Verified', 'source-derived': 'Source-derived', inferred: 'Inferred', unknown: 'Unknown', conflicting: 'Conflicting' })[value] || value || 'Unknown';
 }
 
 async function loadModelFromBrowser() {

@@ -26,6 +26,9 @@ import (
 
 // LoadModel starts llama-server with the given model path.
 func (a *App) LoadModel(modelPath string) (err error) {
+	if err := a.ensureAcceptingWork("load model"); err != nil {
+		return err
+	}
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("recovered from panic in LoadModel: %v", r)
@@ -148,7 +151,7 @@ func (a *App) LoadModel(modelPath string) (err error) {
 	}
 
 	// Prevent redundant reloads: if the same model is already loaded, skip.
-	if a.serverProc != nil && a.serverProc.Process != nil {
+	if existing, _ := a.currentLlamaServer(); existing != nil && existing.Process != nil {
 		fmt.Println("[LoadModel] existing serverProc found")
 		if a.httpClient != nil {
 			if loaded, _ := a.httpClient.GetLoadedModel(); loaded != nil {
@@ -167,10 +170,10 @@ func (a *App) LoadModel(modelPath string) (err error) {
 			fmt.Printf("[LoadModel] load in progress (progress=%d), skipping\n", progress)
 			return nil
 		}
-		fmt.Println("[LoadModel] killing existing server")
-		_ = a.serverProc.Process.Kill()
-		_ = a.serverProc.Wait()
-		fmt.Printf("[LoadModel] stopped existing llama-server (pid %d)\n", a.serverProc.Process.Pid)
+		fmt.Println("[LoadModel] stopping existing server")
+		if err := a.stopLlamaServer(5 * time.Second); err != nil {
+			fmt.Printf("[LoadModel] WARN: existing llama-server did not stop cleanly: %v\n", err)
+		}
 	}
 
 	fmt.Println("[LoadModel] checking port 8080")
@@ -305,6 +308,9 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		fitParams = false
 		fmt.Println("[LoadModel] SWA model detected, disabling --fit to avoid scheduler crash")
 	}
+	if err := a.ensureAcceptingWork("load model"); err != nil {
+		return err
+	}
 	spawnSettings := a.spawnSettingsFor(profile)
 	fmt.Println("[LoadModel] spawning llama-server")
 	serverOutput := loader.NewCapture(loader.DefaultCaptureBytes)
@@ -335,8 +341,15 @@ func (a *App) LoadModel(modelPath string) (err error) {
 	}
 	activeCmd := cmd
 	fmt.Printf("[LoadModel] llama-server spawned (pid %d)\n", cmd.Process.Pid)
-	a.serverProc = cmd
 	pm := waitMonitor(cmd)
+	a.adoptLlamaServer(cmd, pm)
+	// Shutdown may have passed its stop step while the model was being
+	// validated or spawned. Adopt first, then stop the child if that happened:
+	// no child may outlive the shutdown that started during this load.
+	if a.shuttingDown.Load() {
+		_ = a.stopLlamaServer(llamaShutdownTimeout)
+		return fmt.Errorf("model load cancelled because Howl is shutting down")
+	}
 
 	a.loadingProgress.Store(0)
 	a.loadingStage.Store("Starting")
@@ -381,12 +394,14 @@ func (a *App) LoadModel(modelPath string) (err error) {
 					fitRetries++
 					fmt.Printf("[LoadModel] monitor: GGML_SCHED_MAX_SPLIT_INPUTS crash, retry %d/%d\n", fitRetries, maxFitRetries)
 					a.logLLMCrash(fmt.Errorf("GGML_SCHED_MAX_SPLIT_INPUTS crash, retry %d/%d", fitRetries, maxFitRetries), "app-model.go:118")
-					if a.serverProc != nil && a.serverProc.Process != nil {
-						_ = a.serverProc.Process.Kill()
-						_ = a.serverProc.Wait()
+					if err := a.stopLlamaServer(5 * time.Second); err != nil {
+						fmt.Printf("[LoadModel] WARN: crashed llama-server did not stop cleanly: %v\n", err)
 					}
-					a.serverProc = nil
 					serverOutput.Reset()
+					if a.shuttingDown.Load() {
+						fmt.Println("[LoadModel] retry cancelled because Howl is shutting down")
+						return
+					}
 					if !waitForPortFree("8080", 5*time.Second) {
 						a.logError(errors.LLMPortConflict, errors.Critical, "llm.load", "app-model.go:127", fmt.Errorf("port 8080 occupied after crash"))
 						a.emitEvent("model:error", "port 8080 occupied after crash; cannot restart llama-server")
@@ -413,8 +428,12 @@ func (a *App) LoadModel(modelPath string) (err error) {
 						return
 					}
 					activeCmd = cmd2
-					a.serverProc = cmd2
 					pm = waitMonitor(cmd2)
+					a.adoptLlamaServer(cmd2, pm)
+					if a.shuttingDown.Load() {
+						_ = a.stopLlamaServer(llamaShutdownTimeout)
+						return
+					}
 					tick = -1
 					continue
 				}
@@ -516,12 +535,10 @@ func (a *App) LoadModel(modelPath string) (err error) {
 
 // UnloadModel kills the llama-server process, freeing all model memory.
 func (a *App) UnloadModel() error {
-	if a.serverProc != nil && a.serverProc.Process != nil {
-		_ = a.serverProc.Process.Kill()
-		_ = a.serverProc.Wait()
-		fmt.Println("INFO: llama-server killed, model memory freed")
+	if err := a.stopLlamaServer(llamaShutdownTimeout); err != nil {
+		return fmt.Errorf("stop llama-server: %w", err)
 	}
-	a.serverProc = nil
+	fmt.Println("INFO: llama-server stopped, model memory freed")
 	a.loadingProgress.Store(0)
 	a.loadingStage.Store("Unloaded")
 	a.emitEvent("model:unloaded")
@@ -637,7 +654,7 @@ func (a *App) GetModelOptions() map[string]interface{} {
 
 // getSettingsDir returns (and creates) the config directory next to the exe.
 func (a *App) getSettingsDir() string {
-	settingsDir := filepath.Join(paths.ProjectRoot(), "config")
+	settingsDir := paths.InternalConfigDir()
 	_ = os.MkdirAll(settingsDir, 0755)
 	return settingsDir
 }
@@ -819,7 +836,7 @@ func (a *App) loaderLogDir() string {
 	if a.loaderDiagnosticsDir != "" {
 		return a.loaderDiagnosticsDir
 	}
-	return loader.LogDir(paths.ProjectRoot())
+	return loader.LogDir(paths.StateRoot())
 }
 
 // GetModelsDir returns the absolute path to the models directory.

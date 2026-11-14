@@ -1,0 +1,51 @@
+/* F2 content-library integration: external cards and model intelligence. */
+
+.character-bubble-external {
+    border-style: dashed;
+}
+
+.character-external-badge {
+    align-self: center;
+    padding: 3px 8px;
+    border: 1px solid var(--border-secondary);
+    border-radius: 999px;
+    color: var(--text-secondary);
+    background: var(--surface-tertiary);
+    font-size: 10px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.character-external-note {
+    margin: 0 0 16px 0;
+    padding: 10px 12px;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 6px;
+    background: rgba(245, 158, 11, 0.08);
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.character-creation-overlay.read-only .image-upload-button,
+.character-creation-overlay.read-only .character-creation-save {
+    display: none !important;
+}
+
+.character-creation-overlay.read-only .character-form-input,
+.character-creation-overlay.read-only .character-form-textarea,
+.character-creation-overlay.read-only select {
+    opacity: 0.78;
+    cursor: default;
+}
+
+.mb-intel-note {
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.4;
+    min-height: 1em;
+}
+
+.mb-detail-grid span {
+    overflow-wrap: anywhere;
+}

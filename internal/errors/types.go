@@ -60,6 +60,9 @@ const (
 	ASRModelLoadFail    Code = "ASR-MODEL-LOAD"
 	ASRTranscribeFail   Code = "ASR-TRANS-FAIL"
 	AudioHWDetectFail   Code = "AUD-HW-DET"
+	// ASRMicUnavailable refuses ASR allocation when Windows has no usable
+	// capture device. Its error message is the user-facing copy.
+	ASRMicUnavailable Code = "ASR-MIC-UNAVAILABLE"
 )
 
 // Resource Management (High)
@@ -191,6 +194,7 @@ const (
 // System / Infrastructure (Medium)
 const (
 	SYSPanicRecovered   Code = "SYS-PANIC"
+	SYSShutdownFail     Code = "SYS-SHUTDOWN"
 	SYSConfigReadFail   Code = "SYS-CFG-READ"
 	SYSSettingsSaveFail Code = "SYS-SET-SAVE"
 	SYSSettingsLoadFail Code = "SYS-SET-LOAD"

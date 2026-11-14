@@ -1,0 +1,13 @@
+0.00.115.281 I srv  llama_server: initializing ...
+0.00.115.298 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.115.617 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.126.077 I srv    load_model: loading model 'G:\AI GGUF\voice\Qwen2.5-Omni-3B-Q4_K_M.gguf'
+0.00.341.606 E llama_model_load: error loading model: tensor 'blk.9.attn_q.weight' data is not within the file bounds, model is corrupted or incomplete
+0.00.341.618 E llama_model_load_from_file_impl: failed to load model
+0.00.341.683 E common_fit_params: encountered an error while trying to fit params to free device memory: failed to load model
+0.00.383.491 E llama_model_load: error loading model: tensor 'blk.9.attn_q.weight' data is not within the file bounds, model is corrupted or incomplete
+0.00.383.504 E llama_model_load_from_file_impl: failed to load model
+0.00.383.509 E cmn  common_init_: failed to load model 'G:\AI GGUF\voice\Qwen2.5-Omni-3B-Q4_K_M.gguf'
+0.00.383.529 E srv    load_model: failed to load model, 'G:\AI GGUF\voice\Qwen2.5-Omni-3B-Q4_K_M.gguf'
+0.00.383.540 I srv    operator(): operator(): cleaning up before exit...
+0.00.384.446 E srv  server_run_i: exiting due to model loading error

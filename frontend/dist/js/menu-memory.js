@@ -90,7 +90,13 @@ function renderMemoryList(memories) {
         container.innerHTML = '<div class="memory-empty">No memories found</div>';
         return;
     }
-    container.innerHTML = '';
+    const unresolved = memories.filter(m =>
+        (m.scope || m.Scope) === 'character' &&
+        (m.ownerKind || m.owner_kind) !== 'character_id'
+    ).length;
+    container.innerHTML = unresolved > 0
+        ? `<div class="memory-ownership-warning" style="padding:10px 12px;margin-bottom:10px;border:1px solid rgba(248,113,113,0.35);border-radius:8px;color:#fca5a5;font-size:12px;">${unresolved} character memor${unresolved === 1 ? 'y has' : 'ies have'} unresolved legacy ownership and ${unresolved === 1 ? 'is' : 'are'} excluded from character prompts and transfer.</div>`
+        : '';
     memories.forEach(m => {
         const item = document.createElement('div');
         item.className = 'memory-list-item';

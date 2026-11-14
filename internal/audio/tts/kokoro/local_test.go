@@ -338,6 +338,40 @@ func TestKokoroGetVoicesSerializedWithInitialize(t *testing.T) {
 	}
 }
 
+func TestKokoroPassesDirectSpeed(t *testing.T) {
+	s := kokoroUnitSynth(t)
+	var args []string
+	s.runCommand = func(_ context.Context, _ string, got []string, _ string) ([]byte, error) {
+		args = append([]string(nil), got...)
+		output := ""
+		for i := 0; i+1 < len(got); i++ {
+			if got[i] == "--output" {
+				output = got[i+1]
+				break
+			}
+		}
+		if output == "" {
+			return nil, fmt.Errorf("missing --output")
+		}
+		kokoroTestWAVRaw(output)
+		return nil, nil
+	}
+
+	if _, err := s.Synthesize(context.Background(), types.SynthesisRequest{Text: "hello", Speed: 1.25}, nil); err != nil {
+		t.Fatalf("Synthesize: %v", err)
+	}
+	got := ""
+	for i := 0; i+1 < len(args); i++ {
+		if args[i] == "--speed" {
+			got = args[i+1]
+			break
+		}
+	}
+	if got != "1.25" {
+		t.Fatalf("--speed = %q, want direct 1.25", got)
+	}
+}
+
 func closedKokoroChan() chan struct{} {
 	ch := make(chan struct{})
 	close(ch)

@@ -1,7 +1,7 @@
 {
   "engine_config": {
     "binary_path": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\sd-server.exe",
-    "models_dir": "G:\\AI GGUF\\Image models",
+    "models_dir": "H:/InvokeAI/models",
     "output_dir": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\images\\gallery",
     "temp_dir": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\images\\tmp",
     "port": 8081

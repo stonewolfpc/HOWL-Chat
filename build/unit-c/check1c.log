@@ -1,0 +1,30 @@
+=== BUILD DOMINANT STIMULUS (3x sentence) ===
+VOICE=Microsoft David Desktop culture=en-US
+TEXT=Hello. This is a test of the local speech recognition system. The quick brown fox jumps over the lazy dog. Hello. This is a test of the local speech recognition system.
+WROTE=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\stimulus2.wav
+FORMAT=16000Hz mono 16-bit bytes=469966
+DURATION=14.69s PEAK=31000 (-0.5 dBFS)
+=== CLEAR COMPOSER (evidence boundary between attempts) ===
+FOCUSED index=0
+KEY sent: ^a
+KEY sent: {DEL}
+VALUE=
+=== ROUTE + VOLUME ===
+SWITCH Headphones (WH-1000XM4)|{0.0.0.00000000}.{9460d508-20ce-4ade-8b76-e405f9ab758a} => Speakers (Realtek(R) Audio)
+VOLUME=100%
+=== START CAPTURE ===
+INVOKED invoke-pattern index=0
+[0] Button cls="input-icon mic-button recording" id="" name="??" rect=1026,1091,36,42 enabled=True offscreen=False
+---MATCHES=1---
+=== PLAY DOMINANT STIMULUS ===
+PLAYED build/unit-c/stimulus2.wav in 14.79s
+[0] Button cls="input-icon mic-button recording" id="" name="??" rect=1026,1091,36,42 enabled=True offscreen=False
+---MATCHES=1---
+=== STOP CAPTURE ===
+INVOKED invoke-pattern index=0
+=== COMPOSER VALUE AFTER STIMULUS ATTEMPT ===
+VALUE=Because we told you that so many times, Ruth. You do know. Okay, I gotta fix that differently. I'll have to fix it later, Ruth. Too many things going on.
+SAVED build/unit-c/check1c-transcribed.png 1400x900 window=960,253
+=== RESTORE OUTPUT ===
+SWITCH Speakers (Realtek(R) Audio)|{0.0.0.00000000}.{73b46750-0008-4166-99c4-0e281059a9d5} => Headphones (WH-1000XM4)
+VOLUME=54%

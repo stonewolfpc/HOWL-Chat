@@ -1,0 +1,8 @@
+0.00.122.590 I srv  llama_server: initializing ...
+0.00.122.601 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.122.930 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.130.690 I srv    load_model: loading model 'G:\AI GGUF\GGUF\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf'
+0.01.070.064 W load: override 'tokenizer.ggml.add_bos_token' to 'true' for Gemma4
+0.01.113.427 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.113.507 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.165.755 W load: '</s>' is a normal token here, removing it from EOG list

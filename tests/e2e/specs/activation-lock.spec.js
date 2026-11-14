@@ -34,6 +34,7 @@ const q = new URLSearchParams(location.search);
 window.__be = {
   calls: [],
   applied: null,
+  settings: null,
   inProgress: false,
   fail: false,
   delay: 0,
@@ -44,6 +45,33 @@ window.__be = {
   desiredGen: 1,
   appliedGen: 1
 };
+function contractReport(audio, applied) {
+  const backend = { asrEnabled: 'asr_enabled', ttsEnabled: 'tts_enabled', asrEngine: 'asr_engine', ttsEngine: 'tts_engine' };
+  const speedEngines = ['piper', 'kokoro', 'melotts'];
+  if (['whisper-tiny', 'whisper-base', 'whisper-small'].includes(audio && audio.asrEngine)) {
+    Object.assign(backend, { asrLanguage: 'asr_language', asrThreads: 'asr_threads', asrBeamSize: 'asr_beam_size', asrBestOf: 'asr_best_of' });
+  }
+  if (audio && audio.ttsEnabled && speedEngines.includes(audio.ttsEngine)) {
+    backend.ttsSpeed = 'tts_speed';
+  }
+  const renderer = { ttsVolume: true, ttsAutoplayMessage: true };
+  const statuses = {};
+  Object.keys(audio || {}).forEach(key => {
+    if (backend[key]) {
+      const want = audio[key];
+      const got = applied ? applied[backend[key]] : undefined;
+      const match = !!applied && (typeof want === 'boolean' ? !!got === want : String(got || '') === String(want || ''));
+      statuses[key] = { key, owner: 'backend', state: match ? 'applied' : 'rejected', reason: match ? '' : 'not effective' };
+    } else if (renderer[key]) {
+      statuses[key] = { key, owner: 'renderer', state: 'renderer' };
+    } else if (key === 'ttsSpeed') {
+      statuses[key] = { key, owner: 'backend', state: 'unavailable', reason: 'speed requires an explicit TTS engine' };
+    } else {
+      statuses[key] = { key, owner: 'none', state: 'unsupported', reason: 'not implemented in fixture' };
+    }
+  });
+  return { statuses };
+}
 window.go = { main: { App: {
   GetSettings: async () => ({ audio: { asrEnabled: true, asrEngine: 'whisper-base', ttsEngine: 'piper' } }),
   SetSettings: async () => { window.__be.setSettingsCalls++; },
@@ -56,19 +84,35 @@ window.go = { main: { App: {
       tts_ready: false,
       apply_in_progress: window.__be.inProgress,
       applied: window.__be.applied,
+      settings: window.__be.settings,
       desired_gen: window.__be.desiredGen,
       applied_gen: window.__be.appliedGen
     };
   },
-  ApplyAudioSettings: async (...args) => {
-    window.__be.calls.push(args);
+  ApplyAudioSettings: async (audio, ...legacy) => {
+    if (!audio || typeof audio !== 'object') {
+      audio = { asrEnabled: !!legacy[0], ttsEnabled: !!legacy[1], asrEngine: legacy[2], ttsEngine: legacy[3] };
+    }
+    window.__be.calls.push(audio);
     if (window.__be.delay) await new Promise(r => setTimeout(r, window.__be.delay));
     if (window.__be.fail) throw new Error('activation failed');
     if (window.__be.publishApplied) {
       window.__be.applied = {
-        asr_enabled: !!args[0], tts_enabled: !!args[1],
-        asr_engine: args[2], tts_engine: args[3]
+        asr_enabled: !!audio.asrEnabled, tts_enabled: !!audio.ttsEnabled,
+        asr_engine: audio.asrEngine, tts_engine: audio.ttsEngine
       };
+      if (['whisper-tiny', 'whisper-base', 'whisper-small'].includes(audio.asrEngine)) {
+        Object.assign(window.__be.applied, {
+          asr_language: audio.asrLanguage, asr_threads: audio.asrThreads,
+          asr_beam_size: audio.asrBeamSize, asr_best_of: audio.asrBestOf
+        });
+      }
+      if (audio.ttsEnabled && ['piper', 'kokoro', 'melotts'].includes(audio.ttsEngine)) {
+        Object.assign(window.__be.applied, { tts_speed: audio.ttsSpeed });
+      }
+      window.__be.settings = contractReport(audio, window.__be.applied);
+    } else {
+      window.__be.settings = null;
     }
   },
   GetTTSModels: async () => [{ name: 'voice-a', size_mb: 12 }],
@@ -215,20 +259,20 @@ async function expectClosedWithoutSideEffects(page, before) {
 }
 
 const activate = (panel) => panel.evaluate(() =>
-    window.go.main.App.ApplyAudioSettings(true, false, 'whisper-base', 'piper'));
+    window.go.main.App.ApplyAudioSettings({ asrEnabled: true, ttsEnabled: false, asrEngine: 'whisper-base', ttsEngine: 'piper' }));
 
 test('second activation while locked is refused without reaching the backend', async ({ page }) => {
     const panel = await openPanel(page);
     await page.evaluate(() => { window.__be.delay = 1200; });
 
     await panel.evaluate(() => {
-        window.__first = window.go.main.App.ApplyAudioSettings(true, false, 'whisper-base', 'piper');
+        window.__first = window.go.main.App.ApplyAudioSettings({ asrEnabled: true, ttsEnabled: false, asrEngine: 'whisper-base', ttsEngine: 'piper' });
     });
     await expect.poll(() => page.evaluate(() => window.__be.calls.length)).toBe(1);
     await expect.poll(() => page.evaluate(() => window.howlBridgeHost.isActivationLocked())).toBe(true);
 
     const second = await panel.evaluate(() => window.go.main.App
-        .ApplyAudioSettings(true, false, 'whisper-base', 'piper')
+        .ApplyAudioSettings({ asrEnabled: true, ttsEnabled: false, asrEngine: 'whisper-base', ttsEngine: 'piper' })
         .then(() => ({ ok: true }), e => ({ ok: false, name: e.name, message: e.message })));
 
     expect(second.ok).toBe(false);
@@ -299,7 +343,7 @@ test('navigation during an activation keeps the lock after the backend settles',
     const panel = await openPanel(page);
     await page.evaluate(() => { window.__be.delay = 5000; });
     await panel.evaluate(() => {
-        window.go.main.App.ApplyAudioSettings(true, false, 'whisper-base', 'piper');
+        window.go.main.App.ApplyAudioSettings({ asrEnabled: true, ttsEnabled: false, asrEngine: 'whisper-base', ttsEngine: 'piper' });
     });
     await expect.poll(() => page.evaluate(() => window.__be.calls.length)).toBe(1);
     await expect.poll(() => page.evaluate(() => window.howlBridgeHost.isActivationLocked())).toBe(true);

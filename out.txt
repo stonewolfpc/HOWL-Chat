@@ -1,0 +1,17 @@
+project_root=C:\Users\StoneWolfPC\HOWL_Chat
+state_root=C:\Users\StoneWolfPC\AppData\Local\Temp\tmp.9p97aujQwV\run1\data
+config=C:\Users\StoneWolfPC\AppData\Local\Temp\tmp.9p97aujQwV\run1\data\config
+chats=C:\Users\StoneWolfPC\AppData\Local\Temp\tmp.9p97aujQwV\run1\data\Chats
+worlds=C:\Users\StoneWolfPC\AppData\Local\Temp\tmp.9p97aujQwV\run1\data\Worlds
+characters=C:\Users\StoneWolfPC\AppData\Local\Temp\tmp.9p97aujQwV\run1\data\Characters
+scenarios=C:\Users\StoneWolfPC\AppData\Local\Temp\tmp.9p97aujQwV\run1\data\Scenarios
+gallery=C:\Users\StoneWolfPC\AppData\Local\Temp\tmp.9p97aujQwV\run1\data\images\gallery
+entities=C:\Users\StoneWolfPC\AppData\Local\Temp\tmp.9p97aujQwV\run1\data\images\entities
+workflows=C:\Users\StoneWolfPC\AppData\Local\Temp\tmp.9p97aujQwV\run1\data\workflows
+persisted_chats=C:\Users\StoneWolfPC\AppData\Local\Temp\tmp.9p97aujQwV\run1\data\persisted-chats
+logs=C:\Users\StoneWolfPC\AppData\Local\Temp\tmp.9p97aujQwV\run1\data\logs
+tts_cache=C:\Users\StoneWolfPC\AppData\Local\Temp\tmp.9p97aujQwV\run1\data\cache\tts
+temp=C:\Users\StoneWolfPC\AppData\Local\Temp\tmp.9p97aujQwV\run1\temp
+isolation=on
+isolation_root=C:\Users\StoneWolfPC\AppData\Local\Temp\tmp.9p97aujQwV\run1
+webview_data=C:\Users\StoneWolfPC\AppData\Local\Temp\tmp.9p97aujQwV\run1\webview2

@@ -1,0 +1,1 @@
+{"protocol":{"major":1,"minor":0},"id":"req-0123456789abcdef0123456789abcdef-0000000000000003","op":"load","params":{"provider_id":"piper","engine":"piper","model_identity":"piper:en_US-amy-medium:v1","assets":{"root":"C:/Howl/runtime/tts/assets","model":"en_US-amy-medium.onnx","voices":"en_US-amy-medium.onnx.json","config":"config.json","data":"data"}}}

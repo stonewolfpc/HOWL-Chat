@@ -1,0 +1,20 @@
+=== ROUTE STIMULUS TO PHYSICAL SPEAKERS (console+multimedia only; comms stays on headset) ===
+SWITCH Headphones (WH-1000XM4)|{0.0.0.00000000}.{9460d508-20ce-4ade-8b76-e405f9ab758a} => Speakers (Realtek(R) Audio)
+VOLUME=100%
+DEFAULT_RENDER=Speakers (Realtek(R) Audio)|{0.0.0.00000000}.{73b46750-0008-4166-99c4-0e281059a9d5}
+=== CHECK 1: START RECORDING (real mic button click) ===
+    + CategoryInfo          : OperationStopped: (index 0 out of range; matches=0:String) [], RuntimeException
+    + FullyQualifiedErrorId : index 0 out of range; matches=0
+ 
+SAVED build/unit-c/check1-recording.png 1400x900 window=960,253
+=== CHECK 1: PLAY PHYSICAL STIMULUS ===
+PLAYED build/unit-c/stimulus.wav in 5.67s
+=== CHECK 1: STOP RECORDING ===
+INVOKED invoke-pattern index=0
+SAVED build/unit-c/check1-stopped.png 1400x900 window=960,253
+=== COMPOSER VALUE AFTER TRANSCRIPTION ===
+VALUE=
+SAVED build/unit-c/check1-transcribed.png 1400x900 window=960,253
+=== RESTORE DEFAULT OUTPUT TO HEADSET ===
+SWITCH Speakers (Realtek(R) Audio)|{0.0.0.00000000}.{73b46750-0008-4166-99c4-0e281059a9d5} => Headphones (WH-1000XM4)
+DEFAULT_RENDER=Headphones (WH-1000XM4)|{0.0.0.00000000}.{9460d508-20ce-4ade-8b76-e405f9ab758a}

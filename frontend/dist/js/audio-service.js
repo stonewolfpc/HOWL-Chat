@@ -21,9 +21,11 @@ window.AudioService = {
     toggleRecording,
     playTTS,
     stopTTS,
+    invalidateVoiceCache,
     getStatus,
     syncFromSettings,
     getASRReadiness,
+    getMicrophoneStatus,
     enableASR,
     enableTTS,
     isTTSEnabled,
@@ -49,6 +51,12 @@ let _asrEnabled = window.settingsState?.current?.audio?.asrEnabled || false;
 let _ttsEnabled = window.settingsState?.current?.audio?.ttsEnabled || false;
 let _asrReadiness = _asrEnabled ? 'not-ready' : 'disabled';
 let _asrReadinessDetail = '';
+let _micStatus = null;
+
+const MIC_NO_DEVICE_MESSAGE = "Windows shows a mic isn't selected. Please connect a microphone to use this option";
+const MIC_UNAVAILABLE_MESSAGE = 'The selected microphone is unavailable. Reconnect it or choose another microphone in Windows.';
+const MIC_ACCESS_DENIED_MESSAGE = 'Windows is blocking microphone access. Allow desktop apps to use the microphone in Windows Settings.';
+const MIC_INIT_FAILED_MESSAGE = 'The microphone is present but could not be opened for recording.';
 
 const MAX_RECORDING_SECONDS = 120;
 const REMOTE_ASR_ENGINES = new Set(['qwen3-asr-0.6b', 'qwen3-asr-1.7b']);
@@ -71,15 +79,48 @@ function syncFromSettings() {
 
 async function _refreshASRReadiness() {
     const app = window.go?.main?.App;
-    if (typeof app?.GetAudioStatus !== 'function') return;
+    if (typeof app?.GetAudioStatus !== 'function') return null;
     try {
         const status = await app.GetAudioStatus();
+        _micStatus = status?.mic || null;
         _asrReadiness = _readinessFromStatus(status);
         _asrReadinessDetail = status.asr_error || (_asrReadiness === 'remote-unverified' ?
             'remote engine availability is not locally verified' : '');
+        return status;
     } catch (err) {
         console.warn('GetAudioStatus failed while refreshing ASR readiness:', err);
+        _micStatus = null;
+        return null;
     }
+}
+
+// Read capture availability without touching readiness: readiness comes from the
+// applied generation, while the microphone is re-probed on every explicit
+// recording attempt so a device connected after startup is picked up.
+async function _refreshMicrophoneStatus() {
+    const app = window.go?.main?.App;
+    if (typeof app?.GetAudioStatus !== 'function') {
+        _micStatus = null;
+        return null;
+    }
+    try {
+        const status = await app.GetAudioStatus();
+        _micStatus = status?.mic || null;
+        return _micStatus;
+    } catch (err) {
+        console.warn('GetAudioStatus failed while checking the microphone:', err);
+        _micStatus = null;
+        return null;
+    }
+}
+
+function _microphoneErrorMessage(err) {
+    const name = err && err.name;
+    if (name === 'NotFoundError' || name === 'DevicesNotFoundError') return MIC_NO_DEVICE_MESSAGE;
+    if (name === 'NotAllowedError' || name === 'SecurityError' || name === 'PermissionDeniedError') return MIC_ACCESS_DENIED_MESSAGE;
+    if (name === 'NotReadableError' || name === 'TrackStartError') return MIC_UNAVAILABLE_MESSAGE;
+    if (_micStatus && _micStatus.message) return _micStatus.message;
+    return MIC_INIT_FAILED_MESSAGE;
 }
 
 function _readinessFromStatus(status) {
@@ -90,28 +131,17 @@ function _readinessFromStatus(status) {
     return status?.asr_ready ? 'local-initialized' : 'not-ready';
 }
 
-// Re-apply the persisted engine choices once settings have loaded. Without this
-// the dropdowns could restore an engine the backend had never been told about.
+// Restore persisted selections into the UI and mirror the backend's current
+// status. This deliberately does not call ApplyAudioSettings: a saved selection
+// must not load a model or reserve VRAM at startup. Activation stays explicit
+// through Save or Retry.
 async function restorePersistedAudio() {
     if (_restoreApplied) return;
     const s = window.settingsState?.current?.audio;
-    const app = window.go?.main?.App;
-    if (!s || (!s.asrEnabled && !s.ttsEnabled)) return;
-    if (typeof app?.ApplyAudioSettings !== 'function') return;
+    if (!s) return;
     _restoreApplied = true;
-    try {
-        await app.ApplyAudioSettings(
-            !!s.asrEnabled,
-            !!s.ttsEnabled,
-            s.asrEngine || 'auto',
-            s.ttsEngine || 'auto'
-        );
-        await _refreshASRReadiness();
-    } catch (err) {
-        console.warn('Audio settings restore failed:', err);
-        _asrReadiness = 'apply-failed';
-        _asrReadinessDetail = String(err);
-    }
+    syncFromSettings();
+    await _refreshASRReadiness();
 }
 
 // Sync with persisted settings whenever they change
@@ -133,6 +163,9 @@ window.addEventListener('howl:audio-settings-applied', (event) => {
     if (window.settingsState?.current?.audio) {
         Object.assign(window.settingsState.current.audio, detail.audio);
     }
+    // Global engine/voice/speed defaults are part of every inherited
+    // character config, so the per-character merge cache cannot survive them.
+    _invalidateVoiceCache();
     syncFromSettings();
     _restoreApplied = true;
     _asrReadiness = detail.readiness || 'not-ready';
@@ -154,6 +187,14 @@ async function startRecording() {
     if (_recording || _starting || _processing) return;
     if (!_asrEnabled) {
         showNotification('Speech recognition is disabled', 'warning');
+        return;
+    }
+    // Capture availability is checked before the readiness gate so a missing or
+    // unavailable microphone reports its own state instead of a generic
+    // "not ready", matching the backend that refuses ASR allocation.
+    await _refreshMicrophoneStatus();
+    if (_micStatus && _micStatus.state && _micStatus.state !== 'ready') {
+        showNotification(_micStatus.message || MIC_UNAVAILABLE_MESSAGE, 'warning');
         return;
     }
     const blocked = _asrBlockedReason();
@@ -222,7 +263,7 @@ async function startRecording() {
         releaseCapture();
         _recording = false;
         updateMicButtonState(false);
-        showNotification('Microphone access denied or unavailable', 'error');
+        showNotification(_microphoneErrorMessage(err), 'error');
     } finally {
         _starting = false;
     }
@@ -401,11 +442,20 @@ function _getMergedVoiceConfig(characterId) {
     const character = cd?.characters?.find(c => c.id === characterId);
     const voice = character?.howl?.voice;
 
+    // A character with no per-character voice remains a no-override request.
+    // The backend applies the active global engine/voice defaults in that case.
     if (!voice?.enabled) { _voiceConfigCache.set(characterId, null); return null; }
 
+    const engine = voice.engine || '';
     const merged = {
-        engine:           voice.engine  || global.ttsEngine   || 'piper',
-        voice:            voice.voice   || global.ttsVoice    || 'en_US-lessac-medium',
+        character_id:     characterId,
+        // Keep the character's inheritance decision intact. The backend
+        // resolves a blank engine against the active global generation.
+        engine:           engine,
+        // A voice belongs to an engine. An explicit engine with no chosen
+        // model inherits that engine's default, not another engine's global
+        // voice (for example a Piper name sent to Kokoro).
+        voice:            voice.voice || (engine ? '' : (global.ttsVoice || '')),
         speed:            voice.speed   ?? global.ttsSpeed    ?? 1.0,
         volume:           voice.volume  ?? global.ttsVolume   ?? 0.8,
         noiseScale:       voice.noiseScale       ?? global.ttsNoiseScale      ?? 0.667,
@@ -421,6 +471,52 @@ function _invalidateVoiceCache(characterId) {
     else _voiceConfigCache.clear();
 }
 
+function invalidateVoiceCache(characterId) {
+    _invalidateVoiceCache(characterId);
+}
+
+window.addEventListener('howl:character-saved', (event) => {
+    _invalidateVoiceCache(event?.detail?.id || null);
+});
+
+function _selectedOutputDevice() {
+    const audio = window.settingsState?.current?.audio || {};
+    return String(audio.audioOutputDevice || 'default');
+}
+
+// Resolve an explicitly selected output endpoint. The default setting is
+// intentionally allowed to use the Windows default output. An explicit device
+// is pinned by ID and never silently replaced if it disappears.
+async function _resolveExplicitOutputSink() {
+    const selected = _selectedOutputDevice();
+    if (selected === 'none') {
+        throw new Error('Audio output is disabled in Audio Settings.');
+    }
+    if (selected === 'default') return null;
+    if (!navigator.mediaDevices?.enumerateDevices) {
+        throw new Error('This WebView cannot enumerate audio outputs, so the selected output cannot be resolved.');
+    }
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const outputs = devices.filter(device => device.kind === 'audiooutput');
+    if (outputs.length === 0) {
+        throw new Error('No audio output endpoints are available. Refresh Audio Settings.');
+    }
+    const chosen = outputs.find(device => device.deviceId === selected);
+    if (!chosen) {
+        throw new Error('The selected output device is no longer available. Choose it again in Audio Settings.');
+    }
+    return chosen.deviceId;
+}
+
+async function _pinOutputDevice(audioElement) {
+    const sinkId = await _resolveExplicitOutputSink();
+    if (!sinkId) return;
+    if (!audioElement || typeof audioElement.setSinkId !== 'function') {
+        throw new Error('This WebView cannot select the requested output endpoint.');
+    }
+    await audioElement.setSinkId(sinkId);
+}
+
 async function playTTS(text, characterId) {
     if (!text || !_ttsEnabled) return;
 
@@ -429,7 +525,9 @@ async function playTTS(text, characterId) {
     const voiceCfg = _getMergedVoiceConfig(characterId);
     const engine = voiceCfg?.engine || window.settingsState?.current?.audio?.ttsEngine || 'piper';
 
-    // Browser TTS path (works with per-character voices natively)
+    // Browser TTS follows the default output. It cannot target a specific
+    // endpoint, so an explicit non-default selection is reported as a genuine
+    // technical limitation rather than silently using another output.
     if (engine === 'browser') {
         useBrowserTTS(text, voiceCfg);
         return;
@@ -445,16 +543,20 @@ async function playTTS(text, characterId) {
                 audioPath = await window.go.main.App.SynthesizeSpeech(text);
             }
             if (audioPath) {
-                _ttsAudio = new Audio(audioPath);
-                _ttsAudio.volume = voiceCfg?.volume ?? (window.settingsState?.current?.audio?.ttsVolume || 1.0);
-                await _ttsAudio.play();
+                const audio = new Audio(audioPath);
+                await _pinOutputDevice(audio);
+                audio.volume = voiceCfg?.volume ?? (window.settingsState?.current?.audio?.ttsVolume || 1.0);
+                _ttsAudio = audio;
+                await audio.play();
             }
         } else {
             useBrowserTTS(text, voiceCfg);
         }
     } catch (err) {
         console.error('TTS error:', err);
-        useBrowserTTS(text, voiceCfg);
+        if (window.showNotification) {
+            window.showNotification('TTS unavailable: ' + (err?.message || err), 'error');
+        }
     }
 }
 
@@ -471,10 +573,24 @@ function stopTTS() {
 }
 
 function useBrowserTTS(text, voiceCfg) {
-    if (!window.speechSynthesis) return;
+    const selected = _selectedOutputDevice();
+    if (selected === 'none') {
+        if (window.showNotification) window.showNotification('Audio output is disabled in Audio Settings.', 'error');
+        return;
+    }
+    if (selected !== 'default') {
+        if (window.showNotification) {
+            window.showNotification('Browser TTS cannot target a specific output device. Select the Windows default output or use a backend TTS engine.', 'error');
+        }
+        return;
+    }
+    if (!window.speechSynthesis) {
+        if (window.showNotification) window.showNotification('Browser TTS is unavailable in this WebView.', 'error');
+        return;
+    }
+
     const utterance = new SpeechSynthesisUtterance(text);
     const voices = window.speechSynthesis.getVoices();
-    // Try to find a voice matching the requested model name or fall back to a good English voice
     let preferred = null;
     if (voiceCfg?.voice) {
         const search = voiceCfg.voice.toLowerCase();
@@ -484,7 +600,7 @@ function useBrowserTTS(text, voiceCfg) {
         preferred = voices.find(v => v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha'));
     }
     if (preferred) utterance.voice = preferred;
-    utterance.rate  = voiceCfg?.speed  ?? (window.settingsState?.current?.audio?.ttsSpeed  || 1.0);
+    utterance.rate = voiceCfg?.speed ?? (window.settingsState?.current?.audio?.ttsSpeed || 1.0);
     utterance.volume = voiceCfg?.volume ?? (window.settingsState?.current?.audio?.ttsVolume || 1.0);
     window.speechSynthesis.speak(utterance);
 }
@@ -550,6 +666,10 @@ function isASREnabled() {
 
 function getASRReadiness() {
     return { state: _asrReadiness, detail: _asrReadinessDetail };
+}
+
+function getMicrophoneStatus() {
+    return _micStatus;
 }
 
 // ---------------------------------------------------------------------------

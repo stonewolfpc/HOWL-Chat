@@ -28,18 +28,23 @@ import (
 type Pipeline struct {
 	lifecycleMu   sync.RWMutex
 	replacementMu sync.Mutex
+	ttsLoadMu     sync.Mutex
 	mu            sync.RWMutex
 	config        types.PipelineConfig
 	status        types.PipelineStatus
 	loader        *runtime.ModelLoader
 	planner       runtime.Constraints
 
-	asrRecognizer  types.ASRRecognizer
-	ttsSynth       types.TTSSynthesizer
-	multimodal     types.MultimodalBridge
-	ttsCache       types.AudioCache
-	loadedVoice    string // Currently loaded TTS voice model name
-	initialization initOutcome
+	asrRecognizer   types.ASRRecognizer
+	ttsSynth        types.TTSSynthesizer
+	ttsEngines      map[string]types.TTSSynthesizer
+	activeTTSEngine string
+	multimodal      types.MultimodalBridge
+	ttsCache        types.AudioCache
+	ttsCacheMu      sync.Mutex
+	ttsCacheCalls   map[string]*ttsCacheCall
+	loadedVoice     string // Configured voice model for the active synthesizer
+	initialization  initOutcome
 }
 
 type capabilityInit struct {
@@ -51,6 +56,15 @@ type capabilityInit struct {
 type initOutcome struct {
 	asr capabilityInit
 	tts capabilityInit
+}
+
+// ttsCacheCall coalesces concurrent requests with the same complete synthesis
+// identity. Followers receive the leader's result instead of invoking the
+// engine again.
+type ttsCacheCall struct {
+	done chan struct{}
+	path string
+	err  error
 }
 
 func (o initOutcome) aggregateError() error {
@@ -77,7 +91,9 @@ func NewPipeline() *Pipeline {
 	loader := runtime.NewModelLoader()
 	registerBuiltins(loader)
 	return &Pipeline{
-		loader: loader,
+		loader:        loader,
+		ttsEngines:    make(map[string]types.TTSSynthesizer),
+		ttsCacheCalls: make(map[string]*ttsCacheCall),
 	}
 }
 
@@ -100,6 +116,11 @@ func (p *Pipeline) Initialize(ctx context.Context, config types.PipelineConfig) 
 	p.config = config
 	p.status = types.PipelineStatus{}
 	p.ttsCache = cache.NewManager(100)
+	p.ttsCacheMu.Lock()
+	p.ttsCacheCalls = make(map[string]*ttsCacheCall)
+	p.ttsCacheMu.Unlock()
+	p.ttsEngines = make(map[string]types.TTSSynthesizer)
+	p.activeTTSEngine = ""
 	p.planner = constraints
 	p.initialization = initOutcome{
 		asr: capabilityInit{requested: config.ASREnabled},
@@ -130,21 +151,26 @@ func (p *Pipeline) Initialize(ctx context.Context, config types.PipelineConfig) 
 	if config.TTSEnabled {
 		var synth types.TTSSynthesizer
 		var loadedVoice string
+		var ttsEngine string
 		outcome := capabilityInit{requested: true}
 		candidates, selectionErr := ttsCandidatesFor(plan.TTS, config.TTSEngine)
 		if selectionErr != nil {
 			outcome.err = selectionErr
 		} else {
-			synth, loadedVoice, outcome = p.initTTS(ctx, candidates)
+			synth, loadedVoice, ttsEngine, outcome = p.initTTS(ctx, candidates)
 		}
 		p.mu.Lock()
 		p.initialization.tts = outcome
 		p.ttsSynth = nil
+		p.ttsEngines = make(map[string]types.TTSSynthesizer)
+		p.activeTTSEngine = ""
 		p.loadedVoice = ""
 		p.status.TTSReady = false
 		if outcome.ready {
 			p.ttsSynth = synth
 			p.loadedVoice = loadedVoice
+			p.activeTTSEngine = ttsEngine
+			p.ttsEngines[ttsEngineKey(ttsEngine, "")] = synth
 			p.status.TTSReady = true
 		}
 		p.mu.Unlock()
@@ -163,7 +189,6 @@ func (p *Pipeline) ProcessAudioMessage(ctx context.Context, msg types.AudioMessa
 	start := time.Now()
 	p.mu.RLock()
 	asrRec := p.asrRecognizer
-	ttsSynth := p.ttsSynth
 	cacheStore := p.ttsCache
 	p.mu.RUnlock()
 
@@ -182,16 +207,12 @@ func (p *Pipeline) ProcessAudioMessage(ctx context.Context, msg types.AudioMessa
 		response.ResponseText = response.TranscribedText
 
 	case "audio_output":
-		if ttsSynth == nil {
-			return nil, types.NewAudioError(types.ErrCodeModelNotFound, "tts is not enabled", nil)
+		resolved, err := p.resolveTTSRequest(ctx, msg.VoiceOverride)
+		if err != nil {
+			p.recordError()
+			return nil, err
 		}
-		// If voice override requests a different model, lazily switch
-		if msg.VoiceOverride != nil && msg.VoiceOverride.Voice != "" {
-			if err := p.ensureTTSVoice(ctx, msg.VoiceOverride.Voice); err != nil {
-				fmt.Printf("WARN: voice switch failed (%v), using current voice\n", err)
-			}
-		}
-		audioPath, err := p.synthesizeWithCache(ctx, cacheStore, ttsSynth, msg.Text, msg.VoiceOverride)
+		audioPath, err := p.synthesizeWithCache(ctx, cacheStore, resolved, msg.Text)
 		if err != nil {
 			p.recordError()
 			return nil, err
@@ -204,6 +225,253 @@ func (p *Pipeline) ProcessAudioMessage(ctx context.Context, msg types.AudioMessa
 
 	response.ProcessingTime = time.Since(start).Seconds()
 	return response, nil
+}
+
+// resolvedTTS is the request-local result of voice/engine resolution. It is
+// never installed into Pipeline.config or Pipeline.ttsSynth.
+type resolvedTTS struct {
+	synth         types.TTSSynthesizer
+	engine        string
+	voice         string
+	voicePath     string
+	modelIdentity string
+	language      string
+	speed         float64
+	characterID   string
+}
+
+// resolveTTSRequest resolves one request against the active global binding or
+// an explicitly selected engine. Explicit engines are loaded into a separate
+// engine map; they never replace the active global synthesizer. Automatic or
+// blank engine/voice values inherit the active global configuration.
+func (p *Pipeline) resolveTTSRequest(ctx context.Context, override *types.VoiceOverride) (resolvedTTS, error) {
+	p.mu.RLock()
+	activeSynth := p.ttsSynth
+	activeEngine := p.activeTTSEngine
+	configuredEngine := p.config.TTSEngine
+	configuredVoice := p.config.TTSVoice
+	configuredSpeed := p.config.TTSSpeed
+	p.mu.RUnlock()
+
+	if activeSynth == nil {
+		return resolvedTTS{}, types.NewAudioError(types.ErrCodeModelNotFound, "tts is not enabled", nil)
+	}
+	if activeEngine == "" {
+		activeEngine = configuredEngine
+	}
+
+	engine := ""
+	speedEngine := ""
+	inheritEngine := true
+	characterID := ""
+	voice := ""
+	if override != nil {
+		characterID = strings.TrimSpace(override.CharacterID)
+		voice = strings.TrimSpace(override.Voice)
+		requestedEngine := strings.ToLower(strings.TrimSpace(override.Engine))
+		if requestedEngine != "" && requestedEngine != "auto" {
+			inheritEngine = false
+			engine = requestedEngine
+			speedEngine = engine
+			if err := validateTTSEngine(engine); err != nil {
+				return resolvedTTS{}, wrapCharacterVoiceError(characterID, err)
+			}
+		}
+	}
+	if inheritEngine {
+		engine = activeEngine
+		if voice == "" {
+			voice = strings.TrimSpace(configuredVoice)
+		}
+		if engine == "auto" {
+			// The provider selected at initialization is active, but no
+			// engine-specific speed contract is available for "auto".
+			engine = ""
+		}
+		// Preserve Group 2A's auto-select contract: the configured engine,
+		// not the provider chosen at initialization, decides whether the
+		// global speed is applied.
+		if configuredEngine != "" && configuredEngine != "auto" {
+			speedEngine = configuredEngine
+		}
+	}
+
+	synth := activeSynth
+	if !inheritEngine && engine != activeEngine {
+		loaded, err := p.loadTTSForRequest(ctx, engine, voice)
+		if err != nil {
+			return resolvedTTS{}, wrapCharacterVoiceError(characterID, err)
+		}
+		synth = loaded
+	}
+
+	voicePath, err := ttsVoicePath(engine, voice)
+	if err != nil {
+		return resolvedTTS{}, wrapCharacterVoiceError(characterID, err)
+	}
+	modelIdentity := resolvedTTSModelIdentity(synth, engine, voicePath)
+	if voice == "" {
+		voice = firstVoiceOrDefault(synth, "default")
+	}
+	if engine != "piper" {
+		if err := validateTTSVoice(synth, engine, voice); err != nil {
+			return resolvedTTS{}, wrapCharacterVoiceError(characterID, err)
+		}
+	}
+	language := ""
+	if engine == string(types.TTSMeloTTS) {
+		// MeloTTS receives the speaker and language together. Its voice IDs
+		// are language names (EN/ZH/JP/...), so pass the selected voice as
+		// the language hint instead of allowing the adapter to default to EN.
+		language = voice
+	}
+
+	speed := ttsSpeedOrDefault(configuredSpeed)
+	if override != nil && override.Speed > 0 {
+		// Group 2A precedence: a request speed wins over the global speed.
+		// It must still pass the same engine-specific guard as a configured
+		// speed. An automatic selection has no engine-specific range, so its
+		// established pass-through behavior is retained.
+		speed = override.Speed
+		if speed < 0.5 || speed > 2.0 {
+			return resolvedTTS{}, wrapCharacterVoiceError(characterID,
+				types.NewAudioError(types.ErrCodeSynthesisFailed,
+					fmt.Sprintf("speech speed must be between 0.5 and 2.0, got %g", speed), nil))
+		}
+		if engine != "" && engine != "auto" {
+			speed, err = ttsSpeedForConfig(engine, speed)
+			if err != nil {
+				return resolvedTTS{}, wrapCharacterVoiceError(characterID, err)
+			}
+		}
+	} else {
+		speed, err = ttsSpeedForConfig(speedEngine, speed)
+		if err != nil {
+			return resolvedTTS{}, wrapCharacterVoiceError(characterID, err)
+		}
+	}
+
+	return resolvedTTS{
+		synth:         synth,
+		engine:        engine,
+		voice:         voice,
+		voicePath:     voicePath,
+		modelIdentity: modelIdentity,
+		language:      language,
+		speed:         speed,
+		characterID:   characterID,
+	}, nil
+}
+
+func wrapCharacterVoiceError(characterID string, err error) error {
+	if characterID == "" {
+		return err
+	}
+	return fmt.Errorf("character %q voice: %w", characterID, err)
+}
+
+func validateTTSEngine(engine string) error {
+	switch engine {
+	case "", "auto":
+		return nil
+	case "browser":
+		return types.NewAudioError(types.ErrCodeFormatNotSupported,
+			"browser TTS is a renderer-only engine and cannot be synthesized by the backend", nil)
+	}
+	if _, ok := types.GetTTSProfile(types.TTSModelType(engine)); !ok {
+		return types.NewAudioError(types.ErrCodeModelNotFound,
+			fmt.Sprintf("unsupported TTS engine %q", engine), nil)
+	}
+	return nil
+}
+
+func resolvedTTSModelIdentity(synth types.TTSSynthesizer, engine, voicePath string) string {
+	cfg := types.TTSConfig{}
+	if provider, ok := synth.(interface{ GetConfig() types.TTSConfig }); ok {
+		cfg = provider.GetConfig()
+	}
+	return types.TTSModelIdentity(engine, cfg, voicePath)
+}
+
+func validateTTSVoice(synth types.TTSSynthesizer, engine, voice string) error {
+	if voice == "" || synth == nil {
+		return nil
+	}
+	voices := synth.GetVoices()
+	if len(voices) == 0 {
+		// Some adapters enumerate voices dynamically. Let the adapter's own
+		// synthesis contract report an invalid voice rather than guessing.
+		return nil
+	}
+	for _, candidate := range voices {
+		if candidate.ID == voice || candidate.Name == voice {
+			return nil
+		}
+	}
+	return types.NewAudioError(types.ErrCodeSynthesisFailed,
+		fmt.Sprintf("voice %q is not supported by TTS engine %q", voice, engine), nil)
+}
+
+// loadTTSForRequest loads an explicit engine without changing the active global
+// binding. Piper is keyed by its request model path so a later character cannot
+// inherit another Piper voice model by accident.
+func (p *Pipeline) loadTTSForRequest(ctx context.Context, engine, voice string) (types.TTSSynthesizer, error) {
+	p.lifecycleMu.RLock()
+	defer p.lifecycleMu.RUnlock()
+	p.ttsLoadMu.Lock()
+	defer p.ttsLoadMu.Unlock()
+
+	if p.loader == nil {
+		return nil, types.NewAudioError(types.ErrCodeModelNotFound,
+			fmt.Sprintf("cannot load TTS engine %q without a model loader", engine), nil)
+	}
+	voicePath, err := ttsVoicePath(engine, voice)
+	if err != nil {
+		return nil, err
+	}
+	key := ttsEngineKey(engine, voicePath)
+	p.mu.RLock()
+	if synth, ok := p.ttsEngines[key]; ok {
+		p.mu.RUnlock()
+		return synth, nil
+	}
+	p.mu.RUnlock()
+
+	cfg := ttsConfigForModel(types.TTSModelType(engine), defaultTTSCacheDir())
+	if voicePath != "" {
+		cfg.ModelPath = voicePath
+	}
+	synth, err := p.loader.LoadTTS(ctx, engine, cfg)
+	if err != nil {
+		return nil, types.NewAudioError(types.ErrCodeModelLoadFailed,
+			fmt.Sprintf("load TTS engine %q: %v", engine, err), err)
+	}
+	p.mu.Lock()
+	if p.ttsEngines == nil {
+		p.ttsEngines = make(map[string]types.TTSSynthesizer)
+	}
+	p.ttsEngines[key] = synth
+	p.mu.Unlock()
+	return synth, nil
+}
+
+func ttsEngineKey(engine, voicePath string) string {
+	if engine == "piper" && voicePath != "" {
+		return engine + "|" + voicePath
+	}
+	return engine
+}
+
+func ttsVoicePath(engine, voice string) (string, error) {
+	if engine != "piper" || voice == "" {
+		return "", nil
+	}
+	path := voiceModelPath(voice)
+	if _, err := os.Stat(path); err != nil {
+		return "", types.NewAudioError(types.ErrCodeModelNotFound,
+			fmt.Sprintf("piper voice model not found: %s", path), err)
+	}
+	return path, nil
 }
 
 // EnableASR overrides the ASR recognizer.
@@ -268,6 +536,8 @@ func (p *Pipeline) Shutdown(ctx context.Context) error {
 	p.mu.Lock()
 	p.asrRecognizer = nil
 	p.ttsSynth = nil
+	p.ttsEngines = make(map[string]types.TTSSynthesizer)
+	p.activeTTSEngine = ""
 	p.multimodal = nil
 	p.loadedVoice = ""
 	p.status.ASRReady = false
@@ -366,6 +636,31 @@ func ttsCandidatesForRecords(planned []types.TTSModelType, engine string, record
 	return []types.TTSModelType{types.TTSModelType(record.ID)}, nil
 }
 
+// Non-Whisper ASR keeps the values this pipeline used before decode settings
+// became operational. In particular, llama-server still receives its legacy
+// thread count and language value; the four desired decode values must not leak
+// into an engine whose adapter does not implement them.
+const (
+	legacyASRLanguage = "auto"
+	legacyASRThreads  = 6
+)
+
+// asrDecodeConfigFor forwards Whisper decode options only for an explicit
+// Whisper selection. Automatic and non-Whisper engines keep their existing
+// adapter values, and the status report marks the four values unsupported or
+// unavailable rather than pretending they were consumed.
+func asrDecodeConfigFor(config types.PipelineConfig) types.ASRConfig {
+	if !isWhisperASREngine(config.ASREngine) {
+		return types.ASRConfig{Language: legacyASRLanguage, NumThreads: legacyASRThreads}
+	}
+	return types.ASRConfig{
+		Language:   config.ASRLanguage,
+		NumThreads: config.ASRThreads,
+		BeamSize:   config.ASRBeamSize,
+		BestOf:     config.ASRBestOf,
+	}
+}
+
 func (p *Pipeline) initASR(ctx context.Context, candidates []types.ASRModelType, config types.PipelineConfig) (types.ASRRecognizer, capabilityInit) {
 	out := capabilityInit{requested: true}
 	if len(candidates) == 0 {
@@ -377,13 +672,16 @@ func (p *Pipeline) initASR(ctx context.Context, candidates []types.ASRModelType,
 	recMap := make(map[types.ASRModelType]types.ASRRecognizer)
 	ownedIDs := make([]string, 0, len(selected))
 	var errs []error
+	decode := asrDecodeConfigFor(config)
 	for _, modelType := range selected {
 		rec, err := p.loader.LoadASR(ctx, string(modelType), types.ASRConfig{
 			ModelPath:     ASRModelPathFor(modelType),
 			ProjectorPath: ASRProjectorPathFor(modelType),
 			ServerPath:    ASRServerPathFor(),
-			Language:      "auto",
-			NumThreads:    6,
+			Language:      decode.Language,
+			NumThreads:    decode.NumThreads,
+			BeamSize:      decode.BeamSize,
+			BestOf:        decode.BestOf,
 		})
 		if err != nil {
 			errs = append(errs, fmt.Errorf("load ASR %s: %w", modelType, err))
@@ -406,9 +704,9 @@ func (p *Pipeline) initASR(ctx context.Context, candidates []types.ASRModelType,
 		MaxAttempts:          1,
 		AutoSelectByHardware: true,
 		MinMemoryTier:        parseTier(config.HardwareTier),
-		Language:             "auto",
+		Language:             decode.Language,
 	})
-	if err := chain.Initialize(ctx, types.ASRConfig{Language: "auto"}); err != nil {
+	if err := chain.Initialize(ctx, types.ASRConfig{Language: decode.Language}); err != nil {
 		cleanupErrs := []error{fmt.Errorf("initialize ASR chain: %w", err)}
 		for _, id := range ownedIDs {
 			if unloadErr := p.loader.Unload(id); unloadErr != nil {
@@ -422,11 +720,11 @@ func (p *Pipeline) initASR(ctx context.Context, candidates []types.ASRModelType,
 	return chain, out
 }
 
-func (p *Pipeline) initTTS(ctx context.Context, candidates []types.TTSModelType) (types.TTSSynthesizer, string, capabilityInit) {
+func (p *Pipeline) initTTS(ctx context.Context, candidates []types.TTSModelType) (types.TTSSynthesizer, string, string, capabilityInit) {
 	out := capabilityInit{requested: true}
 	if len(candidates) == 0 {
 		out.err = types.NewAudioError(types.ErrCodeModelNotFound, "no TTS candidates for current constraints", nil)
-		return nil, "", out
+		return nil, "", "", out
 	}
 	cacheDir := defaultTTSCacheDir()
 	var errs []error
@@ -438,13 +736,13 @@ func (p *Pipeline) initTTS(ctx context.Context, candidates []types.TTSModelType)
 			continue
 		}
 		out.ready = true
-		return synth, cfg.ModelPath, out
+		return synth, cfg.ModelPath, string(candidate), out
 	}
 	out.err = errors.Join(errs...)
 	if out.err == nil {
 		out.err = types.NewAudioError(types.ErrCodeModelLoadFailed, "failed to initialize any configured TTS engine", nil)
 	}
-	return nil, "", out
+	return nil, "", "", out
 }
 
 // ensureTTSVoice lazily loads a different Piper voice model if the requested
@@ -508,33 +806,94 @@ func (p *Pipeline) initMultimodal(ctx context.Context, candidates []types.Multim
 		nil)
 }
 
-func (p *Pipeline) synthesizeWithCache(ctx context.Context, cacheStore types.AudioCache, synth types.TTSSynthesizer, text string, override *types.VoiceOverride) (string, error) {
-	voice := firstVoiceOrDefault(synth, "default")
+// ttsSpeedForConfig applies a configured speed only to an explicit engine whose
+// profile declares both speed support and a finite range. Automatic selection
+// keeps the established 1.0 default because the effective provider is resolved
+// later by the loader, after this configuration is recorded.
+func ttsSpeedForConfig(engine string, speed float64) (float64, error) {
+	speed = ttsSpeedOrDefault(speed)
+	engine = strings.TrimSpace(engine)
+	if engine == "" || engine == "auto" {
+		return 1.0, nil
+	}
+	min, max, supported, explicit := ttsSpeedRangeFor(engine)
+	if !explicit {
+		return 1.0, nil
+	}
+	if !supported {
+		return 0, types.NewAudioError(types.ErrCodeSynthesisFailed,
+			fmt.Sprintf("TTS engine %q does not support speech speed", engine), nil)
+	}
+	if speed < min || speed > max {
+		return 0, types.NewAudioError(types.ErrCodeSynthesisFailed,
+			fmt.Sprintf("speech speed for %s must be between %g and %g, got %g", engine, min, max, speed), nil)
+	}
+	return speed, nil
+}
+
+func (p *Pipeline) synthesizeWithCache(ctx context.Context, cacheStore types.AudioCache, resolved resolvedTTS, text string) (string, error) {
 	req := types.SynthesisRequest{
-		Text:  text,
-		Voice: voice,
-		Speed: 1.0,
+		Text:          text,
+		Voice:         resolved.voice,
+		Language:      resolved.language,
+		Speed:         ttsSpeedOrDefault(resolved.speed),
+		Engine:        resolved.engine,
+		CharacterID:   resolved.characterID,
+		VoicePath:     resolved.voicePath,
+		ModelIdentity: resolved.modelIdentity,
 	}
-	if override != nil {
-		if override.Voice != "" {
-			req.Voice = override.Voice
-		}
-		if override.Speed > 0 {
-			req.Speed = override.Speed
+	key := types.GenerateCacheKeyForRequest(req)
+	call, leader := p.beginTTSCacheCall(key)
+	if !leader {
+		select {
+		case <-call.done:
+			return call.path, call.err
+		case <-ctx.Done():
+			return "", ctx.Err()
 		}
 	}
-	key := types.GenerateCacheKey(req.Text, req.Voice, req.Speed)
+
+	// The leader performs the single cache lookup for this identity. Followers
+	// wait for that result instead of racing another lookup or synthesis.
 	if cached, ok := cacheStore.Get(key); ok {
+		p.finishTTSCacheCall(key, call, cached.AudioPath, nil)
 		return cached.AudioPath, nil
 	}
-	out, err := synth.Synthesize(ctx, req, nil)
+
+	out, err := resolved.synth.Synthesize(ctx, req, nil)
 	if err != nil {
+		p.finishTTSCacheCall(key, call, "", err)
 		return "", err
 	}
 	if err := cacheStore.Store(key, out); err != nil {
+		p.finishTTSCacheCall(key, call, "", err)
 		return "", err
 	}
+	p.finishTTSCacheCall(key, call, out.AudioPath, nil)
 	return out.AudioPath, nil
+}
+
+func (p *Pipeline) beginTTSCacheCall(key string) (*ttsCacheCall, bool) {
+	p.ttsCacheMu.Lock()
+	defer p.ttsCacheMu.Unlock()
+	if p.ttsCacheCalls == nil {
+		p.ttsCacheCalls = make(map[string]*ttsCacheCall)
+	}
+	if call, ok := p.ttsCacheCalls[key]; ok {
+		return call, false
+	}
+	call := &ttsCacheCall{done: make(chan struct{})}
+	p.ttsCacheCalls[key] = call
+	return call, true
+}
+
+func (p *Pipeline) finishTTSCacheCall(key string, call *ttsCacheCall, path string, err error) {
+	p.ttsCacheMu.Lock()
+	call.path = path
+	call.err = err
+	delete(p.ttsCacheCalls, key)
+	p.ttsCacheMu.Unlock()
+	close(call.done)
 }
 
 func (p *Pipeline) recordError() {
@@ -588,6 +947,9 @@ func defaultTTSCacheDir() string {
 	if v := os.Getenv("HOWL_AUDIO_CACHE_DIR"); v != "" {
 		return v
 	}
+	if paths.IsolationActive() {
+		return paths.StatePath("cache", "tts")
+	}
 	return "cache/tts"
 }
 
@@ -600,6 +962,7 @@ func ttsConfigForModel(model types.TTSModelType, cacheDir string) types.TTSConfi
 		}
 		return types.TTSConfig{
 			ModelPath:    baseURL,
+			ModelName:    meloOpenAIModelName(),
 			CacheDir:     cacheDir,
 			CacheEnabled: true,
 			MaxCacheSize: 100,
@@ -623,6 +986,13 @@ func ttsConfigForModel(model types.TTSModelType, cacheDir string) types.TTSConfi
 			MaxCacheSize: 100,
 		}
 	}
+}
+
+func meloOpenAIModelName() string {
+	if v := strings.TrimSpace(os.Getenv("HOWL_MELOTTS_OPENAI_MODEL")); v != "" {
+		return v
+	}
+	return "tts-1"
 }
 
 func defaultKokoroScriptPath() string {

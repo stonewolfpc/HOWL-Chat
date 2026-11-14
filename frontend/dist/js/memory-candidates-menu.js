@@ -139,6 +139,7 @@ async function runAutoDetection(message) {
                 source_message: message,
                 scope: 'chat',
                 owner_id: cd.sessionId || 'default',
+                owner_kind: 'chat',
                 tags: [eventType, 'auto-captured'],
                 confidence: 60,
                 status: 'pending',

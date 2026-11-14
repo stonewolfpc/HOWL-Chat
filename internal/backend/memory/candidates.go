@@ -158,6 +158,7 @@ func (s *Service) ApproveCandidate(candidateID string) (*types.MemoryRecord, err
 		Content:    target.Content,
 		Scope:      target.Scope,
 		OwnerID:    target.OwnerID,
+		OwnerKind:  target.OwnerKind,
 		Tags:       target.Tags,
 		Pinned:     false,
 		Status:     "active",

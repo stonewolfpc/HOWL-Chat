@@ -1,0 +1,33 @@
+=== PRECONDITION: ASR STATE ===
+6:    "asrEnabled": true,
+7:    "asrEngine": "qwen3-asr-1.7b-local",
+
+   Id
+   --
+17740
+
+
+
+[0] Button cls="input-icon mic-button" id="" name="Speech Input (Hold to record)" rect=954,1107,38,42 enabled=True offscreen=False
+---MATCHES=1---
+=== TYPE ORDINARY TEXT ===
+FOCUSED index=0
+KEY sent: This is an ordinary text message while speech recognition is enabled.
+VALUE=This is an ordinary text message while speech recognition is enabled.
+=== SEND ===
+INVOKED invoke-pattern index=0
+=== AFTER SEND ===
+VALUE=
+[0] Text cls="" id="" name="This is an ordinary text message while speech recognition is enabled." rect=1209,915,424,19 enabled=True offscreen=False
+---MATCHES=1---
+=== NO UNINTENDED CAPTURE? ===
+[0] Button cls="input-icon mic-button" id="" name="Speech Input (Hold to record)" rect=954,1107,38,42 enabled=True offscreen=False
+---MATCHES=1---
+
+   Id StartTime           
+   -- ---------           
+17740 11/4/2026 9:28:40 PM
+
+
+
+SAVED build/unit-c/check5-text-chat.png 1400x900 window=888,269

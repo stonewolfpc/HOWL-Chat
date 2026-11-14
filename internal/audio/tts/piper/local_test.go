@@ -257,6 +257,40 @@ func TestPiperGetVoicesSerializedWithInitialize(t *testing.T) {
 	}
 }
 
+func TestPiperConvertsSpeedToInverseLengthScale(t *testing.T) {
+	s := piperUnitSynth(t)
+	var args []string
+	s.runCommand = func(_ context.Context, _ string, got []string, _ string) ([]byte, error) {
+		args = append([]string(nil), got...)
+		output := ""
+		for i := 0; i+1 < len(got); i++ {
+			if got[i] == "--output_file" {
+				output = got[i+1]
+				break
+			}
+		}
+		if output == "" {
+			return nil, fmt.Errorf("missing --output_file")
+		}
+		piperTestWAVRaw(output)
+		return nil, nil
+	}
+
+	if _, err := s.Synthesize(context.Background(), types.SynthesisRequest{Text: "hello", Speed: 1.25}, nil); err != nil {
+		t.Fatalf("Synthesize: %v", err)
+	}
+	got := ""
+	for i := 0; i+1 < len(args); i++ {
+		if args[i] == "--length_scale" {
+			got = args[i+1]
+			break
+		}
+	}
+	if got != "0.8000" {
+		t.Fatalf("--length_scale = %q, want inverse of 1.25 (0.8000)", got)
+	}
+}
+
 func closedChannel() chan struct{} {
 	ch := make(chan struct{})
 	close(ch)

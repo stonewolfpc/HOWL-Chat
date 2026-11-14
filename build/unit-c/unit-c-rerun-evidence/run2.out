@@ -1,0 +1,32 @@
+[startup] 10:39:01.716  +    0.0ms  process start
+[startup] 10:39:01.719  +    3.7ms  image init: begin
+[startup] 10:39:01.725  +    8.8ms  image init: config ready
+[ImageEngine] Initialized: binary=C:\Users\StoneWolfPC\HOWL_Chat\sd-server.exe models=H:/InvokeAI/models port=8081
+[startup] 10:39:01.729  +   13.0ms  image init: engine initialized
+[ImageEngine] sd-server commit: c6dfa9d
+[ImageEngine] Restored last model: "z-image-turbo-Q4_K_M"
+[startup] 10:39:01.801  +   85.2ms  NewApp done
+[startup] 10:39:02.061  +  345.0ms  OnStartup: webview reached backend
+[startup] 10:39:02.064  +  348.2ms  OnStartup: init complete
+[startup] 10:39:02.067  +  350.9ms  rescan: start
+[startup] 10:39:02.070  +  354.6ms  rescan: scanning G:\AI GGUF\GGUF
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[scan] chat-ineligible model kept in inventory: G:\AI GGUF\GGUF\Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf (task=unknown basis=unrecognized-multimodal-identity)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\GGUF\vocoder-LFM2.5-Audio-1.5B-Q4_0.gguf (component)
+[startup] 10:40:00.367  +58651.2ms  rescan: done G:\AI GGUF\GGUF 25 entries
+[startup] 10:40:00.367  +58651.2ms  rescan: scanning G:\AI GGUF\voice
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\Qwen2.5-Omni-3B-mmproj-Q8_0.gguf (component)
+[scan] chat-ineligible model kept in inventory: G:\AI GGUF\voice\Qwen3-ASR-0.6B-Q8_0.gguf (task=speech-recognition basis=identity=qwen3-asr-0-6b)
+[scan] chat-ineligible model kept in inventory: G:\AI GGUF\voice\Qwen3-ASR-1.7B-Q8_0.gguf (task=speech-recognition basis=identity=qwen3-asr-1-7b)
+[scan] chat-ineligible model kept in inventory: G:\AI GGUF\voice\Ultravox-Llama-3.2-1B-Q4_K_M.gguf (task=audio-understanding basis=identity=ultravox-llama-3-2-1b)
+[scan] chat-ineligible model kept in inventory: G:\AI GGUF\voice\Voxtral-Mini-3B-2507-Q4_K_M.gguf (task=audio-understanding basis=identity=voxtral-mini-3b-2507)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\mmproj-Qwen3-ASR-0.6B-Q8_0.gguf (component)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\mmproj-Qwen3-ASR-1.7B-Q8_0.gguf (component)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\mmproj-Ultravox-v0_5-llama-3_2-1b-f16.gguf (component)
+[GetLLMModels] excluded 13 non-chat or task-ineligible asset(s) from the chat picker
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\mmproj-Voxtral-Mini-3B-2507-Q8_0.gguf (component)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf (component)
+[startup] 10:40:13.286  +71570.1ms  rescan: done G:\AI GGUF\voice 6 entries
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[startup] 10:41:59.634  +177918.5ms  wails.Run returned

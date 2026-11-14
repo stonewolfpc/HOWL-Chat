@@ -1,0 +1,40 @@
+=== CAPTURE ENDPOINTS (state mask: active|disabled|notpresent|unplugged) ===
+  Headset Microphone (CORSAIR VOID ELITE Wireless Gaming Headset)|Headset Microphone|state=4|{0.0.1.00000000}.{0cae330a-e2f7-4776-b429-61d9db0566ca}
+  Microphone (Voicemod)|Microphone|state=2|{0.0.1.00000000}.{116f9971-9a07-4bf7-b6ec-4f9597adc783}
+  Subwoofer (Realtek(R) Audio)|Subwoofer|state=4|{0.0.1.00000000}.{255494be-2efb-41f7-a3d8-c01082566a54}
+  Line In (Realtek(R) Audio)|Line In|state=8|{0.0.1.00000000}.{36021154-88e2-4105-83f6-408a6b3df641}
+  Microphone (Realtek(R) Audio)|Microphone|state=4|{0.0.1.00000000}.{4d22787b-ebd8-4f4d-94c8-ec08ab964972}
+  Microphone (Realtek(R) Audio)|Microphone|state=8|{0.0.1.00000000}.{65e2154b-37ab-4788-b01a-e40abad82a20}
+  Headset (WH-1000XM4)|Headset|state=1|{0.0.1.00000000}.{6b9264d1-a6cc-48b2-84cd-082bacac1599}
+  Microphone (High Definition Audio Device)|Microphone|state=4|{0.0.1.00000000}.{72377329-64bb-46e3-883b-2b362a1f1f0e}
+  Line In (Realtek(R) Audio)|Line In|state=4|{0.0.1.00000000}.{7238b7f0-0abe-420d-bb35-6b8e5ef82922}
+  Stereo Mix (Realtek(R) Audio)|Stereo Mix|state=2|{0.0.1.00000000}.{8f902c1b-b09c-4355-92d3-e323d494d1f0}
+  Microphone (High Definition Audio Device)|Microphone|state=4|{0.0.1.00000000}.{a0422242-d97f-4632-815a-558740a60d5b}
+  Front (Realtek(R) Audio)|Front|state=4|{0.0.1.00000000}.{a2f36c3b-57bb-4553-9ed6-fdba79c9d508}
+  Line In (High Definition Audio Device)|Line In|state=4|{0.0.1.00000000}.{ae094bcb-e588-45c2-9484-7726780604a8}
+  Rear (Realtek(R) Audio)|Rear|state=4|{0.0.1.00000000}.{cb0e77dd-3ddb-49d6-9f3e-c80dde106f8f}
+  Center (Realtek(R) Audio)|Center|state=4|{0.0.1.00000000}.{f496f680-913d-4b14-883f-05362c6e588e}
+  Side (Realtek(R) Audio)|Side|state=4|{0.0.1.00000000}.{f960951f-9c5a-497f-8674-663238cbe1cf}
+
+=== RENDER ENDPOINTS ===
+  NVIDIA Output (NVIDIA High Definition Audio)|NVIDIA Output|state=4|{0.0.0.00000000}.{1d2184b9-620a-4d87-a686-9004149ecea8}
+  Digital Audio (HDMI) (High Definition Audio Device)|Digital Audio (HDMI)|state=4|{0.0.0.00000000}.{2a259ff7-1929-49e2-9a9f-d44a9fe4ffdd}
+  AG322QWG4 (High Definition Audio Device)|AG322QWG4|state=4|{0.0.0.00000000}.{3934d609-5ec4-4627-8694-3a8c734d9635}
+  AG322QWG4 (NVIDIA High Definition Audio)|AG322QWG4|state=1|{0.0.0.00000000}.{42aaf89f-fcab-4f0a-8fdb-d7e525455eb2}
+  Digital Audio (HDMI) (High Definition Audio Device)|Digital Audio (HDMI)|state=4|{0.0.0.00000000}.{59713acc-20ea-48ae-b40b-01b8fcfd6559}
+  Digital Audio (HDMI) (High Definition Audio Device)|Digital Audio (HDMI)|state=4|{0.0.0.00000000}.{65183207-bf71-4659-8f15-624b40982f98}
+  NVIDIA Output (NVIDIA High Definition Audio)|NVIDIA Output|state=4|{0.0.0.00000000}.{7175ed94-c4f9-47a2-abda-23f210908142}
+  Speakers (Realtek(R) Audio)|Speakers|state=1|{0.0.0.00000000}.{73b46750-0008-4166-99c4-0e281059a9d5}
+  Headset Earphone (CORSAIR VOID ELITE Wireless Gaming Headset)|Headset Earphone|state=4|{0.0.0.00000000}.{815b3d05-9193-4db7-9fe9-439c25960229}
+  Headphones (WH-1000XM4)|Headphones|state=1|{0.0.0.00000000}.{9460d508-20ce-4ade-8b76-e405f9ab758a}
+  Speakers (High Definition Audio Device)|Speakers|state=4|{0.0.0.00000000}.{a751cc44-8e5d-4faf-9011-fa7389cbd36c}
+  Digital Audio (HDMI) (High Definition Audio Device)|Digital Audio (HDMI)|state=4|{0.0.0.00000000}.{cf5f760e-cb21-497d-a562-7a163359dc5a}
+  Headphones (High Definition Audio Device)|Headphones|state=4|{0.0.0.00000000}.{d3e5f71a-b232-428f-a223-c876cc9c8a6f}
+  Dummy Output (Voicemod)|Dummy Output|state=2|{0.0.0.00000000}.{d55c5a71-01ce-439a-aec7-26737910dd47}
+  NVIDIA Output (NVIDIA High Definition Audio)|NVIDIA Output|state=4|{0.0.0.00000000}.{ef54bb3a-e004-4ffa-bb33-3f02537bfb40}
+
+=== DEFAULTS ===
+  capture/console : Headset (WH-1000XM4)|Headset|state=1|{0.0.1.00000000}.{6b9264d1-a6cc-48b2-84cd-082bacac1599}
+  capture/comms   : Headset (WH-1000XM4)|Headset|state=1|{0.0.1.00000000}.{6b9264d1-a6cc-48b2-84cd-082bacac1599}
+  render/console  : Headphones (WH-1000XM4)|Headphones|state=1|{0.0.0.00000000}.{9460d508-20ce-4ade-8b76-e405f9ab758a}
+  render/comms    : Headphones (WH-1000XM4)|Headphones|state=1|{0.0.0.00000000}.{9460d508-20ce-4ade-8b76-e405f9ab758a}

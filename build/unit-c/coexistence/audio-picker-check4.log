@@ -1,0 +1,17 @@
+﻿14:19:32.797  UI_READY=True
+14:19:35.284  OPEN_SETTINGS_MENU INVOKED invoke-pattern index=0
+14:19:38.623  OPEN_AUDIO_SETTINGS INVOKED mouse-click index=0 at 1001,517
+14:19:40.113  AUDIO_DOC_READY=True
+14:19:42.566  OPEN_TTS_TAB INVOKED invoke-pattern index=0
+14:19:46.104  HAS_TTS_VOICE_FIELD=True
+14:19:46.108  HAS_TESTVOICE_COLLAPSED=False
+14:19:46.134  FIELD |ComboBox|cls=setting-select|id=tts-voice|name=TTS Voice Model|rect=892,715,529,32
+14:19:48.769  OPEN_SELECT INVOKED mouse-click index=0 at 1156,731
+14:19:51.803  OPEN_HAS_TESTVOICE=True
+14:19:51.806  OPEN_HAS_BUILTIN=True
+14:19:51.807  OPEN_HAS_CHATFILE=False
+14:19:51.886  OPT |ListItem|cls=|id=|name=en_US-lessac-medium (built-in)|rect=893,752,198,24
+14:19:51.889  OPT |ListItem|cls=|id=|name=TestVoiceA (0 MB)|rect=893,776,198,24
+14:19:52.795  SHOT audio4-tts-open.png
+14:19:54.850  RESTORED_DIRS={ "G:\\AI GGUF\\GGUF": "llm", "G:\\AI GGUF\\Image models": "image", "G:\\AI GGUF\\voice": "llm", "H:/InvokeAI/models": "image" }
+14:19:54.863  LEFTOVER=0

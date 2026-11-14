@@ -334,10 +334,11 @@ func (e *Engine) runVideoCLI(cli string, args []string, outPath string, owner st
 	if err != nil {
 		return fmt.Errorf("capture sd-cli output: %w", err)
 	}
-	if err := cmd.Start(); err != nil {
+	// The video CLI is a Howl-owned child too: suspend, assign to the job, then
+	// resume so a crash cannot leave it behind.
+	if err := proc.Start(cmd); err != nil {
 		return fmt.Errorf("start sd-cli: %w", err)
 	}
-	proc.Attach(cmd)
 
 	e.videoMu.Lock()
 	e.videoProc = cmd.Process

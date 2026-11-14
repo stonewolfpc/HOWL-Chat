@@ -49,3 +49,12 @@ func ASRServerPathFor() string {
 func TTSModelPathFor(model types.TTSModelType) string {
 	return ttsConfigForModel(model, defaultTTSCacheDir()).ModelPath
 }
+
+// KokoroVoicesPathFor and KokoroConfigPathFor expose the same archive and
+// vocabulary paths Initialize resolves, so a catalog can report which asset is
+// missing without loading a model or starting Python.
+func KokoroVoicesPathFor() string { return defaultKokoroVoicesPath() }
+
+func KokoroConfigPathFor() string { return defaultKokoroConfigPath() }
+
+func KokoroScriptPathFor() string { return defaultKokoroScriptPath() }

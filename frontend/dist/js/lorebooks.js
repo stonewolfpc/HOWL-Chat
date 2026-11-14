@@ -21,6 +21,7 @@ const LOREBOOK_DEFAULTS = {
     priorityLevel: 3,
     conflictRule: 'higher_priority',
     visibility: 'public',
+    ownerId: '',
     revealCondition: 'never',
     injectionStyle: 'summary',
     injectionPosition: 'system_summary_only',
@@ -114,6 +115,10 @@ let lorebooks = [];
 let selectedLorebookType = 'world';
 let currentEditingId = null;
 
+function lorebookRepo() {
+    return window.LorebookRepo || null;
+}
+
 function splitList(value) {
     return (value || '')
         .split(',')
@@ -201,6 +206,116 @@ function selectLorebookType(type) {
     if (helper) {
         helper.textContent = SCOPE_META[type]?.description || '';
     }
+
+    updateLorebookOwnerVisibility();
+}
+
+// Ownership is a separate relationship from linkedCharacters. Only the owner
+// receives private character lore; links never grant that authority.
+function updateLorebookOwnerVisibility() {
+    const group = getField('lorebook-owner-group');
+    const owner = getField('lorebook-owner');
+    if (!group || !owner) return;
+    const isCharacterScope = (getValue('lorebook-scope') || selectedLorebookType) === 'character';
+    group.style.display = isCharacterScope ? '' : 'none';
+    owner.disabled = !isCharacterScope;
+}
+
+const OWNER_MIGRATION_VERSION = 'howl-character-owner-v1';
+
+function ownerIdentities(characters) {
+    const seen = new Set();
+    return (characters || [])
+        .map(character => ({
+            id: String(character.id || character.ID || '').trim(),
+            name: String(character.name || character.Name || character.title || character.Title || '').trim()
+        }))
+        .filter(character => {
+            if (!character.id || !character.name || seen.has(character.id)) return false;
+            seen.add(character.id);
+            return true;
+        });
+}
+
+// Migrates legacy display-name owners to stable character IDs. The backend only
+// rewrites exact, unique names and leaves ambiguous or unknown values untouched;
+// this page must not guess either. Re-running is safe.
+async function migrateLorebookOwners(records) {
+    const app = window.go?.main?.App;
+    if (!app || typeof app.MigrateLorebookOwners !== 'function') return null;
+    const identities = ownerIdentities(records);
+    if (!identities.length) return null;
+    try {
+        const result = await app.MigrateLorebookOwners(identities, OWNER_MIGRATION_VERSION);
+        const items = Array.isArray(result?.items) ? result.items : [];
+        const remap = new Map(items
+            .filter(item => item.action === 'migrated' && item.owner_name && item.owner_id)
+            .map(item => [item.owner_name, item.owner_id]));
+        if (remap.size) {
+            lorebooks.forEach(lorebook => {
+                if (remap.has(lorebook.ownerId)) lorebook.ownerId = remap.get(lorebook.ownerId);
+            });
+        }
+        if (result && (result.migrated || result.ambiguous || result.unknown || result.failed)) {
+            const status = getField('lorebook-store-status');
+            if (status) {
+                const parts = [];
+                if (result.migrated) parts.push(`${result.migrated} updated`);
+                if (result.ambiguous) parts.push(`${result.ambiguous} ambiguous`);
+                if (result.unknown) parts.push(`${result.unknown} unknown`);
+                if (result.failed) parts.push(`${result.failed} failed`);
+                status.textContent = `Owner identity migration: ${parts.join(', ')}.`;
+            }
+        }
+        return result;
+    } catch (error) {
+        console.warn('Owner identity migration did not run:', error);
+        return null;
+    }
+}
+
+async function loadLorebookOwnerOptions() {
+    const select = getField('lorebook-owner');
+    if (!select) return;
+    let desired = select.dataset.pendingOwner ?? select.value;
+    try {
+        // Chat adds characters from CharacterStorage (localStorage). Ownership is
+        // the stable id from that same library; the name is only a label.
+        let characters = null;
+        if (window.CharacterStorage && typeof window.CharacterStorage.loadAll === 'function') {
+            characters = await window.CharacterStorage.loadAll();
+        } else {
+            const app = window.go?.main?.App;
+            if (!app || typeof app.GetCharacters !== 'function') return;
+            characters = await app.GetCharacters();
+        }
+        const records = ownerIdentities(characters);
+        const migration = await migrateLorebookOwners(records);
+        const remap = new Map((migration?.items || [])
+            .filter(item => item.action === 'migrated' && item.owner_name && item.owner_id)
+            .map(item => [item.owner_name, item.owner_id]));
+        if (remap.has(desired)) desired = remap.get(desired);
+
+        const nameCounts = new Map();
+        records.forEach(record => nameCounts.set(record.name, (nameCounts.get(record.name) || 0) + 1));
+        records.sort((a, b) => a.name.localeCompare(b.name));
+        const known = new Set(records.map(record => record.id));
+        select.innerHTML = '<option value="">Unowned</option>' + records
+            .map(record => {
+                const suffix = nameCounts.get(record.name) > 1 ? ` (${record.id.slice(-6)})` : '';
+                return `<option value="${escapeHtml(record.id)}" data-owner-name="${escapeHtml(record.name)}">${escapeHtml(record.name + suffix)}</option>`;
+            })
+            .join('');
+        if (desired && !known.has(desired)) {
+            // Legacy name or a deleted character: keep the value and show that it
+            // is unresolved. Never silently turn it into an unowned entry.
+            select.innerHTML += `<option value="${escapeHtml(desired)}" data-owner-name="">Unresolved owner: ${escapeHtml(desired)}</option>`;
+        }
+        select.value = desired;
+        delete select.dataset.pendingOwner;
+    } catch (error) {
+        console.warn('Could not load character owners:', error);
+    }
 }
 
 function clearLorebookForm() {
@@ -227,6 +342,7 @@ function clearLorebookForm() {
     setValue('lorebook-recursion', defaults.recursion);
     setValue('lorebook-linked-characters', '');
     setValue('lorebook-linked-entries', '');
+    setValue('lorebook-owner', '');
     setValue('lorebook-inheritance', defaults.inheritance);
 
     selectLorebookType(selectedLorebookType);
@@ -243,6 +359,7 @@ function openLorebookCreationPopup(resetForm = true) {
     }
 
     overlay.style.display = 'flex';
+    loadLorebookOwnerOptions();
     const title = getField('lorebook-editor-title');
     if (title) {
         title.textContent = currentEditingId ? 'Edit Lorebook Entry' : 'Create Lorebook Entry';
@@ -270,6 +387,10 @@ function buildLorebookFromForm() {
         tags: splitList(getValue('lorebook-tags')),
         scope,
         type: scope,
+        ownerId: scope === 'character' ? getValue('lorebook-owner').trim() : '',
+        ownerName: scope === 'character'
+            ? (getField('lorebook-owner')?.selectedOptions?.[0]?.dataset.ownerName || '')
+            : '',
         enabled: getValue('lorebook-enabled'),
         triggerPhrases: splitList(getValue('lorebook-trigger-phrases')),
         secondaryTriggers: splitList(getValue('lorebook-secondary-triggers')),
@@ -294,7 +415,7 @@ function buildLorebookFromForm() {
     });
 }
 
-function saveLorebook() {
+async function saveLorebook() {
     const lorebook = buildLorebookFromForm();
 
     if (!lorebook.title) {
@@ -307,11 +428,17 @@ function saveLorebook() {
         return;
     }
 
+    if (lorebook.scope === 'character' && lorebook.visibility === 'private' && !lorebook.ownerId) {
+        const proceed = confirm('This private character entry has no owner. No character will receive it. Save it as unowned?');
+        if (!proceed) return;
+    }
+
     if (lorebook.triggerPhrases.length === 0 && lorebook.injectionStyle !== 'background') {
         const proceed = confirm('This entry has no trigger phrases. It may never activate unless called manually. Save it anyway?');
         if (!proceed) return;
     }
 
+    const previous = lorebooks.slice();
     const index = lorebooks.findIndex(item => item.id === lorebook.id);
     if (index >= 0) {
         lorebooks[index] = lorebook;
@@ -319,9 +446,21 @@ function saveLorebook() {
         lorebooks.push(lorebook);
     }
 
-    saveLorebooksToStorage();
+    try {
+        const repo = lorebookRepo();
+        if (repo) {
+            await repo.save(lorebook, index >= 0);
+        } else {
+            saveLorebooksToStorage();
+        }
+    } catch (error) {
+        lorebooks = previous;
+        console.error('Failed to save lorebook:', error);
+        alert('Failed to save lorebook. ' + (error?.message || error));
+        return;
+    }
     closeLorebookCreationPopup();
-    loadLorebooks();
+    await loadLorebooks();
 }
 
 function renderTagList(items, className = 'lorebook-chip') {
@@ -329,11 +468,23 @@ function renderTagList(items, className = 'lorebook-chip') {
     return items.slice(0, 4).map(item => `<span class="${className}">${item}</span>`).join('');
 }
 
-function loadLorebooks() {
+async function loadLorebooks() {
     const grid = getField('lorebooks-grid');
     if (!grid) return;
 
-    loadLorebooksFromStorage();
+    const repo = lorebookRepo();
+    if (repo) {
+        try {
+            const state = await repo.hydrate();
+            lorebooks = (state.entries || []).map(normalizeLorebook);
+        } catch (error) {
+            console.error('Failed to load lorebooks from the library:', error);
+            loadLorebooksFromStorage();
+        }
+    } else {
+        loadLorebooksFromStorage();
+    }
+    renderLorebookStoreStatus();
 
     if (lorebooks.length === 0) {
         grid.innerHTML = `
@@ -402,6 +553,10 @@ function populateForm(lorebook) {
     setValue('lorebook-linked-entries', joinList(lorebook.linkedLoreEntries));
     setValue('lorebook-inheritance', lorebook.inheritance);
 
+    const ownerField = getField('lorebook-owner');
+    if (ownerField) ownerField.dataset.pendingOwner = lorebook.ownerId || '';
+    setValue('lorebook-owner', lorebook.ownerId || '');
+
     selectLorebookType(lorebook.scope);
 }
 
@@ -420,21 +575,98 @@ function editLorebook(index) {
     }
 }
 
-function deleteLorebookById(id) {
+async function deleteLorebookById(id) {
     const lorebook = lorebooks.find(item => item.id === id);
     if (!lorebook) return;
 
-    if (confirm(`Delete "${lorebook.title}"?`)) {
-        lorebooks = lorebooks.filter(item => item.id !== id);
-        saveLorebooksToStorage();
-        loadLorebooks();
+    if (!confirm(`Delete "${lorebook.title}"?`)) return;
+
+    try {
+        const repo = lorebookRepo();
+        if (repo) {
+            await repo.remove(id);
+        } else {
+            lorebooks = lorebooks.filter(item => item.id !== id);
+            saveLorebooksToStorage();
+        }
+    } catch (error) {
+        console.error('Failed to delete lorebook:', error);
+        alert('Failed to delete lorebook. ' + (error?.message || error));
+        return;
     }
+    await loadLorebooks();
 }
 
 function deleteLorebook(index) {
     const lorebook = lorebooks[index];
     if (lorebook) {
         deleteLorebookById(lorebook.id);
+    }
+}
+
+function renderLorebookStoreStatus() {
+    const status = getField('lorebook-store-status');
+    const importButton = getField('lorebook-import-button');
+    const rollbackButton = getField('lorebook-rollback-button');
+    const repo = lorebookRepo();
+    const state = repo ? repo.state : null;
+
+    if (status) {
+        if (!repo || !state) {
+            status.textContent = 'Browser storage only.';
+        } else if (state.cutover) {
+            const roots = state.status && Array.isArray(state.status.roots) ? state.status.roots.length : 0;
+            const conflicts = state.status && Array.isArray(state.status.conflicts) ? state.status.conflicts.length : 0;
+            const count = state.entries.length;
+            status.textContent = `Library files in ${roots} folder${roots === 1 ? '' : 's'} · ${count} entr${count === 1 ? 'y' : 'ies'}`
+                + (conflicts ? ` · ${conflicts} identity conflict${conflicts === 1 ? '' : 's'} need review` : '');
+        } else {
+            status.textContent = 'Stored in browser storage. Import to keep lorebooks as files in your library folder.';
+        }
+        status.title = status.textContent;
+    }
+    if (importButton) importButton.disabled = Boolean(state && state.cutover);
+    if (rollbackButton) rollbackButton.disabled = !(state && state.cutover);
+}
+
+async function importLorebooksToLibrary() {
+    const repo = lorebookRepo();
+    if (!repo) {
+        alert('The lorebook library is not available in this window.');
+        return;
+    }
+    const entries = repo.readCache();
+    if (entries.length === 0) {
+        alert('There are no browser-stored lorebooks to import.');
+        return;
+    }
+    const ok = confirm(`Import ${entries.length} lorebook entr${entries.length === 1 ? 'y' : 'ies'} into the configured library folder?\n\nFiles are created beside your other content. The browser copy is kept and this can be undone.`);
+    if (!ok) return;
+    try {
+        const result = await repo.importLegacy();
+        await loadLorebooks();
+        alert(result.message || 'Import complete.');
+    } catch (error) {
+        console.error('Lorebook import failed:', error);
+        alert('Import failed. ' + (error?.message || error));
+    }
+}
+
+async function rollbackLorebookLibrary() {
+    const repo = lorebookRepo();
+    if (!repo) {
+        alert('The lorebook library is not available in this window.');
+        return;
+    }
+    const ok = confirm('Remove the imported lorebook files and return to browser storage?\n\nOnly files created by the last import are removed. Your browser lorebooks are not changed.');
+    if (!ok) return;
+    try {
+        const result = await repo.rollback();
+        await loadLorebooks();
+        alert(result.message || 'Import undone.');
+    } catch (error) {
+        console.error('Lorebook import rollback failed:', error);
+        alert('Undo failed. ' + (error?.message || error));
     }
 }
 

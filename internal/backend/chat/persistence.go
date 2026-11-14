@@ -8,12 +8,23 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"howl-chat/internal/paths"
 )
 
 // PersistenceManager handles chat persistence with the specified directory structure
 type PersistenceManager struct {
 	rootDir string
 	config  AppConfig
+}
+
+// RootDir reports the application-owned chat root. Callers must use this
+// instead of guessing an executable-relative "chats" directory.
+func (pm *PersistenceManager) RootDir() string {
+	if pm == nil {
+		return ""
+	}
+	return pm.rootDir
 }
 
 // NewPersistenceManagerWithDir creates a persistence manager rooted at an arbitrary directory.
@@ -49,6 +60,11 @@ func NewPersistenceManager() (*PersistenceManager, error) {
 
 // getAppDataDir returns the app data directory based on OS
 func getAppDataDir() (string, error) {
+	// An isolated native test run keeps this legacy store inside its own root.
+	if paths.IsolationActive() {
+		return paths.StatePath("persisted-chats"), nil
+	}
+
 	// For Windows: C:\Users\<User>\AppData\Roaming\HOWLChat
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -412,13 +428,9 @@ func (pm *PersistenceManager) migrateLegacyMeta(chatData *ChatData) {
 		}
 	}
 
-	// World / Scenario IDs (fallback to names for now)
-	if meta.WorldID == "" && meta.WorldName != "" {
-		meta.WorldID = meta.WorldName
-	}
-	if meta.ScenarioID == "" && meta.ScenarioName != "" {
-		meta.ScenarioID = meta.ScenarioName
-	}
+	// World / Scenario IDs stay unresolved when the record carries only a
+	// display name. Copying the name into an ID field invents identity and lets a
+	// legacy chat look canonical; the consumer must report it unset instead.
 }
 
 // SaveChatAs creates a copy of the current chat with a new name

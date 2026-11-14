@@ -238,12 +238,36 @@ function saveAllSettings() {
     if (overlay) overlay.classList.remove('show');
 }
 
-function resetAllSettings() {
-    if (!confirm('Reset all settings to default values? This will restore all settings to their original state.')) return;
+async function resetAllSettings() {
+    if (!confirm('Reset all settings to default values? This restores application preferences, including image-generation settings. Chats, characters, worlds, scenarios, lore, memories, registered libraries, and model files are preserved.')) return;
+
+    const previous = currentSettings;
     currentSettings = _defaultSettings();
     initializeSettingsControls();
-    saveSettings();
-    if (typeof showNotification === 'function') showNotification('Settings reset to defaults', 'success');
+    if (saveDebounceTimer) {
+        clearTimeout(saveDebounceTimer);
+        saveDebounceTimer = null;
+    }
+
+    try {
+        // Persist the complete default contract before touching localStorage, so
+        // a backend failure does not leave the UI claiming a reset was saved.
+        // The backend reset also clears the separate image-settings store; the
+        // fallback keeps older builds functional without pretending to reset it.
+        const app = window.go?.main?.App;
+        if (typeof app?.ResetApplicationSettings === 'function') {
+            await app.ResetApplicationSettings(currentSettings);
+        } else {
+            await _writeBackendSettings();
+        }
+        _writeLocalSettings();
+        if (typeof showNotification === 'function') showNotification('Settings reset to defaults', 'success');
+    } catch (e) {
+        currentSettings = previous;
+        initializeSettingsControls();
+        console.error('[settingsState] reset failed:', e);
+        if (typeof showNotification === 'function') showNotification('Failed to reset settings: ' + e.message, 'error');
+    }
 }
 
 // ---------------------------------------------------------------------------

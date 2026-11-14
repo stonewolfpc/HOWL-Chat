@@ -1,0 +1,21 @@
+13:57:36.898  PHASE=restore ISOLATED_ROOT=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun PROFILE=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\profile
+13:57:37.437  RENDER_VOLUME_BEFORE=VOLUME=28%
+13:57:37.540  APP_PID=21568 LOG_OFFSETS=tmp\unit-c-rerun\config\logs\startup.log=79036 Roaming\HOWLChat\config\logs\startup.log=0
+13:57:40.260  WINDOW_READY WINDOW rect=580,270,1400,900 handle=9373816 pid=21568 title=HOWL Chat
+13:57:42.074  SERVERS[startup] count=
+13:57:42.080    pid=24652 port=51049 mmproj=G:\AI
+13:57:42.082  ASR_DISCOVERED pid=24652 port=51049 after 0.3s
+13:57:42.140  ASR_READY port=51049 after 0.1s health=True
+13:57:42.196  GPU_AT_STARTUP 3994 MiB, 8192 MiB, 8 %
+13:57:42.214  RESCAN_DONE after 0.0s in C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\config\logs\startup.log
+13:57:46.212  RESTORE_TREE=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\restore-tree.txt elements=9
+13:57:48.376  MESSAGES[restore]
+13:57:48.378    [] cls= name=
+13:57:48.489  SERVERS[restore] count=
+13:57:48.491    pid=24652 port=51049 mmproj=G:\AI
+13:57:48.497  RESTORE_CHAT_SERVER_PRESENT=False
+13:57:48.539  RESTORE_GPU 4025 MiB, 8192 MiB, 17 %
+13:57:48.631  SHOT=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\restore.png
+13:57:49.705  CLOSE_REQUEST pid=21568 main=9373816
+13:57:49.741  EXITED code=
+13:57:52.753  LEFTOVER=0

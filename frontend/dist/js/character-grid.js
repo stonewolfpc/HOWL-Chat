@@ -29,17 +29,46 @@ function loadAvailableCharacters() {
 // ---------------------------------------------------------------------------
 
 function loadCharacters() {
-    window.CharacterStorage.loadAll()
-        .then(characters => {
-            const cs = window.characterState;
-            characters = cs.migrateCharactersWithIds(characters);
-            cs.characterCache = characters;
-            displayCharacters(characters);
-        })
-        .catch(err => {
-            console.error('Failed to load characters:', err);
-            loadCharactersFromStorage();
-        });
+	return (async () => {
+		try {
+			const cs = window.characterState;
+			let characters = await window.CharacterStorage.loadAll();
+			characters = cs.migrateCharactersWithIds(characters);
+			const external = await loadExternalCharacters();
+			cs.characterCache = characters.concat(external);
+			displayCharacters(cs.characterCache);
+		} catch (err) {
+			console.error('Failed to load characters:', err);
+			loadCharactersFromStorage();
+		}
+	})();
+}
+
+async function loadExternalCharacters() {
+	const app = window.go?.main?.App;
+	if (typeof app?.GetContentLibraryCharacters !== 'function') return [];
+	try {
+		const items = await app.GetContentLibraryCharacters();
+		return (Array.isArray(items) ? items : []).map(item => ({
+			id: `external_${item.id}`,
+			name: item.name || 'Unnamed external character',
+			description: item.description || '',
+			personality: item.personality || '',
+			scenario: item.scenario || '',
+			first_mes: item.first_mes || '',
+			mes_example: item.mes_example || '',
+			metadata: { role: item.format === 'sillytavern' ? 'SillyTavern card' : 'External card' },
+			_external: true,
+			_externalPath: item.path || '',
+			_externalSource: item.source || 'external',
+			_externalFormat: item.format || 'unknown',
+			_externalEditable: !!item.editable,
+			_libraryId: item.library_id || ''
+		})).filter(item => item._externalSource !== 'howl');
+	} catch (err) {
+		console.warn('External character libraries unavailable:', err);
+		return [];
+	}
 }
 
 function loadCharactersFromStorage() {
@@ -47,7 +76,7 @@ function loadCharactersFromStorage() {
     let chars  = cs.characterCache || JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
     chars      = cs.migrateCharactersWithIds(chars);
     cs.characterCache = chars;
-    displayCharacters(chars);
+    return displayCharacters(chars);
 }
 
 // ---------------------------------------------------------------------------
@@ -69,16 +98,22 @@ function displayCharacters(characters) {
         return;
     }
 
-    grid.innerHTML = characters.map((character, index) => {
+	grid.innerHTML = characters.map((character, index) => {
         const thumbnail = character.howl?.images?.find(img => img.isThumbnail);
         const avatarSrc = thumbnail ? thumbnail.data : (character.avatar || 'assets/Character.png');
+		const external = !!character._external;
+		const sourceLabel = external
+			? (character._externalFormat === 'sillytavern' ? 'SillyTavern' : 'External library')
+			: '';
+		const name = escapeCharacterText(character.name || 'Unnamed');
         return `
-            <div class="character-bubble" onclick="editCharacter(${index})">
+			<div class="character-bubble${external ? ' character-bubble-external' : ''}" onclick="${external ? `viewExternalCharacter(${index})` : `editCharacter(${index})`}" title="${external ? escapeCharacterText(character._externalPath || '') : ''}">
                 <div class="character-avatar">
-                    <img src="${avatarSrc}" alt="${character.name}" class="character-avatar-img">
+					<img src="${avatarSrc}" alt="${name}" class="character-avatar-img">
                 </div>
                 <div class="character-info">
-                    <div class="character-name">${character.name}</div>
+					<div class="character-name">${name}</div>
+					${external ? `<div class="character-external-badge">${escapeCharacterText(sourceLabel)} · Read only</div>` : ''}
                     <div class="character-meta">
                         ${(() => {
                             const role = character.metadata?.role || '';
@@ -92,13 +127,21 @@ function displayCharacters(characters) {
                         })()}
                     </div>
                 </div>
-                <div class="character-actions">
-                    <button class="character-edit-btn"   onclick="editCharacter(${index}, event)">✏️</button>
-                    <button class="character-delete-btn" onclick="deleteCharacter(${index}, event)">🗑️</button>
-                </div>
+				<div class="character-actions">
+					${external
+						? `<button class="character-edit-btn" onclick="viewExternalCharacter(${index}, event)" title="View external card">👁</button>`
+						: `<button class="character-edit-btn" onclick="editCharacter(${index}, event)">✏️</button>
+						   <button class="character-delete-btn" onclick="deleteCharacter(${index}, event)">🗑️</button>`}
+				</div>
             </div>
         `;
     }).join('');
+}
+
+function escapeCharacterText(value) {
+	return String(value ?? '').replace(/[&<>"']/g, ch => ({
+		'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+	}[ch]));
 }
 
 // ---------------------------------------------------------------------------
@@ -152,6 +195,9 @@ function editCharacter(index, event) {
     }
 
     openCharacterCreationPopup();
+    if (typeof loadCharacterVoiceControls === 'function') {
+        loadCharacterVoiceControls(voice?.voice || '', true);
+    }
 }
 
 // ---------------------------------------------------------------------------

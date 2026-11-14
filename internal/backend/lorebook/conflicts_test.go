@@ -334,3 +334,129 @@ func TestResolveConflictsWithEntryOverride(t *testing.T) {
         t.Fatalf("newer_wins rule should prefer newer entry, got %s", result[0].ID)
     }
 }
+
+func TestResolveConflictsKeepsDifferentCharacterOwners(t *testing.T) {
+    entries := []ResolvedEntry{
+        {
+            Entry: Entry{
+                ID:            "aria_private",
+                OwnerID:       "char_aria",
+                Scope:         ScopeCharacter,
+                PriorityLevel: 1,
+                ConflictRule:  string(ConflictNewerWins),
+                UpdatedAt:     "2024-01-01",
+            },
+            MatchedPhrase: "dragon",
+        },
+        {
+            Entry: Entry{
+                ID:            "bram_private",
+                OwnerID:       "char_bram",
+                Scope:         ScopeCharacter,
+                PriorityLevel: 5,
+                ConflictRule:  string(ConflictNewerWins),
+                UpdatedAt:     "2024-12-31",
+            },
+            MatchedPhrase: "dragon",
+        },
+    }
+
+    // Same trigger, different owners: neither entry competes for the other's
+    // prompt, so routing must still receive both.
+    result := ResolveConflicts(entries, ConflictHighestPriority)
+    if len(result) != 2 {
+        t.Fatalf("different owners should not collapse, got %d entries", len(result))
+    }
+
+    ids := map[string]bool{}
+    for _, entry := range result {
+        ids[entry.ID] = true
+    }
+    if !ids["aria_private"] || !ids["bram_private"] {
+        t.Fatalf("both owner entries should survive, got %v", ids)
+    }
+}
+
+func TestResolveConflictsStillCollapsesSameCharacterOwner(t *testing.T) {
+    entries := []ResolvedEntry{
+        {
+            Entry: Entry{
+                ID:            "old_private",
+                OwnerID:       "char_aria",
+                Scope:         ScopeCharacter,
+                ConflictRule:  string(ConflictNewerWins),
+                UpdatedAt:     "2024-01-01",
+            },
+            MatchedPhrase: "dragon",
+        },
+        {
+            Entry: Entry{
+                ID:            "new_private",
+                OwnerID:       "char_aria",
+                Scope:         ScopeCharacter,
+                ConflictRule:  string(ConflictNewerWins),
+                UpdatedAt:     "2024-12-31",
+            },
+            MatchedPhrase: "dragon",
+        },
+    }
+
+    result := ResolveConflicts(entries, ConflictHighestPriority)
+    if len(result) != 1 {
+        t.Fatalf("same owner should still collapse, got %d entries", len(result))
+    }
+    if result[0].ID != "new_private" {
+        t.Fatalf("newer same-owner entry should win, got %s", result[0].ID)
+    }
+}
+
+func TestConflictGroupingKeepsNonCharacterScopesShared(t *testing.T) {
+    scopes := []struct {
+        name  string
+        scope Scope
+    }{
+        {"world", ScopeWorld},
+        {"scenario", ScopeScenario},
+    }
+
+    for _, tc := range scopes {
+        entries := []ResolvedEntry{
+            {
+                Entry: Entry{
+                    ID:            "first",
+                    OwnerID:       "owner_a",
+                    Scope:         tc.scope,
+                    ConflictRule:  string(ConflictNewerWins),
+                    UpdatedAt:     "2024-01-01",
+                },
+                MatchedPhrase: "dragon",
+            },
+            {
+                Entry: Entry{
+                    ID:            "second",
+                    OwnerID:       "owner_b",
+                    Scope:         tc.scope,
+                    ConflictRule:  string(ConflictNewerWins),
+                    UpdatedAt:     "2024-12-31",
+                },
+                MatchedPhrase: "dragon",
+            },
+        }
+
+        // The ownership split applies only to private character entries. World and
+        // scenario entries with the same trigger remain one conflict domain even
+        // when their OwnerID fields differ.
+        result := ResolveConflicts(entries, ConflictHighestPriority)
+        if len(result) != 1 {
+            t.Fatalf("%s scope: same trigger should still resolve, got %d entries", tc.name, len(result))
+        }
+        if result[0].ID != "second" {
+            t.Fatalf("%s scope: newer entry should win, got %s", tc.name, result[0].ID)
+        }
+
+        conflicts := FindConflicts(entries)
+        if len(conflicts) != 1 || len(conflicts["dragon"]) != 2 {
+            t.Fatalf("%s scope: conflicts should stay keyed by trigger alone, got %v", tc.name, conflicts)
+        }
+    }
+}

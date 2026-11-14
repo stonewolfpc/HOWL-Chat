@@ -29350,3 +29350,2210 @@
 [TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
 2026/11/01 09:29:30 [rpc] AddCharacterToChat                            ok            0s
 2026/11/01 09:30:00 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:09:01 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:09:01 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:09:01 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:09:01 [rpc] IsModelLoaded                                 ok           8ms
+[inference] family="" source="" temp=0.70 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:09:01 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:09:01 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:09:02 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:09:02 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:09:02 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:09:02 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:09:02 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:09:02 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:09:32 [rpc] SaveChatData                                  ok           6ms
+2026/11/01 10:16:25 [rpc] SetSamplerSettings                            ok           1ms
+2026/11/01 10:16:25 [rpc] SetSamplerSettings                            ok           1ms
+2026/11/01 10:16:25 [rpc] SetSettings                                   ok           1ms
+2026/11/01 10:18:23 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:18:23 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:18:23 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:18:23 [rpc] IsModelLoaded                                 ok          11ms
+2026/11/01 10:18:23 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:18:23 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:18:23 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:18:23 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:18:23 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:18:23 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:18:23 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:18:23 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:18:23 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:18:23 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:19:23 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:19:23 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:19:23 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:19:23 [rpc] IsModelLoaded                                 ok          10ms
+2026/11/01 10:19:23 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:19:23 [rpc] GetEffectiveSampler                           ok           2ms
+2026/11/01 10:19:23 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:19:23 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:19:23 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:19:23 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:19:23 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:19:23 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:19:23 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:19:23 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:20:24 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:20:24 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:20:24 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:20:24 [rpc] GetSamplerSettings                            ok            0s
+2026/11/01 10:20:24 [rpc] IsModelLoaded                                 ok          10ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:20:24 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:20:24 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:20:24 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:20:24 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:20:24 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:20:24 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:20:24 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:20:24 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:20:24 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:21:28 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:21:28 [rpc] GetLLMModels                                  ok           2ms
+2026/11/01 10:21:28 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:21:28 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:21:28 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:21:28 [rpc] IsModelLoaded                                 ok          12ms
+2026/11/01 10:21:28 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:21:28 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:21:28 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:21:28 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:21:28 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:21:28 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:21:28 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:21:28 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:22:07 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:22:07 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:22:07 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:22:07 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:22:07 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:22:07 [rpc] IsModelLoaded                                 ok          10ms
+2026/11/01 10:22:07 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:22:07 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:22:07 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:22:07 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:22:07 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:22:07 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:22:07 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:22:07 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:22:31 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:22:31 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:22:31 [rpc] GetLLMModels                                  ok           2ms
+2026/11/01 10:22:31 [rpc] IsModelLoaded                                 ok           9ms
+2026/11/01 10:22:31 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:22:31 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:22:31 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:22:31 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:22:31 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:22:31 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:22:31 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:22:31 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:22:31 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:22:31 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:23:45 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:23:45 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:23:45 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:23:45 [rpc] IsModelLoaded                                 ok           8ms
+2026/11/01 10:23:45 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:23:45 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:23:45 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:23:45 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:23:45 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:23:45 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:23:45 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:23:45 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:23:45 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:23:45 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:30:58 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:30:58 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:30:58 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:30:58 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:30:58 [rpc] IsModelLoaded                                 ok          10ms
+2026/11/01 10:30:58 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:30:58 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:30:58 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:30:58 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:30:58 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:30:58 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:30:58 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:30:58 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:30:58 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:31:00 [rpc] SaveChatData                                  ok          11ms
+2026/11/01 10:31:00 [rpc] SaveChat                                      ok          12ms
+2026/11/01 10:31:00 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:00 [rpc] GetSamplerSettings                            ok            0s
+2026/11/01 10:31:00 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:00 [rpc] GetLLMModels                                  ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:31:00 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:31:00 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:31:00 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:00 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:31:00 [rpc] IsModelLoaded                                 ok           4ms
+2026/11/01 10:31:00 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:31:00 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:31:00 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:31:00 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:31:00 [rpc] AddCharacterToChat                            ok           1ms
+2026/11/01 10:31:01 [rpc] SaveChatData                                  ok          39ms
+2026/11/01 10:31:01 [rpc] SaveChat                                      ok          43ms
+2026/11/01 10:31:01 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:01 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:01 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:31:01 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:31:01 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:31:01 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:31:01 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:31:01 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:31:01 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:01 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:31:01 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:31:01 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:31:01 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:31:01 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:31:03 [rpc] SaveChatData                                  ok           8ms
+2026/11/01 10:31:03 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:31:03 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:03 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:03 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:31:03 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:31:03 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:31:03 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:31:03 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:31:03 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:31:03 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:03 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:03 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:31:03 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:31:03 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:31:03 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:31:04 [rpc] SaveChat                                      FAILED       1ms  failed to save meta.json: open C:\Users\StoneWolfPC\AppData\Roaming\HOWLChat\chats\2026-11-01T02-42-41Z\meta.json.tmp: The process cannot access the file because it is being used by another process.
+2026/11/01 10:31:04 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:31:04 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:04 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:04 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:31:04 [rpc] IsModelLoaded                                 ok          11ms
+2026/11/01 10:31:04 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:31:04 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:31:04 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:31:04 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:31:04 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:04 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:04 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:31:04 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:31:04 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:31:04 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:31:06 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:31:06 [rpc] SaveChat                                      ok          11ms
+2026/11/01 10:31:06 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:06 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:06 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:31:06 [rpc] IsModelLoaded                                 ok           7ms
+2026/11/01 10:31:06 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:31:06 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:31:06 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:31:06 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:31:06 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:06 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:31:06 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:31:06 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:31:06 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:31:06 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:31:07 [rpc] SaveChat                                      FAILED       5ms  failed to save history.json: open C:\Users\StoneWolfPC\AppData\Roaming\HOWLChat\chats\2026-11-01T02-42-41Z\history.json.tmp: The process cannot access the file because it is being used by another process.
+2026/11/01 10:31:07 [rpc] SaveChatData                                  ok          11ms
+2026/11/01 10:31:07 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:31:07 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:31:07 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:07 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:31:07 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:31:07 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:31:07 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:31:07 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:07 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:07 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:31:07 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:31:07 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:31:07 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:31:10 [rpc] SaveChatData                                  ok          21ms
+2026/11/01 10:31:10 [rpc] SaveChat                                      ok          21ms
+2026/11/01 10:31:10 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:10 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:10 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:31:10 [rpc] IsModelLoaded                                 ok          10ms
+2026/11/01 10:31:10 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:31:10 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:31:10 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:31:10 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:31:10 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:10 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:11 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:31:11 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:31:11 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:31:11 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:31:12 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:31:12 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:31:12 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:13 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:31:13 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:13 [rpc] GetLLMModels                                  ok           1ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:31:13 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:31:13 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:31:13 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:13 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:13 [rpc] LoadChat                                      ok           4ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:31:13 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:31:13 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:31:13 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:31:14 [rpc] SaveChatData                                  ok          12ms
+2026/11/01 10:31:14 [rpc] SaveChat                                      ok          13ms
+2026/11/01 10:31:15 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:15 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:31:15 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:31:15 [rpc] GetSettings                                   ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:31:15 [rpc] GetEffectiveSampler                           ok           1ms
+2026/11/01 10:31:15 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:31:15 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:15 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:15 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:31:15 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:31:15 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:31:15 [rpc] AddCharacterToChat                            ok           1ms
+2026/11/01 10:31:17 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:31:17 [rpc] SaveChat                                      ok          12ms
+2026/11/01 10:31:18 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:18 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:31:18 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:18 [rpc] IsModelLoaded                                 ok           7ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:31:18 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:31:18 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:31:18 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:18 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:31:18 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:31:18 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:31:18 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:31:18 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:31:19 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:19 [rpc] SaveChatData                                  ok           6ms
+2026/11/01 10:31:19 [rpc] SaveChat                                      ok          19ms
+2026/11/01 10:31:20 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:31:20 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:31:20 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:31:20 [rpc] GetSettings                                   ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:31:20 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:31:20 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:31:20 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:20 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:31:21 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:31:21 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:31:21 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:31:21 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:31:22 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:32:23 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:32:23 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:32:23 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:32:23 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:32:23 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:32:23 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:32:23 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:32:23 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:32:23 [rpc] IsModelLoaded                                 ok          13ms
+2026/11/01 10:32:23 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:32:23 [rpc] LoadChat                                      ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:32:23 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:32:23 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:32:23 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:32:24 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:32:24 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:32:25 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:32:25 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:32:25 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:32:25 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:32:25 [rpc] GetSamplerSettings                            ok           1ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:32:25 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:32:25 [rpc] GetModelOptions                               ok           1ms
+2026/11/01 10:32:25 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:32:25 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:32:25 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:32:25 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:32:25 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:32:25 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:32:25 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:33:15 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:15 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:15 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:33:15 [rpc] GetSamplerSettings                            ok            0s
+2026/11/01 10:33:15 [rpc] IsModelLoaded                                 ok           8ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:33:15 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:33:15 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:33:15 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:33:15 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:33:15 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:33:15 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:33:15 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:33:15 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:33:15 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:33:16 [rpc] SaveChat                                      FAILED       4ms  failed to save history.json: open C:\Users\StoneWolfPC\AppData\Roaming\HOWLChat\chats\2026-11-01T02-42-41Z\history.json.tmp: The process cannot access the file because it is being used by another process.
+2026/11/01 10:33:16 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:33:16 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:16 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:16 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:33:17 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:33:17 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:33:17 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:33:17 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:33:17 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:33:17 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:33:17 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:33:17 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:33:17 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:33:17 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:33:17 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:33:18 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:33:18 [rpc] SaveChat                                      ok          12ms
+2026/11/01 10:33:18 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:18 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:18 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:33:18 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:33:18 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:33:18 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:33:18 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:33:18 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:33:18 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:33:18 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:33:18 [rpc] LoadChat                                      ok           7ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:33:18 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:33:18 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:33:18 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:33:20 [rpc] SaveChatData                                  ok          13ms
+2026/11/01 10:33:20 [rpc] SaveChat                                      ok          14ms
+2026/11/01 10:33:20 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:20 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:20 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:33:20 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:33:20 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:33:20 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:33:20 [rpc] IsModelLoaded                                 ok           8ms
+2026/11/01 10:33:20 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:33:20 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:33:20 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:33:20 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:33:20 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:33:20 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:33:20 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:33:21 [rpc] SaveChat                                      FAILED      13ms  failed to save memories.json: open C:\Users\StoneWolfPC\AppData\Roaming\HOWLChat\chats\2026-11-01T02-42-41Z\memories.json.tmp: The process cannot access the file because it is being used by another process.
+2026/11/01 10:33:21 [rpc] SaveChatData                                  ok          14ms
+2026/11/01 10:33:22 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:22 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:22 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:33:22 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:33:22 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:33:22 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:33:22 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:33:22 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:33:22 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:33:22 [rpc] GetActiveChatMeta                             ok           2ms
+2026/11/01 10:33:22 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:33:22 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:33:22 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:33:22 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:33:23 [rpc] SaveChatData                                  ok          13ms
+2026/11/01 10:33:23 [rpc] SaveChat                                      ok          18ms
+2026/11/01 10:33:23 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:23 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:23 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:33:23 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:33:23 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:33:23 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:33:23 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:33:23 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:33:23 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:33:23 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:33:25 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:33:25 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:33:25 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:33:25 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:33:26 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:33:26 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:33:26 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:26 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:26 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:33:26 [rpc] IsModelLoaded                                 ok           8ms
+2026/11/01 10:33:26 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:33:26 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:33:26 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:33:26 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:33:26 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:33:26 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:33:26 [rpc] LoadChat                                      ok          15ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:33:27 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:33:27 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:33:27 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:33:28 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:33:28 [rpc] SaveChat                                      ok          20ms
+2026/11/01 10:33:29 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:29 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:33:29 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:33:29 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:29 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:33:29 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:33:29 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:33:29 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:33:29 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:33:29 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:33:29 [rpc] LoadChat                                      ok           4ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:33:29 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:33:29 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:33:29 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:33:32 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:33:32 [rpc] SaveChat                                      ok          14ms
+2026/11/01 10:33:33 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:33 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:33:33 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:33 [rpc] IsModelLoaded                                 ok           8ms
+2026/11/01 10:33:33 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:33:33 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:33:33 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:33:33 [rpc] GetMemories                                   ok           2ms
+2026/11/01 10:33:33 [rpc] GetActiveChatMeta                             ok           2ms
+2026/11/01 10:33:33 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:33:33 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:33:33 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:33:33 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:33:33 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:33:35 [rpc] SaveChatData                                  ok          11ms
+2026/11/01 10:33:35 [rpc] SaveChat                                      ok          12ms
+2026/11/01 10:33:35 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:35 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:33:35 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:35 [rpc] GetLLMModels                                  ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:33:35 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:33:35 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:33:35 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:33:35 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:33:36 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:33:36 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:33:36 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:33:36 [rpc] AddCharacterToChat                            ok           1ms
+2026/11/01 10:33:37 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:33:37 [rpc] SaveChat                                      ok          13ms
+2026/11/01 10:33:38 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:38 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:33:38 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:38 [rpc] IsModelLoaded                                 ok           7ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:33:38 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:33:38 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:33:38 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:33:38 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:33:38 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:33:38 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:33:38 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:33:38 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:33:39 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:40 [rpc] SaveChat                                      FAILED       1ms  failed to save meta.json: open C:\Users\StoneWolfPC\AppData\Roaming\HOWLChat\chats\2026-11-01T02-42-41Z\meta.json.tmp: The process cannot access the file because it is being used by another process.
+2026/11/01 10:33:40 [rpc] SaveChatData                                  ok           8ms
+2026/11/01 10:33:40 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:40 [rpc] IsModelLoaded                                 ok            0s
+2026/11/01 10:33:40 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:33:40 [rpc] GetLLMModels                                  ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:33:40 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:33:40 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:33:40 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:33:40 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:33:40 [rpc] LoadChat                                      ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:33:41 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:33:41 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:33:41 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:33:42 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:34:20 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:34:20 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:34:20 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:34:20 [rpc] GetSamplerSettings                            ok            0s
+2026/11/01 10:34:20 [rpc] IsModelLoaded                                 ok           9ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:34:20 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:34:20 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:34:20 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:34:20 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:34:20 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:34:20 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:34:20 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:34:20 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:34:20 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:35:36 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:36 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:35:36 [rpc] GetSettings                                   ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:35:36 [rpc] GetEffectiveSampler                           ok           1ms
+2026/11/01 10:35:36 [rpc] IsModelLoaded                                 ok          12ms
+2026/11/01 10:35:36 [rpc] GetSamplerSettings                            ok            0s
+2026/11/01 10:35:36 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:35:36 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:35:36 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:35:36 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:35:36 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:35:36 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:35:36 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:35:36 [rpc] AddCharacterToChat                            ok           1ms
+2026/11/01 10:35:38 [rpc] SaveChatData                                  ok           8ms
+2026/11/01 10:35:38 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:35:38 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:38 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:38 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:35:38 [rpc] IsModelLoaded                                 ok           3ms
+2026/11/01 10:35:38 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:35:38 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:35:38 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:35:38 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:35:38 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:35:38 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:35:38 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:35:38 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:35:38 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:35:38 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:35:39 [rpc] SaveChatData                                  ok          17ms
+2026/11/01 10:35:39 [rpc] SaveChat                                      ok          18ms
+2026/11/01 10:35:40 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:40 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:40 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:35:40 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:35:40 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:35:40 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:35:40 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:35:40 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:35:40 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:35:40 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:35:40 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:35:40 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:35:40 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:35:40 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:35:41 [rpc] SaveChat                                      FAILED       1ms  failed to save meta.json: open C:\Users\StoneWolfPC\AppData\Roaming\HOWLChat\chats\2026-11-01T02-42-41Z\meta.json.tmp: The process cannot access the file because it is being used by another process.
+2026/11/01 10:35:41 [rpc] SaveChatData                                  ok          11ms
+2026/11/01 10:35:41 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:41 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:41 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:35:41 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:35:41 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:35:41 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:35:41 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:35:41 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:35:41 [rpc] IsModelLoaded                                 ok           9ms
+2026/11/01 10:35:41 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:35:41 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:35:41 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:35:41 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:35:41 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:35:43 [rpc] SaveChatData                                  ok          27ms
+2026/11/01 10:35:43 [rpc] SaveChat                                      ok          29ms
+2026/11/01 10:35:43 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:43 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:43 [rpc] GetLLMModels                                  ok           2ms
+2026/11/01 10:35:43 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:35:43 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:35:43 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:35:43 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:35:43 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:35:43 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:35:43 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:35:43 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:35:43 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:35:43 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:35:43 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:35:44 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:35:44 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:35:45 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:45 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:45 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:35:45 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:35:45 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:35:45 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:35:45 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:35:45 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:35:45 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:35:45 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:35:45 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:35:45 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:35:45 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:35:45 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:35:46 [rpc] SaveChatData                                  ok           8ms
+2026/11/01 10:35:46 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:35:46 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:46 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:46 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:35:46 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:35:46 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:35:46 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:35:46 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:35:46 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:35:46 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:35:46 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:35:46 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:35:46 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:35:46 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:35:46 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:35:48 [rpc] SaveChatData                                  ok          15ms
+2026/11/01 10:35:48 [rpc] SaveChat                                      ok          17ms
+2026/11/01 10:35:48 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:48 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:35:48 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:48 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:35:48 [rpc] GetEffectiveSampler                           ok           1ms
+2026/11/01 10:35:48 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:35:48 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:35:48 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:35:48 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:35:48 [rpc] IsModelLoaded                                 ok          13ms
+2026/11/01 10:35:48 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:35:48 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:35:48 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:35:48 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:35:49 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:35:49 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:35:50 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:50 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:50 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:35:50 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:35:50 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:35:50 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:35:50 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:35:50 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:35:50 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:35:50 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:35:50 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:35:50 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:35:50 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:35:50 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:35:51 [rpc] SaveChatData                                  ok          15ms
+2026/11/01 10:35:51 [rpc] SaveChat                                      ok          20ms
+2026/11/01 10:35:51 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:51 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:51 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:35:51 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:35:51 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:35:51 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:35:51 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:35:51 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:35:51 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:35:51 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:35:51 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:35:51 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:35:51 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:35:51 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:35:53 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:35:53 [rpc] SaveChat                                      ok          11ms
+2026/11/01 10:35:53 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:53 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:53 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:35:53 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:35:53 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:35:53 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:35:53 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:35:53 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:35:53 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:35:53 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:35:53 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:35:53 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:35:53 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:35:53 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:35:54 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:54 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:35:54 [rpc] SaveChat                                      ok          11ms
+2026/11/01 10:35:55 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:55 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:55 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:35:55 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:35:55 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:35:55 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:35:55 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:35:55 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:35:55 [rpc] IsModelLoaded                                 ok           9ms
+2026/11/01 10:35:55 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:35:55 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:35:55 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:35:55 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:35:55 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:35:55 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:56 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:35:56 [rpc] SaveChat                                      ok          11ms
+2026/11/01 10:35:56 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:56 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:35:56 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:35:56 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:35:56 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:35:56 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:35:56 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:35:56 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:35:56 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:35:56 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:35:56 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:35:56 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:35:56 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:35:56 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:36:18 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:36:18 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:36:18 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:36:18 [rpc] IsModelLoaded                                 ok           8ms
+2026/11/01 10:36:18 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:36:18 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:36:18 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:36:18 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:36:18 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:36:18 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:36:19 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:36:19 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:36:19 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:36:19 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:37:28 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:28 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:28 [rpc] GetLLMModels                                  ok           8ms
+2026/11/01 10:37:28 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:37:28 [rpc] GetEffectiveSampler                           ok           1ms
+2026/11/01 10:37:28 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:37:28 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:37:28 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:37:28 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:37:28 [rpc] IsModelLoaded                                 ok          22ms
+2026/11/01 10:37:28 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:37:28 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:37:28 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:37:28 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:37:30 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:37:30 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:37:30 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:30 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:30 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:37:30 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:37:30 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:37:30 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:37:30 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:37:30 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:37:30 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:37:30 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:30 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:37:30 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:37:30 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:37:30 [rpc] AddCharacterToChat                            ok           1ms
+2026/11/01 10:37:32 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:37:32 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:37:32 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:32 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:32 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:37:32 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:37:32 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:37:32 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:37:32 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:37:32 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:37:32 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:32 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:32 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:37:32 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:37:32 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:37:32 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:37:33 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:37:33 [rpc] SaveChat                                      ok          12ms
+2026/11/01 10:37:33 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:33 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:33 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:37:33 [rpc] IsModelLoaded                                 ok           8ms
+2026/11/01 10:37:33 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:37:33 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:37:33 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:37:33 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:37:33 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:33 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:33 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:37:33 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:37:33 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:37:33 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:37:35 [rpc] SaveChatData                                  ok          11ms
+2026/11/01 10:37:35 [rpc] SaveChat                                      ok          11ms
+2026/11/01 10:37:35 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:35 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:35 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:37:35 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:37:35 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:37:35 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:37:35 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:37:35 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:37:35 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:35 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:35 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:37:35 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:37:35 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:37:35 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:37:38 [rpc] SaveChatData                                  ok           8ms
+2026/11/01 10:37:38 [rpc] SaveChat                                      ok           9ms
+2026/11/01 10:37:39 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:39 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:39 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:37:39 [rpc] IsModelLoaded                                 ok           8ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:37:39 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:37:39 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:37:39 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:37:39 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:39 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:37:39 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:37:39 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:37:39 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:37:40 [rpc] SaveChatData                                  ok          13ms
+2026/11/01 10:37:40 [rpc] SaveChat                                      ok          15ms
+2026/11/01 10:37:41 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:41 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:37:41 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:37:41 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:41 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:37:41 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:37:41 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:37:41 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:37:41 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:41 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:41 [rpc] LoadChat                                      ok           4ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:37:41 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:37:41 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:37:41 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:37:43 [rpc] SaveChatData                                  ok          12ms
+2026/11/01 10:37:43 [rpc] SaveChat                                      ok          13ms
+2026/11/01 10:37:45 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:45 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:37:45 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:45 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:37:45 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:37:45 [rpc] IsModelLoaded                                 ok          10ms
+2026/11/01 10:37:46 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:37:46 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:37:46 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:46 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:46 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:37:46 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:37:46 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:37:46 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:37:47 [rpc] SaveChat                                      FAILED      18ms  failed to save memories.json: open C:\Users\StoneWolfPC\AppData\Roaming\HOWLChat\chats\2026-11-01T02-42-41Z\memories.json.tmp: The process cannot access the file because it is being used by another process.
+2026/11/01 10:37:47 [rpc] SaveChatData                                  ok          21ms
+2026/11/01 10:37:48 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:48 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:37:48 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:48 [rpc] GetLLMModels                                  ok           3ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:37:48 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:37:48 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:37:48 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:48 [rpc] GetActiveChatMeta                             ok           2ms
+2026/11/01 10:37:48 [rpc] LoadChat                                      ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:37:49 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:37:49 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:37:49 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:37:50 [rpc] SaveChatData                                  ok          14ms
+2026/11/01 10:37:50 [rpc] SaveChat                                      ok          17ms
+2026/11/01 10:37:50 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:51 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:37:51 [rpc] IsModelLoaded                                 ok           8ms
+2026/11/01 10:37:51 [rpc] GetSettings                                   ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:37:51 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:37:51 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:37:51 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:37:51 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:51 [rpc] LoadChat                                      ok           3ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:37:51 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:37:51 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:37:51 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:37:53 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:37:53 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:37:53 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:53 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:37:53 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:37:53 [rpc] GetSettings                                   ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:37:53 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:37:53 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:37:53 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:53 [rpc] GetActiveChatMeta                             ok           5ms
+2026/11/01 10:37:53 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:37:54 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:37:54 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:37:54 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:37:55 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:55 [rpc] SaveChatData                                  ok           6ms
+2026/11/01 10:37:55 [rpc] SaveChat                                      ok          15ms
+2026/11/01 10:37:56 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:56 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:37:56 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:37:56 [rpc] IsModelLoaded                                 ok           8ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:37:56 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:37:56 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:37:56 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:56 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:37:56 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:37:56 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:37:56 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:37:56 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:37:57 [rpc] GetSettings                                   ok           1ms
+2026/11/01 10:37:59 [rpc] SaveChatData                                  ok           6ms
+2026/11/01 10:37:59 [rpc] SaveChat                                      ok          12ms
+2026/11/01 10:38:00 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:38:00 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:38:00 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:38:00 [rpc] GetSettings                                   ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:38:00 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:38:00 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:38:00 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:38:00 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:38:00 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:38:00 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:38:00 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:38:00 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:38:02 [rpc] SaveChatData                                  ok           8ms
+2026/11/01 10:38:02 [rpc] SaveChat                                      ok           9ms
+2026/11/01 10:38:02 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:38:02 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:38:02 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:38:02 [rpc] IsModelLoaded                                 ok           6ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:38:02 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:38:02 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:38:02 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:38:02 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:38:02 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:38:03 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:38:03 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:38:03 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:38:04 [rpc] SaveChatData                                  ok           8ms
+2026/11/01 10:38:04 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:38:04 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:38:05 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:38:05 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:38:05 [rpc] GetLLMModels                                  ok           1ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:38:05 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:38:05 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:38:05 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:38:05 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:38:05 [rpc] LoadChat                                      ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:38:05 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:38:05 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:38:05 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:38:06 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:38:06 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:38:07 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:38:07 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:38:07 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:38:07 [rpc] GetSettings                                   ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:38:07 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:38:07 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:38:07 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:38:07 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:38:07 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:38:07 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:38:07 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:38:07 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:38:09 [rpc] SaveChatData                                  ok           7ms
+2026/11/01 10:38:09 [rpc] SaveChat                                      ok           8ms
+2026/11/01 10:38:09 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:38:09 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:38:09 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:38:09 [rpc] IsModelLoaded                                 ok           7ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:38:09 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:38:09 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:38:09 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:38:09 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:38:09 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:38:10 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:38:10 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:38:10 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:38:55 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:38:55 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:38:55 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:38:55 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:38:55 [rpc] GetEffectiveSampler                           ok           1ms
+2026/11/01 10:38:55 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:38:55 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:38:55 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:38:55 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:38:55 [rpc] IsModelLoaded                                 ok          27ms
+2026/11/01 10:38:55 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:38:55 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:38:55 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:38:55 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:38:56 [rpc] SaveChatData                                  ok           7ms
+2026/11/01 10:38:56 [rpc] SaveChat                                      ok           9ms
+2026/11/01 10:38:56 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:38:56 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:38:56 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:38:56 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:38:56 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:38:56 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:38:56 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:38:56 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:38:56 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:38:56 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:38:56 [rpc] LoadChat                                      ok           4ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:38:56 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:38:56 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:38:56 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:38:58 [rpc] SaveChatData                                  ok          11ms
+2026/11/01 10:38:58 [rpc] SaveChat                                      ok          12ms
+2026/11/01 10:38:58 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:38:58 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:38:58 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:38:58 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:38:58 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:38:58 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:38:58 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:38:58 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:38:58 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:38:58 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:38:58 [rpc] LoadChat                                      ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:38:58 [rpc] AddCharacterToChat                            ok           1ms
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:38:58 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:38:58 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:39:00 [rpc] SaveChatData                                  ok          11ms
+2026/11/01 10:39:00 [rpc] SaveChat                                      ok          13ms
+2026/11/01 10:39:00 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:00 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:00 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:39:00 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:39:00 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:39:00 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:39:00 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:39:00 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:00 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:39:00 [rpc] IsModelLoaded                                 ok          14ms
+2026/11/01 10:39:00 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:39:00 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:39:00 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:39:00 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:39:01 [rpc] SaveChatData                                  ok          11ms
+2026/11/01 10:39:01 [rpc] SaveChat                                      ok          12ms
+2026/11/01 10:39:01 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:01 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:01 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:39:01 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:39:01 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:39:01 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:39:01 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:39:01 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:39:01 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:39:01 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:02 [rpc] LoadChat                                      ok           2ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:39:02 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:39:02 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:39:02 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:39:03 [rpc] SaveChat                                      FAILED       4ms  failed to save history.json: open C:\Users\StoneWolfPC\AppData\Roaming\HOWLChat\chats\2026-11-01T02-42-41Z\history.json.tmp: The process cannot access the file because it is being used by another process.
+2026/11/01 10:39:03 [rpc] SaveChatData                                  ok          13ms
+2026/11/01 10:39:03 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:03 [rpc] GetSamplerSettings                            ok            0s
+2026/11/01 10:39:03 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:03 [rpc] GetLLMModels                                  ok           4ms
+2026/11/01 10:39:03 [rpc] IsModelLoaded                                 ok           4ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:39:03 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:39:03 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:39:03 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:39:03 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:03 [rpc] GetActiveChatMeta                             ok           3ms
+2026/11/01 10:39:05 [rpc] LoadChat                                      ok          11ms
+2026/11/01 10:39:05 [rpc] SaveChatData                                  ok           9ms
+[TRACE:AddCharacterToChat] id=char_1793500884335_945 name=Yara (total=3)
+2026/11/01 10:39:06 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500884992_805 name=Fen (total=3)
+2026/11/01 10:39:06 [rpc] AddCharacterToChat                            ok            0s
+[TRACE:AddCharacterToChat] id=char_1793500885651_601 name=Kesh (total=3)
+2026/11/01 10:39:06 [rpc] AddCharacterToChat                            ok            0s
+2026/11/01 10:39:06 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:06 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:06 [rpc] GetLLMModels                                  ok           1ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:39:06 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:39:06 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:39:06 [rpc] IsModelLoaded                                 ok           9ms
+2026/11/01 10:39:06 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:06 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:06 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:39:08 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:39:08 [rpc] SaveChat                                      ok          11ms
+2026/11/01 10:39:09 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:09 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:39:09 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:39:09 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:09 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:39:09 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:39:09 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:39:09 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:39:09 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:09 [rpc] GetActiveChatMeta                             ok           2ms
+2026/11/01 10:39:10 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:39:11 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:39:11 [rpc] SaveChat                                      ok          11ms
+2026/11/01 10:39:12 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:12 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:39:12 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:12 [rpc] IsModelLoaded                                 ok           8ms
+2026/11/01 10:39:12 [rpc] GetModelOptions                               ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:39:12 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:39:12 [rpc] GetSamplerSettings                            ok            0s
+2026/11/01 10:39:12 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:39:12 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:39:12 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:12 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:39:14 [rpc] SaveChatData                                  ok           6ms
+2026/11/01 10:39:14 [rpc] SaveChat                                      ok          16ms
+2026/11/01 10:39:14 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:14 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:39:14 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:39:14 [rpc] GetSettings                                   ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:39:14 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:39:14 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:39:14 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:14 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:15 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:39:17 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:39:17 [rpc] SaveChat                                      ok          11ms
+2026/11/01 10:39:17 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:17 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:39:17 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:17 [rpc] IsModelLoaded                                 ok           8ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:39:17 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:39:17 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:39:17 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:17 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:17 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:39:18 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:19 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:39:19 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:39:19 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:19 [rpc] IsModelLoaded                                 ok            0s
+2026/11/01 10:39:19 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:19 [rpc] GetLLMModels                                  ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:39:19 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:39:19 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:39:19 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:19 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:19 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:39:21 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:21 [rpc] SaveChatData                                  ok           6ms
+2026/11/01 10:39:21 [rpc] SaveChat                                      ok           8ms
+2026/11/01 10:39:22 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:22 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:39:22 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:39:22 [rpc] GetSettings                                   ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:39:22 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:39:22 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:39:22 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:22 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:22 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:39:24 [rpc] SaveChatData                                  ok           6ms
+2026/11/01 10:39:24 [rpc] SaveChat                                      ok          11ms
+2026/11/01 10:39:24 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:24 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:39:24 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:24 [rpc] IsModelLoaded                                 ok           7ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:39:24 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:39:24 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:39:24 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:24 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:24 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:39:26 [rpc] SaveChatData                                  ok           8ms
+2026/11/01 10:39:26 [rpc] SaveChat                                      ok          14ms
+2026/11/01 10:39:26 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:27 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:39:27 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:27 [rpc] GetLLMModels                                  ok           1ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:39:27 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:39:27 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:39:27 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:39:27 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:27 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:39:49 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:49 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:39:49 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:39:49 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:39:49 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:39:49 [rpc] IsModelLoaded                                 ok          14ms
+2026/11/01 10:39:49 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:39:49 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:39:49 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:39:49 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:39:49 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:41:06 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:41:06 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:41:06 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:41:06 [rpc] IsModelLoaded                                 ok          11ms
+2026/11/01 10:41:06 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:41:06 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:41:06 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:41:06 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:41:06 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:41:06 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:41:06 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:41:07 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:41:07 [rpc] SaveChat                                      ok           9ms
+2026/11/01 10:41:08 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:41:08 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:41:08 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:41:08 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:41:08 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:41:08 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:41:08 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:41:08 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:41:08 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:41:08 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:41:08 [rpc] LoadChat                                      ok           3ms
+2026/11/01 10:41:09 [rpc] SaveChatData                                  ok          13ms
+2026/11/01 10:41:09 [rpc] SaveChat                                      ok          14ms
+2026/11/01 10:41:09 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:41:09 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:41:09 [rpc] GetLLMModels                                  ok           1ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:41:09 [rpc] GetSamplerSettings                            ok            0s
+2026/11/01 10:41:09 [rpc] IsModelLoaded                                 ok          10ms
+2026/11/01 10:41:09 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:41:09 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:41:09 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:41:09 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:41:09 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:41:09 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:41:55 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:41:55 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:41:55 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:41:55 [rpc] IsModelLoaded                                 ok           9ms
+2026/11/01 10:41:55 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:41:55 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:41:55 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:41:55 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:41:55 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:41:55 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:41:55 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:41:57 [rpc] SaveChatData                                  ok           6ms
+2026/11/01 10:41:57 [rpc] SaveChat                                      ok           7ms
+2026/11/01 10:41:57 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:41:57 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:41:57 [rpc] GetLLMModels                                  ok           2ms
+2026/11/01 10:41:57 [rpc] IsModelLoaded                                 ok           5ms
+2026/11/01 10:41:57 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:41:57 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:41:57 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:41:57 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:41:57 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:41:57 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:41:57 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:41:59 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:41:59 [rpc] SaveChat                                      ok          11ms
+2026/11/01 10:41:59 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:41:59 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:41:59 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:41:59 [rpc] IsModelLoaded                                 ok           3ms
+2026/11/01 10:41:59 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:41:59 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:41:59 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:41:59 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:41:59 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:41:59 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:41:59 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:42:55 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:42:55 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:42:55 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:42:55 [rpc] GetSamplerSettings                            ok            0s
+2026/11/01 10:42:55 [rpc] IsModelLoaded                                 ok          10ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:42:55 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:42:55 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:42:55 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:42:55 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:42:55 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:42:55 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:42:56 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:42:56 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:42:56 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:42:56 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:42:56 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:42:56 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:42:56 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:42:56 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:42:56 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:42:56 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:42:56 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:42:56 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:42:56 [rpc] LoadChat                                      ok           3ms
+2026/11/01 10:42:58 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:42:58 [rpc] SaveChat                                      ok          11ms
+2026/11/01 10:42:58 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:42:58 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:42:58 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:42:58 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:42:58 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:42:58 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:42:58 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:42:58 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:42:58 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:42:58 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:42:58 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:43:20 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:20 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:43:20 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:20 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:43:20 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:43:20 [rpc] IsModelLoaded                                 ok          12ms
+2026/11/01 10:43:20 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:43:20 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:43:20 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:20 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:43:20 [rpc] LoadChat                                      ok           3ms
+2026/11/01 10:43:22 [rpc] SaveChatData                                  ok           8ms
+2026/11/01 10:43:22 [rpc] SaveChat                                      ok           8ms
+2026/11/01 10:43:22 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:22 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:22 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:43:22 [rpc] IsModelLoaded                                 ok           2ms
+2026/11/01 10:43:22 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:43:22 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:43:22 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:43:22 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:43:22 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:22 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:22 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:43:24 [rpc] SaveChatData                                  ok          11ms
+2026/11/01 10:43:24 [rpc] SaveChat                                      ok          11ms
+2026/11/01 10:43:24 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:24 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:24 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:43:24 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:43:24 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:43:24 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:43:24 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:43:24 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:43:24 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:24 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:24 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:43:25 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:43:25 [rpc] SaveChat                                      ok          11ms
+2026/11/01 10:43:25 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:25 [rpc] GetSamplerSettings                            ok            0s
+2026/11/01 10:43:25 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:25 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:43:25 [rpc] GetModelOptions                               ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:43:25 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:43:25 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:43:25 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:25 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:43:25 [rpc] IsModelLoaded                                 ok          13ms
+2026/11/01 10:43:25 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:43:27 [rpc] SaveChat                                      FAILED       1ms  failed to save meta.json: open C:\Users\StoneWolfPC\AppData\Roaming\HOWLChat\chats\1793551145811\meta.json.tmp: The process cannot access the file because it is being used by another process.
+2026/11/01 10:43:27 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:43:27 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:27 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:27 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:43:27 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:43:27 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:43:27 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:43:27 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:43:27 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:43:27 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:43:27 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:27 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:43:29 [rpc] SaveChat                                      FAILED       1ms  failed to save meta.json: open C:\Users\StoneWolfPC\AppData\Roaming\HOWLChat\chats\1793551145811\meta.json.tmp: The process cannot access the file because it is being used by another process.
+2026/11/01 10:43:29 [rpc] SaveChatData                                  ok           8ms
+2026/11/01 10:43:29 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:29 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:29 [rpc] GetLLMModels                                  ok           2ms
+2026/11/01 10:43:29 [rpc] IsModelLoaded                                 ok           3ms
+2026/11/01 10:43:29 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:43:29 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:43:29 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:43:29 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:43:29 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:43:29 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:43:29 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:43:30 [rpc] SaveChat                                      FAILED       1ms  failed to save meta.json: open C:\Users\StoneWolfPC\AppData\Roaming\HOWLChat\chats\1793551145811\meta.json.tmp: The process cannot access the file because it is being used by another process.
+2026/11/01 10:43:30 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:43:30 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:30 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:30 [rpc] GetLLMModels                                  ok           3ms
+2026/11/01 10:43:30 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:43:30 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:43:30 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:43:30 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:43:30 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:30 [rpc] IsModelLoaded                                 ok          13ms
+2026/11/01 10:43:30 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:31 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:43:33 [rpc] SaveChatData                                  ok           7ms
+2026/11/01 10:43:33 [rpc] SaveChat                                      ok           8ms
+2026/11/01 10:43:34 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:34 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:34 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:43:34 [rpc] IsModelLoaded                                 ok           2ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:43:34 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:43:34 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:43:34 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:34 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:34 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:43:36 [rpc] SaveChatData                                  ok           9ms
+2026/11/01 10:43:36 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:43:36 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:36 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:43:36 [rpc] GetSettings                                   ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:43:36 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:43:36 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:43:36 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:36 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:43:36 [rpc] IsModelLoaded                                 ok          10ms
+2026/11/01 10:43:36 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:43:38 [rpc] SaveChatData                                  ok           6ms
+2026/11/01 10:43:38 [rpc] SaveChat                                      ok          13ms
+2026/11/01 10:43:40 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:40 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:43:40 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:43:40 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:40 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:43:40 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:43:41 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:43:41 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:43:41 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:41 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:43:41 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:43:42 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:43:42 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:43:43 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:43 [rpc] IsModelLoaded                                 ok           9ms
+2026/11/01 10:43:43 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:43:43 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:43 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:43:43 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:43:43 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:43:43 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:43:43 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:43 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:43:43 [rpc] LoadChat                                      ok           3ms
+2026/11/01 10:43:44 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:45 [rpc] SaveChatData                                  FAILED       2ms  failed to save meta.json: rename C:\Users\StoneWolfPC\AppData\Roaming\HOWLChat\chats\1793551145811\meta.json.tmp C:\Users\StoneWolfPC\AppData\Roaming\HOWLChat\chats\1793551145811\meta.json: Access is denied.
+2026/11/01 10:43:45 [rpc] SaveChat                                      ok          13ms
+2026/11/01 10:43:45 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:45 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:43:45 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:45 [rpc] GetLLMModels                                  ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:43:45 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:43:45 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:43:45 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:45 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:45 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:43:47 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:47 [rpc] SaveChatData                                  ok          12ms
+2026/11/01 10:43:47 [rpc] SaveChat                                      ok          16ms
+2026/11/01 10:43:48 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:48 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:43:48 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:48 [rpc] IsModelLoaded                                 ok           7ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:43:48 [rpc] GetEffectiveSampler                           ok           2ms
+2026/11/01 10:43:48 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:43:48 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:48 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:48 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:43:50 [rpc] SaveChatData                                  ok          10ms
+2026/11/01 10:43:50 [rpc] SaveChat                                      ok          11ms
+2026/11/01 10:43:50 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:50 [rpc] IsModelLoaded                                 ok           1ms
+2026/11/01 10:43:50 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:43:50 [rpc] GetSettings                                   ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:43:50 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:43:50 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:43:50 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:50 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:50 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:43:54 [rpc] SaveChatData                                  ok           7ms
+2026/11/01 10:43:54 [rpc] SaveChat                                      ok          10ms
+2026/11/01 10:43:55 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:55 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:43:55 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:43:55 [rpc] IsModelLoaded                                 ok          10ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:43:55 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:43:55 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:43:55 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:55 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:43:55 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:44:39 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:44:39 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:44:39 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:44:39 [rpc] IsModelLoaded                                 ok           7ms
+2026/11/01 10:44:39 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:44:39 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:44:39 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:44:39 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:44:39 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:44:39 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:44:39 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:45:08 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:45:08 [rpc] GetLLMModels                                  ok            0s
+2026/11/01 10:45:08 [rpc] GetSettings                                   ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:45:08 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:45:08 [rpc] GetSamplerSettings                            ok            0s
+2026/11/01 10:45:08 [rpc] GetMemories                                   ok           1ms
+2026/11/01 10:45:08 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:45:08 [rpc] IsModelLoaded                                 ok          18ms
+2026/11/01 10:45:08 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:45:08 [rpc] GetActiveChatMeta                             ok           1ms
+2026/11/01 10:45:08 [rpc] LoadChat                                      ok           2ms
+2026/11/01 10:45:53 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:45:53 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 10:45:53 [rpc] GetSettings                                   ok            0s
+2026/11/01 10:45:53 [rpc] IsModelLoaded                                 ok           9ms
+2026/11/01 10:45:53 [rpc] GetSamplerSettings                            ok            0s
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 10:45:53 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 10:45:53 [rpc] GetModelOptions                               ok            0s
+2026/11/01 10:45:53 [rpc] GetMemories                                   ok            0s
+2026/11/01 10:45:53 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:45:53 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 10:45:53 [rpc] LoadChat                                      ok           1ms
+2026/11/01 10:58:12 [rpc] GetImageSettings                              ok            0s
+2026/11/01 10:58:12 [rpc] GetRegisteredModels                           ok           1ms
+2026/11/01 10:58:12 [rpc] ListImageWorkflows                            ok           1ms
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+2026/11/01 10:58:12 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 10:58:12 [rpc] ScanImageModels                               ok           5ms
+2026/11/01 10:58:12 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 10:58:12 [rpc] ListGalleryImages                             ok           6ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           7ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           7ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           4ms
+2026/11/01 10:58:12 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 10:58:12 [rpc] GetModelDirectories                           ok           1ms
+2026/11/01 10:58:13 [rpc] GetImageSettings                              ok           1ms
+2026/11/01 10:58:13 [rpc] ListImageWorkflows                            ok           1ms
+2026/11/01 10:58:13 [rpc] GetRegisteredModels                           ok           1ms
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+2026/11/01 10:58:13 [rpc] GetAppDiagnostics                             ok           1ms
+2026/11/01 10:58:13 [rpc] ScanImageModels                               ok           5ms
+2026/11/01 10:58:13 [rpc] ListGalleryImages                             ok           5ms
+2026/11/01 10:58:13 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           4ms
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           3ms
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 10:58:13 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 10:58:14 [rpc] GetModelDirectories                           ok            0s
+2026/11/01 10:58:15 [rpc] GetImageSettings                              ok           1ms
+2026/11/01 10:58:15 [rpc] GetRegisteredModels                           ok           1ms
+2026/11/01 10:58:15 [rpc] ListImageWorkflows                            ok           1ms
+2026/11/01 10:58:15 [rpc] GetAppDiagnostics                             ok           3ms
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+2026/11/01 10:58:15 [rpc] ScanImageModels                               ok           9ms
+2026/11/01 10:58:15 [rpc] ListGalleryImages                             ok           8ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           6ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           3ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           3ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           4ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           4ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           4ms
+2026/11/01 10:58:15 [rpc] GetGalleryImage                               ok           4ms
+2026/11/01 10:58:15 [rpc] GetSDServerVersion                            ok           1ms
+2026/11/01 10:58:15 [rpc] GetModelDirectories                           ok            0s
+2026/11/01 10:59:07 [rpc] GetImageSettings                              ok            0s
+2026/11/01 10:59:07 [rpc] GetRegisteredModels                           ok           1ms
+2026/11/01 10:59:07 [rpc] ListImageWorkflows                            ok            0s
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+2026/11/01 10:59:07 [rpc] ScanImageModels                               ok           4ms
+2026/11/01 10:59:07 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 10:59:07 [rpc] ListGalleryImages                             ok           5ms
+2026/11/01 10:59:07 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           3ms
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           3ms
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           3ms
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 10:59:07 [rpc] GetGalleryImage                               ok           7ms
+2026/11/01 10:59:08 [rpc] GetModelDirectories                           ok           1ms
+2026/11/01 10:59:09 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 10:59:09 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:00:09 [rpc] GetImageSettings                              ok           1ms
+2026/11/01 11:00:09 [rpc] GetRegisteredModels                           ok           1ms
+2026/11/01 11:00:09 [rpc] ListImageWorkflows                            ok            0s
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+2026/11/01 11:00:09 [rpc] GetAppDiagnostics                             ok           1ms
+2026/11/01 11:00:09 [rpc] ScanImageModels                               ok           4ms
+2026/11/01 11:00:09 [rpc] ListGalleryImages                             ok           4ms
+2026/11/01 11:00:09 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           4ms
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           9ms
+2026/11/01 11:00:09 [rpc] GetGalleryImage                               ok           7ms
+2026/11/01 11:00:09 [rpc] GetModelDirectories                           ok           1ms
+2026/11/01 11:00:11 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:00:11 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:01:05 [rpc] GetImageSettings                              ok            0s
+2026/11/01 11:01:05 [rpc] GetRegisteredModels                           ok           1ms
+2026/11/01 11:01:05 [rpc] ListImageWorkflows                            ok           1ms
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+2026/11/01 11:01:05 [rpc] ScanImageModels                               ok           4ms
+2026/11/01 11:01:05 [rpc] GetAppDiagnostics                             ok           1ms
+2026/11/01 11:01:05 [rpc] ListGalleryImages                             ok           4ms
+2026/11/01 11:01:05 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok            0s
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok           6ms
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 11:01:05 [rpc] GetGalleryImage                               ok           6ms
+2026/11/01 11:01:05 [rpc] GetModelDirectories                           ok           1ms
+2026/11/01 11:01:06 [rpc] GetImageSettings                              ok           1ms
+2026/11/01 11:01:06 [rpc] ListImageWorkflows                            ok            0s
+2026/11/01 11:01:06 [rpc] GetRegisteredModels                           ok           1ms
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+2026/11/01 11:01:06 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:01:06 [rpc] ScanImageModels                               ok           4ms
+2026/11/01 11:01:06 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:01:06 [rpc] ListGalleryImages                             ok           7ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok           6ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok           6ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok          10ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok           9ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok           6ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok           3ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok           7ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok           8ms
+2026/11/01 11:01:06 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 11:01:07 [rpc] GetModelDirectories                           ok           1ms
+2026/11/01 11:01:50 [rpc] GetImageSettings                              ok            0s
+2026/11/01 11:01:50 [rpc] GetRegisteredModels                           ok            0s
+2026/11/01 11:01:50 [rpc] ListImageWorkflows                            ok           1ms
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+2026/11/01 11:01:51 [rpc] ScanImageModels                               ok           4ms
+2026/11/01 11:01:51 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:01:51 [rpc] ListGalleryImages                             ok           5ms
+2026/11/01 11:01:51 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok           3ms
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok           7ms
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok           7ms
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok          14ms
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok           6ms
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok           6ms
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok           7ms
+2026/11/01 11:01:51 [rpc] GetGalleryImage                               ok           7ms
+2026/11/01 11:01:51 [rpc] GetModelDirectories                           ok           1ms
+2026/11/01 11:01:52 [rpc] GetImageSettings                              ok            0s
+2026/11/01 11:01:52 [rpc] ListImageWorkflows                            ok            0s
+2026/11/01 11:01:52 [rpc] GetRegisteredModels                           ok           1ms
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+2026/11/01 11:01:52 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:01:52 [rpc] ScanImageModels                               ok           4ms
+2026/11/01 11:01:52 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:01:52 [rpc] ListGalleryImages                             ok           3ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           4ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           4ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           6ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 11:01:52 [rpc] GetGalleryImage                               ok           8ms
+2026/11/01 11:01:52 [rpc] GetModelDirectories                           ok           1ms
+2026/11/01 11:02:14 [rpc] GetImageSettings                              ok            0s
+2026/11/01 11:02:14 [rpc] GetRegisteredModels                           ok            0s
+2026/11/01 11:02:14 [rpc] ListImageWorkflows                            ok           1ms
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+2026/11/01 11:02:14 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:02:14 [rpc] ScanImageModels                               ok           4ms
+2026/11/01 11:02:14 [rpc] ListGalleryImages                             ok           5ms
+2026/11/01 11:02:14 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           5ms
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           3ms
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           7ms
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           6ms
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           7ms
+2026/11/01 11:02:14 [rpc] GetGalleryImage                               ok           4ms
+2026/11/01 11:02:15 [rpc] GetModelDirectories                           ok           1ms
+2026/11/01 11:02:16 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:02:16 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:08 [rpc] GetSettings                                   ok            0s
+2026/11/01 11:56:08 [rpc] GetSettings                                   ok            0s
+2026/11/01 11:56:08 [rpc] GetLLMModels                                  ok           1ms
+2026/11/01 11:56:08 [rpc] IsModelLoaded                                 ok           8ms
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+2026/11/01 11:56:08 [rpc] GetEffectiveSampler                           ok            0s
+2026/11/01 11:56:08 [rpc] GetMemories                                   ok            0s
+2026/11/01 11:56:08 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 11:56:08 [rpc] GetActiveChatMeta                             ok            0s
+2026/11/01 11:56:08 [rpc] LoadChat                                      ok           2ms
+2026/11/01 11:56:16 [rpc] SaveChat                                      FAILED       1ms  failed to save meta.json: open C:\Users\StoneWolfPC\AppData\Roaming\HOWLChat\chats\1793551145811\meta.json.tmp: The process cannot access the file because it is being used by another process.
+2026/11/01 11:56:16 [rpc] SaveChatData                                  ok           6ms
+2026/11/01 11:56:16 [rpc] GetImageSettings                              ok           1ms
+2026/11/01 11:56:16 [rpc] GetRegisteredModels                           ok           1ms
+2026/11/01 11:56:16 [rpc] ListImageWorkflows                            ok           1ms
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+2026/11/01 11:56:16 [rpc] GetAppDiagnostics                             ok           1ms
+2026/11/01 11:56:16 [rpc] ScanImageModels                               ok           6ms
+2026/11/01 11:56:16 [rpc] ListGalleryImages                             ok           6ms
+2026/11/01 11:56:16 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:16 [rpc] GetCompatibleAssets                           ok            0s
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           6ms
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           3ms
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           1ms
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           4ms
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           2ms
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           8ms
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           4ms
+2026/11/01 11:56:16 [rpc] GetGalleryImage                               ok           3ms
+2026/11/01 11:56:16 [rpc] GetModelDirectories                           ok           1ms
+2026/11/01 11:56:18 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:18 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:20 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:20 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:22 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:22 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:24 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:24 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:26 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:26 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:28 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:28 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:30 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:30 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:32 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:32 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:34 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:34 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:36 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:36 [rpc] GetSDServerVersion                            ok           1ms
+2026/11/01 11:56:38 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:38 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:40 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:40 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:42 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:42 [rpc] GetSDServerVersion                            ok            0s
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+[scan-image] E:\HOWL_Chat\models -> 3 new or updated, 0 removed
+2026/11/01 11:56:43 [rpc] RefreshModelDirectories                       ok           3ms
+2026/11/01 11:56:43 [rpc] GetModelDirectories                           ok            0s
+[Scanner] Scan complete: 3 models, 0 VAEs, 1 LoRAs, 0 ControlNets, 0 embeddings, 0 LLMs
+2026/11/01 11:56:43 [rpc] ScanImageModels                               ok           3ms
+2026/11/01 11:56:43 [rpc] GetCompatibleAssets                           ok            0s
+2026/11/01 11:56:44 [rpc] GetAppDiagnostics                             ok           1ms
+2026/11/01 11:56:44 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:46 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:46 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:48 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:48 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:50 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:50 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:52 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:52 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:54 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:54 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:56 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:56 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:56:58 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:56:58 [rpc] GetSDServerVersion                            ok            0s
+2026/11/01 11:57:00 [rpc] GetAppDiagnostics                             ok            0s
+2026/11/01 11:57:00 [rpc] GetSDServerVersion                            ok            0s

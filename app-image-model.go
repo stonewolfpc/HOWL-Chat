@@ -108,6 +108,9 @@ func (a *App) lazyInitEngine() error {
 // address it. Cancellable loads run inside StartImageJob, where the job owns the
 // load it started.
 func (a *App) SetActiveImageModel(opts interface{}) (err error) {
+	if err := a.ensureAcceptingWork("load image model"); err != nil {
+		return err
+	}
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Printf("[PANIC] SetActiveImageModel: %v\n", r)
@@ -138,6 +141,11 @@ func (a *App) SetActiveImageModel(opts interface{}) (err error) {
 		}
 		a.logImageLoadError(err, "app-image-model.go")
 		return err
+	}
+
+	if a.shuttingDown.Load() {
+		_ = a.imageEngine.Shutdown()
+		return fmt.Errorf("image model load cancelled because Howl is shutting down")
 	}
 
 	resource.GetManager().RegisterModel(

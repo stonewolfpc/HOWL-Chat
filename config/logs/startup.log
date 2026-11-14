@@ -795,3 +795,905 @@
 20:51:06.446  +   30.7ms  rescan: scanning G:\AI GGUF\GGUF
 20:51:06.449  +   33.9ms  rescan: done G:\AI GGUF\GGUF 25 entries
 21:03:01.392  +2537780.0ms  wails.Run returned
+18:39:58.255  +    0.0ms  process start
+18:39:58.267  +   12.1ms  image init: begin
+18:39:58.291  +   36.6ms  image init: config ready
+18:39:58.292  +   37.1ms  image init: engine initialized
+18:39:58.394  +  139.6ms  NewApp done
+18:39:58.646  +  391.3ms  OnStartup: webview reached backend
+18:39:58.684  +  429.9ms  OnStartup: init complete
+18:39:58.686  +  431.9ms  rescan: start
+18:39:58.689  +  434.0ms  rescan: scanning G:\AI GGUF\GGUF
+18:39:58.710  +  455.7ms  rescan: done G:\AI GGUF\GGUF 26 entries
+18:40:15.808  +17553.1ms  wails.Run returned
+09:24:12.104  +    0.0ms  process start
+09:24:12.116  +   12.9ms  image init: begin
+09:24:12.132  +   28.8ms  image init: config ready
+09:24:12.133  +   29.3ms  image init: engine initialized
+09:24:12.226  +  121.9ms  NewApp done
+09:24:12.524  +  420.9ms  OnStartup: webview reached backend
+09:24:12.526  +  421.9ms  OnStartup: init complete
+09:24:12.526  +  422.4ms  rescan: start
+09:24:12.527  +  423.0ms  rescan: scanning G:\AI GGUF\GGUF
+09:24:12.530  +  426.7ms  rescan: done G:\AI GGUF\GGUF 26 entries
+09:29:11.287  +299183.7ms  wails.Run returned
+15:28:36.810  +    0.0ms  process start
+15:28:36.818  +    7.3ms  image init: begin
+15:28:36.822  +   11.5ms  image init: config ready
+15:28:36.822  +   12.0ms  image init: engine initialized
+15:28:36.874  +   63.5ms  NewApp done
+15:28:37.097  +  286.4ms  OnStartup: webview reached backend
+15:28:37.098  +  287.5ms  OnStartup: init complete
+15:28:37.098  +  287.5ms  rescan: start
+15:28:37.098  +  288.0ms  rescan: scanning G:\AI GGUF\GGUF
+15:28:37.101  +  290.6ms  rescan: done G:\AI GGUF\GGUF 26 entries
+17:14:27.793  +   10.8ms  image init: begin
+17:14:27.805  +   23.1ms  image init: config ready
+17:14:27.806  +   23.6ms  image init: engine initialized
+17:14:27.837  +   55.3ms  rescan: start
+17:14:27.837  +   55.3ms  rescan: scanning G:\AI GGUF\GGUF
+17:14:27.841  +   58.6ms  rescan: done G:\AI GGUF\GGUF 26 entries
+17:29:38.681  +    1.5ms  image init: begin
+17:29:38.686  +    6.2ms  image init: config ready
+17:29:38.687  +    6.8ms  image init: engine initialized
+17:29:38.704  +   24.0ms  rescan: start
+17:29:38.704  +   24.5ms  rescan: scanning G:\AI GGUF\GGUF
+17:29:38.706  +   26.6ms  rescan: done G:\AI GGUF\GGUF 26 entries
+18:16:50.336  +    1.6ms  image init: begin
+18:16:50.341  +    6.3ms  image init: config ready
+18:16:50.341  +    6.8ms  image init: engine initialized
+18:16:50.468  +  133.5ms  rescan: start
+18:16:50.468  +  133.5ms  rescan: scanning G:\AI GGUF\GGUF
+18:16:50.471  +  136.3ms  rescan: done G:\AI GGUF\GGUF 26 entries
+18:25:48.458  +    1.8ms  image init: begin
+18:25:48.463  +    6.3ms  image init: config ready
+18:25:48.463  +    6.8ms  image init: engine initialized
+18:25:48.483  +   26.7ms  rescan: start
+18:25:48.483  +   27.2ms  rescan: scanning G:\AI GGUF\GGUF
+18:34:34.712  +    1.6ms  image init: begin
+18:34:34.716  +    6.3ms  image init: config ready
+18:34:34.717  +    6.8ms  image init: engine initialized
+18:34:34.736  +   25.6ms  rescan: start
+18:34:34.736  +   26.1ms  rescan: scanning G:\AI GGUF\GGUF
+18:40:30.244  +    1.5ms  image init: begin
+18:40:30.246  +    3.7ms  image init: config ready
+18:40:30.246  +    3.7ms  image init: engine initialized
+18:40:30.266  +   23.8ms  rescan: start
+18:40:30.267  +   24.4ms  rescan: scanning G:\AI GGUF\GGUF
+18:44:40.801  +    1.6ms  image init: begin
+18:44:40.803  +    3.7ms  image init: config ready
+18:44:40.804  +    4.2ms  image init: engine initialized
+18:44:40.822  +   22.0ms  rescan: start
+18:54:05.283  +    1.5ms  image init: begin
+18:54:05.285  +    3.6ms  image init: config ready
+18:54:05.286  +    4.2ms  image init: engine initialized
+18:54:05.306  +   24.7ms  rescan: start
+18:54:05.307  +   25.4ms  rescan: scanning G:\AI GGUF\GGUF
+18:57:14.846  +    2.1ms  image init: begin
+18:57:14.848  +    4.1ms  image init: config ready
+18:57:14.849  +    4.6ms  image init: engine initialized
+18:57:14.866  +   21.8ms  rescan: start
+18:57:14.867  +   22.8ms  rescan: scanning G:\AI GGUF\GGUF
+18:58:38.990  +    1.5ms  image init: begin
+18:58:38.992  +    3.6ms  image init: config ready
+18:58:38.992  +    4.2ms  image init: engine initialized
+18:58:39.009  +   21.3ms  rescan: start
+18:59:27.786  +    1.6ms  image init: begin
+18:59:27.788  +    3.6ms  image init: config ready
+18:59:27.788  +    4.2ms  image init: engine initialized
+18:59:27.806  +   21.9ms  rescan: start
+18:59:27.807  +   22.5ms  rescan: scanning G:\AI GGUF\GGUF
+19:00:44.174  +    1.7ms  image init: begin
+19:00:44.175  +    3.3ms  image init: config ready
+19:00:44.176  +    3.8ms  image init: engine initialized
+19:00:44.192  +   20.3ms  rescan: start
+19:00:44.193  +   21.0ms  rescan: scanning G:\AI GGUF\GGUF
+19:03:08.078  +    1.6ms  image init: begin
+19:03:08.080  +    3.8ms  image init: config ready
+19:03:08.080  +    4.3ms  image init: engine initialized
+19:03:08.204  +  128.3ms  rescan: start
+19:03:08.205  +  129.2ms  rescan: scanning G:\AI GGUF\GGUF
+19:15:02.439  +    1.6ms  image init: begin
+19:15:02.441  +    4.3ms  image init: config ready
+19:15:02.441  +    4.3ms  image init: engine initialized
+19:15:02.500  +   63.0ms  rescan: start
+19:15:02.501  +   63.6ms  rescan: scanning G:\AI GGUF\GGUF
+19:20:54.920  +    0.0ms  process start
+19:20:54.922  +    2.1ms  image init: begin
+19:20:54.926  +    6.3ms  image init: config ready
+19:20:54.927  +    6.8ms  image init: engine initialized
+19:20:54.970  +   50.1ms  NewApp done
+19:20:55.285  +  365.2ms  OnStartup: webview reached backend
+19:20:55.286  +  366.2ms  OnStartup: init complete
+19:20:55.286  +  366.2ms  rescan: start
+19:20:55.286  +  366.8ms  rescan: scanning G:\AI GGUF\GGUF
+19:20:55.290  +  370.1ms  rescan: done G:\AI GGUF\GGUF 26 entries
+19:30:45.100  +    1.5ms  image init: begin
+19:30:45.101  +    2.6ms  image init: config ready
+19:30:45.102  +    3.1ms  image init: engine initialized
+19:43:32.315  +    1.6ms  image init: begin
+19:43:32.317  +    3.6ms  image init: config ready
+19:43:32.318  +    4.2ms  image init: engine initialized
+19:43:32.340  +   26.6ms  rescan: start
+19:48:24.966  +    1.0ms  image init: begin
+19:48:24.969  +    3.4ms  image init: config ready
+19:48:24.969  +    3.9ms  image init: engine initialized
+19:48:24.991  +   26.2ms  rescan: start
+19:48:44.434  +    1.6ms  image init: begin
+19:48:44.436  +    3.1ms  image init: config ready
+19:48:44.436  +    3.6ms  image init: engine initialized
+19:48:44.452  +   19.7ms  rescan: start
+19:49:06.884  +    2.1ms  image init: begin
+19:49:06.886  +    3.6ms  image init: config ready
+19:49:06.886  +    4.1ms  image init: engine initialized
+19:49:06.904  +   22.3ms  rescan: start
+20:02:37.352  +    1.6ms  image init: begin
+20:02:37.354  +    3.7ms  image init: config ready
+20:02:37.354  +    4.2ms  image init: engine initialized
+20:02:37.405  +   55.2ms  rescan: start
+20:05:11.689  +    1.9ms  image init: begin
+20:05:11.691  +    4.0ms  image init: config ready
+20:05:11.692  +    4.5ms  image init: engine initialized
+20:05:11.713  +   25.7ms  rescan: start
+20:05:53.858  +    2.3ms  image init: begin
+20:05:53.860  +    4.1ms  image init: config ready
+20:05:53.860  +    4.7ms  image init: engine initialized
+20:05:53.877  +   21.2ms  rescan: start
+20:10:56.296  +    1.6ms  image init: begin
+20:10:56.298  +    3.7ms  image init: config ready
+20:10:56.298  +    4.2ms  image init: engine initialized
+20:10:56.321  +   26.9ms  rescan: start
+20:21:03.589  +    2.3ms  image init: begin
+20:21:03.594  +    7.1ms  image init: config ready
+20:21:03.594  +    7.6ms  image init: engine initialized
+20:21:03.619  +   32.6ms  rescan: start
+20:24:56.728  +    1.6ms  image init: begin
+20:24:56.730  +    3.7ms  image init: config ready
+20:24:56.730  +    4.2ms  image init: engine initialized
+20:24:56.747  +   21.0ms  rescan: start
+20:58:23.483  +5848563.0ms  wails.Run returned
+20:58:24.974  +    0.0ms  process start
+20:58:24.977  +    3.2ms  image init: begin
+20:58:24.979  +    5.3ms  image init: config ready
+20:58:24.980  +    5.8ms  image init: engine initialized
+20:58:25.057  +   82.7ms  NewApp done
+20:58:25.393  +  419.4ms  OnStartup: webview reached backend
+20:58:25.395  +  421.6ms  OnStartup: init complete
+20:58:25.396  +  422.1ms  rescan: start
+21:06:53.321  +    2.2ms  image init: begin
+21:06:53.325  +    6.3ms  image init: config ready
+21:06:53.325  +    6.3ms  image init: engine initialized
+21:06:53.345  +   26.5ms  rescan: start
+21:07:00.990  + 7671.1ms  rescan: start
+21:48:57.068  +   14.7ms  image init: begin
+21:48:57.087  +   33.6ms  image init: config ready
+21:48:57.087  +   34.2ms  image init: engine initialized
+21:48:57.289  +  235.4ms  rescan: start
+21:58:07.961  +    1.5ms  image init: begin
+21:58:07.972  +   13.2ms  image init: config ready
+21:58:07.973  +   13.7ms  image init: engine initialized
+21:58:08.001  +   41.7ms  rescan: start
+22:10:15.555  +    1.6ms  image init: begin
+22:10:15.559  +    5.7ms  image init: config ready
+22:10:15.559  +    6.3ms  image init: engine initialized
+22:10:15.590  +   36.4ms  rescan: start
+22:11:06.089  +    1.5ms  image init: begin
+22:11:06.094  +    6.5ms  image init: config ready
+22:11:06.095  +    7.0ms  image init: engine initialized
+22:11:06.111  +   23.8ms  rescan: start
+17:30:27.151  +    7.3ms  image init: begin
+17:30:27.365  +  222.0ms  image init: config ready
+17:30:27.366  +  222.5ms  image init: engine initialized
+17:30:27.394  +  251.0ms  rescan: start
+18:03:20.998  +    0.0ms  process start
+18:03:21.010  +   12.1ms  image init: begin
+18:03:21.029  +   31.1ms  image init: config ready
+18:03:21.041  +   42.8ms  image init: engine initialized
+18:03:21.079  +   80.7ms  NewApp done
+18:03:21.239  +  241.3ms  wails.Run returned
+18:04:14.267  +    0.0ms  process start
+18:04:14.269  +    2.6ms  image init: begin
+18:04:14.274  +    7.2ms  image init: config ready
+18:04:14.274  +    7.2ms  image init: engine initialized
+18:04:14.327  +   60.7ms  NewApp done
+18:04:14.702  +  435.7ms  OnStartup: webview reached backend
+18:04:14.704  +  437.3ms  OnStartup: init complete
+18:04:14.704  +  437.3ms  rescan: start
+18:26:38.242  +1343974.9ms  wails.Run returned
+18:26:42.744  +    0.0ms  process start
+18:26:42.747  +    2.7ms  image init: begin
+18:26:42.750  +    6.5ms  image init: config ready
+18:26:42.751  +    7.0ms  image init: engine initialized
+18:26:42.804  +   59.8ms  NewApp done
+18:26:43.045  +  300.7ms  OnStartup: webview reached backend
+18:26:43.045  +  301.2ms  OnStartup: init complete
+18:26:43.046  +  301.7ms  rescan: start
+18:28:34.241  +111496.9ms  rescan: start
+18:33:21.316  +    0.0ms  process start
+18:33:21.319  +    2.6ms  image init: begin
+18:33:21.324  +    7.7ms  image init: config ready
+18:33:21.325  +    8.3ms  image init: engine initialized
+18:33:21.351  +   34.3ms  NewApp done
+18:33:21.377  +   60.7ms  wails.Run returned
+18:33:25.187  +    0.0ms  process start
+18:33:25.189  +    2.1ms  image init: begin
+18:33:25.194  +    7.4ms  image init: config ready
+18:33:25.195  +    7.9ms  image init: engine initialized
+18:33:25.245  +   58.4ms  NewApp done
+18:33:25.516  +  328.8ms  OnStartup: webview reached backend
+18:33:25.517  +  329.9ms  OnStartup: init complete
+18:33:25.517  +  329.9ms  rescan: start
+18:33:25.517  +  330.4ms  rescan: scanning G:\AI GGUF\GGUF
+18:33:25.520  +  333.6ms  rescan: done G:\AI GGUF\GGUF 26 entries
+18:40:50.774  +848030.6ms  wails.Run returned
+18:41:38.658  +493471.4ms  rescan: start
+18:41:38.660  +493473.5ms  rescan: scanning G:\AI GGUF\GGUF
+18:41:38.663  +493476.7ms  rescan: done G:\AI GGUF\GGUF 26 entries
+21:04:23.314  +    0.0ms  process start
+21:04:23.316  +    2.1ms  image init: begin
+21:04:23.318  +    4.6ms  image init: config ready
+21:04:23.319  +    5.2ms  image init: engine initialized
+21:04:23.376  +   62.4ms  NewApp done
+21:04:23.687  +  373.4ms  OnStartup: webview reached backend
+21:04:23.689  +  375.0ms  OnStartup: init complete
+21:04:23.689  +  375.5ms  rescan: start
+21:04:23.690  +  376.6ms  rescan: scanning G:\AI GGUF\GGUF
+21:05:11.120  +9105933.2ms  wails.Run returned
+21:05:23.666  +60352.7ms  rescan: done G:\AI GGUF\GGUF 25 entries
+21:05:23.666  +60352.7ms  rescan: scanning G:\AI GGUF\voice
+21:05:36.880  +73566.1ms  rescan: done G:\AI GGUF\voice 6 entries
+21:08:00.739  +    0.0ms  process start
+21:08:00.741  +    2.1ms  image init: begin
+21:08:00.744  +    5.2ms  image init: config ready
+21:08:00.745  +    5.7ms  image init: engine initialized
+21:08:00.808  +   69.4ms  NewApp done
+21:08:00.915  +  175.8ms  OnStartup: webview reached backend
+21:08:00.916  +  176.9ms  OnStartup: init complete
+21:08:00.916  +  177.5ms  rescan: start
+21:08:00.916  +  177.5ms  rescan: scanning G:\AI GGUF\GGUF
+21:08:03.298  +219984.4ms  wails.Run returned
+21:08:59.614  +58875.0ms  rescan: done G:\AI GGUF\GGUF 25 entries
+21:08:59.614  +58875.0ms  rescan: scanning G:\AI GGUF\voice
+21:09:12.795  +72056.3ms  rescan: done G:\AI GGUF\voice 6 entries
+21:18:12.424  +611685.3ms  wails.Run returned
+21:18:35.808  +    0.0ms  process start
+21:18:35.811  +    2.6ms  image init: begin
+21:18:35.813  +    5.3ms  image init: config ready
+21:18:35.814  +    5.8ms  image init: engine initialized
+21:18:35.865  +   57.3ms  NewApp done
+21:18:36.128  +  319.7ms  OnStartup: webview reached backend
+21:18:36.129  +  320.8ms  OnStartup: init complete
+21:18:36.129  +  321.3ms  rescan: start
+21:18:36.130  +  321.9ms  rescan: scanning G:\AI GGUF\GGUF
+21:19:34.999  +59190.6ms  rescan: done G:\AI GGUF\GGUF 25 entries
+21:19:34.999  +59190.6ms  rescan: scanning G:\AI GGUF\voice
+21:19:47.991  +72182.9ms  rescan: done G:\AI GGUF\voice 6 entries
+21:28:28.972  +593164.0ms  wails.Run returned
+21:28:38.795  +    0.0ms  process start
+21:28:38.800  +    4.4ms  image init: begin
+21:28:38.804  +    8.8ms  image init: config ready
+21:28:38.810  +   15.1ms  image init: engine initialized
+21:28:38.864  +   69.2ms  NewApp done
+21:28:39.124  +  329.4ms  OnStartup: webview reached backend
+21:28:39.128  +  333.3ms  OnStartup: init complete
+21:28:39.131  +  335.6ms  rescan: start
+21:28:39.134  +  338.4ms  rescan: scanning G:\AI GGUF\GGUF
+21:29:37.170  +58374.9ms  rescan: done G:\AI GGUF\GGUF 25 entries
+21:29:37.170  +58374.9ms  rescan: scanning G:\AI GGUF\voice
+21:29:50.149  +71353.8ms  rescan: done G:\AI GGUF\voice 6 entries
+21:37:23.436  +524640.5ms  wails.Run returned
+21:38:53.285  +    0.0ms  process start
+21:38:53.294  +    9.5ms  image init: begin
+21:38:53.314  +   29.3ms  image init: config ready
+21:38:53.315  +   29.8ms  image init: engine initialized
+21:38:53.358  +   72.9ms  NewApp done
+21:38:53.617  +  332.3ms  OnStartup: webview reached backend
+21:38:53.619  +  333.9ms  OnStartup: init complete
+21:38:53.619  +  334.4ms  rescan: start
+21:38:53.620  +  335.5ms  rescan: scanning G:\AI GGUF\GGUF
+21:38:53.623  +  338.1ms  rescan: done G:\AI GGUF\GGUF 26 entries
+21:38:53.624  +  338.7ms  rescan: scanning G:\AI GGUF\voice
+21:38:53.626  +  340.8ms  rescan: done G:\AI GGUF\voice 13 entries
+22:17:06.508  +    0.0ms  process start
+22:17:06.510  +    2.1ms  image init: begin
+22:17:06.530  +   21.6ms  image init: config ready
+22:17:06.530  +   22.1ms  image init: engine initialized
+22:17:06.653  +  144.5ms  NewApp done
+22:17:06.971  +  462.4ms  OnStartup: webview reached backend
+22:17:06.972  +  463.4ms  OnStartup: init complete
+22:17:06.972  +  463.4ms  rescan: start
+22:17:06.972  +  464.0ms  rescan: scanning G:\AI GGUF\GGUF
+22:18:06.310  +59802.3ms  rescan: done G:\AI GGUF\GGUF 25 entries
+22:18:06.310  +59802.3ms  rescan: scanning G:\AI GGUF\voice
+22:18:19.168  +72660.0ms  rescan: done G:\AI GGUF\voice 6 entries
+22:20:52.431  +2519146.4ms  wails.Run returned
+09:59:01.943  +    0.0ms  process start
+09:59:01.957  +   14.1ms  image init: begin
+09:59:01.979  +   35.9ms  image init: config ready
+09:59:01.980  +   36.5ms  image init: engine initialized
+09:59:02.062  +  119.2ms  NewApp done
+09:59:09.887  + 7944.1ms  wails.Run returned
+10:00:19.667  +    0.0ms  process start
+10:00:19.673  +    6.1ms  image init: begin
+10:00:19.678  +   11.4ms  image init: config ready
+10:00:19.684  +   16.7ms  image init: engine initialized
+10:00:19.716  +   49.2ms  NewApp done
+10:00:22.869  + 3202.6ms  wails.Run returned
+10:01:25.210  +    0.0ms  process start
+10:01:25.213  +    2.7ms  image init: begin
+10:01:25.216  +    5.3ms  image init: config ready
+10:01:25.216  +    5.8ms  image init: engine initialized
+10:01:25.263  +   52.8ms  NewApp done
+10:01:25.562  +  351.3ms  OnStartup: webview reached backend
+10:01:25.563  +  352.4ms  OnStartup: init complete
+10:01:25.563  +  352.9ms  rescan: start
+10:01:25.567  +  356.6ms  rescan: scanning G:\AI GGUF\GGUF
+10:01:31.270  + 6060.0ms  wails.Run returned
+10:02:16.823  +    0.0ms  process start
+10:02:16.825  +    2.1ms  image init: begin
+10:02:16.827  +    4.7ms  image init: config ready
+10:02:16.828  +    5.7ms  image init: engine initialized
+10:02:16.880  +   57.6ms  NewApp done
+10:02:17.159  +  336.8ms  OnStartup: webview reached backend
+10:02:17.160  +  337.8ms  OnStartup: init complete
+10:02:17.160  +  337.8ms  rescan: start
+10:02:17.161  +  338.4ms  rescan: scanning G:\AI GGUF\GGUF
+10:02:22.895  + 6072.1ms  wails.Run returned
+10:02:55.885  +    0.0ms  process start
+10:02:55.888  +    3.2ms  image init: begin
+10:02:55.891  +    6.6ms  image init: config ready
+10:02:55.892  +    7.1ms  image init: engine initialized
+10:02:55.937  +   52.1ms  NewApp done
+10:02:56.174  +  288.7ms  OnStartup: webview reached backend
+10:02:56.175  +  289.8ms  OnStartup: init complete
+10:02:56.175  +  290.3ms  rescan: start
+10:02:56.175  +  290.3ms  rescan: scanning G:\AI GGUF\GGUF
+10:03:18.879  +    0.0ms  process start
+10:03:18.882  +    2.6ms  image init: begin
+10:03:18.886  +    6.4ms  image init: config ready
+10:03:18.886  +    7.1ms  image init: engine initialized
+10:03:18.938  +   58.6ms  NewApp done
+10:03:19.205  +  325.9ms  OnStartup: webview reached backend
+10:03:19.207  +  327.5ms  OnStartup: init complete
+10:03:19.207  +  327.5ms  rescan: start
+10:03:19.208  +  328.5ms  rescan: scanning G:\AI GGUF\GGUF
+10:03:20.696  + 1816.6ms  wails.Run returned
+10:03:23.026  +    0.7ms  process start
+10:03:23.028  +    2.8ms  image init: begin
+10:03:23.031  +    5.9ms  image init: config ready
+10:03:23.031  +    6.4ms  image init: engine initialized
+10:03:23.077  +   51.5ms  NewApp done
+10:03:23.319  +  293.7ms  OnStartup: webview reached backend
+10:03:23.319  +  294.2ms  OnStartup: init complete
+10:03:23.320  +  294.7ms  rescan: start
+10:03:23.320  +  295.3ms  rescan: scanning G:\AI GGUF\GGUF
+10:04:53.920  +    0.0ms  process start
+10:04:53.922  +    2.1ms  image init: begin
+10:04:53.924  +    4.7ms  image init: config ready
+10:04:53.925  +    5.1ms  image init: engine initialized
+10:04:53.980  +   59.8ms  NewApp done
+10:04:54.238  +  317.9ms  OnStartup: webview reached backend
+10:04:54.239  +  318.9ms  OnStartup: init complete
+10:04:54.239  +  319.5ms  rescan: start
+10:04:54.239  +  319.5ms  rescan: scanning G:\AI GGUF\GGUF
+10:05:29.462  +35542.6ms  wails.Run returned
+14:06:01.871  +   44.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan4131516161\001\Newer Models
+14:06:48.421  +   81.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3368490073\001\Newer Models
+14:47:44.093  + 1139.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1086289518\001\Newer Models
+15:11:56.571  + 1204.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1141357178\001\Newer Models
+15:12:16.493  + 1195.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3888922562\001\Newer Models
+15:13:56.845  + 1205.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2132188928\001\Newer Models
+15:51:30.926  + 1218.5ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan515042204\001\Newer Models
+15:52:15.209  + 1204.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan4000891808\001\Newer Models
+15:54:56.514  + 1208.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan170831634\001\Newer Models
+16:03:05.535  +    0.0ms  process start
+16:03:05.538  +    3.1ms  image init: begin
+16:03:05.540  +    5.2ms  image init: config ready
+16:03:05.541  +    5.7ms  image init: engine initialized
+16:03:05.571  +   35.7ms  NewApp done
+16:03:05.598  +   62.6ms  wails.Run returned
+16:03:40.888  + 1255.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1789435928\001\Newer Models
+16:15:20.358  +    0.0ms  process start
+16:15:20.360  +    2.6ms  image init: begin
+16:15:20.362  +    4.7ms  image init: config ready
+16:15:20.363  +    5.2ms  image init: engine initialized
+16:15:20.392  +   34.7ms  NewApp done
+16:15:20.419  +   61.4ms  wails.Run returned
+16:16:00.274  +    0.0ms  process start
+16:16:00.277  +    2.6ms  image init: begin
+16:16:00.280  +    5.2ms  image init: config ready
+16:16:00.280  +    5.7ms  image init: engine initialized
+16:16:00.332  +   57.7ms  NewApp done
+16:16:00.611  +  336.8ms  OnStartup: webview reached backend
+16:16:00.612  +  337.9ms  OnStartup: init complete
+16:16:00.613  +  338.9ms  rescan: start
+16:16:00.614  +  339.5ms  rescan: scanning G:\AI GGUF\GGUF
+16:17:00.625  +    0.0ms  process start
+16:17:00.627  +    2.1ms  image init: begin
+16:17:00.630  +    4.7ms  image init: config ready
+16:17:00.630  +    5.3ms  image init: engine initialized
+16:17:00.682  +   57.2ms  NewApp done
+16:17:00.963  +  337.8ms  OnStartup: webview reached backend
+16:17:00.964  +  338.8ms  OnStartup: init complete
+16:17:00.964  +  339.3ms  rescan: start
+16:17:00.965  +  339.9ms  rescan: scanning G:\AI GGUF\GGUF
+16:18:03.459  +62833.7ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=28
+16:18:03.459  +62834.2ms  rescan: scanning G:\AI GGUF\voice
+16:18:15.759  +75134.6ms  rescan: done G:\AI GGUF\voice 6 entries parsed=12
+16:18:54.602  +    0.0ms  process start
+16:18:54.604  +    2.2ms  image init: begin
+16:18:54.606  +    4.8ms  image init: config ready
+16:18:54.606  +    4.8ms  image init: engine initialized
+16:18:54.657  +   55.6ms  NewApp done
+16:18:54.919  +  317.5ms  OnStartup: webview reached backend
+16:18:54.920  +  318.6ms  OnStartup: init complete
+16:18:54.920  +  318.6ms  rescan: start
+16:18:54.921  +  319.1ms  rescan: scanning G:\AI GGUF\GGUF
+16:18:54.925  +  323.8ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+16:18:54.926  +  324.3ms  rescan: scanning G:\AI GGUF\voice
+16:18:54.990  +  388.8ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+16:22:38.165  +    0.0ms  process start
+16:22:38.168  +    2.6ms  image init: begin
+16:22:38.171  +    6.2ms  image init: config ready
+16:22:38.172  +    6.8ms  image init: engine initialized
+16:22:38.200  +   35.0ms  NewApp done
+16:22:38.549  +  384.4ms  OnStartup: webview reached backend
+16:22:38.550  +  385.4ms  OnStartup: init complete
+16:22:38.551  +  385.9ms  rescan: start
+16:22:38.551  +  386.4ms  rescan: scanning G:\AI GGUF\GGUF
+16:22:38.560  +  395.5ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+16:22:38.561  +  396.5ms  rescan: scanning G:\AI GGUF\voice
+16:22:38.655  +  489.9ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+16:23:00.068  +    0.0ms  process start
+16:23:00.071  +    2.6ms  image init: begin
+16:23:00.075  +    6.9ms  image init: config ready
+16:23:00.076  +    7.4ms  image init: engine initialized
+16:23:00.111  +   42.6ms  NewApp done
+16:23:00.252  +  183.6ms  OnStartup: webview reached backend
+16:23:00.253  +  184.6ms  OnStartup: init complete
+16:23:00.253  +  185.2ms  rescan: start
+16:23:00.254  +  185.7ms  rescan: scanning G:\AI GGUF\GGUF
+16:23:00.262  +  193.6ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+16:23:00.262  +  194.1ms  rescan: scanning G:\AI GGUF\voice
+16:23:00.373  +  304.4ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+16:24:06.179  +    0.0ms  process start
+16:24:06.182  +    2.6ms  image init: begin
+16:24:06.186  +    6.3ms  image init: config ready
+16:24:06.186  +    6.8ms  image init: engine initialized
+16:24:06.218  +   38.1ms  NewApp done
+16:24:06.555  +  375.5ms  OnStartup: webview reached backend
+16:24:06.556  +  376.9ms  OnStartup: init complete
+16:24:06.557  +  377.4ms  rescan: start
+16:24:06.557  +  377.4ms  rescan: scanning G:\AI GGUF\GGUF
+16:24:06.565  +  385.4ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+16:24:06.566  +  386.5ms  rescan: scanning G:\AI GGUF\voice
+16:24:06.681  +  501.5ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+16:24:28.579  +    0.0ms  process start
+16:24:28.583  +    4.3ms  image init: begin
+16:24:28.587  +    8.2ms  image init: config ready
+16:24:28.587  +    8.8ms  image init: engine initialized
+16:24:28.617  +   38.9ms  NewApp done
+16:24:28.954  +  375.1ms  OnStartup: webview reached backend
+16:24:28.955  +  376.4ms  OnStartup: init complete
+16:24:28.956  +  377.4ms  rescan: start
+16:24:28.957  +  377.9ms  rescan: scanning G:\AI GGUF\GGUF
+16:24:28.967  +  388.8ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+16:24:28.968  +  389.3ms  rescan: scanning G:\AI GGUF\voice
+16:24:29.077  +  498.0ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+16:25:01.527  + 1596.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3867382887\001\Newer Models
+16:57:10.511  +    0.0ms  process start
+16:57:10.525  +   13.9ms  image init: begin
+16:57:11.085  +  573.9ms  image init: config ready
+16:57:11.085  +  574.4ms  image init: engine initialized
+16:57:11.210  +  699.3ms  NewApp done
+16:57:11.449  +  938.1ms  OnStartup: webview reached backend
+16:57:11.450  +  939.2ms  OnStartup: init complete
+16:57:11.451  +  939.8ms  rescan: start
+16:57:11.451  +  939.8ms  rescan: scanning G:\AI GGUF\GGUF
+16:57:11.605  + 1094.5ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+16:57:11.606  + 1095.0ms  rescan: scanning G:\AI GGUF\voice
+16:57:11.986  + 1475.1ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+16:57:22.385  +11874.4ms  wails.Run returned
+17:11:04.040  + 1769.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3950174122\001\Newer Models
+17:13:24.011  + 1639.5ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan223796812\001\Newer Models
+17:14:44.528  + 1702.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1061798733\001\Newer Models
+17:15:31.381  +    0.0ms  process start
+17:15:31.391  +    9.8ms  image init: begin
+17:15:31.394  +   12.4ms  image init: config ready
+17:15:31.394  +   12.9ms  image init: engine initialized
+17:15:31.454  +   72.3ms  NewApp done
+17:15:31.485  +  103.4ms  wails.Run returned
+17:16:25.070  + 2285.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2418677901\001\Newer Models
+17:17:07.386  +    0.0ms  process start
+17:17:07.389  +    3.2ms  image init: begin
+17:17:07.392  +    5.3ms  image init: config ready
+17:17:07.392  +    5.8ms  image init: engine initialized
+17:17:07.410  +   23.8ms  NewApp done
+17:17:07.436  +   50.2ms  wails.Run returned
+19:21:45.068  + 2196.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan304855827\001\Newer Models
+19:23:27.086  +    0.0ms  process start
+19:23:27.089  +    3.1ms  image init: begin
+19:23:27.091  +    5.7ms  image init: config ready
+19:23:27.092  +    6.2ms  image init: engine initialized
+19:23:27.114  +   28.3ms  NewApp done
+19:23:27.144  +   58.0ms  wails.Run returned
+19:38:56.987  + 1644.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2737573271\001\Newer Models
+00:39:16.319  + 2923.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2873845233\001\Newer Models
+00:44:50.454  + 2726.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3332244904\001\Newer Models
+00:50:29.361  + 2937.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2360261178\001\Newer Models
+00:53:36.829  + 3014.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3608752155\001\Newer Models
+07:38:26.421  + 2062.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1010257959\001\Newer Models
+07:51:49.782  + 2113.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan4226386394\001\Newer Models
+07:57:54.338  + 1807.5ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2454386046\001\Newer Models
+08:28:40.620  + 1421.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1414251607\001\Newer Models
+14:15:07.962  + 1775.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1889917660\001\Newer Models
+14:17:27.448  + 1728.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2234880140\001\Newer Models
+15:10:21.294  + 1632.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1845474948\001\Newer Models
+15:29:31.587  + 2566.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1471024716\001\Newer Models
+15:35:35.970  + 2106.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1637202217\001\Newer Models
+16:10:35.262  + 1812.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1444114286\001\Newer Models
+16:12:35.561  + 2580.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1765362592\001\Newer Models
+16:16:28.985  + 2072.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan497466975\001\Newer Models
+16:18:17.128  + 3695.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan206052262\001\Newer Models
+16:23:02.223  + 2030.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3255210665\001\Newer Models
+16:37:10.008  + 3617.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2232429684\001\Newer Models
+16:54:44.377  + 2333.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2757883201\001\Newer Models
+17:19:13.058  + 3240.5ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3493758815\001\Newer Models
+12:17:09.078  +    0.0ms  process start
+12:17:09.092  +   13.6ms  image init: begin
+12:17:09.765  +  687.1ms  image init: config ready
+12:17:09.766  +  687.6ms  image init: engine initialized
+12:17:09.845  +  766.7ms  NewApp done
+12:17:10.203  + 1124.6ms  OnStartup: webview reached backend
+12:17:10.204  + 1125.7ms  OnStartup: init complete
+12:17:10.205  + 1126.2ms  rescan: start
+12:17:10.205  + 1126.7ms  rescan: scanning G:\AI GGUF\GGUF
+12:17:10.346  + 1267.2ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+12:17:10.346  + 1267.2ms  rescan: scanning G:\AI GGUF\voice
+12:17:10.646  + 1567.9ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+12:26:48.446  +579367.4ms  wails.Run returned
+18:23:56.574  + 2325.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2134169381\001\Newer Models
+18:25:50.578  + 1643.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3122743595\001\Newer Models
+18:27:23.482  + 1585.5ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1878098164\001\Newer Models
+18:28:43.562  + 1598.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3420578669\001\Newer Models
+19:26:21.608  + 3080.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan560875584\001\Newer Models
+19:31:11.562  + 2044.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3505148080\001\Newer Models
+19:32:47.438  + 1611.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3850563032\001\Newer Models
+19:33:36.352  + 1828.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3847603071\001\Newer Models
+19:35:01.617  + 1830.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2464377952\001\Newer Models
+19:52:24.432  + 1602.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3528535751\001\Newer Models
+19:52:53.668  + 1515.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3512101824\001\Newer Models
+19:54:04.202  + 1866.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan575176376\001\Newer Models
+19:55:40.507  + 1343.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan4153299679\001\Newer Models
+19:59:04.702  + 1850.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2147296806\001\Newer Models
+20:01:03.094  + 1332.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3236539756\001\Newer Models
+21:04:54.001  + 3260.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3219017626\001\Newer Models
+21:05:14.323  + 4105.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2938661446\001\Newer Models
+21:09:37.759  + 3651.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2597752012\001\Newer Models
+21:18:46.135  + 3293.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2749835997\001\Newer Models
+21:32:43.780  +    9.9ms  image init: begin
+21:32:43.782  +   11.9ms  image init: config ready
+21:32:43.784  +   13.0ms  image init: engine initialized
+21:32:43.792  +   21.2ms  rescan: start
+21:35:13.833  +    2.1ms  image init: begin
+21:35:13.835  +    4.3ms  image init: config ready
+21:35:13.835  +    4.3ms  image init: engine initialized
+21:35:13.843  +   12.6ms  rescan: start
+21:57:45.126  +    9.1ms  image init: begin
+21:57:45.128  +   11.0ms  image init: config ready
+21:57:45.129  +   12.1ms  image init: engine initialized
+21:57:45.139  +   22.1ms  rescan: start
+22:13:09.091  +    0.0ms  process start
+22:13:09.094  +    3.4ms  image init: begin
+22:13:09.781  +  690.5ms  image init: config ready
+22:13:09.782  +  691.0ms  image init: engine initialized
+22:13:09.872  +  780.9ms  NewApp done
+22:13:09.900  +  809.3ms  wails.Run returned
+22:19:06.574  +    0.0ms  process start
+22:19:06.589  +   14.9ms  image init: begin
+22:19:06.608  +   33.5ms  image init: config ready
+22:19:06.608  +   34.1ms  image init: engine initialized
+22:19:06.687  +  113.3ms  NewApp done
+22:19:06.714  +  140.1ms  wails.Run returned
+22:20:01.228  +    0.0ms  process start
+22:20:01.232  +    3.8ms  image init: begin
+22:20:01.235  +    7.2ms  image init: config ready
+22:20:01.235  +    7.7ms  image init: engine initialized
+22:20:01.253  +   25.1ms  NewApp done
+22:20:01.279  +   50.8ms  wails.Run returned
+22:20:49.119  +    0.0ms  process start
+22:20:49.123  +    3.1ms  image init: begin
+22:20:49.125  +    5.8ms  image init: config ready
+22:20:49.125  +    5.8ms  image init: engine initialized
+22:20:49.144  +   24.1ms  NewApp done
+22:20:49.172  +   52.9ms  wails.Run returned
+22:45:58.039  +    0.0ms  process start
+22:45:58.042  +    3.1ms  image init: begin
+22:45:58.044  +    5.2ms  image init: config ready
+22:45:58.045  +    5.7ms  image init: engine initialized
+22:45:58.064  +   25.1ms  NewApp done
+22:45:58.090  +   51.3ms  wails.Run returned
+22:59:05.241  +    0.0ms  process start
+22:59:05.244  +    3.1ms  image init: begin
+22:59:05.246  +    5.8ms  image init: config ready
+22:59:05.247  +    6.3ms  image init: engine initialized
+22:59:05.266  +   25.1ms  NewApp done
+22:59:05.290  +   49.7ms  wails.Run returned
+23:21:04.116  +    0.0ms  process start
+23:21:04.130  +   14.1ms  image init: begin
+23:21:04.149  +   33.0ms  image init: config ready
+23:21:04.150  +   33.6ms  image init: engine initialized
+23:21:04.231  +  114.6ms  NewApp done
+23:21:04.260  +  143.9ms  wails.Run returned
+23:30:26.344  +   36.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3962669198\001\Newer Models
+23:33:34.096  +   58.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2045370594\001\Newer Models
+23:33:59.168  + 1649.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan558835261\001\Newer Models
+23:38:36.949  + 1650.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan114285084\001\Newer Models
+23:39:12.560  + 1610.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1252757988\001\Newer Models
+23:43:06.903  + 1656.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1221723144\001\Newer Models
+23:45:29.372  + 1640.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2871295426\001\Newer Models
+23:46:09.755  + 1600.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1437297127\001\Newer Models
+23:46:36.941  + 1616.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan245608345\001\Newer Models
+23:49:54.627  + 1655.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3313165663\001\Newer Models
+23:50:47.862  + 1605.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1025685965\001\Newer Models
+23:58:50.644  + 1647.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan52622441\001\Newer Models
+00:00:10.283  + 1621.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2225593607\001\Newer Models
+00:00:41.182  + 1605.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2771184678\001\Newer Models
+00:05:22.107  + 1697.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1638136629\001\Newer Models
+00:06:18.931  + 1615.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3598166522\001\Newer Models
+00:09:27.019  +    0.0ms  process start
+00:09:27.022  +    3.2ms  image init: begin
+00:09:27.025  +    5.8ms  image init: config ready
+00:09:27.025  +    5.8ms  image init: engine initialized
+00:09:27.045  +   25.9ms  NewApp done
+00:09:27.073  +   54.1ms  wails.Run returned
+00:09:40.357  + 1681.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2672697046\001\Newer Models
+00:10:37.080  +    0.0ms  process start
+00:10:37.083  +    2.9ms  image init: begin
+00:10:37.086  +    5.5ms  image init: config ready
+00:10:37.086  +    6.1ms  image init: engine initialized
+00:10:37.102  +   22.3ms  NewApp done
+00:10:37.128  +   48.0ms  wails.Run returned
+00:11:25.354  +    0.0ms  process start
+00:11:25.357  +    3.0ms  image init: begin
+00:11:25.359  +    5.5ms  image init: config ready
+00:11:25.360  +    6.1ms  image init: engine initialized
+00:11:25.375  +   21.3ms  NewApp done
+00:11:25.402  +   48.4ms  wails.Run returned
+00:12:25.014  + 1657.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3837865176\001\Newer Models
+00:16:18.796  +    0.0ms  process start
+00:16:18.799  +    2.7ms  image init: begin
+00:16:18.801  +    5.4ms  image init: config ready
+00:16:18.802  +    5.9ms  image init: engine initialized
+00:16:18.924  +  128.1ms  NewApp done
+00:16:18.950  +  154.3ms  wails.Run returned
+00:19:17.713  + 1628.5ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1298116279\001\Newer Models
+00:27:17.834  + 1650.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan4276804917\001\Newer Models
+00:39:55.920  + 1655.5ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3895792262\001\Newer Models
+00:40:40.492  +    0.0ms  process start
+00:40:40.495  +    3.1ms  image init: begin
+00:40:40.497  +    5.2ms  image init: config ready
+00:40:40.498  +    5.7ms  image init: engine initialized
+00:40:40.517  +   25.4ms  NewApp done
+00:40:40.542  +   50.6ms  wails.Run returned
+01:01:14.835  + 1797.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan4140230522\001\Newer Models
+01:01:40.243  + 1773.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2621460444\001\Newer Models
+01:01:51.599  +    0.0ms  process start
+01:01:51.601  +    2.6ms  image init: begin
+01:01:51.604  +    5.2ms  image init: config ready
+01:01:51.605  +    5.7ms  image init: engine initialized
+01:01:51.624  +   24.6ms  NewApp done
+01:01:51.649  +   50.3ms  wails.Run returned
+01:03:08.564  + 1795.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3532942089\001\Newer Models
+01:06:58.887  + 1868.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1806872272\001\Newer Models
+01:08:34.816  + 1802.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan543569545\001\Newer Models
+01:23:36.150  + 1749.5ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2464082260\001\Newer Models
+01:24:37.085  + 1714.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan589824137\001\Newer Models
+01:24:48.577  +    0.0ms  process start
+01:24:48.580  +    3.0ms  image init: begin
+01:24:48.583  +    5.6ms  image init: config ready
+01:24:48.583  +    6.1ms  image init: engine initialized
+01:24:48.602  +   25.2ms  NewApp done
+01:24:48.631  +   53.7ms  wails.Run returned
+01:26:13.347  + 1758.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1899440550\001\Newer Models
+01:27:54.302  + 1734.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1496934709\001\Newer Models
+01:34:06.118  + 1767.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2694760541\001\Newer Models
+01:34:46.682  +    0.0ms  process start
+01:34:46.685  +    2.6ms  image init: begin
+01:34:46.687  +    5.3ms  image init: config ready
+01:34:46.687  +    5.3ms  image init: engine initialized
+01:34:46.715  +   32.8ms  NewApp done
+01:34:46.742  +   59.8ms  wails.Run returned
+01:39:42.460  + 1822.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan18766859\001\Newer Models
+07:35:24.212  + 2842.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3281530504\001\Newer Models
+07:39:27.452  + 2085.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan114584966\001\Newer Models
+07:40:45.574  + 2142.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1783350955\001\Newer Models
+07:41:04.969  + 1749.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3975574820\001\Newer Models
+07:41:48.093  +    0.0ms  process start
+07:41:48.107  +   14.1ms  image init: begin
+07:41:48.120  +   27.7ms  image init: config ready
+07:41:48.121  +   28.3ms  image init: engine initialized
+07:41:48.209  +  116.6ms  NewApp done
+07:41:48.239  +  146.1ms  wails.Run returned
+07:41:59.663  +    0.0ms  process start
+07:41:59.666  +    2.6ms  image init: begin
+07:41:59.668  +    5.2ms  image init: config ready
+07:41:59.669  +    6.0ms  image init: engine initialized
+07:41:59.689  +   25.6ms  NewApp done
+07:41:59.716  +   53.2ms  wails.Run returned
+07:42:36.964  +    0.0ms  process start
+07:42:36.967  +    2.8ms  image init: begin
+07:42:36.969  +    5.4ms  image init: config ready
+07:42:36.970  +    5.9ms  image init: engine initialized
+07:42:36.990  +   26.3ms  NewApp done
+07:42:37.018  +   53.9ms  wails.Run returned
+07:42:46.928  +    0.0ms  process start
+07:42:46.931  +    2.6ms  image init: begin
+07:42:46.934  +    5.2ms  image init: config ready
+07:42:46.934  +    5.7ms  image init: engine initialized
+07:42:46.954  +   25.4ms  NewApp done
+07:42:46.980  +   51.8ms  wails.Run returned
+07:45:36.092  + 1778.5ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2319894081\001\Newer Models
+07:45:50.995  +    0.0ms  process start
+07:45:50.998  +    2.7ms  image init: begin
+07:45:51.001  +    5.3ms  image init: config ready
+07:45:51.001  +    5.9ms  image init: engine initialized
+07:45:51.021  +   26.1ms  NewApp done
+07:45:51.049  +   53.6ms  wails.Run returned
+07:47:51.360  + 1764.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2960597979\001\Newer Models
+07:48:02.982  + 1771.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1910238311\001\Newer Models
+07:56:13.014  + 2327.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2131860860\001\Newer Models
+07:56:54.976  +    0.0ms  process start
+07:56:54.989  +   13.6ms  image init: begin
+07:56:55.003  +   27.8ms  image init: config ready
+07:56:55.004  +   28.3ms  image init: engine initialized
+07:56:55.084  +  108.2ms  NewApp done
+07:56:55.111  +  135.3ms  wails.Run returned
+07:58:37.116  + 1802.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2482657198\001\Newer Models
+07:58:52.535  +    0.0ms  process start
+07:58:52.538  +    2.6ms  image init: begin
+07:58:52.541  +    5.2ms  image init: config ready
+07:58:52.541  +    5.7ms  image init: engine initialized
+07:58:52.561  +   25.4ms  NewApp done
+07:58:52.589  +   53.6ms  wails.Run returned
+07:59:59.475  + 1717.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3152905249\001\Newer Models
+08:00:11.045  + 1650.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan788286778\001\Newer Models
+08:05:52.492  +    0.0ms  process start
+08:05:52.495  +    2.6ms  image init: begin
+08:05:52.498  +    5.3ms  image init: config ready
+08:05:52.498  +    5.9ms  image init: engine initialized
+08:05:52.519  +   26.6ms  NewApp done
+08:05:52.548  +   55.4ms  wails.Run returned
+08:09:34.031  + 1829.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan872325605\001\Newer Models
+08:10:02.427  +    0.0ms  process start
+08:10:02.430  +    2.6ms  image init: begin
+08:10:02.432  +    4.9ms  image init: config ready
+08:10:02.433  +    5.7ms  image init: engine initialized
+08:10:02.453  +   26.0ms  NewApp done
+08:10:02.480  +   52.8ms  wails.Run returned
+08:12:27.474  +    0.0ms  process start
+08:12:27.477  +    3.0ms  image init: begin
+08:12:27.479  +    5.6ms  image init: config ready
+08:12:27.480  +    6.1ms  image init: engine initialized
+08:12:27.499  +   25.1ms  NewApp done
+08:12:27.526  +   52.3ms  wails.Run returned
+08:13:55.940  + 1733.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan774987164\001\Newer Models
+08:17:36.478  + 1693.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1153379040\001\Newer Models
+08:21:14.285  + 1743.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2380917915\001\Newer Models
+08:21:56.123  +    0.0ms  process start
+08:21:56.125  +    2.6ms  image init: begin
+08:21:56.128  +    5.7ms  image init: config ready
+08:21:56.128  +    5.7ms  image init: engine initialized
+08:21:56.148  +   25.7ms  NewApp done
+08:21:56.177  +   54.7ms  wails.Run returned
+08:45:16.122  + 1720.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3895773024\001\Newer Models
+08:50:21.049  + 1668.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2445778083\001\Newer Models
+08:57:24.172  + 1746.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan474687430\001\Newer Models
+08:57:59.902  + 1662.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan4160792364\001\Newer Models
+09:21:59.453  + 1705.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3353954316\001\Newer Models
+09:22:38.350  + 1916.5ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2960362043\001\Newer Models
+09:24:08.181  + 1797.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan4217710657\001\Newer Models
+09:49:19.149  + 1842.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1303719420\001\Newer Models
+09:52:29.802  + 1806.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan315132555\001\Newer Models
+10:05:44.402  + 1817.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1448395126\001\Newer Models
+10:06:55.367  + 1784.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan121270017\001\Newer Models
+10:07:47.088  + 1839.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan4000150448\001\Newer Models
+10:08:10.078  + 1808.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan348313382\001\Newer Models
+10:14:59.710  + 1829.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan752242947\001\Newer Models
+10:32:12.710  + 1762.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan474545649\001\Newer Models
+10:33:29.905  + 1742.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan914010622\001\Newer Models
+10:33:51.080  + 1869.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2501300365\001\Newer Models
+10:34:02.944  + 1789.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3037469121\001\Newer Models
+10:36:39.314  + 1849.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan154831462\001\Newer Models
+10:36:51.498  + 1746.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2844936926\001\Newer Models
+10:44:17.639  + 1800.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3441926552\001\Newer Models
+10:44:29.581  + 1780.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan549999397\001\Newer Models
+11:06:25.016  +    0.0ms  process start
+11:06:25.019  +    3.1ms  image init: begin
+11:06:25.021  +    5.7ms  image init: config ready
+11:06:25.021  +    5.7ms  image init: engine initialized
+11:06:25.065  +   49.7ms  NewApp done
+11:06:25.106  +   90.2ms  wails.Run returned
+11:06:55.170  + 1843.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan412161196\001\Newer Models
+11:07:20.689  +    0.0ms  process start
+11:07:20.692  +    3.2ms  image init: begin
+11:07:20.695  +    5.9ms  image init: config ready
+11:07:20.695  +    6.4ms  image init: engine initialized
+11:07:20.715  +   26.8ms  NewApp done
+11:07:20.745  +   56.3ms  wails.Run returned
+11:11:15.306  + 1864.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2805275735\001\Newer Models
+11:11:39.719  +    0.0ms  process start
+11:11:39.722  +    2.6ms  image init: begin
+11:11:39.725  +    5.2ms  image init: config ready
+11:11:39.725  +    5.7ms  image init: engine initialized
+11:11:39.744  +   24.3ms  NewApp done
+11:11:39.774  +   54.2ms  wails.Run returned
+11:12:47.168  + 1858.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3755025868\001\Newer Models
+11:13:11.579  +    0.0ms  process start
+11:13:11.583  +    3.1ms  image init: begin
+11:13:11.585  +    5.2ms  image init: config ready
+11:13:11.585  +    5.7ms  image init: engine initialized
+11:13:11.605  +   25.8ms  NewApp done
+11:13:11.634  +   55.0ms  wails.Run returned
+11:37:26.775  + 2971.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan4132779868\001\Newer Models
+11:38:37.643  +    0.0ms  process start
+11:38:37.658  +   14.7ms  image init: begin
+11:38:37.673  +   29.7ms  image init: config ready
+11:38:37.673  +   30.2ms  image init: engine initialized
+11:38:37.756  +  113.3ms  NewApp done
+11:38:37.787  +  143.9ms  wails.Run returned
+11:39:05.729  +    0.0ms  process start
+11:39:05.732  +    3.1ms  image init: begin
+11:39:05.735  +    5.7ms  image init: config ready
+11:39:05.735  +    5.7ms  image init: engine initialized
+11:39:05.752  +   23.2ms  NewApp done
+11:39:05.787  +   57.7ms  wails.Run returned
+11:41:23.182  + 1833.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan531004583\001\Newer Models
+11:41:40.233  +    0.0ms  process start
+11:41:40.236  +    2.6ms  image init: begin
+11:41:40.238  +    5.2ms  image init: config ready
+11:41:40.239  +    5.8ms  image init: engine initialized
+11:41:40.258  +   24.9ms  NewApp done
+11:41:40.288  +   54.9ms  wails.Run returned
+11:45:07.363  + 1838.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan657076334\001\Newer Models
+11:45:24.546  +    0.0ms  process start
+11:45:24.549  +    2.6ms  image init: begin
+11:45:24.551  +    5.2ms  image init: config ready
+11:45:24.552  +    5.7ms  image init: engine initialized
+11:45:24.571  +   24.9ms  NewApp done
+11:45:24.599  +   53.0ms  wails.Run returned
+13:06:56.126  + 1729.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2213754363\001\Newer Models
+13:07:18.050  +    0.0ms  process start
+13:07:18.053  +    2.6ms  image init: begin
+13:07:18.055  +    5.1ms  image init: config ready
+13:07:18.055  +    5.1ms  image init: engine initialized
+13:07:18.076  +   25.4ms  NewApp done
+13:07:18.104  +   54.1ms  wails.Run returned
+13:33:14.580  + 2613.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2133064056\001\Newer Models
+13:55:15.389  + 1868.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1124461377\001\Newer Models
+18:41:40.374  +    0.6ms  process start
+18:41:40.387  +   13.6ms  image init: begin
+18:41:41.116  +  742.9ms  image init: config ready
+18:41:41.117  +  743.4ms  image init: engine initialized
+18:41:41.192  +  818.6ms  NewApp done
+18:41:41.448  + 1074.9ms  OnStartup: webview reached backend
+18:41:41.449  + 1075.4ms  OnStartup: init complete
+18:41:41.449  + 1075.9ms  rescan: start
+18:41:41.450  + 1076.4ms  rescan: scanning G:\AI GGUF\GGUF
+18:41:41.589  + 1215.2ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+18:41:41.589  + 1215.2ms  rescan: scanning G:\AI GGUF\voice
+18:41:41.980  + 1606.2ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+18:42:30.998  +50624.4ms  wails.Run returned
+19:12:34.659  +    0.0ms  process start
+19:12:34.675  +   16.5ms  image init: begin
+19:12:35.351  +  693.0ms  image init: config ready
+19:12:35.353  +  694.1ms  image init: engine initialized
+19:12:35.478  +  819.5ms  NewApp done
+19:12:35.743  + 1084.9ms  OnStartup: webview reached backend
+19:12:35.745  + 1086.5ms  OnStartup: init complete
+19:12:35.746  + 1087.0ms  rescan: start
+19:12:35.746  + 1087.5ms  rescan: scanning G:\AI GGUF\GGUF
+19:12:35.892  + 1233.3ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+19:12:35.892  + 1233.8ms  rescan: scanning G:\AI GGUF\voice
+19:12:36.331  + 1672.9ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+19:13:05.050  +30391.2ms  wails.Run returned

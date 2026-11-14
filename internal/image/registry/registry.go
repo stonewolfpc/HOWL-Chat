@@ -32,14 +32,17 @@ const AdmissionCacheVersion = 1
 
 // Entry is one record in the global registry.
 type Entry struct {
-	Name         string              `json:"name"`
-	Path         string              `json:"path"`
-	Type         string              `json:"type"`
-	Family       string              `json:"family"`
-	Format       string              `json:"format"`
-	SizeMB       float64             `json:"size_mb"`
-	FileSize     int64               `json:"file_size,omitempty"`
-	ModTimeNS    int64               `json:"mod_time_ns,omitempty"`
+	Name      string  `json:"name"`
+	Path      string  `json:"path"`
+	Type      string  `json:"type"`
+	Family    string  `json:"family"`
+	Format    string  `json:"format"`
+	SizeMB    float64 `json:"size_mb"`
+	FileSize  int64   `json:"file_size,omitempty"`
+	ModTimeNS int64   `json:"mod_time_ns,omitempty"`
+	// Available is computed from the filesystem. A registered model whose drive
+	// is temporarily unplugged stays known to the catalog; it is not deleted.
+	Available    bool                `json:"available"`
 	Files        map[string]string   `json:"files,omitempty"`
 	Recommended  scanner.Recommended `json:"recommended"`
 	RegisteredAt time.Time           `json:"registered_at"`
@@ -62,8 +65,8 @@ type Registry struct {
 	configDir string
 	entries   map[string]Entry  // keyed on absolute path
 	dirs      map[string]string // dir path → asset type ("llm", "tts", "image")
-	// needsSave is set when load() dropped entries, so the healing is written
-	// back instead of being repeated (and re-injected) on every start.
+	// needsSave is retained for format-compatible callers; missing files are no
+	// longer treated as permission to forget a registration.
 	needsSave bool
 }
 
@@ -185,13 +188,14 @@ func sameIdentity(a, b Entry) bool {
 		a.ModTimeNS == b.ModTimeNS && a.Type == b.Type && a.Family == b.Family
 }
 
-// ByType returns a snapshot of all live entries of the given asset type
-// (e.g. "llm", "tts", "diffusion"). Files no longer on disk are pruned.
+// ByType returns a snapshot of all available entries of the given asset type
+// (e.g. "llm", "tts", "diffusion"). Missing files remain registered through
+// All(), but are not offered by pickers while their drive is unavailable.
 func (r *Registry) ByType(assetType string) []Entry {
-	all := r.All() // All() already prunes + holds lock internally
+	all := r.All() // All() computes availability under its own lock
 	var out []Entry
 	for _, e := range all {
-		if e.Type == assetType {
+		if e.Type == assetType && e.Available {
 			out = append(out, e)
 		}
 	}
@@ -292,26 +296,18 @@ func (r *Registry) SyncIndex(dir string, idx scanner.ModelIndex) (int, int, erro
 	return r.SyncDir(dir, entries, seen)
 }
 
-// All returns a snapshot of all known entries, pruning any whose file has
-// since been deleted from disk.
+// All returns a snapshot of all known entries and their current availability.
+// Missing files remain registered so an unplugged drive does not erase the
+// user's catalog; callers can use Available to avoid offering an absent file.
 func (r *Registry) All() []Entry {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	var pruned []string
 	out := make([]Entry, 0, len(r.entries))
 	for path, e := range r.entries {
-		if _, err := os.Stat(path); os.IsNotExist(err) {
-			pruned = append(pruned, path)
-			continue
-		}
+		_, err := os.Stat(path)
+		e.Available = err == nil
 		out = append(out, e)
-	}
-	if len(pruned) > 0 {
-		for _, p := range pruned {
-			delete(r.entries, p)
-		}
-		_ = r.save() // best-effort; ignore error on prune
 	}
 	return out
 }
@@ -334,6 +330,9 @@ func (r *Registry) ToModelIndex() scanner.ModelIndex {
 func buildModelIndex(entries []Entry) scanner.ModelIndex {
 	var idx scanner.ModelIndex
 	for _, e := range entries {
+		if !e.Available {
+			continue
+		}
 		ae := scanner.AssetEntry{
 			Name:        e.Name,
 			Path:        e.Path,
@@ -394,10 +393,11 @@ func (r *Registry) load() error {
 	}
 
 	for _, e := range raw {
-		if _, err := os.Stat(e.Path); err != nil {
-			r.needsSave = true // file is gone
-			continue
-		}
+		// Keep missing entries. A disconnected external drive must not silently
+		// erase the user's registration or the model identity that lives there.
+		// Availability is recomputed on every All() read.
+		_, err := os.Stat(e.Path)
+		e.Available = err == nil
 		// Kind validation deliberately does NOT run here. It used to call
 		// entryKindMatches, which parses the GGUF header of every registered
 		// model on every launch (measured 49s for 27 models) on the goroutine

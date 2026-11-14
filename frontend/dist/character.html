@@ -21,11 +21,14 @@
     <link rel="stylesheet" href="css/ambient.css?v=41">
     <link rel="stylesheet" href="css/character-components.css?v=41">
     <link rel="stylesheet" href="css/character-header.css?v=41">
+    <link rel="stylesheet" href="css/content-integration.css?v=1">
     <link rel="stylesheet" href="css/world-form.css?v=41">
     <link rel="stylesheet" href="css/world-dropdown-item.css?v=41">
     <link rel="stylesheet" href="css/nav-icon-images.css?v=41">
     <link rel="stylesheet" href="css/icons.css?v=41">
     <link rel="stylesheet" href="css/tutorials.css?v=41">
+    <script src="/wails/ipc.js"></script>
+    <script src="/wails/runtime.js"></script>
 </head>
 <body>
     <!-- Ambient Background Effects -->
@@ -135,6 +138,7 @@
                 <button class="character-creation-close" onclick="closeCharacterCreationPopup()">×</button>
             </div>
             <div class="character-creation-content">
+                <div class="character-external-note" id="character-external-banner" style="display:none;"></div>
                 <div class="character-sheet-container">
                     <!-- Image Attachment Area -->
                     <div class="character-images-section">
@@ -246,18 +250,15 @@
                                     <label class="character-form-label" for="char-voice-model">Voice Model</label>
                                     <select class="character-form-input" id="char-voice-model" style="background: rgba(0,0,0,0.3);">
                                         <option value="">Inherit Global</option>
-                                        <option value="en_US-lessac-medium">en_US-lessac-medium</option>
-                                        <option value="en_US-lessac-low">en_US-lessac-low</option>
-                                        <option value="en_US-ryan-medium">en_US-ryan-medium</option>
-                                        <option value="en_US-amy-medium">en_US-amy-medium</option>
-                                        <option value="en_GB-northern_english_male-medium">en_GB-northern_english_male-medium</option>
                                     </select>
+                                    <div id="char-voice-status" style="font-size:12px; line-height:1.4; color:var(--text-secondary, #888); margin-top:6px;">Checking voice catalog...</div>
                                 </div>
                                 <div style="display:flex; gap:12px;">
                                     <div style="flex:1;">
                                         <label class="character-form-label" for="char-voice-speed">Speed</label>
                                         <input type="range" class="character-form-input" id="char-voice-speed" min="0.5" max="2.0" step="0.05" value="1.0" style="padding:0;">
                                         <span id="char-voice-speed-val" style="font-size:12px; color:var(--text-secondary);">1.0x</span>
+                                        <div id="char-voice-speed-hint" style="font-size:11px; line-height:1.35; color:var(--text-secondary, #888); margin-top:3px;"></div>
                                     </div>
                                     <div style="flex:1;">
                                         <label class="character-form-label" for="char-voice-volume">Volume</label>
@@ -272,7 +273,7 @@
             </div>
             <div class="character-creation-footer">
                 <button class="character-creation-cancel" onclick="closeCharacterCreationPopup()">Cancel</button>
-                <button class="character-creation-save" onclick="saveCharacter()">Save Character</button>
+                <button class="character-creation-save" id="character-creation-save" onclick="saveCharacter()">Save Character</button>
             </div>
         </div>
     </div>

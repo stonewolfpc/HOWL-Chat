@@ -10,6 +10,7 @@ import (
 
 	"howl-chat/internal/audio/hw"
 	"howl-chat/internal/audio/types"
+	"howl-chat/internal/paths"
 )
 
 // BaseRecognizer provides common functionality for all ASR implementations
@@ -175,7 +176,7 @@ func (b *BaseRecognizer) EnsureCompatibleFormat(ctx context.Context, inputPath s
 		return inputPath, nil // Already compatible
 	}
 
-	dir := os.TempDir()
+	dir := paths.TempDir()
 	if err := os.MkdirAll(filepath.Join(dir, "howl-asr"), 0o755); err != nil {
 		return "", NewTranscodingError(metadata.Format, targetFormat.Format, err)
 	}

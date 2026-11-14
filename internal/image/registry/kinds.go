@@ -98,7 +98,7 @@ func (r *Registry) EntriesUnderDir(dir string) []Entry {
 func (r *Registry) ByTypeInDirs(assetType, kind string) []Entry {
 	var out []Entry
 	for _, e := range r.All() {
-		if e.Type != assetType {
+		if e.Type != assetType || !e.Available {
 			continue
 		}
 		if r.KindForPath(e.Path) != kind {

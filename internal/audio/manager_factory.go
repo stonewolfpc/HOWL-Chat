@@ -41,6 +41,12 @@ func newProductionFactory(create func() *Pipeline) PipelineFactory {
 			HardwareTier:      "auto",
 			ASREngine:         desired.ASREngine,
 			TTSEngine:         desired.TTSEngine,
+			TTSVoice:          desired.TTSVoice,
+			TTSSpeed:          desired.TTSSpeed,
+			ASRLanguage:       desired.ASRLanguage,
+			ASRThreads:        desired.ASRThreads,
+			ASRBeamSize:       desired.ASRBeamSize,
+			ASRBestOf:         desired.ASRBestOf,
 		})
 
 		outcome := pipeline.initializationResult()

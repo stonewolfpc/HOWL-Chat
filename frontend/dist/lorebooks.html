@@ -100,6 +100,14 @@
                 <button class="create-character-button" onclick="openLorebookCreationPopup()">Create Entry</button>
             </div>
 
+            <div class="lorebook-store-bar">
+                <span class="lorebook-store-status" id="lorebook-store-status">Checking lorebook library...</span>
+                <div class="lorebook-store-actions">
+                    <button type="button" class="lorebook-store-button" id="lorebook-import-button" onclick="importLorebooksToLibrary()">Import to Library</button>
+                    <button type="button" class="lorebook-store-button secondary" id="lorebook-rollback-button" onclick="rollbackLorebookLibrary()">Undo Import</button>
+                </div>
+            </div>
+
             <div class="lorebook-scope-strip">
                 <div class="lorebook-scope-note">World lore frames reality. Scenario lore frames the scene. Character lore belongs to a specific AI but can still be called when visibility allows.</div>
             </div>
@@ -263,6 +271,14 @@
                                 </div>
                             </div>
 
+                            <div class="character-form-group" id="lorebook-owner-group" style="display: none;">
+                                <label class="character-form-label" for="lorebook-owner">Owner Character</label>
+                                <select class="character-form-input" id="lorebook-owner">
+                                    <option value="">Unowned</option>
+                                </select>
+                                <div class="lorebook-helper">Owner is the character this private lore belongs to. Linked characters are associations and never grant ownership.</div>
+                            </div>
+
                             <div class="lorebook-editor-section">
                                 <div class="lorebook-section-title">Injection</div>
                                 <div class="lorebook-grid-four">
@@ -346,6 +362,8 @@
     <script src="js/menu.js?v=41"></script>
     <script src="js/delete-confirm.js?v=41"></script>
     <script src="js/delete-service.js?v=41"></script>
+    <script src="js/lorebook-repository.js?v=1"></script>
+    <script src="js/character-storage.js?v=41"></script>
     <script src="js/lorebooks.js?v=41"></script>
     <script src="js/navigation.js?v=41"></script>
     <script src="js/menu-edit.js?v=41"></script>

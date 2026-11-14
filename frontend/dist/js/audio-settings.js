@@ -31,6 +31,11 @@ let _saving = false;
 let _lastOutcome = null;
 
 const REMOTE_ASR_ENGINES = new Set(['qwen3-asr-0.6b', 'qwen3-asr-1.7b']);
+const WHISPER_ASR_ENGINES = new Set(['whisper-tiny', 'whisper-base', 'whisper-small']);
+const CORE_BACKEND_KEYS = ['asrEnabled', 'ttsEnabled', 'asrEngine', 'ttsEngine'];
+const WHISPER_DECODE_KEYS = ['asrLanguage', 'asrThreads', 'asrBeamSize', 'asrBestOf'];
+const TTS_SPEED_ENGINES = new Set(['piper', 'kokoro', 'melotts']);
+const RENDERER_EFFECTIVE_KEYS = ['ttsVolume', 'ttsAutoplayMessage'];
 
 // Tri-state: true = activation active, false = authority says idle,
 // null = unknown. Unknown is never treated as idle, and no stale value is kept
@@ -262,7 +267,7 @@ function _setRetryVisible(visible) {
 function _setOutcome(saved, applied, readiness, detail, tone) {
     const values = [
         ['audio-save-state', saved, tone === 'busy' ? 'busy' : (saved === 'Saved' ? 'ok' : (saved === 'Not saved' ? '' : 'warn'))],
-        ['audio-apply-state', applied, applied === 'Applied' ? 'ok' : (applied === 'Apply failed' ? 'error' : (tone === 'busy' ? 'busy' : ''))],
+        ['audio-apply-state', applied, (applied === 'Applied' || applied === 'Applied (supported)') ? 'ok' : (applied === 'Apply failed' ? 'error' : (applied === 'Partially applied' ? 'warn' : (tone === 'busy' ? 'busy' : '')))],
         ['audio-ready-state', readiness, readiness === 'Ready (local initialized)' ? 'ok' : (readiness === 'Readiness unchecked' || !readiness ? '' : 'warn')]
     ];
     values.forEach(([id, text, state]) => {
@@ -511,6 +516,10 @@ async function _pollBackendStatus() {
 
 function _asrStatusText(status) {
     const scope = status?.asr_readiness;
+    if (scope === 'mic-unavailable') {
+        const mic = status?.mic;
+        return 'Status: ' + (mic && mic.message ? mic.message : 'microphone unavailable');
+    }
     if (scope === 'local-initialized' && status.asr_ready) {
         return 'Status: ready (local engine initialized; transcription not verified)';
     }
@@ -559,13 +568,9 @@ function _renderCapabilities(status, asrText) {
 // ---------------------------------------------------------------------------
 
 function _audioSnapshot() {
-    const audio = window.settingsState?.current?.audio || {};
-    return {
-        asrEnabled: !!audio.asrEnabled,
-        ttsEnabled: !!audio.ttsEnabled,
-        asrEngine: audio.asrEngine || 'auto',
-        ttsEngine: audio.ttsEngine || 'auto'
-    };
+    // The persisted contract is all 34 fields. ApplyAudioSettings receives the
+    // whole object so the backend can preserve and report every requested value.
+    return { ...(window.settingsState?.current?.audio || {}) };
 }
 
 async function _applySnapshot(audio) {
@@ -573,24 +578,69 @@ async function _applySnapshot(audio) {
     if (typeof app?.ApplyAudioSettings !== 'function') {
         throw new Error('audio backend is unavailable');
     }
-    await app.ApplyAudioSettings(
-        audio.asrEnabled,
-        audio.ttsEnabled,
-        audio.asrEngine,
-        audio.ttsEngine
-    );
+    await app.ApplyAudioSettings(audio);
 }
 
-// Applied is never inferred from a resolved promise. It requires the backend to
-// publish the ACTIVE generation's effective configuration and that it equals
-// what this panel requested.
-function _confirmApplied(audio, status) {
-    const applied = status && status.applied;
-    if (!applied) return false;
-    return !!applied.asr_enabled === !!audio.asrEnabled &&
-           !!applied.tts_enabled === !!audio.ttsEnabled &&
-           String(applied.asr_engine || '') === String(audio.asrEngine || '') &&
-           String(applied.tts_engine || '') === String(audio.ttsEngine || '');
+// Applied is never inferred from a resolved promise. The backend publishes a
+// per-setting report; only its applied states count. Renderer-owned values are
+// counted separately from backend-applied values.
+function _contractState(audio, status) {
+    const report = status?.settings;
+    const statuses = report?.statuses;
+    if (!statuses) return null;
+
+    const entries = Object.values(statuses);
+    // Whisper decode options are required only when an explicit Whisper model
+    // is selected. For every other engine the backend must report them as
+    // unsupported (or unavailable while ASR is off), and they must not prevent
+    // the core capability fields from being called applied.
+    const requiredBackendKeys = [...CORE_BACKEND_KEYS];
+    if (WHISPER_ASR_ENGINES.has(audio?.asrEngine)) {
+        requiredBackendKeys.push(...WHISPER_DECODE_KEYS);
+    }
+    // Speed is a backend-applied setting only for an explicit engine the
+    // backend knows how to drive. Auto-select is reported unavailable.
+    if (audio?.ttsEnabled && TTS_SPEED_ENGINES.has(audio?.ttsEngine)) {
+        requiredBackendKeys.push('ttsSpeed');
+    }
+    const backendApplied = requiredBackendKeys.filter(key => statuses[key]?.state === 'applied');
+    const rendererApplied = RENDERER_EFFECTIVE_KEYS.filter(key => {
+        const setting = statuses[key];
+        return setting && setting.owner === 'renderer' && setting.state === 'renderer';
+    });
+    const invalid = entries.filter(setting => setting.state === 'invalid').length;
+    const rejected = entries.filter(setting => setting.state === 'rejected').length;
+    const pending = entries.filter(setting => setting.state === 'pending').length;
+    const unsupported = entries.filter(setting => setting.state === 'unsupported').length;
+    const unavailable = entries.filter(setting => setting.state === 'unavailable').length;
+    const allSupportedApplied = backendApplied.length === requiredBackendKeys.length &&
+        rendererApplied.length === RENDERER_EFFECTIVE_KEYS.length &&
+        invalid === 0 && rejected === 0 && pending === 0;
+    const anyApplied = backendApplied.length > 0 || rendererApplied.length > 0;
+    const detailParts = [
+        `${backendApplied.length} of ${requiredBackendKeys.length} backend settings applied`,
+        `${rendererApplied.length} of ${RENDERER_EFFECTIVE_KEYS.length} renderer settings applied`
+    ];
+    if (unsupported > 0) detailParts.push(`${unsupported} unsupported settings saved but not applied`);
+    if (unavailable > 0) detailParts.push(`${unavailable} unavailable`);
+    if (invalid > 0) detailParts.push(`${invalid} invalid`);
+    if (rejected > 0) detailParts.push(`${rejected} rejected`);
+    if (pending > 0) detailParts.push(`${pending} pending`);
+
+    return {
+        report,
+        backendApplied: backendApplied.length,
+        requiredBackend: requiredBackendKeys.length,
+        rendererApplied: rendererApplied.length,
+        invalid,
+        rejected,
+        pending,
+        unsupported,
+        unavailable,
+        anyApplied,
+        allSupportedApplied,
+        detail: detailParts.join('; ') + '.'
+    };
 }
 
 async function _readReadiness(audio) {
@@ -607,11 +657,22 @@ async function _readReadiness(audio) {
     _applyInProgress = (status && typeof status.apply_in_progress === 'boolean')
         ? status.apply_in_progress
         : null;
-    const appliedConfirmed = _confirmApplied(audio, status);
-    const context = { appliedConfirmed, applyInProgress: _applyInProgress, status };
+    const contract = _contractState(audio, status);
+    const appliedConfirmed = contract?.allSupportedApplied === true;
+    const context = { appliedConfirmed, applyInProgress: _applyInProgress, status, contract };
 
     if (!audio.asrEnabled) {
         return { ...context, state: 'disabled', label: 'Disabled (ASR off)', detail: 'Speech recognition is disabled.', closeable: true };
+    }
+    const mic = status?.mic;
+    if (mic && mic.state && mic.state !== 'ready') {
+        return {
+            ...context,
+            state: 'mic-unavailable',
+            label: 'Microphone unavailable',
+            detail: mic.message || 'The selected microphone is unavailable.',
+            closeable: false
+        };
     }
     if (audio.asrEngine === 'auto') {
         return {
@@ -675,28 +736,56 @@ function _dispatchParent(audio, readiness) {
 }
 
 function _showApplied(readiness) {
-    const confirmed = readiness.appliedConfirmed === true && readiness.applyInProgress === false;
+    const contract = readiness.contract;
+    const confirmed = contract?.allSupportedApplied === true && readiness.applyInProgress === false;
     _lastOutcome = { saved: true, applied: confirmed };
+    const contractDetail = contract?.detail || '';
+    const readinessDetail = readiness.detail || '';
+    const detail = [contractDetail, readinessDetail].filter(Boolean).join(' ');
 
     if (confirmed) {
         const tone = readiness.closeable ? '' : 'warn';
-        _setOutcome('Saved', 'Applied', readiness.label, readiness.detail || '', tone);
+        // The label is intentionally scoped: 28 persisted fields are not
+        // applied by this build and must not be hidden behind a bare "Applied".
+        _setOutcome('Saved', 'Applied (supported)', readiness.label, detail, tone);
+    } else if (contract?.anyApplied) {
+        _setOutcome('Saved', 'Partially applied', readiness.label, detail, 'warn');
+    } else if (contract) {
+        _setOutcome('Saved', 'Not applied', readiness.label, detail, 'warn');
     } else {
         _setOutcome('Saved', 'Indeterminate — effective configuration unconfirmed', readiness.label,
-            'Activation reported success, but the effective configuration could not be confirmed.' +
-            (readiness.detail ? ' ' + readiness.detail : ''), 'warn');
+            'Activation reported success, but the backend did not publish a per-setting report.' +
+            (readinessDetail ? ' ' + readinessDetail : ''), 'warn');
     }
     _setRetryVisible(!confirmed || readiness.state === 'not-ready' || readiness.state === 'unchecked' || readiness.state === 'apply-failed');
 
-    if (readiness.state === 'local-initialized') {
-        _notify('Audio settings saved and applied. ASR is initialized.', 'success');
-    } else if (readiness.state === 'disabled') {
-        _notify('Audio settings saved and applied.', 'success');
-    } else if (readiness.state === 'remote-unverified') {
-        _notify('Audio settings saved. Remote ASR availability is not verified.', 'warning');
+    const unsupportedNote = contract?.unsupported
+        ? ` ${contract.unsupported} unsupported settings remain saved but not applied.`
+        : '';
+    if (confirmed && readiness.state === 'local-initialized') {
+        _notify('Audio settings saved. Supported settings applied; ASR is initialized.' + unsupportedNote, 'success');
+    } else if (confirmed && readiness.state === 'disabled') {
+        _notify('Audio settings saved. Supported settings applied.' + unsupportedNote, 'success');
+    } else if (confirmed && readiness.state === 'remote-unverified') {
+        _notify('Audio settings saved. Remote ASR availability is not verified.' + unsupportedNote, 'warning');
+    } else if (!confirmed) {
+        _notify('Audio settings saved, but not all supported audio settings are effective.', 'warning');
     } else {
-        _notify('Audio settings saved, but speech recognition is not ready.', 'warning');
+        _notify('Audio settings saved, but speech recognition is not ready.' + unsupportedNote, 'warning');
     }
+}
+
+// Read the microphone state after a failed activation so the panel can show the
+// specific Windows condition instead of a generic backend error.
+async function _microphoneFailure() {
+    const app = window.go?.main?.App;
+    if (typeof app?.GetAudioStatus !== 'function') return null;
+    try {
+        const status = await app.GetAudioStatus();
+        const mic = status?.mic;
+        if (mic && mic.state && mic.state !== 'ready') return mic;
+    } catch (e) { /* reported as the original failure */ }
+    return null;
 }
 
 async function saveAudioSettings() {
@@ -755,11 +844,18 @@ async function saveAudioSettings() {
         }
         console.error('[audio-settings] apply failed:', err);
         _lastOutcome = { saved: true, applied: false };
-        _setOutcome('Saved', 'Apply failed', 'Not ready',
-            'The preference is saved. Activation failed: ' + err, 'error');
+        const mic = await _microphoneFailure();
+        if (mic) {
+            _setOutcome('Saved', 'Apply failed — microphone unavailable', 'Not ready', mic.message, 'error');
+            _dispatchParent(audio, { state: 'mic-unavailable', label: 'Microphone unavailable', detail: mic.message });
+            _notify(mic.message, 'error');
+        } else {
+            _setOutcome('Saved', 'Apply failed', 'Not ready',
+                'The preference is saved. Activation failed: ' + err, 'error');
+            _dispatchParent(audio, { state: 'apply-failed', label: 'Apply failed', detail: String(err) });
+            _notify('Audio settings saved, but activation failed. Use Retry activation.', 'error');
+        }
         _setRetryVisible(true);
-        _dispatchParent(audio, { state: 'apply-failed', label: 'Apply failed', detail: String(err) });
-        _notify('Audio settings saved, but activation failed. Use Retry activation.', 'error');
         _saving = false;
         _setSaveEnabled(true);
         return false;
@@ -811,9 +907,16 @@ async function retryAudioActivation() {
         }
         console.error('[audio-settings] retry apply failed:', err);
         _lastOutcome = { saved: true, applied: false };
-        _setOutcome('Saved', 'Apply failed', 'Not ready', 'Activation still failed: ' + err, 'error');
+        const mic = await _microphoneFailure();
+        if (mic) {
+            _setOutcome('Saved', 'Apply failed — microphone unavailable', 'Not ready', mic.message, 'error');
+            _dispatchParent(audio, { state: 'mic-unavailable', label: 'Microphone unavailable', detail: mic.message });
+            _notify(mic.message, 'error');
+        } else {
+            _setOutcome('Saved', 'Apply failed', 'Not ready', 'Activation still failed: ' + err, 'error');
+            _dispatchParent(audio, { state: 'apply-failed', label: 'Apply failed', detail: String(err) });
+        }
         _setRetryVisible(true);
-        _dispatchParent(audio, { state: 'apply-failed', label: 'Apply failed', detail: String(err) });
         _saving = false;
         _setSaveEnabled(true);
         return false;

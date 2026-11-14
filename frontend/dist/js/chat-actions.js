@@ -57,7 +57,10 @@ async function _syncDomHistoryToBackend() {
                          : 'system';
             const text   = msgDiv.querySelector('.chat-text')?.textContent?.trim() || '';
             const sender = msgDiv.querySelector('.chat-sender')?.textContent?.trim() || '';
-            if (text) entries.push({ role, text, sender });
+            const characterId = msgDiv.dataset.characterId || '';
+            const timestamp = msgDiv.dataset.timestamp || '';
+            const hasImage = msgDiv.dataset.hasImage === 'true';
+            if (text) entries.push({ role, text, sender, characterId, timestamp, hasImage });
         });
 
         // Replace, never append. Appending the surviving messages on top of the

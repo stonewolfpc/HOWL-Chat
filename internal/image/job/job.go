@@ -29,6 +29,7 @@ type Manager struct {
 	jobs       map[string]*types.ImageJob
 	engine     engine.ImageEngine
 	onComplete func(id string, result *types.ImageResult)
+	closed     bool
 }
 
 // NewManager creates a job manager bound to an image engine.
@@ -60,6 +61,13 @@ func (m *Manager) SetOnComplete(fn func(id string, result *types.ImageResult)) {
 // (where this used to happen) a slow load blocked the caller, could not be
 // observed, and could not be cancelled.
 func (m *Manager) Start(opts types.ImageOptions, prepare func(jobID string) error) string {
+	m.mu.Lock()
+	if m.closed {
+		m.mu.Unlock()
+		return ""
+	}
+	m.mu.Unlock()
+
 	job := &types.ImageJob{
 		ID:        fmt.Sprintf("job_%d", time.Now().UnixNano()),
 		Status:    statusQueued,
@@ -69,6 +77,10 @@ func (m *Manager) Start(opts types.ImageOptions, prepare func(jobID string) erro
 	}
 
 	m.mu.Lock()
+	if m.closed {
+		m.mu.Unlock()
+		return ""
+	}
 	m.jobs[job.ID] = job
 	m.mu.Unlock()
 
@@ -119,6 +131,30 @@ func (m *Manager) Cancel(id string) bool {
 		_ = eng.CancelJob(jobID)
 	}
 	return true
+}
+
+// CancelAll marks every non-terminal job cancelled and asks the engine to
+// abort each one. It is used during application shutdown so an in-flight load
+// or generation cannot outlive the window.
+func (m *Manager) CancelAll() {
+	m.mu.Lock()
+	m.closed = true
+	ids := make([]string, 0, len(m.jobs))
+	for id, job := range m.jobs {
+		if job.Status == statusCompleted || job.Status == statusFailed || job.Status == statusCancelled {
+			continue
+		}
+		job.Status = statusCancelled
+		ids = append(ids, id)
+	}
+	eng := m.engine
+	m.mu.Unlock()
+
+	if eng != nil {
+		for _, id := range ids {
+			_ = eng.CancelJob(id)
+		}
+	}
 }
 
 // List returns all jobs newest-first.

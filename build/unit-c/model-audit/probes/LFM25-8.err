@@ -1,0 +1,15 @@
+0.00.119.565 I srv  llama_server: initializing ...
+0.00.119.578 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.119.931 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.129.403 I srv    load_model: loading model 'G:\AI GGUF\GGUF$M'
+0.00.129.545 E gguf_init_from_file: failed to open GGUF file 'G:\AI GGUF\GGUF$M' (No such file or directory)
+0.00.129.611 E llama_model_load: error loading model: llama_model_loader: failed to load model from G:\AI GGUF\GGUF$M
+0.00.129.615 E llama_model_load_from_file_impl: failed to load model
+0.00.129.640 E common_fit_params: encountered an error while trying to fit params to free device memory: failed to load model
+0.00.129.669 E gguf_init_from_file: failed to open GGUF file 'G:\AI GGUF\GGUF$M' (No such file or directory)
+0.00.129.678 E llama_model_load: error loading model: llama_model_loader: failed to load model from G:\AI GGUF\GGUF$M
+0.00.129.679 E llama_model_load_from_file_impl: failed to load model
+0.00.129.679 E cmn  common_init_: failed to load model 'G:\AI GGUF\GGUF$M'
+0.00.129.684 E srv    load_model: failed to load model, 'G:\AI GGUF\GGUF$M'
+0.00.129.686 I srv    operator(): operator(): cleaning up before exit...
+0.00.130.619 E srv  server_run_i: exiting due to model loading error

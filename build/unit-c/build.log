@@ -1,0 +1,26 @@
+[0;92mWails CLI[0m [0;31mv2.12.0[0m
+
+
+# [1;33m[1;33mBuild Options[0m
+[1;33m[0m[0m
+Platform(s)       [90m[90m | [0m[0mwindows/amd64                          
+Compiler          [90m[90m | [0m[0mC:\Go\bin\go.exe                       
+Skip Bindings     [90m[90m | [0m[0mtrue                                   
+Build Mode        [90m[90m | [0m[0mproduction                             
+Devtools          [90m[90m | [0m[0mfalse                                  
+Frontend Directory[90m[90m | [0m[0mC:\Users\StoneWolfPC\HOWL_Chat\frontend
+Obfuscated        [90m[90m | [0m[0mfalse                                  
+Skip Frontend     [90m[90m | [0m[0mtrue                                   
+Compress          [90m[90m | [0m[0mfalse                                  
+Package           [90m[90m | [0m[0mtrue                                   
+Clean Bin Dir     [90m[90m | [0m[0mfalse                                  
+LDFlags           [90m[90m | [0m[0m                                       
+Tags              [90m[90m | [0m[0m[desktop,production]                   
+Race Detector     [90m[90m | [0m[0mfalse                                  
+Output File       [90m[90m | [0m[0mhowl-chat-unit-c.exe                   
+
+
+# [1;33m[1;33mBuilding target: windows/amd64[0m
+[1;33m[0m[0m
+2026/11/04 21:03:55 internal error: package "os" without types was imported from "howl-chat/internal/paths"
+2026/11/04 21:03:55 internal error: package "time" without types was imported from "howl-chat/internal/backend/types"

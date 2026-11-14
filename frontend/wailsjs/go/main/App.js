@@ -10,8 +10,20 @@ export function AddCharacterToChat(arg1) {
   return window['go']['main']['App']['AddCharacterToChat'](arg1);
 }
 
+export function AddContentLibrary(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['main']['App']['AddContentLibrary'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function AddDefaultContentLibrary(arg1, arg2) {
+  return window['go']['main']['App']['AddDefaultContentLibrary'](arg1, arg2);
+}
+
 export function AddMemory(arg1, arg2) {
   return window['go']['main']['App']['AddMemory'](arg1, arg2);
+}
+
+export function AddModelDirectory(arg1, arg2) {
+  return window['go']['main']['App']['AddModelDirectory'](arg1, arg2);
 }
 
 export function AddScenarioToChat(arg1) {
@@ -30,8 +42,24 @@ export function AppendChatMessage(arg1, arg2, arg3) {
   return window['go']['main']['App']['AppendChatMessage'](arg1, arg2, arg3);
 }
 
+export function ApplyAudioSettings(arg1) {
+  return window['go']['main']['App']['ApplyAudioSettings'](arg1);
+}
+
+export function BrowseModelDirectory(arg1) {
+  return window['go']['main']['App']['BrowseModelDirectory'](arg1);
+}
+
+export function BuildCharacterLoreBlock(arg1, arg2) {
+  return window['go']['main']['App']['BuildCharacterLoreBlock'](arg1, arg2);
+}
+
 export function CancelImageJob(arg1) {
   return window['go']['main']['App']['CancelImageJob'](arg1);
+}
+
+export function CheckModelFit(arg1, arg2) {
+  return window['go']['main']['App']['CheckModelFit'](arg1, arg2);
 }
 
 export function ClearChat() {
@@ -58,6 +86,14 @@ export function DebugImageEngine() {
   return window['go']['main']['App']['DebugImageEngine']();
 }
 
+export function DefaultContentLibraryPath(arg1) {
+  return window['go']['main']['App']['DefaultContentLibraryPath'](arg1);
+}
+
+export function DeferDiscoveredDirectory(arg1) {
+  return window['go']['main']['App']['DeferDiscoveredDirectory'](arg1);
+}
+
 export function DeleteChat(arg1) {
   return window['go']['main']['App']['DeleteChat'](arg1);
 }
@@ -66,12 +102,24 @@ export function DeleteGalleryImage(arg1) {
   return window['go']['main']['App']['DeleteGalleryImage'](arg1);
 }
 
+export function DeleteImageWorkflow(arg1) {
+  return window['go']['main']['App']['DeleteImageWorkflow'](arg1);
+}
+
+export function DeleteLorebook(arg1) {
+  return window['go']['main']['App']['DeleteLorebook'](arg1);
+}
+
 export function DeleteMemory(arg1, arg2) {
   return window['go']['main']['App']['DeleteMemory'](arg1, arg2);
 }
 
 export function DeleteRAGDocument(arg1) {
   return window['go']['main']['App']['DeleteRAGDocument'](arg1);
+}
+
+export function DownloadModelDependencies(arg1) {
+  return window['go']['main']['App']['DownloadModelDependencies'](arg1);
 }
 
 export function EditMemory(arg1, arg2, arg3) {
@@ -86,8 +134,20 @@ export function EnableAudioTTS(arg1) {
   return window['go']['main']['App']['EnableAudioTTS'](arg1);
 }
 
+export function EnsureLorebookLibrary() {
+  return window['go']['main']['App']['EnsureLorebookLibrary']();
+}
+
+export function ExecuteContentImport(arg1, arg2) {
+  return window['go']['main']['App']['ExecuteContentImport'](arg1, arg2);
+}
+
 export function ExitApp() {
   return window['go']['main']['App']['ExitApp']();
+}
+
+export function ExportContentItem(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['main']['App']['ExportContentItem'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function ExportMemories(arg1, arg2) {
@@ -100,6 +160,10 @@ export function ExtractImageMetadata(arg1) {
 
 export function ExtractImageMetadataFromBase64(arg1) {
   return window['go']['main']['App']['ExtractImageMetadataFromBase64'](arg1);
+}
+
+export function FreeVRAMFor(arg1, arg2) {
+  return window['go']['main']['App']['FreeVRAMFor'](arg1, arg2);
 }
 
 export function GenerateCharacterResponse(arg1, arg2) {
@@ -142,6 +206,22 @@ export function GetCompatibleAssets(arg1) {
   return window['go']['main']['App']['GetCompatibleAssets'](arg1);
 }
 
+export function GetContentLibraries(arg1) {
+  return window['go']['main']['App']['GetContentLibraries'](arg1);
+}
+
+export function GetContentLibraryCharacters() {
+  return window['go']['main']['App']['GetContentLibraryCharacters']();
+}
+
+export function GetContentLibraryInventory(arg1) {
+  return window['go']['main']['App']['GetContentLibraryInventory'](arg1);
+}
+
+export function GetEffectiveSampler() {
+  return window['go']['main']['App']['GetEffectiveSampler']();
+}
+
 export function GetErrorLog(arg1) {
   return window['go']['main']['App']['GetErrorLog'](arg1);
 }
@@ -162,8 +242,16 @@ export function GetImageJobStatus(arg1) {
   return window['go']['main']['App']['GetImageJobStatus'](arg1);
 }
 
+export function GetImagePlacement() {
+  return window['go']['main']['App']['GetImagePlacement']();
+}
+
 export function GetImageSettings() {
   return window['go']['main']['App']['GetImageSettings']();
+}
+
+export function GetImageWorkflow(arg1) {
+  return window['go']['main']['App']['GetImageWorkflow'](arg1);
 }
 
 export function GetLLMModelDetails(arg1) {
@@ -190,6 +278,14 @@ export function GetLoadingStage() {
   return window['go']['main']['App']['GetLoadingStage']();
 }
 
+export function GetLorebookStoreDiagnostics() {
+  return window['go']['main']['App']['GetLorebookStoreDiagnostics']();
+}
+
+export function GetLorebookStoreStatus() {
+  return window['go']['main']['App']['GetLorebookStoreStatus']();
+}
+
 export function GetMemories(arg1, arg2) {
   return window['go']['main']['App']['GetMemories'](arg1, arg2);
 }
@@ -198,8 +294,32 @@ export function GetMemoryDetail(arg1, arg2) {
   return window['go']['main']['App']['GetMemoryDetail'](arg1, arg2);
 }
 
+export function GetMemoryIdentityDiagnostics(arg1) {
+  return window['go']['main']['App']['GetMemoryIdentityDiagnostics'](arg1);
+}
+
+export function GetModelCatalog() {
+  return window['go']['main']['App']['GetModelCatalog']();
+}
+
+export function GetModelDependencies(arg1) {
+  return window['go']['main']['App']['GetModelDependencies'](arg1);
+}
+
+export function GetModelDirectories() {
+  return window['go']['main']['App']['GetModelDirectories']();
+}
+
+export function GetModelDiscoveryState() {
+  return window['go']['main']['App']['GetModelDiscoveryState']();
+}
+
 export function GetModelIndex() {
   return window['go']['main']['App']['GetModelIndex']();
+}
+
+export function GetModelIntelligence(arg1) {
+  return window['go']['main']['App']['GetModelIntelligence'](arg1);
 }
 
 export function GetModelMemoryEstimate(arg1, arg2, arg3) {
@@ -250,6 +370,14 @@ export function GetTTSModels() {
   return window['go']['main']['App']['GetTTSModels']();
 }
 
+export function GetTTSVoiceCatalog(arg1) {
+  return window['go']['main']['App']['GetTTSVoiceCatalog'](arg1);
+}
+
+export function ImportLorebooks(arg1) {
+  return window['go']['main']['App']['ImportLorebooks'](arg1);
+}
+
 export function InstallAssets(arg1) {
   return window['go']['main']['App']['InstallAssets'](arg1);
 }
@@ -266,6 +394,10 @@ export function IsRAGEnabled() {
   return window['go']['main']['App']['IsRAGEnabled']();
 }
 
+export function ListContentImportJournal(arg1) {
+  return window['go']['main']['App']['ListContentImportJournal'](arg1);
+}
+
 export function ListGalleryImages() {
   return window['go']['main']['App']['ListGalleryImages']();
 }
@@ -276,6 +408,14 @@ export function ListImageLoRAs() {
 
 export function ListImageModels() {
   return window['go']['main']['App']['ListImageModels']();
+}
+
+export function ListImageWorkflows() {
+  return window['go']['main']['App']['ListImageWorkflows']();
+}
+
+export function ListLorebooks() {
+  return window['go']['main']['App']['ListLorebooks']();
 }
 
 export function ListRAGDocuments(arg1, arg2) {
@@ -298,16 +438,20 @@ export function LoadModelMetadata(arg1) {
   return window['go']['main']['App']['LoadModelMetadata'](arg1);
 }
 
+export function MigrateLorebookOwners(arg1, arg2) {
+  return window['go']['main']['App']['MigrateLorebookOwners'](arg1, arg2);
+}
+
 export function NewChat(arg1) {
   return window['go']['main']['App']['NewChat'](arg1);
 }
 
-export function OnShutdown(arg1) {
-  return window['go']['main']['App']['OnShutdown'](arg1);
-}
-
 export function OpenCharacterSheet(arg1) {
   return window['go']['main']['App']['OpenCharacterSheet'](arg1);
+}
+
+export function OpenContentDirectoryPicker() {
+  return window['go']['main']['App']['OpenContentDirectoryPicker']();
 }
 
 export function OpenDirectoryPicker() {
@@ -316,6 +460,10 @@ export function OpenDirectoryPicker() {
 
 export function OpenImageModelsDirPicker() {
   return window['go']['main']['App']['OpenImageModelsDirPicker']();
+}
+
+export function OpenImageWorkflowsFolder() {
+  return window['go']['main']['App']['OpenImageWorkflowsFolder']();
 }
 
 export function OpenModelFilePicker() {
@@ -330,6 +478,14 @@ export function PinMemory(arg1, arg2, arg3) {
   return window['go']['main']['App']['PinMemory'](arg1, arg2, arg3);
 }
 
+export function PreviewContentImport(arg1) {
+  return window['go']['main']['App']['PreviewContentImport'](arg1);
+}
+
+export function RefreshModelDirectories(arg1) {
+  return window['go']['main']['App']['RefreshModelDirectories'](arg1);
+}
+
 export function RefreshResourceSnapshot() {
   return window['go']['main']['App']['RefreshResourceSnapshot']();
 }
@@ -342,8 +498,20 @@ export function RemoveCharacterFromChat(arg1) {
   return window['go']['main']['App']['RemoveCharacterFromChat'](arg1);
 }
 
+export function RemoveContentLibrary(arg1) {
+  return window['go']['main']['App']['RemoveContentLibrary'](arg1);
+}
+
 export function RemoveLLMModel(arg1) {
   return window['go']['main']['App']['RemoveLLMModel'](arg1);
+}
+
+export function RemoveModelDirectory(arg1) {
+  return window['go']['main']['App']['RemoveModelDirectory'](arg1);
+}
+
+export function ReplaceChatHistory(arg1) {
+  return window['go']['main']['App']['ReplaceChatHistory'](arg1);
 }
 
 export function RequestAllocation(arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
@@ -358,8 +526,36 @@ export function RescanImageModels() {
   return window['go']['main']['App']['RescanImageModels']();
 }
 
+export function ResetApplicationSettings(arg1) {
+  return window['go']['main']['App']['ResetApplicationSettings'](arg1);
+}
+
+export function ResetImageSettings() {
+  return window['go']['main']['App']['ResetImageSettings']();
+}
+
 export function ResetSessionCharacters() {
   return window['go']['main']['App']['ResetSessionCharacters']();
+}
+
+export function ResumeContentImport(arg1, arg2) {
+  return window['go']['main']['App']['ResumeContentImport'](arg1, arg2);
+}
+
+export function RollbackContentImport(arg1, arg2) {
+  return window['go']['main']['App']['RollbackContentImport'](arg1, arg2);
+}
+
+export function RollbackLorebookImport() {
+  return window['go']['main']['App']['RollbackLorebookImport']();
+}
+
+export function RollbackLorebookOwnerMigration() {
+  return window['go']['main']['App']['RollbackLorebookOwnerMigration']();
+}
+
+export function RunSilentModelDiscovery() {
+  return window['go']['main']['App']['RunSilentModelDiscovery']();
 }
 
 export function SaveChat() {
@@ -382,8 +578,20 @@ export function SaveImageAs(arg1) {
   return window['go']['main']['App']['SaveImageAs'](arg1);
 }
 
+export function SaveImageWorkflow(arg1) {
+  return window['go']['main']['App']['SaveImageWorkflow'](arg1);
+}
+
+export function SaveLorebook(arg1, arg2) {
+  return window['go']['main']['App']['SaveLorebook'](arg1, arg2);
+}
+
 export function SaveTempImage(arg1) {
   return window['go']['main']['App']['SaveTempImage'](arg1);
+}
+
+export function ScanDiscoveredDirectory(arg1) {
+  return window['go']['main']['App']['ScanDiscoveredDirectory'](arg1);
 }
 
 export function ScanImageModels() {
@@ -420,6 +628,18 @@ export function SetActiveImageModel(arg1) {
 
 export function SetAutoCaptureConfig(arg1, arg2) {
   return window['go']['main']['App']['SetAutoCaptureConfig'](arg1, arg2);
+}
+
+export function SetContentLibraryRole(arg1, arg2) {
+  return window['go']['main']['App']['SetContentLibraryRole'](arg1, arg2);
+}
+
+export function SetDefaultContentLibrary(arg1) {
+  return window['go']['main']['App']['SetDefaultContentLibrary'](arg1);
+}
+
+export function SetDirectoryDiscovery(arg1) {
+  return window['go']['main']['App']['SetDirectoryDiscovery'](arg1);
 }
 
 export function SetErrorReportingEnabled(arg1) {
@@ -510,30 +730,10 @@ export function UploadRAGDocument(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['main']['App']['UploadRAGDocument'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function WipeAllData() {
-  return window['go']['main']['App']['WipeAllData']();
-}
-
 export function UploadRAGDocumentText(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['main']['App']['UploadRAGDocumentText'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function BrowseModelDirectory(path) {
-  return window['go']['main']['App']['BrowseModelDirectory'](path);
-}
-
-export function DeferDiscoveredDirectory(path) {
-  return window['go']['main']['App']['DeferDiscoveredDirectory'](path);
-}
-
-export function GetModelDiscoveryState() {
-  return window['go']['main']['App']['GetModelDiscoveryState']();
-}
-
-export function ScanDiscoveredDirectory(path) {
-  return window['go']['main']['App']['ScanDiscoveredDirectory'](path);
-}
-
-export function SetDirectoryDiscovery(enabled) {
-  return window['go']['main']['App']['SetDirectoryDiscovery'](enabled);
+export function WipeAllData() {
+  return window['go']['main']['App']['WipeAllData']();
 }

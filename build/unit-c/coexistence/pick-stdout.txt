@@ -1,0 +1,29 @@
+13:04:56.860  PHASE=pick ISOLATED_ROOT=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun PROFILE=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\profile
+13:04:57.396  RENDER_VOLUME_BEFORE=VOLUME=62%
+13:04:57.495  APP_PID=2196 LOG_OFFSETS=tmp\unit-c-rerun\config\logs\startup.log=75624 Roaming\HOWLChat\config\logs\startup.log=0
+13:05:00.301  WINDOW_READY WINDOW rect=580,270,1400,900 handle=5047990 pid=2196 title=HOWL Chat
+13:05:02.161  SERVERS[startup] count=
+13:05:02.167    pid=22828 port=62025 mmproj=G:\AI
+13:05:02.169  ASR_DISCOVERED pid=22828 port=62025 after 0.4s
+13:05:02.229  ASR_READY port=62025 after 0.1s health=True
+13:05:02.286  GPU_AT_STARTUP 3953 MiB, 8192 MiB, 7 %
+13:06:11.908  RESCAN_DONE after 69.6s in C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\config\logs\startup.log
+13:06:15.467  PICKER_OPEN powershell.exe : index 0 out of range; matches=0
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1:29 char:16
++ ...      $out = & powershell -NoProfile -ExecutionPolicy Bypass -File $ui ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (index 0 out of range; matches=0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\uia.ps1:181 char:44
++ ... e $Index) { throw ("index $Index out of range; matches=" + $found.Cou ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (index 0 out of range; matches=0:String) [], RuntimeException
+    + FullyQualifiedErrorId : index 0 out of range; matches=0
+13:06:18.015  SCAN step=0 options=0
+13:06:18.019  NO_VISIBLE_ROW
+13:06:18.023  PICK_RESULT=False
+13:06:18.110  SHOT=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\pick-probe.png
+13:06:19.149  CLOSE_REQUEST pid=2196 main=5047990
+13:06:19.191  EXITED code=
+13:06:22.205  LEFTOVER=0

@@ -23,6 +23,9 @@ import (
 
 // SendMessageStreamWithImage streams an LLM response, optionally with an image.
 func (a *App) SendMessageStreamWithImage(message string, imageData string) error {
+	if err := a.ensureAcceptingWork("send message"); err != nil {
+		return err
+	}
 	if a.httpClient == nil {
 		return fmt.Errorf("llama client not initialized")
 	}
@@ -58,7 +61,8 @@ func (a *App) SendMessageStreamWithImage(message string, imageData string) error
 	opts := a.buildInferenceOptions()
 
 	streamCtx, cancel := context.WithCancel(context.Background())
-	a.streamCancel = cancel
+	streamToken := a.beginStream(cancel)
+	defer a.endStream(streamToken)
 
 	// Thinking goes to its own channel: it is shown (or not) but never becomes
 	// the reply, never enters history and is never sent back next turn.
@@ -112,8 +116,6 @@ func (a *App) SendMessageStreamWithImage(message string, imageData string) error
 	}
 	splitter.Flush()
 
-	a.streamCancel = nil
-
 	if streamErr != nil {
 		// A user abort is normal and must never surface as an error. AbortStream
 		// cancels the stream context we own, and the HTTP client reports the
@@ -150,6 +152,9 @@ func (a *App) SendMessageStreamWithImage(message string, imageData string) error
 // GenerateCharacterResponse generates a response for a specific character and emits
 // character-scoped events: chat:chunk:<id>, chat:complete:<id>, chat:error:<id>.
 func (a *App) GenerateCharacterResponse(message string, characterID string) error {
+	if err := a.ensureAcceptingWork("character response"); err != nil {
+		return err
+	}
 	if a.httpClient == nil {
 		return fmt.Errorf("llama client not initialized")
 	}
@@ -202,7 +207,8 @@ func (a *App) GenerateCharacterResponse(message string, characterID string) erro
 
 	opts := a.buildInferenceOptions()
 	streamCtx, cancel := context.WithCancel(context.Background())
-	a.streamCancel = cancel
+	streamToken := a.beginStream(cancel)
+	defer a.endStream(streamToken)
 
 	eventChunk := fmt.Sprintf("chat:chunk:%s", characterID)
 	eventComplete := fmt.Sprintf("chat:complete:%s", characterID)
@@ -242,18 +248,15 @@ func (a *App) GenerateCharacterResponse(message string, characterID string) erro
 		select {
 		case <-streamCtx.Done():
 			a.emitEvent(eventAborted)
-			a.streamCancel = nil
 			return nil
 		default:
 			a.logError(errors.LLMStreamInterrupted, errors.High, "llm.infer.character", "app-prompt.go:165", err)
 			a.emitEvent(eventError, err.Error())
-			a.streamCancel = nil
 			return err
 		}
 	}
 
-	a.streamCancel = nil
-	_ = a.AppendChatMessage("assistant", stripThinkBlocks(response.String()), character.Name)
+	_ = a.appendChatMessage("assistant", stripThinkBlocks(response.String()), character.Name, characterID)
 	a.emitEvent("chat:complete", map[string]interface{}{
 		"message":     response.String(),
 		"characterId": characterID,
@@ -268,16 +271,27 @@ func (a *App) GenerateCharacterResponse(message string, characterID string) erro
 
 // AppendChatMessage records a message in the in-memory history and appends it
 // to history.ndjson — O(1) disk write, no full file rewrite.
+//
+// This public binding is used for user/system turns, which have no character
+// owner. Character responses use appendChatMessage with an explicit ID.
 func (a *App) AppendChatMessage(role, content, sender string) error {
+	return a.appendChatMessage(role, content, sender, "")
+}
+
+func (a *App) appendChatMessage(role, content, sender, characterID string) error {
 	if strings.TrimSpace(content) == "" {
 		return nil
 	}
-	a.chatMessages = append(a.chatMessages, map[string]interface{}{
+	message := map[string]interface{}{
 		"role":      role,
 		"content":   content,
 		"sender":    sender,
-		"timestamp": time.Now().Unix(),
-	})
+		"timestamp": time.Now().Format(time.RFC3339),
+	}
+	if characterID != "" {
+		message["characterId"] = characterID
+	}
+	a.chatMessages = append(a.chatMessages, message)
 	chatID := ""
 	if a.chatPersistence != nil {
 		chatID = a.chatPersistence.GetLastChatID()
@@ -286,11 +300,12 @@ func (a *App) AppendChatMessage(role, content, sender string) error {
 		return nil
 	}
 	entry := chat.ChatHistory{
-		ID:        fmt.Sprintf("%d", len(a.chatMessages)-1),
-		Sender:    sender,
-		Text:      content,
-		Role:      role,
-		Timestamp: time.Now().Format(time.RFC3339),
+		ID:          fmt.Sprintf("%d", len(a.chatMessages)-1),
+		Sender:      sender,
+		Text:        content,
+		Role:        role,
+		Timestamp:   time.Now().Format(time.RFC3339),
+		CharacterID: characterID,
 	}
 	return a.chatPersistence.AppendHistoryEntry(chatID, entry)
 }
@@ -335,20 +350,31 @@ func (a *App) ReplaceChatHistory(entries []map[string]interface{}) error {
 		if timestamp == "" {
 			timestamp = now
 		}
+		characterID := historyFieldString(entry, "characterId", "CharacterId")
+		hasImage, _ := entry["hasImage"].(bool)
 
 		history = append(history, chat.ChatHistory{
-			ID:        fmt.Sprintf("%d", i),
-			Sender:    sender,
-			Text:      text,
-			Role:      role,
-			Timestamp: timestamp,
+			ID:          fmt.Sprintf("%d", i),
+			Sender:      sender,
+			Text:        text,
+			Role:        role,
+			Timestamp:   timestamp,
+			HasImage:    hasImage,
+			CharacterID: characterID,
 		})
-		messages = append(messages, map[string]interface{}{
+		message := map[string]interface{}{
 			"role":      role,
 			"content":   text,
 			"sender":    sender,
-			"timestamp": time.Now().Unix(),
-		})
+			"timestamp": timestamp,
+		}
+		if hasImage {
+			message["hasImage"] = true
+		}
+		if characterID != "" {
+			message["characterId"] = characterID
+		}
+		messages = append(messages, message)
 	}
 
 	a.chatMessages = messages
@@ -385,7 +411,7 @@ func (a *App) AddSystemMessage(content string) error {
 	a.chatMessages = append(a.chatMessages, map[string]interface{}{
 		"role":      "system",
 		"content":   content,
-		"timestamp": time.Now().Unix(),
+		"timestamp": time.Now().Format(time.RFC3339),
 	})
 	return nil
 }
@@ -395,10 +421,7 @@ func (a *App) AbortStream() error {
 	if a.httpClient != nil {
 		a.httpClient.CancelRequest()
 	}
-	if a.streamCancel != nil {
-		a.streamCancel()
-		a.streamCancel = nil
-	}
+	a.cancelActiveStream()
 	a.emitEvent("chat:aborted")
 	return nil
 }
@@ -418,7 +441,10 @@ func (a *App) SetLorebooks(entries []map[string]interface{}) error {
 		}
 		parsed = append(parsed, entry)
 	}
-	a.lorebooks = parsed
+	// After cutover the canonical files own the text; a chat's saved snapshot is
+	// only the selection. Resolve against canonical content so an edited lorebook
+	// reaches the prompt without waiting for a new chat.
+	a.lorebooks = a.mergeCanonicalLore(parsed, true)
 	return nil
 }
 
@@ -430,6 +456,25 @@ func (a *App) UpdateLorebookContext(activeIDs []string) error {
 	}
 	for i := range a.lorebooks {
 		a.lorebooks[i].Enabled = active[a.lorebooks[i].ID]
+	}
+
+	// A lorebook created after this chat was saved is not in the chat snapshot yet.
+	// Enabling it must attach the canonical entry rather than silently doing nothing.
+	known := make(map[string]bool, len(a.lorebooks))
+	for _, entry := range a.lorebooks {
+		known[entry.ID] = true
+	}
+	for _, id := range activeIDs {
+		if known[id] {
+			continue
+		}
+		entry, ok := a.canonicalLorebook(id)
+		if !ok {
+			continue
+		}
+		entry.Enabled = true
+		a.lorebooks = append(a.lorebooks, entry)
+		known[id] = true
 	}
 	return nil
 }
@@ -756,12 +801,13 @@ func (a *App) resolveLorePromptBlock() string {
 }
 
 // resolveCharacterLorePromptBlock resolves lorebooks scoped to a specific character.
-func (a *App) resolveCharacterLorePromptBlock(characterName string) string {
-	return a.resolveLore(characterName)
+// characterID is the durable character.id; a display name is not an identity.
+func (a *App) resolveCharacterLorePromptBlock(characterID string) string {
+	return a.resolveLore(characterID)
 }
 
-// resolveLore is the shared implementation behind both lore resolution paths.
-func (a *App) resolveLore(characterName string) string {
+// resolveLore is the shared implementation behind the general prompt path.
+func (a *App) resolveLore(characterID string) string {
 	if len(a.lorebooks) == 0 || len(a.chatMessages) == 0 {
 		return ""
 	}
@@ -801,6 +847,38 @@ func (a *App) resolveLore(characterName string) string {
 		history = append(history, lorebook.Message{Role: role, Content: content})
 	}
 
+	return a.resolveLoreBlock(characterID, lastMessage, history)
+}
+
+// BuildCharacterLoreBlock is the one lore policy for character turns. The
+// frontend composer calls it with the turn it is about to send, so ownership,
+// visibility, activation, deleted and stale-entry rules are applied by the same
+// resolver as the general prompt path instead of being rebuilt in JavaScript.
+func (a *App) BuildCharacterLoreBlock(characterID string, message string) string {
+	if len(a.lorebooks) == 0 || strings.TrimSpace(message) == "" {
+		return ""
+	}
+
+	history := make([]lorebook.Message, 0, 6)
+	start := len(a.chatMessages) - 6
+	if start < 0 {
+		start = 0
+	}
+	for _, msg := range a.chatMessages[start:] {
+		role, _ := msg["role"].(string)
+		content, _ := msg["content"].(string)
+		if strings.TrimSpace(content) == "" {
+			continue
+		}
+		history = append(history, lorebook.Message{Role: role, Content: content})
+	}
+
+	return a.resolveLoreBlock(characterID, message, history)
+}
+
+// resolveLoreBlock applies the budget, resolved-entry bookkeeping and scope
+// routing. Callers differ only in where the turn text comes from.
+func (a *App) resolveLoreBlock(characterID, lastMessage string, history []lorebook.Message) string {
 	// Lore budget scales with the window instead of a fixed byte count: roughly a
 	// quarter of the context, which is the share the SillyTavern defaults and the
 	// community guides converge on. Characters are ~4x tokens, so a cap of `ctx`
@@ -841,7 +919,7 @@ func (a *App) resolveLore(characterName string) string {
 	if a.world != nil {
 		worldName = a.world.Name
 	}
-	routed := lorebook.RouteResolvedEntries(resolved, characterName, scenarioName, worldName)
+	routed := lorebook.RouteResolvedEntries(resolved, characterID, scenarioName, worldName)
 	return lorebook.BuildPromptBlock(routed)
 }
 

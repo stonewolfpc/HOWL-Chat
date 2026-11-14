@@ -424,6 +424,7 @@ function createDeathMemoryEntry(character, reason) {
             content:     content,
             scope:       'character',
             ownerId:     character.id,
+            ownerKind:   'character_id',
             tags:        ['death', 'event', character.name.toLowerCase().replace(/\s+/g, '-')],
             source:      'auto',
             trigger:     'death',

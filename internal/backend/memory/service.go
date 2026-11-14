@@ -40,7 +40,7 @@ func (s *Service) SetChatID(chatID string) {
 // NewService creates a new memory service instance
 func NewService(chatID string) *Service {
 	return &Service{
-		projectRoot: paths.ProjectRoot(),
+		projectRoot: paths.StateRoot(),
 		chatID:      chatID,
 	}
 }
@@ -54,7 +54,7 @@ type MemoryStorage struct {
 // NewMemoryStorage creates a new storage instance
 func NewMemoryStorage(chatID string) *MemoryStorage {
 	return &MemoryStorage{
-		projectRoot: paths.ProjectRoot(),
+		projectRoot: paths.StateRoot(),
 		chatID:      chatID,
 	}
 }
@@ -312,7 +312,7 @@ func (s *Service) SetAutoCaptureConfig(config types.AutoCaptureConfig) error {
 // ProcessMessageForEvents runs the auto-capture pipeline on a single message
 // Detects events, classifies them, and queues candidates for review.
 // Returns the number of new candidates queued.
-func (s *Service) ProcessMessageForEvents(message string, history []string, characterNames []string) (int, error) {
+func (s *Service) ProcessMessageForEvents(message string, history []string, identities []CharacterIdentity) (int, error) {
 	config, err := s.GetAutoCaptureConfig()
 	if err != nil {
 		return 0, err
@@ -328,7 +328,7 @@ func (s *Service) ProcessMessageForEvents(message string, history []string, char
 	}
 
 	// Step 2: Classify and build candidates
-	candidates := BatchClassify(detections, message, characterNames, s.chatID)
+	candidates := BatchClassify(detections, message, identities, s.chatID)
 	if len(candidates) == 0 {
 		return 0, nil
 	}
@@ -419,7 +419,7 @@ func (s *Service) DeduplicateMemories() (int, error) {
 }
 
 // ExportCharacterMemoriesForContinuity exports memories for cross-scenario use
-func (s *Service) ExportCharacterMemoriesForContinuity(characterName string) ([]types.MemoryRecord, error) {
+func (s *Service) ExportCharacterMemoriesForContinuity(characterID string) ([]types.MemoryRecord, error) {
 	storage := NewMemoryStorage(s.chatID)
 	memories, err := storage.loadMemories()
 	if err != nil {
@@ -428,11 +428,11 @@ func (s *Service) ExportCharacterMemoriesForContinuity(characterName string) ([]
 
 	cc := NewCharacterContinuity()
 	config, _ := cc.LoadContinuityConfig(s.chatID)
-	return cc.ExportCharacterMemories(characterName, memories, config), nil
+	return cc.ExportCharacterMemories(characterID, memories, config), nil
 }
 
 // ImportCharacterMemoriesForContinuity imports memories into current chat
-func (s *Service) ImportCharacterMemoriesForContinuity(characterName string, imported []types.MemoryRecord) error {
+func (s *Service) ImportCharacterMemoriesForContinuity(characterID string, imported []types.MemoryRecord) error {
 	storage := NewMemoryStorage(s.chatID)
 	memories, err := storage.loadMemories()
 	if err != nil {
@@ -441,7 +441,7 @@ func (s *Service) ImportCharacterMemoriesForContinuity(characterName string, imp
 
 	cc := NewCharacterContinuity()
 	config, _ := cc.LoadContinuityConfig(s.chatID)
-	merged := cc.ImportCharacterMemories(characterName, imported, memories, config)
+	merged := cc.ImportCharacterMemories(characterID, imported, memories, config)
 
 	return storage.saveMemories(merged)
 }

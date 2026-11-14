@@ -1,167 +1,14 @@
 [
   {
-    "name": "Llama 3.1 8B",
-    "path": "G:\\AI GGUF\\Image models\\llama-q2_k.gguf",
-    "type": "llm",
-    "family": "",
-    "format": "gguf",
-    "size_mb": 3032.144561767578,
-    "file_size": 3179434016,
-    "mod_time_ns": 1790689209017459100,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\llama-q2_k.gguf"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
-  },
-  {
-    "name": "flux1-kontext-dev-Q4_K_M",
-    "path": "H:\\InvokeAI\\models\\d48b3263-b2d0-45ff-8763-97417299aa68\\flux1-kontext-dev-Q4_K_M.gguf",
-    "type": "diffusion",
-    "family": "flux",
-    "format": "gguf",
-    "size_mb": 6610.696563720703,
-    "file_size": 6931817760,
-    "mod_time_ns": 1782051532000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\d48b3263-b2d0-45ff-8763-97417299aa68\\flux1-kontext-dev-Q4_K_M.gguf"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 4,
-      "cfg": 1,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "ip-adapter_sd15",
-    "path": "H:\\InvokeAI\\models\\fca48206-66da-4eac-888e-40938201eaec\\ip-adapter_sd15.safetensors",
-    "type": "controlnet",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 42.57466125488281,
-    "file_size": 44642768,
-    "mod_time_ns": 1781069914000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\fca48206-66da-4eac-888e-40938201eaec\\ip-adapter_sd15.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "flux1-schnell-Q4_K_M",
-    "path": "G:\\AI GGUF\\Image models\\flux1-schnell-Q4_K_M.gguf",
-    "type": "diffusion",
-    "family": "flux",
-    "format": "gguf",
-    "size_mb": 6591.172882080078,
-    "file_size": 6911345696,
-    "mod_time_ns": 1790353093963181600,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\flux1-schnell-Q4_K_M.gguf"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 4,
-      "cfg": 1,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
-  },
-  {
-    "name": "Wan2.2-TI2V-5B-Q4_K_M",
-    "path": "H:\\InvokeAI\\models\\94474de4-d281-4c60-b3f9-8a596b622544\\Wan2.2-TI2V-5B-Q4_K_M.gguf",
-    "type": "diffusion",
-    "family": "wan",
-    "format": "gguf",
-    "size_mb": 3274.0745544433594,
-    "file_size": 3433116000,
-    "mod_time_ns": 1790355124000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\94474de4-d281-4c60-b3f9-8a596b622544\\Wan2.2-TI2V-5B-Q4_K_M.gguf"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "text_encoder",
-    "path": "H:\\InvokeAI\\models\\000bcce4-ccdf-4b75-9ed7-2ef764183835\\text_encoder\\model.safetensors",
-    "type": "clip_l",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 234.74154663085938,
-    "file_size": 246144352,
-    "mod_time_ns": 1780021882000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\000bcce4-ccdf-4b75-9ed7-2ef764183835\\text_encoder\\model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "flux_dev_flux1-dev-bnb_nf4",
-    "path": "H:\\InvokeAI\\models\\88adb689-2c69-4574-8d2b-2a46d5c5852b\\flux_dev_flux1-dev-bnb_nf4.safetensors",
-    "type": "diffusion",
-    "family": "flux",
-    "format": "safetensors",
-    "size_mb": 6388.874735832214,
-    "file_size": 6699220715,
-    "mod_time_ns": 1782051312000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\88adb689-2c69-4574-8d2b-2a46d5c5852b\\flux_dev_flux1-dev-bnb_nf4.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 4,
-      "cfg": 1,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Wayfarer-2-12B-absolute-heresy.i1-Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Wayfarer-2-12B-absolute-heresy.i1-Q4_K_M.gguf",
+    "name": "Rocinante-X-12B-v1-absolute-heresy.Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Rocinante-X-12B-v1-absolute-heresy.Q4_K_M.gguf",
     "type": "llm",
     "family": "llama",
     "format": "gguf",
-    "size_mb": 7130.832000732422,
-    "file_size": 7477219296,
-    "mod_time_ns": 1789863356323322600,
+    "size_mb": 7130.821594238281,
+    "file_size": 7477208384,
+    "mod_time_ns": 1789862013741231600,
+    "available": true,
     "recommended": {
       "sampler": "",
       "scheduler": "",
@@ -170,137 +17,41 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Rocinante X 12B v1 Absolute Heresy",
+    "model_tags": [
+      "heretic",
+      "uncensored",
+      "decensored",
+      "abliterated"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
   },
   {
-    "name": "fa0e6cfc-042e-4094-acfa-9a84e0bf55aa",
-    "path": "H:\\InvokeAI\\models\\fa0e6cfc-042e-4094-acfa-9a84e0bf55aa",
+    "name": "diffusion_pytorch_model",
+    "path": "G:\\AI GGUF\\Image models\\diffusion_pytorch_model.safetensors",
     "type": "diffusion",
-    "family": "sd1.5",
-    "format": "bundle",
-    "size_mb": 4772.451599121094,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\fa0e6cfc-042e-4094-acfa-9a84e0bf55aa\\diffusion_pytorch_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler_a",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "qwen_2.5_vl_7b_fp8_scaled",
-    "path": "G:\\AI GGUF\\Image models\\qwen_2.5_vl_7b_fp8_scaled.safetensors",
-    "type": "llm",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 8949.919395446777,
-    "file_size": 9384670680,
-    "mod_time_ns": 1793571520999555900,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\qwen_2.5_vl_7b_fp8_scaled.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
-  },
-  {
-    "name": "bnb_llm_int8_model",
-    "path": "H:\\InvokeAI\\models\\1553b55d-f260-4330-b61b-6f63d4bcab16\\text_encoder_2\\bnb_llm_int8_model.safetensors",
-    "type": "t5xxl",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 4671.199867248535,
-    "file_size": 4898108072,
-    "mod_time_ns": 1780023192000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\1553b55d-f260-4330-b61b-6f63d4bcab16\\text_encoder_2\\bnb_llm_int8_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Flux.1-depth-dev-lora",
-    "path": "G:\\AI GGUF\\Image models\\flux1-depth-dev-lora.safetensors",
-    "type": "lora",
-    "family": "flux",
-    "format": "safetensors",
-    "size_mb": 1186.7909545898438,
-    "file_size": 1244440512,
-    "mod_time_ns": 1790352452618520000,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\flux1-depth-dev-lora.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
-  },
-  {
-    "name": "Wan2.2-TI2V-5B-Diffusers_diffusion_pytorch_model",
-    "path": "H:\\InvokeAI\\models\\6274c602-fd86-4fa3-aa55-35c8f25d5cd4\\Wan2.2-TI2V-5B-Diffusers_diffusion_pytorch_model.safetensors",
-    "type": "diffusion",
-    "family": "wan",
-    "format": "safetensors",
-    "size_mb": 2688.195999145508,
-    "file_size": 2818777808,
-    "mod_time_ns": 1790355462000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\6274c602-fd86-4fa3-aa55-35c8f25d5cd4\\Wan2.2-TI2V-5B-Diffusers_diffusion_pytorch_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "ip-adapter_sdxl_vit-h",
-    "path": "H:\\InvokeAI\\models\\9ac493f2-a37e-4e5a-98f0-8fa5cef2893f\\ip-adapter_sdxl_vit-h.safetensors",
-    "type": "controlnet",
     "family": "sdxl",
     "format": "safetensors",
-    "size_mb": 666.0376205444336,
-    "file_size": 698391064,
-    "mod_time_ns": 1782024362000000000,
+    "size_mb": 44.03508758544922,
+    "file_size": 46174136,
+    "mod_time_ns": 1793764014374930500,
+    "available": true,
     "files": {
-      "model": "H:\\InvokeAI\\models\\9ac493f2-a37e-4e5a-98f0-8fa5cef2893f\\ip-adapter_sdxl_vit-h.safetensors"
+      "model": "G:\\AI GGUF\\Image models\\diffusion_pytorch_model.safetensors"
     },
     "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
     },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
   },
   {
     "name": "t5xxl_fp8_e4m3fn",
@@ -311,6 +62,7 @@
     "size_mb": 4667.220024108887,
     "file_size": 4893934904,
     "mod_time_ns": 1793563871470193800,
+    "available": true,
     "files": {
       "model": "G:\\AI GGUF\\Image models\\t5xxl_fp8_e4m3fn.safetensors"
     },
@@ -322,282 +74,18 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
   },
   {
-    "name": "high_noise_model",
-    "path": "H:\\InvokeAI\\models\\de1e4ca9-c1dd-4001-9083-44de303c7b7d\\high_noise_model.safetensors",
-    "type": "lora",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 1170.1368560791016,
-    "file_size": 1226977424,
-    "mod_time_ns": 1790355212000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\de1e4ca9-c1dd-4001-9083-44de303c7b7d\\high_noise_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SD1.5 9210930b",
-    "path": "H:\\InvokeAI\\models\\9210930b-3571-4c63-8bc0-17b1bb6ce14b\\diffusion_pytorch_model.fp16.safetensors",
-    "type": "controlnet",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 689.1237659454346,
-    "file_size": 722598642,
-    "mod_time_ns": 1781069904000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\9210930b-3571-4c63-8bc0-17b1bb6ce14b\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "krea2_turbo-Q4_K_M",
-    "path": "G:\\AI GGUF\\Image models\\krea2_turbo-Q4_K_M.gguf",
-    "type": "diffusion",
-    "family": "qwen_image",
-    "format": "gguf",
-    "size_mb": 7139.481719970703,
-    "file_size": 7486289184,
-    "mod_time_ns": 1790354050137384600,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\krea2_turbo-Q4_K_M.gguf"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 2.5,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
-  },
-  {
-    "name": "clip_l",
-    "path": "G:\\AI GGUF\\Image models\\clip_l.safetensors",
-    "type": "clip_l",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 234.7413558959961,
-    "file_size": 246144152,
-    "mod_time_ns": 1793563394983474100,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\clip_l.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
-  },
-  {
-    "name": "Flux.1 Autoencoder",
-    "path": "H:\\InvokeAI\\models\\a185e8d7-f7a1-40f3-b669-65d1fa657e9b\\ae.safetensors",
-    "type": "vae",
-    "family": "flux",
-    "format": "safetensors",
-    "size_mb": 319.771183013916,
-    "file_size": 335304388,
-    "mod_time_ns": 1783926654000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\a185e8d7-f7a1-40f3-b669-65d1fa657e9b\\ae.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "qwen_3_4b",
-    "path": "G:\\AI GGUF\\Image models\\qwen_3_4b.safetensors",
-    "type": "llm",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 7672.292755126953,
-    "file_size": 8044982048,
-    "mod_time_ns": 1793563632814645200,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\qwen_3_4b.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
-  },
-  {
-    "name": "71b33fcd",
-    "path": "H:\\InvokeAI\\models\\71b33fcd-b4b6-4734-b2ce-158344598877\\model.safetensors",
-    "type": "clip_g",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 1631.2986183166504,
-    "file_size": 1710540580,
-    "mod_time_ns": 1782050696000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\71b33fcd-b4b6-4734-b2ce-158344598877\\model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Flux.1 Autoencoder",
-    "path": "G:\\AI GGUF\\Image models\\ae.safetensors",
-    "type": "vae",
-    "family": "flux",
-    "format": "safetensors",
-    "size_mb": 319.771183013916,
-    "file_size": 335304388,
-    "mod_time_ns": 1790355389251100100,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\ae.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
-  },
-  {
-    "name": "SDXL 439da426",
-    "path": "H:\\InvokeAI\\models\\439da426-b813-48c9-afd4-e124bcb2176d",
-    "type": "diffusion",
-    "family": "sdxl",
-    "format": "diffusers",
-    "size_mb": 6616.603307723999,
-    "files": {
-      "clip_g": "H:\\InvokeAI\\models\\439da426-b813-48c9-afd4-e124bcb2176d\\text_encoder_2\\model.fp16.safetensors",
-      "clip_l": "H:\\InvokeAI\\models\\439da426-b813-48c9-afd4-e124bcb2176d\\text_encoder\\model.fp16.safetensors",
-      "model": "H:\\InvokeAI\\models\\439da426-b813-48c9-afd4-e124bcb2176d\\unet\\diffusion_pytorch_model.fp16.safetensors",
-      "vae": "H:\\InvokeAI\\models\\439da426-b813-48c9-afd4-e124bcb2176d\\vae\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "dpmpp_2m",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Wan2.2-I2V-A14B-LowNoise-Q4_K_M",
-    "path": "H:\\InvokeAI\\models\\5fb20f2e-1fff-4ef7-a154-aa7dc99c2ff9\\Wan2.2-I2V-A14B-LowNoise-Q4_K_M.gguf",
-    "type": "diffusion",
-    "family": "wan",
-    "format": "gguf",
-    "size_mb": 9204.60595703125,
-    "file_size": 9651728896,
-    "mod_time_ns": 1790357148000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\5fb20f2e-1fff-4ef7-a154-aa7dc99c2ff9\\Wan2.2-I2V-A14B-LowNoise-Q4_K_M.gguf"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SD1.5 d7b0ebf4",
-    "path": "H:\\InvokeAI\\models\\d7b0ebf4-526c-4760-81d4-59999cb4c11b\\diffusion_pytorch_model.fp16.safetensors",
-    "type": "controlnet",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 689.1237659454346,
-    "file_size": 722598642,
-    "mod_time_ns": 1781069662000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\d7b0ebf4-526c-4760-81d4-59999cb4c11b\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "krea2_turbo-Q8_0",
-    "path": "H:\\InvokeAI\\models\\f422a798-da59-4e19-8b5c-b8ca16f169a3\\krea2_turbo-Q8_0.gguf",
-    "type": "diffusion",
-    "family": "qwen_image",
-    "format": "gguf",
-    "size_mb": 13071.020782470703,
-    "file_size": 13705958688,
-    "mod_time_ns": 1790356334000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\f422a798-da59-4e19-8b5c-b8ca16f169a3\\krea2_turbo-Q8_0.gguf"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 2.5,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "MN-12B-Mag-Mell-R1-Uncensored-Scale1.2.i1-Q4_K_S",
-    "path": "G:\\AI GGUF\\GGUF\\MN-12B-Mag-Mell-R1-Uncensored-Scale1.2.i1-Q4_K_S.gguf",
+    "name": "Wayfarer-2-12B-absolute-heresy.i1-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Wayfarer-2-12B-absolute-heresy.i1-Q4_K_M.gguf",
     "type": "llm",
     "family": "llama",
     "format": "gguf",
-    "size_mb": 6790.349578857422,
-    "file_size": 7120197600,
-    "mod_time_ns": 1790383801514712200,
+    "size_mb": 7130.832000732422,
+    "file_size": 7477219296,
+    "mod_time_ns": 1789863356323322600,
+    "available": true,
     "recommended": {
       "sampler": "",
       "scheduler": "",
@@ -606,61 +94,32 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Wayfarer 2 12B Absolute Heresy",
+    "model_tags": [
+      "text adventure",
+      "roleplay",
+      "heretic",
+      "uncensored",
+      "decensored",
+      "abliterated",
+      "text-generation"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
   },
   {
-    "name": "SD1.5 0240d8e2",
-    "path": "H:\\InvokeAI\\models\\0240d8e2-394f-4a57-a541-da8fdad202ed\\diffusion_pytorch_model.fp16.safetensors",
-    "type": "controlnet",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 689.1237659454346,
-    "file_size": 722598642,
-    "mod_time_ns": 1781069318000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\0240d8e2-394f-4a57-a541-da8fdad202ed\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SD1.5 412e2e4b",
-    "path": "H:\\InvokeAI\\models\\412e2e4b-e4d0-4b1c-a435-be838cb6a6ab\\diffusion_pytorch_model.fp16.safetensors",
-    "type": "controlnet",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 689.1237659454346,
-    "file_size": 722598642,
-    "mod_time_ns": 1781070218000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\412e2e4b-e4d0-4b1c-a435-be838cb6a6ab\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "LongWriter-glm4-9b-abliterated.IQ4_XS",
-    "path": "G:\\AI GGUF\\GGUF\\LongWriter-glm4-9b-abliterated.IQ4_XS.gguf",
+    "name": "Qwen2.5-Omni-7B-abliterated.Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Qwen2.5-Omni-7B-abliterated.Q4_K_M.gguf",
     "type": "llm",
-    "family": "chatglm",
+    "family": "qwen2vl",
     "format": "gguf",
-    "size_mb": 5058.002593994141,
-    "file_size": 5303700128,
-    "mod_time_ns": 1791168252645207000,
+    "size_mb": 4466.126129150391,
+    "file_size": 4683072672,
+    "mod_time_ns": 1793633283045269900,
+    "available": true,
     "recommended": {
       "sampler": "",
       "scheduler": "",
@@ -669,153 +128,12 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
-  },
-  {
-    "name": "19203d5d-5c1f-4be1-b9f3-39563f6f3771",
-    "path": "H:\\InvokeAI\\models\\19203d5d-5c1f-4be1-b9f3-39563f6f3771",
-    "type": "diffusion",
-    "family": "sd1.5",
-    "format": "bundle",
-    "size_mb": 4772.451599121094,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\19203d5d-5c1f-4be1-b9f3-39563f6f3771\\diffusion_pytorch_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler_a",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "003_realSR_BSRGAN_DFOWMFC_s64w8_SwinIR-L_x4_GAN-with-dict-keys-params-and-params_ema",
-    "path": "H:\\InvokeAI\\models\\482d7331-38aa-460f-b46a-5b04bf5a2e6a\\003_realSR_BSRGAN_DFOWMFC_s64w8_SwinIR-L_x4_GAN-with-dict-keys-params-and-params_ema.pth",
-    "type": "upscaler",
-    "family": "",
-    "format": "pth",
-    "size_mb": 271.75097370147705,
-    "file_size": 284951549,
-    "mod_time_ns": 1780022134000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\482d7331-38aa-460f-b46a-5b04bf5a2e6a\\003_realSR_BSRGAN_DFOWMFC_s64w8_SwinIR-L_x4_GAN-with-dict-keys-params-and-params_ema.pth"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "flux-2-klein-4b-Q4_K_M",
-    "path": "H:\\InvokeAI\\models\\0d27a183-7d55-4be6-b31a-0f2f827cb848\\flux-2-klein-4b-Q4_K_M.gguf",
-    "type": "diffusion",
-    "family": "flux",
-    "format": "gguf",
-    "size_mb": 2483.6646118164062,
-    "file_size": 2604311104,
-    "mod_time_ns": 1782079372000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\0d27a183-7d55-4be6-b31a-0f2f827cb848\\flux-2-klein-4b-Q4_K_M.gguf"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 4,
-      "cfg": 1,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "UnholyDesireMixSinisterAesthetic_V907 1",
-    "path": "G:\\AI GGUF\\Image models\\unholyDesireMixSinister_v90.safetensors",
-    "type": "diffusion",
-    "family": "sdxl",
-    "format": "safetensors",
-    "size_mb": 6616.831590652466,
-    "file_size": 6938250802,
-    "mod_time_ns": 1790356750190121700,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\unholyDesireMixSinister_v90.safetensors"
-    },
-    "recommended": {
-      "sampler": "dpmpp_2m",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
-  },
-  {
-    "name": "SD1.5 e02466f4",
-    "path": "H:\\InvokeAI\\models\\e02466f4-a222-4b55-9124-5b3fc766e463\\diffusion_pytorch_model.fp16.safetensors",
-    "type": "controlnet",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 689.1237659454346,
-    "file_size": 722598642,
-    "mod_time_ns": 1781070126000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\e02466f4-a222-4b55-9124-5b3fc766e463\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Wayfarer-2-12B.i1-Q4_K_M(1)",
-    "path": "G:\\AI GGUF\\GGUF\\Wayfarer-2-12B.i1-Q4_K_M(1).gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 7130.831848144531,
-    "file_size": 7477219136,
-    "mod_time_ns": 1790601761230475300,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
-  },
-  {
-    "name": "Captain-Eris_Violet-V0.420-12B.Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Captain-Eris_Violet-V0.420-12B.Q4_K_M.gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 7130.821624755859,
-    "file_size": 7477208416,
-    "mod_time_ns": 1793026547050225400,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-10-31T15:12:53.2790902-05:00"
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "multimodal-chat",
+    "arch": "qwen2vl",
+    "model_name": "Qwen2.5 Omni 7B Abliterated",
+    "embedding_length": 3584,
+    "admission_version": 1
   },
   {
     "name": "Mistral-Helcyon-Mercury-12b-v3.2-absolute-heresy.i1-Q4_K_M",
@@ -826,6 +144,7 @@
     "size_mb": 7130.8221435546875,
     "file_size": 7477208960,
     "mod_time_ns": 1793281686431166000,
+    "available": true,
     "recommended": {
       "sampler": "",
       "scheduler": "",
@@ -834,39 +153,33 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Mistral Helcyon Mercury 12b v3.2 Absolute Heresy",
+    "model_tags": [
+      "GPT-4o",
+      "converstional",
+      "companion",
+      "roleplay",
+      "heretic",
+      "uncensored",
+      "decensored",
+      "abliterated"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
   },
   {
-    "name": "Wan2.2-T2V-A14B-LowNoise-Q4_K_M",
-    "path": "H:\\InvokeAI\\models\\3502638c-cd7a-4ab5-a29a-94f3998d9c2a\\Wan2.2-T2V-A14B-LowNoise-Q4_K_M.gguf",
-    "type": "diffusion",
-    "family": "wan",
-    "format": "gguf",
-    "size_mb": 9203.04345703125,
-    "file_size": 9650090496,
-    "mod_time_ns": 1790356894000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\3502638c-cd7a-4ab5-a29a-94f3998d9c2a\\Wan2.2-T2V-A14B-LowNoise-Q4_K_M.gguf"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "mira-12b.Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\mira-12b.Q4_K_M.gguf",
+    "name": "Qwen2.5-Omni-3B-Q4_K_M",
+    "path": "G:\\AI GGUF\\voice\\Qwen2.5-Omni-3B-Q4_K_M.gguf",
     "type": "llm",
-    "family": "gemma4",
+    "family": "qwen2vl",
     "format": "gguf",
-    "size_mb": 7039.436187744141,
-    "file_size": 7381383840,
-    "mod_time_ns": 1793031612637398300,
+    "size_mb": 819.62890625,
+    "file_size": 859443200,
+    "mod_time_ns": 1793833420771144900,
+    "available": true,
     "recommended": {
       "sampler": "",
       "scheduler": "",
@@ -875,815 +188,28 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
+    "registered_at": "2026-11-05T16:18:15.7583445-06:00",
+    "admission": "multimodal-chat",
+    "arch": "qwen2vl",
+    "model_tags": [
+      "multimodal",
+      "any-to-any"
+    ],
+    "embedding_length": 2048,
+    "admission_version": 1
   },
   {
-    "name": "ip-adapter-plus-face_sd15",
-    "path": "H:\\InvokeAI\\models\\829ab8fb-f3f5-4e35-a058-c98517d18466\\ip-adapter-plus-face_sd15.safetensors",
-    "type": "controlnet",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 93.63488006591797,
-    "file_size": 98183288,
-    "mod_time_ns": 1781069756000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\829ab8fb-f3f5-4e35-a058-c98517d18466\\ip-adapter-plus-face_sd15.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Wan2.2-T2V-A14B-Diffusers_diffusion_pytorch_model",
-    "path": "H:\\InvokeAI\\models\\97f4f9a7-f86a-4bf5-987f-e8ac54bae481\\Wan2.2-T2V-A14B-Diffusers_diffusion_pytorch_model.safetensors",
-    "type": "diffusion",
-    "family": "wan",
-    "format": "safetensors",
-    "size_mb": 484.0773506164551,
-    "file_size": 507591892,
-    "mod_time_ns": 1790354374000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\97f4f9a7-f86a-4bf5-987f-e8ac54bae481\\Wan2.2-T2V-A14B-Diffusers_diffusion_pytorch_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "anima-lllite-inpainting-base-1",
-    "path": "H:\\InvokeAI\\models\\faf037b6-2ab8-4d67-bc7c-f2481f164bf5\\anima-lllite-inpainting-v2.safetensors",
-    "type": "lora",
-    "family": "anima",
-    "format": "safetensors",
-    "size_mb": 62.72589874267578,
-    "file_size": 65772872,
-    "mod_time_ns": 1790352196000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\faf037b6-2ab8-4d67-bc7c-f2481f164bf5\\anima-lllite-inpainting-v2.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SD1.5 ef2437a2",
-    "path": "H:\\InvokeAI\\models\\ef2437a2-12e2-4da1-858e-6ceda7c55c72\\diffusion_pytorch_model.fp16.safetensors",
-    "type": "controlnet",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 689.1237659454346,
-    "file_size": 722598642,
-    "mod_time_ns": 1781070010000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\ef2437a2-12e2-4da1-858e-6ceda7c55c72\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "qwen_image_vae",
-    "path": "H:\\InvokeAI\\models\\8a4abe8a-af1b-4929-b49e-16b9bac4a069\\qwen_image_vae.safetensors",
-    "type": "vae",
-    "family": "qwen_image",
-    "format": "safetensors",
-    "size_mb": 242.04849815368652,
-    "file_size": 253806246,
-    "mod_time_ns": 1780023462000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\8a4abe8a-af1b-4929-b49e-16b9bac4a069\\qwen_image_vae.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SD1.5 c508990c",
-    "path": "H:\\InvokeAI\\models\\c508990c-acb7-4aae-9769-04d789658e60\\diffusion_pytorch_model.safetensors",
-    "type": "lora",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 319.140661239624,
-    "file_size": 334643238,
-    "mod_time_ns": 1780023310000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\c508990c-acb7-4aae-9769-04d789658e60\\diffusion_pytorch_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SD1.5 ba2e27a5",
-    "path": "H:\\InvokeAI\\models\\ba2e27a5-eacd-4978-8e3e-501cec7dfca2\\diffusion_pytorch_model.fp16.safetensors",
-    "type": "controlnet",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 689.1237659454346,
-    "file_size": 722598642,
-    "mod_time_ns": 1781069214000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\ba2e27a5-eacd-4978-8e3e-501cec7dfca2\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "ip_adapter",
-    "path": "H:\\InvokeAI\\models\\9ea0a1ab-9723-4da0-8d91-e2dbae96b7f1\\ip_adapter.safetensors",
-    "type": "diffusion",
-    "family": "flux",
-    "format": "safetensors",
-    "size_mb": 1008.373664855957,
-    "file_size": 1057356424,
-    "mod_time_ns": 1782050576000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\9ea0a1ab-9723-4da0-8d91-e2dbae96b7f1\\ip_adapter.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 4,
-      "cfg": 1,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SDXL c8c9b2cd",
-    "path": "H:\\InvokeAI\\models\\c8c9b2cd-f418-4d40-bbde-781e021fe5db\\diffusion_pytorch_model.bin",
-    "type": "diffusion",
-    "family": "sdxl",
-    "format": "bin",
-    "size_mb": 4772.6042947769165,
-    "file_size": 5004438321,
-    "mod_time_ns": 1782050246000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\c8c9b2cd-f418-4d40-bbde-781e021fe5db\\diffusion_pytorch_model.bin"
-    },
-    "recommended": {
-      "sampler": "dpmpp_2m",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Flux.2 8c89cbbe",
-    "path": "H:\\InvokeAI\\models\\8c89cbbe-d389-4964-9516-4e46fec3aea7\\diffusion_pytorch_model.safetensors",
-    "type": "diffusion",
-    "family": "flux2",
-    "format": "safetensors",
-    "size_mb": 160.33256340026855,
-    "file_size": 168120878,
-    "mod_time_ns": 1780023376000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\8c89cbbe-d389-4964-9516-4e46fec3aea7\\diffusion_pytorch_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 4,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "qwen_3_06b_base",
-    "path": "H:\\InvokeAI\\models\\2207ca1c-dcfa-4fab-9e2e-1649e65d5aac\\qwen_3_06b_base.safetensors",
-    "type": "llm",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 1136.9086227416992,
-    "file_size": 1192135096,
-    "mod_time_ns": 1780022046000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\2207ca1c-dcfa-4fab-9e2e-1649e65d5aac\\qwen_3_06b_base.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "MN-12B-Mag-Mell-R1-KTO.Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\MN-12B-Mag-Mell-R1-KTO.Q4_K_M.gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 7130.818267822266,
-    "file_size": 7477204896,
-    "mod_time_ns": 1788118111989223600,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
-  },
-  {
-    "name": "Qwen3.8-27B-Uncensored-HauhauCS-Aggressive-IQ2_M",
-    "path": "G:\\AI GGUF\\GGUF\\Qwen3.8-27B-Uncensored-HauhauCS-Aggressive-IQ2_M.gguf",
-    "type": "llm",
-    "family": "qwen35",
-    "format": "gguf",
-    "size_mb": 9841.830200195312,
-    "file_size": 10319906944,
-    "mod_time_ns": 1788765321152838100,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
-  },
-  {
-    "name": "Qwen-Image-Lightning-8steps-V2.0-bf16",
-    "path": "H:\\InvokeAI\\models\\395393c3-9abd-4590-9dc1-41273d5a4bf7\\Qwen-Image-Lightning-8steps-V2.0-bf16.safetensors",
-    "type": "llm",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 810.2496109008789,
-    "file_size": 849608296,
-    "mod_time_ns": 1782077482000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\395393c3-9abd-4590-9dc1-41273d5a4bf7\\Qwen-Image-Lightning-8steps-V2.0-bf16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "EasyNegative",
-    "path": "H:\\InvokeAI\\models\\a46451f8-a498-4915-873f-2a7db140da6f\\EasyNegative.safetensors",
-    "type": "embedding",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 0.023512840270996094,
-    "file_size": 24655,
-    "mod_time_ns": 1781070218000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\a46451f8-a498-4915-873f-2a7db140da6f\\EasyNegative.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SDXL 435d86fa",
-    "path": "H:\\InvokeAI\\models\\435d86fa-b1f2-4afe-8889-4624cbbb8991\\diffusion_pytorch_model.safetensors",
-    "type": "controlnet",
-    "family": "sdxl",
-    "format": "safetensors",
-    "size_mb": 2396.9101028442383,
-    "file_size": 2513342408,
-    "mod_time_ns": 1784010018000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\435d86fa-b1f2-4afe-8889-4624cbbb8991\\diffusion_pytorch_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Qwen-Image-Lightning-4steps-V2.0-bf16",
-    "path": "H:\\InvokeAI\\models\\9464f789-c389-41df-9404-57fb26d054f4\\Qwen-Image-Lightning-4steps-V2.0-bf16.safetensors",
-    "type": "llm",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 810.2496109008789,
-    "file_size": 849608296,
-    "mod_time_ns": 1782078780000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\9464f789-c389-41df-9404-57fb26d054f4\\Qwen-Image-Lightning-4steps-V2.0-bf16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "patricide-12B-Unslop-Mell.Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\patricide-12B-Unslop-Mell.Q4_K_M.gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 7130.817962646484,
-    "file_size": 7477204576,
-    "mod_time_ns": 1789434959039214100,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
-  },
-  {
-    "name": "qwen_image_vae",
-    "path": "G:\\AI GGUF\\Image models\\qwen_image_vae.safetensors",
-    "type": "vae",
-    "family": "qwen_image",
-    "format": "safetensors",
-    "size_mb": 242.04849815368652,
-    "file_size": 253806246,
-    "mod_time_ns": 1793563398936267500,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\qwen_image_vae.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
-  },
-  {
-    "name": "2x-AnimeSharpV4_RCAN",
-    "path": "H:\\InvokeAI\\models\\501ef8cb-8125-437c-b3b9-69e1e4537213\\2x-AnimeSharpV4_RCAN.safetensors",
-    "type": "lora",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 29.61463737487793,
-    "file_size": 31053198,
-    "mod_time_ns": 1784009512000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\501ef8cb-8125-437c-b3b9-69e1e4537213\\2x-AnimeSharpV4_RCAN.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "ip-adapter-plus_sd15",
-    "path": "H:\\InvokeAI\\models\\50c48de6-8c52-4542-bf68-0d45aab4b023\\ip-adapter-plus_sd15.safetensors",
-    "type": "controlnet",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 93.63488006591797,
-    "file_size": 98183288,
-    "mod_time_ns": 1781069712000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\50c48de6-8c52-4542-bf68-0d45aab4b023\\ip-adapter-plus_sd15.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "high_noise_model",
-    "path": "H:\\InvokeAI\\models\\9d1eaf74-9e78-42f1-94ac-0ada6a386796\\high_noise_model.safetensors",
-    "type": "lora",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 1170.1368560791016,
-    "file_size": 1226977424,
-    "mod_time_ns": 1790356068000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\9d1eaf74-9e78-42f1-94ac-0ada6a386796\\high_noise_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Z-Image-Turbo-Fun-Controlnet-Tile-2.1-8steps",
-    "path": "H:\\InvokeAI\\models\\d333f395-6b34-437f-8bba-a522b5e750b5\\Z-Image-Turbo-Fun-Controlnet-Tile-2.1-8steps.safetensors",
-    "type": "controlnet",
-    "family": "z_image",
-    "format": "safetensors",
-    "size_mb": 6401.525115966797,
-    "file_size": 6712485600,
-    "mod_time_ns": 1780023048000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\d333f395-6b34-437f-8bba-a522b5e750b5\\Z-Image-Turbo-Fun-Controlnet-Tile-2.1-8steps.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SD1.5 ab8e7047",
-    "path": "H:\\InvokeAI\\models\\ab8e7047-39dc-4a3d-b227-bdbc569cc035\\diffusion_pytorch_model.fp16.safetensors",
-    "type": "controlnet",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 689.1237659454346,
-    "file_size": 722598642,
-    "mod_time_ns": 1781069608000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\ab8e7047-39dc-4a3d-b227-bdbc569cc035\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "helcyon-grok-v3.0-Q4_K_M(1)",
-    "path": "G:\\AI GGUF\\GGUF\\helcyon-grok-v3.0-Q4_K_M(1).gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 7130.816955566406,
-    "file_size": 7477203520,
-    "mod_time_ns": 1793029079268142600,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
-  },
-  {
-    "name": "SD1.5 a2f24eea",
-    "path": "H:\\InvokeAI\\models\\a2f24eea-3c6f-4c88-a3a6-72fbdc04c0bd\\diffusion_pytorch_model.fp16.safetensors",
-    "type": "controlnet",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 689.1237659454346,
-    "file_size": 722598642,
-    "mod_time_ns": 1781070370000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\a2f24eea-3c6f-4c88-a3a6-72fbdc04c0bd\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "z-image-turbo-Q4_K_M",
-    "path": "G:\\AI GGUF\\Image models\\z-image-turbo-Q4_K_M.gguf",
-    "type": "diffusion",
-    "family": "z_image",
-    "format": "gguf",
-    "size_mb": 4785.169006347656,
-    "file_size": 5017613376,
-    "mod_time_ns": 1790354564653771500,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\z-image-turbo-Q4_K_M.gguf"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 8,
-      "cfg": 1,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
-  },
-  {
-    "name": "RealESRGAN_x4plus",
-    "path": "H:\\InvokeAI\\models\\afcc2b0d-a417-40e5-bd7d-4b130887eb72\\RealESRGAN_x4plus.pth",
-    "type": "upscaler",
-    "family": "",
-    "format": "pth",
-    "size_mb": 63.935269355773926,
-    "file_size": 67040989,
-    "mod_time_ns": 1780021900000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\afcc2b0d-a417-40e5-bd7d-4b130887eb72\\RealESRGAN_x4plus.pth"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SDXL 1b2b8fc7",
-    "path": "H:\\InvokeAI\\models\\1b2b8fc7-60b5-431d-86bb-0929a31a2d36\\diffusion_pytorch_model.fp16.safetensors",
-    "type": "controlnet",
-    "family": "sdxl",
-    "format": "safetensors",
-    "size_mb": 2386.2258281707764,
-    "file_size": 2502139134,
-    "mod_time_ns": 1782050262000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\1b2b8fc7-60b5-431d-86bb-0929a31a2d36\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Deliberate_v5",
-    "path": "H:\\InvokeAI\\models\\e16b8f35-e924-424c-86a6-9b4d76c52372\\Deliberate_v5.safetensors",
-    "type": "diffusion",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 2033.8305416107178,
-    "file_size": 2132625894,
-    "mod_time_ns": 1781069068000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\e16b8f35-e924-424c-86a6-9b4d76c52372\\Deliberate_v5.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler_a",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Qwen-Image-Edit-2511-Lightning-8steps-V1.0-bf16",
-    "path": "H:\\InvokeAI\\models\\69d34dbe-02b6-4498-8e94-d0f449aa6a6b\\Qwen-Image-Edit-2511-Lightning-8steps-V1.0-bf16.safetensors",
-    "type": "llm",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 810.2496109008789,
-    "file_size": 849608296,
-    "mod_time_ns": 1782078328000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\69d34dbe-02b6-4498-8e94-d0f449aa6a6b\\Qwen-Image-Edit-2511-Lightning-8steps-V1.0-bf16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1)",
-    "path": "G:\\AI GGUF\\GGUF\\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
-    "type": "llm",
-    "family": "gemma4",
-    "format": "gguf",
-    "size_mb": 5088.124969482422,
-    "file_size": 5335285728,
-    "mod_time_ns": 1788573228448965700,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-10-31T15:12:53.2790902-05:00"
-  },
-  {
-    "name": "z_image_turbo-Q4_K",
-    "path": "H:\\InvokeAI\\models\\b4f4d36f-ac8b-4141-80f4-47a8e089685d\\z_image_turbo-Q4_K.gguf",
-    "type": "diffusion",
-    "family": "z_image",
-    "format": "gguf",
-    "size_mb": 3685.2362670898438,
-    "file_size": 3864250304,
-    "mod_time_ns": 1781070570000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\b4f4d36f-ac8b-4141-80f4-47a8e089685d\\z_image_turbo-Q4_K.gguf"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 8,
-      "cfg": 1,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SD1.5 7bf31271",
-    "path": "H:\\InvokeAI\\models\\7bf31271-ea16-4d04-9fff-dd9e748b64a2\\diffusion_pytorch_model.fp16.safetensors",
-    "type": "controlnet",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 689.1237659454346,
-    "file_size": 722598642,
-    "mod_time_ns": 1781068914000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\7bf31271-ea16-4d04-9fff-dd9e748b64a2\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "ip-adapter-plus_sdxl_vit-h",
-    "path": "H:\\InvokeAI\\models\\9f45ebb1-6185-4967-8ee6-8b4ea49238c5\\ip-adapter-plus_sdxl_vit-h.safetensors",
-    "type": "controlnet",
-    "family": "sdxl",
-    "format": "safetensors",
-    "size_mb": 808.2556838989258,
-    "file_size": 847517512,
-    "mod_time_ns": 1782024194000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\9f45ebb1-6185-4967-8ee6-8b4ea49238c5\\ip-adapter-plus_sdxl_vit-h.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "LFM2.5-8B-A1B-heretic.Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
-    "type": "llm",
-    "family": "lfm2moe",
-    "format": "gguf",
-    "size_mb": 4916.7303466796875,
-    "file_size": 5155565440,
-    "mod_time_ns": 1791658079577875300,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
-  },
-  {
-    "name": "Wan2.2-T2V-A14B-HighNoise-Q4_K_M",
-    "path": "H:\\InvokeAI\\models\\76664103-cb79-479a-b7f2-61fcbcf1b51c\\Wan2.2-T2V-A14B-HighNoise-Q4_K_M.gguf",
-    "type": "diffusion",
-    "family": "wan",
-    "format": "gguf",
-    "size_mb": 9203.04345703125,
-    "file_size": 9650090496,
-    "mod_time_ns": 1790355694000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\76664103-cb79-479a-b7f2-61fcbcf1b51c\\Wan2.2-T2V-A14B-HighNoise-Q4_K_M.gguf"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Text_Encoders",
-    "path": "H:\\InvokeAI\\models\\f4332aa3-70a3-42e0-bfb1-4ca0ceaba447\\Qwen_3_4b-Q6_K.gguf",
+    "name": "llama-q2_k",
+    "path": "G:\\AI GGUF\\Image models\\llama-q2_k.gguf",
     "type": "llm",
     "family": "",
     "format": "gguf",
-    "size_mb": 3153.095916748047,
-    "file_size": 3306260704,
-    "mod_time_ns": 1782050444000000000,
+    "size_mb": 3032.144561767578,
+    "file_size": 3179434016,
+    "mod_time_ns": 1790689209017459100,
+    "available": true,
     "files": {
-      "model": "H:\\InvokeAI\\models\\f4332aa3-70a3-42e0-bfb1-4ca0ceaba447\\Qwen_3_4b-Q6_K.gguf"
+      "model": "G:\\AI GGUF\\Image models\\llama-q2_k.gguf"
     },
     "recommended": {
       "sampler": "",
@@ -1693,271 +219,7 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "low_noise_model",
-    "path": "H:\\InvokeAI\\models\\5e41b9d2-5c12-4739-a2b6-67802a5e9610\\low_noise_model.safetensors",
-    "type": "lora",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 1170.1368560791016,
-    "file_size": 1226977424,
-    "mod_time_ns": 1790355894000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\5e41b9d2-5c12-4739-a2b6-67802a5e9610\\low_noise_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SD1.5 b281113b",
-    "path": "H:\\InvokeAI\\models\\b281113b-d895-4ca1-b644-dc5e30a99fb4",
-    "type": "diffusion",
-    "family": "sd1.5",
-    "format": "diffusers",
-    "size_mb": 2033.8378887176514,
-    "files": {
-      "clip_l": "H:\\InvokeAI\\models\\b281113b-d895-4ca1-b644-dc5e30a99fb4\\text_encoder\\model.fp16.safetensors",
-      "model": "H:\\InvokeAI\\models\\b281113b-d895-4ca1-b644-dc5e30a99fb4\\unet\\diffusion_pytorch_model.fp16.safetensors",
-      "vae": "H:\\InvokeAI\\models\\b281113b-d895-4ca1-b644-dc5e30a99fb4\\vae\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler_a",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "sd_xl_base_1.0.safetensors",
-    "path": "H:\\InvokeAI\\models\\808f1b54-cebd-4dca-89ee-7c124b8ee4f4\\perfect-eyes-xl.safetensors",
-    "type": "lora",
-    "family": "sdxl",
-    "format": "safetensors",
-    "size_mb": 217.87070846557617,
-    "file_size": 228453996,
-    "mod_time_ns": 1790193536000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\808f1b54-cebd-4dca-89ee-7c124b8ee4f4\\perfect-eyes-xl.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "anima-lllite-anytest-like-base-1r3-lr3e-4",
-    "path": "H:\\InvokeAI\\models\\e348d09f-4cb3-4167-acdc-db89aeb861fc\\anima-lllite-any-test-like-v2.safetensors",
-    "type": "embedding",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 15.64312744140625,
-    "file_size": 16403008,
-    "mod_time_ns": 1790352186000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\e348d09f-4cb3-4167-acdc-db89aeb861fc\\anima-lllite-any-test-like-v2.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "NewFantasyCore-XL",
-    "path": "G:\\AI GGUF\\Image models\\NewFantasyCore-SDXL.safetensors",
-    "type": "lora",
-    "family": "sdxl",
-    "format": "safetensors",
-    "size_mb": 217.88085556030273,
-    "file_size": 228464636,
-    "mod_time_ns": 1790351579827223300,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\NewFantasyCore-SDXL.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
-  },
-  {
-    "name": "flux_schnell_flux1-schnell-bnb_nf4",
-    "path": "H:\\InvokeAI\\models\\0fcf9fb4-5aaf-4cf2-94f9-8003bcb0315c\\flux_schnell_flux1-schnell-bnb_nf4.safetensors",
-    "type": "diffusion",
-    "family": "flux",
-    "format": "safetensors",
-    "size_mb": 6383.377334594727,
-    "file_size": 6693456272,
-    "mod_time_ns": 1782051254000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\0fcf9fb4-5aaf-4cf2-94f9-8003bcb0315c\\flux_schnell_flux1-schnell-bnb_nf4.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 4,
-      "cfg": 1,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SD1.5 ce4320f4",
-    "path": "H:\\InvokeAI\\models\\ce4320f4-c628-404f-a008-11df598fb4b0\\diffusion_pytorch_model.bin",
-    "type": "lora",
-    "family": "sd1.5",
-    "format": "bin",
-    "size_mb": 295.1546506881714,
-    "file_size": 309492083,
-    "mod_time_ns": 1780021924000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\ce4320f4-c628-404f-a008-11df598fb4b0\\diffusion_pytorch_model.bin"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "flux1-krea-dev-Q4_K_M",
-    "path": "H:\\InvokeAI\\models\\67ee0018-6c6d-4dfe-84c8-0542d7d9ac44\\flux1-krea-dev-Q4_K_M.gguf",
-    "type": "diffusion",
-    "family": "flux",
-    "format": "gguf",
-    "size_mb": 6610.696563720703,
-    "file_size": 6931817760,
-    "mod_time_ns": 1782051430000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\67ee0018-6c6d-4dfe-84c8-0542d7d9ac44\\flux1-krea-dev-Q4_K_M.gguf"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 4,
-      "cfg": 1,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "b2629c28",
-    "path": "H:\\InvokeAI\\models\\b2629c28-ab74-430b-8b65-9fb97a978252\\model.safetensors",
-    "type": "llm",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 3518.974937438965,
-    "file_size": 3689912664,
-    "mod_time_ns": 1782050086000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\b2629c28-ab74-430b-8b65-9fb97a978252\\model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "flux-2-klein-4b-fp8",
-    "path": "H:\\InvokeAI\\models\\f6b27000-ed82-421e-a028-a4d5d93079a3\\flux-2-klein-4b-fp8.safetensors",
-    "type": "diffusion",
-    "family": "flux",
-    "format": "safetensors",
-    "size_mb": 3882.0500564575195,
-    "file_size": 4070624520,
-    "mod_time_ns": 1783929924000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\f6b27000-ed82-421e-a028-a4d5d93079a3\\flux-2-klein-4b-fp8.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 4,
-      "cfg": 1,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SD1.5 100c910a",
-    "path": "H:\\InvokeAI\\models\\100c910a-4645-43f4-b0f9-25ac5c50a239\\diffusion_pytorch_model.fp16.safetensors",
-    "type": "controlnet",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 689.1237659454346,
-    "file_size": 722598642,
-    "mod_time_ns": 1781070036000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\100c910a-4645-43f4-b0f9-25ac5c50a239\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Z-Image-Turbo-Fun-Controlnet-Union-2.1-8steps",
-    "path": "H:\\InvokeAI\\models\\24e06d11-7ac2-4cd2-92d6-18a9106371af\\Z-Image-Turbo-Fun-Controlnet-Union-2.1-8steps.safetensors",
-    "type": "controlnet",
-    "family": "z_image",
-    "format": "safetensors",
-    "size_mb": 6401.525115966797,
-    "file_size": 6712485600,
-    "mod_time_ns": 1780022878000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\24e06d11-7ac2-4cd2-92d6-18a9106371af\\Z-Image-Turbo-Fun-Controlnet-Union-2.1-8steps.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
   },
   {
     "name": "Captain_Eris-Twighlight-12B.Q4_K_M",
@@ -1968,6 +230,7 @@
     "size_mb": 7130.821624755859,
     "file_size": 7477208416,
     "mod_time_ns": 1793027367055017000,
+    "available": true,
     "recommended": {
       "sampler": "",
       "scheduler": "",
@@ -1976,61 +239,27 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-10-31T15:12:53.2790902-05:00"
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Captain_BMO 12B",
+    "model_tags": [
+      "mergekit",
+      "merge"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
   },
   {
-    "name": "CyberRealistic_V4.1_FP16",
-    "path": "H:\\InvokeAI\\models\\f6aefd9d-2a0e-4e3e-9a3c-c754fcb5f3e1\\CyberRealistic_V4.1_FP16.safetensors",
-    "type": "diffusion",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 2033.8546390533447,
-    "file_size": 2132651162,
-    "mod_time_ns": 1781068728000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\f6aefd9d-2a0e-4e3e-9a3c-c754fcb5f3e1\\CyberRealistic_V4.1_FP16.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler_a",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Qwen-Image-Edit-2511_diffusion_pytorch_model",
-    "path": "H:\\InvokeAI\\models\\e20747da-6c16-40f0-b277-e31f0e0694a1\\Qwen-Image-Edit-2511_diffusion_pytorch_model.safetensors",
+    "name": "Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated-Q6_K",
+    "path": "G:\\AI GGUF\\GGUF\\Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated-Q6_K.gguf",
     "type": "llm",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 242.04918479919434,
-    "file_size": 253806966,
-    "mod_time_ns": 1780023414000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\e20747da-6c16-40f0-b277-e31f0e0694a1\\Qwen-Image-Edit-2511_diffusion_pytorch_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Rocinante-X-12B-v1-absolute-heresy.Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Rocinante-X-12B-v1-absolute-heresy.Q4_K_M.gguf",
-    "type": "llm",
-    "family": "llama",
+    "family": "qwen35",
     "format": "gguf",
-    "size_mb": 7130.821594238281,
-    "file_size": 7477208384,
-    "mod_time_ns": 1789862013741231600,
+    "size_mb": 7208.730621337891,
+    "file_size": 7558901920,
+    "mod_time_ns": 1793281873598143400,
+    "available": true,
     "recommended": {
       "sampler": "",
       "scheduler": "",
@@ -2039,191 +268,38 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "qwen35",
+    "model_name": "Huihui Qwythos 9B Claude Mythos 5 1M Abliterated MTP",
+    "model_tags": [
+      "qwen3.5",
+      "reasoning",
+      "uncensored",
+      "long-context",
+      "1M-context",
+      "function-calling",
+      "tool-use",
+      "sft",
+      "full-fine-tune",
+      "cybersecurity",
+      "biomedical",
+      "agentic",
+      "text-generation"
+    ],
+    "embedding_length": 4096,
+    "admission_version": 1
   },
   {
-    "name": "ee343d8d-8d99-4e86-8712-38fbfd6335f6",
-    "path": "H:\\InvokeAI\\models\\ee343d8d-8d99-4e86-8712-38fbfd6335f6",
-    "type": "diffusion",
-    "family": "sd1.5",
-    "format": "bundle",
-    "size_mb": 8464.54557800293,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\ee343d8d-8d99-4e86-8712-38fbfd6335f6\\model-00001-of-00002.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler_a",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "RealESRGAN_x2plus",
-    "path": "H:\\InvokeAI\\models\\58c5cb3d-dadb-40f2-bf58-f49332d8e707\\RealESRGAN_x2plus.pth",
-    "type": "upscaler",
-    "family": "",
-    "format": "pth",
-    "size_mb": 63.955044746398926,
-    "file_size": 67061725,
-    "mod_time_ns": 1780021894000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\58c5cb3d-dadb-40f2-bf58-f49332d8e707\\RealESRGAN_x2plus.pth"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SDXL f686038d",
-    "path": "H:\\InvokeAI\\models\\f686038d-9500-466d-9a16-72ac9e5838e9",
-    "type": "diffusion",
-    "family": "sdxl",
-    "format": "diffusers",
-    "size_mb": 5794.456747055054,
-    "files": {
-      "clip_g": "H:\\InvokeAI\\models\\f686038d-9500-466d-9a16-72ac9e5838e9\\text_encoder_2\\model.fp16.safetensors",
-      "model": "H:\\InvokeAI\\models\\f686038d-9500-466d-9a16-72ac9e5838e9\\unet\\diffusion_pytorch_model.fp16.safetensors",
-      "vae": "H:\\InvokeAI\\models\\f686038d-9500-466d-9a16-72ac9e5838e9\\vae\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "dpmpp_2m",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "sam-vit-huge SD1.5",
-    "path": "H:\\InvokeAI\\models\\.download_cache\\facebook_sam-vit-huge\\sam-vit-huge\\model.safetensors",
-    "type": "diffusion",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 2445.6332092285156,
-    "file_size": 2564432288,
-    "mod_time_ns": 1790194930000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\.download_cache\\facebook_sam-vit-huge\\sam-vit-huge\\model.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler_a",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "low_noise_model",
-    "path": "H:\\InvokeAI\\models\\83497ae6-0307-4591-8ff8-c5c30b1b1c6d\\low_noise_model.safetensors",
-    "type": "lora",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 1170.1368560791016,
-    "file_size": 1226977424,
-    "mod_time_ns": 1790356248000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\83497ae6-0307-4591-8ff8-c5c30b1b1c6d\\low_noise_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "427e7e88",
-    "path": "H:\\InvokeAI\\models\\427e7e88-a264-45ed-b7ee-e26a8f1bb663\\model.safetensors",
+    "name": "Qwen2.5-Omni-7B-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Qwen2.5-Omni-7B-Q4_K_M.gguf",
     "type": "llm",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 2411.2448196411133,
-    "file_size": 2528373448,
-    "mod_time_ns": 1781070732000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\427e7e88-a264-45ed-b7ee-e26a8f1bb663\\model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Deliberate_v5-inpainting",
-    "path": "H:\\InvokeAI\\models\\a2254dea-c6c2-417a-9c1b-7f9491a8fa34\\Deliberate_v5-inpainting.safetensors",
-    "type": "diffusion",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 2033.8819332122803,
-    "file_size": 2132679782,
-    "mod_time_ns": 1781069106000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\a2254dea-c6c2-417a-9c1b-7f9491a8fa34\\Deliberate_v5-inpainting.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler_a",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "face_xl_v0_1",
-    "path": "H:\\InvokeAI\\models\\3e0b92ef-7faf-40a6-b9b3-48b7dfa9cd9f\\face_xl_v0_1.safetensors",
-    "type": "lora",
-    "family": "sdxl",
-    "format": "safetensors",
-    "size_mb": 213.37053298950195,
-    "file_size": 223735220,
-    "mod_time_ns": 1790196522000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\3e0b92ef-7faf-40a6-b9b3-48b7dfa9cd9f\\face_xl_v0_1.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced",
-    "path": "G:\\AI GGUF\\GGUF\\GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced.gguf",
-    "type": "llm",
-    "family": "gpt-oss",
+    "family": "qwen2vl",
     "format": "gguf",
-    "size_mb": 11548.582702636719,
-    "file_size": 12109566656,
-    "mod_time_ns": 1790257071300863900,
+    "size_mb": 4466.126525878906,
+    "file_size": 4683073088,
+    "mod_time_ns": 1793633131433067300,
+    "available": true,
     "recommended": {
       "sampler": "",
       "scheduler": "",
@@ -2232,112 +308,40 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-10-31T15:12:53.2790902-05:00"
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "multimodal-chat",
+    "arch": "qwen2vl",
+    "model_name": "Qwen2.5-Omni-7B",
+    "model_tags": [
+      "multimodal",
+      "unsloth",
+      "any-to-any"
+    ],
+    "embedding_length": 3584,
+    "admission_version": 1
   },
   {
-    "name": "z_image_turbo-Q8_0",
-    "path": "H:\\InvokeAI\\models\\a5e1d3b3-5d81-4883-a435-149753fc0d10\\z_image_turbo-Q8_0.gguf",
+    "name": "flux1-schnell-Q4_K_M",
+    "path": "G:\\AI GGUF\\Image models\\flux1-schnell-Q4_K_M.gguf",
     "type": "diffusion",
-    "family": "z_image",
+    "family": "flux",
     "format": "gguf",
-    "size_mb": 6272.736267089844,
-    "file_size": 6577440704,
-    "mod_time_ns": 1782076014000000000,
+    "size_mb": 6591.172882080078,
+    "file_size": 6911345696,
+    "mod_time_ns": 1790353093963181600,
+    "available": true,
     "files": {
-      "model": "H:\\InvokeAI\\models\\a5e1d3b3-5d81-4883-a435-149753fc0d10\\z_image_turbo-Q8_0.gguf"
+      "model": "G:\\AI GGUF\\Image models\\flux1-schnell-Q4_K_M.gguf"
     },
     "recommended": {
       "sampler": "euler",
       "scheduler": "karras",
-      "steps": 8,
+      "steps": 4,
       "cfg": 1,
       "width": 1024,
       "height": 1024
     },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SDXL 3e826235",
-    "path": "H:\\InvokeAI\\models\\3e826235-5757-45bd-b718-fb3c207a4e83\\diffusion_pytorch_model.safetensors",
-    "type": "controlnet",
-    "family": "sdxl",
-    "format": "safetensors",
-    "size_mb": 2386.225799560547,
-    "file_size": 2502139104,
-    "mod_time_ns": 1782024328000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\3e826235-5757-45bd-b718-fb3c207a4e83\\diffusion_pytorch_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SDXL 98332c5b",
-    "path": "H:\\InvokeAI\\models\\98332c5b-2bb3-4ef0-888e-fd33b92f78a4",
-    "type": "diffusion",
-    "family": "sdxl",
-    "format": "diffusers",
-    "size_mb": 6616.603307723999,
-    "files": {
-      "clip_g": "H:\\InvokeAI\\models\\98332c5b-2bb3-4ef0-888e-fd33b92f78a4\\text_encoder_2\\model.fp16.safetensors",
-      "clip_l": "H:\\InvokeAI\\models\\98332c5b-2bb3-4ef0-888e-fd33b92f78a4\\text_encoder\\model.fp16.safetensors",
-      "model": "H:\\InvokeAI\\models\\98332c5b-2bb3-4ef0-888e-fd33b92f78a4\\unet\\diffusion_pytorch_model.fp16.safetensors",
-      "vae": "H:\\InvokeAI\\models\\98332c5b-2bb3-4ef0-888e-fd33b92f78a4\\vae\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "dpmpp_2m",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "c4ai-command-r7b-12-2024-abliterated-Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\c4ai-command-r7b-12-2024-abliterated-Q4_K_M.gguf",
-    "type": "llm",
-    "family": "cohere2",
-    "format": "gguf",
-    "size_mb": 4822.740875244141,
-    "file_size": 5057010336,
-    "mod_time_ns": 1791658348024289100,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-10-31T15:12:53.2790902-05:00"
-  },
-  {
-    "name": "TheDrummer_Rocinante-X-12B-v1-Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\TheDrummer_Rocinante-X-12B-v1-Q4_K_M.gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 7130.820953369141,
-    "file_size": 7477207712,
-    "mod_time_ns": 1789402055634232700,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
   },
   {
     "name": "taesdxl",
@@ -2348,6 +352,7 @@
     "size_mb": 9.339611053466797,
     "file_size": 9793292,
     "mod_time_ns": 1793484538334589500,
+    "available": true,
     "files": {
       "model": "G:\\AI GGUF\\Image models\\taesdxl.safetensors"
     },
@@ -2359,39 +364,18 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
   },
   {
-    "name": "Flux abd93e61",
-    "path": "H:\\InvokeAI\\models\\abd93e61-08ca-4b34-be3b-7309cbdb1b43\\diffusion_pytorch_model.safetensors",
-    "type": "controlnet",
-    "family": "flux",
-    "format": "safetensors",
-    "size_mb": 6298.021240234375,
-    "file_size": 6603953920,
-    "mod_time_ns": 1780022742000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\abd93e61-08ca-4b34-be3b-7309cbdb1b43\\diffusion_pytorch_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated-Q6_K",
-    "path": "G:\\AI GGUF\\GGUF\\Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated-Q6_K.gguf",
+    "name": "MN-12B-Mag-Mell-R1-KTO.Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\MN-12B-Mag-Mell-R1-KTO.Q4_K_M.gguf",
     "type": "llm",
-    "family": "qwen35",
+    "family": "llama",
     "format": "gguf",
-    "size_mb": 7208.730621337891,
-    "file_size": 7558901920,
-    "mod_time_ns": 1793281873598143400,
+    "size_mb": 7130.818267822266,
+    "file_size": 7477204896,
+    "mod_time_ns": 1788118111989223600,
+    "available": true,
     "recommended": {
       "sampler": "",
       "scheduler": "",
@@ -2400,29 +384,1080 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "MN 12B Mag Mell R1 KTO",
+    "model_tags": [
+      "llama-factory",
+      "full",
+      "generated_from_trainer"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
   },
   {
-    "name": "anima-base-v1.0",
-    "path": "H:\\InvokeAI\\models\\17f909a9-3853-4e01-9e59-517715f9666b\\anima-base-v1.0.safetensors",
+    "name": "z-image-turbo-Q4_K_M",
+    "path": "G:\\AI GGUF\\Image models\\z-image-turbo-Q4_K_M.gguf",
     "type": "diffusion",
-    "family": "anima",
-    "format": "safetensors",
-    "size_mb": 3988.47420501709,
-    "file_size": 4182218328,
-    "mod_time_ns": 1781070834000000000,
+    "family": "z_image",
+    "format": "gguf",
+    "size_mb": 4785.169006347656,
+    "file_size": 5017613376,
+    "mod_time_ns": 1790354564653771500,
+    "available": true,
     "files": {
-      "model": "H:\\InvokeAI\\models\\17f909a9-3853-4e01-9e59-517715f9666b\\anima-base-v1.0.safetensors"
+      "model": "G:\\AI GGUF\\Image models\\z-image-turbo-Q4_K_M.gguf"
     },
     "recommended": {
       "sampler": "euler",
       "scheduler": "karras",
-      "steps": 30,
-      "cfg": 6,
+      "steps": 8,
+      "cfg": 1,
       "width": 1024,
       "height": 1024
     },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+  },
+  {
+    "name": "unholyDesireMixSinister_v90",
+    "path": "G:\\AI GGUF\\Image models\\unholyDesireMixSinister_v90.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 6616.831590652466,
+    "file_size": 6938250802,
+    "mod_time_ns": 1790356750190121700,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\unholyDesireMixSinister_v90.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+  },
+  {
+    "name": "flux1-depth-dev-lora",
+    "path": "G:\\AI GGUF\\Image models\\flux1-depth-dev-lora.safetensors",
+    "type": "lora",
+    "family": "flux",
+    "format": "safetensors",
+    "size_mb": 1186.7909545898438,
+    "file_size": 1244440512,
+    "mod_time_ns": 1790352452618520000,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\flux1-depth-dev-lora.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+  },
+  {
+    "name": "ae",
+    "path": "G:\\AI GGUF\\Image models\\ae.safetensors",
+    "type": "vae",
+    "family": "flux",
+    "format": "safetensors",
+    "size_mb": 319.771183013916,
+    "file_size": 335304388,
+    "mod_time_ns": 1790355389251100100,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\ae.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+  },
+  {
+    "name": "Wayfarer-2-12B.i1-Q4_K_M(1)",
+    "path": "G:\\AI GGUF\\GGUF\\Wayfarer-2-12B.i1-Q4_K_M(1).gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.831848144531,
+    "file_size": 7477219136,
+    "mod_time_ns": 1790601761230475300,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Wayfarer 2 12B",
+    "model_tags": [
+      "text adventure",
+      "roleplay"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "NewFantasyCore-SDXL",
+    "path": "G:\\AI GGUF\\Image models\\NewFantasyCore-SDXL.safetensors",
+    "type": "lora",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 217.88085556030273,
+    "file_size": 228464636,
+    "mod_time_ns": 1790351579827223300,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\NewFantasyCore-SDXL.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+  },
+  {
+    "name": "Captain-Eris_Violet-V0.420-12B.Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Captain-Eris_Violet-V0.420-12B.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.821624755859,
+    "file_size": 7477208416,
+    "mod_time_ns": 1793026547050225400,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Captain_BMO 12B",
+    "model_tags": [
+      "mergekit",
+      "merge"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "mira-12b.Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\mira-12b.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "gemma4",
+    "format": "gguf",
+    "size_mb": 7039.436187744141,
+    "file_size": 7381383840,
+    "mod_time_ns": 1793031612637398300,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "gemma4",
+    "model_name": "Mira 12b",
+    "model_tags": [
+      "gemma4",
+      "conversational",
+      "thinking",
+      "chat",
+      "companion",
+      "text-generation"
+    ],
+    "embedding_length": 3840,
+    "admission_version": 1
+  },
+  {
+    "name": "OpenPose-ControlNet-SDXL-Thibaud-TEST",
+    "path": "G:\\AI GGUF\\Image models\\OpenPose-ControlNet-SDXL-Thibaud-TEST.safetensors",
+    "type": "controlnet",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 2386.225799560547,
+    "file_size": 2502139104,
+    "mod_time_ns": 1793496871101061600,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\OpenPose-ControlNet-SDXL-Thibaud-TEST.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+  },
+  {
+    "name": "Voxtral-Mini-3B-2507-Q4_K_M",
+    "path": "G:\\AI GGUF\\voice\\Voxtral-Mini-3B-2507-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 2358.4384155273438,
+    "file_size": 2473001920,
+    "mod_time_ns": 1793833075345011300,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:15.7583445-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_tags": [
+      "transformers",
+      "vllm",
+      "audio-text-to-text"
+    ],
+    "embedding_length": 3072,
+    "admission_version": 1
+  },
+  {
+    "name": "qwen_2.5_vl_7b_fp8_scaled",
+    "path": "G:\\AI GGUF\\Image models\\qwen_2.5_vl_7b_fp8_scaled.safetensors",
+    "type": "llm",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 8949.919395446777,
+    "file_size": 9384670680,
+    "mod_time_ns": 1793571520999555900,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\qwen_2.5_vl_7b_fp8_scaled.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+  },
+  {
+    "name": "Ultravox-Llama-3.2-1B-Q4_K_M",
+    "path": "G:\\AI GGUF\\voice\\Ultravox-Llama-3.2-1B-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 668.2265625,
+    "file_size": 700686336,
+    "mod_time_ns": 1793833224287786700,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:15.7583445-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Llama 3.2 1B Instruct",
+    "model_tags": [
+      "facebook",
+      "meta",
+      "pytorch",
+      "llama",
+      "llama-3",
+      "text-generation"
+    ],
+    "embedding_length": 2048,
+    "admission_version": 1
+  },
+  {
+    "name": "MN-12B-Mag-Mell-R1-Uncensored-Scale1.2.i1-Q4_K_S",
+    "path": "G:\\AI GGUF\\GGUF\\MN-12B-Mag-Mell-R1-Uncensored-Scale1.2.i1-Q4_K_S.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 6790.349578857422,
+    "file_size": 7120197600,
+    "mod_time_ns": 1790383801514712200,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Mistral Nemo Base 2407 Chatml",
+    "model_tags": [
+      "mergekit",
+      "merge"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "qwen35",
+    "format": "gguf",
+    "size_mb": 5366.3675537109375,
+    "file_size": 5627044224,
+    "mod_time_ns": 1788721954601494900,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "qwen35",
+    "model_name": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16",
+    "embedding_length": 4096,
+    "admission_version": 1
+  },
+  {
+    "name": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1)",
+    "path": "G:\\AI GGUF\\GGUF\\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
+    "type": "llm",
+    "family": "gemma4",
+    "format": "gguf",
+    "size_mb": 5088.124969482422,
+    "file_size": 5335285728,
+    "mod_time_ns": 1788573228448965700,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "gemma4",
+    "model_name": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive",
+    "embedding_length": 2560,
+    "admission_version": 1
+  },
+  {
+    "name": "ggml-base",
+    "path": "G:\\AI GGUF\\voice\\ggml-base.bin",
+    "type": "llm",
+    "family": "llm",
+    "format": "bin",
+    "size_mb": 141.09751224517822,
+    "file_size": 147951465,
+    "mod_time_ns": 1778482524294760300,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
+  },
+  {
+    "name": "qwen_3_4b",
+    "path": "G:\\AI GGUF\\Image models\\qwen_3_4b.safetensors",
+    "type": "llm",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 7672.292755126953,
+    "file_size": 8044982048,
+    "mod_time_ns": 1793563632814645200,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\qwen_3_4b.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+  },
+  {
+    "name": "MLSD-Controlnet-Lllite-v20-TEST",
+    "path": "G:\\AI GGUF\\Image models\\MLSD-Controlnet-Lllite-v20-TEST.safetensors",
+    "type": "controlnet",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 213.5340576171875,
+    "file_size": 223906688,
+    "mod_time_ns": 1793764268182277500,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\MLSD-Controlnet-Lllite-v20-TEST.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+  },
+  {
+    "name": "vocoder-LFM2.5-Audio-1.5B-Q4_0",
+    "path": "G:\\AI GGUF\\GGUF\\vocoder-LFM2.5-Audio-1.5B-Q4_0.gguf",
+    "type": "llm",
+    "family": "this model cannot be used as LLM, use it via --model-vocoder in TTS examples",
+    "format": "gguf",
+    "size_mb": 103.93768310546875,
+    "file_size": 108986560,
+    "mod_time_ns": 1793630579001605700,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-04T18:29:20.8969491-06:00"
+  },
+  {
+    "name": "LongWriter-glm4-9b-abliterated.IQ4_XS",
+    "path": "G:\\AI GGUF\\GGUF\\LongWriter-glm4-9b-abliterated.IQ4_XS.gguf",
+    "type": "llm",
+    "family": "chatglm",
+    "format": "gguf",
+    "size_mb": 5058.002593994141,
+    "file_size": 5303700128,
+    "mod_time_ns": 1791168252645207000,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "chatglm",
+    "model_name": "LongWriter Glm4 9b",
+    "model_tags": [
+      "llm",
+      "glm",
+      "glm4",
+      "chatglm",
+      "llama",
+      "chat",
+      "instruct",
+      "it",
+      "abliterated",
+      "longwriter",
+      "long context",
+      "text-generation"
+    ],
+    "embedding_length": 4096,
+    "admission_version": 1
+  },
+  {
+    "name": "clip_l",
+    "path": "G:\\AI GGUF\\Image models\\clip_l.safetensors",
+    "type": "clip_l",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 234.7413558959961,
+    "file_size": 246144152,
+    "mod_time_ns": 1793563394983474100,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\clip_l.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+  },
+  {
+    "name": "TheDrummer_Rocinante-X-12B-v1-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\TheDrummer_Rocinante-X-12B-v1-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.820953369141,
+    "file_size": 7477207712,
+    "mod_time_ns": 1789402055634232700,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Rocinante X 12B v1",
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "mmproj-gemma-4-E2B-it-Q8_0",
+    "path": "G:\\AI GGUF\\voice\\mmproj-gemma-4-E2B-it-Q8_0.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 531.547607421875,
+    "file_size": 557368064,
+    "mod_time_ns": 1793833983046751500,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
+  },
+  {
+    "name": "helcyon-grok-v3.0-Q4_K_M(1)",
+    "path": "G:\\AI GGUF\\GGUF\\helcyon-grok-v3.0-Q4_K_M(1).gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.816955566406,
+    "file_size": 7477203520,
+    "mod_time_ns": 1793029079268142600,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Helcyon Grok",
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "mmproj-Voxtral-Mini-3B-2507-Q8_0",
+    "path": "G:\\AI GGUF\\voice\\mmproj-Voxtral-Mini-3B-2507-Q8_0.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 682.5581359863281,
+    "file_size": 715714080,
+    "mod_time_ns": 1793833133345093000,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
+  },
+  {
+    "name": "LFM2.5-8B-A1B-heretic.Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "lfm2moe",
+    "format": "gguf",
+    "size_mb": 4916.7303466796875,
+    "file_size": 5155565440,
+    "mod_time_ns": 1791658079577875300,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "lfm2moe",
+    "model_name": "LFM2.5 8B A1B Heretic",
+    "model_tags": [
+      "liquid",
+      "lfm2.5",
+      "edge",
+      "heretic",
+      "uncensored",
+      "decensored",
+      "abliterated",
+      "ara",
+      "text-generation"
+    ],
+    "embedding_length": 2048,
+    "admission_version": 1
+  },
+  {
+    "name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced",
+    "path": "G:\\AI GGUF\\GGUF\\GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced.gguf",
+    "type": "llm",
+    "family": "gpt-oss",
+    "format": "gguf",
+    "size_mb": 11548.582702636719,
+    "file_size": 12109566656,
+    "mod_time_ns": 1790257071300863900,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "gpt-oss",
+    "model_name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced",
+    "embedding_length": 2880,
+    "admission_version": 1
+  },
+  {
+    "name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive",
+    "path": "G:\\AI GGUF\\GGUF\\GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive.gguf",
+    "type": "llm",
+    "family": "gpt-oss",
+    "format": "gguf",
+    "size_mb": 11548.581970214844,
+    "file_size": 12109565888,
+    "mod_time_ns": 1790257098978214900,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "gpt-oss",
+    "model_name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive",
+    "embedding_length": 2880,
+    "admission_version": 1
+  },
+  {
+    "name": "Moonlit-Mirage-12B-Heretic.i1-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Moonlit-Mirage-12B-Heretic.i1-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.8385009765625,
+    "file_size": 7477226112,
+    "mod_time_ns": 1793281554873858700,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Moonlit Mirage 12B Heretic",
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "Riverfish-Rocinante-12B-SFT-DPO.i1-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Riverfish-Rocinante-12B-SFT-DPO.i1-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.8189697265625,
+    "file_size": 7477205632,
+    "mod_time_ns": 1789861169204740000,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Riverfish Rocinante 12B SFT DPO",
+    "model_tags": [
+      "text-generation-inference",
+      "transformers",
+      "unsloth",
+      "mistral"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "Gemma-4-E2B-it-Q8_0",
+    "path": "G:\\AI GGUF\\voice\\Gemma-4-E2B-it-Q8_0.gguf",
+    "type": "llm",
+    "family": "gemma4",
+    "format": "gguf",
+    "size_mb": 3864.1328125,
+    "file_size": 4051836928,
+    "mod_time_ns": 1793833946560430800,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:15.7583445-06:00",
+    "admission": "chat",
+    "arch": "gemma4",
+    "model_name": "gemma-4-E2B-it",
+    "model_tags": [
+      "any-to-any"
+    ],
+    "embedding_length": 1536,
+    "admission_version": 1
+  },
+  {
+    "name": "Qwen3-ASR-0.6B-Q8_0",
+    "path": "G:\\AI GGUF\\voice\\Qwen3-ASR-0.6B-Q8_0.gguf",
+    "type": "llm",
+    "family": "qwen3vl",
+    "format": "gguf",
+    "size_mb": 767.4686889648438,
+    "file_size": 804749248,
+    "mod_time_ns": 1793833537460705800,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:15.7583445-06:00",
+    "admission": "multimodal-chat",
+    "arch": "qwen3vl",
+    "model_tags": [
+      "automatic-speech-recognition"
+    ],
+    "embedding_length": 1024,
+    "admission_version": 1
+  },
+  {
+    "name": "mmproj-Qwen3-ASR-0.6B-Q8_0",
+    "path": "G:\\AI GGUF\\voice\\mmproj-Qwen3-ASR-0.6B-Q8_0.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 204.46060180664062,
+    "file_size": 214392480,
+    "mod_time_ns": 1793833559688767000,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
+  },
+  {
+    "name": "Qwen3-ASR-1.7B-Q8_0",
+    "path": "G:\\AI GGUF\\voice\\Qwen3-ASR-1.7B-Q8_0.gguf",
+    "type": "llm",
+    "family": "qwen3vl",
+    "format": "gguf",
+    "size_mb": 2064.7382202148438,
+    "file_size": 2165034944,
+    "mod_time_ns": 1793831921531991400,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:15.7583445-06:00",
+    "admission": "multimodal-chat",
+    "arch": "qwen3vl",
+    "model_tags": [
+      "automatic-speech-recognition"
+    ],
+    "embedding_length": 2048,
+    "admission_version": 1
+  },
+  {
+    "name": "krea2_turbo-Q4_K_M",
+    "path": "G:\\AI GGUF\\Image models\\krea2_turbo-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "qwen_image",
+    "format": "gguf",
+    "size_mb": 7139.481719970703,
+    "file_size": 7486289184,
+    "mod_time_ns": 1790354050137384600,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\krea2_turbo-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 2.5,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+  },
+  {
+    "name": "Qwen3.8-27B-Uncensored-HauhauCS-Aggressive-IQ2_M",
+    "path": "G:\\AI GGUF\\GGUF\\Qwen3.8-27B-Uncensored-HauhauCS-Aggressive-IQ2_M.gguf",
+    "type": "llm",
+    "family": "qwen35",
+    "format": "gguf",
+    "size_mb": 9841.830200195312,
+    "file_size": 10319906944,
+    "mod_time_ns": 1788765321152838100,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "qwen35",
+    "model_name": "Qwen3.8-27B-Uncensored-HauhauCS-Aggressive",
+    "model_tags": [
+      "uncensored",
+      "qwen3.8",
+      "gguf",
+      "multimodal",
+      "vision",
+      "mtp"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "qwen3vl",
+    "format": "gguf",
+    "size_mb": 4794.869232177734,
+    "file_size": 5027784800,
+    "mod_time_ns": 1788764915781506900,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "multimodal-chat",
+    "arch": "qwen3vl",
+    "model_name": "Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M",
+    "embedding_length": 4096,
+    "admission_version": 1
+  },
+  {
+    "name": "Qwen2.5-Omni-3B-mmproj-Q8_0",
+    "path": "G:\\AI GGUF\\voice\\Qwen2.5-Omni-3B-mmproj-Q8_0.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 1281.46484375,
+    "file_size": 1343713280,
+    "mod_time_ns": 1793833650404861000,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
+  },
+  {
+    "name": "c4ai-command-r7b-12-2024-abliterated-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\c4ai-command-r7b-12-2024-abliterated-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "cohere2",
+    "format": "gguf",
+    "size_mb": 4822.740875244141,
+    "file_size": 5057010336,
+    "mod_time_ns": 1791658348024289100,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "cohere2",
+    "model_name": "C4Ai Command R7B 12 2024",
+    "model_tags": [
+      "abliterated",
+      "uncensored"
+    ],
+    "embedding_length": 4096,
+    "admission_version": 1
+  },
+  {
+    "name": "Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "gemma4",
+    "format": "gguf",
+    "size_mb": 7039.4342041015625,
+    "file_size": 7381381760,
+    "mod_time_ns": 1788651487224645600,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "gemma4",
+    "model_name": "Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced",
+    "embedding_length": 3840,
+    "admission_version": 1
+  },
+  {
+    "name": "patricide-12B-Unslop-Mell.Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\patricide-12B-Unslop-Mell.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.817962646484,
+    "file_size": 7477204576,
+    "mod_time_ns": 1789434959039214100,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "UnslopNemo 12B v4.1",
+    "model_tags": [
+      "mergekit",
+      "merge",
+      "12b",
+      "chat",
+      "roleplay",
+      "creative-writing"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
   },
   {
     "name": "HiDream-I1-Full-text_encoder_4-FP8",
@@ -2433,6 +1468,7 @@
     "size_mb": 8159.602470397949,
     "file_size": 8555963320,
     "mod_time_ns": 1790690390847226100,
+    "available": true,
     "files": {
       "model": "G:\\AI GGUF\\Image models\\HiDream-I1-Full-text_encoder_4-FP8.pt"
     },
@@ -2444,39 +1480,18 @@
       "width": 512,
       "height": 512
     },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
   },
   {
-    "name": "SD1.5 c0238b8e",
-    "path": "H:\\InvokeAI\\models\\c0238b8e-ca25-4f1e-ab95-21ccc929cea3\\diffusion_pytorch_model.bin",
-    "type": "diffusion",
-    "family": "sd1.5",
-    "format": "bin",
-    "size_mb": 1378.3027420043945,
-    "file_size": 1445255176,
-    "mod_time_ns": 1781069776000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\c0238b8e-ca25-4f1e-ab95-21ccc929cea3\\diffusion_pytorch_model.bin"
-    },
-    "recommended": {
-      "sampler": "euler_a",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Riverfish-Rocinante-12B-SFT-DPO.i1-Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Riverfish-Rocinante-12B-SFT-DPO.i1-Q4_K_M.gguf",
+    "name": "mmproj-Ultravox-v0_5-llama-3_2-1b-f16",
+    "path": "G:\\AI GGUF\\voice\\mmproj-Ultravox-v0_5-llama-3_2-1b-f16.gguf",
     "type": "llm",
-    "family": "llama",
+    "family": "clip",
     "format": "gguf",
-    "size_mb": 7130.8189697265625,
-    "file_size": 7477205632,
-    "mod_time_ns": 1789861169204740000,
+    "size_mb": 1184.19140625,
+    "file_size": 1241714688,
+    "mod_time_ns": 1793833314936662100,
+    "available": true,
     "recommended": {
       "sampler": "",
       "scheduler": "",
@@ -2485,358 +1500,21 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
+    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
   },
   {
-    "name": "SD1.5 cafa7726",
-    "path": "H:\\InvokeAI\\models\\cafa7726-24dd-4f54-b2a0-07970daab832\\diffusion_pytorch_model.bin",
-    "type": "lora",
-    "family": "sd1.5",
-    "format": "bin",
-    "size_mb": 293.7484006881714,
-    "file_size": 308017523,
-    "mod_time_ns": 1780022122000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\cafa7726-24dd-4f54-b2a0-07970daab832\\diffusion_pytorch_model.bin"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16",
-    "path": "H:\\InvokeAI\\models\\784c8acf-837e-4155-b057-89c460c9db6e\\Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
-    "type": "llm",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 810.2496109008789,
-    "file_size": 849608296,
-    "mod_time_ns": 1782078630000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\784c8acf-837e-4155-b057-89c460c9db6e\\Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "big-lama",
-    "path": "H:\\InvokeAI\\models\\.download_cache\\https__github.com_sanster_models_releases_download_add_big_lama_big-lama.pt\\big-lama.pt",
-    "type": "lora",
-    "family": "sd1.5",
-    "format": "pt",
-    "size_mb": 196.14190292358398,
-    "file_size": 205669692,
-    "mod_time_ns": 1790189312000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\.download_cache\\https__github.com_sanster_models_releases_download_add_big_lama_big-lama.pt\\big-lama.pt"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "6dfe9131",
-    "path": "H:\\InvokeAI\\models\\6dfe9131-c2e7-4e6d-8883-1f378e45a103\\model.safetensors",
-    "type": "llm",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 3349.257110595703,
-    "file_size": 3511950624,
-    "mod_time_ns": 1780022610000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\6dfe9131-c2e7-4e6d-8883-1f378e45a103\\model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "controlnet_openpose_sdxl_thibaud_fp16",
-    "path": "G:\\AI GGUF\\Image models\\controlnet_openpose_sdxl_thibaud_fp16.safetensors",
-    "type": "controlnet",
-    "family": "sdxl",
-    "format": "safetensors",
-    "size_mb": 2386.225799560547,
-    "file_size": 2502139104,
-    "mod_time_ns": 1793496871101061600,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\controlnet_openpose_sdxl_thibaud_fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:27.0199219-06:00"
-  },
-  {
-    "name": "Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced-Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf",
-    "type": "llm",
-    "family": "gemma4",
-    "format": "gguf",
-    "size_mb": 7039.4342041015625,
-    "file_size": 7381381760,
-    "mod_time_ns": 1788651487224645600,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-10-31T15:12:53.2790902-05:00"
-  },
-  {
-    "name": "Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf",
-    "type": "llm",
-    "family": "qwen3vl",
-    "format": "gguf",
-    "size_mb": 4794.869232177734,
-    "file_size": 5027784800,
-    "mod_time_ns": 1788764915781506900,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
-  },
-  {
-    "name": "SD1.5 d3b71e2f",
-    "path": "H:\\InvokeAI\\models\\d3b71e2f-1729-4499-8e5b-4bfa534b8d0f\\diffusion_pytorch_model.fp16.safetensors",
-    "type": "controlnet",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 689.1237659454346,
-    "file_size": 722598642,
-    "mod_time_ns": 1781069720000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\d3b71e2f-1729-4499-8e5b-4bfa534b8d0f\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SD1.5 061462d6",
-    "path": "H:\\InvokeAI\\models\\061462d6-1a08-414b-9861-c88a47ba2830",
-    "type": "diffusion",
-    "family": "sd1.5",
-    "format": "diffusers",
-    "size_mb": 2033.8104228973389,
-    "files": {
-      "clip_l": "H:\\InvokeAI\\models\\061462d6-1a08-414b-9861-c88a47ba2830\\text_encoder\\model.fp16.safetensors",
-      "model": "H:\\InvokeAI\\models\\061462d6-1a08-414b-9861-c88a47ba2830\\unet\\diffusion_pytorch_model.fp16.safetensors",
-      "vae": "H:\\InvokeAI\\models\\061462d6-1a08-414b-9861-c88a47ba2830\\vae\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "euler_a",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 512,
-      "height": 512
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "CyberRealistic_Negative_v3",
-    "path": "H:\\InvokeAI\\models\\450a1ec8-a8c5-4f3d-a781-1a5745835099\\CyberRealistic_Negative_v3.pt",
-    "type": "embedding",
-    "family": "",
-    "format": "pt",
-    "size_mb": 0.053745269775390625,
-    "file_size": 56356,
-    "mod_time_ns": 1781067986000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\450a1ec8-a8c5-4f3d-a781-1a5745835099\\CyberRealistic_Negative_v3.pt"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SDXL 4539fc37",
-    "path": "H:\\InvokeAI\\models\\4539fc37-98c8-4a9e-8bd6-4a3299bf1c85",
-    "type": "diffusion",
-    "family": "sdxl",
-    "format": "diffusers",
-    "size_mb": 6616.603307723999,
-    "files": {
-      "clip_g": "H:\\InvokeAI\\models\\4539fc37-98c8-4a9e-8bd6-4a3299bf1c85\\text_encoder_2\\model.fp16.safetensors",
-      "clip_l": "H:\\InvokeAI\\models\\4539fc37-98c8-4a9e-8bd6-4a3299bf1c85\\text_encoder\\model.fp16.safetensors",
-      "model": "H:\\InvokeAI\\models\\4539fc37-98c8-4a9e-8bd6-4a3299bf1c85\\unet\\diffusion_pytorch_model.fp16.safetensors",
-      "vae": "H:\\InvokeAI\\models\\4539fc37-98c8-4a9e-8bd6-4a3299bf1c85\\vae\\diffusion_pytorch_model.fp16.safetensors"
-    },
-    "recommended": {
-      "sampler": "dpmpp_2m",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
-    "type": "llm",
-    "family": "qwen35",
-    "format": "gguf",
-    "size_mb": 5366.3675537109375,
-    "file_size": 5627044224,
-    "mod_time_ns": 1788721954601494900,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
-  },
-  {
-    "name": "grounding-dino-base SD1.5",
-    "path": "H:\\InvokeAI\\models\\.download_cache\\idea-research_grounding-dino-base\\grounding-dino-base\\model.safetensors",
+    "name": "qwen_image_vae",
+    "path": "G:\\AI GGUF\\Image models\\qwen_image_vae.safetensors",
     "type": "vae",
-    "family": "sd1.5",
-    "format": "safetensors",
-    "size_mb": 890.1604385375977,
-    "file_size": 933400872,
-    "mod_time_ns": 1790195242000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\.download_cache\\idea-research_grounding-dino-base\\grounding-dino-base\\model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "SDXL 7decb14d",
-    "path": "H:\\InvokeAI\\models\\7decb14d-59e8-4434-b2d3-2e23022ecdf1\\diffusion_pytorch_model.safetensors",
-    "type": "controlnet",
-    "family": "sdxl",
-    "format": "safetensors",
-    "size_mb": 2386.225799560547,
-    "file_size": 2502139104,
-    "mod_time_ns": 1782050718000000000,
-    "files": {
-      "model": "H:\\InvokeAI\\models\\7decb14d-59e8-4434-b2d3-2e23022ecdf1\\diffusion_pytorch_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "Moonlit-Mirage-12B-Heretic.i1-Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Moonlit-Mirage-12B-Heretic.i1-Q4_K_M.gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 7130.8385009765625,
-    "file_size": 7477226112,
-    "mod_time_ns": 1793281554873858700,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-01T15:25:54.0595825-06:00"
-  },
-  {
-    "name": "krea2_turbo-Q4_K_M",
-    "path": "H:\\InvokeAI\\models\\93c2615a-7a1a-4dd7-ba35-463589b87972\\krea2_turbo-Q4_K_M.gguf",
-    "type": "diffusion",
     "family": "qwen_image",
-    "format": "gguf",
-    "size_mb": 7139.481719970703,
-    "file_size": 7486289184,
-    "mod_time_ns": 1790354152000000000,
+    "format": "safetensors",
+    "size_mb": 242.04849815368652,
+    "file_size": 253806246,
+    "mod_time_ns": 1793563398936267500,
+    "available": true,
     "files": {
-      "model": "H:\\InvokeAI\\models\\93c2615a-7a1a-4dd7-ba35-463589b87972\\krea2_turbo-Q4_K_M.gguf"
+      "model": "G:\\AI GGUF\\Image models\\qwen_image_vae.safetensors"
     },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 2.5,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-01T20:21:29.6008942-06:00"
-  },
-  {
-    "name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive",
-    "path": "G:\\AI GGUF\\GGUF\\GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive.gguf",
-    "type": "llm",
-    "family": "gpt-oss",
-    "format": "gguf",
-    "size_mb": 11548.581970214844,
-    "file_size": 12109565888,
-    "mod_time_ns": 1790257098978214900,
     "recommended": {
       "sampler": "",
       "scheduler": "",
@@ -2845,6 +1523,26 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-10-31T15:12:53.2790902-05:00"
+    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+  },
+  {
+    "name": "mmproj-Qwen3-ASR-1.7B-Q8_0",
+    "path": "G:\\AI GGUF\\voice\\mmproj-Qwen3-ASR-1.7B-Q8_0.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 339.2308654785156,
+    "file_size": 355709344,
+    "mod_time_ns": 1793831954417521800,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
   }
 ]

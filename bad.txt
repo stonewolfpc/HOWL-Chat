@@ -1,0 +1,1 @@
+ISOLATION-ERROR HOWL_WEBVIEW_DATA_DIR must be outside the project tree: "C:\\Users\\StoneWolfPC\\HOWL_Chat\\build\\tmp\\probe-root" overlaps "C:\\Users\\StoneWolfPC\\HOWL_Chat"

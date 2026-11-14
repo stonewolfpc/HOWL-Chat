@@ -2,6 +2,7 @@ package melotts
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/url"
@@ -190,6 +191,101 @@ func TestMeloTTSStreamHoldsCallLockThroughRead(t *testing.T) {
 		}
 	case <-time.After(2 * time.Second):
 		t.Fatal("second synthesis did not finish")
+	}
+}
+
+type recordedMeloRequest struct {
+	path string
+	body map[string]any
+}
+
+type meloRecordingTransport struct {
+	mu       sync.Mutex
+	requests []recordedMeloRequest
+	fallback bool
+}
+
+func (r *meloRecordingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	var body map[string]any
+	_ = json.NewDecoder(req.Body).Decode(&body)
+	r.mu.Lock()
+	r.requests = append(r.requests, recordedMeloRequest{path: req.URL.Path, body: body})
+	r.mu.Unlock()
+
+	if r.fallback && strings.HasSuffix(req.URL.Path, "/synthesize") {
+		return &http.Response{
+			StatusCode: http.StatusNotFound,
+			Status:     "404 Not Found",
+			Header:     make(http.Header),
+			Body:       io.NopCloser(strings.NewReader("")),
+			Request:    req,
+		}, nil
+	}
+
+	wav := make([]byte, 64)
+	copy(wav[0:4], "RIFF")
+	copy(wav[8:12], "WAVE")
+	return &http.Response{
+		StatusCode: http.StatusOK,
+		Status:     "200 OK",
+		Header:     http.Header{"Content-Type": []string{"audio/wav"}},
+		Body:       io.NopCloser(strings.NewReader(string(wav))),
+		Request:    req,
+	}, nil
+}
+
+func TestMeloTTSLegacyPayloadSendsSpeedWithoutLengthScale(t *testing.T) {
+	c := meloUnitClient(t)
+	transport := &meloRecordingTransport{}
+	c.httpClient = &http.Client{Transport: transport}
+
+	if _, err := c.Synthesize(context.Background(), types.SynthesisRequest{Text: "hello", Speed: 1.25}, nil); err != nil {
+		t.Fatalf("Synthesize: %v", err)
+	}
+	if len(transport.requests) != 1 {
+		t.Fatalf("requests = %d, want 1 legacy request", len(transport.requests))
+	}
+	req := transport.requests[0]
+	if !strings.HasSuffix(req.path, "/synthesize") {
+		t.Fatalf("path = %q, want /synthesize", req.path)
+	}
+	if got := req.body["speed"]; got != 1.25 {
+		t.Fatalf("legacy speed = %v, want 1.25", got)
+	}
+	if _, ok := req.body["length_scale"]; ok {
+		t.Fatal("legacy /synthesize payload still contains length_scale")
+	}
+}
+
+func TestMeloTTSOpenAIPayloadIsUnchanged(t *testing.T) {
+	c := meloUnitClient(t)
+	c.SetInitialized(types.TTSConfig{ModelName: "configured-model", CacheDir: t.TempDir()})
+	transport := &meloRecordingTransport{fallback: true}
+	c.httpClient = &http.Client{Transport: transport}
+
+	if _, err := c.Synthesize(context.Background(), types.SynthesisRequest{Text: "hello", Speed: 1.25}, nil); err != nil {
+		t.Fatalf("Synthesize: %v", err)
+	}
+	if len(transport.requests) != 2 {
+		t.Fatalf("requests = %d, want legacy probe plus OpenAI request", len(transport.requests))
+	}
+	req := transport.requests[1]
+	if !strings.HasSuffix(req.path, "/v1/audio/speech") {
+		t.Fatalf("path = %q, want /v1/audio/speech", req.path)
+	}
+	if _, ok := req.body["length_scale"]; ok {
+		t.Fatal("OpenAI-compatible payload unexpectedly contains length_scale")
+	}
+	for _, key := range []string{"model", "input", "voice", "response_format", "speed"} {
+		if _, ok := req.body[key]; !ok {
+			t.Fatalf("OpenAI-compatible payload missing %q: %#v", key, req.body)
+		}
+	}
+	if got := req.body["speed"]; got != 1.25 {
+		t.Fatalf("OpenAI-compatible speed = %v, want 1.25", got)
+	}
+	if got := req.body["model"]; got != "configured-model" {
+		t.Fatalf("OpenAI-compatible model = %v, want configured-model", got)
 	}
 }
 

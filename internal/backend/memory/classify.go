@@ -19,13 +19,13 @@ import (
 )
 
 // ClassifyAndBuildCandidate converts a detection result into a reviewable candidate
-func ClassifyAndBuildCandidate(result types.EventDetectionResult, sourceMessage string, characterNames []string, chatID string) types.MemoryCandidate {
+func ClassifyAndBuildCandidate(result types.EventDetectionResult, sourceMessage string, identities []CharacterIdentity, chatID string) types.MemoryCandidate {
 	scope := inferScope(result.EventType)
-	ownerID := inferOwner(result, characterNames, chatID)
+	ownerID, ownerKind := inferOwner(result, identities, chatID)
 	title := generateTitle(result)
 	summary := generateSummary(result)
 	content := buildContent(result, sourceMessage)
-	tags := generateTags(result, characterNames)
+	tags := generateTags(result, identities)
 
 	return types.MemoryCandidate{
 		ID:            types.NewMemoryID(),
@@ -36,6 +36,7 @@ func ClassifyAndBuildCandidate(result types.EventDetectionResult, sourceMessage 
 		SourceMessage: sourceMessage,
 		Scope:         scope,
 		OwnerID:       ownerID,
+		OwnerKind:     ownerKind,
 		Tags:          tags,
 		Confidence:    result.Confidence,
 		Status:        "pending",
@@ -64,21 +65,34 @@ func inferScope(eventType types.EventType) string {
 	}
 }
 
-// inferOwner determines which entity owns this memory
-func inferOwner(result types.EventDetectionResult, characterNames []string, chatID string) string {
-	// Try to find a character name in evidence or context
+// inferOwner determines which entity owns this memory. A display name may match
+// a character, but ownership is always the stable ID. If a name matches more
+// than one identity (duplicates, or several characters mentioned), the memory is
+// chat-owned rather than guessed.
+func inferOwner(result types.EventDetectionResult, identities []CharacterIdentity, chatID string) (string, string) {
 	lowerContext := strings.ToLower(result.Context)
-	for _, name := range characterNames {
+	matches := map[string]bool{}
+	for _, identity := range identities {
+		id := strings.TrimSpace(identity.ID)
+		name := strings.TrimSpace(identity.Name)
+		if id == "" || name == "" {
+			continue
+		}
 		if strings.Contains(lowerContext, strings.ToLower(name)) {
-			return name
+			matches[id] = true
+		}
+	}
+	if len(matches) == 1 {
+		for id := range matches {
+			return id, types.OwnerKindCharacterID
 		}
 	}
 
-	// Default to chat session for unowned events
+	// Default to chat session for unowned or ambiguous events.
 	if chatID != "" {
-		return chatID
+		return chatID, types.OwnerKindChat
 	}
-	return "default"
+	return "default", types.OwnerKindChat
 }
 
 // generateTitle creates a human-readable title from event type and evidence
@@ -155,13 +169,14 @@ func buildContent(result types.EventDetectionResult, sourceMessage string) strin
 }
 
 // generateTags creates relevant tags from event type and character names
-func generateTags(result types.EventDetectionResult, characterNames []string) []string {
+func generateTags(result types.EventDetectionResult, identities []CharacterIdentity) []string {
 	tags := []string{string(result.EventType), "auto-captured"}
 
-	// Add character name tags if found in context
+	// Names are descriptive tags only; ownership uses the stable ID.
 	lowerContext := strings.ToLower(result.Context)
-	for _, name := range characterNames {
-		if strings.Contains(lowerContext, strings.ToLower(name)) {
+	for _, identity := range identities {
+		name := strings.TrimSpace(identity.Name)
+		if name != "" && strings.Contains(lowerContext, strings.ToLower(name)) {
 			tag := strings.ToLower(strings.ReplaceAll(name, " ", "-"))
 			tags = append(tags, tag)
 		}
@@ -216,13 +231,13 @@ func MergeRelatedEvents(results []types.EventDetectionResult) []types.EventDetec
 }
 
 // BatchClassify runs full pipeline: detect -> dedup -> merge -> build candidates
-func BatchClassify(results []types.EventDetectionResult, sourceMessage string, characterNames []string, chatID string) []types.MemoryCandidate {
+func BatchClassify(results []types.EventDetectionResult, sourceMessage string, identities []CharacterIdentity, chatID string) []types.MemoryCandidate {
 	results = DeduplicateResults(results)
 	results = MergeRelatedEvents(results)
 
 	var candidates []types.MemoryCandidate
 	for _, r := range results {
-		candidates = append(candidates, ClassifyAndBuildCandidate(r, sourceMessage, characterNames, chatID))
+		candidates = append(candidates, ClassifyAndBuildCandidate(r, sourceMessage, identities, chatID))
 	}
 	return candidates
 }

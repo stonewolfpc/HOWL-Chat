@@ -21,6 +21,7 @@ let selectedLorebooks   = [];
 let currentEditingId    = null;
 let currentEditingIndex = -1;
 let characterCache      = null;
+let dirtyFields         = new Set();
 
 // ---------------------------------------------------------------------------
 // Format Utility
@@ -71,6 +72,18 @@ function resolveLorebooksFromRefs(refs) {
 // ID Migration
 // ---------------------------------------------------------------------------
 
+function markCharacterFieldDirty(id) {
+    if (id) dirtyFields.add(id);
+}
+
+function isCharacterFieldDirty(id) {
+    return dirtyFields.has(id);
+}
+
+function resetCharacterDirtyFields() {
+    dirtyFields = new Set();
+}
+
 function migrateCharactersWithIds(characters) {
     let needsUpdate = false;
     const migrated  = characters.map((c, i) => {
@@ -103,6 +116,9 @@ window.characterState = {
     set currentEditingIndex(v){ currentEditingIndex = v; },
     get characterCache()      { return characterCache; },
     set characterCache(v)     { characterCache = v; },
+    markFieldDirty: markCharacterFieldDirty,
+    isFieldDirty: isCharacterFieldDirty,
+    resetDirtyFields: resetCharacterDirtyFields,
     formatFileSize,
     lorebookDisplayName,
     lorebookKey,

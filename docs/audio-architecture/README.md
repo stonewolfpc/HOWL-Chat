@@ -153,6 +153,9 @@ internal/audio/
 │   ├── model_profiles.go     # Model metadata & registry
 │   └── utils.go              # Audio format utilities
 │
+├── capability/               # Task-based capability contract (T2.9.5B)
+│   └── capability.go         # Records, dimensions, verified selection
+│
 ├── asr/                      # Speech-to-text (Stage 2)
 │   ├── interface.go          # ASR recognizer interface
 │   ├── whisper/              # Whisper.cpp integration
@@ -190,13 +193,23 @@ internal/audio/
 
 ### ASR Models
 
-| Model | Size | Languages | Speed | Quality | Tier |
-|-------|------|-----------|-------|---------|------|
-| Whisper Tiny | 39MB | 10 | 0.3x RT | ★★★ | Tiny |
-| Whisper Base | 74MB | 12 | 0.5x RT | ★★★★ | Small |
-| Whisper Small | 244MB | 15 | 1.0x RT | ★★★★★ | Medium |
-| Qwen3-ASR 0.6B | 600MB | 10 | 0.8x RT | ★★★★ | Small |
-| Qwen3-ASR 1.7B | 1.7GB | 18 | 1.2x RT | ★★★★★ | Medium |
+Availability is per task and per provider, not inferred from a file name. Streaming is false for every entry because every adapter returns
+"not supported" from `TranscribeStream`.
+
+| Model | Runtime | Location | Languages | Quality | Tier | Verification |
+|-------|---------|----------|-----------|---------|------|--------------|
+| Whisper Tiny | whisper-cli | local | 10 | ★★★ | Tiny | implementation |
+| Whisper Base | whisper-cli | local | 12 | ★★★★ | Small | implementation |
+| Whisper Small | whisper-cli | local | 15 | ★★★★★ | Small | implementation |
+| Qwen3-ASR 0.6B | DashScope API | remote | 10 | ★★★★ | Small | unverified |
+| Qwen3-ASR 1.7B | DashScope API | remote | 18 | ★★★★★ | Medium | unverified |
+| Qwen3-ASR 1.7B (local GGUF) | llama-server | local | 18 | ★★★★★ | Medium | end_to_end — file transcription adapter; streaming unsupported |
+
+The machine-readable source of this table is the capability contract in `internal/audio/capability`. It is what `GetAudioStatus` reports and
+what the settings UI renders, so the UI, the resolver and the pipeline read one declaration. The local GGUF entry is admitted only when the
+model and its matching projector resolve and the bundled llama-server exposes the audio route; it transcribes files but does not stream.
+The T2.9.5B Tranche A implementation record, including the E4 gate and application adapter, is
+`docs/audio-architecture/t2.9.5b-tranche-a-implementation.md`.
 
 ### TTS Models
 
@@ -420,6 +433,13 @@ config := types.PipelineConfig{
 - [ ] Multimodal integration (Stage 4)
 - [ ] Real-time streaming (Stage 5)
 - [ ] WebRTC bridge (Stage 5)
+
+### Deferred 📝
+
+- [ ] Model dependency discovery, curated model collection and transparent
+      connectivity — requirements recorded in
+      [`../deferred-model-ecosystem.md`](../deferred-model-ecosystem.md). Deferred;
+      no audio-stage dependency and no change to the stages above.
 
 ---
 

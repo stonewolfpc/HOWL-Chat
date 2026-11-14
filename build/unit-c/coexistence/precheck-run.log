@@ -1,0 +1,194 @@
+﻿12:41:56.451  PHASE=precheck ISOLATED_ROOT=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun PROFILE=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\profile
+12:41:56.972  RENDER_VOLUME_BEFORE=VOLUME=58%
+12:41:57.054  APP_PID=15616
+12:41:57.874  EXCEPTION howl-chat-unit-c window not found
+12:41:57.878  STACK at Uia, C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1: line 23
+at WaitWindow, C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1: line 132
+at Launch, C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1: line 226
+at <ScriptBlock>, C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1: line 278
+12:41:57.917  CLOSE_REQUEST pid=15616 main=6096348
+12:41:57.982  EXITED code=
+12:42:01.015  LEFTOVER=0
+12:42:22.701  PHASE=precheck ISOLATED_ROOT=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun PROFILE=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\profile
+12:42:23.247  RENDER_VOLUME_BEFORE=VOLUME=58%
+12:42:23.326  APP_PID=25876
+12:42:26.198  WINDOW_READY WINDOW rect=580,270,1400,900 handle=13502032 pid=25876 title=HOWL Chat
+12:42:27.951  SERVERS[startup] count=
+12:42:27.958    pid=7632 port=58558 mmproj=G:\AI
+12:42:27.976  EXCEPTION ASR server not found at startup
+12:42:27.978  STACK at Launch, C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1: line 238
+at <ScriptBlock>, C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1: line 286
+12:42:27.996  CLOSE_REQUEST pid=25876 main=13502032
+12:42:28.042  EXITED code=
+12:42:31.061  LEFTOVER=0
+12:42:55.606  PHASE=precheck ISOLATED_ROOT=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun PROFILE=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\profile
+12:42:56.120  RENDER_VOLUME_BEFORE=VOLUME=58%
+12:42:56.197  APP_PID=13304
+12:42:58.939  WINDOW_READY WINDOW rect=580,270,1400,900 handle=2753318 pid=13304 title=HOWL Chat
+12:43:00.775  SERVERS[startup] count=
+12:43:00.780    pid=18484 port=57236 mmproj=G:\AI
+12:43:00.782  ASR_DISCOVERED pid=18484 port=57236 after 0.3s
+12:43:00.863  ASR_READY port=57236 after 0.1s health=True
+12:43:00.919  GPU_AT_STARTUP 3935 MiB, 8192 MiB, 6 %
+12:43:01.407  EXCEPTION Exception calling "GetFullPath" with "1" argument(s): "The given path's format is not supported."
+12:43:01.409  STACK at Stimulus, C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1: line 153
+at Dictate, C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1: line 162
+at <ScriptBlock>, C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1: line 376
+12:43:01.423  CLOSE_REQUEST pid=13304 main=2753318
+12:43:01.473  EXITED code=
+12:43:04.493  LEFTOVER=0
+12:43:25.794  PHASE=precheck ISOLATED_ROOT=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun PROFILE=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\profile
+12:43:26.326  RENDER_VOLUME_BEFORE=VOLUME=58%
+12:43:26.403  APP_PID=5900
+12:43:29.218  WINDOW_READY WINDOW rect=580,270,1400,900 handle=2293788 pid=5900 title=HOWL Chat
+12:43:31.042  SERVERS[startup] count=
+12:43:31.047    pid=16216 port=55008 mmproj=G:\AI
+12:43:31.048  ASR_DISCOVERED pid=16216 port=55008 after 0.3s
+12:43:31.107  ASR_READY port=55008 after 0.1s health=True
+12:43:31.159  GPU_AT_STARTUP 3927 MiB, 8192 MiB, 5 %
+12:43:32.050  STIMULUS VOICE=Microsoft David Desktop culture=en-US | TEXT=The blue lantern guild meets at seven in the copper harbour. | WROTE=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\stimulus.wav | FORMAT=16000Hz mono 16-bit bytes=129966 | DURATION=4.06s PEAK=31000 (-0.5 dBFS) | 
+12:43:32.582  VOLUME_SET 100% for stimulus
+12:43:34.288  MIC_ON powershell.exe : index 0 out of range; matches=0
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1:28 char:16
++ ...      $out = & powershell -NoProfile -ExecutionPolicy Bypass -File $ui ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (index 0 out of range; matches=0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\uia.ps1:147 char:40
++ ... e $Index) { throw ("index $Index out of range; matches=" + $found.Cou ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (index 0 out of range; matches=0:String) [], RuntimeException
+    + FullyQualifiedErrorId : index 0 out of range; matches=0
+12:43:34.300  EXCEPTION Cannot convert the "System.Object[]" value of type "System.Object[]" to type "System.Int32".
+12:43:34.303  STACK at Dictate, C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1: line 170
+at <ScriptBlock>, C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1: line 378
+12:43:34.317  CLOSE_REQUEST pid=5900 main=2293788
+12:43:34.366  EXITED code=
+12:43:37.379  LEFTOVER=0
+12:43:56.708  PHASE=precheck ISOLATED_ROOT=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun PROFILE=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\profile
+12:43:57.234  RENDER_VOLUME_BEFORE=VOLUME=52%
+12:43:57.312  APP_PID=29456
+12:44:00.090  WINDOW_READY WINDOW rect=580,270,1400,900 handle=2164154 pid=29456 title=HOWL Chat
+12:44:01.948  SERVERS[startup] count=
+12:44:01.955    pid=21168 port=56794 mmproj=G:\AI
+12:44:01.957  ASR_DISCOVERED pid=21168 port=56794 after 0.3s
+12:44:02.016  ASR_READY port=56794 after 0.1s health=True
+12:44:02.064  GPU_AT_STARTUP 3968 MiB, 8192 MiB, 7 %
+12:44:02.885  STIMULUS VOICE=Microsoft David Desktop culture=en-US | TEXT=The blue lantern guild meets at seven in the copper harbour. | WROTE=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\stimulus.wav | FORMAT=16000Hz mono 16-bit bytes=129966 | DURATION=4.06s PEAK=31000 (-0.5 dBFS) | 
+12:44:03.428  VOLUME_SET 100% for stimulus
+12:44:05.161  MIC_ON powershell.exe : index 0 out of range; matches=0
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1:28 char:16
++ ...      $out = & powershell -NoProfile -ExecutionPolicy Bypass -File $ui ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (index 0 out of range; matches=0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\uia.ps1:147 char:40
++ ... e $Index) { throw ("index $Index out of range; matches=" + $found.Cou ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (index 0 out of range; matches=0:String) [], RuntimeException
+    + FullyQualifiedErrorId : index 0 out of range; matches=0
+12:44:10.738  PLAYBACK_EXITED=True
+12:44:11.813  MIC_OFF INVOKED invoke-pattern index=0
+12:44:37.651  COMPOSER_WAIT t=25s still empty
+12:44:40.213  COMPOSER_WAIT t=28s still empty
+12:44:42.739  COMPOSER_WAIT t=30s still empty
+12:44:45.260  COMPOSER_WAIT t=33s still empty
+12:44:47.787  COMPOSER_WAIT t=35s still empty
+12:44:50.308  COMPOSER_WAIT t=38s still empty
+12:44:52.830  COMPOSER_WAIT t=40s still empty
+12:44:55.355  COMPOSER_WAIT t=43s still empty
+12:44:57.911  COMPOSER_WAIT t=46s still empty
+12:45:00.436  COMPOSER_WAIT t=48s still empty
+12:45:02.961  COMPOSER_WAIT t=51s still empty
+12:45:05.479  COMPOSER_WAIT t=53s still empty
+12:45:07.995  COMPOSER_WAIT t=56s still empty
+12:45:10.532  COMPOSER_WAIT t=58s still empty
+12:45:13.034  COMPOSER_WAIT t=61s still empty
+12:45:13.036  TRANSCRIPT[precheck]=
+12:45:13.047  CAPTURE missing in C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\profile\Temp\howl-asr
+12:45:13.052  ASR_TEMP_FILES=0
+12:45:13.140  SHOT=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\precheck.png
+12:45:13.143  PRECHECK_RESULT_LENGTH=0
+12:45:13.182  GPU_PRECHECK 3957 MiB, 8192 MiB, 22 %
+12:45:13.192  CLOSE_REQUEST pid=29456 main=2164154
+12:45:13.234  EXITED code=
+12:45:16.261  LEFTOVER=0
+12:45:16.263  PHASE_COMPLETE
+12:46:01.546  PHASE=precheck ISOLATED_ROOT=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun PROFILE=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\profile
+12:46:02.066  RENDER_VOLUME_BEFORE=VOLUME=86%
+12:46:02.142  APP_PID=18928
+12:46:04.911  WINDOW_READY WINDOW rect=580,270,1400,900 handle=13829712 pid=18928 title=HOWL Chat
+12:46:06.723  SERVERS[startup] count=
+12:46:06.730    pid=29364 port=51278 mmproj=G:\AI
+12:46:06.733  ASR_DISCOVERED pid=29364 port=51278 after 0.3s
+12:46:06.792  ASR_READY port=51278 after 0.1s health=True
+12:46:06.844  GPU_AT_STARTUP 3969 MiB, 8192 MiB, 5 %
+12:46:07.620  STIMULUS VOICE=Microsoft David Desktop culture=en-US | TEXT=The blue lantern guild meets at seven in the copper harbour. | WROTE=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\stimulus.wav | FORMAT=16000Hz mono 16-bit bytes=129966 | DURATION=4.06s PEAK=31000 (-0.5 dBFS) | 
+12:46:08.162  VOLUME_SET 100% for stimulus
+12:46:10.906  MIC_ELEMENT_FOUND=1 after 3s
+12:46:13.629  MIC_ON INVOKED invoke-pattern index=0
+12:46:14.670  MIC_RECORDING_STATE=1
+12:46:14.690  PLAYBACK_STARTED
+12:46:19.969  PLAYBACK_EXITED=True
+12:46:22.801  MIC_OFF INVOKED invoke-pattern index=0
+12:46:25.909  TRANSCRIPT[precheck]=Yeah, that's only one of the functions. All, all close enough to one hundred percent. Everything else is mostly well.
+12:46:25.919  CAPTURE missing in C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\profile\Temp\howl-asr
+12:46:25.923  ASR_TEMP_FILES=0
+12:46:26.035  SHOT=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\precheck.png
+12:46:26.037  PRECHECK_RESULT_LENGTH=117
+12:46:26.090  GPU_PRECHECK 4237 MiB, 8192 MiB, 5 %
+12:46:27.118  CLOSE_REQUEST pid=18928 main=13829712
+12:46:27.168  EXITED code=
+12:46:30.187  LEFTOVER=0
+12:46:30.189  PHASE_COMPLETE
+12:47:33.212  PHASE=precheck ISOLATED_ROOT=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun PROFILE=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\profile
+12:47:33.744  RENDER_VOLUME_BEFORE=VOLUME=100%
+12:47:33.823  APP_PID=30076
+12:47:36.560  WINDOW_READY WINDOW rect=580,270,1400,900 handle=2165086 pid=30076 title=HOWL Chat
+12:47:38.405  SERVERS[startup] count=
+12:47:38.411    pid=19300 port=62878 mmproj=G:\AI
+12:47:38.413  ASR_DISCOVERED pid=19300 port=62878 after 0.3s
+12:47:38.474  ASR_READY port=62878 after 0.1s health=True
+12:47:38.528  GPU_AT_STARTUP 3967 MiB, 8192 MiB, 5 %
+12:47:39.318  STIMULUS VOICE=Microsoft David Desktop culture=en-US | TEXT=The blue lantern guild meets at seven in the copper harbour. | WROTE=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\stimulus.wav | FORMAT=16000Hz mono 16-bit bytes=129966 | DURATION=4.06s PEAK=31000 (-0.5 dBFS) | 
+12:47:39.853  RENDER_BEFORE=Headphones (WH-1000XM4)|{0.0.0.00000000}.{9460d508-20ce-4ade-8b76-e405f9ab758a}
+12:47:40.444  EXCEPTION Exception calling "SetDefaultRender" with "2" argument(s): "no active render endpoint matching 'Headset (WH-1000XM4)'"
+12:47:40.447  STACK at RenderSet, C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1: line 163
+at Dictate, C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1: line 178
+at <ScriptBlock>, C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\coexist.ps1: line 435
+12:47:41.413  CLOSE_REQUEST pid=30076 main=2165086
+12:47:41.460  EXITED code=
+12:47:44.482  LEFTOVER=0
+12:48:38.594  PHASE=precheck ISOLATED_ROOT=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun PROFILE=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\profile
+12:48:39.122  RENDER_VOLUME_BEFORE=VOLUME=62%
+12:48:39.198  APP_PID=29480
+12:48:41.970  WINDOW_READY WINDOW rect=580,270,1400,900 handle=2621468 pid=29480 title=HOWL Chat
+12:48:43.795  SERVERS[startup] count=
+12:48:43.801    pid=29524 port=50371 mmproj=G:\AI
+12:48:43.804  ASR_DISCOVERED pid=29524 port=50371 after 0.3s
+12:48:43.874  ASR_READY port=50371 after 0.1s health=True
+12:48:43.926  GPU_AT_STARTUP 3966 MiB, 8192 MiB, 7 %
+12:48:44.712  STIMULUS VOICE=Microsoft David Desktop culture=en-US | TEXT=The blue lantern guild meets at seven in the copper harbour. | WROTE=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\stimulus.wav | FORMAT=16000Hz mono 16-bit bytes=129966 | DURATION=4.06s PEAK=31000 (-0.5 dBFS) | 
+12:48:45.239  RENDER_BEFORE=Headphones (WH-1000XM4)|{0.0.0.00000000}.{9460d508-20ce-4ade-8b76-e405f9ab758a}
+12:48:46.201  RENDER_SWITCH SWITCH Headphones (WH-1000XM4)|{0.0.0.00000000}.{9460d508-20ce-4ade-8b76-e405f9ab758a} => Speakers (Realtek(R) Audio)
+12:48:46.721  VOLUME_BEFORE=VOLUME=100%
+12:48:47.261  VOLUME_SET VOLUME=100%
+12:48:49.995  MIC_ELEMENT_FOUND=1 after 3s
+12:48:52.706  MIC_ON INVOKED invoke-pattern index=0
+12:48:53.738  MIC_RECORDING_STATE=1
+12:48:53.757  PLAYBACK_STARTED
+12:48:59.023  PLAYBACK_EXITED=True
+12:49:01.833  MIC_OFF INVOKED invoke-pattern index=0
+12:49:02.380  VOLUME_RESTORE VOLUME=100%
+12:49:03.343  RENDER_RESTORE SWITCH Speakers (Realtek(R) Audio)|{0.0.0.00000000}.{73b46750-0008-4166-99c4-0e281059a9d5} => Headphones (WH-1000XM4)
+12:49:33.368  CAPTURE_NOT_OBSERVED during transcription
+12:49:35.945  TRANSCRIPT[precheck]=The Blue Lantern Guild meets at seven in the Copper Harbor.
+12:49:36.034  SHOT=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\precheck.png
+12:49:36.036  PRECHECK_RESULT_LENGTH=59
+12:49:36.089  GPU_PRECHECK 4220 MiB, 8192 MiB, 6 %
+12:49:37.117  CLOSE_REQUEST pid=29480 main=2621468
+12:49:37.167  EXITED code=
+12:49:40.191  LEFTOVER=0
+12:49:40.193  PHASE_COMPLETE

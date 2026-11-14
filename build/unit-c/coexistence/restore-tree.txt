@@ -1,0 +1,10 @@
+﻿|Window|cls=wailsWindow|id=|name=HOWL Chat|rect=580,270,1400,900
+  |Pane|cls=Chrome_WidgetWin_1|id=|name=HOWL Chat|rect=588,301,1384,861
+    |Pane|cls=Intermediate D3D Window|id=|name=|rect=588,301,1384,861
+    |Pane|cls=RootView|id=|name=HOWL Chat - Web content|rect=588,301,1384,861
+      |Pane|cls=NonClientView|id=|name=|rect=588,301,1384,861
+        |Pane|cls=EmbeddedBrowserTabRootView|id=|name=|rect=-1,-1,-1,-1
+        |Pane|cls=NativeFrameView|id=|name=|rect=588,301,1384,861
+          |Pane|cls=ClientView|id=|name=|rect=588,301,1384,861
+            |Pane|cls=EmbeddedBrowserDownloadView|id=|name=|rect=-1,-1,-1,-1
+---ELEMENTS=9---

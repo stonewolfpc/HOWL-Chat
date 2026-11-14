@@ -6,10 +6,8 @@ package proc
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 	"strconv"
-	"strings"
 	"sync"
 	"syscall"
 	"unsafe"
@@ -172,16 +170,6 @@ func KillTree(pid int) {
 	_ = c.Run()
 }
 
-// KillTreeByName terminates every process with the given image name.
-func KillTreeByName(name string) {
-	if name == "" {
-		return
-	}
-	c := exec.Command("taskkill", "/T", "/F", "/IM", name)
-	HideWindow(c)
-	_ = c.Run()
-}
-
 // CloseJob terminates every process still attached to the job.
 // It is unchanged by the suspended-start path; shutdown still closes the job.
 func CloseJob() {
@@ -192,37 +180,4 @@ func CloseJob() {
 	// Closing the handle triggers KILL_ON_JOB_CLOSE for the whole tree.
 	_ = windows.CloseHandle(job)
 	job = 0
-}
-
-// ReapOrphans kills llama-server/sd-server processes that belong to this
-// project but survived a previous instance (crash or force-kill). Matching is
-// by executable path, so copies living elsewhere are left alone.
-func ReapOrphans(projectRoot string) int {
-	if projectRoot == "" {
-		return 0
-	}
-	root := strings.TrimRight(projectRoot, `\/`)
-	script := fmt.Sprintf(
-		"$root='%s'; "+
-			"Get-CimInstance Win32_Process -Filter \"Name='llama-server.exe' or Name='sd-server.exe'\" | "+
-			"Where-Object { $_.ExecutablePath -and $_.ExecutablePath -like ($root + '*') } | "+
-			"ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue; $_.ProcessId }",
-		strings.ReplaceAll(root, "'", "''"),
-	)
-	cmd := exec.Command("powershell", "-NoProfile", "-NonInteractive", "-Command", script)
-	HideWindow(cmd)
-	out, err := cmd.Output()
-	if err != nil {
-		return 0
-	}
-	killed := 0
-	for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
-		if strings.TrimSpace(line) != "" {
-			killed++
-		}
-	}
-	if killed > 0 {
-		fmt.Fprintf(os.Stderr, "[proc] reaped %d orphaned model process(es)\n", killed)
-	}
-	return killed
 }

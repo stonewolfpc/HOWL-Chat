@@ -542,6 +542,7 @@ class DataSync {
                     content: content,
                     scope: 'chat',
                     ownerId: cd.sessionId || 'default',
+                    ownerKind: 'chat',
                     tags: ['character-swap', 'continuity', char.name.toLowerCase().replace(/\s+/g, '-')],
                     source: 'auto',
                     trigger: 'character_swap',

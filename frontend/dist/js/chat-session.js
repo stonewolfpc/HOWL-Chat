@@ -141,8 +141,9 @@ function collectChatHistory() {
             sender: sender,
             text: text,
             role: role,
-            timestamp: new Date().toISOString(),
-            hasImage: false // Future: check for images
+            characterId: msg.dataset.characterId || '',
+            timestamp: msg.dataset.timestamp || new Date().toISOString(),
+            hasImage: msg.dataset.hasImage === 'true'
         });
     });
     
@@ -406,9 +407,13 @@ function rebuildChatFromLoadedHistory(history) {
         const role = (msg.Role || msg.role || '').toLowerCase();
         const sender = msg.Sender || msg.sender || (role === 'assistant' ? 'AI' : role === 'user' ? 'You' : 'System');
         const text = msg.Text || msg.text || '';
+        const characterId = msg.characterId || msg.CharacterId || '';
 
         const messageDiv = document.createElement('div');
         messageDiv.className = `chat-message ${role === 'user' ? 'user' : 'assistant'}`;
+        messageDiv.dataset.characterId = characterId;
+        if (msg.Timestamp || msg.timestamp) messageDiv.dataset.timestamp = msg.Timestamp || msg.timestamp;
+        if (msg.HasImage || msg.hasImage) messageDiv.dataset.hasImage = 'true';
         messageDiv.innerHTML = `
             <div class="chat-bubble">
                 <div class="chat-sender">${sender}</div>

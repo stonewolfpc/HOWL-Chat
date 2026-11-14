@@ -19,8 +19,19 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     setTimeout(() => {
-        loadCharacters();
+        const load = loadCharacters();
         loadAvailableLorebooks();
+        Promise.resolve(load).then(() => {
+            const characterId = new URLSearchParams(window.location.search).get('id');
+            if (!characterId) return;
+            const characters = window.characterState?.characterCache || [];
+            const index = characters.findIndex(character => character.id === characterId);
+            if (index >= 0) {
+                editCharacter(index);
+            } else if (typeof showNotification === 'function') {
+                showNotification('The requested character was not found.', 'error');
+            }
+        });
     }, 100);
 
     document.addEventListener('keydown', function (event) {

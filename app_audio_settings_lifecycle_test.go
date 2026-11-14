@@ -50,6 +50,7 @@ func TestAudioSettingsPersistAcrossStoreRestart(t *testing.T) {
 }
 
 func TestRemoteASRApplyNeverReportsLocalReadiness(t *testing.T) {
+	useMicProbe(t, constantMicProbe(newMicrophoneStatus(MicStateReady, "", 1)))
 	for _, engine := range []string{"qwen3-asr-0.6b", "qwen3-asr-1.7b"} {
 		t.Run(engine, func(t *testing.T) {
 			pipeline := &appFakePipeline{}
@@ -76,6 +77,7 @@ func TestRemoteASRApplyNeverReportsLocalReadiness(t *testing.T) {
 }
 
 func TestLocalASRReadinessIsInitializedOnly(t *testing.T) {
+	useMicProbe(t, constantMicProbe(newMicrophoneStatus(MicStateReady, "", 1)))
 	pipeline := &appFakePipeline{}
 	app, manager := newAudioTestApp(t, func(_ context.Context, _ audio.Settings, candidate *audio.Candidate) error {
 		*candidate = *appCandidate(pipeline, true, false, nil, nil)
@@ -95,6 +97,7 @@ func TestLocalASRReadinessIsInitializedOnly(t *testing.T) {
 }
 
 func TestASRReadinessReportsUnconfiguredAndDisabled(t *testing.T) {
+	useMicProbe(t, constantMicProbe(newMicrophoneStatus(MicStateReady, "", 1)))
 	pipeline := &appFakePipeline{}
 	app, manager := newAudioTestApp(t, func(_ context.Context, _ audio.Settings, candidate *audio.Candidate) error {
 		*candidate = *appCandidate(pipeline, true, false, nil, nil)
@@ -140,7 +143,7 @@ func TestFailedActivationDoesNotEraseSavedSelection(t *testing.T) {
 		return nil
 	})
 	t.Cleanup(func() { _ = app.audioManager.Close(context.Background()) })
-	if err := app.ApplyAudioSettings(true, false, "whisper-base", "piper"); err == nil {
+	if err := app.ApplyAudioSettings(desiredWithBackend(audio.Settings{ASREnabled: true, ASREngine: "whisper-base", TTSEngine: "piper"})); err == nil {
 		t.Fatal("ApplyAudioSettings returned nil for a failed activation")
 	}
 

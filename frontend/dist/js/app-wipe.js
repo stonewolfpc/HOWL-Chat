@@ -87,12 +87,12 @@ async function wipeFrontendData() {
 // ---------------------------------------------------------------------------
 
 async function resetApplication() {
-    if (!confirm('WARNING: This will delete ALL data:\n\n' +
-        '- All chat sessions\n' +
-        '- All characters, worlds, and scenarios\n' +
-        '- All memories and lorebooks\n' +
+    if (!confirm('WARNING: This will delete Howl-owned content:\n\n' +
+        '- All chat sessions under the configured Howl chat root\n' +
+        '- All Howl browser-stored characters, worlds, scenarios, and lorebooks\n' +
         '- All generated gallery images\n' +
-        '- All settings (except model paths)\n\n' +
+        '- Browser caches and settings\n\n' +
+        'External content-library folders are NOT deleted.\n\n' +
         'This CANNOT be undone. Are you sure?')) {
         return;
     }
@@ -102,15 +102,23 @@ async function resetApplication() {
     }
 
     try {
-        // Call backend wipe first
+        // Call backend wipe first. Frontend data must not be cleared while the
+        // backend still holds content: that would report a partial wipe as if
+        // it were complete.
         if (window.go?.main?.App?.WipeAllData) {
             await window.go.main.App.WipeAllData();
         }
     } catch (err) {
         console.error('[Wipe] Backend wipe failed:', err);
+        if (typeof showNotification === 'function') {
+            showNotification('Content wipe did not complete: ' + (err?.message || err), 'error');
+        } else {
+            alert('Content wipe did not complete: ' + (err?.message || err));
+        }
+        return;
     }
 
-    // Then wipe frontend and reload
+    // Backend reported success; only now clear browser stores and reload.
     await wipeFrontendData();
 }
 

@@ -1,3 +1,86 @@
+export namespace audio {
+	
+	export class DesiredSettings {
+	    asrEnabled: boolean;
+	    ttsEnabled: boolean;
+	    asrEngine: string;
+	    asrLanguage: string;
+	    asrDevice: string;
+	    asrThreads: number;
+	    asrBeamSize: number;
+	    asrBestOf: number;
+	    asrTemperature: number;
+	    asrTranslateToEnglish: boolean;
+	    asrNoTimestamps: boolean;
+	    asrFlashAttention: boolean;
+	    vadEnabled: boolean;
+	    vadThreshold: number;
+	    vadMinSpeechMs: number;
+	    vadMinSilenceMs: number;
+	    vadPaddingMs: number;
+	    ttsEngine: string;
+	    ttsVoice: string;
+	    ttsSpeed: number;
+	    ttsVolume: number;
+	    ttsNoiseScale: number;
+	    ttsNoiseW: number;
+	    ttsSentenceSilence: number;
+	    ttsAutoplayMessage: boolean;
+	    ttsCacheEnabled: boolean;
+	    ttsCacheSizeMB: number;
+	    audioInputDevice: string;
+	    audioOutputDevice: string;
+	    audioSampleRate: number;
+	    audioChannels: string;
+	    audioBitDepth: number;
+	    micSensitivity: number;
+	    pushToTalk: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new DesiredSettings(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.asrEnabled = source["asrEnabled"];
+	        this.ttsEnabled = source["ttsEnabled"];
+	        this.asrEngine = source["asrEngine"];
+	        this.asrLanguage = source["asrLanguage"];
+	        this.asrDevice = source["asrDevice"];
+	        this.asrThreads = source["asrThreads"];
+	        this.asrBeamSize = source["asrBeamSize"];
+	        this.asrBestOf = source["asrBestOf"];
+	        this.asrTemperature = source["asrTemperature"];
+	        this.asrTranslateToEnglish = source["asrTranslateToEnglish"];
+	        this.asrNoTimestamps = source["asrNoTimestamps"];
+	        this.asrFlashAttention = source["asrFlashAttention"];
+	        this.vadEnabled = source["vadEnabled"];
+	        this.vadThreshold = source["vadThreshold"];
+	        this.vadMinSpeechMs = source["vadMinSpeechMs"];
+	        this.vadMinSilenceMs = source["vadMinSilenceMs"];
+	        this.vadPaddingMs = source["vadPaddingMs"];
+	        this.ttsEngine = source["ttsEngine"];
+	        this.ttsVoice = source["ttsVoice"];
+	        this.ttsSpeed = source["ttsSpeed"];
+	        this.ttsVolume = source["ttsVolume"];
+	        this.ttsNoiseScale = source["ttsNoiseScale"];
+	        this.ttsNoiseW = source["ttsNoiseW"];
+	        this.ttsSentenceSilence = source["ttsSentenceSilence"];
+	        this.ttsAutoplayMessage = source["ttsAutoplayMessage"];
+	        this.ttsCacheEnabled = source["ttsCacheEnabled"];
+	        this.ttsCacheSizeMB = source["ttsCacheSizeMB"];
+	        this.audioInputDevice = source["audioInputDevice"];
+	        this.audioOutputDevice = source["audioOutputDevice"];
+	        this.audioSampleRate = source["audioSampleRate"];
+	        this.audioChannels = source["audioChannels"];
+	        this.audioBitDepth = source["audioBitDepth"];
+	        this.micSensitivity = source["micSensitivity"];
+	        this.pushToTalk = source["pushToTalk"];
+	    }
+	}
+
+}
+
 export namespace chat {
 	
 	export class Image {
@@ -181,6 +264,7 @@ export namespace chat {
 	    role: string;
 	    timestamp: string;
 	    hasImage: boolean;
+	    characterId?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new ChatHistory(source);
@@ -194,6 +278,7 @@ export namespace chat {
 	        this.role = source["role"];
 	        this.timestamp = source["timestamp"];
 	        this.hasImage = source["hasImage"];
+	        this.characterId = source["characterId"];
 	    }
 	}
 	export class ChatMeta {
@@ -313,6 +398,890 @@ export namespace chat {
 	
 	
 	
+
+}
+
+export namespace contentimport {
+	
+	export class ItemResult {
+	    source_key: string;
+	    item_id?: string;
+	    state: string;
+	    reason?: string;
+	    path?: string;
+	    message?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ItemResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.source_key = source["source_key"];
+	        this.item_id = source["item_id"];
+	        this.state = source["state"];
+	        this.reason = source["reason"];
+	        this.path = source["path"];
+	        this.message = source["message"];
+	    }
+	}
+	export class JournalItem {
+	    source_key: string;
+	    source_kind: string;
+	    source_id?: string;
+	    source_name?: string;
+	    source_root?: string;
+	    folder?: string;
+	    item_id?: string;
+	    library_id?: string;
+	    root?: string;
+	    final_path?: string;
+	    staging_path?: string;
+	    owner_path?: string;
+	    revision?: string;
+	    plan_hash?: string;
+	    state: string;
+	    reason?: string;
+	    message?: string;
+	    evidence?: string;
+	    source_hash?: string;
+	    document_hash?: string;
+	    lore_hashes?: Record<string, string>;
+	    media_hash?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new JournalItem(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.source_key = source["source_key"];
+	        this.source_kind = source["source_kind"];
+	        this.source_id = source["source_id"];
+	        this.source_name = source["source_name"];
+	        this.source_root = source["source_root"];
+	        this.folder = source["folder"];
+	        this.item_id = source["item_id"];
+	        this.library_id = source["library_id"];
+	        this.root = source["root"];
+	        this.final_path = source["final_path"];
+	        this.staging_path = source["staging_path"];
+	        this.owner_path = source["owner_path"];
+	        this.revision = source["revision"];
+	        this.plan_hash = source["plan_hash"];
+	        this.state = source["state"];
+	        this.reason = source["reason"];
+	        this.message = source["message"];
+	        this.evidence = source["evidence"];
+	        this.source_hash = source["source_hash"];
+	        this.document_hash = source["document_hash"];
+	        this.lore_hashes = source["lore_hashes"];
+	        this.media_hash = source["media_hash"];
+	    }
+	}
+	export class Operation {
+	    version: number;
+	    category: string;
+	    operation_id: string;
+	    plan_hash: string;
+	    destination_library_id: string;
+	    destination_root?: string;
+	    status: string;
+	    started_at: string;
+	    updated_at: string;
+	    items: JournalItem[];
+	    message?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Operation(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.version = source["version"];
+	        this.category = source["category"];
+	        this.operation_id = source["operation_id"];
+	        this.plan_hash = source["plan_hash"];
+	        this.destination_library_id = source["destination_library_id"];
+	        this.destination_root = source["destination_root"];
+	        this.status = source["status"];
+	        this.started_at = source["started_at"];
+	        this.updated_at = source["updated_at"];
+	        this.items = this.convertValues(source["items"], JournalItem);
+	        this.message = source["message"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ReferenceIssue {
+	    field: string;
+	    index: number;
+	    reason: string;
+	    kind?: string;
+	    id?: string;
+	    legacy_name?: string;
+	    message?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ReferenceIssue(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.field = source["field"];
+	        this.index = source["index"];
+	        this.reason = source["reason"];
+	        this.kind = source["kind"];
+	        this.id = source["id"];
+	        this.legacy_name = source["legacy_name"];
+	        this.message = source["message"];
+	    }
+	}
+	export class PlanItem {
+	    source_key: string;
+	    source_kind: string;
+	    source_id?: string;
+	    source_name?: string;
+	    source_root?: string;
+	    folder?: string;
+	    proposed_id?: string;
+	    action: string;
+	    reason?: string;
+	    message?: string;
+	    evidence?: string;
+	    source_hash: string;
+	    document_hash?: string;
+	    lore_hashes?: Record<string, string>;
+	    media_hash?: string;
+	    writes?: string[];
+	    references?: ReferenceIssue[];
+	
+	    static createFrom(source: any = {}) {
+	        return new PlanItem(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.source_key = source["source_key"];
+	        this.source_kind = source["source_kind"];
+	        this.source_id = source["source_id"];
+	        this.source_name = source["source_name"];
+	        this.source_root = source["source_root"];
+	        this.folder = source["folder"];
+	        this.proposed_id = source["proposed_id"];
+	        this.action = source["action"];
+	        this.reason = source["reason"];
+	        this.message = source["message"];
+	        this.evidence = source["evidence"];
+	        this.source_hash = source["source_hash"];
+	        this.document_hash = source["document_hash"];
+	        this.lore_hashes = source["lore_hashes"];
+	        this.media_hash = source["media_hash"];
+	        this.writes = source["writes"];
+	        this.references = this.convertValues(source["references"], ReferenceIssue);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Plan {
+	    hash: string;
+	    category: string;
+	    destination_library_id: string;
+	    destination_root?: string;
+	    destination_status: string;
+	    conversion_version: string;
+	    items: PlanItem[];
+	    ready: number;
+	    adoptable: number;
+	    conflicted: number;
+	    quarantined: number;
+	    unsupported: number;
+	    reference_issues: number;
+	    writes: number;
+	    errors?: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Plan(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.hash = source["hash"];
+	        this.category = source["category"];
+	        this.destination_library_id = source["destination_library_id"];
+	        this.destination_root = source["destination_root"];
+	        this.destination_status = source["destination_status"];
+	        this.conversion_version = source["conversion_version"];
+	        this.items = this.convertValues(source["items"], PlanItem);
+	        this.ready = source["ready"];
+	        this.adoptable = source["adoptable"];
+	        this.conflicted = source["conflicted"];
+	        this.quarantined = source["quarantined"];
+	        this.unsupported = source["unsupported"];
+	        this.reference_issues = source["reference_issues"];
+	        this.writes = source["writes"];
+	        this.errors = source["errors"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	
+	export class Resolution {
+	    source_key: string;
+	    destination_id?: string;
+	    new_id?: boolean;
+	    actor?: string;
+	    evidence?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Resolution(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.source_key = source["source_key"];
+	        this.destination_id = source["destination_id"];
+	        this.new_id = source["new_id"];
+	        this.actor = source["actor"];
+	        this.evidence = source["evidence"];
+	    }
+	}
+	export class Request {
+	    category: string;
+	    destination_library_id: string;
+	    browser_records: any[];
+	    legacy_roots: string[];
+	    resolutions: Resolution[];
+	    operation_id?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Request(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.category = source["category"];
+	        this.destination_library_id = source["destination_library_id"];
+	        this.browser_records = source["browser_records"];
+	        this.legacy_roots = source["legacy_roots"];
+	        this.resolutions = this.convertValues(source["resolutions"], Resolution);
+	        this.operation_id = source["operation_id"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	export class Result {
+	    operation_id: string;
+	    status: string;
+	    plan_hash: string;
+	    plan: Plan;
+	    items: ItemResult[];
+	    message?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Result(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.operation_id = source["operation_id"];
+	        this.status = source["status"];
+	        this.plan_hash = source["plan_hash"];
+	        this.plan = this.convertValues(source["plan"], Plan);
+	        this.items = this.convertValues(source["items"], ItemResult);
+	        this.message = source["message"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class RollbackItem {
+	    item_id: string;
+	    state: string;
+	    reason?: string;
+	    message?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new RollbackItem(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.item_id = source["item_id"];
+	        this.state = source["state"];
+	        this.reason = source["reason"];
+	        this.message = source["message"];
+	    }
+	}
+	export class RollbackResult {
+	    operation_id: string;
+	    status: string;
+	    items: RollbackItem[];
+	    message?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new RollbackResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.operation_id = source["operation_id"];
+	        this.status = source["status"];
+	        this.items = this.convertValues(source["items"], RollbackItem);
+	        this.message = source["message"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+
+}
+
+export namespace library {
+	
+	export class Item {
+	    id: string;
+	    library_id: string;
+	    category: string;
+	    name: string;
+	    path: string;
+	    format: string;
+	    source: string;
+	    external: boolean;
+	    editable: boolean;
+	    available: boolean;
+	    description?: string;
+	    personality?: string;
+	    scenario?: string;
+	    first_mes?: string;
+	    mes_example?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Item(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.library_id = source["library_id"];
+	        this.category = source["category"];
+	        this.name = source["name"];
+	        this.path = source["path"];
+	        this.format = source["format"];
+	        this.source = source["source"];
+	        this.external = source["external"];
+	        this.editable = source["editable"];
+	        this.available = source["available"];
+	        this.description = source["description"];
+	        this.personality = source["personality"];
+	        this.scenario = source["scenario"];
+	        this.first_mes = source["first_mes"];
+	        this.mes_example = source["mes_example"];
+	    }
+	}
+	export class InventoryRoot {
+	    id: string;
+	    category: string;
+	    path: string;
+	    role: number;
+	    origin: string;
+	    format: string;
+	    default_save: boolean;
+	    created_at: string;
+	    available: boolean;
+	    scanned: boolean;
+	    stale: boolean;
+	    scan_error?: string;
+	    scanned_at?: string;
+	    items: Item[];
+	
+	    static createFrom(source: any = {}) {
+	        return new InventoryRoot(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.category = source["category"];
+	        this.path = source["path"];
+	        this.role = source["role"];
+	        this.origin = source["origin"];
+	        this.format = source["format"];
+	        this.default_save = source["default_save"];
+	        this.created_at = source["created_at"];
+	        this.available = source["available"];
+	        this.scanned = source["scanned"];
+	        this.stale = source["stale"];
+	        this.scan_error = source["scan_error"];
+	        this.scanned_at = source["scanned_at"];
+	        this.items = this.convertValues(source["items"], Item);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	export class OperationResult {
+	    status: string;
+	    category?: string;
+	    item_id?: string;
+	    target?: string;
+	    message?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new OperationResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.status = source["status"];
+	        this.category = source["category"];
+	        this.item_id = source["item_id"];
+	        this.target = source["target"];
+	        this.message = source["message"];
+	    }
+	}
+	export class Registration {
+	    id: string;
+	    category: string;
+	    path: string;
+	    role: number;
+	    origin: string;
+	    format: string;
+	    default_save: boolean;
+	    created_at: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Registration(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.category = source["category"];
+	        this.path = source["path"];
+	        this.role = source["role"];
+	        this.origin = source["origin"];
+	        this.format = source["format"];
+	        this.default_save = source["default_save"];
+	        this.created_at = source["created_at"];
+	    }
+	}
+	export class View {
+	    id: string;
+	    category: string;
+	    path: string;
+	    role: number;
+	    origin: string;
+	    format: string;
+	    default_save: boolean;
+	    created_at: string;
+	    exists: boolean;
+	    readable: boolean;
+	    writable: boolean;
+	    save_root: boolean;
+	    available: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new View(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.category = source["category"];
+	        this.path = source["path"];
+	        this.role = source["role"];
+	        this.origin = source["origin"];
+	        this.format = source["format"];
+	        this.default_save = source["default_save"];
+	        this.created_at = source["created_at"];
+	        this.exists = source["exists"];
+	        this.readable = source["readable"];
+	        this.writable = source["writable"];
+	        this.save_root = source["save_root"];
+	        this.available = source["available"];
+	    }
+	}
+
+}
+
+export namespace lorebookstore {
+	
+	export class ImportItem {
+	    id: string;
+	    action: string;
+	    path?: string;
+	    detail?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ImportItem(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.action = source["action"];
+	        this.path = source["path"];
+	        this.detail = source["detail"];
+	    }
+	}
+	export class ImportResult {
+	    status: string;
+	    cutover: boolean;
+	    root_id?: string;
+	    created: number;
+	    adopted: number;
+	    skipped: number;
+	    conflicts: number;
+	    items: ImportItem[];
+	    message: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ImportResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.status = source["status"];
+	        this.cutover = source["cutover"];
+	        this.root_id = source["root_id"];
+	        this.created = source["created"];
+	        this.adopted = source["adopted"];
+	        this.skipped = source["skipped"];
+	        this.conflicts = source["conflicts"];
+	        this.items = this.convertValues(source["items"], ImportItem);
+	        this.message = source["message"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Item {
+	    id: string;
+	    library_id: string;
+	    root: string;
+	    path: string;
+	    origin: string;
+	    editable: boolean;
+	    available: boolean;
+	    updated_at?: string;
+	    entry: Record<string, any>;
+	
+	    static createFrom(source: any = {}) {
+	        return new Item(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.library_id = source["library_id"];
+	        this.root = source["root"];
+	        this.path = source["path"];
+	        this.origin = source["origin"];
+	        this.editable = source["editable"];
+	        this.available = source["available"];
+	        this.updated_at = source["updated_at"];
+	        this.entry = source["entry"];
+	    }
+	}
+	export class RootStatus {
+	    id: string;
+	    path: string;
+	    origin: string;
+	    available: boolean;
+	    writable: boolean;
+	    save_root: boolean;
+	    count: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new RootStatus(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.path = source["path"];
+	        this.origin = source["origin"];
+	        this.available = source["available"];
+	        this.writable = source["writable"];
+	        this.save_root = source["save_root"];
+	        this.count = source["count"];
+	    }
+	}
+	export class ListResult {
+	    cutover: boolean;
+	    cutover_at?: string;
+	    count: number;
+	    items: Item[];
+	    roots: RootStatus[];
+	    conflicts: string[];
+	    ignored: number;
+	    errors: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new ListResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.cutover = source["cutover"];
+	        this.cutover_at = source["cutover_at"];
+	        this.count = source["count"];
+	        this.items = this.convertValues(source["items"], Item);
+	        this.roots = this.convertValues(source["roots"], RootStatus);
+	        this.conflicts = source["conflicts"];
+	        this.ignored = source["ignored"];
+	        this.errors = source["errors"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class OwnerIdentity {
+	    id: string;
+	    name: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new OwnerIdentity(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	    }
+	}
+	export class OwnerMigrationItem {
+	    id: string;
+	    action: string;
+	    owner_id?: string;
+	    owner_name?: string;
+	    detail?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new OwnerMigrationItem(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.action = source["action"];
+	        this.owner_id = source["owner_id"];
+	        this.owner_name = source["owner_name"];
+	        this.detail = source["detail"];
+	    }
+	}
+	export class OwnerMigrationResult {
+	    status: string;
+	    version?: string;
+	    migrated: number;
+	    already: number;
+	    ambiguous: number;
+	    unknown: number;
+	    failed: number;
+	    restored?: number;
+	    skipped?: number;
+	    items: OwnerMigrationItem[];
+	    message: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new OwnerMigrationResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.status = source["status"];
+	        this.version = source["version"];
+	        this.migrated = source["migrated"];
+	        this.already = source["already"];
+	        this.ambiguous = source["ambiguous"];
+	        this.unknown = source["unknown"];
+	        this.failed = source["failed"];
+	        this.restored = source["restored"];
+	        this.skipped = source["skipped"];
+	        this.items = this.convertValues(source["items"], OwnerMigrationItem);
+	        this.message = source["message"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	export class SaveResult {
+	    status: string;
+	    id: string;
+	    path?: string;
+	    message?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new SaveResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.status = source["status"];
+	        this.id = source["id"];
+	        this.path = source["path"];
+	        this.message = source["message"];
+	    }
+	}
 
 }
 
@@ -513,6 +1482,87 @@ export namespace main {
 		    }
 		    return a;
 		}
+	}
+	export class DirectoryFolder {
+	    name: string;
+	    path: string;
+	    model_files: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new DirectoryFolder(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.path = source["path"];
+	        this.model_files = source["model_files"];
+	    }
+	}
+	export class DirectoryBrowse {
+	    path: string;
+	    parent: string;
+	    at_root: boolean;
+	    home: string;
+	    drives: string[];
+	    folders: DirectoryFolder[];
+	    model_files: number;
+	    kind: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new DirectoryBrowse(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.path = source["path"];
+	        this.parent = source["parent"];
+	        this.at_root = source["at_root"];
+	        this.home = source["home"];
+	        this.drives = source["drives"];
+	        this.folders = this.convertValues(source["folders"], DirectoryFolder);
+	        this.model_files = source["model_files"];
+	        this.kind = source["kind"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	export class DiscoveryCandidate {
+	    path: string;
+	    name: string;
+	    model_files: number;
+	    kind: string;
+	    kinds: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new DiscoveryCandidate(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.path = source["path"];
+	        this.name = source["name"];
+	        this.model_files = source["model_files"];
+	        this.kind = source["kind"];
+	        this.kinds = source["kinds"];
+	    }
 	}
 	export class FilteredAssets {
 	    vaes: AssetInfo[];
@@ -758,6 +1808,7 @@ export namespace main {
 	    type: string;
 	    scope: string;
 	    scopeId?: string;
+	    ownerKind?: string;
 	    confidence?: number;
 	    status?: string;
 	    pinned?: boolean;
@@ -784,6 +1835,7 @@ export namespace main {
 	        this.type = source["type"];
 	        this.scope = source["scope"];
 	        this.scopeId = source["scopeId"];
+	        this.ownerKind = source["ownerKind"];
 	        this.confidence = source["confidence"];
 	        this.status = source["status"];
 	        this.pinned = source["pinned"];
@@ -812,6 +1864,44 @@ export namespace main {
 	        this.exists = source["exists"];
 	        this.models = source["models"];
 	    }
+	}
+	export class ModelDiscoveryState {
+	    enabled: boolean;
+	    suppressed: boolean;
+	    prompting: boolean;
+	    candidate?: DiscoveryCandidate;
+	    deferred: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ModelDiscoveryState(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.enabled = source["enabled"];
+	        this.suppressed = source["suppressed"];
+	        this.prompting = source["prompting"];
+	        this.candidate = this.convertValues(source["candidate"], DiscoveryCandidate);
+	        this.deferred = source["deferred"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	export class ModelFitResult {
 	    kind: string;
@@ -950,6 +2040,97 @@ export namespace main {
 	        this.size_mb = source["size_mb"];
 	    }
 	}
+	export class TTSVoiceOption {
+	    id: string;
+	    name: string;
+	    language?: string;
+	    description?: string;
+	    available: boolean;
+	    detail?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TTSVoiceOption(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	        this.language = source["language"];
+	        this.description = source["description"];
+	        this.available = source["available"];
+	        this.detail = source["detail"];
+	    }
+	}
+	export class TTSVoiceCatalog {
+	    engine: string;
+	    inherited: boolean;
+	    available: boolean;
+	    default_voice?: string;
+	    speed_supported: boolean;
+	    min_speed: number;
+	    max_speed: number;
+	    detail?: string;
+	    voices: TTSVoiceOption[];
+	
+	    static createFrom(source: any = {}) {
+	        return new TTSVoiceCatalog(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.engine = source["engine"];
+	        this.inherited = source["inherited"];
+	        this.available = source["available"];
+	        this.default_voice = source["default_voice"];
+	        this.speed_supported = source["speed_supported"];
+	        this.min_speed = source["min_speed"];
+	        this.max_speed = source["max_speed"];
+	        this.detail = source["detail"];
+	        this.voices = this.convertValues(source["voices"], TTSVoiceOption);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+
+}
+
+export namespace memory {
+	
+	export class IdentityDiagnostics {
+	    total: number;
+	    stable: number;
+	    unresolved: number;
+	    unresolvedOwners?: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new IdentityDiagnostics(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.total = source["total"];
+	        this.stable = source["stable"];
+	        this.unresolved = source["unresolved"];
+	        this.unresolvedOwners = source["unresolvedOwners"];
+	    }
+	}
 
 }
 
@@ -987,6 +2168,55 @@ export namespace metadata {
 	        this.model_name = source["model_name"];
 	        this.scheduler = source["scheduler"];
 	        this.raw = source["raw"];
+	    }
+	}
+
+}
+
+export namespace modelintel {
+	
+	export class Profile {
+	    path: string;
+	    name: string;
+	    format: string;
+	    architecture?: string;
+	    family?: string;
+	    tokenizer?: string;
+	    chat_template?: string;
+	    fingerprint?: string;
+	    capabilities: string[];
+	    runtimes: string[];
+	    evidence: string;
+	    source: string;
+	    notes?: string[];
+	    available: boolean;
+	    size_bytes: number;
+	    mod_time_ns: number;
+	    updated_at: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Profile(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.path = source["path"];
+	        this.name = source["name"];
+	        this.format = source["format"];
+	        this.architecture = source["architecture"];
+	        this.family = source["family"];
+	        this.tokenizer = source["tokenizer"];
+	        this.chat_template = source["chat_template"];
+	        this.fingerprint = source["fingerprint"];
+	        this.capabilities = source["capabilities"];
+	        this.runtimes = source["runtimes"];
+	        this.evidence = source["evidence"];
+	        this.source = source["source"];
+	        this.notes = source["notes"];
+	        this.available = source["available"];
+	        this.size_bytes = source["size_bytes"];
+	        this.mod_time_ns = source["mod_time_ns"];
+	        this.updated_at = source["updated_at"];
 	    }
 	}
 
@@ -1235,6 +2465,7 @@ export namespace types {
 	    video_data?: string;
 	    video_mime?: string;
 	    image_metadatas?: ImageMetadata[];
+	    gallery_error?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new ImageResult(source);
@@ -1250,6 +2481,7 @@ export namespace types {
 	        this.video_data = source["video_data"];
 	        this.video_mime = source["video_mime"];
 	        this.image_metadatas = this.convertValues(source["image_metadatas"], ImageMetadata);
+	        this.gallery_error = source["gallery_error"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

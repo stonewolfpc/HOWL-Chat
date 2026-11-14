@@ -50,6 +50,33 @@ async function installBackend(page, options = {}) {
         window.showNotification = (message, type) => {
             window.__audioBackend.notifications.push({ message, type });
         };
+        function contractReport(audio, applied) {
+            const backend = { asrEnabled: 'asr_enabled', ttsEnabled: 'tts_enabled', asrEngine: 'asr_engine', ttsEngine: 'tts_engine' };
+            const speedEngines = ['piper', 'kokoro', 'melotts'];
+            if (['whisper-tiny', 'whisper-base', 'whisper-small'].includes(audio && audio.asrEngine)) {
+                Object.assign(backend, { asrLanguage: 'asr_language', asrThreads: 'asr_threads', asrBeamSize: 'asr_beam_size', asrBestOf: 'asr_best_of' });
+            }
+            if (audio && audio.ttsEnabled && speedEngines.includes(audio.ttsEngine)) {
+                backend.ttsSpeed = 'tts_speed';
+            }
+            const renderer = { ttsVolume: true, ttsAutoplayMessage: true };
+            const statuses = {};
+            Object.keys(audio || {}).forEach(key => {
+                if (backend[key]) {
+                    const want = audio[key];
+                    const got = applied ? applied[backend[key]] : undefined;
+                    const match = !!applied && (typeof want === 'boolean' ? !!got === want : String(got || '') === String(want || ''));
+                    statuses[key] = { key, owner: 'backend', state: match ? 'applied' : 'rejected', reason: match ? '' : 'not effective' };
+                } else if (renderer[key]) {
+                    statuses[key] = { key, owner: 'renderer', state: 'renderer' };
+                } else if (key === 'ttsSpeed') {
+                    statuses[key] = { key, owner: 'backend', state: 'unavailable', reason: 'speed requires an explicit TTS engine' };
+                } else {
+                    statuses[key] = { key, owner: 'none', state: 'unsupported', reason: 'not implemented in fixture' };
+                }
+            });
+            return { statuses };
+        }
         window.go = {
             main: {
                 App: {
@@ -65,8 +92,9 @@ async function installBackend(page, options = {}) {
                         }
                         window.__audioBackend.setCalls.push(JSON.parse(JSON.stringify(settings)));
                     },
-                    ApplyAudioSettings: async (...args) => {
-                        window.__audioBackend.applyCalls.push(args);
+                    ApplyAudioSettings: async (audio) => {
+                        audio = audio || {};
+                        window.__audioBackend.applyCalls.push(audio);
                         if (window.__audioBackend.applyError) {
                             throw new Error(window.__audioBackend.applyError);
                         }
@@ -75,12 +103,26 @@ async function installBackend(page, options = {}) {
                         window.__audioBackend.statusCalls += 1;
                         const last = window.__audioBackend.applyCalls[window.__audioBackend.applyCalls.length - 1];
                         const applied = last ? {
-                            asr_enabled: !!last[0],
-                            tts_enabled: !!last[1],
-                            asr_engine: last[2] || '',
-                            tts_engine: last[3] || ''
+                            asr_enabled: !!last.asrEnabled,
+                            tts_enabled: !!last.ttsEnabled,
+                            asr_engine: last.asrEngine || '',
+                            tts_engine: last.ttsEngine || ''
                         } : null;
-                        return { ...window.__audioBackend.status, applied, apply_in_progress: false };
+                        if (applied && ['whisper-tiny', 'whisper-base', 'whisper-small'].includes(last.asrEngine)) {
+                            Object.assign(applied, {
+                                asr_language: last.asrLanguage, asr_threads: last.asrThreads,
+                                asr_beam_size: last.asrBeamSize, asr_best_of: last.asrBestOf
+                            });
+                        }
+                        if (applied && last.ttsEnabled && ['piper', 'kokoro', 'melotts'].includes(last.ttsEngine)) {
+                            Object.assign(applied, { tts_speed: last.ttsSpeed });
+                        }
+                        return {
+                            ...window.__audioBackend.status,
+                            applied,
+                            settings: last ? contractReport(last, applied) : null,
+                            apply_in_progress: false
+                        };
                     },
                     GetTTSModels: async () => [],
                 },
@@ -113,14 +155,17 @@ test('Save waits for hydration, persists first, applies, and closes only when lo
 
     await expect(page.locator('#audio-settings-overlay')).not.toHaveClass(/show/);
     await expect(page.locator('#audio-save-state')).toHaveText('Saved');
-    await expect(page.locator('#audio-apply-state')).toHaveText('Applied');
+    await expect(page.locator('#audio-apply-state')).toHaveText('Applied (supported)');
     await expect(page.locator('#audio-ready-state')).toHaveText('Ready (local initialized)');
 
     const calls = await page.evaluate(() => ({ ...window.__audioBackend, status: undefined }));
     expect(calls.setCalls).toHaveLength(1);
     expect(calls.setCalls[0].audio.asrEnabled).toBe(true);
     expect(calls.setCalls[0].audio.asrEngine).toBe('whisper-base');
-    expect(calls.applyCalls).toEqual([[true, false, 'whisper-base', 'piper']]);
+    expect(calls.applyCalls).toHaveLength(1);
+    expect(calls.applyCalls[0]).toMatchObject({
+        asrEnabled: true, ttsEnabled: false, asrEngine: 'whisper-base', ttsEngine: 'piper'
+    });
     expect(calls.notifications.some(n => n.type === 'error')).toBe(false);
 });
 
@@ -133,10 +178,11 @@ test('a remote engine is never rendered as locally ready, even if the status fla
     await page.locator('#audio-settings-save').click();
 
     await expect(page.locator('#audio-save-state')).toHaveText('Saved');
-    await expect(page.locator('#audio-apply-state')).toHaveText('Applied');
+    await expect(page.locator('#audio-apply-state')).toHaveText('Applied (supported)');
     await expect(page.locator('#audio-ready-state')).toContainText('Remote engine');
     await expect(page.locator('#audio-ready-state')).not.toHaveText('Ready (local initialized)');
     await expect(page.locator('#audio-settings-overlay')).toHaveClass(/show/);
+    await expect(page.locator('#audio-outcome-detail')).toContainText('27 unsupported settings saved but not applied');
 
     const notifications = await page.evaluate(() => window.__audioBackend.notifications);
     expect(notifications.some(n => n.type === 'warning' && /not verified/i.test(n.message))).toBe(true);
@@ -174,7 +220,7 @@ test('activation failure keeps Saved visible and Retry applies without saving or
     await page.evaluate(() => { window.__audioBackend.applyError = ''; });
     await page.locator('#audio-retry-activation').click();
 
-    await expect(page.locator('#audio-apply-state')).toHaveText('Applied');
+    await expect(page.locator('#audio-apply-state')).toHaveText('Applied (supported)');
     await expect(page.locator('#audio-ready-state')).toHaveText('Ready (local initialized)');
     await expect(page.locator('#audio-settings-overlay')).not.toHaveClass(/show/);
     const calls = await page.evaluate(() => ({
@@ -365,10 +411,12 @@ test('remote-unverified permits microphone capture and never becomes local-ready
     expect(await page.evaluate(() => window.AudioService.getASRReadiness().state)).toBe('remote-unverified');
 });
 
-// Ownership decision: startup reconciliation is renderer-owned by AudioService
-// after the real howl:settings-loaded event. Go loads settings, but does not run
-// a competing startup apply. This test loads the scripts in index.html order.
-test('startup reconciles the exact persisted engine through the real settings-loaded event', async ({ page }) => {
+// Startup restores persisted selections into the renderer but must not apply
+// them: applying would load a model and reserve VRAM without an explicit user
+// activation, and a saved selection must not imply ASR is active. Readiness is
+// read from the backend, and activation stays explicit through Save or Retry.
+// This test loads the scripts in index.html order.
+test('startup restores the persisted engine without applying it', async ({ page }) => {
     await installParentAudioPage(page, {
         audioServiceFirst: true,
         settings: {
@@ -382,14 +430,14 @@ test('startup reconciles the exact persisted engine through the real settings-lo
         status: LOCAL_READY,
     });
 
-    await page.waitForFunction(() => window.__parentAudio.applyCalls.length > 0);
+    await page.waitForFunction(() => window.AudioService.isASREnabled() === true);
     const state = await page.evaluate(() => ({
         applyCalls: window.__parentAudio.applyCalls,
         enabled: window.AudioService.isASREnabled(),
         readiness: window.AudioService.getASRReadiness().state,
     }));
 
-    expect(state.applyCalls).toEqual([[true, false, 'whisper-base', 'piper']]);
+    expect(state.applyCalls).toEqual([]);
     expect(state.enabled).toBe(true);
     expect(state.readiness).toBe('local-initialized');
 });

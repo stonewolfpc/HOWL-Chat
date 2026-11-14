@@ -1,0 +1,32 @@
+[startup] 21:08:00.739  +    0.0ms  process start
+[startup] 21:08:00.741  +    2.1ms  image init: begin
+[startup] 21:08:00.744  +    5.2ms  image init: config ready
+[ImageEngine] Initialized: binary=C:\Users\StoneWolfPC\HOWL_Chat\sd-server.exe models=H:/InvokeAI/models port=8081
+[startup] 21:08:00.745  +    5.7ms  image init: engine initialized
+[ImageEngine] sd-server commit: c6dfa9d
+[ImageEngine] Restored last model: "z-image-turbo-Q4_K_M"
+[startup] 21:08:00.808  +   69.4ms  NewApp done
+2026/11/04 21:08:00 [WebView2] Environment created successfully
+[startup] 21:08:00.915  +  175.8ms  OnStartup: webview reached backend
+[startup] 21:08:00.916  +  176.9ms  OnStartup: init complete
+[startup] 21:08:00.916  +  177.5ms  rescan: start
+[startup] 21:08:00.916  +  177.5ms  rescan: scanning G:\AI GGUF\GGUF
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+[TRACE:AddCharacterToChat] id=char_1793475578956_795 name=Tina (total=1)
+[scan] chat-ineligible model kept in inventory: G:\AI GGUF\GGUF\Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf (task=unknown basis=unrecognized-multimodal-identity)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\GGUF\vocoder-LFM2.5-Audio-1.5B-Q4_0.gguf (component)
+[startup] 21:08:59.614  +58875.0ms  rescan: done G:\AI GGUF\GGUF 25 entries
+[startup] 21:08:59.614  +58875.0ms  rescan: scanning G:\AI GGUF\voice
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\Qwen2.5-Omni-3B-mmproj-Q8_0.gguf (component)
+[scan] chat-ineligible model kept in inventory: G:\AI GGUF\voice\Qwen3-ASR-0.6B-Q8_0.gguf (task=speech-recognition basis=identity=qwen3-asr-0-6b)
+[scan] chat-ineligible model kept in inventory: G:\AI GGUF\voice\Qwen3-ASR-1.7B-Q8_0.gguf (task=speech-recognition basis=identity=qwen3-asr-1-7b)
+[scan] chat-ineligible model kept in inventory: G:\AI GGUF\voice\Ultravox-Llama-3.2-1B-Q4_K_M.gguf (task=audio-understanding basis=identity=ultravox-llama-3-2-1b)
+[scan] chat-ineligible model kept in inventory: G:\AI GGUF\voice\Voxtral-Mini-3B-2507-Q4_K_M.gguf (task=audio-understanding basis=identity=voxtral-mini-3b-2507)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\mmproj-Qwen3-ASR-0.6B-Q8_0.gguf (component)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\mmproj-Qwen3-ASR-1.7B-Q8_0.gguf (component)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\mmproj-Ultravox-v0_5-llama-3_2-1b-f16.gguf (component)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\mmproj-Voxtral-Mini-3B-2507-Q8_0.gguf (component)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf (component)
+[startup] 21:09:12.795  +72056.3ms  rescan: done G:\AI GGUF\voice 6 entries
+[GetLLMModels] excluded 13 non-chat or task-ineligible asset(s) from the chat picker
+[startup] 21:18:12.424  +611685.3ms  wails.Run returned

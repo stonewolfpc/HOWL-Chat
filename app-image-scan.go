@@ -264,8 +264,9 @@ func (a *App) InstallAssets(move bool) (InstallSummary, error) {
 	return convertInstallResult(res), nil
 }
 
-// GetRegisteredModels returns every model known to the persistent registry,
-// across all scan directories, pruning any whose files have been deleted.
+// GetRegisteredModels returns every available model known to the persistent
+// registry. Missing files stay registered for a later reconnection, but are not
+// offered by the picker while unavailable.
 func (a *App) GetRegisteredModels() (ScanResult, error) {
 	if a.modelRegistry == nil {
 		return ScanResult{}, fmt.Errorf("model registry not initialised")

@@ -1,0 +1,58 @@
+﻿14:17:04.378  REGISTRY_AFTER_START {'lora': 2, 'llm': 44, 'embedding': 1, 'vae': 2, 'tts': 1, 't5xxl': 1, 'controlnet': 2, 'diffusion': 6, 'clip_l': 1} | TTS=TestVoiceA
+14:17:07.301  BROWSER_READY=True
+14:17:08.258  OPEN_BROWSER INVOKED invoke-pattern index=0
+14:17:13.002  BROWSER_OPEN=False
+14:17:13.005  RESCAN_BTN=True
+14:17:14.052  RESCAN_CLICK INVOKED invoke-pattern index=0
+14:17:20.816  RESCAN_TOAST=True
+14:17:20.818  RESCAN_NO_ERROR=True
+14:17:20.879  REGISTRY_AFTER_UI_RESCAN {'diffusion': 6, 'llm': 44, 'lora': 2, 'embedding': 1, 'vae': 2, 'tts': 1, 't5xxl': 1, 'controlnet': 2, 'clip_l': 1} | TTS=TestVoiceA
+14:17:21.986  CLOSE_BROWSER powershell.exe : index 0 out of range; matches=0
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\audio-picker-check2.ps1:21 char:20
++ ...  { return ((& powershell -NoProfile -ExecutionPolicy Bypass -File $ui ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (index 0 out of range; matches=0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\uia.ps1:147 char:40
++ ... e $Index) { throw ("index $Index out of range; matches=" + $found.Cou ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (index 0 out of range; matches=0:String) [], RuntimeException
+    + FullyQualifiedErrorId : index 0 out of range; matches=0
+14:17:24.083  OPEN_SETTINGS_MENU INVOKED invoke-pattern index=0
+14:17:26.177  OPEN_AUDIO_SETTINGS INVOKED mouse-click index=0 at 1001,517
+14:17:48.045  AUDIO_DOC_READY=False
+14:17:49.130  OPEN_TTS_TAB powershell.exe : index 0 out of range; matches=0
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\audio-picker-check2.ps1:21 char:20
++ ...  { return ((& powershell -NoProfile -ExecutionPolicy Bypass -File $ui ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (index 0 out of range; matches=0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\uia.ps1:147 char:40
++ ... e $Index) { throw ("index $Index out of range; matches=" + $found.Cou ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (index 0 out of range; matches=0:String) [], RuntimeException
+    + FullyQualifiedErrorId : index 0 out of range; matches=0
+14:17:52.966  TTS_TAB_TREE_LEN=41119
+14:17:52.969  HAS_TTS_VOICE_FIELD=False
+14:17:52.971  HAS_TESTVOICE=False
+14:17:52.972  HAS_SHOULDNOTAPPEAR=False
+14:17:54.119  OPEN_SELECT powershell.exe : index 0 out of range; matches=0
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\audio-picker-check2.ps1:21 char:20
++ ...  { return ((& powershell -NoProfile -ExecutionPolicy Bypass -File $ui ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (index 0 out of range; matches=0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\uia.ps1:147 char:40
++ ... e $Index) { throw ("index $Index out of range; matches=" + $found.Cou ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (index 0 out of range; matches=0:String) [], RuntimeException
+    + FullyQualifiedErrorId : index 0 out of range; matches=0
+14:17:57.116  OPEN_TREE_VOICE=False
+14:17:57.118  OPEN_TREE_CHATFILE=False
+14:17:57.120  OPEN_TREE_BUILTIN=False
+14:17:58.003  SHOT audio2-tts-open.png
+14:18:00.064  RESTORED_DIRS={ "G:\\AI GGUF\\GGUF": "llm", "G:\\AI GGUF\\Image models": "image", "G:\\AI GGUF\\voice": "llm", "H:/InvokeAI/models": "image" }
+14:18:00.073  LEFTOVER=0

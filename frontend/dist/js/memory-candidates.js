@@ -289,6 +289,7 @@ function approveLocalCandidate(candidateId) {
             content: candidate.content,
             scope: candidate.scope,
             ownerId: candidate.owner_id,
+            ownerKind: candidate.owner_kind || '',
             tags: candidate.tags,
             source: 'auto',
             confidence: candidate.confidence

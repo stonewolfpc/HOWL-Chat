@@ -1,0 +1,30 @@
+=== CLOSE APP (graceful) ===
+graceful-exit
+=== AFTER CLOSE ===
+
+   Id ProcessName 
+   -- ----------- 
+18992 llama-server
+
+
+
+=== CHAT STORE FILES (recent) ===
+./config/logs/howl-errors-20261105.jsonl
+./config/model-registry.json
+./config/model-scan-dirs.json
+./config/settings.json
+=== RELAUNCH ===
+NEWPID=18960
+=== AFTER RESTART ===
+
+   Id ProcessName      WorkingSet64
+   -- -----------      ------------
+18960 howl-chat-unit-c    103936000
+17740 llama-server       2232926208
+
+
+
+=== SENT MESSAGE PRESENT AFTER RESTART? ===
+---MATCHES=0---
+SAVED build/unit-c/check4-restarted.png 1400x900 window=580,270
+=== SAVED CHAT CONTENT SEARCH ===

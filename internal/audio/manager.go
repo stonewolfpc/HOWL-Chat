@@ -53,8 +53,8 @@ type ManagedPipeline interface {
 	Shutdown(context.Context) error
 }
 
-// Settings is the minimal T2.9.2 desired-capability set. T2.9.6 extends it for
-// the full D5 settings contract.
+// Settings is the operational audio configuration adopted by one generation.
+// It intentionally excludes settings owned by the renderer or not yet wired.
 type Settings struct {
 	ASREnabled bool
 	TTSEnabled bool
@@ -63,6 +63,18 @@ type Settings struct {
 	// changing only the engine still rebuilds the generation.
 	ASREngine string
 	TTSEngine string
+	TTSVoice  string
+	// TTSSpeed is the configured speech-rate multiplier. The pipeline forwards
+	// it only for an explicit TTS engine whose profile declares speed support.
+	TTSSpeed float64
+
+	// Whisper-only decode options. They are populated only when the selected
+	// engine is an explicit Whisper model; other providers receive their
+	// existing defaults and report these values as unsupported.
+	ASRLanguage string
+	ASRThreads  int
+	ASRBeamSize int
+	ASRBestOf   int
 }
 
 // CapabilityResult is the factory's per-capability outcome for a candidate.

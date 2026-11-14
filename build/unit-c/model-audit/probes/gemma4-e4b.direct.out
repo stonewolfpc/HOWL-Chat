@@ -1,0 +1,15 @@
+0.00.123.647 I srv  llama_server: initializing ...
+0.00.123.657 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.123.998 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.132.968 I srv    load_model: loading model 'G:\AI GGUF\GGUF\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf'
+0.00.989.803 W load: override 'tokenizer.ggml.add_bos_token' to 'true' for Gemma4
+0.01.030.139 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.030.211 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.089.406 W load: '</s>' is a normal token here, removing it from EOG list
+0.01.610.548 W resolve_fused_ops: layer 24 is assigned to device CPU but Flash Attention is assigned to device CUDA0 (usually due to missing support)
+0.01.610.554 W resolve_fused_ops: Flash Attention not supported, set to disabled
+0.01.623.132 I cmn          init: llama threadpool init, n_threads = 4
+0.02.348.234 I srv    load_model: initializing, n_slots = 4, n_ctx_slot = 256, kv_unified = 'true'
+0.02.352.670 W common_chat_template_detect_params_init: detected an outdated gemma4 chat template, applying compatibility workarounds. Consider updating to the official template.
+0.02.353.929 I srv  server_run_i: model loaded
+0.02.353.938 I srv  server_on_li: listening on http://127.0.0.1:18097

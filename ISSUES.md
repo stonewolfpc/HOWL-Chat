@@ -179,15 +179,21 @@ reproducible — the original regex was not retained — so they are not reconci
 against; they are replaced by the measurements above (325 provided + 47 absent =
 372; 29 created-before-use + 18 never created = 47).
 
-**Four candidate findings, none repaired, none authorised:**
+**Candidate findings (the audio handoff is repaired in code; the other three remain unaddressed):**
 
-1. **Audio composer id is conditional, not a quick fix.** `audio-service.js:158`
-targets `#chat-input`; the composer is `index.html:1164` `id="message-input"`
-(class `.input-field`), which `chat-input.js:207` reads and `index.html:1157`
-already addresses by id for TTS. But upstream, `saveBlobToTempFile` returns
-`URL.createObjectURL(blob)` and passes it to `TranscribeAudio`, which expects a
-path — so the transcript may never exist. Repairing the id alone may fix a path
-that still cannot produce a transcript. Audit the handoff contract first.
+1. **Audio microphone handoff — repaired in the microphone/history tranche
+   (2026-11-04).** The renderer no longer uses `MediaRecorder` or a `blob:` URL.
+   It captures mono PCM through Web Audio, encodes a 16 kHz PCM16 WAV locally
+   (`audio-wav.js`), and calls `TranscribeAudioData` with one base64 payload. The
+   Go binding writes a uniquely named `%TEMP%/howl-asr/recording-*.wav`, hands
+   that path only to the managed pipeline, and removes it on success, error,
+   cancellation, or panic. The composer target is now `#message-input`; the
+   transcript is appended into the composer, not sent automatically. Go tests
+   cover binding/pipeline handoff, temp cleanup on success/error/cancellation,
+   concurrent unique paths, and the frontend contract; a Node assertion covers
+   the WAV header and 48 kHz-to-16 kHz output. **Limits:** no live Wails
+   microphone run, no persisted-history reopen test, no concurrent chat + ASR
+   measurement, and no general transcription-quality claim yet.
 2. **Two write-only character properties.** `first_mes` and `scenario` are collected
 at `character-form.js:61-62` (always `''`, missing fields) and restored at
 `character-grid.js:127` (guarded no-op). Neither has a consumer anywhere in the
@@ -346,6 +352,7 @@ Separate pass, its own stage, after everything above. Look for waste everywhere.
 
 Append here as stages close. One line each: date, stage, evidence, result.
 
+- 2026-11-04 · Microphone/history tranche (code close-out, live run pending) — replaced the WebM `MediaRecorder`/`blob:` handoff with renderer-side 16 kHz PCM16 WAV capture and a `TranscribeAudioData` binding; temp files are unique and removed on success, error, cancellation, and panic; composer target corrected to `#message-input`. Evidence: root tests, full `internal/audio/...` tests, `go build ./...`, JS syntax, Node WAV header/resample assertions. Not yet evidence: live Wails mic capture, transcript send + conversation reload/history, concurrent chat + ASR, real Whisper. No registry or family-list changes.
 - 2026-11-02 · Image generation settlement guard — source review PASS; stage-recorded tests PASS; independent review PASS; real-app acceptance PASS on verified build `d7e8aacd…` (PID 9252): abort leaves child alive, next request refused as abandoned, Unload/Reload recovers, work admitted after reset. Closed with no code change; the earlier live run had tested a pre-guard 18:59 binary. Unresolved: why the old sd-server exited.
 - 2026-11-02 · T2.2 ghost-ID inventory (evidence revision, no code change) — 18 ghost ids over 30 sites confirmed against a regenerated accounting: 372 literal `getElementById` ids, 601 markup ids, 325 provided by markup, 47 absent, 29 created before use, 18 never created. Withdrawn as superseded: 75 absent ids / 400 lookup ids / 51 runtime-created / 4 prefixes / 10 compound fragments (summed to 83; 51 exceeded the 50-id creation set; 75 counted strings, not ids). Recorded, none repaired: the audio `chat-input` vs `message-input` mismatch is conditional on an upstream `blob:` URL handoff (`saveBlobToTempFile` returns `createObjectURL`), so it is not yet a one-line fix; character `first_mes`/`scenario` are persisted write-only empty strings with no consumer; three manager modules have no discovered load path but unestablished behavioural equivalence, so they are legacy-looking, not provably redundant; the three form/manager pairs are parallel implementations, not duplicates. Limits: 16 template-literal lookups unclassified, one valid selector-extraction method, static inference only. Checkpoint `1477530` untouched.
 - 2026-11-01 · T2.1 Stage C (remaining pages theme verification) — five pages measured in both themes through `setThemeMode` with transitions off: 0 offenders at the probe's `|dL| * 255 < 60` luminance heuristic (text >=16 px only; the 14 px button labels were assessed visually), 0 stuck-dark areas in light, expected dark panels only in dark, and the buttons checked render white. No code changed. Independent review: PASS WITH FINDINGS, no blocking findings; closed. Corrections recorded: `real-settings.html` no longer exists (deleted by T2.2); `--accent-secondary` is deliberately constant cyan in both modes; the "stuck light flyout" reading was retracted, its proposed 4 s-transition cause withdrawn as unsupported and contradicted (no `@property` registration, probe overrides transitions), cause Unestablished; `ReapOrphans` kills by executable path under the project root, not by recorded state or parent identity. Evidence limits: per-page results and screenshots were not persisted, and the harness wrote chat state through real bindings. Open: override-sheet deletion, top-bar collision, `audio-settings` dark body background, stale `real-settings` references, and the cross-cutting process-ownership defect.

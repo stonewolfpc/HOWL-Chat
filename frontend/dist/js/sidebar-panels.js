@@ -106,6 +106,9 @@ function handleCharacterCreation() {
             if (character && index !== undefined && cd.characters && cd.characters[index]) {
                 cd.characters[index] = character;
                 saveChatData();
+                if (window.AudioService?.invalidateVoiceCache) {
+                    window.AudioService.invalidateVoiceCache(character.id);
+                }
                 if (window.updateCharacterPanel) window.updateCharacterPanel();
             }
         }

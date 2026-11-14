@@ -38,7 +38,9 @@
     <link rel="stylesheet" href="css/sampler-settings.css?v=41">
     <link rel="stylesheet" href="css/model-settings.css?v=41">
     <link rel="stylesheet" href="css/model-browser.css?v=42">
+    <link rel="stylesheet" href="css/content-integration.css?v=1">
     <link rel="stylesheet" href="css/model-directory.css?v=1">
+    <link rel="stylesheet" href="css/content-libraries.css?v=1">
     <link rel="stylesheet" href="css/story-tools.css?v=41">
     <link rel="stylesheet" href="css/icons.css?v=41">
     <link rel="stylesheet" href="css/tutorials.css?v=41">
@@ -68,6 +70,7 @@
     <script src="js/settings-controls.js?v=41"></script>
     <script src="js/real-settings.js?v=41"></script>
     <script src="js/model-directory.js?v=1"></script>
+    <script src="js/content-libraries.js?v=1"></script>
     <script src="js/chat-session.js?v=41"></script>
     <script src="js/loading-progress.js?v=41"></script>
     <script src="js/error-system.js?v=41"></script>
@@ -151,7 +154,7 @@
                          lost; give it its own flyout rather than repointing this item twice. -->
                     <div class="dropdown-item" onclick="toggleFlyout('sampler-settings-flyout')">Advanced</div>
                     <div class="dropdown-separator"></div>
-                    <div class="dropdown-item" onclick="resetApplication()" style="color: var(--danger-color, #ff4444);">Reset Application...</div>
+                    <div class="dropdown-item" onclick="resetAllSettings()">Reset Settings to Defaults...</div>
                     <div class="dropdown-separator"></div>
                     <div class="dropdown-item" onclick="exitApp()">Exit</div>
                 </div>
@@ -1407,6 +1410,15 @@
                             </div>
                         </div>
 
+                        <!-- Content libraries -->
+                        <div class="setting-card content-library-card">
+                            <div class="setting-label">Content Libraries</div>
+                            <div class="setting-description">Register folders Howl may read or save. Removing a library forgets the location only; files are never deleted.</div>
+                            <div id="content-libraries-manager" class="cl-manager" aria-live="polite">
+                                <div class="cl-empty">Loading libraries...</div>
+                            </div>
+                        </div>
+
                         <!-- Backup & Restore -->
                         <div class="setting-card">
                             <div class="setting-label">Backup & Restore</div>
@@ -1502,7 +1514,7 @@
             <div class="real-settings-footer">
                 <div class="settings-info">Settings are automatically saved</div>
                 <div class="settings-actions">
-                    <button class="settings-reset-btn" onclick="resetAllSettings()">Reset to Defaults</button>
+                    <button class="settings-reset-btn" onclick="resetAllSettings()">Reset Settings to Defaults</button>
                     <button class="settings-save-btn" onclick="saveAllSettings()">Save Settings</button>
                 </div>
             </div>
@@ -1667,7 +1679,13 @@
                         <div><strong>Layers:</strong> <span id="mb-detail-layers"></span></div>
                         <div><strong>Max Context:</strong> <span id="mb-detail-context"></span></div>
                         <div><strong>File Size:</strong> <span id="mb-detail-size"></span></div>
+                        <div><strong>Evidence:</strong> <span id="mb-detail-evidence"></span></div>
+                        <div><strong>Capabilities:</strong> <span id="mb-detail-capabilities"></span></div>
+                        <div><strong>Candidate runtimes:</strong> <span id="mb-detail-runtimes"></span></div>
+                        <div><strong>Tokenizer:</strong> <span id="mb-detail-tokenizer"></span></div>
                     </div>
+                    <div class="mb-intel-note" id="mb-detail-source"></div>
+                    <div class="mb-intel-note" id="mb-detail-notes"></div>
                     <div class="mb-memory-bar">
                         <div class="mb-mem-item">
                             <span class="mb-mem-label">VRAM</span>

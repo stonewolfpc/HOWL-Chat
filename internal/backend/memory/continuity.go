@@ -61,16 +61,18 @@ func NewCharacterContinuity() *CharacterContinuity {
 	return &CharacterContinuity{projectRoot: root}
 }
 
-// ExportCharacterMemories extracts transferable memories for a character
-func (cc *CharacterContinuity) ExportCharacterMemories(characterName string, allMemories []types.MemoryRecord, config ContinuityConfig) []types.MemoryRecord {
-	if !config.Enabled {
+// ExportCharacterMemories extracts transferable memories for a character.
+// characterID must be the stable character.id. Legacy records without the
+// character_id owner kind are retained in storage but never exported.
+func (cc *CharacterContinuity) ExportCharacterMemories(characterID string, allMemories []types.MemoryRecord, config ContinuityConfig) []types.MemoryRecord {
+	if !config.Enabled || characterID == "" {
 		return nil
 	}
 
-	// Filter to character-scoped memories
+	// Filter to character-scoped memories owned by this stable identity.
 	var characterMemories []types.MemoryRecord
 	for _, m := range allMemories {
-		if m.Scope != "character" || m.OwnerID != characterName {
+		if !IsStableCharacterOwnership(m, characterID) {
 			continue
 		}
 		if m.Confidence < config.MinConfidence {
@@ -109,9 +111,11 @@ func (cc *CharacterContinuity) ExportCharacterMemories(characterName string, all
 	return transferable
 }
 
-// ImportCharacterMemories merges exported memories into a new scenario
-func (cc *CharacterContinuity) ImportCharacterMemories(characterName string, imported []types.MemoryRecord, existing []types.MemoryRecord, config ContinuityConfig) []types.MemoryRecord {
-	if !config.Enabled || len(imported) == 0 {
+// ImportCharacterMemories merges exported memories into a new scenario. Only
+// records carrying the same stable character ID are accepted; legacy
+// name-owned or foreign-owned records are skipped, never reassigned.
+func (cc *CharacterContinuity) ImportCharacterMemories(characterID string, imported []types.MemoryRecord, existing []types.MemoryRecord, config ContinuityConfig) []types.MemoryRecord {
+	if !config.Enabled || len(imported) == 0 || characterID == "" {
 		return existing
 	}
 
@@ -124,6 +128,9 @@ func (cc *CharacterContinuity) ImportCharacterMemories(characterName string, imp
 	result = append(result, existing...)
 
 	for _, imp := range imported {
+		if !IsStableCharacterOwnership(imp, characterID) {
+			continue
+		}
 		if seen[imp.ID] {
 			continue
 		}

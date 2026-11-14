@@ -1,0 +1,6 @@
+{"id":"0","sender":"User","text":"Reply with exactly this word and nothing else: PONG","role":"user","timestamp":"2026-11-05T12:01:55-06:00","hasImage":false}
+{"id":"1","sender":"AI","text":"PONG","role":"assistant","timestamp":"2026-11-05T12:02:08-06:00","hasImage":false}
+{"id":"2","sender":"User","text":"Sorry, sweetheart. The Blue Lantern Guild meets at seven in the Copper Harbor.","role":"user","timestamp":"2026-11-05T13:14:18-06:00","hasImage":false}
+{"id":"3","sender":"AI","text":"Copper Harbor. Seven sharp. I won't be late again, darling. Promise.","role":"assistant","timestamp":"2026-11-05T13:14:24-06:00","hasImage":false}
+{"id":"4","sender":"User","text":"Reply with exactly this word and nothing else: LEDGER","role":"user","timestamp":"2026-11-05T13:16:57-06:00","hasImage":false}
+{"id":"5","sender":"AI","text":"LEDGER","role":"assistant","timestamp":"2026-11-05T13:16:59-06:00","hasImage":false}

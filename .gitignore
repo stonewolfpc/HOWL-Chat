@@ -94,8 +94,19 @@ runtime/
 .sd-upgrade/
 .freebuff/
 build/bin/
+build/tools/
 howl-chat-*.exe
 harness.log
 harness.err
 preview-probe.json
 probe2.json
+
+# Runtime binaries fetched from upstream releases (replaceable, not source)
+sd-cli.exe
+sd-cli
+sd-server.exe
+sd-server
+*.bak
+
+# Test scratch and scratch evidence (regenerated)
+build/tmp/

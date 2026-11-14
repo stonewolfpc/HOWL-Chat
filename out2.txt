@@ -1,0 +1,16 @@
+project_root=C:\Users\StoneWolfPC\HOWL_Chat
+state_root=C:\Users\StoneWolfPC\HOWL_Chat
+config=C:\Users\StoneWolfPC\HOWL_Chat\config
+chats=C:\Users\StoneWolfPC\HOWL_Chat\Chats
+worlds=C:\Users\StoneWolfPC\HOWL_Chat\Worlds
+characters=C:\Users\StoneWolfPC\HOWL_Chat\Characters
+scenarios=C:\Users\StoneWolfPC\HOWL_Chat\Scenarios
+gallery=C:\Users\StoneWolfPC\HOWL_Chat\images\gallery
+entities=C:\Users\StoneWolfPC\HOWL_Chat\images\entities
+workflows=C:\Users\StoneWolfPC\HOWL_Chat\workflows
+persisted_chats=C:\Users\StoneWolfPC\HOWL_Chat\persisted-chats
+logs=C:\Users\StoneWolfPC\HOWL_Chat\logs
+tts_cache=C:\Users\StoneWolfPC\HOWL_Chat\cache\tts
+temp=C:\Users\STONEW~1\AppData\Local\Temp
+isolation=off
+webview_data=

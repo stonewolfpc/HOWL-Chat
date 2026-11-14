@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"howl-chat/internal/proc"
 	"os/exec"
 	"sync"
 	"sync/atomic"
@@ -17,6 +16,7 @@ import (
 	"howl-chat/internal/backend/model"
 	"howl-chat/internal/backend/rag"
 	"howl-chat/internal/backend/types"
+	"howl-chat/internal/contentimport"
 	"howl-chat/internal/errors"
 	imageengine "howl-chat/internal/image/engine"
 	"howl-chat/internal/image/gallery"
@@ -24,15 +24,32 @@ import (
 	"howl-chat/internal/image/registry"
 	imgsettings "howl-chat/internal/image/settings"
 	imagetypes "howl-chat/internal/image/types"
+	"howl-chat/internal/library"
+	"howl-chat/internal/lorebookstore"
+	"howl-chat/internal/modelintel"
 	"howl-chat/internal/paths"
 	appsettings "howl-chat/internal/settings"
 )
+
+// inferenceClient is the exact inference surface the app uses. *llama.HTTPClient
+// implements it in production. It exists so a recorder can sit at the same call
+// point in tests, without a second prompt-assembly route or a live model.
+type inferenceClient interface {
+	GenerateChat(messages []llama.ChatMessage, options *llama.InferenceOptions) (string, error)
+	GenerateChatStream(messages []llama.ChatMessage, options *llama.InferenceOptions, callback llama.TokenCallback) error
+	GenerateChatStreamWithImage(messages []llama.ChatMessage, imageData []byte, options *llama.InferenceOptions, callback llama.TokenCallback) error
+	CancelRequest()
+	GetContextSize() int
+	GetLoadedModel() (map[string]interface{}, error)
+	Health() error
+	IsLoaded() bool
+}
 
 // App represents Wails application
 // Contains application context and backend services
 type App struct {
 	ctx             context.Context
-	httpClient      *llama.HTTPClient
+	httpClient      inferenceClient
 	serverProc      *exec.Cmd
 	samplerSettings map[string]interface{}
 	modelSettings   map[string]interface{}
@@ -45,8 +62,19 @@ type App struct {
 	characters      []*chat.CharacterContext
 	lorebooks       []lorebook.Entry
 	triggeredLore   map[string]bool
+	streamMu        sync.Mutex
 	streamCancel    context.CancelFunc
+	streamGen       uint64
 	chatPersistence *chat.PersistenceManager
+
+	// Lifecycle ownership. shuttingDown is read by all new-work entry points;
+	// shutdownCoord makes cleanup single-entry; serverMu protects the llama
+	// process and its one Wait owner.
+	shuttingDown  atomic.Bool
+	shutdownMu    sync.Mutex
+	shutdownCoord *shutdownCoordinator
+	serverMu      sync.Mutex
+	serverMonitor *processMonitor
 
 	// Model loading progress (updated by LoadModel goroutine, read by GetLoadingProgress/Stage)
 	loadingProgress atomic.Int64 // stores progress*1000 as integer for lock-free reads
@@ -65,6 +93,21 @@ type App struct {
 	// Audio Manager Integration
 	audioManager *audio.Manager
 
+	// Audio settings contract. The renderer can persist all 34 fields, while
+	// audioManager applies only the four operational fields. audioDesired is the
+	// authoritative request; audioApplyErr is the last explicit application
+	// failure and is never mixed into the manager's effective configuration.
+	audioDesiredMu  sync.RWMutex
+	audioDesired    audio.DesiredSettings
+	audioDesiredSet bool
+	audioApplyErr   string
+
+	// asrActivationPending records that an explicit ASR activation was requested
+	// but could not complete. The microphone gate refuses before the manager
+	// adopts the request, so status uses this flag to keep reporting the actual
+	// microphone condition instead of falling back to "disabled".
+	asrActivationPending atomic.Bool
+
 	// Image Generation Engine
 	imageEngine    imageengine.ImageEngine
 	gallerySvc     *gallery.Service
@@ -77,6 +120,12 @@ type App struct {
 	lastImageModelOpts imagetypes.ModelLoadOptions
 	imgSettingsStore   *imgsettings.Store
 	modelRegistry      *registry.Registry
+	contentLibraries   *library.Registry
+	contentInventory   *library.InventoryStore
+	worldImport        *contentimport.Service
+	scenarioImport     *contentimport.Service
+	lorebookStore      *lorebookstore.Store
+	modelIntel         *modelintel.Cache
 
 	// loaderDiagnosticsDir overrides where model-load failure records are
 	// written. Empty means <project root>/logs.
@@ -98,12 +147,9 @@ type App struct {
 // NewApp creates a new instance of the App struct
 // Initializes backend services with llama-server HTTP client
 func NewApp() *App {
-	// Kill model servers left behind by a crashed or force-killed previous instance.
-	// Deferred to a goroutine: this shells out to PowerShell (~0.3-0.5s measured)
-	// and nothing needs it before the window exists, so it must not sit on the
-	// pre-window startup path where every millisecond delays the first paint.
-	go proc.ReapOrphans(paths.ProjectRoot())
-
+	// Children are assigned to the application job at start. Crash cleanup is
+	// handled by KILL_ON_JOB_CLOSE, not by matching executable paths: a second
+	// Howl instance must never be able to reap this instance's model servers.
 	client := llama.NewHTTPClient("localhost", 8080, true)
 
 	// Initialize model manager
@@ -135,7 +181,7 @@ func NewApp() *App {
 	} else {
 		ragEmbedder = rag.NewKeywordEmbedder()
 	}
-	ragService = rag.NewService(paths.ProjectRoot(), ragEmbedder)
+	ragService = rag.NewService(paths.StateRoot(), ragEmbedder)
 	if chatService != nil {
 		chatService.SetRAGService(ragService)
 		chatService.SetRAGEnabled(true)
@@ -191,14 +237,51 @@ func NewApp() *App {
 		audioManager:    audio.NewProductionManager(),
 	}
 
+	// Production is a no-op; a promptcapture build swaps in the test-only recorder.
+	app.httpClient = wrapInferenceCapture(app.httpClient)
+
 	// Initialize unified settings store
 	app.settingsStore = appsettings.NewStore(app.getSettingsDir())
+	if libs, err := library.New(app.getSettingsDir()); err != nil {
+		fmt.Printf("Warning: failed to load content libraries: %v\n", err)
+	} else {
+		app.contentLibraries = libs
+		if chatService != nil {
+			if err := chatService.SetContentLibraries(libs); err != nil {
+				fmt.Printf("Warning: failed to attach world/scenario store: %v\n", err)
+			}
+		}
+		if service, err := contentimport.New(libs, library.Worlds, app.getSettingsDir()); err != nil {
+			fmt.Printf("Warning: failed to initialise world import: %v\n", err)
+		} else {
+			app.worldImport = service
+		}
+		if service, err := contentimport.New(libs, library.Scenarios, app.getSettingsDir()); err != nil {
+			fmt.Printf("Warning: failed to initialise scenario import: %v\n", err)
+		} else {
+			app.scenarioImport = service
+		}
+	}
+	app.contentInventory = library.NewInventoryStore(app.getSettingsDir())
+	app.lorebookStore = lorebookstore.New(app.contentLibraries, app.getSettingsDir())
+	if intel, err := modelintel.NewCache(app.getSettingsDir()); err != nil {
+		fmt.Printf("Warning: failed to load model intelligence cache: %v\n", err)
+	} else {
+		app.modelIntel = intel
+	}
 	loadedSettings, err := app.settingsStore.Load()
 	if err != nil {
 		fmt.Printf("Warning: failed to load unified settings: %v\n", err)
 		loadedSettings = make(map[string]interface{})
 	}
 	app.appSettings = loadedSettings
+
+	// Restore the full desired audio contract without activating anything. The
+	// manager remains untouched until the user explicitly saves or retries.
+	app.setAudioDesired(audio.DefaultDesiredSettings())
+	if rawAudio, ok := loadedSettings["audio"].(map[string]interface{}); ok {
+		app.setAudioDesired(audio.DesiredSettingsFromMap(rawAudio))
+	}
 
 	// Migrate legacy sampler/model settings into unified store if unified is empty
 	if samplerSection, ok := loadedSettings["sampler"].(map[string]interface{}); ok && len(samplerSection) > 0 {
@@ -254,41 +337,15 @@ func (a *App) startup(ctx context.Context) {
 	// "Never show again" means silent discovery, not no discovery: keep the
 	// pickers accurate in the background without interrupting the user.
 	go a.RunSilentModelDiscovery()
+	startNativeTestSeam(a)
 }
 
-// OnShutdown is called when the application is shutting down
-// Performs cleanup operations before application termination
+// OnShutdown is the Wails shutdown callback. It delegates to the one
+// idempotent lifecycle sequence shared with explicit Exit.
 func (a *App) OnShutdown(ctx context.Context) {
-	// Save current chat before shutting down
-	if a.chatPersistence != nil {
-		a.performFinalSave()
+	if err := a.shutdown(ctx); err != nil {
+		fmt.Printf("Application shutdown completed with errors: %v\n", err)
 	}
-
-	// Stop the model server (and anything it spawned) before anything else,
-	// so port 8080 and VRAM are released immediately.
-	if a.serverProc != nil && a.serverProc.Process != nil {
-		proc.KillTree(a.serverProc.Process.Pid)
-		_ = a.serverProc.Process.Kill()
-		_, _ = a.serverProc.Process.Wait()
-		a.serverProc = nil
-	}
-
-	// Shut down the image engine, which owns its own sd-server subprocess.
-	if a.imageEngine != nil {
-		_ = a.imageEngine.Shutdown()
-	}
-
-	// Shut down the manager-owned audio generation. The manager applies its
-	// bounded drain policy; a timeout or shutdown failure must be visible.
-	if a.audioManager != nil {
-		if err := a.audioManager.Close(ctx); err != nil {
-			fmt.Printf("Audio manager shutdown error: %v\n", err)
-		}
-	}
-
-	// Reap anything still attached to the job object, so llama-server and
-	// sd-server can never outlive the app window.
-	proc.CloseJob()
 }
 
 // Chat Management Wails Bindings

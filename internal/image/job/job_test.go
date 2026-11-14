@@ -252,6 +252,26 @@ func TestNextJobCompletesAfterACancel(t *testing.T) {
 	}
 }
 
+func TestCancelAllClosesAdmissionAndCancelsActiveJob(t *testing.T) {
+	eng := newFakeEngine()
+	m := NewManager(eng)
+
+	id := m.Start(types.ImageOptions{Mode: "txt2img"}, nil)
+	waitUntil(t, 3*time.Second, func() bool { return m.Status(id).Status == "generating" })
+
+	m.CancelAll()
+
+	if got := m.Status(id).Status; got != "cancelled" {
+		t.Fatalf("active job status = %q, want cancelled", got)
+	}
+	if got := eng.cancelledJobs(); len(got) != 1 || got[0] != id {
+		t.Fatalf("engine cancellations = %v, want [%s]", got, id)
+	}
+	if next := m.Start(types.ImageOptions{Mode: "txt2img"}, nil); next != "" {
+		t.Fatalf("Start returned %q after CancelAll, want refusal", next)
+	}
+}
+
 func waitUntil(t *testing.T, d time.Duration, cond func() bool) {
 	t.Helper()
 	deadline := time.Now().Add(d)

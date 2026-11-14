@@ -1,0 +1,877 @@
+[
+ {
+  "file": "G:\\AI GGUF\\voice\\Gemma-4-E2B-it-Q8_0.gguf",
+  "bytes": 4051836928,
+  "ver": 3,
+  "tensors": 601,
+  "arch": "gemma4",
+  "name": "gemma-4-E2B-it",
+  "layers": 35,
+  "embd": 1536,
+  "ctx": 131072,
+  "ftype": 7,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": false,
+  "problems": [
+   "blk.21.ffn_up.weight:overrun+1080320",
+   "blk.21.inp_gate.weight:overrun+1498112",
+   "blk.21.layer_output_scale.weight:overrun+1498116",
+   "blk.21.post_attention_norm.weight:overrun+1504288"
+  ],
+  "max_end": 4951678048,
+  "data_start": 15819104
+ },
+ {
+  "file": "G:\\AI GGUF\\voice\\Qwen2.5-Omni-3B-Q4_K_M.gguf",
+  "bytes": 859443200,
+  "ver": 3,
+  "tensors": 435,
+  "arch": "qwen2vl",
+  "name": "",
+  "layers": 36,
+  "embd": 2048,
+  "ctx": 32768,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": false,
+  "problems": [
+   "blk.9.attn_q.weight:overrun+1978688",
+   "blk.9.attn_v.bias:overrun+1979712",
+   "blk.9.attn_v.weight:overrun+2409792",
+   "blk.9.ffn_down.weight:overrun+20903232"
+  ],
+  "max_end": 2098976768,
+  "data_start": 5954880
+ },
+ {
+  "file": "G:\\AI GGUF\\voice\\Qwen2.5-Omni-3B-mmproj-Q8_0.gguf",
+  "bytes": 1343713280,
+  "ver": 3,
+  "tensors": 1008,
+  "arch": "clip",
+  "name": "",
+  "layers": null,
+  "embd": null,
+  "ctx": null,
+  "ftype": 7,
+  "chat_template": false,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": false,
+  "problems": [
+   "v.blk.31.ffn_up.weight:overrun+260064",
+   "v.blk.31.ln1.weight:overrun+265184",
+   "v.blk.31.ln2.weight:overrun+270304",
+   "v.blk.4.attn_k.bias:overrun+275424"
+  ],
+  "max_end": 1537973248,
+  "data_start": 58080
+ },
+ {
+  "file": "G:\\AI GGUF\\voice\\Qwen3-ASR-0.6B-Q8_0.gguf",
+  "bytes": 804749248,
+  "ver": 3,
+  "tensors": 311,
+  "arch": "qwen3vl",
+  "name": "",
+  "layers": 28,
+  "embd": 1024,
+  "ctx": 65536,
+  "ftype": 7,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 798801920,
+  "data_start": 5947328
+ },
+ {
+  "file": "G:\\AI GGUF\\voice\\Qwen3-ASR-1.7B-Q8_0.gguf",
+  "bytes": 2165034944,
+  "ver": 3,
+  "tensors": 311,
+  "arch": "qwen3vl",
+  "name": "",
+  "layers": 28,
+  "embd": 2048,
+  "ctx": 65536,
+  "ftype": 7,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 2159087616,
+  "data_start": 5947328
+ },
+ {
+  "file": "G:\\AI GGUF\\voice\\Ultravox-Llama-3.2-1B-Q4_K_M.gguf",
+  "bytes": 700686336,
+  "ver": 3,
+  "tensors": 147,
+  "arch": "llama",
+  "name": "Llama 3.2 1B Instruct",
+  "layers": 16,
+  "embd": 2048,
+  "ctx": 131072,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": false,
+  "problems": [
+   "blk.7.ffn_down.weight:overrun+4305024",
+   "blk.7.ffn_gate.weight:overrun+13742208",
+   "blk.7.ffn_up.weight:overrun+23179392",
+   "blk.7.ffn_norm.weight:overrun+23187584"
+  ],
+  "max_end": 799862912,
+  "data_start": 7831552
+ },
+ {
+  "file": "G:\\AI GGUF\\voice\\Voxtral-Mini-3B-2507-Q4_K_M.gguf",
+  "bytes": 2473001920,
+  "ver": 3,
+  "tensors": 273,
+  "arch": "llama",
+  "name": "",
+  "layers": 30,
+  "embd": 3072,
+  "ctx": 131072,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 2464591872,
+  "data_start": 8410048
+ },
+ {
+  "file": "G:\\AI GGUF\\voice\\mmproj-Qwen3-ASR-0.6B-Q8_0.gguf",
+  "bytes": 214392480,
+  "ver": 3,
+  "tensors": 302,
+  "arch": "clip",
+  "name": "",
+  "layers": null,
+  "embd": null,
+  "ctx": null,
+  "ftype": 7,
+  "chat_template": false,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 214374976,
+  "data_start": 17504
+ },
+ {
+  "file": "G:\\AI GGUF\\voice\\mmproj-Qwen3-ASR-1.7B-Q8_0.gguf",
+  "bytes": 355709344,
+  "ver": 3,
+  "tensors": 398,
+  "arch": "clip",
+  "name": "",
+  "layers": null,
+  "embd": null,
+  "ctx": null,
+  "ftype": 7,
+  "chat_template": false,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 355686464,
+  "data_start": 22880
+ },
+ {
+  "file": "G:\\AI GGUF\\voice\\mmproj-Ultravox-v0_5-llama-3_2-1b-f16.gguf",
+  "bytes": 1241714688,
+  "ver": 3,
+  "tensors": 491,
+  "arch": "clip",
+  "name": "",
+  "layers": null,
+  "embd": null,
+  "ctx": null,
+  "ftype": 1,
+  "chat_template": false,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": false,
+  "problems": [
+   "a.blk.9.ffn_up.weight:overrun+10829728",
+   "a.blk.9.ffn_down.bias:overrun+10834848",
+   "a.blk.9.ffn_down.weight:overrun+23942048",
+   "a.blk.9.ln2.bias:overrun+23947168"
+  ],
+  "max_end": 1371095040,
+  "data_start": 28576
+ },
+ {
+  "file": "G:\\AI GGUF\\voice\\mmproj-Voxtral-Mini-3B-2507-Q8_0.gguf",
+  "bytes": 715714080,
+  "ver": 3,
+  "tensors": 489,
+  "arch": "clip",
+  "name": "",
+  "layers": null,
+  "embd": null,
+  "ctx": null,
+  "ftype": 7,
+  "chat_template": false,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 715685888,
+  "data_start": 28192
+ },
+ {
+  "file": "G:\\AI GGUF\\voice\\mmproj-gemma-4-E2B-it-Q8_0.gguf",
+  "bytes": 557368064,
+  "ver": 3,
+  "tensors": 1411,
+  "arch": "clip",
+  "name": "gemma-4-E2B-it",
+  "layers": null,
+  "embd": null,
+  "ctx": null,
+  "ftype": 7,
+  "chat_template": false,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 557283456,
+  "data_start": 84608
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Captain-Eris_Violet-V0.420-12B.Q4_K_M.gguf",
+  "bytes": 7477208416,
+  "ver": 3,
+  "tensors": 363,
+  "arch": "llama",
+  "name": "Captain_BMO 12B",
+  "layers": 40,
+  "embd": 5120,
+  "ctx": 1024000,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7469322240,
+  "data_start": 7886176
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Captain_Eris-Twighlight-12B.Q4_K_M.gguf",
+  "bytes": 7477208416,
+  "ver": 3,
+  "tensors": 363,
+  "arch": "llama",
+  "name": "Captain_BMO 12B",
+  "layers": 40,
+  "embd": 5120,
+  "ctx": 1024000,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7469322240,
+  "data_start": 7886176
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive.gguf",
+  "bytes": 12109565888,
+  "ver": 3,
+  "tensors": 459,
+  "arch": "gpt-oss",
+  "name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive",
+  "layers": 24,
+  "embd": 2880,
+  "ctx": 131072,
+  "ftype": 38,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": false,
+  "problems": [
+   "blk.0.ffn_down_exps.weight:unknown_type_39",
+   "blk.0.ffn_gate_exps.weight:unknown_type_39",
+   "blk.0.ffn_up_exps.weight:unknown_type_39",
+   "blk.1.ffn_down_exps.weight:unknown_type_39"
+  ],
+  "max_end": 12096558336,
+  "data_start": 13007552
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced.gguf",
+  "bytes": 12109566656,
+  "ver": 3,
+  "tensors": 459,
+  "arch": "gpt-oss",
+  "name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced",
+  "layers": 24,
+  "embd": 2880,
+  "ctx": 131072,
+  "ftype": 38,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": false,
+  "problems": [
+   "blk.0.ffn_down_exps.weight:unknown_type_39",
+   "blk.0.ffn_gate_exps.weight:unknown_type_39",
+   "blk.0.ffn_up_exps.weight:unknown_type_39",
+   "blk.1.ffn_down_exps.weight:unknown_type_39"
+  ],
+  "max_end": 12096558336,
+  "data_start": 13008320
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
+  "bytes": 5335285728,
+  "ver": 3,
+  "tensors": 720,
+  "arch": "gemma4",
+  "name": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive",
+  "layers": 42,
+  "embd": 2560,
+  "ctx": 131072,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 5319466304,
+  "data_start": 15819424
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf",
+  "bytes": 7381381760,
+  "ver": 3,
+  "tensors": 667,
+  "arch": "gemma4",
+  "name": "Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced",
+  "layers": 48,
+  "embd": 3840,
+  "ctx": 262144,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7365559808,
+  "data_start": 15821952
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated-Q6_K.gguf",
+  "bytes": 7558901920,
+  "ver": 3,
+  "tensors": 442,
+  "arch": "qwen35",
+  "name": "Huihui Qwythos 9B Claude Mythos 5 1M Abliterated MTP",
+  "layers": 33,
+  "embd": 4096,
+  "ctx": 1048576,
+  "ftype": 18,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7547932672,
+  "data_start": 10969248
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+  "bytes": 5155565440,
+  "ver": 3,
+  "tensors": 256,
+  "arch": "lfm2moe",
+  "name": "LFM2.5 8B A1B Heretic",
+  "layers": 24,
+  "embd": 2048,
+  "ctx": 128000,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 5147326208,
+  "data_start": 8239232
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\LongWriter-glm4-9b-abliterated.IQ4_XS.gguf",
+  "bytes": 5303700128,
+  "ver": 3,
+  "tensors": 283,
+  "arch": "chatglm",
+  "name": "LongWriter Glm4 9b",
+  "layers": 40,
+  "embd": 4096,
+  "ctx": 1048576,
+  "ftype": 30,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 5297668096,
+  "data_start": 6032032
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\MN-12B-Mag-Mell-R1-KTO.Q4_K_M.gguf",
+  "bytes": 7477204896,
+  "ver": 3,
+  "tensors": 363,
+  "arch": "llama",
+  "name": "MN 12B Mag Mell R1 KTO",
+  "layers": 40,
+  "embd": 5120,
+  "ctx": 1024000,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7469322240,
+  "data_start": 7882656
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\MN-12B-Mag-Mell-R1-Uncensored-Scale1.2.i1-Q4_K_S.gguf",
+  "bytes": 7120197600,
+  "ver": 3,
+  "tensors": 363,
+  "arch": "llama",
+  "name": "Mistral Nemo Base 2407 Chatml",
+  "layers": 40,
+  "embd": 5120,
+  "ctx": 1024000,
+  "ftype": 14,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7112314880,
+  "data_start": 7882720
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Mistral-Helcyon-Mercury-12b-v3.2-absolute-heresy.i1-Q4_K_M.gguf",
+  "bytes": 7477208960,
+  "ver": 3,
+  "tensors": 363,
+  "arch": "llama",
+  "name": "Mistral Helcyon Mercury 12b v3.2 Absolute Heresy",
+  "layers": 40,
+  "embd": 5120,
+  "ctx": 131072,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7469322240,
+  "data_start": 7886720
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Moonlit-Mirage-12B-Heretic.i1-Q4_K_M.gguf",
+  "bytes": 7477226112,
+  "ver": 3,
+  "tensors": 363,
+  "arch": "llama",
+  "name": "Moonlit Mirage 12B Heretic",
+  "layers": 40,
+  "embd": 5120,
+  "ctx": 131072,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7469343488,
+  "data_start": 7882624
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Qwen2.5-Omni-7B-Q4_K_M.gguf",
+  "bytes": 4683073088,
+  "ver": 3,
+  "tensors": 339,
+  "arch": "qwen2vl",
+  "name": "Qwen2.5-Omni-7B",
+  "layers": 28,
+  "embd": 3584,
+  "ctx": 32768,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 4677120000,
+  "data_start": 5953088
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Qwen2.5-Omni-7B-abliterated.Q4_K_M.gguf",
+  "bytes": 4683072672,
+  "ver": 3,
+  "tensors": 339,
+  "arch": "qwen2vl",
+  "name": "Qwen2.5 Omni 7B Abliterated",
+  "layers": 28,
+  "embd": 3584,
+  "ctx": 32768,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 4677120000,
+  "data_start": 5952672
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+  "bytes": 5627044224,
+  "ver": 3,
+  "tensors": 427,
+  "arch": "qwen35",
+  "name": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16",
+  "layers": 32,
+  "embd": 4096,
+  "ctx": 262144,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 5616076800,
+  "data_start": 10967424
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Qwen3.8-27B-Uncensored-HauhauCS-Aggressive-IQ2_M.gguf",
+  "bytes": 10319906944,
+  "ver": 3,
+  "tensors": 866,
+  "arch": "qwen35",
+  "name": "Qwen3.8-27B-Uncensored-HauhauCS-Aggressive",
+  "layers": 65,
+  "embd": 5120,
+  "ctx": 262144,
+  "ftype": 29,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 10308911104,
+  "data_start": 10995840
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf",
+  "bytes": 5027784800,
+  "ver": 3,
+  "tensors": 399,
+  "arch": "qwen3vl",
+  "name": "Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M",
+  "layers": 36,
+  "embd": 4096,
+  "ctx": 262144,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 5021827072,
+  "data_start": 5957728
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Riverfish-Rocinante-12B-SFT-DPO.i1-Q4_K_M.gguf",
+  "bytes": 7477205632,
+  "ver": 3,
+  "tensors": 363,
+  "arch": "llama",
+  "name": "Riverfish Rocinante 12B SFT DPO",
+  "layers": 40,
+  "embd": 5120,
+  "ctx": 1024000,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7469322240,
+  "data_start": 7883392
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Rocinante-X-12B-v1-absolute-heresy.Q4_K_M.gguf",
+  "bytes": 7477208384,
+  "ver": 3,
+  "tensors": 363,
+  "arch": "llama",
+  "name": "Rocinante X 12B v1 Absolute Heresy",
+  "layers": 40,
+  "embd": 5120,
+  "ctx": 131072,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7469322240,
+  "data_start": 7886144
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\TheDrummer_Rocinante-X-12B-v1-Q4_K_M.gguf",
+  "bytes": 7477207712,
+  "ver": 3,
+  "tensors": 363,
+  "arch": "llama",
+  "name": "Rocinante X 12B v1",
+  "layers": 40,
+  "embd": 5120,
+  "ctx": 131072,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7469322240,
+  "data_start": 7885472
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Wayfarer-2-12B-absolute-heresy.i1-Q4_K_M.gguf",
+  "bytes": 7477219296,
+  "ver": 3,
+  "tensors": 363,
+  "arch": "llama",
+  "name": "Wayfarer 2 12B Absolute Heresy",
+  "layers": 40,
+  "embd": 5120,
+  "ctx": 131072,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7469336416,
+  "data_start": 7882880
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\Wayfarer-2-12B.i1-Q4_K_M(1).gguf",
+  "bytes": 7477219136,
+  "ver": 3,
+  "tensors": 363,
+  "arch": "llama",
+  "name": "Wayfarer 2 12B",
+  "layers": 40,
+  "embd": 5120,
+  "ctx": 131072,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7469336416,
+  "data_start": 7882720
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\c4ai-command-r7b-12-2024-abliterated-Q4_K_M.gguf",
+  "bytes": 5057010336,
+  "ver": 3,
+  "tensors": 258,
+  "arch": "cohere2",
+  "name": "C4Ai Command R7B 12 2024",
+  "layers": 32,
+  "embd": 4096,
+  "ctx": 8192,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 5046091776,
+  "data_start": 10918560
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\helcyon-grok-v3.0-Q4_K_M(1).gguf",
+  "bytes": 7477203520,
+  "ver": 3,
+  "tensors": 363,
+  "arch": "llama",
+  "name": "Helcyon Grok",
+  "layers": 40,
+  "embd": 5120,
+  "ctx": 131072,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7469322240,
+  "data_start": 7881280
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\mira-12b.Q4_K_M.gguf",
+  "bytes": 7381383840,
+  "ver": 3,
+  "tensors": 667,
+  "arch": "gemma4",
+  "name": "Mira 12b",
+  "layers": 48,
+  "embd": 3840,
+  "ctx": 262144,
+  "ftype": 15,
+  "chat_template": true,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7365559808,
+  "data_start": 15824032
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\patricide-12B-Unslop-Mell.Q4_K_M.gguf",
+  "bytes": 7477204576,
+  "ver": 3,
+  "tensors": 363,
+  "arch": "llama",
+  "name": "UnslopNemo 12B v4.1",
+  "layers": 40,
+  "embd": 5120,
+  "ctx": 1024000,
+  "ftype": 15,
+  "chat_template": false,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 7469322240,
+  "data_start": 7882336
+ },
+ {
+  "file": "G:\\AI GGUF\\GGUF\\vocoder-LFM2.5-Audio-1.5B-Q4_0.gguf",
+  "bytes": 108986560,
+  "ver": 3,
+  "tensors": 85,
+  "arch": "this model cannot be used as LLM, use it via --model-vocoder in TTS examples",
+  "name": "",
+  "layers": null,
+  "embd": null,
+  "ctx": null,
+  "ftype": null,
+  "chat_template": false,
+  "split": [
+   null,
+   null
+  ],
+  "data_ok": true,
+  "problems": [],
+  "max_end": 108979712,
+  "data_start": 6848
+ }
+]

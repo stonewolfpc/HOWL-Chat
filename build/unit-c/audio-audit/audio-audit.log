@@ -1,0 +1,52 @@
+﻿14:29:18.791  SETTINGS[seeded] {"asrEnabled": true, "asrEngine": "qwen3-asr-1.7b-local", "ttsEnabled": false, "ttsEngine": "piper", "ttsSpeed": 1.0, "ttsVolume": 0.8, "asrLanguage": "de", "vadEnabled": true, "pushToTalk": false, "micSensitivity": 0.25, "audioInputDevice": "none", "audioOutputDevice": "default"}
+14:29:18.801  PASS1_START
+14:29:19.745  WINDOW pid=30616 after=1s
+14:29:27.215  UI_READY=True
+14:29:27.221  STARTUP_STATUS_ASR=
+14:29:29.553  SETTINGS_MENU INVOKED invoke-pattern index=0
+14:29:32.875  AUDIO_ITEM INVOKED mouse-click index=0 at 1001,517
+14:29:34.375  AUDIO_DOC=True
+14:29:37.072  GENERAL_HAS_ASR_LABEL=True
+14:29:37.090  GENERAL_TABS=General,??? Speech Recognition,?? Text-to-Speech,VAD,Hardware
+14:29:40.920  TAB[Speech Recognition] INVOKED mouse-click index=0 at 1113,1016
+14:29:43.703  TAB[Text-to-Speech] INVOKED invoke-pattern index=0
+14:29:46.487  TAB[VAD] INVOKED invoke-pattern index=0
+14:29:49.258  TAB[Hardware] INVOKED invoke-pattern index=0
+14:29:50.745  HARDWARE_INPUT_PRESENT=True
+14:29:50.746  TTS_SPEED_FIELD=False
+14:29:51.720  SET_SPEED INVOKED invoke-pattern index=0
+14:29:53.700  SPEED_SET SETVALUE ok
+14:29:54.727  ASR_OFF powershell.exe : index 0 out of range; matches=0
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\audio-audit.ps1:23 char:20
++ ...  { return ((& powershell -NoProfile -ExecutionPolicy Bypass -File $ui ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (index 0 out of range; matches=0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\uia.ps1:161 char:40
++ ... e $Index) { throw ("index $Index out of range; matches=" + $found.Cou ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (index 0 out of range; matches=0:String) [], RuntimeException
+    + FullyQualifiedErrorId : index 0 out of range; matches=0
+14:29:56.115  SAVE_CLICK INVOKED invoke-pattern index=0
+14:30:03.524  OUTCOME_SAVED=False
+14:30:03.527  OUTCOME_APPLIED=False
+14:30:03.529  MODAL_CLOSED=True
+14:30:03.588  SETTINGS[after-save] {"asrEnabled": true, "asrEngine": "qwen3-asr-1.7b-local", "ttsEnabled": false, "ttsEngine": "piper", "ttsSpeed": 1.35, "ttsVolume": 0.8, "asrLanguage": "de", "vadEnabled": true, "pushToTalk": false, "micSensitivity": 0.25, "audioInputDevice": "none", "audioOutputDevice": "default"}
+14:30:03.613  STARTUP_AUDIO_LINES=0
+14:30:05.663  PASS2_START
+14:30:06.521  WINDOW pid=11728 after=1s
+14:30:14.872  SETTINGS_MENU INVOKED invoke-pattern index=0
+14:30:18.164  AUDIO_ITEM INVOKED mouse-click index=0 at 1001,517
+14:30:19.689  AUDIO_DOC=True
+14:30:25.169  RESTORE_TTS_TAB INVOKED invoke-pattern index=0
+14:30:25.174  RESTORE_SPEED_FIELD=True
+14:30:25.231  SETTINGS[after-relaunch] {"asrEnabled": true, "asrEngine": "qwen3-asr-1.7b-local", "ttsEnabled": false, "ttsEngine": "piper", "ttsSpeed": 1.35, "ttsVolume": 0.8, "asrLanguage": "de", "vadEnabled": true, "pushToTalk": false, "micSensitivity": 0.25, "audioInputDevice": "none", "audioOutputDevice": "default"}
+14:30:27.366  RESIZED 1920x1080
+14:30:29.725  MODAL_RECT_1920 510,31 900x600
+14:30:29.727  LIGHT_THEME_START
+14:30:30.689  VIEW_MENU INVOKED invoke-pattern index=0
+14:30:32.475  LIGHT_CLICK INVOKED mouse-click index=0 at 324,178
+14:30:35.371  LIGHT_THEME_SHOT=tts-1920-light.png
+14:30:37.511  SETTINGS[restored] {"asrEnabled": true, "asrEngine": "qwen3-asr-1.7b-local", "ttsEnabled": false, "ttsEngine": "piper", "ttsSpeed": 1, "ttsVolume": 0.8, "asrLanguage": "auto", "vadEnabled": false, "pushToTalk": true, "micSensitivity": 0.5, "audioInputDevice": "default", "audioOutputDevice": "default"}
+14:30:37.517  LEFTOVER=0

@@ -21,7 +21,10 @@ func startupMark(label string) {
 
 	fmt.Print("[startup] " + line)
 
-	logDir := filepath.Join("config", "logs")
+	logDir := isolatedStatePath("config", "logs")
+	if logDir == "" {
+		logDir = filepath.Join("config", "logs")
+	}
 	if err := os.MkdirAll(logDir, 0755); err != nil {
 		return
 	}

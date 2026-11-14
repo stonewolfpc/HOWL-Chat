@@ -1,0 +1,31 @@
+2026/11/05 10:24:39 [WebView2] Environment created successfully
+0.00.115.769 I srv  llama_server: initializing ...
+0.00.115.791 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.116.131 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.122.025 I srv    load_model: loading model 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+0.00.388.243 E llama_model_load: error loading model: tensor 'blk.21.ffn_up.weight' data is not within the file bounds, model is corrupted or incomplete
+0.00.388.255 E llama_model_load_from_file_impl: failed to load model
+0.00.388.259 E cmn  common_init_: failed to load model 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+0.00.388.265 E srv    load_model: failed to load model, 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+0.00.388.268 I srv    operator(): operator(): cleaning up before exit...
+0.00.389.247 E srv  server_run_i: exiting due to model loading error
+0.00.113.296 I srv  llama_server: initializing ...
+0.00.113.307 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.113.603 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.132.041 I srv    load_model: loading model 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+0.00.388.766 E llama_model_load: error loading model: tensor 'blk.21.ffn_up.weight' data is not within the file bounds, model is corrupted or incomplete
+0.00.388.778 E llama_model_load_from_file_impl: failed to load model
+0.00.388.782 E cmn  common_init_: failed to load model 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+0.00.388.786 E srv    load_model: failed to load model, 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+0.00.388.790 I srv    operator(): operator(): cleaning up before exit...
+0.00.389.788 E srv  server_run_i: exiting due to model loading error
+0.00.111.093 I srv  llama_server: initializing ...
+0.00.111.106 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.111.401 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.126.372 I srv    load_model: loading model 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+0.00.358.954 E llama_model_load: error loading model: tensor 'blk.21.ffn_up.weight' data is not within the file bounds, model is corrupted or incomplete
+0.00.358.973 E llama_model_load_from_file_impl: failed to load model
+0.00.358.981 E cmn  common_init_: failed to load model 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+0.00.358.993 E srv    load_model: failed to load model, 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+0.00.359.003 I srv    operator(): operator(): cleaning up before exit...
+0.00.360.258 E srv  server_run_i: exiting due to model loading error

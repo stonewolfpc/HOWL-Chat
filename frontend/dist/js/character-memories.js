@@ -28,7 +28,9 @@ function getCharacterMemoriesData(characterId) {
         window.MemoryStore.getMemoryEntries() : [];
 
     return allMemories.filter(m =>
-        m.scope === 'character' && m.ownerId === characterId
+        m.scope === 'character' &&
+        m.ownerKind === 'character_id' &&
+        m.ownerId === characterId
     );
 }
 

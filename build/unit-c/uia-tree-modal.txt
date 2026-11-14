@@ -1,0 +1,361 @@
+﻿|Window|cls=wailsWindow|id=|name=HOWL Chat|rect=1105,271,1400,900
+  |Pane|cls=Chrome_WidgetWin_1|id=|name=HOWL Chat|rect=1113,302,1384,861
+    |Pane|cls=Intermediate D3D Window|id=|name=|rect=1113,302,1384,861
+    |Pane|cls=BrowserRootView|id=|name=HOWL Chat - Web content|rect=1113,302,1384,861
+      |Pane|cls=NonClientView|id=|name=|rect=1113,302,1384,861
+        |Pane|cls=EmbeddedBrowserTabRootView|id=|name=|rect=-1,-1,-1,-1
+        |Pane|cls=EmbeddedBrowserFrameView|id=|name=|rect=1113,302,1384,861
+          |Pane|cls=BrowserView|id=|name=|rect=1113,302,1384,861
+            |Pane|cls=TopContainerView|id=|name=|rect=-1,-1,-1,-1
+            |Pane|cls=SidebarContentsSplitView|id=|name=|rect=1113,302,1384,861
+              |Pane|cls=SidebarContentsSplitView|id=|name=|rect=1113,302,1384,861
+                |Pane|cls=MultiContentsView|id=|name=|rect=1113,302,1384,861
+                  |Pane|cls=View|id=|name=|rect=1113,302,1384,861
+                    |Pane|cls=View|id=|name=|rect=-1,-1,-1,-1
+                    |Document|cls=|id=RootWebArea|name=HOWL Chat|rect=1113,302,1384,861
+                      |Text|cls=|id=|name=﻿|rect=-1,-1,-1,-1 OFFSCR
+                      |Image|cls=|id=|name=HOWL Chat|rect=1129,314,44,45
+                      |Text|cls=|id=|name=HOWL Chat|rect=1185,327,77,19
+                      |Button|cls=menu-button|id=|name=File|rect=1309,324,48,25
+                      |Button|cls=menu-button|id=|name=View|rect=1394,324,55,25
+                      |Button|cls=menu-button|id=|name=Settings|rect=1486,324,74,25
+                      |Group|cls=dropdown-item|id=|name=|rect=1471,360,149,32
+                        |Text|cls=|id=|name=Sampler Settings|rect=1487,368,90,16
+                      |Group|cls=dropdown-item|id=|name=|rect=1471,392,149,32
+                        |Text|cls=|id=|name=Model Settings|rect=1487,400,81,16
+                      |Group|cls=dropdown-item|id=|name=|rect=1471,424,149,32
+                        |Text|cls=|id=|name=Story Tools|rect=1487,432,59,16
+                      |Group|cls=dropdown-item|id=|name=|rect=1471,470,149,32
+                        |Text|cls=|id=|name=Keyboard Shortcuts|rect=1487,478,105,16
+                      |Group|cls=dropdown-item|id=|name=|rect=1471,502,149,32
+                        |Text|cls=|id=|name=Audio Settings|rect=1487,510,78,16
+                      |Group|cls=dropdown-item|id=|name=|rect=1471,534,149,32
+                        |Text|cls=|id=|name=TTS Settings|rect=1487,542,66,16
+                      |Button|cls=menu-button|id=|name=Help|rect=1597,324,54,25
+                      |Group|cls=flyout-overlay|id=flyout-overlay|name=|rect=1113,302,1384,861
+                      |Text|cls=|id=|name=Sampler Settings|rect=1146,281,151,28
+                      |Button|cls=flyout-close|id=|name=✕|rect=2432,279,32,32
+                      |Text|cls=|id=|name=Core Settings|rect=1156,335,84,19
+                      |Image|cls=|id=|name=|rect=1167,378,14,14
+                      |Text|cls=|id=|name=Temperature|rect=1186,376,74,18
+                      |Text|cls=|id=|name=Controls creativity. Higher = more random.|rect=1167,403,214,16
+                      |Slider|cls=setting-slider|id=temperature|name=|rect=1167,447,162,5
+                      |Spinner|cls=setting-value|id=temperature-value|name=|rect=1336,437,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1346,378,48,18
+                      |CheckBox|cls=|id=top-p-enabled|name=|rect=1558,378,48,26 OFFSCR
+                      |Text|cls=|id=|name=Enabled|rect=1558,390,39,16
+                      |Image|cls=|id=|name=|rect=1426,378,14,14
+                      |Text|cls=|id=|name=Top‑P|rect=1445,376,35,18
+                      |Image|cls=|id=|name=|rect=1484,377,15,15
+                      |Text|cls=|id=|name=Filters tokens by cumulative probability.|rect=1426,403,198,16
+                      |Slider|cls=setting-slider|id=top-p|name=|rect=1426,447,163,5
+                      |Spinner|cls=setting-value|id=top-p-value|name=|rect=1595,437,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1606,378,47,18
+                      |Image|cls=|id=|name=|rect=1686,378,13,14
+                      |Text|cls=|id=|name=Top‑K|rect=1704,376,35,18
+                      |Text|cls=|id=|name=Only allows the top K most likely tokens.|rect=1686,403,201,16
+                      |Slider|cls=setting-slider|id=top-k|name=|rect=1686,447,162,5
+                      |Spinner|cls=setting-value|id=top-k-value|name=|rect=1855,437,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1865,378,48,18
+                      |Image|cls=|id=|name=|rect=1945,378,14,14
+                      |Text|cls=|id=|name=Min‑P|rect=1964,376,36,18
+                      |Image|cls=|id=|name=|rect=2005,377,14,15
+                      |Text|cls=|id=|name=Filters tokens below minimum probability.|rect=1945,403,209,16
+                      |Slider|cls=setting-slider|id=min-p|name=|rect=1945,447,162,5
+                      |Spinner|cls=setting-value|id=min-p-value|name=|rect=2114,437,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=2124,378,48,18
+                      |Image|cls=|id=|name=|rect=2204,378,14,14
+                      |Text|cls=|id=|name=Repeat Penalty|rect=2223,376,87,18
+                      |Text|cls=|id=|name=Penalizes repeated tokens.|rect=2204,403,133,16
+                      |Slider|cls=setting-slider|id=repeat-penalty|name=|rect=2204,447,163,5
+                      |Spinner|cls=setting-value|id=repeat-penalty-value|name=|rect=2373,437,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=2384,378,47,18
+                      |Image|cls=|id=|name=|rect=1167,489,14,14
+                      |Text|cls=|id=|name=Repeat Last‑N|rect=1186,487,82,18
+                      |Text|cls=|id=|name=How far back repetition is checked.|rect=1167,515,175,15
+                      |Slider|cls=setting-slider|id=repeat-last-n|name=|rect=1167,558,162,5
+                      |Spinner|cls=setting-value|id=repeat-last-n-value|name=|rect=1336,548,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1346,489,48,18
+                      |Text|cls=|id=|name=Intermediate Controls|rect=1156,611,137,20
+                      |CheckBox|cls=|id=presence-penalty-enabled|name=|rect=1472,654,48,27 OFFSCR
+                      |Text|cls=|id=|name=Enabled|rect=1472,666,39,16
+                      |Image|cls=|id=|name=|rect=1167,654,14,14
+                      |Text|cls=|id=|name=Presence Penalty|rect=1186,652,98,18
+                      |Image|cls=|id=|name=|rect=1288,654,15,14
+                      |Text|cls=|id=|name=Penalizes new topics (reduces topic drift).|rect=1167,680,205,15
+                      |Slider|cls=setting-slider|id=presence-penalty|name=|rect=1167,723,335,5
+                      |Spinner|cls=setting-value|id=presence-penalty-value|name=|rect=1509,714,60,24
+                      |Button|cls=setting-reset|id=|name=Default|rect=1519,654,48,18
+                      |CheckBox|cls=|id=frequency-penalty-enabled|name=|rect=1904,654,48,27 OFFSCR
+                      |Text|cls=|id=|name=Enabled|rect=1904,666,39,16
+                      |Image|cls=|id=|name=|rect=1599,654,14,14
+                      |Text|cls=|id=|name=Frequency Penalty|rect=1618,652,106,18
+                      |Image|cls=|id=|name=|rect=1729,654,15,14
+                      |Text|cls=|id=|name=Penalizes tokens based on frequency.|rect=1599,680,186,15
+                      |Slider|cls=setting-slider|id=frequency-penalty|name=|rect=1599,723,335,5
+                      |Spinner|cls=setting-value|id=frequency-penalty-value|name=|rect=1941,714,60,24
+                      |Button|cls=setting-reset|id=|name=Default|rect=1951,654,48,18
+                      |CheckBox|cls=|id=typical-p-enabled|name=|rect=2336,654,48,27 OFFSCR
+                      |Text|cls=|id=|name=Enabled|rect=2336,666,39,16
+                      |Image|cls=|id=|name=|rect=2031,654,14,14
+                      |Text|cls=|id=|name=Typical‑P|rect=2050,652,53,18
+                      |Image|cls=|id=|name=|rect=2108,654,15,14
+                      |Text|cls=|id=|name=Filters tokens by typical probability.|rect=2031,680,177,15
+                      |Slider|cls=setting-slider|id=typical-p|name=|rect=2031,723,336,5
+                      |Spinner|cls=setting-value|id=typical-p-value|name=|rect=2373,714,60,24
+                      |Button|cls=setting-reset|id=|name=Default|rect=2384,654,47,18
+                      |Text|cls=|id=|name=Advanced Controls|rect=1156,776,119,20
+                      |CheckBox|cls=|id=mirostat-mode-enabled|name=|rect=1299,819,48,27 OFFSCR
+                      |Text|cls=|id=|name=Enabled|rect=1299,832,39,15
+                      |Image|cls=|id=|name=|rect=1167,819,14,14
+                      |Text|cls=|id=|name=Mirostat Mode|rect=1186,817,87,18
+                      |Image|cls=|id=|name=|rect=1277,819,15,15
+                      |Text|cls=|id=|name=Auto‑tunes sampling parameters.|rect=1167,845,167,16
+                      |Slider|cls=setting-slider|id=mirostat-mode|name=|rect=1167,888,162,5
+                      |Spinner|cls=setting-value|id=mirostat-mode-value|name=|rect=1336,879,60,24
+                      |Button|cls=setting-reset|id=|name=Default|rect=1346,819,48,18
+                      |Image|cls=|id=|name=|rect=1426,819,14,14
+                      |Text|cls=|id=|name=Mirostat Tau|rect=1445,817,73,18
+                      |Text|cls=|id=|name=Target perplexity for Mirostat.|rect=1426,845,148,16
+                      |Slider|cls=setting-slider|id=mirostat-tau|name=|rect=1426,888,163,5
+                      |Spinner|cls=setting-value|id=mirostat-tau-value|name=|rect=1595,879,60,24
+                      |Button|cls=setting-reset|id=|name=Default|rect=1606,819,47,18
+                      |Image|cls=|id=|name=|rect=1686,819,13,14
+                      |Text|cls=|id=|name=Mirostat Eta|rect=1704,817,71,18
+                      |Text|cls=|id=|name=Learning rate for Mirostat.|rect=1686,845,130,16
+                      |Slider|cls=setting-slider|id=mirostat-eta|name=|rect=1686,888,162,5
+                      |Spinner|cls=setting-value|id=mirostat-eta-value|name=|rect=1855,879,60,24
+                      |Button|cls=setting-reset|id=|name=Default|rect=1865,819,48,18
+                      |CheckBox|cls=|id=dyn-temp-range-enabled|name=|rect=2077,819,48,27 OFFSCR
+                      |Text|cls=|id=|name=Enabled|rect=2077,832,39,15
+                      |Image|cls=|id=|name=|rect=1945,836,14,14
+                      |Text|cls=|id=|name=Dynamic Temperature Range|rect=1964,817,74,51
+                      |Image|cls=|id=|name=|rect=2057,836,15,14
+                      |Text|cls=|id=|name=Adjusts temperature based on token probability.|rect=1945,878,182,31
+                      |Slider|cls=setting-slider|id=dyn-temp-range|name=|rect=1945,937,162,5
+                      |Spinner|cls=setting-value|id=dyn-temp-range-value|name=|rect=2114,927,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=2124,819,48,18
+                      |Image|cls=|id=|name=|rect=2204,836,14,14
+                      |Text|cls=|id=|name=Dynamic Temperature Exponent|rect=2223,817,74,51
+                      |Text|cls=|id=|name=Exponent for dynamic temperature calculation.|rect=2204,878,175,31
+                      |Slider|cls=setting-slider|id=dyn-temp-exp|name=|rect=2204,937,163,5
+                      |Spinner|cls=setting-value|id=dyn-temp-exp-value|name=|rect=2373,927,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=2384,819,47,18
+                      |Image|cls=|id=|name=|rect=1167,979,14,14
+                      |Text|cls=|id=|name=DRY Multiplier|rect=1186,977,85,18
+                      |Text|cls=|id=|name=Penalty for repetition in output.|rect=1167,1005,157,15
+                      |Slider|cls=setting-slider|id=dry-multiplier|name=|rect=1167,1048,162,5
+                      |Spinner|cls=setting-value|id=dry-multiplier-value|name=|rect=1336,1038,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1346,979,48,18
+                      |Image|cls=|id=|name=|rect=1426,987,14,14
+                      |Text|cls=|id=|name=DRY Allowed Length|rect=1445,977,75,35
+                      |Text|cls=|id=|name=Minimum length before DRY applies.|rect=1426,1021,184,16
+                      |Slider|cls=setting-slider|id=dry-allowed-length|name=|rect=1426,1065,163,5
+                      |Spinner|cls=setting-value|id=dry-allowed-length-value|name=|rect=1595,1055,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1606,979,47,18
+                      |Image|cls=|id=|name=|rect=1686,979,13,14
+                      |Text|cls=|id=|name=DRY Base|rect=1704,977,56,18
+                      |Text|cls=|id=|name=Base penalty for DRY.|rect=1686,1005,107,15
+                      |Slider|cls=setting-slider|id=dry-base|name=|rect=1686,1048,162,5
+                      |Spinner|cls=setting-value|id=dry-base-value|name=|rect=1855,1038,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1865,979,48,18
+                      |Image|cls=|id=|name=|rect=1945,979,14,14
+                      |Text|cls=|id=|name=Seed|rect=1964,977,29,18
+                      |Text|cls=|id=|name=Controls randomness.|rect=1945,1005,109,15
+                      |Spinner|cls=setting-value|id=seed|name=|rect=1945,1038,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=2124,979,48,18
+                      |Text|cls=|id=|name=NO MODEL LOADED|rect=2372,329,109,15
+                      |Text|cls=|id=|name=Story Tools|rect=1126,270,99,27 OFFSCR
+                      |Button|cls=flyout-close|id=|name=✕|rect=2451,267,33,32 OFFSCR
+                      |Text|cls=|id=|name=Recent Memories|rect=1126,335,156,27
+                      |Image|cls=setting-icon|id=|name=Memory Management|rect=1139,415,25,25
+                      |Text|cls=|id=|name=Memory Management|rect=1176,417,141,20
+                      |Text|cls=|id=|name=Automated lore entries for this chat|rect=1139,454,186,17
+                      |Text|cls=|id=|name=Loading memories...|rect=1139,507,122,20
+                      |Button|cls=setting-button|id=|name=Expand|rect=1268,506,79,33
+                      |Text|cls=|id=|name=All Memories|rect=2194,712,97,21
+                      |Button|cls=flyout-close|id=|name=✕|rect=2428,706,32,33
+                      |Text|cls=|id=|name=Loading memories...|rect=2178,755,124,20
+                      |Text|cls=|id=|name=Edit Memory|rect=1572,522,94,22
+                      |Button|cls=flyout-close|id=|name=✕|rect=2006,517,32,32
+                      |Text|cls=|id=|name=Title|rect=1576,586,25,17
+                      |Edit|cls=|id=memory-title|name=Title|rect=1576,609,458,39
+                      |Text|cls=|id=|name=Content|rect=1576,664,46,17
+                      |Edit|cls=|id=memory-content|name=Content|rect=1576,687,458,192
+                      |Button|cls=setting-button|id=|name=Save|rect=1576,911,65,33
+                      |Button|cls=setting-button secondary|id=|name=Cancel|rect=1652,911,76,33
+                      |Group|cls=nav-item active|id=|name=|rect=1117,361,71,56
+                        |Image|cls=nav-icon-img|id=|name=Chat|rect=1140,377,25,24
+                      |Group|cls=nav-item|id=|name=|rect=1117,421,71,56
+                        |Image|cls=nav-icon-img|id=|name=World|rect=1140,437,25,24
+                      |Group|cls=nav-item|id=|name=|rect=1117,481,71,56
+                        |Image|cls=nav-icon-img|id=|name=Characters|rect=1140,497,25,24
+                      |Group|cls=nav-item|id=|name=|rect=1117,541,71,56
+                        |Image|cls=nav-icon-img|id=|name=Scenarios|rect=1140,557,25,24
+                      |Group|cls=nav-item|id=|name=|rect=1117,601,71,56
+                        |Image|cls=nav-icon-img|id=|name=Lorebooks|rect=1140,617,25,24
+                      |Group|cls=nav-item|id=|name=|rect=1117,661,71,56
+                        |Image|cls=nav-icon-img|id=|name=Image Generator|rect=1140,677,25,24
+                      |Text|cls=|id=|name=CHARACTERS|rect=1221,376,97,19
+                      |Group|cls=character-avatar|id=|name=|rect=1262,434,61,60
+                        |Text|cls=|id=|name=👤|rect=1276,448,33,32
+                      |Group|cls=character-info|id=|name=|rect=1222,514,141,36
+                        |Text|cls=|id=|name=Tina|rect=1279,514,27,19
+                        |Text|cls=|id=|name=Kissing booth operator|rect=1236,535,113,15
+                      |Button|cls=character-menu-btn|id=|name=⋮|rect=1346,428,21,25
+                      |Button|cls=add-character-btn|id=|name=Add Character|rect=1211,571,112,32
+                      |Text|cls=|id=|name=You|rect=1426,382,21,16
+                      |Text|cls=|id=|name=Hello!|rect=1426,399,37,19
+                      |Button|cls=bubble-button icon-button|id=|name=Copy|rect=1426,427,32,32
+                        |Image|cls=|id=|name=|rect=1434,435,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Edit|rect=1466,427,32,32
+                        |Image|cls=|id=|name=|rect=1474,435,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Undo (remove this and everything after)|rect=1506,427,32,32
+                        |Image|cls=|id=|name=|rect=1514,435,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Delete|rect=1546,427,32,32
+                        |Image|cls=|id=|name=|rect=1554,435,16,16
+                      |Text|cls=|id=|name=You|rect=1426,485,21,16
+                      |Text|cls=|id=|name=And how are you today beautiful?|rect=1426,502,209,19
+                      |Button|cls=bubble-button icon-button|id=|name=Copy|rect=1426,530,32,32
+                        |Image|cls=|id=|name=|rect=1434,538,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Edit|rect=1466,530,32,32
+                        |Image|cls=|id=|name=|rect=1474,538,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Undo (remove this and everything after)|rect=1506,530,32,32
+                        |Image|cls=|id=|name=|rect=1514,538,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Delete|rect=1546,530,32,32
+                        |Image|cls=|id=|name=|rect=1554,538,16,16
+                      |Text|cls=|id=|name=You|rect=1426,588,21,16
+                      |Text|cls=|id=|name=Reply with exactly: SWITCH TEST OK|rect=1426,605,222,19
+                      |Button|cls=bubble-button icon-button|id=|name=Copy|rect=1426,633,32,32
+                        |Image|cls=|id=|name=|rect=1434,641,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Edit|rect=1466,633,32,32
+                        |Image|cls=|id=|name=|rect=1474,641,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Undo (remove this and everything after)|rect=1506,633,32,32
+                        |Image|cls=|id=|name=|rect=1514,641,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Delete|rect=1546,633,32,32
+                        |Image|cls=|id=|name=|rect=1554,641,16,16
+                      |Text|cls=|id=|name=Tina|rect=1951,691,27,19
+                      |Text|cls=|id=|name=Blue|rect=1951,711,27,19
+                      |Button|cls=bubble-button icon-button|id=|name=Regenerate|rect=1951,739,32,32
+                        |Image|cls=|id=|name=|rect=1959,747,16,16
+                      |Button|cls=bubble-button icon-button|id=prev-btn|name=Previous|rect=1991,739,32,32
+                        |Image|cls=|id=|name=|rect=1999,747,16,16
+                      |Button|cls=bubble-button icon-button disabled|id=next-btn|name=Next|rect=2031,739,32,32
+                        |Image|cls=|id=|name=|rect=2039,747,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Continue|rect=2071,739,32,32
+                        |Image|cls=|id=|name=|rect=2079,747,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Edit|rect=2111,739,32,32
+                        |Image|cls=|id=|name=|rect=2119,747,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Copy|rect=2151,739,32,32
+                        |Image|cls=|id=|name=|rect=2159,747,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Undo (remove this and everything after)|rect=2191,739,32,32
+                        |Image|cls=|id=|name=|rect=2199,747,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Delete|rect=2231,739,32,32
+                        |Image|cls=|id=|name=|rect=2239,747,16,16
+                      |Text|cls=|id=|name=Tina|rect=1951,797,27,19
+                      |Text|cls=|id=|name=Blue|rect=1951,817,27,19
+                      |Button|cls=bubble-button icon-button|id=|name=Regenerate|rect=1951,845,32,32
+                        |Image|cls=|id=|name=|rect=1959,853,16,16
+                      |Button|cls=bubble-button icon-button|id=prev-btn|name=Previous|rect=1991,845,32,32
+                        |Image|cls=|id=|name=|rect=1999,853,16,16
+                      |Button|cls=bubble-button icon-button disabled|id=next-btn|name=Next|rect=2031,845,32,32
+                        |Image|cls=|id=|name=|rect=2039,853,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Continue|rect=2071,845,32,32
+                        |Image|cls=|id=|name=|rect=2079,853,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Edit|rect=2111,845,32,32
+                        |Image|cls=|id=|name=|rect=2119,853,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Copy|rect=2151,845,32,32
+                        |Image|cls=|id=|name=|rect=2159,853,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Undo (remove this and everything after)|rect=2191,845,32,32
+                        |Image|cls=|id=|name=|rect=2199,853,16,16
+                      |Button|cls=bubble-button icon-button|id=|name=Delete|rect=2231,845,32,32
+                        |Image|cls=|id=|name=|rect=2239,853,16,16
+                      |Text|cls=|id=|name=CHAT CONTEXT|rect=2318,368,113,19
+                      |Image|cls=|id=|name=|rect=2313,418,16,17
+                      |Text|cls=|id=|name=WORLD|rect=2337,418,49,17
+                      |Text|cls=|id=|name=No World|rect=2330,481,52,17
+                      |Text|cls=|id=|name=Minnesota|rect=2400,479,54,18
+                      |Button|cls=context-btn|id=|name=Change World|rect=2313,545,158,32
+                      |Image|cls=|id=|name=|rect=2313,608,16,17
+                      |Text|cls=|id=|name=SCENARIO|rect=2337,608,67,17
+                      |Text|cls=|id=|name=No Scenario|rect=2333,664,46,31
+                      |Text|cls=|id=|name=The kissing booth outside Middleview High|rect=2400,669,58,18
+                      |Button|cls=context-btn|id=|name=Change Scenario|rect=2313,735,158,32
+                      |Image|cls=|id=|name=|rect=2313,798,16,17
+                      |Text|cls=|id=|name=LOREBOOKS|rect=2337,798,78,17
+                      |Text|cls=|id=|name=📚|rect=2378,847,28,27
+                      |Text|cls=|id=|name=No lorebooks selected|rect=2326,896,132,19
+                      |Button|cls=add-lorebook-btn|id=|name=Add Lorebook|rect=2325,941,134,30
+                      |Text|cls=|id=|name=No model loaded|rect=2340,1032,104,16
+                      |Group|cls=model-select-custom|id=llm-model-select|name=|rect=2313,1073,158,34
+                        |Group|cls=model-select-trigger|id=|name=|rect=2313,1073,158,34
+                          |Text|cls=|id=|name=— select model —|rect=2322,1082,98,16
+                      |Button|cls=model-button load-button|id=|name=Load|rect=2313,1113,76,30 OFFSCR
+                      |Button|cls=model-button|id=|name=Browser|rect=2395,1113,76,30 OFFSCR
+                      |Button|cls=model-button unload-button|id=|name=UNLOAD|rect=2313,1151,158,32 OFFSCR
+                      |Button|cls=input-icon|id=|name=Vision|rect=1125,1109,38,42
+                        |Image|cls=|id=|name=|rect=1134,1120,20,20
+                      |Button|cls=input-icon mic-button|id=|name=Speech Input (Hold to record)|rect=1171,1109,38,42
+                        |Image|cls=|id=|name=|rect=1180,1120,20,20
+                      |Button|cls=input-icon tts-icon|id=|name=Text to Speech (TTS)|rect=1217,1109,38,42
+                        |Image|cls=|id=|name=|rect=1226,1120,20,20
+                      |Button|cls=input-icon|id=|name=Document|rect=1263,1109,38,42
+                        |Image|cls=|id=|name=|rect=1272,1120,20,20
+                      |Edit|cls=input-field|id=message-input|name=Type your message...|rect=1326,1109,1063,42
+                      |Button|cls=send-button|id=|name=Send|rect=2400,1109,85,42
+                      |Text|cls=|id=|name=Audio settings saved, but activation failed. Use Retry activation.|rect=2497,334,227,38 OFFSCR
+                      |Group|cls=real-settings-overlay show|id=audio-settings-modal|name=|rect=1113,302,1384,861
+                        |Document|cls=|id=RootWebArea|name=Audio Settings - HOWL Chat|rect=1355,302,900,600
+                          |Text|cls=real-settings-title|id=|name= Audio & Voice Settings|rect=1404,338,222,25
+                            |Image|cls=|id=|name=|rect=1404,345,20,21
+                          |Button|cls=real-settings-close|id=|name=✕|rect=2181,332,25,36
+                          |Button|cls=audio-tab|id=tab-general|name=General|rect=1380,399,90,46
+                          |Button|cls=audio-tab active|id=tab-asr|name=🎙️ Speech Recognition|rect=1469,399,190,46
+                          |Button|cls=audio-tab|id=tab-tts|name=🔊 Text-to-Speech|rect=1658,399,158,46
+                          |Button|cls=audio-tab|id=tab-vad|name=VAD|rect=1815,399,69,46
+                          |Button|cls=audio-tab|id=tab-hardware|name=Hardware|rect=1883,399,101,46
+                          |Image|cls=|id=|name=|rect=1408,370,16,17 OFFSCR
+                          |Text|cls=|id=|name= Speech Recognition (ASR) Engine|rect=1424,365,237,18 OFFSCR
+                          |Text|cls=|id=|name=ASR Engine|rect=1417,425,74,16 OFFSCR
+                          |Text|cls=|id=|name=Select the speech recognition backend. Auto uses a local, admitted engine. An explicit eng~|rect=1417,446,352,49
+                          |ComboBox|cls=setting-select|id=asr-engine|name=ASR Engine|rect=1417,506,356,32
+                          |Text|cls=|id=|name=Checking available engines…|rect=1417,541,132,13
+                          |Text|cls=|id=|name=Spoken Language|rect=1822,425,108,16 OFFSCR
+                          |Text|cls=|id=|name=Language for transcription. Auto attempts to detect from audio.|rect=1822,446,305,15
+                          |ComboBox|cls=setting-select|id=asr-language|name=Spoken Language|rect=1822,472,356,32
+                          |Text|cls=|id=|name=Compute Device|rect=1417,603,99,16
+                          |Text|cls=|id=|name=Hardware to run ASR inference on. CUDA requires NVIDIA GPU.|rect=1417,624,323,15
+                          |ComboBox|cls=setting-select|id=asr-device|name=Compute Device|rect=1417,650,356,32
+                          |Text|cls=|id=|name=CPU Threads|rect=1822,603,83,16
+                          |Text|cls=|id=|name=Parallel computation threads for CPU inference. Higher = faster but more CPU usage.|rect=1822,624,354,32
+                          |Slider|cls=setting-slider|id=asr-threads|name=CPU Threads|rect=1824,676,254,7
+                          |Spinner|cls=setting-value|id=asr-threads-value|name=|rect=2090,666,88,26
+                          |Text|cls=|id=|name=Beam Size|rect=1417,741,62,16
+                          |Text|cls=|id=|name=Number of beams for beam-search decoding. Higher = more accurate but slower.|rect=1417,762,352,32
+                          |Slider|cls=setting-slider|id=asr-beam-size|name=Beam Size|rect=1419,815,254,7 OFFSCR
+                          |Spinner|cls=setting-value|id=asr-beam-size-value|name=|rect=1684,805,89,26 OFFSCR
+                          |Text|cls=|id=|name=Best-of (Candidates)|rect=1822,741,123,16
+                          |Text|cls=|id=|name=Number of candidate transcriptions to evaluate. Higher = better accuracy.|rect=1822,762,353,15
+                          |Slider|cls=setting-slider|id=asr-best-of|name=Best-of (Candidates)|rect=1824,798,254,7
+                          |Spinner|cls=setting-value|id=asr-best-of-value|name=|rect=2090,788,88,26
+                          |Text|cls=|id=|name=Temperature|rect=1417,880,78,16 OFFSCR
+                          |Text|cls=|id=|name=Sampling randomness. 0 = deterministic, 1 = maximum randomness. Lower is more accurate.|rect=1417,901,331,32 OFFSCR
+                          |Slider|cls=setting-slider|id=asr-temperature|name=Temperature|rect=1419,953,254,7 OFFSCR
+                          |Spinner|cls=setting-value|id=asr-temperature-value|name=|rect=1684,944,89,26 OFFSCR
+                          |Text|cls=|id=|name=Automatically translate all recognized speech to English before sending.|rect=1822,901,349,15 OFFSCR
+                          |CheckBox|cls=|id=asr-translate|name=Translate to English|rect=1826,939,41,13
+                          |Text|cls=|id=|name=Remove timestamps from output. Cleaner text but loses timing info.|rect=1417,1040,327,15 OFFSCR
+                          |CheckBox|cls=|id=asr-no-timestamps|name=Suppress Timestamps|rect=1421,1077,40,13
+                          |Text|cls=|id=|name=Enable Flash Attention for faster inference on modern GPUs. Disable if encountering errors~|rect=1822,1040,345,31 OFFSCR
+                          |CheckBox|cls=|id=asr-flash-attn|name=Flash Attention|rect=1826,1094,41,13
+                          |StatusBar|cls=audio-outcome|id=audio-outcome|name=|rect=1404,816,339,17
+                            |Text|cls=|id=|name=Saved|rect=1411,818,27,13
+                            |Text|cls=|id=|name=Apply failed|rect=1457,818,57,13
+                            |Text|cls=|id=|name=Not ready|rect=1533,818,44,13
+                          |Text|cls=|id=|name=The preference is saved. Activation failed: Error: audio backend is unavailable|rect=1404,837,292,28
+                          |Text|cls=|id=|name=Saved, applied, and ready are reported independently.|rect=1404,871,258,14
+                          |Button|cls=settings-reset-btn|id=audio-retry-activation|name=Retry activation|rect=1742,824,136,55
+                          |Button|cls=settings-reset-btn|id=|name=Reset Audio Defaults|rect=1889,824,170,55
+                          |Button|cls=settings-save-btn|id=audio-settings-save|name=Save & Close|rect=2070,824,136,55
+            |Pane|cls=EmbeddedBrowserDownloadView|id=|name=|rect=-1,-1,-1,-1
+        |Pane|cls=TopContainerOverlayView|id=|name=|rect=1113,302,1384,861

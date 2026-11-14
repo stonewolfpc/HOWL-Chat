@@ -1,0 +1,18 @@
+=== ORPHAN STATUS NOW ===
+
+   Id StartTime            AgeMin WorkingSet64
+   -- ---------            ------ ------------
+17740 11/4/2026 9:28:40 PM    9.9   2278309888
+
+
+
+=== ANY PARENT APP? ===
+0
+=== KILL ORPHAN ===
+killing 17740
+
+=== ERROR LOG: CHAT ENTRIES ===
+{"t":"2026-11-05T03:27:48.1615727Z","c":"LLM-STREAM-BRK","s":"high","op":"llm.infer.character","loc":"app-prompt.go:165","msg":"failed to send request: Post \"http://localhost:8080/v1/chat/completions\": dial tcp [::1]:8080: connectex: No connection could be m
+{"t":"2026-11-05T03:35:55.6638373Z","c":"LLM-STREAM-BRK","s":"high","op":"llm.infer.character","loc":"app-prompt.go:165","msg":"failed to send request: Post \"http://localhost:8080/v1/chat/completions\": dial tcp [::1]:8080: connectex: No connection could be m
+=== ERROR LOG LINE COUNT ===
+4 config/logs/howl-errors-20261105.jsonl

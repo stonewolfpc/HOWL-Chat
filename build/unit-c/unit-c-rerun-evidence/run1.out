@@ -1,0 +1,275 @@
+[startup] 10:24:39.215  +    0.0ms  process start
+[startup] 10:24:39.221  +    6.4ms  image init: begin
+[startup] 10:24:39.225  +   10.5ms  image init: config ready
+[ImageEngine] Initialized: binary=C:\Users\StoneWolfPC\HOWL_Chat\sd-server.exe models=H:/InvokeAI/models port=8081
+[startup] 10:24:39.230  +   15.2ms  image init: engine initialized
+[ImageEngine] sd-server commit: c6dfa9d
+[ImageEngine] Restored last model: "z-image-turbo-Q4_K_M"
+[startup] 10:24:39.283  +   68.2ms  NewApp done
+[startup] 10:24:39.560  +  344.7ms  OnStartup: webview reached backend
+[startup] 10:24:39.563  +  348.4ms  OnStartup: init complete
+[startup] 10:24:39.568  +  353.2ms  rescan: start
+[startup] 10:24:39.576  +  360.9ms  rescan: scanning G:\AI GGUF\GGUF
+[inference] family="" source="" temp=0.20 top_p=1.00 top_k=40 min_p=0.05 repeat=1.10 n_predict=512
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[scan] chat-ineligible model kept in inventory: G:\AI GGUF\GGUF\Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf (task=unknown basis=unrecognized-multimodal-identity)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\GGUF\vocoder-LFM2.5-Audio-1.5B-Q4_0.gguf (component)
+[startup] 10:25:38.384  +59169.6ms  rescan: done G:\AI GGUF\GGUF 25 entries
+[startup] 10:25:38.385  +59170.1ms  rescan: scanning G:\AI GGUF\voice
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\Qwen2.5-Omni-3B-mmproj-Q8_0.gguf (component)
+[scan] chat-ineligible model kept in inventory: G:\AI GGUF\voice\Qwen3-ASR-0.6B-Q8_0.gguf (task=speech-recognition basis=identity=qwen3-asr-0-6b)
+[scan] chat-ineligible model kept in inventory: G:\AI GGUF\voice\Qwen3-ASR-1.7B-Q8_0.gguf (task=speech-recognition basis=identity=qwen3-asr-1-7b)
+[scan] chat-ineligible model kept in inventory: G:\AI GGUF\voice\Ultravox-Llama-3.2-1B-Q4_K_M.gguf (task=audio-understanding basis=identity=ultravox-llama-3-2-1b)
+[scan] chat-ineligible model kept in inventory: G:\AI GGUF\voice\Voxtral-Mini-3B-2507-Q4_K_M.gguf (task=audio-understanding basis=identity=voxtral-mini-3b-2507)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\mmproj-Qwen3-ASR-0.6B-Q8_0.gguf (component)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\mmproj-Qwen3-ASR-1.7B-Q8_0.gguf (component)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\mmproj-Ultravox-v0_5-llama-3_2-1b-f16.gguf (component)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\mmproj-Voxtral-Mini-3B-2507-Q8_0.gguf (component)
+[scan] excluding non-chat GGUF from LLM registry: G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf (component)
+[startup] 10:25:51.090  +71874.9ms  rescan: done G:\AI GGUF\voice 6 entries
+[GetLLMModels] excluded 13 non-chat or task-ineligible asset(s) from the chat picker
+[ReadProfile] final: Family=gemma4 Layers=35 Params=1610055338 Size=3864.1MB Quant=Q8_0 DModel=1536 Heads=8 KVHeads=1
+[LoadModel] START path="G:\\AI GGUF\\voice\\Gemma-4-E2B-it-Q8_0.gguf"
+[LoadModel] path validated
+[LoadModel] admission: class=chat arch="gemma4" projector="" evidence=[general.architecture=gemma4 gemma4.embedding_length=1536]
+[LoadModel] chat eligibility: task=multimodal-chat eligible=true basis=identity=gemma-4-e2b-it identity="gemma-4-e2b-it" aliases=[gemma-4-e2b-it] text=true vision=declared-unverified audio=declared-unverified
+[LoadModel] projector paired by identity: G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf (kind=hybrid identity="gemma-4-e2b-it" projection_dim=1536 model_embedding=1536 mismatch=false notes=[])
+[LoadModel] checking port 8080
+[LoadModel] port 8080 free
+[LoadModel] validating llama-server binary
+[LoadModel] llama-server binary validated
+[LoadModel] reading GGUF metadata from: G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf
+[ReadProfile] final: Family=gemma4 Layers=35 Params=1610055338 Size=3864.1MB Quant=Q8_0 DModel=1536 Heads=8 KVHeads=1
+[LoadModel] profile: Family=gemma4 Layers=35 Params=1610055338 Size=3864.1MB Quant=Q8_0 ArchSpec=true
+[LoadModel] applying safe defaults
+[applySafeDefaults] enter
+[applySafeDefaults] getting hardware snapshot
+[ResourceManager] GetManager called
+[ResourceManager] initializing singleton
+[ResourceManager] refreshHardware: calling hw.DetectHardware()
+[hw] detected VRAM via nvidia-smi: 8192 MB
+[ResourceManager] refreshHardware: hw.DetectHardware() returned
+[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout
+[resource] GPU detected via nvidia-smi: NVIDIA GeForce GTX 1080 (8192 MB)
+[ResourceManager] refreshHardware: queryGPUs() returned 1 GPUs
+[ResourceManager] refreshHardware: storing snapshot
+[ResourceManager] initialization complete
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[applySafeDefaults] freeVRAM=3448 freeRAM=42766
+[applySafeDefaults] reading settings
+[applySafeDefaults] capped context to 3096
+[applySafeDefaults] settings: ctx=3096 gpuLayers=22 batch=256
+[applySafeDefaults] archSpec: layers=35 dmodel=1536 heads=8 kvheads=1
+[applySafeDefaults] creating memory model
+[applySafeDefaults] calling ClampToHardware
+[applySafeDefaults] ClampToHardware returned
+[applySafeDefaults] adjustment: SWA model: partial offload unsafe, falling back to CPU-only (all layers would need 4221 MB > 3448 MB free)
+[applySafeDefaults] final: GPU=451MB RAM=4429MB ctx=3096 gpuLayers=0 batch=256
+[applySafeDefaults] done
+[LoadModel] safe defaults applied
+[LoadModel] projector G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf declares "hybrid" (declared_vision=true declared_audio=true advertised_vision=false advertised_audio=false dim=1536 type= evidence=clip.has_vision_encoder,clip.has_audio_encoder,clip.vision.attention.head_count,clip.audio.attention.head_count)
+[LoadModel] validating spawn settings
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[LoadModel] spawn params: ctx=3096 gpuLayers=0 batch=256 freeVRAM=3448 freeRAM=42766
+[LoadModel] validation result: level=0 msg="Memory OK — estimated 451 MB GPU / 4429 MB RAM (free: 3448 / 42766 MB)"
+[LoadModel] spawn validation passed
+[LoadModel] SWA model detected, disabling --fit to avoid scheduler crash
+[LoadModel] chat template: model-native for family "gemma4" (133 bytes)
+[LoadModel] spawning llama-server
+INFO: using paired mmproj file: G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf
+INFO: llama-server started (pid 30244) with model G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf
+[LoadModel] llama-server spawned (pid 30244)
+INFO: Registering model with estimated GPU:452MB RAM:4429MB
+[ResourceManager] GetManager called
+[LoadModel] monitor started (pid 30244, timeout 60s)
+[LoadModel] monitor: process died at tick 0, captured output len=969
+[LoadModel] monitor: time: 2026-11-05T10:28:37-06:00
+stage: startup
+model: G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf
+model_name: Gemma-4-E2B-it-Q8_0.gguf
+architecture: gemma4
+projector: G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf
+executable: C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\runtime\llama\llama-server.exe
+args: C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\runtime\llama\llama-server.exe --host 127.0.0.1 --port 8080 -m G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf -c 3096 --threads 8 -b 256 -ngl 0 --fit off --mmproj G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf --chat-template {%- for message in messages %}<start_of_turn>{{ message.role }}
+{{ message.content }}<end_of_turn>
+{%- endfor %}<start_of_turn>model
+ --reasoning on --reasoning-format deepseek --reasoning-budget 2048 --reasoning-budget-message I have thought enough. Time to answer.
+exit: exit status 1
+detail: llama-server exited before becoming healthy
+output_bytes: 969 (truncated=false)
+output_tail:
+  0.00.115.769 I srv  llama_server: initializing ...
+  0.00.115.791 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+  0.00.116.131 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+  0.00.122.025 I srv    load_model: loading model 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+  0.00.388.243 E llama_model_load: error loading model: tensor 'blk.21.ffn_up.weight' data is not within the file bounds, model is corrupted or incomplete
+  0.00.388.255 E llama_model_load_from_file_impl: failed to load model
+  0.00.388.259 E cmn  common_init_: failed to load model 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+  0.00.388.265 E srv    load_model: failed to load model, 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+  0.00.388.268 I srv    operator(): operator(): cleaning up before exit...
+  0.00.389.247 E srv  server_run_i: exiting due to model loading error
+
+[ReadProfile] final: Family=gemma4 Layers=35 Params=1610055338 Size=3864.1MB Quant=Q8_0 DModel=1536 Heads=8 KVHeads=1
+[LoadModel] START path="G:\\AI GGUF\\voice\\Gemma-4-E2B-it-Q8_0.gguf"
+[LoadModel] path validated
+[LoadModel] admission: class=chat arch="gemma4" projector="" evidence=[general.architecture=gemma4 gemma4.embedding_length=1536]
+[LoadModel] chat eligibility: task=multimodal-chat eligible=true basis=identity=gemma-4-e2b-it identity="gemma-4-e2b-it" aliases=[gemma-4-e2b-it] text=true vision=declared-unverified audio=declared-unverified
+[LoadModel] projector paired by identity: G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf (kind=hybrid identity="gemma-4-e2b-it" projection_dim=1536 model_embedding=1536 mismatch=false notes=[])
+[LoadModel] existing serverProc found
+[LoadModel] killing existing server
+[LoadModel] stopped existing llama-server (pid 30244)
+[LoadModel] checking port 8080
+[LoadModel] port 8080 free
+[LoadModel] validating llama-server binary
+[LoadModel] llama-server binary validated
+[LoadModel] reading GGUF metadata from: G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf
+[ReadProfile] final: Family=gemma4 Layers=35 Params=1610055338 Size=3864.1MB Quant=Q8_0 DModel=1536 Heads=8 KVHeads=1
+[LoadModel] profile: Family=gemma4 Layers=35 Params=1610055338 Size=3864.1MB Quant=Q8_0 ArchSpec=true
+[LoadModel] applying safe defaults
+[applySafeDefaults] enter
+[applySafeDefaults] getting hardware snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[applySafeDefaults] freeVRAM=3448 freeRAM=42766
+[applySafeDefaults] reading settings
+[applySafeDefaults] settings: ctx=3096 gpuLayers=0 batch=256
+[applySafeDefaults] archSpec: layers=35 dmodel=1536 heads=8 kvheads=1
+[applySafeDefaults] creating memory model
+[applySafeDefaults] calling ClampToHardware
+[applySafeDefaults] ClampToHardware returned
+[applySafeDefaults] adjustment: GPU VRAM insufficient even at 0 layers (3448 MB free), using CPU only
+[applySafeDefaults] final: GPU=451MB RAM=4429MB ctx=3096 gpuLayers=0 batch=256
+[applySafeDefaults] done
+[LoadModel] safe defaults applied
+[LoadModel] projector G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf declares "hybrid" (declared_vision=true declared_audio=true advertised_vision=false advertised_audio=false dim=1536 type= evidence=clip.has_vision_encoder,clip.has_audio_encoder,clip.vision.attention.head_count,clip.audio.attention.head_count)
+[LoadModel] validating spawn settings
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[LoadModel] spawn params: ctx=3096 gpuLayers=0 batch=256 freeVRAM=3448 freeRAM=42766
+[LoadModel] validation result: level=0 msg="Memory OK — estimated 451 MB GPU / 4429 MB RAM (free: 3448 / 42766 MB)"
+[LoadModel] spawn validation passed
+[LoadModel] SWA model detected, disabling --fit to avoid scheduler crash
+[LoadModel] chat template: model-native for family "gemma4" (133 bytes)
+[LoadModel] spawning llama-server
+INFO: using paired mmproj file: G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf
+INFO: llama-server started (pid 21056) with model G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf
+[LoadModel] llama-server spawned (pid 21056)
+INFO: Registering model with estimated GPU:452MB RAM:4429MB
+[ResourceManager] GetManager called
+[LoadModel] monitor started (pid 21056, timeout 60s)
+[LoadModel] monitor: process died at tick 0, captured output len=969
+[LoadModel] monitor: time: 2026-11-05T10:35:03-06:00
+stage: startup
+model: G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf
+model_name: Gemma-4-E2B-it-Q8_0.gguf
+architecture: gemma4
+projector: G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf
+executable: C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\runtime\llama\llama-server.exe
+args: C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\runtime\llama\llama-server.exe --host 127.0.0.1 --port 8080 -m G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf -c 3096 --threads 8 -b 256 -ngl 0 --fit off --mmproj G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf --chat-template {%- for message in messages %}<start_of_turn>{{ message.role }}
+{{ message.content }}<end_of_turn>
+{%- endfor %}<start_of_turn>model
+ --reasoning on --reasoning-format deepseek --reasoning-budget 2048 --reasoning-budget-message I have thought enough. Time to answer.
+exit: exit status 1
+detail: llama-server exited before becoming healthy
+output_bytes: 969 (truncated=false)
+output_tail:
+  0.00.113.296 I srv  llama_server: initializing ...
+  0.00.113.307 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+  0.00.113.603 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+  0.00.132.041 I srv    load_model: loading model 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+  0.00.388.766 E llama_model_load: error loading model: tensor 'blk.21.ffn_up.weight' data is not within the file bounds, model is corrupted or incomplete
+  0.00.388.778 E llama_model_load_from_file_impl: failed to load model
+  0.00.388.782 E cmn  common_init_: failed to load model 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+  0.00.388.786 E srv    load_model: failed to load model, 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+  0.00.388.790 I srv    operator(): operator(): cleaning up before exit...
+  0.00.389.788 E srv  server_run_i: exiting due to model loading error
+
+[ReadProfile] final: Family=gemma4 Layers=35 Params=1610055338 Size=3864.1MB Quant=Q8_0 DModel=1536 Heads=8 KVHeads=1
+[LoadModel] START path="G:\\AI GGUF\\voice\\Gemma-4-E2B-it-Q8_0.gguf"
+[LoadModel] path validated
+[LoadModel] admission: class=chat arch="gemma4" projector="" evidence=[general.architecture=gemma4 gemma4.embedding_length=1536]
+[LoadModel] chat eligibility: task=multimodal-chat eligible=true basis=identity=gemma-4-e2b-it identity="gemma-4-e2b-it" aliases=[gemma-4-e2b-it] text=true vision=declared-unverified audio=declared-unverified
+[LoadModel] projector paired by identity: G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf (kind=hybrid identity="gemma-4-e2b-it" projection_dim=1536 model_embedding=1536 mismatch=false notes=[])
+[LoadModel] existing serverProc found
+[LoadModel] killing existing server
+[LoadModel] stopped existing llama-server (pid 21056)
+[LoadModel] checking port 8080
+[LoadModel] port 8080 free
+[LoadModel] validating llama-server binary
+[LoadModel] llama-server binary validated
+[LoadModel] reading GGUF metadata from: G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf
+[ReadProfile] final: Family=gemma4 Layers=35 Params=1610055338 Size=3864.1MB Quant=Q8_0 DModel=1536 Heads=8 KVHeads=1
+[LoadModel] profile: Family=gemma4 Layers=35 Params=1610055338 Size=3864.1MB Quant=Q8_0 ArchSpec=true
+[LoadModel] applying safe defaults
+[applySafeDefaults] enter
+[applySafeDefaults] getting hardware snapshot
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[applySafeDefaults] freeVRAM=3448 freeRAM=42766
+[applySafeDefaults] reading settings
+[applySafeDefaults] settings: ctx=3096 gpuLayers=0 batch=256
+[applySafeDefaults] archSpec: layers=35 dmodel=1536 heads=8 kvheads=1
+[applySafeDefaults] creating memory model
+[applySafeDefaults] calling ClampToHardware
+[applySafeDefaults] ClampToHardware returned
+[applySafeDefaults] adjustment: GPU VRAM insufficient even at 0 layers (3448 MB free), using CPU only
+[applySafeDefaults] final: GPU=451MB RAM=4429MB ctx=3096 gpuLayers=0 batch=256
+[applySafeDefaults] done
+[LoadModel] safe defaults applied
+[LoadModel] projector G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf declares "hybrid" (declared_vision=true declared_audio=true advertised_vision=false advertised_audio=false dim=1536 type= evidence=clip.has_vision_encoder,clip.has_audio_encoder,clip.vision.attention.head_count,clip.audio.attention.head_count)
+[LoadModel] validating spawn settings
+[ResourceManager] GetManager called
+[ResourceManager] HardwareSnapshot: acquiring RLock
+[ResourceManager] HardwareSnapshot: RLock acquired
+[ResourceManager] HardwareSnapshot: RLock released
+[LoadModel] spawn params: ctx=3096 gpuLayers=0 batch=256 freeVRAM=3448 freeRAM=42766
+[LoadModel] validation result: level=0 msg="Memory OK — estimated 451 MB GPU / 4429 MB RAM (free: 3448 / 42766 MB)"
+[LoadModel] spawn validation passed
+[LoadModel] SWA model detected, disabling --fit to avoid scheduler crash
+[LoadModel] chat template: model-native for family "gemma4" (133 bytes)
+[LoadModel] spawning llama-server
+INFO: using paired mmproj file: G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf
+INFO: llama-server started (pid 18468) with model G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf
+[LoadModel] llama-server spawned (pid 18468)
+INFO: Registering model with estimated GPU:452MB RAM:4429MB
+[ResourceManager] GetManager called
+[LoadModel] monitor started (pid 18468, timeout 60s)
+[LoadModel] monitor: process died at tick 0, captured output len=969
+[LoadModel] monitor: time: 2026-11-05T10:38:02-06:00
+stage: startup
+model: G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf
+model_name: Gemma-4-E2B-it-Q8_0.gguf
+architecture: gemma4
+projector: G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf
+executable: C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\runtime\llama\llama-server.exe
+args: C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\runtime\llama\llama-server.exe --host 127.0.0.1 --port 8080 -m G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf -c 3096 --threads 8 -b 256 -ngl 0 --fit off --mmproj G:\AI GGUF\voice\mmproj-gemma-4-E2B-it-Q8_0.gguf --chat-template {%- for message in messages %}<start_of_turn>{{ message.role }}
+{{ message.content }}<end_of_turn>
+{%- endfor %}<start_of_turn>model
+ --reasoning on --reasoning-format deepseek --reasoning-budget 2048 --reasoning-budget-message I have thought enough. Time to answer.
+exit: exit status 1
+detail: llama-server exited before becoming healthy
+output_bytes: 969 (truncated=false)
+output_tail:
+  0.00.111.093 I srv  llama_server: initializing ...
+  0.00.111.106 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+  0.00.111.401 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+  0.00.126.372 I srv    load_model: loading model 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+  0.00.358.954 E llama_model_load: error loading model: tensor 'blk.21.ffn_up.weight' data is not within the file bounds, model is corrupted or incomplete
+  0.00.358.973 E llama_model_load_from_file_impl: failed to load model
+  0.00.358.981 E cmn  common_init_: failed to load model 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+  0.00.358.993 E srv    load_model: failed to load model, 'G:\AI GGUF\voice\Gemma-4-E2B-it-Q8_0.gguf'
+  0.00.359.003 I srv    operator(): operator(): cleaning up before exit...
+  0.00.360.258 E srv  server_run_i: exiting due to model loading error
+
+[startup] 10:38:24.541  +825326.6ms  wails.Run returned

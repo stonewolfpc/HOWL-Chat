@@ -32,6 +32,13 @@ async function syncLorebooks() {
         console.error('Wails runtime not available');
         return;
     }
+    if (window.LorebookRepo && typeof window.LorebookRepo.hydrate === 'function') {
+        try {
+            await window.LorebookRepo.hydrate();
+        } catch (error) {
+            console.error('Lorebook library refresh failed:', error);
+        }
+    }
     try {
         const lorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
         window.go.main.App.SetLorebooks(Array.isArray(lorebooks) ? lorebooks : []).catch(error => {
@@ -95,7 +102,23 @@ function buildCharacterContext() {
     return context;
 }
 
-function buildCharacterSpecificMessage(userMessage, character, priorResponses = []) {
+// Ask the backend for this character's lore block. The shared resolver applies
+// ownership, visibility, activation and stale-root rules; the page must not
+// reconstruct them from localStorage.
+async function requestCharacterLoreBlock(characterID, userMessage) {
+    const app = window.go?.main?.App;
+    if (!app || typeof app.BuildCharacterLoreBlock !== 'function') {
+        // Fail loudly: sending the turn without lore would silently bypass the
+        // ownership and visibility policy, which is exactly the W18 defect.
+        throw new Error('The lorebook resolver is not available in this window.');
+    }
+    // The stable character.id authorizes ownership. The display name is only a
+    // label and must not cross the resolver boundary as an identity.
+    const block = await app.BuildCharacterLoreBlock(characterID, userMessage);
+    return typeof block === 'string' ? block : '';
+}
+
+function buildCharacterSpecificMessage(userMessage, character, priorResponses = [], loreBlock = '') {
     let msg = `You are ${character.name}, a distinct participant in a group roleplay conversation.\n`;
     msg += `You speak only when someone addresses you directly by name, role, or context, or when it is naturally your turn to respond.\n`;
     msg += `If others are speaking to each other, you listen quietly and stay in character, reacting only when your involvement makes sense.\n\n`;
@@ -134,24 +157,11 @@ function buildCharacterSpecificMessage(userMessage, character, priorResponses = 
         }
     }
 
-    // Scoped lorebook entries: world → all; scenario → all; character → owner only
-    const lorebooks = (() => {
-        try { return JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]'); }
-        catch (_) { return []; }
-    })();
-    const activeLore = lorebooks.filter(e => e.enabled !== false);
-    const worldLore   = activeLore.filter(e => e.scope === 'world'   || e.type === 'world');
-    const scenarioLore= activeLore.filter(e => e.scope === 'scenario'|| e.type === 'scenario');
-    const charLore    = activeLore.filter(e =>
-        (e.scope === 'character' || e.type === 'character') &&
-        (e.linkedCharacters?.includes?.(character.id) || e.ownerId === character.id || e.ownerId === character.name)
-    );
-    const scopedLore = [...worldLore, ...scenarioLore, ...charLore];
-    if (scopedLore.length > 0) {
-        msg += `\n[RELEVANT LORE]\n`;
-        for (const entry of scopedLore.slice(0, 6)) {
-            msg += `- ${entry.title || 'Untitled'}: ${entry.content?.slice?.(0, 300) || entry.content || ''}\n`;
-        }
+    // Lore comes from the backend resolver (BuildCharacterLoreBlock): one policy
+    // for visibility, ownership, activation and stale roots across both prompt
+    // paths. The browser store is a cache, not a second policy.
+    if (loreBlock) {
+        msg += `\n${loreBlock}\n`;
     }
 
     // Automated memories: character-scoped memories for this character only
@@ -278,7 +288,17 @@ async function streamMultiCharacterResponses(userMessage) {
     let character = window.CharacterQueue.getCurrentCharacter();
     while (character) {
         console.log(`Generating response for: ${character.name} (priority ${character.metadata?.priority ?? 3})`);
-        const characterSpecificMessage = buildCharacterSpecificMessage(userMessage, character, priorResponses);
+        let loreBlock = '';
+        try {
+            loreBlock = await requestCharacterLoreBlock(character.id, userMessage);
+        } catch (error) {
+            console.error(`Lore resolution failed for ${character.name}:`, error);
+            if (typeof showNotification === 'function') {
+                showNotification(`Lore lookup failed for ${character.name}; response skipped.`, 'error', 8000);
+            }
+            break;
+        }
+        const characterSpecificMessage = buildCharacterSpecificMessage(userMessage, character, priorResponses, loreBlock);
         let responseText;
         try {
             responseText = await streamSingleCharacterResponse(characterSpecificMessage, character);

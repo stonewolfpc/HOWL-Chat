@@ -1,0 +1,225 @@
+﻿|Window|cls=wailsWindow|id=|name=HOWL Chat|rect=580,270,1400,900
+  |Pane|cls=Chrome_WidgetWin_1|id=|name=HOWL Chat|rect=588,301,1384,861
+    |Pane|cls=Intermediate D3D Window|id=|name=|rect=588,301,1384,861
+    |Pane|cls=BrowserRootView|id=|name=HOWL Chat - Web content|rect=588,301,1384,861
+      |Pane|cls=NonClientView|id=|name=|rect=588,301,1384,861
+        |Pane|cls=EmbeddedBrowserTabRootView|id=|name=|rect=-1,-1,-1,-1
+        |Pane|cls=EmbeddedBrowserFrameView|id=|name=|rect=588,301,1384,861
+          |Pane|cls=BrowserView|id=|name=|rect=588,301,1384,861
+            |Pane|cls=TopContainerView|id=|name=|rect=-1,-1,-1,-1
+            |Pane|cls=SidebarContentsSplitView|id=|name=|rect=588,301,1384,861
+              |Pane|cls=SidebarContentsSplitView|id=|name=|rect=588,301,1384,861
+                |Pane|cls=MultiContentsView|id=|name=|rect=588,301,1384,861
+                  |Pane|cls=View|id=|name=|rect=588,301,1384,861
+                    |Pane|cls=View|id=|name=|rect=-1,-1,-1,-1
+                    |Document|cls=|id=RootWebArea|name=HOWL Chat|rect=588,301,1384,861
+                      |Text|cls=|id=|name=﻿|rect=-1,-1,-1,-1 OFFSCR
+                      |Image|cls=|id=|name=HOWL Chat|rect=604,313,44,45
+                      |Text|cls=|id=|name=HOWL Chat|rect=660,326,77,19
+                      |Button|cls=menu-button|id=|name=File|rect=784,323,48,25
+                      |Button|cls=menu-button|id=|name=View|rect=869,323,55,25
+                      |Button|cls=menu-button|id=|name=Settings|rect=961,323,74,25
+                      |Button|cls=menu-button|id=|name=Help|rect=1072,323,54,25
+                      |Group|cls=flyout-overlay|id=flyout-overlay|name=|rect=588,301,1384,861
+                      |Text|cls=|id=|name=Sampler Settings|rect=621,280,151,28
+                      |Button|cls=flyout-close|id=|name=✕|rect=1907,278,32,32
+                      |Text|cls=|id=|name=Core Settings|rect=631,334,84,19
+                      |Image|cls=|id=|name=|rect=642,377,14,14
+                      |Text|cls=|id=|name=Temperature|rect=661,375,74,18
+                      |Text|cls=|id=|name=Controls creativity. Higher = more random.|rect=642,402,214,16
+                      |Slider|cls=setting-slider|id=temperature|name=|rect=642,446,162,5
+                      |Spinner|cls=setting-value|id=temperature-value|name=|rect=811,436,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=821,377,48,18
+                      |CheckBox|cls=|id=top-p-enabled|name=|rect=1033,377,48,26 OFFSCR
+                      |Text|cls=|id=|name=Enabled|rect=1033,389,39,16
+                      |Image|cls=|id=|name=|rect=901,377,14,14
+                      |Text|cls=|id=|name=Top‑P|rect=920,375,35,18
+                      |Image|cls=|id=|name=|rect=959,376,15,15
+                      |Text|cls=|id=|name=Filters tokens by cumulative probability.|rect=901,402,198,16
+                      |Slider|cls=setting-slider|id=top-p|name=|rect=901,446,163,5
+                      |Spinner|cls=setting-value|id=top-p-value|name=|rect=1070,436,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1081,377,47,18
+                      |Image|cls=|id=|name=|rect=1161,377,13,14
+                      |Text|cls=|id=|name=Top‑K|rect=1179,375,35,18
+                      |Text|cls=|id=|name=Only allows the top K most likely tokens.|rect=1161,402,201,16
+                      |Slider|cls=setting-slider|id=top-k|name=|rect=1161,446,162,5
+                      |Spinner|cls=setting-value|id=top-k-value|name=|rect=1330,436,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1340,377,48,18
+                      |Image|cls=|id=|name=|rect=1420,377,14,14
+                      |Text|cls=|id=|name=Min‑P|rect=1439,375,36,18
+                      |Image|cls=|id=|name=|rect=1480,376,14,15
+                      |Text|cls=|id=|name=Filters tokens below minimum probability.|rect=1420,402,209,16
+                      |Slider|cls=setting-slider|id=min-p|name=|rect=1420,446,162,5
+                      |Spinner|cls=setting-value|id=min-p-value|name=|rect=1589,436,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1599,377,48,18
+                      |Image|cls=|id=|name=|rect=1679,377,14,14
+                      |Text|cls=|id=|name=Repeat Penalty|rect=1698,375,87,18
+                      |Text|cls=|id=|name=Penalizes repeated tokens.|rect=1679,402,133,16
+                      |Slider|cls=setting-slider|id=repeat-penalty|name=|rect=1679,446,163,5
+                      |Spinner|cls=setting-value|id=repeat-penalty-value|name=|rect=1848,436,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1859,377,47,18
+                      |Image|cls=|id=|name=|rect=642,488,14,14
+                      |Text|cls=|id=|name=Repeat Last‑N|rect=661,486,82,18
+                      |Text|cls=|id=|name=How far back repetition is checked.|rect=642,514,175,15
+                      |Slider|cls=setting-slider|id=repeat-last-n|name=|rect=642,557,162,5
+                      |Spinner|cls=setting-value|id=repeat-last-n-value|name=|rect=811,547,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=821,488,48,18
+                      |Text|cls=|id=|name=Intermediate Controls|rect=631,610,137,20
+                      |CheckBox|cls=|id=presence-penalty-enabled|name=|rect=947,653,48,27 OFFSCR
+                      |Text|cls=|id=|name=Enabled|rect=947,665,39,16
+                      |Image|cls=|id=|name=|rect=642,653,14,14
+                      |Text|cls=|id=|name=Presence Penalty|rect=661,651,98,18
+                      |Image|cls=|id=|name=|rect=763,653,15,14
+                      |Text|cls=|id=|name=Penalizes new topics (reduces topic drift).|rect=642,679,205,15
+                      |Slider|cls=setting-slider|id=presence-penalty|name=|rect=642,722,335,5
+                      |Spinner|cls=setting-value|id=presence-penalty-value|name=|rect=984,713,60,24
+                      |Button|cls=setting-reset|id=|name=Default|rect=994,653,48,18
+                      |CheckBox|cls=|id=frequency-penalty-enabled|name=|rect=1379,653,48,27 OFFSCR
+                      |Text|cls=|id=|name=Enabled|rect=1379,665,39,16
+                      |Image|cls=|id=|name=|rect=1074,653,14,14
+                      |Text|cls=|id=|name=Frequency Penalty|rect=1093,651,106,18
+                      |Image|cls=|id=|name=|rect=1204,653,15,14
+                      |Text|cls=|id=|name=Penalizes tokens based on frequency.|rect=1074,679,186,15
+                      |Slider|cls=setting-slider|id=frequency-penalty|name=|rect=1074,722,335,5
+                      |Spinner|cls=setting-value|id=frequency-penalty-value|name=|rect=1416,713,60,24
+                      |Button|cls=setting-reset|id=|name=Default|rect=1426,653,48,18
+                      |CheckBox|cls=|id=typical-p-enabled|name=|rect=1811,653,48,27 OFFSCR
+                      |Text|cls=|id=|name=Enabled|rect=1811,665,39,16
+                      |Image|cls=|id=|name=|rect=1506,653,14,14
+                      |Text|cls=|id=|name=Typical‑P|rect=1525,651,53,18
+                      |Image|cls=|id=|name=|rect=1583,653,15,14
+                      |Text|cls=|id=|name=Filters tokens by typical probability.|rect=1506,679,177,15
+                      |Slider|cls=setting-slider|id=typical-p|name=|rect=1506,722,336,5
+                      |Spinner|cls=setting-value|id=typical-p-value|name=|rect=1848,713,60,24
+                      |Button|cls=setting-reset|id=|name=Default|rect=1859,653,47,18
+                      |Text|cls=|id=|name=Advanced Controls|rect=631,775,119,20
+                      |CheckBox|cls=|id=mirostat-mode-enabled|name=|rect=774,818,48,27 OFFSCR
+                      |Text|cls=|id=|name=Enabled|rect=774,831,39,15
+                      |Image|cls=|id=|name=|rect=642,818,14,14
+                      |Text|cls=|id=|name=Mirostat Mode|rect=661,816,87,18
+                      |Image|cls=|id=|name=|rect=752,818,15,15
+                      |Text|cls=|id=|name=Auto‑tunes sampling parameters.|rect=642,844,167,16
+                      |Slider|cls=setting-slider|id=mirostat-mode|name=|rect=642,887,162,5
+                      |Spinner|cls=setting-value|id=mirostat-mode-value|name=|rect=811,878,60,24
+                      |Button|cls=setting-reset|id=|name=Default|rect=821,818,48,18
+                      |Image|cls=|id=|name=|rect=901,818,14,14
+                      |Text|cls=|id=|name=Mirostat Tau|rect=920,816,73,18
+                      |Text|cls=|id=|name=Target perplexity for Mirostat.|rect=901,844,148,16
+                      |Slider|cls=setting-slider|id=mirostat-tau|name=|rect=901,887,163,5
+                      |Spinner|cls=setting-value|id=mirostat-tau-value|name=|rect=1070,878,60,24
+                      |Button|cls=setting-reset|id=|name=Default|rect=1081,818,47,18
+                      |Image|cls=|id=|name=|rect=1161,818,13,14
+                      |Text|cls=|id=|name=Mirostat Eta|rect=1179,816,71,18
+                      |Text|cls=|id=|name=Learning rate for Mirostat.|rect=1161,844,130,16
+                      |Slider|cls=setting-slider|id=mirostat-eta|name=|rect=1161,887,162,5
+                      |Spinner|cls=setting-value|id=mirostat-eta-value|name=|rect=1330,878,60,24
+                      |Button|cls=setting-reset|id=|name=Default|rect=1340,818,48,18
+                      |CheckBox|cls=|id=dyn-temp-range-enabled|name=|rect=1552,818,48,27 OFFSCR
+                      |Text|cls=|id=|name=Enabled|rect=1552,831,39,15
+                      |Image|cls=|id=|name=|rect=1420,835,14,14
+                      |Text|cls=|id=|name=Dynamic Temperature Range|rect=1439,816,74,51
+                      |Image|cls=|id=|name=|rect=1532,835,15,14
+                      |Text|cls=|id=|name=Adjusts temperature based on token probability.|rect=1420,877,182,31
+                      |Slider|cls=setting-slider|id=dyn-temp-range|name=|rect=1420,936,162,5
+                      |Spinner|cls=setting-value|id=dyn-temp-range-value|name=|rect=1589,926,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1599,818,48,18
+                      |Image|cls=|id=|name=|rect=1679,835,14,14
+                      |Text|cls=|id=|name=Dynamic Temperature Exponent|rect=1698,816,74,51
+                      |Text|cls=|id=|name=Exponent for dynamic temperature calculation.|rect=1679,877,175,31
+                      |Slider|cls=setting-slider|id=dyn-temp-exp|name=|rect=1679,936,163,5
+                      |Spinner|cls=setting-value|id=dyn-temp-exp-value|name=|rect=1848,926,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1859,818,47,18
+                      |Image|cls=|id=|name=|rect=642,978,14,14
+                      |Text|cls=|id=|name=DRY Multiplier|rect=661,976,85,18
+                      |Text|cls=|id=|name=Penalty for repetition in output.|rect=642,1004,157,15
+                      |Slider|cls=setting-slider|id=dry-multiplier|name=|rect=642,1047,162,5
+                      |Spinner|cls=setting-value|id=dry-multiplier-value|name=|rect=811,1037,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=821,978,48,18
+                      |Image|cls=|id=|name=|rect=901,986,14,14
+                      |Text|cls=|id=|name=DRY Allowed Length|rect=920,976,75,35
+                      |Text|cls=|id=|name=Minimum length before DRY applies.|rect=901,1020,184,16
+                      |Slider|cls=setting-slider|id=dry-allowed-length|name=|rect=901,1064,163,5
+                      |Spinner|cls=setting-value|id=dry-allowed-length-value|name=|rect=1070,1054,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1081,978,47,18
+                      |Image|cls=|id=|name=|rect=1161,978,13,14
+                      |Text|cls=|id=|name=DRY Base|rect=1179,976,56,18
+                      |Text|cls=|id=|name=Base penalty for DRY.|rect=1161,1004,107,15
+                      |Slider|cls=setting-slider|id=dry-base|name=|rect=1161,1047,162,5
+                      |Spinner|cls=setting-value|id=dry-base-value|name=|rect=1330,1037,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1340,978,48,18
+                      |Image|cls=|id=|name=|rect=1420,978,14,14
+                      |Text|cls=|id=|name=Seed|rect=1439,976,29,18
+                      |Text|cls=|id=|name=Controls randomness.|rect=1420,1004,109,15
+                      |Spinner|cls=setting-value|id=seed|name=|rect=1420,1037,60,25
+                      |Button|cls=setting-reset|id=|name=Default|rect=1599,978,48,18
+                      |Text|cls=|id=|name=NO MODEL LOADED|rect=1847,328,109,15
+                      |Text|cls=|id=|name=Story Tools|rect=601,269,99,27 OFFSCR
+                      |Button|cls=flyout-close|id=|name=✕|rect=1926,266,33,32 OFFSCR
+                      |Text|cls=|id=|name=Recent Memories|rect=601,334,156,27
+                      |Image|cls=setting-icon|id=|name=Memory Management|rect=614,414,25,25
+                      |Text|cls=|id=|name=Memory Management|rect=651,416,141,20
+                      |Text|cls=|id=|name=Automated lore entries for this chat|rect=614,453,186,17
+                      |Text|cls=|id=|name=Loading memories...|rect=614,506,122,20
+                      |Button|cls=setting-button|id=|name=Expand|rect=743,505,79,33
+                      |Text|cls=|id=|name=All Memories|rect=1669,711,97,21
+                      |Button|cls=flyout-close|id=|name=✕|rect=1903,705,32,33
+                      |Text|cls=|id=|name=Loading memories...|rect=1653,754,124,20
+                      |Text|cls=|id=|name=Edit Memory|rect=1047,521,94,22
+                      |Button|cls=flyout-close|id=|name=✕|rect=1481,516,32,32
+                      |Text|cls=|id=|name=Title|rect=1051,585,25,17
+                      |Edit|cls=|id=memory-title|name=Title|rect=1051,608,458,39
+                      |Text|cls=|id=|name=Content|rect=1051,663,46,17
+                      |Edit|cls=|id=memory-content|name=Content|rect=1051,686,458,192
+                      |Button|cls=setting-button|id=|name=Save|rect=1051,910,65,33
+                      |Button|cls=setting-button secondary|id=|name=Cancel|rect=1127,910,76,33
+                      |Group|cls=nav-item active|id=|name=|rect=592,360,71,56
+                        |Image|cls=nav-icon-img|id=|name=Chat|rect=615,376,25,24
+                      |Group|cls=nav-item|id=|name=|rect=592,420,71,56
+                        |Image|cls=nav-icon-img|id=|name=World|rect=615,436,25,24
+                      |Group|cls=nav-item|id=|name=|rect=592,480,71,56
+                        |Image|cls=nav-icon-img|id=|name=Characters|rect=615,496,25,24
+                      |Group|cls=nav-item|id=|name=|rect=592,540,71,56
+                        |Image|cls=nav-icon-img|id=|name=Scenarios|rect=615,556,25,24
+                      |Group|cls=nav-item|id=|name=|rect=592,600,71,56
+                        |Image|cls=nav-icon-img|id=|name=Lorebooks|rect=615,616,25,24
+                      |Group|cls=nav-item|id=|name=|rect=592,660,71,56
+                        |Image|cls=nav-icon-img|id=|name=Image Generator|rect=615,676,25,24
+                      |Text|cls=|id=|name=CHARACTERS|rect=696,375,97,19
+                      |Text|cls=|id=|name=👥|rect=734,460,67,64
+                      |Text|cls=|id=|name=No characters selected|rect=724,540,87,38
+                      |Button|cls=add-character-btn|id=|name=Add Character|rect=711,598,113,32
+                      |Text|cls=|id=|name=CHAT CONTEXT|rect=1793,367,113,19
+                      |Image|cls=|id=|name=|rect=1788,417,16,17
+                      |Text|cls=|id=|name=WORLD|rect=1812,417,49,17
+                      |Text|cls=|id=|name=No World|rect=1805,480,52,17
+                      |Text|cls=|id=|name=No World Selected|rect=1875,478,57,18
+                      |Button|cls=context-btn|id=|name=Change World|rect=1788,544,158,32
+                      |Image|cls=|id=|name=|rect=1788,607,16,17
+                      |Text|cls=|id=|name=SCENARIO|rect=1812,607,67,17
+                      |Text|cls=|id=|name=No Scenario|rect=1808,663,46,31
+                      |Text|cls=|id=|name=No Scenario Selected|rect=1875,668,60,18
+                      |Button|cls=context-btn|id=|name=Change Scenario|rect=1788,734,158,32
+                      |Image|cls=|id=|name=|rect=1788,797,16,17
+                      |Text|cls=|id=|name=LOREBOOKS|rect=1812,797,78,17
+                      |Text|cls=|id=|name=📚|rect=1853,846,28,27
+                      |Text|cls=|id=|name=No lorebooks selected|rect=1801,895,132,19
+                      |Button|cls=add-lorebook-btn|id=|name=Add Lorebook|rect=1800,940,134,30
+                      |Text|cls=|id=|name=No model loaded|rect=1815,1031,104,16
+                      |Group|cls=model-select-custom|id=llm-model-select|name=|rect=1788,1072,158,34
+                        |Group|cls=model-select-trigger|id=|name=|rect=1788,1072,158,34
+                          |Text|cls=|id=|name=— select model —|rect=1797,1081,98,16
+                      |Button|cls=model-button load-button|id=|name=Load|rect=1788,1112,76,30 OFFSCR
+                      |Button|cls=model-button|id=|name=Browser|rect=1870,1112,76,30 OFFSCR
+                      |Button|cls=model-button unload-button|id=|name=UNLOAD|rect=1788,1150,158,32 OFFSCR
+                      |Button|cls=input-icon|id=|name=Vision|rect=600,1108,38,42
+                        |Image|cls=|id=|name=|rect=609,1119,20,20
+                      |Button|cls=input-icon mic-button|id=|name=Speech Input (Hold to record)|rect=646,1108,38,42
+                        |Image|cls=|id=|name=|rect=655,1119,20,20
+                      |Button|cls=input-icon tts-icon|id=|name=Text to Speech (TTS)|rect=692,1108,38,42
+                        |Image|cls=|id=|name=|rect=701,1119,20,20
+                      |Button|cls=input-icon|id=|name=Document|rect=738,1108,38,42
+                        |Image|cls=|id=|name=|rect=747,1119,20,20
+                      |Edit|cls=input-field|id=message-input|name=Type your message...|rect=801,1108,1063,42
+                      |Button|cls=send-button|id=|name=Send|rect=1875,1108,85,42
+            |Pane|cls=EmbeddedBrowserDownloadView|id=|name=|rect=-1,-1,-1,-1
+        |Pane|cls=TopContainerOverlayView|id=|name=|rect=588,301,1384,861

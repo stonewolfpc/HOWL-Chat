@@ -1,0 +1,21 @@
+D1 FIXTURE SNAPSHOT  2026-11-04T21:46:15-06:00
+
+--- ASR CONFIG UNDER TEST (config/settings.json) ---
+6:    "asrEnabled": true,
+7:    "asrEngine": "qwen3-asr-1.7b-local",
+16:    "audioInputDevice": "default",
+17:    "audioOutputDevice": "default",
+25:    "ttsEngine": "piper",
+
+--- HASHES (detect any accidental change during D1) ---
+e786f53f2fd7f91b794936dad1930e2b09594de8a81167179a857ecb011757bf *config/settings.json
+d43ce0d6d41184c6b5766b55b828768c06a665049168be53acd4558e9eeef132 */c/Users/StoneWolfPC/AppData/Roaming/HOWLChat/config.json
+fd9eee449cfd22605cdd61560527b3d714f38f12d7ac7d283e09447ddaa28639 */c/Users/StoneWolfPC/AppData/Roaming/HOWLChat/chats/2026-10-31T14-06-59Z/history.json
+
+--- INTENDED AUDIO OUTPUT (must stay headphones; no speaker routing) ---
+DEFAULT_RENDER=Headphones (WH-1000XM4)|{0.0.0.00000000}.{9460d508-20ce-4ade-8b76-e405f9ab758a}
+VOLUME=54%
+  capture/console : Headset (WH-1000XM4)|Headset|state=1|{0.0.1.00000000}.{6b9264d1-a6cc-48b2-84cd-082bacac1599}
+
+--- NOTHING SHOULD BE RUNNING ---
+

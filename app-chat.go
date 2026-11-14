@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"howl-chat/internal/audio"
 	"howl-chat/internal/backend/chat"
 	"howl-chat/internal/backend/lorebook"
 	"howl-chat/internal/errors"
@@ -150,10 +151,10 @@ func (a *App) ClearScenarioFromSession() error {
 	return nil
 }
 
-// ExitApp performs a final save and quits the application.
+// ExitApp performs the same idempotent shutdown as window close, then quits.
 func (a *App) ExitApp() error {
-	if a.chatPersistence != nil {
-		a.performFinalSave()
+	if err := a.shutdown(nil); err != nil {
+		fmt.Printf("Shutdown failed: %v\n", err)
 	}
 	runtime.Quit(a.ctx)
 	return nil
@@ -165,6 +166,9 @@ func (a *App) ExitApp() error {
 
 // SendMessage sends a message and returns the AI response synchronously.
 func (a *App) SendMessage(message string) (string, error) {
+	if err := a.ensureAcceptingWork("send message"); err != nil {
+		return "", err
+	}
 	if a.httpClient == nil {
 		return "", fmt.Errorf("llama client not initialized")
 	}
@@ -178,7 +182,7 @@ func (a *App) SendMessage(message string) (string, error) {
 	// out of the next prompt on the non-streaming path too, not just the streamed one.
 	response = stripThinkBlocks(response)
 	a.chatMessages = append(a.chatMessages, map[string]interface{}{
-		"role": "assistant", "content": response, "timestamp": time.Now().Unix(),
+		"role": "assistant", "content": response, "timestamp": time.Now().Format(time.RFC3339),
 	})
 	if a.chatPersistence != nil {
 		go func() {
@@ -251,6 +255,7 @@ func (a *App) LoadChatData() (map[string]interface{}, error) {
 				"triggerFrequency": lb.TriggerFrequency, "priorityLevel": lb.PriorityLevel,
 				"maxLength": lb.MaxLength, "contextBudget": lb.ContextBudget,
 				"scanWindow": lb.ScanWindow, "automated": lb.Automated,
+				"stale": lb.Stale,
 			}
 		}
 		meta := map[string]interface{}{
@@ -319,17 +324,16 @@ func (a *App) performSave() error {
 	return a.chatPersistence.SaveChat(chatData)
 }
 
-func (a *App) performFinalSave() {
+func (a *App) performFinalSave() error {
 	if err := a.performSave(); err != nil {
-		fmt.Println("Final save failed:", err)
-		return
+		return fmt.Errorf("final save: %w", err)
 	}
 	if a.chatPersistence == nil {
-		return
+		return nil
 	}
 	chatID := a.chatPersistence.GetLastChatID()
 	if chatID == "" {
-		return
+		return nil
 	}
 	// On exit, rewrite the append log from the state that was just persisted, so
 	// stale lines (duplicate appends, deleted messages, legacy DOM-scrape entries)
@@ -338,15 +342,14 @@ func (a *App) performFinalSave() {
 	// its existing history instead of being truncated to nothing.
 	chatData, err := a.chatPersistence.LoadChat(chatID)
 	if err != nil {
-		fmt.Println("Final history reload failed:", err)
-		return
+		return fmt.Errorf("final history reload: %w", err)
 	}
 	a.updateChatDataFromAppState(chatData)
 	if err := a.chatPersistence.RewriteHistory(chatID, chatData.History); err != nil {
-		fmt.Println("Final history rewrite failed:", err)
-		return
+		return fmt.Errorf("final history rewrite: %w", err)
 	}
 	fmt.Println("[FinalSave] rewrote history.ndjson with", len(chatData.History), "entries")
+	return nil
 }
 
 // recordUserTurn appends a user turn to the in-memory history unless the
@@ -363,7 +366,7 @@ func (a *App) recordUserTurn(content string) {
 		}
 	}
 	a.chatMessages = append(a.chatMessages, map[string]interface{}{
-		"role": "user", "content": content, "timestamp": time.Now().Unix(),
+		"role": "user", "content": content, "timestamp": time.Now().Format(time.RFC3339),
 	})
 }
 
@@ -392,12 +395,20 @@ func (a *App) buildChatHistory() []chat.ChatHistory {
 				sender = "Assistant"
 			}
 		}
+		characterID, _ := msg["characterId"].(string)
+		timestamp, _ := msg["timestamp"].(string)
+		if timestamp == "" {
+			timestamp = time.Now().Format(time.RFC3339)
+		}
+		hasImage, _ := msg["hasImage"].(bool)
 		history = append(history, chat.ChatHistory{
-			ID:        fmt.Sprintf("%d", len(history)),
-			Sender:    sender,
-			Text:      content,
-			Role:      role,
-			Timestamp: time.Now().Format(time.RFC3339),
+			ID:          fmt.Sprintf("%d", len(history)),
+			Sender:      sender,
+			Text:        content,
+			Role:        role,
+			Timestamp:   timestamp,
+			HasImage:    hasImage,
+			CharacterID: characterID,
 		})
 	}
 	return history
@@ -502,6 +513,15 @@ func (a *App) updateAppStateFromChat(chatData *chat.ChatData) {
 		} else if h.Sender != "" && h.Sender != "System" {
 			msg["sender"] = h.Sender
 		}
+		if h.Timestamp != "" {
+			msg["timestamp"] = h.Timestamp
+		}
+		if h.HasImage {
+			msg["hasImage"] = true
+		}
+		if h.CharacterID != "" {
+			msg["characterId"] = h.CharacterID
+		}
 		a.chatMessages = append(a.chatMessages, msg)
 	}
 
@@ -543,10 +563,15 @@ func (a *App) convertFrontendDataToChatData(data map[string]interface{}) (*chat.
 		chatData.History = make([]chat.ChatHistory, 0, len(historyData))
 		for _, item := range historyData {
 			if m, ok := item.(map[string]interface{}); ok {
+				characterID := a.getStringFromMap(m, "characterId")
+				if characterID == "" {
+					characterID = a.getStringFromMap(m, "CharacterId")
+				}
 				chatData.History = append(chatData.History, chat.ChatHistory{
 					ID: a.getStringFromMap(m, "id"), Sender: a.getStringFromMap(m, "sender"),
 					Text: a.getStringFromMap(m, "text"), Role: a.getStringFromMap(m, "role"),
 					Timestamp: a.getStringFromMap(m, "timestamp"), HasImage: a.getBoolFromMap(m, "hasImage"),
+					CharacterID: characterID,
 				})
 			}
 		}
@@ -700,5 +725,14 @@ func (a *App) SetSettings(settings map[string]interface{}) error {
 			a.modelSettings[k] = v
 		}
 	}
-	return a.settingsStore.Save(settings)
+	if err := a.settingsStore.Save(settings); err != nil {
+		return err
+	}
+	// Saving is not applying. Keep the complete requested contract current so
+	// status can distinguish a saved value from the active generation.
+	if rawAudio, ok := settings["audio"].(map[string]interface{}); ok {
+		a.setAudioDesired(audio.DesiredSettingsFromMap(rawAudio))
+		a.setAudioApplyError("")
+	}
+	return nil
 }

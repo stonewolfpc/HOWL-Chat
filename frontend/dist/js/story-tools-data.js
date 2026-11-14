@@ -148,6 +148,7 @@ function _normalizeBackendMemory(bm) {
         content:    bm.content     || bm.Content,
         scope:      bm.scope       || bm.Scope       || 'global',
         ownerId:    bm.owner_id    || bm.ownerId     || '',
+        ownerKind:  bm.owner_kind  || bm.ownerKind   || '',
         tags:       bm.tags        || bm.Tags        || [],
         pinned:     bm.pinned      || bm.Pinned      || false,
         status:     bm.status      || bm.Status      || 'active',

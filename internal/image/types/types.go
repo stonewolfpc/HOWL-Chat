@@ -171,6 +171,9 @@ type ImageResult struct {
 	VideoData      string          `json:"video_data,omitempty"`      // base64 clip for video mode
 	VideoMIME      string          `json:"video_mime,omitempty"`      // container type for the data URL
 	ImageMetadatas []ImageMetadata `json:"image_metadatas,omitempty"` // per-image metadata for batches
+	// GalleryError reports that generation succeeded but the gallery copy did
+	// not. The image bytes above remain usable; this is a partial result.
+	GalleryError string `json:"gallery_error,omitempty"`
 }
 
 // ImageSource links a generated image to an entity.

@@ -1,0 +1,54 @@
+﻿14:10:41.416  PASS_A_START
+14:10:41.499  APP_PID=17916
+14:10:49.663  PROMPT_VISIBLE=False
+14:10:50.635  SCAN_CLICK INVOKED invoke-pattern index=0
+14:10:56.042  PROMPT_AFTER_SCAN=False
+14:10:56.051  DIRS[after-scan] has_demo=True
+14:10:56.059    DIR C:\\Users\\StoneWolfPC\\HOWL_Chat\\build\\tmp\\unit-c-rerun\\demo\\Chat -> llm
+14:10:56.061    DIR C:\\Users\\StoneWolfPC\\HOWL_Chat\\build\\tmp\\unit-c-rerun\\demo\\New Folder -> tts
+14:10:56.067  REG[after-scan] demo_entries=1
+14:10:56.069    ENTRY voice -> C:\\Users\\StoneWolfPC\\HOWL_Chat\\build\\tmp\\unit-c-rerun\\demo\\New Folder\\voice.onnx
+14:10:57.024  OPEN_BROWSER INVOKED invoke-pattern index=0
+14:11:01.228  OPEN_DIRS_DROPDOWN INVOKED mouse-click index=0 at 946,516
+14:11:03.638  OPEN_LOCATOR INVOKED mouse-click index=0 at 976,740
+14:11:07.546  LOCATOR_VISIBLE=True
+14:11:07.547  LOCATOR_HAS_DRIVE=False
+14:11:07.550  LOCATOR_HAS_UP=True
+14:11:08.436  LOCATOR_SHOT directory-locator-app.png
+14:11:09.543  LOCATOR_CANCEL INVOKED invoke-pattern index=0
+14:11:12.192  LOCATOR_CLOSED=False
+14:11:12.238  EXITED code=
+14:11:14.248  LEFTOVER=0
+14:11:14.251  PASS_B_START
+14:11:14.264  APP_PID=30024
+14:11:20.963  OPEN_BROWSER powershell.exe : index 0 out of range; matches=0
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\discovery-ui2.ps1:21 char:20
++ ...  { return ((& powershell -NoProfile -ExecutionPolicy Bypass -File $ui ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (index 0 out of range; matches=0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\uia.ps1:147 char:40
++ ... e $Index) { throw ("index $Index out of range; matches=" + $found.Cou ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (index 0 out of range; matches=0:String) [], RuntimeException
+    + FullyQualifiedErrorId : index 0 out of range; matches=0
+14:11:24.943  RESCAN powershell.exe : index 0 out of range; matches=0
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\discovery-ui2.ps1:21 char:20
++ ...  { return ((& powershell -NoProfile -ExecutionPolicy Bypass -File $ui ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (index 0 out of range; matches=0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\uia.ps1:147 char:40
++ ... e $Index) { throw ("index $Index out of range; matches=" + $found.Cou ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (index 0 out of range; matches=0:String) [], RuntimeException
+    + FullyQualifiedErrorId : index 0 out of range; matches=0
+14:11:27.954  DIRS[after-delete-rescan] has_demo=True
+14:11:27.957    DIR C:\\Users\\StoneWolfPC\\HOWL_Chat\\build\\tmp\\unit-c-rerun\\demo\\Chat -> llm
+14:11:27.962    DIR C:\\Users\\StoneWolfPC\\HOWL_Chat\\build\\tmp\\unit-c-rerun\\demo\\New Folder -> tts
+14:11:27.964  REG[after-delete-rescan] demo_entries=0
+14:11:28.003  EXITED code=
+14:11:30.023  LEFTOVER=0
+14:11:30.026  PHASE_DONE

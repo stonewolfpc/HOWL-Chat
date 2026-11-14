@@ -52,11 +52,14 @@ type imageWorkflowDoc struct {
 
 // imageWorkflowDir returns (and creates) the folder that holds workflow files.
 func imageWorkflowDir() (string, error) {
-	base, err := os.UserConfigDir()
-	if err != nil {
-		return "", fmt.Errorf("cannot locate the user config directory: %w", err)
+	dir := isolatedStatePath("workflows")
+	if dir == "" {
+		base, err := os.UserConfigDir()
+		if err != nil {
+			return "", fmt.Errorf("cannot locate the user config directory: %w", err)
+		}
+		dir = filepath.Join(base, "HOWL_Chat", "workflows")
 	}
-	dir := filepath.Join(base, "HOWL_Chat", "workflows")
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return "", fmt.Errorf("cannot create the workflows folder: %w", err)
 	}

@@ -70,10 +70,13 @@ func (a *App) CreateCharacter(character map[string]interface{}) (map[string]inte
 		name, _ = character["id"].(string)
 	}
 
-	cwd, _ := os.Getwd()
-	charDir := filepath.Join(cwd, "Characters", name)
-	if _, err := os.Stat(filepath.Join(filepath.Dir(os.Args[0]), "Characters")); err == nil {
-		charDir = filepath.Join(filepath.Dir(os.Args[0]), "Characters", name)
+	charDir := isolatedStatePath("Characters", name)
+	if charDir == "" {
+		cwd, _ := os.Getwd()
+		charDir = filepath.Join(cwd, "Characters", name)
+		if _, err := os.Stat(filepath.Join(filepath.Dir(os.Args[0]), "Characters")); err == nil {
+			charDir = filepath.Join(filepath.Dir(os.Args[0]), "Characters", name)
+		}
 	}
 	if err := os.MkdirAll(charDir, 0755); err != nil {
 		a.logError(errors.CHARDirFail, errors.High, "character.create", "app-characters.go:59", err)
@@ -95,30 +98,13 @@ func (a *App) CreateCharacter(character map[string]interface{}) (map[string]inte
 
 // getCharactersDir resolves the Characters directory path (cwd or exe dir).
 func getCharactersDir() string {
+	if dir := isolatedStateDir("Characters"); dir != "" {
+		return dir
+	}
 	cwd, _ := os.Getwd()
 	dir := filepath.Join(cwd, "Characters")
 	if _, err := os.Stat(dir); err != nil {
 		dir = filepath.Join(filepath.Dir(os.Args[0]), "Characters")
-	}
-	return dir
-}
-
-// getWorldsDir resolves the Worlds directory path.
-func getWorldsDir() string {
-	cwd, _ := os.Getwd()
-	dir := filepath.Join(cwd, "Worlds")
-	if _, err := os.Stat(dir); err != nil {
-		dir = filepath.Join(filepath.Dir(os.Args[0]), "Worlds")
-	}
-	return dir
-}
-
-// getScenariosDir resolves the Scenarios directory path.
-func getScenariosDir() string {
-	cwd, _ := os.Getwd()
-	dir := filepath.Join(cwd, "Scenarios")
-	if _, err := os.Stat(dir); err != nil {
-		dir = filepath.Join(filepath.Dir(os.Args[0]), "Scenarios")
 	}
 	return dir
 }
@@ -190,46 +176,17 @@ func loadCharacterFromDiskByID(id string) *chat.CharacterContext {
 	return nil
 }
 
-// worldExistsOnDisk returns true if a world's JSON file still exists.
-func worldExistsOnDisk(name string) bool {
-	if name == "" {
-		return false
-	}
-	dir := getWorldsDir()
-	path := filepath.Join(dir, name, "world.json")
-	_, err := os.Stat(path)
-	exists := err == nil
-	if !exists {
-		fmt.Printf("[DEBUG worldExistsOnDisk] name=%q path=%q exists=%v err=%v\n", name, path, exists, err)
-		fmt.Printf("[DEBUG] Worlds dir contents: %v\n", listDirNames(dir))
-	}
-	return exists
-}
-
-// scenarioExistsOnDisk returns true if a scenario's JSON file still exists.
-func scenarioExistsOnDisk(name string) bool {
-	if name == "" {
-		return false
-	}
-	dir := getScenariosDir()
-	path := filepath.Join(dir, name, "scenario.json")
-	_, err := os.Stat(path)
-	exists := err == nil
-	if !exists {
-		fmt.Printf("[DEBUG scenarioExistsOnDisk] name=%q path=%q exists=%v err=%v\n", name, path, exists, err)
-		fmt.Printf("[DEBUG] Scenarios dir contents: %v\n", listDirNames(dir))
-	}
-	return exists
-}
-
 // GetCharacters loads all characters from the Characters directory.
 func (a *App) GetCharacters() ([]map[string]interface{}, error) {
 	var characters []map[string]interface{}
 
-	cwd, _ := os.Getwd()
-	charactersDir := filepath.Join(cwd, "Characters")
-	if _, err := os.Stat(charactersDir); err != nil {
-		charactersDir = filepath.Join(filepath.Dir(os.Args[0]), "Characters")
+	charactersDir := isolatedStateDir("Characters")
+	if charactersDir == "" {
+		cwd, _ := os.Getwd()
+		charactersDir = filepath.Join(cwd, "Characters")
+		if _, err := os.Stat(charactersDir); err != nil {
+			charactersDir = filepath.Join(filepath.Dir(os.Args[0]), "Characters")
+		}
 	}
 	_ = os.MkdirAll(charactersDir, 0755)
 
@@ -389,7 +346,9 @@ func (a *App) syncAppStateFromChatService() {
 	a.world = a.chatService.GetWorldData()
 	a.scenario = a.chatService.GetScenarioData()
 	a.characters = a.chatService.GetCharacterData()
-	a.lorebooks = a.chatService.GetAllLorebookEntries()
+	// Same overlay as SetLorebooks: whichever sync runs last, the prompt pool keeps
+	// canonical text after cutover instead of the chat service's legacy copies.
+	a.lorebooks = a.mergeCanonicalLore(a.chatService.GetAllLorebookEntries(), false)
 }
 
 // applyChatDataToState keeps backend state in sync with frontend chat state.

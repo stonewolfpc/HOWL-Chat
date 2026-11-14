@@ -1210,6 +1210,11 @@ function displayResult(result) {
     const meta = document.getElementById('ig-meta');
     const actions = document.getElementById('ig-actions');
 
+    if (result?.gallery_error) {
+        if (typeof showNotification === 'function') showNotification(result.gallery_error, 'error');
+        else if (typeof setStatus === 'function') setStatus(result.gallery_error);
+    }
+
     if (result?.images && result.images.length > 1) {
         // Batch result: show grid of all images
         let gridHtml = '<div class="ig-batch-grid">';

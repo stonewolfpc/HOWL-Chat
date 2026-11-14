@@ -106,7 +106,7 @@ func (e *Engine) Initialize(config types.EngineConfig) error {
 		config.OutputDir = filepath.Join(filepath.Dir(os.Args[0]), "images", "gallery")
 	}
 	if config.TempDir == "" {
-		config.TempDir = filepath.Join(os.TempDir(), "howl-image-temp")
+		config.TempDir = filepath.Join(paths.TempDir(), "howl-image-temp")
 	}
 	if config.Port == 0 {
 		config.Port = 8081 // default, different from llama-server 8080
@@ -182,11 +182,11 @@ func (e *Engine) LoadModel(opts types.ModelLoadOptions) error {
 	}
 	stderrBuf := new(strings.Builder)
 	cmd.Stderr = io.MultiWriter(os.Stderr, stderrBuf)
-	if err := cmd.Start(); err != nil {
+	// Start suspended and assign job ownership before any engine code runs.
+	if err := proc.Start(cmd); err != nil {
 		return fmt.Errorf("failed to start sd-server: %w", err)
 	}
 	e.setServerProc(cmd.Process)
-	proc.Attach(cmd)
 	// Exactly one goroutine reaps this child; everything else reads its verdict.
 	e.startProcessReaper(cmd)
 	go e.pumpServerOutput(stdoutPipe)

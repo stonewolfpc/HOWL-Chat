@@ -101,6 +101,31 @@ const CharacterStorage = (() => {
 
     const LS_KEY = 'howl-chat-characters';
 
+    /**
+     * Merge a character patch into an existing stored record.
+     *
+     * Objects are merged recursively so an edit to one voice/metadata field
+     * cannot erase its siblings. Arrays and scalar values are replaced, which
+     * keeps explicit clears and list edits authoritative.
+     */
+    function mergeRecord(existing, patch) {
+        if (!patch || typeof patch !== 'object' || Array.isArray(patch)) return patch;
+        if (!existing || typeof existing !== 'object' || Array.isArray(existing)) return patch;
+
+        const merged = { ...existing };
+        for (const key of Object.keys(patch)) {
+            const value = patch[key];
+            if (value === undefined) continue;
+            if (value && typeof value === 'object' && !Array.isArray(value)
+                && existing[key] && typeof existing[key] === 'object' && !Array.isArray(existing[key])) {
+                merged[key] = mergeRecord(existing[key], value);
+            } else {
+                merged[key] = value;
+            }
+        }
+        return merged;
+    }
+
     /** Strip image .data and .original blobs before writing to localStorage. */
     function stripImageData(character) {
         const stripped = { ...character };
@@ -146,26 +171,44 @@ const CharacterStorage = (() => {
      * @returns {Promise<void>}
      */
     async function save(character) {
-        if (!character.id) throw new Error('Character must have an id');
-
-        // Persist full images (with blobs) to IndexedDB
-        const images = character.howl?.images || [];
-        await saveImages(character.id, images);
-
-        // Determine thumbnail src for display (first thumbnail or first image)
-        const thumb   = images.find(img => img.isThumbnail) || images[0];
-        const stripped = stripImageData(character);
-        // Store a lightweight avatarThumb reference for the grid (no full blob)
-        stripped._thumbId = thumb ? (thumb.id || null) : null;
+        if (!character || !character.id) throw new Error('Character must have an id');
 
         const all = readMetadata();
         const idx = all.findIndex(c => c.id === character.id);
+        const existing = idx >= 0 ? all[idx] : null;
+
+        // The caller may be a partial view of the record (for example the sidebar
+        // image action). Merge into the persisted record before writing anything.
+        const merged = mergeRecord(existing, character);
+
+        // Only replace image blobs when the caller supplied an images field.
+        // A partial save with no images intent must not erase existing blobs.
+        const howlPatch = character.howl;
+        const replacesImages = howlPatch && typeof howlPatch === 'object'
+            && Object.prototype.hasOwnProperty.call(howlPatch, 'images');
+        if (replacesImages) {
+            await saveImages(merged.id, Array.isArray(howlPatch.images) ? howlPatch.images : []);
+        }
+
+        const images = Array.isArray(merged.howl?.images) ? merged.howl.images : [];
+
+        // Determine thumbnail src for display (first thumbnail or first image)
+        const thumb   = images.find(img => img.isThumbnail) || images[0];
+        const stripped = stripImageData(merged);
+        // Store a lightweight avatarThumb reference for the grid (no full blob)
+        stripped._thumbId = thumb ? (thumb.id || null) : null;
+
         if (idx >= 0) {
             all[idx] = stripped;
         } else {
             all.push(stripped);
         }
         writeMetadata(all);
+        if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+            window.dispatchEvent(new CustomEvent('howl:character-saved', {
+                detail: { id: merged.id }
+            }));
+        }
     }
 
     /**
@@ -204,7 +247,7 @@ const CharacterStorage = (() => {
         writeMetadata(updated);
     }
 
-    return { save, loadAll, remove, loadImages };
+    return { save, loadAll, remove, loadImages, mergeRecord };
 
 })();
 

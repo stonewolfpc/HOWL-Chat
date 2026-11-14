@@ -322,7 +322,8 @@ function rebuildChatFromHistory(history) {
         if (lastMsg) {
             if (msg.id || msg.ID) lastMsg.dataset.id = msg.id || msg.ID;
             if (msg.timestamp || msg.Timestamp) lastMsg.dataset.timestamp = msg.timestamp || msg.Timestamp;
-            if (characterId) lastMsg.dataset.characterId = characterId;
+            lastMsg.dataset.characterId = characterId || '';
+            lastMsg.dataset.hasImage = (msg.hasImage || msg.HasImage) ? 'true' : '';
         }
     });
     console.log('[rebuildChatFromHistory] done');

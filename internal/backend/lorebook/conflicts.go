@@ -83,12 +83,25 @@ func hasConflict(group []ResolvedEntry) bool {
 }
 
 // groupByTrigger groups entries by their matched phrase
+// conflictGroupKey keeps character ownership domains separate while grouping.
+// Two private character entries with the same trigger are not competing for the
+// same prompt when they belong to different stable character IDs. Routing by ID
+// happens after this stage, so collapsing them here would let one owner's entry
+// suppress the other owner's entry before either reaches its recipient.
+func conflictGroupKey(entry ResolvedEntry) string {
+	key := entry.MatchedPhrase
+	if entry.Scope == ScopeCharacter {
+		key += "\x00character:" + entry.OwnerID
+	}
+	return key
+}
+
 func groupByTrigger(entries []ResolvedEntry) [][]ResolvedEntry {
 	groups := make(map[string][]ResolvedEntry)
 	var keys []string
 
 	for _, entry := range entries {
-		key := entry.MatchedPhrase
+		key := conflictGroupKey(entry)
 		if _, exists := groups[key]; !exists {
 			keys = append(keys, key)
 		}
@@ -208,7 +221,7 @@ func FindConflicts(entries []ResolvedEntry) map[string][]ResolvedEntry {
 	conflicts := make(map[string][]ResolvedEntry)
 
 	for _, entry := range entries {
-		key := entry.MatchedPhrase
+		key := conflictGroupKey(entry)
 		conflicts[key] = append(conflicts[key], entry)
 	}
 

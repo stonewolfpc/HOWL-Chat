@@ -57,6 +57,16 @@ type SynthesisRequest struct {
 	Voice    string
 	Speed    float64 // 0.5 - 2.0
 	Language string
+
+	// Engine and CharacterID identify the request that produced this synthesis.
+	// They are diagnostics/ownership fields; VoicePath is the optional
+	// engine-specific model path used by Piper. ModelIdentity is the canonical
+	// identity of the engine/model assets that generated the audio and is used
+	// for cache separation.
+	Engine        string
+	CharacterID   string
+	VoicePath     string
+	ModelIdentity string
 }
 
 // SynthesisResult contains generated audio
@@ -137,6 +147,7 @@ type TTSSynthesizer interface {
 // TTSConfig contains synthesizer configuration
 type TTSConfig struct {
 	ModelPath    string
+	ModelName    string // Engine-specific model identifier, e.g. Melo OpenAI-compatible model
 	Device       string
 	CacheDir     string
 	CacheEnabled bool
@@ -277,12 +288,27 @@ type PipelineConfig struct {
 	// the contract can select, and is never silently replaced.
 	ASREngine string
 	TTSEngine string
+	// TTSVoice is the global voice/speaker default. Character requests may
+	// override it; inherited requests use it when non-empty.
+	TTSVoice string
+	// TTSSpeed is the configured speech-rate multiplier. It is forwarded only
+	// when TTSEngine is explicit and the selected profile supports speed.
+	TTSSpeed float64
+
+	// Whisper decode options. The pipeline forwards these to the Whisper
+	// adapter only when ASREngine names an explicit Whisper model.
+	ASRLanguage string
+	ASRThreads  int
+	ASRBeamSize int
+	ASRBestOf   int
 }
 
 // VoiceOverride carries per-request TTS voice settings (e.g. per-character).
+// An empty or "auto" Engine means inheritance of the active global engine.
 type VoiceOverride struct {
-	Engine          string  `json:"engine"` // "piper", "melotts", "browser", "" = inherit
-	Voice           string  `json:"voice"`  // model name, e.g. "en_US-lessac-medium"
+	CharacterID     string  `json:"character_id,omitempty"`
+	Engine          string  `json:"engine"` // "piper", "melotts", "kokoro", "" = inherit
+	Voice           string  `json:"voice"`  // voice/speaker id; empty = engine default
 	Speed           float64 `json:"speed"`
 	Volume          float64 `json:"volume"`
 	NoiseScale      float64 `json:"noise_scale"`

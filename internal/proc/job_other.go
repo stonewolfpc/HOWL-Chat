@@ -25,8 +25,5 @@ func HideWindow(cmd *exec.Cmd) {}
 // KillTree is a no-op off Windows.
 func KillTree(pid int) {}
 
-// KillTreeByName is a no-op off Windows.
-func KillTreeByName(name string) {}
-
 // CloseJob is a no-op off Windows.
 func CloseJob() {}

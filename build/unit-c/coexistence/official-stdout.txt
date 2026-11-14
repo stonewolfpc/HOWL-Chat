@@ -1,0 +1,84 @@
+13:11:23.960  PHASE=official ISOLATED_ROOT=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun PROFILE=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\profile
+13:11:24.510  RENDER_VOLUME_BEFORE=VOLUME=62%
+13:11:24.612  APP_PID=21040 LOG_OFFSETS=tmp\unit-c-rerun\config\logs\startup.log=76981 Roaming\HOWLChat\config\logs\startup.log=0
+13:11:27.364  WINDOW_READY WINDOW rect=580,270,1400,900 handle=4587688 pid=21040 title=HOWL Chat
+13:11:29.208  SERVERS[startup] count=
+13:11:29.215    pid=26068 port=54935 mmproj=G:\AI
+13:11:29.217  ASR_DISCOVERED pid=26068 port=54935 after 0.3s
+13:11:29.279  ASR_READY port=54935 after 0.1s health=True
+13:11:29.327  GPU_AT_STARTUP 3931 MiB, 8192 MiB, 7 %
+13:12:38.903  RESCAN_DONE after 69.6s in C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\config\logs\startup.log
+13:12:44.066  PICKER_OPEN CLICKED index=0 at 1867,1253 after 3s
+13:12:46.494  WINDOW_BOUNDS 580,434..1980,1334
+13:12:47.599  SCAN step=0 matches=2
+13:12:47.606    ROW cls= off=False name=Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1) (5.0 GB) rect=1797,1245,137,16
+13:12:47.611    ROW cls= off=False name=Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1) (5.0 GB) rect=1801,1053,118,16
+13:12:47.627  PICK_TARGET name=Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1) (5.0 GB) rect=1797,1245,137,16 click=1865,1253
+13:12:48.628  PICK_CLICK CLICKED at 1865,1253
+13:12:50.603  TRIGGER_AFTER_PICK [0] Group cls="model-select-trigger" id="" name="" rect=1788,1236,158,34 enabled=True offscreen=False | ---MATCHES=1---
+13:12:52.569  SHOT=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\picked.png
+13:12:53.621  LOAD_CLICK INVOKED invoke-pattern index=0
+13:13:07.726  CHAT_READY=True after 14.1s
+13:13:09.850  SERVERS[loaded] count=2
+13:13:09.852    pid=26068 port=54935 mmproj=G:\AI
+13:13:09.855    pid=2200 port=8080 mmproj=
+13:13:09.857    CMD pid=26068: C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\runtime\llama\llama-server.exe -m "G:\AI GGUF\voice\Qwen3-ASR-1.7B-Q8_0.gguf" --mmproj "G:\AI GGUF\voice\mmproj-Qwen3-ASR-1.7B-Q8_0.gguf" --host 127.0.0.1 --port 54935 -c 2048 -ngl 99 --no-warmup -t 6
+13:13:09.859    CMD pid=2200: C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\runtime\llama\llama-server.exe --host 127.0.0.1 --port 8080 -m "G:\AI GGUF\GGUF\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf" -c 3096 --threads 8 -b 256 -ngl 0 --fit off --chat-template "{%- for message in messages %}<start_of_turn>{{ message.role }}
+{{ message.content }}<end_of_turn>
+{%- endfor %}<start_of_turn>model
+" --reasoning on --reasoning-format deepseek --reasoning-budget 2048 --reasoning-budget-message "I have thought enough. Time to answer."
+13:13:09.881  CHAT_MODEL_ARG pid=26068 GGUF\voice\Qwen3-ASR-1.7B-Q8_0.gguf" ; GGUF\voice\mmproj-Qwen3-ASR-1.7B-Q8_0.gguf"
+13:13:09.884  CHAT_MODEL_ARG pid=2200 GGUF\GGUF\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf"
+13:13:09.941  GPU_BOTH_LOADED 4169 MiB, 8192 MiB, 7 %
+13:13:09.948  RAM_APP_MB=132
+13:13:11.067  SHOT=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\both-loaded.png
+13:13:11.842  STIMULUS VOICE=Microsoft David Desktop culture=en-US | TEXT=The blue lantern guild meets at seven in the copper harbour. | WROTE=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\stimulus.wav | FORMAT=16000Hz mono 16-bit bytes=129966 | DURATION=4.06s PEAK=31000 (-0.5 dBFS) | 
+13:13:12.374  RENDER_BEFORE=Headphones (WH-1000XM4)|{0.0.0.00000000}.{9460d508-20ce-4ade-8b76-e405f9ab758a}
+13:13:13.365  RENDER_SWITCH SWITCH Headphones (WH-1000XM4)|{0.0.0.00000000}.{9460d508-20ce-4ade-8b76-e405f9ab758a} => Speakers (Realtek(R) Audio)
+13:13:13.884  VOLUME_BEFORE=VOLUME=100%
+13:13:14.421  VOLUME_SET VOLUME=100%
+13:13:15.505  MIC_ELEMENT_FOUND=1 after 1s
+13:13:18.233  MIC_ON INVOKED invoke-pattern index=0
+13:13:19.276  MIC_RECORDING_STATE=1
+13:13:19.301  PLAYBACK_STARTED
+13:13:24.568  PLAYBACK_EXITED=True
+13:13:27.400  MIC_OFF INVOKED invoke-pattern index=0
+13:13:27.946  VOLUME_RESTORE VOLUME=100%
+13:13:28.900  RENDER_RESTORE SWITCH Speakers (Realtek(R) Audio)|{0.0.0.00000000}.{73b46750-0008-4166-99c4-0e281059a9d5} => Headphones (WH-1000XM4)
+13:13:28.915  ASR_DIR_EXISTS=
+13:14:14.004  CAPTURE_NOT_OBSERVED during transcription
+13:14:16.575  TRANSCRIPT[dictated]=Sorry, sweetheart. The Blue Lantern Guild meets at seven in the Copper Harbor.
+13:14:16.623  SHOT=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\dictated.png
+13:14:17.665  SEND[dictated] messages_before=0
+13:14:18.733  SEND_INVOKE INVOKED invoke-pattern index=0
+13:16:51.553  REPLY_TIMEOUT[dictated] after 150 s
+13:16:52.630  MESSAGES[dictated]
+13:16:52.632    [] cls= name=
+13:16:52.680  SHOT=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\dictated-reply.png
+13:16:52.729  GPU_AFTER_DICTATION 4455 MiB, 8192 MiB, 30 %
+13:16:52.840  SERVERS[after-dictation] count=2
+13:16:52.842    pid=26068 port=54935 mmproj=G:\AI
+13:16:52.843    pid=2200 port=8080 mmproj=
+13:16:52.855  BOTH_RESIDENT_AFTER_DICTATION=False
+13:16:54.138  TYPED_SET SETVALUE ok
+13:16:55.193  TYPED_VALUE VALUE=Reply with exactly this word and nothing else: LEDGER
+13:16:56.241  SEND[typed] messages_before=0
+13:16:57.314  SEND_INVOKE INVOKED invoke-pattern index=0
+13:19:30.353  REPLY_TIMEOUT[typed] after 150 s
+13:19:31.404  MESSAGES[typed]
+13:19:31.406    [] cls= name=
+13:19:31.460  SHOT=C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\typed-reply.png
+13:19:31.501  GPU_AFTER_TYPED 4483 MiB, 8192 MiB, 31 %
+13:19:31.648  SERVERS_FINAL_COUNT=2
+13:19:31.655  CHAT_DIR=C:\Users\StoneWolfPC\HOWL_Chat\build\tmp\unit-c-rerun\profile\AppData\Roaming\HOWLChat\chats\2026-11-05T18-01-55Z
+13:19:31.714  HASH meta.json 0B166359A0BA375E168B036A1A45B3CCB460A98ED08A5A9F27E86E6741BF1148
+13:19:31.719  HASH history.ndjson 5DFFB392D4DEE71D4476089D8B05AFED96BD0A06DB13912100D67BA0653321CA
+13:19:31.722  HASH history.json 9A114016033B3E09617F07CE6E8CA09BCF4CD221D34E51E8B84B2F1E38A80D6E
+13:19:31.725  CONFIG {
+  "lastChatId": "2026-11-05T18-01-55Z"
+}
+13:19:31.728  HASH config.json E7ADBD279D1053CC3E5F88E8786873D7118F766BD56BC01B323424AB78F7D63C
+13:19:32.795  CLOSE_REQUEST pid=21040 main=4587688
+13:19:32.834  EXITED code=
+13:19:35.852  LEFTOVER=0
+13:19:35.854  PHASE_COMPLETE

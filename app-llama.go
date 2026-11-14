@@ -190,10 +190,12 @@ func spawnLlamaServerWithModel(modelPath, mmprojPath string, settings map[string
 	cmd.Stdout = io.MultiWriter(capture, loader.SafeConsole(os.Stdout))
 	cmd.Stderr = io.MultiWriter(capture, loader.SafeConsole(os.Stderr))
 
-	if err := cmd.Start(); err != nil {
+	// Start suspended, assign to the application job, then resume. No child code
+	// runs before ownership is established, so a crash cannot leave an unowned
+	// llama-server behind.
+	if err := proc.Start(cmd); err != nil {
 		return nil, fmt.Errorf("failed to start llama-server: %w", err)
 	}
-	proc.Attach(cmd)
 	fmt.Printf("INFO: llama-server started (pid %d) with model %s\n", cmd.Process.Pid, modelPath)
 	return cmd, nil
 }
@@ -257,5 +259,25 @@ func (pm *processMonitor) isAlive() bool {
 		return false
 	default:
 		return true
+	}
+}
+
+// wait waits for the monitor's single Wait to complete. A killed child is a
+// successful stop; only a timeout is an error.
+func (pm *processMonitor) wait(timeout time.Duration) error {
+	if pm == nil {
+		return nil
+	}
+	if timeout <= 0 {
+		<-pm.done
+		return nil
+	}
+	timer := time.NewTimer(timeout)
+	defer timer.Stop()
+	select {
+	case <-pm.done:
+		return nil
+	case <-timer.C:
+		return fmt.Errorf("process did not exit within %s", timeout)
 	}
 }

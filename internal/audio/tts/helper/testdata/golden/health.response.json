@@ -1,0 +1,1 @@
+{"protocol":{"major":1,"minor":0},"id":"req-0123456789abcdef0123456789abcdef-0000000000000005","ok":true,"result":{"process":{"alive":true,"pid":1234,"uptime_ms":1000},"state":"ready","ready":true,"accepting_work":true,"active_request_id":null,"queue_depth":0,"last_error":null}}

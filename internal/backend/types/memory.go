@@ -11,22 +11,30 @@ package types
 
 import "time"
 
+// Memory ownership kinds. An empty kind is legacy/unresolved and must not be
+// treated as a stable character identity.
+const (
+	OwnerKindCharacterID = "character_id"
+	OwnerKindChat        = "chat"
+)
+
 // MemoryRecord represents a single automated memory entry
 type MemoryRecord struct {
-	ID           string   `json:"id"`            // Unique memory identifier
-	Title        string   `json:"title"`         // Memory title
-	Summary      string   `json:"summary"`       // Memory summary
-	Content      string   `json:"content"`       // Full memory content
-	Scope        string   `json:"scope"`         // Memory scope (global/world/scenario/character)
-	OwnerID      string   `json:"owner_id"`      // Owner ID for scoped memories
-	Tags         []string `json:"tags"`          // Memory tags for categorization
-	Pinned       bool     `json:"pinned"`        // Whether memory is pinned
-	Status       string   `json:"status"`        // Memory status (active/archived)
-	Confidence   float64  `json:"confidence"`    // Confidence score (0-100)
-	Source       string   `json:"source"`        // Source of the memory (auto/manual)
-	TriggerCount int      `json:"trigger_count"` // Times this memory has triggered
-	CreatedAt    string   `json:"created_at"`    // When the memory was created
-	UpdatedAt    string   `json:"updated_at"`    // When the memory was last updated
+	ID           string   `json:"id"`                   // Unique memory identifier
+	Title        string   `json:"title"`                // Memory title
+	Summary      string   `json:"summary"`              // Memory summary
+	Content      string   `json:"content"`              // Full memory content
+	Scope        string   `json:"scope"`                // Memory scope (global/world/scenario/character)
+	OwnerID      string   `json:"owner_id"`             // Owner ID for scoped memories
+	OwnerKind    string   `json:"owner_kind,omitempty"` // character_id, chat, or empty (legacy)
+	Tags         []string `json:"tags"`                 // Memory tags for categorization
+	Pinned       bool     `json:"pinned"`               // Whether memory is pinned
+	Status       string   `json:"status"`               // Memory status (active/archived)
+	Confidence   float64  `json:"confidence"`           // Confidence score (0-100)
+	Source       string   `json:"source"`               // Source of the memory (auto/manual)
+	TriggerCount int      `json:"trigger_count"`        // Times this memory has triggered
+	CreatedAt    string   `json:"created_at"`           // When the memory was created
+	UpdatedAt    string   `json:"updated_at"`           // When the memory was last updated
 }
 
 // MemoryFilter represents filtering options for memory queries
@@ -114,6 +122,7 @@ type MemoryCandidate struct {
 	SourceMessage string    `json:"source_message"`
 	Scope         string    `json:"scope"`
 	OwnerID       string    `json:"owner_id"`
+	OwnerKind     string    `json:"owner_kind,omitempty"`
 	Tags          []string  `json:"tags"`
 	Confidence    float64   `json:"confidence"`
 	Status        string    `json:"status"` // pending | approved | rejected

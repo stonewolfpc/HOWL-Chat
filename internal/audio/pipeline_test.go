@@ -12,6 +12,7 @@ import (
 	"time"
 
 	audioruntime "howl-chat/internal/audio/runtime"
+	"howl-chat/internal/audio/tts/cache"
 	"howl-chat/internal/audio/types"
 )
 
@@ -80,6 +81,11 @@ type scriptedTTS struct {
 	initStarted  chan struct{}
 	initRelease  <-chan struct{}
 	startOnce    *sync.Once
+	delay        time.Duration
+
+	mu       sync.Mutex
+	requests []types.SynthesisRequest
+	voices   []types.Voice
 }
 
 func (s *scriptedTTS) Initialize(ctx context.Context, config types.TTSConfig) error {
@@ -101,17 +107,41 @@ func (s *scriptedTTS) Initialize(ctx context.Context, config types.TTSConfig) er
 	return s.initErr
 }
 
-func (s *scriptedTTS) Synthesize(context.Context, types.SynthesisRequest, types.ProgressCallback) (*types.SynthesisResult, error) {
+func (s *scriptedTTS) GetConfig() types.TTSConfig {
+	return s.config
+}
+
+func (s *scriptedTTS) Synthesize(_ context.Context, req types.SynthesisRequest, _ types.ProgressCallback) (*types.SynthesisResult, error) {
 	s.synthCalls.Add(1)
+	if s.delay > 0 {
+		time.Sleep(s.delay)
+	}
+	s.mu.Lock()
+	s.requests = append(s.requests, req)
+	s.mu.Unlock()
 	return &types.SynthesisResult{AudioPath: "scripted.wav"}, nil
+}
+
+func (s *scriptedTTS) lastRequest() (types.SynthesisRequest, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if len(s.requests) == 0 {
+		return types.SynthesisRequest{}, false
+	}
+	return s.requests[len(s.requests)-1], true
 }
 
 func (s *scriptedTTS) SynthesizeStream(context.Context, types.SynthesisRequest, chan<- types.AudioChunk) error {
 	return nil
 }
 
-func (s *scriptedTTS) GetVoices() []types.Voice { return []types.Voice{{ID: "scripted"}} }
-func (s *scriptedTTS) SupportsSSML() bool       { return false }
+func (s *scriptedTTS) GetVoices() []types.Voice {
+	if len(s.voices) > 0 {
+		return append([]types.Voice(nil), s.voices...)
+	}
+	return []types.Voice{{ID: "scripted"}}
+}
+func (s *scriptedTTS) SupportsSSML() bool { return false }
 func (s *scriptedTTS) Release() error {
 	s.releaseCalls.Add(1)
 	if s.releasePanic != nil {
@@ -379,6 +409,89 @@ func TestPipelineR8LazyTTSOwnership(t *testing.T) {
 	}
 	if set.tts[types.TTSPiper].releaseCalls.Load() != 3 {
 		t.Fatalf("piper release calls = %d, want 3", set.tts[types.TTSPiper].releaseCalls.Load())
+	}
+}
+
+func configureScriptedTTSSpeed(t *testing.T, p *Pipeline, set *providerSet, engine string, speed float64) *scriptedTTS {
+	t.Helper()
+	synth, ok := set.tts[types.TTSModelType(engine)]
+	if !ok {
+		t.Fatalf("no scripted TTS for %q", engine)
+	}
+	p.mu.Lock()
+	p.config = types.PipelineConfig{TTSEnabled: true, TTSEngine: engine, TTSSpeed: speed}
+	p.ttsSynth = synth
+	p.ttsCache = cache.NewManager(10)
+	p.mu.Unlock()
+	return synth
+}
+
+func TestPipelineForwardsConfiguredTTSSpeed(t *testing.T) {
+	p, set := newScriptedPipeline(providerBehavior{})
+	synth := configureScriptedTTSSpeed(t, p, set, "piper", 1.25)
+
+	if _, err := p.ProcessAudioMessage(context.Background(), types.AudioMessage{Type: "audio_output", Text: "hello"}); err != nil {
+		t.Fatalf("ProcessAudioMessage: %v", err)
+	}
+	req, ok := synth.lastRequest()
+	if !ok {
+		t.Fatal("synthesizer received no request")
+	}
+	if req.Speed != 1.25 {
+		t.Fatalf("synthesis speed = %g, want configured 1.25", req.Speed)
+	}
+}
+
+func TestPipelineAutomaticTTSDoesNotApplyConfiguredSpeed(t *testing.T) {
+	p, set := newScriptedPipeline(providerBehavior{})
+	synth := configureScriptedTTSSpeed(t, p, set, "piper", 1.25)
+	p.mu.Lock()
+	p.config.TTSEngine = "auto"
+	p.mu.Unlock()
+
+	if _, err := p.ProcessAudioMessage(context.Background(), types.AudioMessage{Type: "audio_output", Text: "hello"}); err != nil {
+		t.Fatalf("ProcessAudioMessage: %v", err)
+	}
+	req, ok := synth.lastRequest()
+	if !ok {
+		t.Fatal("synthesizer received no request")
+	}
+	if req.Speed != 1.0 {
+		t.Fatalf("auto-select synthesis speed = %g, want the established 1.0", req.Speed)
+	}
+}
+
+func TestPipelineRejectsMeloTTSSpeedOutsideProductGuard(t *testing.T) {
+	p, set := newScriptedPipeline(providerBehavior{})
+	synth := configureScriptedTTSSpeed(t, p, set, "melotts", 1.5)
+
+	_, err := p.ProcessAudioMessage(context.Background(), types.AudioMessage{Type: "audio_output", Text: "hello"})
+	if err == nil {
+		t.Fatal("ProcessAudioMessage accepted an out-of-guard MeloTTS speed")
+	}
+	if !strings.Contains(err.Error(), "between 0.8 and 1.2") {
+		t.Fatalf("error = %v, want the MeloTTS product guard", err)
+	}
+	if got := synth.synthCalls.Load(); got != 0 {
+		t.Fatalf("synthesis calls = %d, want 0 for an invalid MeloTTS speed", got)
+	}
+}
+
+func TestPipelineSpeedParticipatesInCacheKey(t *testing.T) {
+	p, set := newScriptedPipeline(providerBehavior{})
+	synth := configureScriptedTTSSpeed(t, p, set, "piper", 1.25)
+
+	if _, err := p.ProcessAudioMessage(context.Background(), types.AudioMessage{Type: "audio_output", Text: "hello"}); err != nil {
+		t.Fatalf("first ProcessAudioMessage: %v", err)
+	}
+	p.mu.Lock()
+	p.config.TTSSpeed = 1.5
+	p.mu.Unlock()
+	if _, err := p.ProcessAudioMessage(context.Background(), types.AudioMessage{Type: "audio_output", Text: "hello"}); err != nil {
+		t.Fatalf("second ProcessAudioMessage: %v", err)
+	}
+	if got := synth.synthCalls.Load(); got != 2 {
+		t.Fatalf("synthesis calls = %d, want 2 for distinct speeds (cache key must include speed)", got)
 	}
 }
 

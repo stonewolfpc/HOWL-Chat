@@ -17,6 +17,7 @@ import (
 
 	"howl-chat/internal/audio/tts"
 	"howl-chat/internal/audio/types"
+	"howl-chat/internal/paths"
 )
 
 // Client talks to an HTTP MeloTTS deployment.
@@ -71,7 +72,7 @@ func (c *Client) Initialize(ctx context.Context, cfg types.TTSConfig) error {
 
 	outDir := strings.TrimSpace(cfg.CacheDir)
 	if outDir == "" {
-		outDir = filepath.Join(os.TempDir(), "howl-melotts-out")
+		outDir = filepath.Join(paths.TempDir(), "howl-melotts-out")
 	}
 	if err := os.MkdirAll(outDir, 0o755); err != nil {
 		return types.NewAudioError(types.ErrCodeModelLoadFailed, "failed to create MeloTTS output directory", err)
@@ -216,18 +217,19 @@ func (c *Client) outputDir() string {
 	if d := strings.TrimSpace(c.GetConfig().CacheDir); d != "" {
 		return d
 	}
-	return filepath.Join(os.TempDir(), "howl-melotts-out")
+	return filepath.Join(paths.TempDir(), "howl-melotts-out")
 }
 
 func (c *Client) tryLegacySynth(ctx context.Context, req types.SynthesisRequest) ([]byte, string, error) {
 	u := cloneURL(*c.baseURL)
 	u.Path = strings.TrimSuffix(u.Path, "/") + "/synthesize"
+	// MeloTTS exposes speed as its public control; length_scale is an internal
+	// derivation. Sending both is unnecessary and is rejected by some servers.
 	body := map[string]any{
-		"text":         req.Text,
-		"language":     normalizeMeloLanguage(req.Language),
-		"speaker_id":   normalizeSpeakerID(req.Voice),
-		"speed":        req.Speed,
-		"length_scale": invertSpeed(req.Speed),
+		"text":       req.Text,
+		"language":   normalizeMeloLanguage(req.Language),
+		"speaker_id": normalizeSpeakerID(req.Voice),
+		"speed":      req.Speed,
 	}
 	payload, err := json.Marshal(body)
 	if err != nil {
@@ -279,7 +281,10 @@ func (c *Client) tryLegacySynth(ctx context.Context, req types.SynthesisRequest)
 func (c *Client) tryOpenAICompatSynth(ctx context.Context, req types.SynthesisRequest) ([]byte, string, error) {
 	u := cloneURL(*c.baseURL)
 	u.Path = strings.TrimSuffix(u.Path, "/") + "/v1/audio/speech"
-	model := strings.TrimSpace(os.Getenv("HOWL_MELOTTS_OPENAI_MODEL"))
+	model := strings.TrimSpace(c.GetConfig().ModelName)
+	if model == "" {
+		model = strings.TrimSpace(os.Getenv("HOWL_MELOTTS_OPENAI_MODEL"))
+	}
 	if model == "" {
 		model = "tts-1"
 	}
@@ -367,13 +372,6 @@ func normalizeMeloLanguage(lang string) string {
 		}
 	}
 	return "EN"
-}
-
-func invertSpeed(speed float64) float64 {
-	if speed <= 0 {
-		return 1
-	}
-	return 1 / clampSpeechSpeed(speed)
 }
 
 func clampSpeechSpeed(v float64) float64 {

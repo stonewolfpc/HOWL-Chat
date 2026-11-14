@@ -11,6 +11,7 @@ import (
 
 	"howl-chat/internal/audio/tts"
 	"howl-chat/internal/audio/types"
+	"howl-chat/internal/paths"
 )
 
 // Synthesizer implements TTSSynthesizer using Kokoro ONNX via Python bridge.
@@ -67,7 +68,7 @@ func (s *Synthesizer) Initialize(ctx context.Context, config types.TTSConfig) er
 
 	outputDir := config.CacheDir
 	if outputDir == "" {
-		outputDir = filepath.Join(os.TempDir(), "howl-kokoro-tts")
+		outputDir = filepath.Join(paths.TempDir(), "howl-kokoro-tts")
 	}
 	if err := os.MkdirAll(outputDir, 0o755); err != nil {
 		return types.NewAudioError(types.ErrCodeModelLoadFailed, "failed to create kokoro output directory", err)

@@ -80,6 +80,30 @@ func waitAppCondition(t *testing.T, what string, condition func() bool) {
 	}
 }
 
+func desiredWithBackend(settings audio.Settings) audio.DesiredSettings {
+	desired := audio.DefaultDesiredSettings()
+	desired.ASREnabled = settings.ASREnabled
+	desired.TTSEnabled = settings.TTSEnabled
+	desired.ASREngine = settings.ASREngine
+	desired.TTSEngine = settings.TTSEngine
+	if settings.TTSSpeed != 0 {
+		desired.TTSSpeed = settings.TTSSpeed
+	}
+	if settings.ASRLanguage != "" {
+		desired.ASRLanguage = settings.ASRLanguage
+	}
+	if settings.ASRThreads != 0 {
+		desired.ASRThreads = settings.ASRThreads
+	}
+	if settings.ASRBeamSize != 0 {
+		desired.ASRBeamSize = settings.ASRBeamSize
+	}
+	if settings.ASRBestOf != 0 {
+		desired.ASRBestOf = settings.ASRBestOf
+	}
+	return desired
+}
+
 func newAudioTestApp(t *testing.T, factory audio.PipelineFactory) (*App, *audio.Manager) {
 	t.Helper()
 	manager := audio.NewManager(factory)
@@ -127,6 +151,7 @@ func TestA1SingleManagerOwnership(t *testing.T) {
 
 // A3: enable uses Apply and a failed replacement preserves the old generation.
 func TestA3TemporaryEnableBridgePreservesPreviousReadiness(t *testing.T) {
+	useMicProbe(t, constantMicProbe(newMicrophoneStatus(MicStateReady, "", 1)))
 	p1 := &appFakePipeline{status: audiotypes.PipelineStatus{ASRReady: true}}
 	p2 := &appFakePipeline{}
 	replacementErr := errors.New("replacement ASR failed")

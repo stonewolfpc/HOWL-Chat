@@ -63,6 +63,7 @@ function createMemoryEntry(data) {
         content:     data.content || data.summary || '',
         scope:       data.scope || 'global',
         ownerId:     data.ownerId || '',
+        ownerKind:   data.ownerKind || '',
         tags:        data.tags || [],
         pinned:      data.pinned || false,
         status:      'active',
@@ -87,6 +88,7 @@ function createMemoryEntry(data) {
             rawText:         entry.content,
             scope:           entry.scope,
             scopeId:         entry.ownerId,
+            ownerKind:       entry.ownerKind,
             tags:            entry.tags,
             pinned:          entry.pinned,
             status:          entry.status,
@@ -199,7 +201,11 @@ function deleteMemoryEntry(id) {
  * @returns {Object[]}
  */
 function getCharacterMemories(characterId) {
-    return getMemoryEntries({ scope: 'character' }).filter(m => m.ownerId === characterId);
+    // Only stable-ID-owned records are character-private. Legacy name-owned or
+    // unmarked records stay in storage but fail closed here and in the backend.
+    return getMemoryEntries({ scope: 'character' }).filter(m =>
+        m.ownerKind === 'character_id' && m.ownerId === characterId
+    );
 }
 
 /**

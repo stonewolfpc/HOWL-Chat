@@ -24,6 +24,7 @@ function showRealSettings() {
     if (!overlay) return;
     overlay.classList.add('show');
     window.settingsState.loadSettings();
+    if (window.contentLibraries?.refresh) window.contentLibraries.refresh();
 }
 
 function openRealSettings() {

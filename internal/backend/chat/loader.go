@@ -68,40 +68,6 @@ func loadMemoriesSnapshot(filePath string) ([]lorebook.Entry, error) {
 	return allMemories, nil
 }
 
-// loadWorldData loads world data from a given JSON file path.
-func loadWorldData(filePath string) (*WorldContext, error) {
-	data, err := os.ReadFile(filePath)
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return nil, nil // Return nil if file doesn't exist
-		}
-		return nil, types.WrapError(types.ErrorCodeInternal, "failed to read world file", err)
-	}
-
-	world, err := decodeWorldContext(data)
-	if err != nil {
-		return nil, types.WrapError(types.ErrorCodeInternal, "failed to unmarshal world JSON", err)
-	}
-	return world, nil
-}
-
-// loadScenarioData loads scenario data from a given JSON file path.
-func loadScenarioData(filePath string) (*ScenarioContext, error) {
-	data, err := os.ReadFile(filePath)
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return nil, nil // Return nil if file doesn't exist
-		}
-		return nil, types.WrapError(types.ErrorCodeInternal, "failed to read scenario file", err)
-	}
-
-	scenario, err := decodeScenarioContext(data)
-	if err != nil {
-		return nil, types.WrapError(types.ErrorCodeInternal, "failed to unmarshal scenario JSON", err)
-	}
-	return scenario, nil
-}
-
 // loadCharacterData loads character data from a given JSON file path.
 func loadCharacterData(filePath string) (*CharacterContext, error) {
 	data, err := os.ReadFile(filePath)
@@ -120,8 +86,10 @@ func loadCharacterData(filePath string) (*CharacterContext, error) {
 }
 
 // loadMemoriesFromService loads user-created memories via the memory service
-// and converts them to lorebook.Entry format for resolution
-func loadMemoriesFromService(memService *memory.Service, worldName, scenarioName string, characterNames []string) ([]lorebook.Entry, error) {
+// and converts them to lorebook.Entry format for resolution. World and scenario
+// records are matched by stable ID only; a display name, or an empty owner, is
+// unresolved and excluded from the prompt pool.
+func loadMemoriesFromService(memService *memory.Service, worldID, scenarioID string, characterIDs []string) ([]lorebook.Entry, error) {
 	// Get all memories from service
 	filter := types.MemoryFilter{Status: "active"}
 	records, err := memService.GetMemories(filter)
@@ -129,30 +97,27 @@ func loadMemoriesFromService(memService *memory.Service, worldName, scenarioName
 		return nil, err
 	}
 
-	// Convert to lorebook entries
-	entries := memory.ToLorebookEntries(records)
-
-	// Filter to only include memories relevant to current context
-	var filtered []lorebook.Entry
-	for _, entry := range entries {
-		switch entry.Scope {
-		case lorebook.ScopeWorld:
-			if entry.OwnerID == "" || entry.OwnerID == worldName {
-				filtered = append(filtered, entry)
+	// Filter records before conversion so a legacy name-owned memory can never be
+	// promoted to lorebook entry ownership merely by matching a character ID.
+	var filteredRecords []types.MemoryRecord
+	for _, record := range records {
+		switch record.Scope {
+		case "world":
+			if worldID != "" && record.OwnerID == worldID {
+				filteredRecords = append(filteredRecords, record)
 			}
-		case lorebook.ScopeScenario:
-			if entry.OwnerID == "" || entry.OwnerID == scenarioName {
-				filtered = append(filtered, entry)
+		case "scenario":
+			if scenarioID != "" && record.OwnerID == scenarioID {
+				filteredRecords = append(filteredRecords, record)
 			}
-		case lorebook.ScopeCharacter:
-			if contains(characterNames, entry.OwnerID) {
-				filtered = append(filtered, entry)
+		case "character":
+			if memory.IsStableCharacterOwnershipForAny(record, characterIDs) {
+				filteredRecords = append(filteredRecords, record)
 			}
 		default:
-			// Global scope - include all
-			filtered = append(filtered, entry)
+			filteredRecords = append(filteredRecords, record)
 		}
 	}
 
-	return filtered, nil
+	return memory.ToLorebookEntries(filteredRecords), nil
 }

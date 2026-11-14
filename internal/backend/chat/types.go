@@ -76,6 +76,10 @@ type ChatHistory struct {
 	Role      string `json:"role"` // "system", "user", "assistant"
 	Timestamp string `json:"timestamp"`
 	HasImage  bool   `json:"hasImage"`
+	// CharacterID is the stable identity of the character that produced an
+	// assistant message. Empty means ownership is not established (legacy or
+	// non-character messages).
+	CharacterID string `json:"characterId,omitempty"`
 }
 
 // ChatData represents the complete chat data

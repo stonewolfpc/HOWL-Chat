@@ -1,0 +1,22 @@
+=== COMPOSER BEFORE SEND ===
+VALUE=Because we told you that so many times, Ruth. You do know. Okay, I gotta fix that differently. I'll have to fix it later, Ruth. Too many things going on.
+=== FIND SEND BUTTON ===
+[0] Button cls="send-button" id="" name="Send" rect=2255,1091,85,42 enabled=True offscreen=False
+---MATCHES=1---
+=== PRESS SEND ===
+INVOKED invoke-pattern index=0
+=== COMPOSER AFTER SEND (should be cleared) ===
+VALUE=
+=== TRANSCRIPT CONTAINS SENT TEXT? ===
+[0] Text cls="" id="" name="Because we told you that so many times, Ruth. You do know. Okay, I gotta fix that differently. I'll have to fix it later, Ruth. Too many things going on." rect=1281,878,503,40 enabled=True offscreen=False
+---MATCHES=1---
+SAVED build/unit-c/check3-sent.png 1400x900 window=960,253
+=== PERSISTENCE FILES TOUCHED RECENTLY ===
+=== LLAMA SERVER STILL UP ===
+
+   Id WorkingSet64
+   -- ------------
+18992   2302742528
+
+
+

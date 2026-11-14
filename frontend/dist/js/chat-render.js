@@ -73,10 +73,8 @@ function addAssistantMessage(sender, text, characterId = null) {
              : (window.sidebarState ? window.sidebarState.currentChatData : null);
 
     let character = null;
-    if (cd && cd.characters) {
-        character = characterId
-            ? cd.characters.find(c => c.id === characterId)
-            : cd.characters[0] || null;
+    if (cd && cd.characters && characterId) {
+        character = cd.characters.find(c => c.id === characterId) || null;
     }
 
     // Resolve image — character.image may be a string, an object {data,path,url}, or absent
@@ -111,7 +109,6 @@ function addAssistantMessage(sender, text, characterId = null) {
             </div>
         </div>
     `;
-    messageDiv.dataset.characterId = characterId || (character ? character.id : null);
     chatHistory.appendChild(messageDiv);
     chatHistory.scrollTop = chatHistory.scrollHeight;
     updateNavigationButtons();

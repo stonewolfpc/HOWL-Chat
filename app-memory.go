@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"howl-chat/internal/backend/memory"
 	"howl-chat/internal/backend/types"
 	"howl-chat/internal/errors"
 )
@@ -38,6 +39,7 @@ type MemoryRecord struct {
 	Type            string                 `json:"type"`
 	Scope           string                 `json:"scope"`
 	ScopeID         string                 `json:"scopeId,omitempty"`
+	OwnerKind       string                 `json:"ownerKind,omitempty"`
 	Confidence      int                    `json:"confidence,omitempty"`
 	Status          string                 `json:"status,omitempty"`
 	Pinned          bool                   `json:"pinned,omitempty"`
@@ -141,6 +143,7 @@ func (a *App) AddMemory(chatID string, record MemoryRecord) (*MemoryRecord, erro
 		Content:    record.RawText,
 		Scope:      record.Scope,
 		OwnerID:    record.ScopeID,
+		OwnerKind:  record.OwnerKind,
 		Tags:       record.Tags,
 		Pinned:     record.Pinned,
 		Status:     record.Status,
@@ -256,6 +259,18 @@ func (a *App) SetAutoCaptureConfig(chatID string, config AutoCaptureConfig) erro
 	return err
 }
 
+// GetMemoryIdentityDiagnostics reports unresolved character-scope memory
+// ownership. It never reassigns or deletes legacy records.
+func (a *App) GetMemoryIdentityDiagnostics(chatID string) (memory.IdentityDiagnostics, error) {
+	if a.memoryService == nil {
+		return memory.IdentityDiagnostics{}, fmt.Errorf("memory service not initialized")
+	}
+	if chatID != "" {
+		a.memoryService.SetChatID(chatID)
+	}
+	return a.memoryService.GetMemoryIdentityDiagnostics()
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -273,6 +288,7 @@ func typesMemoryToRecord(tm types.MemoryRecord) MemoryRecord {
 		Type:            "automated",
 		Scope:           tm.Scope,
 		ScopeID:         tm.OwnerID,
+		OwnerKind:       tm.OwnerKind,
 		Confidence:      int(tm.Confidence),
 		Status:          tm.Status,
 		Pinned:          tm.Pinned,

@@ -3,6 +3,7 @@ package gallery
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,6 +13,10 @@ import (
 	"howl-chat/internal/image/metadata"
 	"howl-chat/internal/image/types"
 )
+
+// ErrOutsideGallery is returned when a requested path is not contained by the
+// gallery root after lexical and symlink/reparse-point resolution.
+var ErrOutsideGallery = errors.New("path is outside the gallery")
 
 // Service manages generated images on disk.
 type Service struct {
@@ -89,22 +94,61 @@ func (s *Service) saveSingle(b64 string, meta types.ImageMetadata) error {
 		imgDataWithMeta = imgData
 	}
 
-	timestamp := time.Now().UTC().Format("20060102_150405_") + fmt.Sprintf("%d", time.Now().UnixNano()%1000)
-	baseName := fmt.Sprintf("img_%s", timestamp)
+	baseName := fmt.Sprintf("img_%s_%d", time.Now().UTC().Format("20060102_150405"), time.Now().UnixNano()%1000000)
 	imgPath := filepath.Join(s.baseDir, baseName+".png")
-	if err := os.WriteFile(imgPath, imgDataWithMeta, 0644); err != nil {
+	meta.File = imgPath
+	metaBytes, err := json.MarshalIndent(meta, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encode metadata: %w", err)
+	}
+	if err := writeFileAtomic(imgPath, imgDataWithMeta, 0644); err != nil {
 		return fmt.Errorf("write image: %w", err)
 	}
 
-	meta.File = imgPath
 	metaPath := filepath.Join(s.baseDir, baseName+".json")
-	metaBytes, _ := json.MarshalIndent(meta, "", "  ")
-	if err := os.WriteFile(metaPath, metaBytes, 0644); err != nil {
+	if err := writeFileAtomic(metaPath, metaBytes, 0644); err != nil {
+		// Do not leave an image without its sidecar when the sidecar could not
+		// be committed.
+		_ = os.Remove(imgPath)
 		return fmt.Errorf("write metadata: %w", err)
 	}
+	return nil
+}
 
-	thumbDir := filepath.Join(s.baseDir, "thumbs")
-	_ = os.MkdirAll(thumbDir, 0755)
+func writeFileAtomic(path string, data []byte, mode os.FileMode) error {
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
+	tmp, err := os.CreateTemp(dir, "."+filepath.Base(path)+".tmp-*")
+	if err != nil {
+		return err
+	}
+	tmpName := tmp.Name()
+	cleanup := func() {
+		_ = tmp.Close()
+		_ = os.Remove(tmpName)
+	}
+	if _, err := tmp.Write(data); err != nil {
+		cleanup()
+		return err
+	}
+	if err := tmp.Chmod(mode); err != nil {
+		cleanup()
+		return err
+	}
+	if err := tmp.Sync(); err != nil {
+		cleanup()
+		return err
+	}
+	if err := tmp.Close(); err != nil {
+		_ = os.Remove(tmpName)
+		return err
+	}
+	if err := os.Rename(tmpName, path); err != nil {
+		_ = os.Remove(tmpName)
+		return err
+	}
 	return nil
 }
 
@@ -135,7 +179,11 @@ func (s *Service) List() ([]types.ImageMetadata, error) {
 			continue
 		}
 		path := filepath.Join(s.baseDir, entry.Name())
-		data, err := os.ReadFile(path)
+		resolved, err := s.ResolveFile(path)
+		if err != nil {
+			continue
+		}
+		data, err := os.ReadFile(resolved)
 		if err != nil {
 			continue
 		}
@@ -168,19 +216,109 @@ func (s *Service) resolveImagePath(metaName, recorded string) (string, bool) {
 		candidates = append(candidates, filepath.Join(s.baseDir, filepath.Base(recorded)))
 	}
 	for _, c := range candidates {
-		if info, err := os.Stat(c); err == nil && !info.IsDir() {
-			return c, true
+		resolved, err := s.ResolveFile(c)
+		if err != nil {
+			continue
 		}
+		return resolved, true
 	}
 	return "", false
 }
 
-// Delete removes an image and its metadata.
-func (s *Service) Delete(baseName string) error {
-	for _, ext := range []string{".png", ".json"} {
-		p := filepath.Join(s.baseDir, baseName+ext)
-		_ = os.Remove(p)
+// ResolveFile validates a requested gallery path and returns the resolved path.
+// Both lexical containment and symlink/reparse-point containment are checked.
+func (s *Service) ResolveFile(filePath string) (string, error) {
+	if strings.TrimSpace(filePath) == "" {
+		return "", fmt.Errorf("gallery path is empty")
 	}
-	_ = os.Remove(filepath.Join(s.baseDir, "thumbs", baseName+".webp"))
+	base, err := filepath.Abs(s.baseDir)
+	if err != nil {
+		return "", fmt.Errorf("resolve gallery root: %w", err)
+	}
+	target, err := filepath.Abs(filePath)
+	if err != nil {
+		return "", fmt.Errorf("resolve gallery path: %w", err)
+	}
+	baseResolved := base
+	if resolved, err := filepath.EvalSymlinks(base); err == nil {
+		baseResolved = resolved
+	}
+	targetResolved := target
+	if resolved, err := filepath.EvalSymlinks(target); err == nil {
+		targetResolved = resolved
+	} else if !os.IsNotExist(err) {
+		return "", fmt.Errorf("resolve gallery path: %w", err)
+	}
+	if !isUnderDir(targetResolved, baseResolved) {
+		return "", fmt.Errorf("%w: %s", ErrOutsideGallery, filePath)
+	}
+	info, err := os.Stat(targetResolved)
+	if err != nil {
+		return "", fmt.Errorf("read gallery image: %w", err)
+	}
+	if info.IsDir() {
+		return "", fmt.Errorf("gallery path is a directory")
+	}
+	return targetResolved, nil
+}
+
+// Read returns the bytes of a file inside the gallery root.
+func (s *Service) Read(filePath string) ([]byte, error) {
+	resolved, err := s.ResolveFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+	return os.ReadFile(resolved)
+}
+
+func isUnderDir(path, dir string) bool {
+	rel, err := filepath.Rel(dir, path)
+	if err != nil {
+		return false
+	}
+	if rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return false
+	}
+	return !filepath.IsAbs(rel)
+}
+
+// Delete removes an image, its metadata, and its thumbnail. Missing sidecars
+// are harmless, but a missing item or a real filesystem failure is reported.
+func (s *Service) Delete(baseName string) error {
+	baseName = strings.TrimSpace(baseName)
+	for _, ext := range []string{".png", ".json", ".webp"} {
+		if strings.EqualFold(filepath.Ext(baseName), ext) {
+			baseName = strings.TrimSuffix(baseName, filepath.Ext(baseName))
+			break
+		}
+	}
+	if baseName == "" || baseName == "." || baseName == ".." ||
+		filepath.IsAbs(baseName) || filepath.Base(baseName) != baseName ||
+		strings.ContainsAny(baseName, `/\`) {
+		return fmt.Errorf("invalid gallery item name %q", baseName)
+	}
+
+	var errs []error
+	removed := false
+	for _, ext := range []string{".png", ".json"} {
+		err := os.Remove(filepath.Join(s.baseDir, baseName+ext))
+		if err == nil {
+			removed = true
+		} else if !os.IsNotExist(err) {
+			errs = append(errs, err)
+		}
+	}
+	err := os.Remove(filepath.Join(s.baseDir, "thumbs", baseName+".webp"))
+	if err == nil {
+		removed = true
+	} else if !os.IsNotExist(err) {
+		errs = append(errs, err)
+	}
+	if len(errs) > 0 {
+		return fmt.Errorf("delete gallery item %q: %w", baseName, errors.Join(errs...))
+	}
+	if !removed {
+		return fmt.Errorf("gallery item %q not found", baseName)
+	}
 	return nil
 }

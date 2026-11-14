@@ -1,0 +1,47 @@
+=== RESOURCE BASELINE ===
+
+   Id ProcessName      WorkingSet64
+   -- -----------      ------------
+18960 howl-chat-unit-c     55869440
+17740 llama-server       2233180160
+
+
+
+=== REPEAT CYCLE 1 (start) ===
+INVOKED invoke-pattern index=0
+[0] Button cls="input-icon mic-button recording" id="" name="??" rect=954,1107,36,42 enabled=True offscreen=False
+---MATCHES=1---
+INVOKED invoke-pattern index=0
+=== REPEAT CYCLE 2 (start) ===
+INVOKED invoke-pattern index=0
+[0] Button cls="input-icon mic-button recording" id="" name="??" rect=954,1107,36,42 enabled=True offscreen=False
+---MATCHES=1---
+INVOKED invoke-pattern index=0
+=== RESOURCES AFTER REPEATED USE ===
+
+   Id ProcessName      WorkingSet64
+   -- -----------      ------------
+18960 howl-chat-unit-c     56930304
+17740 llama-server       2278309888
+
+
+
+=== SHUTDOWN TIMELINE ===
+0.8s app_procs=0 llama_pids=[17740]
+1.6s app_procs=0 llama_pids=[17740]
+2.4s app_procs=0 llama_pids=[17740]
+3.1s app_procs=0 llama_pids=[17740]
+3.9s app_procs=0 llama_pids=[17740]
+4.6s app_procs=0 llama_pids=[17740]
+5.4s app_procs=0 llama_pids=[17740]
+6.2s app_procs=0 llama_pids=[17740]
+6.9s app_procs=0 llama_pids=[17740]
+=== FINAL ORPHAN CHECK ===
+
+   Id ProcessName 
+   -- ----------- 
+17740 llama-server
+
+
+
+=== EXIT ===

@@ -1,0 +1,35 @@
+﻿14:08:28.042  PHASE discovery-ui
+14:08:29.621  APP_PID=27160
+14:08:30.687  WINDOW_READY
+14:08:38.281  PROMPT_VISIBLE=True
+14:08:38.302  PROMPT_PATH_MENTIONS=2
+14:08:39.238  SHOT discovery-prompt.png -> SAVED C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\discovery-prompt.png 1400x900 window=580,270
+14:08:40.223  PROMPT_BUTTONS 2
+14:08:41.261  PROMPT_NOT_NOW INVOKED invoke-pattern index=0
+14:08:43.880  PROMPT_AFTER_DISMISS_VISIBLE=False
+14:08:43.891  DEFERRED_RECORD {   "deferred": {     "C:\\Users\\StoneWolfPC\\HOWL_Chat\\build\\tmp\\unit-c-rerun\\demo\\New Folder": "2026-11-05T20:08:41.2321441Z"   } }
+14:08:44.868  OPEN_BROWSER INVOKED invoke-pattern index=0
+14:08:50.628  BROWSER_HAS_GEMMA=True
+14:08:50.630  BROWSER_HAS_ASR=False
+14:08:50.631  BROWSER_HAS_MMPROJ=False
+14:08:51.529  SHOT model-browser-rendered.png -> SAVED C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\model-browser-rendered.png 1400x900 window=580,270
+14:08:52.653  OPEN_LOCATOR powershell.exe : index 0 out of range; matches=0
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\discovery-ui.ps1:22 char:20
++ ...  { return ((& powershell -NoProfile -ExecutionPolicy Bypass -File $ui ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (index 0 out of range; matches=0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+At C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\tools\uia.ps1:147 char:40
++ ... e $Index) { throw ("index $Index out of range; matches=" + $found.Cou ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (index 0 out of range; matches=0:String) [], RuntimeException
+    + FullyQualifiedErrorId : index 0 out of range; matches=0
+14:08:56.479  LOCATOR_VISIBLE=False
+14:08:56.482  LOCATOR_HAS_DRIVES=False
+14:08:57.370  SHOT directory-locator.png -> SAVED C:\Users\StoneWolfPC\HOWL_Chat\build\unit-c\coexistence\directory-locator.png 1400x900 window=580,270
+14:08:58.429  LOCATOR_CANCEL INVOKED invoke-pattern index=0
+14:09:01.038  LOCATOR_CLOSED=True
+14:09:01.091  EXITED code=
+14:09:04.103  LEFTOVER=0
+14:09:04.106  PHASE_DONE

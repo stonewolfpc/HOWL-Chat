@@ -24,6 +24,7 @@ func ToLorebookEntry(record types.MemoryRecord) lorebook.Entry {
 		Content:           record.Content,
 		Scope:             lorebook.Scope(record.Scope),
 		OwnerID:           record.OwnerID,
+		OwnerKind:         record.OwnerKind,
 		Tags:              record.Tags,
 		Enabled:           record.Status == "active",
 		PriorityLevel:     calculatePriority(record),

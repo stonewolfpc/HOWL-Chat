@@ -11,6 +11,7 @@ import (
 
 	"howl-chat/internal/audio/tts"
 	"howl-chat/internal/audio/types"
+	"howl-chat/internal/paths"
 )
 
 // Synthesizer implements TTSSynthesizer using Piper CLI.
@@ -56,7 +57,7 @@ func (s *Synthesizer) Initialize(ctx context.Context, config types.TTSConfig) er
 
 	outputDir := config.CacheDir
 	if outputDir == "" {
-		outputDir = filepath.Join(os.TempDir(), "howl-tts")
+		outputDir = filepath.Join(paths.TempDir(), "howl-tts")
 	}
 	if err := os.MkdirAll(outputDir, 0o755); err != nil {
 		return types.NewAudioError(types.ErrCodeModelLoadFailed, "failed to create tts output directory", err)
@@ -187,8 +188,12 @@ func (s *Synthesizer) Release() error {
 }
 
 func (s *Synthesizer) runPiper(ctx context.Context, req types.SynthesisRequest, outPath string) error {
+	modelPath := s.modelPath
+	if req.VoicePath != "" {
+		modelPath = req.VoicePath
+	}
 	args := []string{
-		"--model", s.modelPath,
+		"--model", modelPath,
 		"--output_file", outPath,
 	}
 	if req.Speed > 0 {

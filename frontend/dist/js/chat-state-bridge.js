@@ -513,7 +513,12 @@ function collectForSave() {
         const role   = el.classList.contains('user')      ? 'user'
                      : el.classList.contains('assistant') ? 'assistant'
                      : 'system';
-        return { id: i.toString(), sender, text, role, timestamp: new Date().toISOString() };
+        return {
+            id: i.toString(), sender, text, role,
+            characterId: el.dataset.characterId || '',
+            timestamp: el.dataset.timestamp || new Date().toISOString(),
+            hasImage: el.dataset.hasImage === 'true'
+        };
     }) : [];
 
     return {

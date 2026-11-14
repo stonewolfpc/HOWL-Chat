@@ -19,3 +19,58 @@
 @import url('lb-creation.css?v=41');
 @import url('lb-light-theme.css?v=41');
 @import url('lb-responsive.css?v=41');
+
+/* Lorebook store bar: canonical library status and explicit import controls */
+.lorebook-store-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 14px 0 18px;
+    padding: 10px 14px;
+    border: 1px solid rgba(0, 229, 255, 0.22);
+    border-radius: 10px;
+    background: rgba(0, 24, 32, 0.55);
+}
+
+.lorebook-store-status {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: rgba(190, 245, 255, 0.82);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lorebook-store-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.lorebook-store-button {
+    padding: 7px 14px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: #041018;
+    background: #35d7f2;
+    border: 1px solid rgba(120, 240, 255, 0.55);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.lorebook-store-button.secondary {
+    color: #bff4ff;
+    background: transparent;
+    border-color: rgba(120, 240, 255, 0.35);
+}
+
+.lorebook-store-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.lorebook-store-button:disabled {
+    opacity: 0.38;
+    cursor: default;
+}
