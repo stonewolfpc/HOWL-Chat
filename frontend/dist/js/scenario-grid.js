@@ -133,7 +133,7 @@ async function editScenario(index, event) {
     updateScenarioImagesList();
 
     // Re-hydrate from the full character catalog — stored scenarios have avatars stripped
-    const allChars = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+    const allChars = (window.CharacterStorage?.all?.() || []);
     ss.selectedCharacters = (scenario.characters || []).map(sc => {
         const full = allChars.find(c => c.name === sc.name || c.id === sc.id);
         return full || sc; // fall back to stored (name+role only) if not in catalog

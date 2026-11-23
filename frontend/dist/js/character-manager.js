@@ -27,7 +27,7 @@ class CharacterManager {
      */
     loadCharacters() {
         try {
-            this.characters = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+            this.characters = (window.CharacterStorage?.all?.() || []);
         } catch (error) {
             console.error('Failed to load characters:', error);
             this.characters = [];
@@ -35,11 +35,12 @@ class CharacterManager {
     }
 
     /**
-     * Save characters to localStorage
+     * Persist through the character repository; this class is not a writer.
      */
     saveCharacters() {
         try {
-            localStorage.setItem('howl-chat-characters', JSON.stringify(this.characters));
+            Promise.all(this.characters.map(character => window.CharacterStorage.save(character)))
+                .catch(error => console.error('Failed to save characters:', error));
         } catch (error) {
             console.error('Failed to save characters:', error);
         }

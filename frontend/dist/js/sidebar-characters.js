@@ -556,18 +556,8 @@ async function removeCharacterFromChat(characterId) {
 // ---------------------------------------------------------------------------
 
 function addCharacterToChat() {
-    let characters = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
-
-    const needsMigration = characters.some(c => !c.id);
-    if (needsMigration) {
-        characters = characters.map((character, index) => {
-            if (!character.id) {
-                return { ...character, id: 'char_' + Date.now() + '_' + index + '_' + Math.floor(Math.random() * 1000) };
-            }
-            return character;
-        });
-        localStorage.setItem('howl-chat-characters', JSON.stringify(characters));
-    }
+    // The canonical store assigns identity; this list is display-only.
+    const characters = (window.CharacterStorage?.all?.() || []);
 
     const cd = window.sidebarState.currentChatData;
     const modal = document.createElement('div');
@@ -614,7 +604,7 @@ function addCharacterToChat() {
 }
 
 async function selectCharacterForChat(characterId) {
-    const characters = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+    const characters = (window.CharacterStorage?.all?.() || []);
     const character  = characters.find(c => c.id === characterId);
     if (!character) { console.error('Character not found with ID:', characterId); return; }
 

@@ -178,7 +178,7 @@ ContextDisplay.prototype.selectWorld = async function (worldId) {
     this.currentChatData.lorebooks  = [];
 
     const scenariosCatalog  = JSON.parse(localStorage.getItem('howl-chat-scenarios')  || '[]');
-    const charactersCatalog = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+    const charactersCatalog = (window.CharacterStorage?.all?.() || []);
     const lorebooksCatalog  = JSON.parse(localStorage.getItem('howl-chat-lorebooks')  || '[]');
 
     const lorebookRefSets   = [];
@@ -359,7 +359,7 @@ ContextDisplay.prototype.selectScenario = async function (scenarioId) {
     // Resolve scenario characters from localStorage
     let scenarioChars = [];
     if (scenario.characters?.length > 0) {
-        const all = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+        const all = (window.CharacterStorage?.all?.() || []);
         scenarioChars = all.filter(c => scenario.characters.some(sc => sc.id === c.id));
         if (scenarioChars.length > 0 && this.currentChatData.characters?.length > 0 && typeof dataSync !== 'undefined') {
             await dataSync.createMemoryLorebook(this.currentChatData.characters, scenarioChars);
@@ -424,7 +424,7 @@ function _renderCharacterList(characters, selectedIds) {
 }
 
 ContextDisplay.prototype.openCharacterSelector = function () {
-    const allCharacters = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+    const allCharacters = (window.CharacterStorage?.all?.() || []);
     const selectedIds = new Set((this.currentChatData.characters || []).map(c => c.id));
     const currentWorld = this.currentChatData.world;
     const currentScenario = this.currentChatData.scenario;
@@ -471,7 +471,7 @@ ContextDisplay.prototype.openCharacterSelector = function () {
 
 ContextDisplay.prototype.toggleCharacter = async function (characterId) {
     console.log('[TRACE:toggleCharacter] id:', characterId);
-    const all       = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+    const all       = (window.CharacterStorage?.all?.() || []);
     const character = all.find(c => c.id === characterId);
     if (!character) return;
 

@@ -1,14 +1,13 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 
 	"howl-chat/internal/backend/chat"
 	"howl-chat/internal/backend/lorebook"
+	"howl-chat/internal/characterstore"
 	"howl-chat/internal/errors"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -47,41 +46,98 @@ func (a *App) ResetSessionCharacters() error {
 	return nil
 }
 
-// CreateCharacter creates a new character and writes it to Characters/<name>/character.json.
+// characterStore returns the one canonical character store for this process.
+func (a *App) characterStore() *characterstore.Store {
+	a.characterMu.Lock()
+	defer a.characterMu.Unlock()
+	if a.characters == nil {
+		a.characters = characterstore.New(getCharactersDir())
+	}
+	return a.characters
+}
+
+// CreateCharacter is the legacy binding name for SaveCharacter. The store owns the
+// identity, folder and envelope; this path no longer writes raw JSON itself.
 func (a *App) CreateCharacter(character map[string]interface{}) (map[string]interface{}, error) {
-	if character["id"] == nil || character["id"] == "" {
-		character["id"] = fmt.Sprintf("char_%d", time.Now().Unix())
-	}
+	return a.SaveCharacter(character)
+}
 
-	name, _ := character["name"].(string)
-	if name == "" {
-		name, _ = character["id"].(string)
+// SaveCharacter creates or updates a character through the canonical store. A
+// supplied revision is enforced, so a stale editor cannot overwrite a newer save.
+func (a *App) SaveCharacter(character map[string]interface{}) (map[string]interface{}, error) {
+	if character == nil {
+		return nil, fmt.Errorf("SaveCharacter: character is required")
 	}
+	base, _ := character["revision"].(string)
+	item, err := a.characterStore().Save(character, base)
+	if err != nil {
+		a.logError(errors.CHARSaveFail, errors.High, "character.save", "app-characters.go", err)
+		return nil, fmt.Errorf("SaveCharacter: %w", err)
+	}
+	// Return the canonical document plus the revision the next save must cite.
+	document := item.Document
+	document["revision"] = item.Revision
+	return document, nil
+}
 
-	charDir := isolatedStatePath("Characters", name)
-	if charDir == "" {
-		cwd, _ := os.Getwd()
-		charDir = filepath.Join(cwd, "Characters", name)
-		if _, err := os.Stat(filepath.Join(filepath.Dir(os.Args[0]), "Characters")); err == nil {
-			charDir = filepath.Join(filepath.Dir(os.Args[0]), "Characters", name)
+// DeleteCharacter removes one character through the canonical store.
+func (a *App) DeleteCharacter(characterID string) error {
+	if err := a.characterStore().Delete(characterID); err != nil {
+		a.logError(errors.CHARSaveFail, errors.High, "character.delete", "app-characters.go", err)
+		return fmt.Errorf("DeleteCharacter: %w", err)
+	}
+	return nil
+}
+
+// ImportCharacters upserts legacy/external character documents. It is
+// idempotent and returns the previous document per item for rollback.
+func (a *App) ImportCharacters(characters []interface{}) ([]map[string]interface{}, error) {
+	documents := make([]map[string]interface{}, 0, len(characters))
+	for _, raw := range characters {
+		if document, ok := raw.(map[string]interface{}); ok && document != nil {
+			documents = append(documents, document)
 		}
 	}
-	if err := os.MkdirAll(charDir, 0755); err != nil {
-		a.logError(errors.CHARDirFail, errors.High, "character.create", "app-characters.go:59", err)
-		return nil, fmt.Errorf("CreateCharacter: failed to create directory: %w", err)
-	}
-
-	data, err := json.Marshal(character)
+	results, err := a.characterStore().Import(documents)
 	if err != nil {
-		a.logError(errors.CHARCreateFail, errors.High, "character.create", "app-characters.go:68", err)
-		return nil, fmt.Errorf("CreateCharacter: failed to marshal character: %w", err)
+		a.logError(errors.CHARSaveFail, errors.High, "character.import", "app-characters.go", err)
+		return nil, fmt.Errorf("ImportCharacters: %w", err)
 	}
-	charPath := filepath.Join(charDir, "character.json")
-	if err := os.WriteFile(charPath, data, 0644); err != nil {
-		a.logError(errors.CHARSaveFail, errors.High, "character.create", "app-characters.go:73", err)
-		return nil, fmt.Errorf("CreateCharacter: failed to write character: %w", err)
+	out := make([]map[string]interface{}, 0, len(results))
+	for _, result := range results {
+		entry := map[string]interface{}{
+			"id":       result.ID,
+			"status":   result.Status,
+			"revision": result.Revision,
+		}
+		if result.Previous != nil {
+			entry["previous"] = result.Previous
+		}
+		out = append(out, entry)
 	}
-	return character, nil
+	return out, nil
+}
+
+// RollbackCharacters restores what an ImportCharacters call replaced.
+func (a *App) RollbackCharacters(results []interface{}) error {
+	entries := make([]characterstore.ImportResult, 0, len(results))
+	for _, raw := range results {
+		result, ok := raw.(map[string]interface{})
+		if !ok || result == nil {
+			continue
+		}
+		entry := characterstore.ImportResult{}
+		entry.ID, _ = result["id"].(string)
+		entry.Status, _ = result["status"].(string)
+		entry.Revision, _ = result["revision"].(string)
+		entry.Previous, _ = result["previous"].(map[string]interface{})
+		entries = append(entries, entry)
+	}
+	if err := a.characterStore().Rollback(entries); err != nil {
+		a.logError(errors.CHARSaveFail, errors.High, "character.rollback", "app-characters.go", err)
+		return fmt.Errorf("RollbackCharacters: %w", err)
+	}
+	return nil
 }
 
 // getCharactersDir resolves the Characters directory path (cwd or exe dir).
@@ -112,108 +168,50 @@ func listDirNames(dir string) []string {
 	return names
 }
 
-// characterExistsOnDisk returns true if a character's JSON file still exists.
+// characterExistsOnDisk reports whether the canonical store holds an identity.
 func characterExistsOnDisk(name string) bool {
 	if name == "" {
 		return false
 	}
-	dir := getCharactersDir()
-	path := filepath.Join(dir, name, "character.json")
-	_, err := os.Stat(path)
-	exists := err == nil
-	if !exists {
-		fmt.Printf("[DEBUG characterExistsOnDisk] name=%q path=%q exists=%v err=%v\n", name, path, exists, err)
-		fmt.Printf("[DEBUG] Characters dir contents: %v\n", listDirNames(dir))
-	}
-	return exists
+	_, err := characterstore.New(getCharactersDir()).Get(name)
+	return err == nil
 }
 
-// loadCharacterFromDiskByID scans the Characters directory for a character
-// whose JSON file contains the matching ID.  Returns nil if not found.
+// loadCharacterFromDiskByID reads one character through the canonical store.
 func loadCharacterFromDiskByID(id string) *chat.CharacterContext {
 	if id == "" {
 		return nil
 	}
-	dir := getCharactersDir()
-	entries, err := os.ReadDir(dir)
+	item, err := characterstore.New(getCharactersDir()).Get(id)
 	if err != nil {
 		return nil
 	}
-	for _, entry := range entries {
-		if !entry.IsDir() {
-			continue
-		}
-		path := filepath.Join(dir, entry.Name(), "character.json")
-		data, err := os.ReadFile(path)
-		if err != nil {
-			continue
-		}
-		var raw map[string]interface{}
-		if err := json.Unmarshal(data, &raw); err != nil {
-			continue
-		}
-		if raw["id"] != id {
-			continue
-		}
-		cc, err := chat.ParseCharacterContextFromMap(raw)
-		if err != nil {
-			continue
-		}
-		return &cc
+	cc, err := chat.ParseCharacterContextFromMap(item.Document)
+	if err != nil {
+		return nil
 	}
-	return nil
+	return &cc
 }
 
-// GetCharacters loads all characters from the Characters directory.
+// GetCharacters returns the canonical character documents with the revision
+// each one must cite on its next save.
 func (a *App) GetCharacters() ([]map[string]interface{}, error) {
-	var characters []map[string]interface{}
-
-	charactersDir := isolatedStateDir("Characters")
-	if charactersDir == "" {
-		cwd, _ := os.Getwd()
-		charactersDir = filepath.Join(cwd, "Characters")
-		if _, err := os.Stat(charactersDir); err != nil {
-			charactersDir = filepath.Join(filepath.Dir(os.Args[0]), "Characters")
-		}
-	}
-	_ = os.MkdirAll(charactersDir, 0755)
-
-	entries, err := os.ReadDir(charactersDir)
+	items, err := a.characterStore().List()
 	if err != nil {
-		a.logError(errors.CHARLoadFail, errors.High, "character.load.all", "app-characters.go:90", err)
-		return characters, fmt.Errorf("failed to read characters directory: %w", err)
+		a.logError(errors.CHARLoadFail, errors.High, "character.load.all", "app-characters.go", err)
+		return nil, fmt.Errorf("GetCharacters: %w", err)
 	}
-
-	for _, entry := range entries {
-		if !entry.IsDir() {
-			continue
+	characters := make([]map[string]interface{}, 0, len(items))
+	for _, item := range items {
+		document := item.Document
+		if _, ok := document["id"]; !ok {
+			document["id"] = item.ID
 		}
-		charName := entry.Name()
-		charPath := filepath.Join(charactersDir, charName, "character.json")
-		data, err := os.ReadFile(charPath)
-		if err != nil {
-			continue
+		if _, ok := document["name"]; !ok {
+			document["name"] = item.ID
 		}
-		if len(data) == 0 || string(data) == "{}" {
-			characters = append(characters, map[string]interface{}{
-				"id": charName, "name": charName, "howl": map[string]interface{}{},
-			})
-			continue
-		}
-		var charData map[string]interface{}
-		if err := json.Unmarshal(data, &charData); err != nil {
-			a.logErrorSilent(errors.CHARParseFail, errors.Medium, "character.load.parse", "app-characters.go:112", err)
-			charData = map[string]interface{}{
-				"id": charName, "name": charName, "howl": map[string]interface{}{},
-			}
-		}
-		if _, ok := charData["name"]; !ok {
-			charData["name"] = charName
-		}
-		if _, ok := charData["id"]; !ok {
-			charData["id"] = charName
-		}
-		characters = append(characters, charData)
+		document["revision"] = item.Revision
+		characters = append(characters, document)
 	}
 	return characters, nil
 }

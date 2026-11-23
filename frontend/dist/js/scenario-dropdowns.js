@@ -44,7 +44,7 @@ function toggleDropdown(dropdownId) {
 // ---------------------------------------------------------------------------
 
 function loadAvailableCharacters() {
-    const characters = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+    const characters = (window.CharacterStorage?.all?.() || []);
     window.scenarioState.availableCharacters = characters;
     updateCharacterDropdown();
 }

@@ -287,7 +287,7 @@ class ScenarioManager {
     getAvailableItems(type) {
         switch (type) {
             case 'character':
-                return JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+                return (window.CharacterStorage?.all?.() || []);
             case 'lorebook':
                 return JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
             default:

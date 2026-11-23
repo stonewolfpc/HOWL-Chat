@@ -279,7 +279,7 @@ async function loadLorebookOwnerOptions() {
     if (!select) return;
     let desired = select.dataset.pendingOwner ?? select.value;
     try {
-        // Chat adds characters from CharacterStorage (localStorage). Ownership is
+        // Chat adds characters from the character repository. Ownership is
         // the stable id from that same library; the name is only a label.
         let characters = null;
         if (window.CharacterStorage && typeof window.CharacterStorage.loadAll === 'function') {

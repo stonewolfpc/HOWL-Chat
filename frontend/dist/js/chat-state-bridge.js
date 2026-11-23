@@ -181,12 +181,12 @@ async function hydrateFromBackend(chatData) {
     console.log('[hydrateFromBackend] missingCharIds (added-only):', missingCharIds);
     if (missingCharIds.length > 0) {
         try {
-            const allChars = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+            const allChars = (window.CharacterStorage?.all?.() || []);
             for (const id of missingCharIds) {
                 const found = allChars.find(c => c.id === id);
                 if (found) {
                     console.log('[hydrateFromBackend] adding missing character from localStorage:', id, found.name);
-                    characters.push(_enrichCharacterFromLocalStorage(found));
+                    characters.push(_enrichCharacterFromRepository(found));
                 } else {
                     console.log('[hydrateFromBackend] character not found in localStorage:', id);
                 }
@@ -243,7 +243,7 @@ async function hydrateFromBackend(chatData) {
     // Enrich from localStorage — recover title/image the backend doesn't store
     if (_state.world)    _enrichWorldFromLocalStorage(_state.world);
     if (_state.scenario) _enrichScenarioFromLocalStorage(_state.scenario);
-    _state.characters = _state.characters.map(c => _enrichCharacterFromLocalStorage(c));
+    _state.characters = _state.characters.map(c => _enrichCharacterFromRepository(c));
     _state.lorebooks  = _enrichLorebooksFromLocalStorage(_state.lorebooks);
 
     // Resolve images async for anything enrichment added
@@ -687,10 +687,10 @@ function _enrichScenarioFromLocalStorage(scenario) {
     } catch (_) {}
 }
 
-function _enrichCharacterFromLocalStorage(character) {
+function _enrichCharacterFromRepository(character) {
     if (!character) return character;
     try {
-        const stored = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+        const stored = (window.CharacterStorage?.all?.() || []);
         const match  = character.id
             ? stored.find(c => c.id === character.id)
             : stored.find(c => c.name && c.name.toLowerCase() === (character.name || '').toLowerCase());

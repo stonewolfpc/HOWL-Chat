@@ -295,7 +295,7 @@ class WorldManager {
             case 'scenario':
                 return JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
             case 'character':
-                return JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+                return (window.CharacterStorage?.all?.() || []);
             case 'lorebook':
                 return JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
             default:

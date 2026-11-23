@@ -87,7 +87,7 @@ class LorebookManager {
                     this.lorebooks.filter(l => scenario.lorebooks.some(sl => sl.id === l.id)) : [];
 
             case 'character':
-                const character = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]')
+                const character = (window.CharacterStorage?.all?.() || [])
                     .find(c => c.id === sourceId);
                 return character && character.lorebooks ?
                     this.lorebooks.filter(l => character.lorebooks.some(cl => cl.id === l.id)) : [];
@@ -105,7 +105,7 @@ class LorebookManager {
     getLorebookSource(lorebookId) {
         const worlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
         const scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
-        const characters = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+        const characters = (window.CharacterStorage?.all?.() || []);
 
         // Check worlds
         for (const world of worlds) {

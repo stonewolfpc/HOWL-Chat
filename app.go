@@ -9,6 +9,7 @@ import (
 	"howl-chat/internal/backend/chat"
 	"howl-chat/internal/backend/memory"
 	"howl-chat/internal/backend/rag"
+	"howl-chat/internal/characterstore"
 	"howl-chat/internal/diagnostics"
 	"howl-chat/internal/host"
 	"howl-chat/internal/media"
@@ -33,6 +34,12 @@ type App struct {
 	// (membership, append log, snapshots). App holds one handle to the owner and
 	// the Wails bindings; it keeps none of that state in its own fields.
 	conversation *chat.ActiveConversation
+
+	// characters is the canonical character store. The renderer reads and
+	// writes characters only through the bindings in app-characters.go; App
+	// composes the owner and keeps no character maps of its own.
+	characters  *characterstore.Store
+	characterMu sync.Mutex
 
 	// Level 0 — application lifecycle and coordination (internal/host).
 	// The authority owns admission, shutdown sequencing, background joining,

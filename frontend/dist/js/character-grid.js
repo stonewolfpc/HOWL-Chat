@@ -19,7 +19,7 @@
 
 function loadAvailableCharacters() {
     const cs     = window.characterState;
-    let chars    = cs.characterCache || JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+    let chars    = cs.characterCache || (window.CharacterStorage?.all?.() || []);
     chars        = cs.migrateCharactersWithIds(chars);
     cs.characterCache = chars;
 }
@@ -73,7 +73,7 @@ async function loadExternalCharacters() {
 
 function loadCharactersFromStorage() {
     const cs   = window.characterState;
-    let chars  = cs.characterCache || JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+    let chars  = cs.characterCache || (window.CharacterStorage?.all?.() || []);
     chars      = cs.migrateCharactersWithIds(chars);
     cs.characterCache = chars;
     return displayCharacters(chars);
@@ -154,7 +154,7 @@ function editCharacter(index, event) {
     const cs         = window.characterState;
     cs.currentEditingIndex = index;
 
-    const characters = cs.characterCache || JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+    const characters = cs.characterCache || (window.CharacterStorage?.all?.() || []);
     const character  = characters[index];
     if (!character) { console.error('Character not found at index:', index); return; }
 
@@ -223,10 +223,13 @@ function deleteCharacter(index, event) {
                     loadCharacters();
                 })
                 .catch(err => {
+                    // The store refused or failed the delete: keep the character
+                    // visible and surface the refusal instead of writing a
+                    // renderer-only tombstone.
                     console.error('Failed to delete character:', err);
-                    chars.splice(index, 1);
-                    cs.characterCache = chars;
-                    localStorage.setItem('howl-chat-characters', JSON.stringify(chars));
+                    if (typeof showNotification === 'function') {
+                        showNotification('Character was not deleted: ' + (err.message || err), 'error');
+                    }
                     loadCharacters();
                 });
         }

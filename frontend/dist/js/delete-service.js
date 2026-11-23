@@ -175,10 +175,13 @@ const DeleteService = (() => {
         });
         if (scenariosChanged) _writeLS('howl-chat-scenarios', scenarios);
 
-        // Remove from characters
-        const chars = _readLS('howl-chat-characters');
+        // Remove from characters through the canonical store. Work on a copy so
+        // a failed save cannot leave the repository projection mutated.
+        const charSource = typeof window.CharacterStorage?.all === 'function'
+            ? JSON.parse(JSON.stringify((window.CharacterStorage?.all?.() || [])))
+            : [];
         let charsChanged = false;
-        chars.forEach(c => {
+        charSource.forEach(c => {
             if (Array.isArray(c.lorebooks)) {
                 const before = c.lorebooks.length;
                 c.lorebooks = c.lorebooks.filter(l => l.id !== lbId);
@@ -190,7 +193,15 @@ const DeleteService = (() => {
                 if (c.howl.lorebooks.length !== before) charsChanged = true;
             }
         });
-        if (charsChanged) _writeLS('howl-chat-characters', chars);
+        if (charsChanged && typeof window.CharacterStorage?.save === 'function') {
+            for (const character of charSource) {
+                try {
+                    await window.CharacterStorage.save(character);
+                } catch (e) {
+                    console.warn('[DeleteService] character lorebook detach save failed:', e);
+                }
+            }
+        }
 
         // Remove from active chat via bridge
         if (window.chatBridge) {

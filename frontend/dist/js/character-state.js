@@ -84,17 +84,14 @@ function resetCharacterDirtyFields() {
     dirtyFields = new Set();
 }
 
+// Identity is assigned by the canonical store on save. This helper only fills
+// a display id in memory for a list that was never persisted; it must not write
+// a second character store back to localStorage.
 function migrateCharactersWithIds(characters) {
-    let needsUpdate = false;
-    const migrated  = characters.map((c, i) => {
-        if (!c.id) {
-            needsUpdate = true;
-            return { ...c, id: `char_${Date.now()}_${i}_${Math.floor(Math.random() * 1000)}` };
-        }
-        return c;
-    });
-    if (needsUpdate) localStorage.setItem('howl-chat-characters', JSON.stringify(migrated));
-    return migrated;
+    if (!Array.isArray(characters)) return [];
+    return characters.map((c, i) => c.id
+        ? c
+        : { ...c, id: `char_${Date.now()}_${i}_${Math.floor(Math.random() * 1000)}` });
 }
 
 // ---------------------------------------------------------------------------

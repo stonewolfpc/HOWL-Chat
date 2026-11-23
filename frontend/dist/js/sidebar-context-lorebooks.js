@@ -30,7 +30,7 @@ function getLorebookSourceType(lorebook, cd) {
     }
     if (Array.isArray(cd.characters) && cd.characters.length > 0) {
         const charIds = cd.characters.map(c => (c.id || '').toString().trim().toLowerCase()).filter(Boolean);
-        const catalog = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+        const catalog = (window.CharacterStorage?.all?.() || []);
         for (const c of cd.characters) {
             if (inRefs(c.howl?.lorebooks) || inRefs(c.lorebooks)) return 'character';
         }
@@ -170,7 +170,7 @@ function openLorebookSelector() {
         (Array.isArray(cd.scenario.howl?.lorebooks) && cd.scenario.howl.lorebooks.some(r => r.id === id)) ||
         (Array.isArray(cd.scenario.lorebooks)        && cd.scenario.lorebooks.some(r => r.id === id))
     );
-    const _charCatalog   = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+    const _charCatalog   = (window.CharacterStorage?.all?.() || []);
     const _charIds       = Array.isArray(cd.characters) ? cd.characters.map(c => (c.id || '').toString().trim().toLowerCase()) : [];
     const inCharRefs     = (id) => {
         if (!Array.isArray(cd.characters)) return false;

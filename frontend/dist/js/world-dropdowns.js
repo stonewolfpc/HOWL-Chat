@@ -217,7 +217,7 @@ async function loadAvailableCharacters() {
     if (!dropdownItems) return;
 
     try {
-        const characters = JSON.parse(localStorage.getItem('howl-chat-characters') || '[]');
+        const characters = (window.CharacterStorage?.all?.() || []);
         if (characters.length === 0) {
             dropdownItems.innerHTML = `<div class="world-dropdown-item disabled"><span class="world-dropdown-item-text">No characters created yet</span></div>`;
             window._worldDropdownCache.characters = [];
