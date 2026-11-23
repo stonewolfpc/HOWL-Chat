@@ -57,16 +57,18 @@ function initThinkSettings() {
     if (!sel) return;
 
     const modelSettings = () => {
-        if (!window.settingsState?.current) return null;
-        window.settingsState.current.model = window.settingsState.current.model || {};
-        return window.settingsState.current.model;
+        const model = window.settingsState?.get?.('model');
+        return model && typeof model === 'object' ? { ...model } : null;
     };
 
-    const current = modelSettings();
-    if (current) {
+    const hydrate = () => {
+        const current = modelSettings();
+        if (!current) return;
         sel.value = current.think_mode || 'hidden';
         if (budget && current.think_budget) budget.value = current.think_budget;
-    }
+    };
+    hydrate();
+    window.addEventListener('howl:settings-loaded', hydrate);
 
     const save = () => {
         const m = modelSettings();
@@ -76,7 +78,7 @@ function initThinkSettings() {
             const n = parseInt(budget.value, 10);
             m.think_budget = Number.isFinite(n) && n >= 0 ? n : 2048;
         }
-        if (window.settingsState?.saveSettings) window.settingsState.saveSettings();
+        window.settingsState.set('model', m);
     };
 
     sel.addEventListener('change', save);

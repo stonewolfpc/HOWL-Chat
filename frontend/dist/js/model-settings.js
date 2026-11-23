@@ -175,58 +175,23 @@ function initTextInputs() {
     });
 }
 
-// Save model settings to unified store and backend
+// Save model settings through the settings seam. The seam writes the backend
+// document before any renderer state changes, so there is no second path.
 async function saveModelSettings() {
-    // Sync to unified store
-    if (window.settingsState?.current) {
-        window.settingsState.current.model = modelSettings;
-        if (window.settingsState.saveSettings) {
-            await window.settingsState.saveSettings();
-        }
-    }
-
-    if (!window.go || !window.go.main || !window.go.main.App) {
-        console.log('Wails runtime not available, settings saved to local store');
+    if (!window.settingsState?.set) {
+        console.error('Error saving model settings: settings seam unavailable');
         return;
     }
-
-    try {
-        await window.go.main.App.SetModelOptions(modelSettings);
-    } catch (error) {
-        console.error('Error saving model settings:', error);
-    }
+    const saved = await window.settingsState.set('model', modelSettings);
+    if (!saved) console.error('Error saving model settings: backend rejected the write');
 }
 
-// Load model settings from unified store, backend, or defaults
+// Load model settings from the authoritative settings snapshot, or defaults.
 async function loadModelSettings() {
-    // 1. Try unified settings store first
-    if (window.settingsState?.current?.model) {
-        const settings = window.settingsState.current.model;
-        if (Object.keys(settings).length > 0) {
-            modelSettings = { ...modelSettings, ...settings };
-            updateUIFromSettings();
-            return;
-        }
+    const settings = window.settingsState?.get?.('model');
+    if (settings && Object.keys(settings).length > 0) {
+        modelSettings = { ...modelSettings, ...settings };
     }
-
-    // 2. Fallback to legacy backend binding
-    let loaded = false;
-    if (window.go && window.go.main && window.go.main.App) {
-        try {
-            const settings = await window.go.main.App.GetModelOptions();
-            if (settings && Object.keys(settings).length > 0) {
-                modelSettings = { ...modelSettings, ...settings };
-                // Seed into unified store
-                if (window.settingsState?.current) {
-                    window.settingsState.current.model = modelSettings;
-                }
-                loaded = true;
-            }
-        } catch (error) {
-            console.error('Error loading model settings from backend:', error);
-        }
-    }
-
     updateUIFromSettings();
 }
 
@@ -317,8 +282,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initDropdowns();
     initTextInputs();
     
-    // Load settings from backend on initialization
-    loadModelSettings();
+    // Load settings once the authoritative snapshot is in memory.
+    (window.settingsState?.ready || Promise.resolve(true)).then(loadModelSettings);
 });
 
 // ---------------------------------------------------------------------------

@@ -23,6 +23,10 @@ function showRealSettings() {
     const overlay = document.getElementById('real-settings-overlay');
     if (!overlay) return;
     overlay.classList.add('show');
+    // Which panel was open is a UI-only preference, deliberately kept out of
+    // the backend settings document.
+    const lastPanel = window.UIPrefs?.get('settings-panel');
+    if (lastPanel && document.getElementById(`${lastPanel}-panel`)) showSettingsPanel(lastPanel);
     window.settingsState.loadSettings();
     if (window.contentLibraries?.refresh) window.contentLibraries.refresh();
 }
@@ -43,6 +47,7 @@ function showSettingsPanel(panelId) {
     document.querySelectorAll('.real-settings-nav-item').forEach(i => i.classList.remove('active'));
     document.getElementById(`${panelId}-panel`)?.classList.add('active');
     document.querySelector(`[onclick^="showSettingsPanel('${panelId}')"]`)?.classList.add('active');
+    window.UIPrefs?.set('settings-panel', panelId);
 }
 
 // ---------------------------------------------------------------------------
@@ -50,8 +55,9 @@ function showSettingsPanel(panelId) {
 // ---------------------------------------------------------------------------
 
 document.addEventListener('DOMContentLoaded', function () {
-    window.settingsState.loadSettings();
-    initializeSettingsControls();
+    // Build the controls only after the authoritative snapshot is in memory,
+    // so they show backend values instead of the defaults they were built with.
+    (window.settingsState.ready || Promise.resolve(true)).then(initializeSettingsControls);
 });
 
 // ---------------------------------------------------------------------------

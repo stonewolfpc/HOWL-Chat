@@ -1,8 +1,9 @@
 /**
  * Sampler Settings Module
  *
- * Handles synchronization between sliders/number inputs/toggles for sampler settings,
- * communicates with backend, and persists to localStorage as fallback.
+ * Handles synchronization between sliders/number inputs/toggles for sampler
+ * settings. All reads and writes go through settings-state.js, the renderer's
+ * single seam to the backend settings authority.
  *
  * @module sampler-settings
  */
@@ -132,8 +133,8 @@ function initSamplerSettings() {
     // Initialize default reset buttons
     initResetButtons();
     
-    // Load settings from backend on initialization
-    loadSamplerSettings();
+    // Load settings once the authoritative snapshot is in memory.
+    (window.settingsState?.ready || Promise.resolve(true)).then(loadSamplerSettings);
 }
 
 // Initialize default reset button functionality
@@ -262,66 +263,34 @@ function setSamplerSettings(settings) {
     });
 }
 
-// Save sampler settings to unified store and backend
+// Save sampler settings through the settings seam. The seam writes the whole
+// authoritative document to the backend before it updates any renderer state,
+// so this module never talks to a second backend binding.
 async function saveSamplerSettings() {
-    try {
-        const settings = getSamplerSettings();
-        // Update unified settings store
-        if (window.settingsState?.current) {
-            window.settingsState.current.sampler = settings;
-            if (window.settingsState.saveSettings) {
-                await window.settingsState.saveSettings();
-            }
-        }
-        // Keep legacy backend binding for compatibility
-        if (window.go && window.go.main && window.go.main.App) {
-            await window.go.main.App.SetSamplerSettings(settings);
-        }
-    } catch (error) {
-        console.error('Failed to save sampler settings:', error);
+    if (!window.settingsState?.set) {
+        console.error('Failed to save sampler settings: settings seam unavailable');
+        return;
     }
+    const saved = await window.settingsState.set('sampler', getSamplerSettings());
+    if (!saved) console.error('Failed to save sampler settings: backend rejected the write');
 }
 
-// Load sampler settings from unified store, backend, or defaults
+// Load sampler settings from the authoritative settings snapshot, or defaults.
 async function loadSamplerSettings() {
-    // 1. Try unified settings store first
-    if (window.settingsState?.current?.sampler) {
-        const settings = window.settingsState.current.sampler;
-        if (Object.keys(settings).length > 0) {
-            setSamplerSettings(settings);
-            return;
-        }
+    const settings = window.settingsState?.get?.('sampler');
+    if (settings && Object.keys(settings).length > 0) {
+        setSamplerSettings(settings);
+        return;
     }
 
-    // 2. Fallback to legacy backend binding
-    let loaded = false;
-    try {
-        if (window.go && window.go.main && window.go.main.App) {
-            const settings = await window.go.main.App.GetSamplerSettings();
-            if (settings) {
-                setSamplerSettings(settings);
-                // Seed into unified store
-                if (window.settingsState?.current) {
-                    window.settingsState.current.sampler = settings;
-                }
-                loaded = true;
-            }
+    samplerSettings.forEach(setting => {
+        const slider = document.getElementById(setting.id);
+        const valueInput = document.getElementById(`${setting.id}-value`);
+        if (slider && valueInput) {
+            slider.value = setting.default;
+            valueInput.value = setting.default;
         }
-    } catch (error) {
-        console.error('Failed to load sampler settings from backend:', error);
-    }
-
-    // 3. Defaults
-    if (!loaded) {
-        samplerSettings.forEach(setting => {
-            const slider = document.getElementById(setting.id);
-            const valueInput = document.getElementById(`${setting.id}-value`);
-            if (slider && valueInput) {
-                slider.value = setting.default;
-                valueInput.value = setting.default;
-            }
-        });
-    }
+    });
 }
 
 // Apply a named preset to all sampler controls

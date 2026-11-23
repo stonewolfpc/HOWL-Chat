@@ -37,6 +37,10 @@
 *unet*
 *encoder*
 
+# These globs describe model artifacts, not source. A Go file under internal/
+# is always source, even when its name contains "vae" or "encoder".
+!internal/**/*.go
+
 # Local models directory
 models/
 
@@ -90,7 +94,7 @@ gollama.cpp/
 # BACKUP / HEAVYWEIGHT (not source; captured in backups/ snapshot instead)
 # =============================================================================
 backups/
-runtime/
+/runtime/
 .sd-upgrade/
 .freebuff/
 build/bin/

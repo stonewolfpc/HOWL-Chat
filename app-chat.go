@@ -549,7 +549,13 @@ func (a *App) parseLorebookEntryFromMap(m map[string]interface{}) (lorebook.Entr
 // ---------------------------------------------------------------------------
 
 func (a *App) GetSettings() map[string]interface{} {
-	return a.settings.All()
+	// The document plus the live sampler/model sections: one authoritative
+	// snapshot for the renderer's settings seam, so it never has to fall back
+	// to the legacy per-section bindings.
+	snapshot := a.settings.All()
+	snapshot["sampler"] = a.settings.Sampler()
+	snapshot["model"] = a.settings.Model()
+	return snapshot
 }
 
 func (a *App) SetSettings(settings map[string]interface{}) error {

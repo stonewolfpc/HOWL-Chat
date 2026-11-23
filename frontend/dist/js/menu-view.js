@@ -117,12 +117,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // default, so on any page that does not load settings-state.js it overrode
     // the restored mode and wrote 'dark' back to the mirror.
 
-    // UI Scale
-    const savedScale = s?.general?.uiScale || localStorage.getItem('howl-chat-ui-scale');
+    // UI Scale and Animation Speed are domain settings: they come only from
+    // the backend-authoritative settings snapshot, never a renderer cache key.
+    const savedScale = s?.general?.uiScale;
     if (savedScale) document.documentElement.style.setProperty('--ui-scale', savedScale);
 
-    // Animation Speed
-    const savedAnimSpeed = s?.general?.animationSpeed || localStorage.getItem('howl-chat-animation-speed');
+    const savedAnimSpeed = s?.general?.animationSpeed;
     if (savedAnimSpeed) document.documentElement.style.setProperty('--animation-speed', savedAnimSpeed);
 
     // Accessibility modes
@@ -138,4 +138,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const worldPanel = document.querySelector('.world-sidebar');
     if (worldPanel && s?.ui?.worldPanelHidden) worldPanel.classList.add('hidden');
+});
+
+// The settings snapshot arrives after DOMContentLoaded (the backend read is
+// async), so re-apply the presentation values when the authority answers.
+window.addEventListener('howl:settings-loaded', function () {
+    const s = window.settingsState?.current;
+    if (s?.general?.uiScale) document.documentElement.style.setProperty('--ui-scale', s.general.uiScale);
+    if (s?.general?.animationSpeed) document.documentElement.style.setProperty('--animation-speed', s.general.animationSpeed);
 });

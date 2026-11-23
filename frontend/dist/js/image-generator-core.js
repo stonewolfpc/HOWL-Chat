@@ -118,11 +118,11 @@ async function _persistPaths(modelsDir, sdPath) {
     try {
         if (modelsDir) await app.SetImageModelsDir(modelsDir);
         if (sdPath)    await app.SetSDServerPath(sdPath);
-        if (window.settingsState?.current) {
-            window.settingsState.current.imageGen = window.settingsState.current.imageGen || {};
-            window.settingsState.current.imageGen.modelsDir    = modelsDir;
-            window.settingsState.current.imageGen.sdServerPath = sdPath;
-            window.settingsState.saveSettings?.();
+        if (window.settingsState?.set) {
+            const imageGen = { ...(window.settingsState.get('imageGen') || {}) };
+            imageGen.modelsDir = modelsDir;
+            imageGen.sdServerPath = sdPath;
+            await window.settingsState.set('imageGen', imageGen);
         }
     } catch (err) {
         setStatus('Path error: ' + (err.message || err));
@@ -966,7 +966,7 @@ async function onGenerate() {
             // before declaring the engine lost: Chromium throttles timers in a
             // hidden tab (the browser harness) and WebView2 does the same to a
             // minimised window, which paused the 500 ms poll long enough for this
-            // watchdog to fire while the job was still generating — the harness
+            // watchdog to fire while the job was still generating ï¿½ the harness
             // showed "Lost contact with the image engine" beside a gallery that
             // already held the finished image.
             lastPollMs = Date.now();
@@ -982,7 +982,7 @@ async function onGenerate() {
                     if (abortReject) {
                         const fail = abortReject;
                         abortReject = null;
-                        fail(new Error('Lost contact with the image engine. The job may still finish in the background — check the gallery.'));
+                        fail(new Error('Lost contact with the image engine. The job may still finish in the background ï¿½ check the gallery.'));
                     }
                 } finally {
                     watchdogProbing = false;

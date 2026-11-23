@@ -14,7 +14,10 @@
 // localStorage Keys Used by HOWL Chat
 // ---------------------------------------------------------------------------
 const HOWL_LOCALSTORAGE_KEYS = [
-    'howl-chat-settings',
+    'howl-chat-settings',        // derived settings cache (backend is authoritative)
+    'howl-ui:settings-panel',    // renderer-only UI preference
+    'howl-chat-ui-scale',        // legacy keys superseded by backend settings
+    'howl-chat-animation-speed',
     'howl-worlds',
     'howl-chat-scenarios',
     'howl-chat-characters',
