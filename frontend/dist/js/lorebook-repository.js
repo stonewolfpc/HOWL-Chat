@@ -144,6 +144,7 @@
         importLegacy,
         rollback,
         readCache,
+        all() { return state.entries; },
         state
     };
 })();

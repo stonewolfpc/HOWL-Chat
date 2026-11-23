@@ -229,6 +229,13 @@ async function loadChatSessionById(sessionId) {
         // Do NOT syncAllDataToBackend here — LoadChat already set the backend state.
         // Re-syncing would overwrite chat-specific character/lorebook selections
         // with the full scenario defaults (e.g. all scenario characters).
+        if (window.ChatSessionPointer) {
+            window.ChatSessionPointer.write(
+                window.sidebarState?.currentChatData || { world, scenario, characters, lorebooks },
+                sessionId
+            );
+        }
+
         updateSessionInfoDisplay(meta);
         const loadedName = meta.Name || meta.name || 'New Chat';
         showNotification(`Chat session loaded: ${loadedName}`, 'success');
@@ -260,7 +267,7 @@ async function loadChatDataFromStorage() {
     if (!cachedSessionId) {
         console.warn('[loadChatDataFromStorage] cached session has no conversation id — discarding it');
         await window.HOWLStorage.deleteChatData('howl-chat-current-chat').catch(() => {});
-        localStorage.removeItem('howl-chat-current-session');
+        window.ChatSessionPointer?.clear();
         window.sidebarState.resetToDefaultState();
         await updateContextDisplay();
         return;
@@ -281,7 +288,7 @@ async function loadChatDataFromStorage() {
     if (!confirmed) {
         console.warn('[loadChatDataFromStorage] cached session', cachedSessionId, 'is not a present conversation — discarding cache');
         await window.HOWLStorage.deleteChatData('howl-chat-current-chat').catch(() => {});
-        localStorage.removeItem('howl-chat-current-session');
+        window.ChatSessionPointer?.clear();
         window.sidebarState.resetToDefaultState();
         await updateContextDisplay();
         return;
@@ -436,6 +443,7 @@ async function saveChatData() {
         });
 
         await window.HOWLStorage.setChatData('howl-chat-current-chat', JSON.parse(dataString));
+        if (window.ChatSessionPointer) window.ChatSessionPointer.write(cd);
         console.log('Chat data saved successfully to storage');
 
         // Sync full state to backend via SaveChatData (carries tracking arrays)
@@ -625,7 +633,7 @@ function deleteChatSession(chatId, chatName, onDeletedOrEvent) {
                 if (window.HOWLStorage) {
                     await window.HOWLStorage.deleteChatData('howl-chat-current-chat').catch(() => {});
                 }
-                localStorage.removeItem('howl-chat-current-session');
+                window.ChatSessionPointer?.clear();
 
                 // Update File > Load session list if it exists
                 if (typeof savedSessions !== 'undefined' && Array.isArray(savedSessions)) {

@@ -74,7 +74,7 @@ class DataSync {
                 if (window.HOWLStorage) {
                     window.HOWLStorage.deleteChatData('howl-chat-current-chat').catch(() => {});
                 }
-                localStorage.removeItem('howl-chat-current-session');
+                window.ChatSessionPointer?.clear();
                 console.log('[DataSync] no active chat on backend, cache cleared');
             }
         } catch (error) {
@@ -595,7 +595,7 @@ class DataSync {
         if (window.HOWLStorage) {
             window.HOWLStorage.deleteChatData('howl-chat-current-chat').catch(() => {});
         }
-        localStorage.removeItem('howl-chat-current-session');
+        window.ChatSessionPointer?.clear();
 
         console.log('[DataSync] autosave stopped and currentChatId cleared');
     }

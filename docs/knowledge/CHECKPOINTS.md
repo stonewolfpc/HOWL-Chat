@@ -5100,3 +5100,57 @@ Next: §21.5 item 5, chat session pointer.
 
 **Resume token:** `HEKI-CP-2026-11-23-101`
 **Next:** chat session pointer cutover (§21.5 item 5).
+
+## HEKI-CP-2026-11-23-102 — chat session pointer landed
+
+**Result: `howl-chat-current-session` is a chat-id and UI-selection pointer;
+full catalogs hydrate from their domain repositories.**
+
+`chat-session-pointer.js` is the only writer and reader of the key. The pointer
+is `{version: 2, chatId, selection: {worldId, scenarioId, characters,
+lorebookIds, activeCharacterIds, removedCharacterIds, addedCharacterIds,
+activeLorebookIds, removedLorebookIds, addedLorebookIds}}`. Character entries
+keep `{id}` plus only the UI fields `status`, `active`, `stepOutReason` and
+`stepOutMode`; no names or other catalog records are stored. `hydrate()` awaits
+`WorldRepository`, `ScenarioRepository`, `CharacterStorage` and `LorebookRepo`,
+resolves records by id, and merges the stored character UI fields. A legacy
+session blob is converted to the id-only shape once, kept only in memory for
+first hydration, and rewritten as a pointer. `LorebookRepo` gained `all()` and
+is loaded on the chat page.
+
+`context-data.js` delegates writes to `ChatSessionPointer.write` and loads via
+`read()`/`hydrate()`. `sidebar-session.js` writes after session load and chat
+data cache saves; its load/new-chat/delete paths use `clear()`. `data-sync.js`
+uses `clear()` on reset paths. `app-wipe.js` still names the key only so a full
+reset removes it. A static test rejects any other module naming the key.
+
+**Verification (edited tree).** `node --check` on the five edited renderer
+modules: 0 each. `node --test tests/renderer/*.test.js`: 39/39 pass, including
+6 new pointer tests. `go build ./...`: 0. `go vet ./...`: 0. Full
+`go test ./... -skip TestProbeMicrophoneOnHost -count=1`: 0.
+
+**User-visible evidence.** Browser dev host `127.0.0.1:8799` with an isolated
+OS-temp root: created a chat; selected the fixture world, scenario and
+character through the UI. The raw pointer held only the chat id and ids
+(`item5-world`, `item5-scenario`, `item5-character`) with no catalog text;
+live hydration returned the canonical titles from the repositories; reload
+restored all three in the UI. Packaged WebView2 host, rebuilt from the edited
+tree with a separate isolated root: repeated the same selection workflow, read
+the WebView2 Local Storage record back with only the chat id and ids, then
+closed and reopened the app and saw all three panels restored. No packaged
+devtools were needed; the record was read from the WebView2 profile after the
+UI showed the final selection.
+
+**Code contents (10 files):** `chat-session-pointer.js` (new), `context-data.js`,
+`sidebar-session.js`, `data-sync.js`, `lorebook-repository.js`, `index.html`,
+`story-tools.html`, `tests/renderer/chat-session-pointer.test.js` (new), HOC
+§21.11 and this checkpoint. No Go source, eval, experiments, config or build
+artifacts. Nothing pushed.
+
+**Left open.** §21.5 item 6 remains dependent on per-domain cutover markers;
+only `LorebookRepo` currently reports `cutover`. Other context-entry paths that
+add lorebooks still read the pre-cutover lorebook cache directly. The pointer
+itself no longer duplicates catalog records.
+
+**Resume token:** `HEKI-CP-2026-11-23-102`
+**Next:** per-domain cutover/rollback markers, then §21.5 item 6.

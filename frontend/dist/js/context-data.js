@@ -179,36 +179,20 @@ class ContextDisplay {
 
     async loadChatDataFromStorage() {
         try {
-            const stored = localStorage.getItem('howl-chat-current-session');
-            if (stored) {
-                const light          = JSON.parse(stored);
-                const allWorlds      = window.WorldRepository.all();
-                const allScenarios   = window.ScenarioRepository.all();
-                const allCharacters  = (window.CharacterStorage?.all?.() || []);
-                const allLorebooks   = JSON.parse(localStorage.getItem('howl-chat-lorebooks')    || '[]');
-                this.currentChatData = {
-                    characters: light.characters ? light.characters.map(lc => {
-                        const full = allCharacters.find(ac => ac.id === lc.id);
-                        if (!full) return null;
-                        return {
-                            ...full,
-                            status:        lc.status        || full.status,
-                            active:        typeof lc.active === 'boolean' ? lc.active : full.active,
-                            stepOutReason: lc.stepOutReason || full.stepOutReason,
-                            stepOutMode:   lc.stepOutMode   || full.stepOutMode
-                        };
-                    }).filter(Boolean) : [],
-                    world:      light.world      ? allWorlds.find(aw => aw.id === light.world.id)           : null,
-                    scenario:   light.scenario   ? allScenarios.find(as => as.id === light.scenario.id)     : null,
-                    lorebooks:  light.lorebooks  ? light.lorebooks.map(ll => allLorebooks.find(al => al.id === ll.id)).filter(Boolean) : [],
-                    chatName:   light.chatName || 'New Chat'
-                };
+            const pointer = window.ChatSessionPointer?.read();
+            if (pointer) {
+                this.currentChatData = await window.ChatSessionPointer.hydrate(pointer);
+                // A pre-pointer blob is rewritten as the id-only envelope after
+                // its records have been resolved from the domain repositories.
+                if (pointer.legacy) {
+                    window.ChatSessionPointer.write(this.currentChatData, pointer.chatId);
+                }
             } else {
                 this.resetToDefaultState();
             }
             await this.updateContextDisplay();
         } catch (error) {
-            console.error('Failed to load from localStorage:', error);
+            console.error('Failed to restore the chat session pointer:', error);
             this.resetToDefaultState();
             await this.updateContextDisplay();
         }
@@ -228,24 +212,9 @@ class ContextDisplay {
 
     saveChatData() {
         try {
-            const cd = this.currentChatData;
-            const light = {
-                characters: cd.characters ? cd.characters.map(c => ({ id: c.id, name: c.name })) : [],
-                world: cd.world ? { id: cd.world.id, name: cd.world.name, title: cd.world.title } : null,
-                scenario: cd.scenario ? { id: cd.scenario.id, name: cd.scenario.name, title: cd.scenario.title } : null,
-                lorebooks: cd.lorebooks ? cd.lorebooks.map(lb => ({ id: lb.id, name: lb.name, title: lb.title })) : [],
-                chatName: cd.chatName,
-                // Tracking arrays
-                activeCharacterIds:  cd.activeCharacterIds  || [],
-                removedCharacterIds: cd.removedCharacterIds || [],
-                addedCharacterIds:   cd.addedCharacterIds   || [],
-                activeLorebookIds:   cd.activeLorebookIds   || [],
-                removedLorebookIds:  cd.removedLorebookIds  || [],
-                addedLorebookIds:    cd.addedLorebookIds    || []
-            };
-            localStorage.setItem('howl-chat-current-session', JSON.stringify(light));
+            window.ChatSessionPointer?.write(this.currentChatData);
         } catch (error) {
-            console.error('Failed to save chat data:', error);
+            console.error('Failed to save the chat session pointer:', error);
         }
     }
 
