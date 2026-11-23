@@ -79,7 +79,7 @@ async function updateWorldDisplay() {
 }
 
 function openWorldSelector() {
-    const worlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
+    const worlds = window.WorldRepository.all();
     const cd     = window.sidebarState.currentChatData;
 
     const modal = document.createElement('div');
@@ -126,7 +126,7 @@ function openWorldSelector() {
 }
 
 async function selectWorld(worldId) {
-    const worlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
+    const worlds = window.WorldRepository.all();
     const world  = worlds.find(w => w.id === worldId);
     if (!world) { console.error('World not found:', worldId); return; }
 

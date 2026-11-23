@@ -125,7 +125,7 @@ function _renderWorldList(worlds, activeWorldId) {
 // ---------------------------------------------------------------------------
 
 ContextDisplay.prototype.openWorldSelector = function () {
-    const allWorlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
+    const allWorlds = window.WorldRepository.all();
     const activeWorldId = this.currentChatData.world?.id;
     const fe = window.FilterEngine;
 
@@ -158,7 +158,7 @@ ContextDisplay.prototype.openWorldSelector = function () {
 };
 
 ContextDisplay.prototype.selectWorld = async function (worldId) {
-    const worlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
+    const worlds = window.WorldRepository.all();
     let world  = worlds.find(w => w.id === worldId);
     if (!world) return;
 
@@ -177,7 +177,7 @@ ContextDisplay.prototype.selectWorld = async function (worldId) {
     this.currentChatData.characters = [];
     this.currentChatData.lorebooks  = [];
 
-    const scenariosCatalog  = JSON.parse(localStorage.getItem('howl-chat-scenarios')  || '[]');
+    const scenariosCatalog  = window.ScenarioRepository.all();
     const charactersCatalog = (window.CharacterStorage?.all?.() || []);
     const lorebooksCatalog  = JSON.parse(localStorage.getItem('howl-chat-lorebooks')  || '[]');
 
@@ -300,7 +300,7 @@ function _filterableModalShellWithAttach(title, listHtml, cancelOnclick, newLabe
 }
 
 ContextDisplay.prototype.openScenarioSelector = function () {
-    const allScenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+    const allScenarios = window.ScenarioRepository.all();
     const activeScenarioId = this.currentChatData.scenario?.id;
     const currentWorld = this.currentChatData.world;
     const fe = window.FilterEngine;
@@ -340,7 +340,7 @@ ContextDisplay.prototype.openScenarioSelector = function () {
 };
 
 ContextDisplay.prototype.selectScenario = async function (scenarioId) {
-    const scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+    const scenarios = window.ScenarioRepository.all();
     let scenario  = scenarios.find(s => s.id === scenarioId);
     if (!scenario) return;
 

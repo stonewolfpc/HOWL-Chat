@@ -29,21 +29,10 @@ class WorldManager {
      */
     loadWorlds() {
         try {
-            this.worlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
+            this.worlds = window.WorldRepository.all();
         } catch (error) {
             console.error('Failed to load worlds:', error);
             this.worlds = [];
-        }
-    }
-
-    /**
-     * Save worlds to localStorage
-     */
-    saveWorlds() {
-        try {
-            localStorage.setItem('howl-worlds', JSON.stringify(this.worlds));
-        } catch (error) {
-            console.error('Failed to save worlds:', error);
         }
     }
 
@@ -293,7 +282,7 @@ class WorldManager {
     getAvailableItems(type) {
         switch (type) {
             case 'scenario':
-                return JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+                return window.ScenarioRepository.all();
             case 'character':
                 return (window.CharacterStorage?.all?.() || []);
             case 'lorebook':
@@ -335,7 +324,7 @@ class WorldManager {
     /**
      * Save world
      */
-    saveWorld() {
+    async saveWorld() {
         const title = document.getElementById('world-title').value.trim();
         const details = document.getElementById('world-details').value.trim();
 
@@ -344,8 +333,10 @@ class WorldManager {
             return;
         }
 
+        const existing = this.editingWorldId ? window.WorldRepository.get(this.editingWorldId) : null;
         const worldData = {
-            id: this.editingWorldId || Date.now().toString(),
+            ...(existing || {}),
+            id: this.editingWorldId || undefined,
             title: title,
             details: details,
             image: document.getElementById('world-image-preview').src || null,
@@ -354,20 +345,19 @@ class WorldManager {
             howl: {
                 lorebooks: this.selectedLorebooks
             },
-            createdAt: new Date().toISOString(),
+            createdAt: existing?.createdAt || new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
 
-        if (this.editingWorldId) {
-            const index = this.worlds.findIndex(w => w.id === this.editingWorldId);
-            if (index !== -1) {
-                this.worlds[index] = worldData;
-            }
-        } else {
-            this.worlds.push(worldData);
+        try {
+            await window.WorldRepository.save(worldData);
+            this.loadWorlds();
+        } catch (error) {
+            console.error('Failed to save world:', error);
+            alert('Failed to save world: ' + error.message);
+            return;
         }
 
-        this.saveWorlds();
         this.closeWorldCreationPopup();
 
         // Show success message
@@ -380,13 +370,19 @@ class WorldManager {
      * Delete world
      * @param {string} worldId - World ID to delete
      */
-    deleteWorld(worldId) {
+    async deleteWorld(worldId) {
         const world = this.getWorldById(worldId);
         if (!world) return;
 
         if (confirm(`Delete world "${world.title}"? This action cannot be undone.`)) {
-            this.worlds = this.worlds.filter(w => w.id !== worldId);
-            this.saveWorlds();
+            try {
+                await window.WorldRepository.remove(worldId);
+                this.loadWorlds();
+            } catch (error) {
+                console.error('Failed to delete world:', error);
+                alert('Failed to delete world: ' + error.message);
+                return;
+            }
 
             if (typeof showNotification === 'function') {
                 showNotification(`World deleted: ${world.title}`, 'success');

@@ -101,10 +101,6 @@ StorageManager.prototype.compactScenarioImages = async function (scenarios) {
             }
         }
     }
-    if (changed) {
-        try { localStorage.setItem('howl-chat-scenarios', JSON.stringify(scenarios)); }
-        catch (error) { console.warn('Could not persist compacted scenarios:', error); }
-    }
     return changed;
 };
 
@@ -114,9 +110,6 @@ StorageManager.prototype.compactScenarioImages = async function (scenarios) {
 
 StorageManager.prototype.storeScenario = async function (scenarioData) {
     await this.initialize();
-    const scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
-    await this.compactScenarioImages(scenarios);
-
     const processedData = { ...scenarioData };
     if (!processedData.id) processedData.id = this.generateId();
 
@@ -151,23 +144,8 @@ StorageManager.prototype.storeScenario = async function (scenarioData) {
         processedData.images = storedImages;
     }
 
-    // Strip all blob data (thumbnail + character avatars) before localStorage write
-    const lsData = _stripScenarioBlobs(processedData);
-
     try {
-        const fresh = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
-        await this.compactScenarioImages(fresh);
-        fresh.push(lsData);
-        try {
-            localStorage.setItem('howl-chat-scenarios', JSON.stringify(fresh));
-        } catch (quotaErr) {
-            if (quotaErr.name === 'QuotaExceededError') {
-                // Strip blobs from all existing entries and retry
-                localStorage.setItem('howl-chat-scenarios', JSON.stringify(fresh.map(_stripScenarioBlobs)));
-            } else {
-                throw quotaErr;
-            }
-        }
+        await window.ScenarioRepository.save(_stripScenarioBlobs(processedData));
         return true;
     } catch (error) {
         console.error('Failed to store scenario:', error);
@@ -180,7 +158,7 @@ StorageManager.prototype.storeScenario = async function (scenarioData) {
 // ---------------------------------------------------------------------------
 
 StorageManager.prototype.getScenario = async function (scenarioId) {
-    const scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+    const scenarios = window.ScenarioRepository.all();
     const scenario  = scenarios.find(s => s.id === scenarioId);
     if (!scenario) return null;
 
@@ -202,13 +180,13 @@ StorageManager.prototype.getScenario = async function (scenarioId) {
 
 StorageManager.prototype.updateScenario = async function (index, scenarioData) {
     await this.initialize();
-    const scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+    const scenarios = window.ScenarioRepository.all();
     if (index < 0 || index >= scenarios.length) throw new Error('Invalid scenario index for update');
-
-    await this.compactScenarioImages(scenarios);
 
     const processedData = { ...scenarioData };
     const oldScenario   = scenarios[index];
+    processedData.id = oldScenario.id;
+    if (oldScenario.revision) processedData.revision = oldScenario.revision;
 
     if (scenarioData.image && scenarioData.image.data) {
         const sameStored = oldScenario.image?.stored && scenarioData.image.id && oldScenario.image.id === scenarioData.image.id;
@@ -279,20 +257,8 @@ StorageManager.prototype.updateScenario = async function (index, scenarioData) {
         processedData.images = [];
     }
 
-    // Strip all blob data (thumbnail + character avatars) before localStorage write
-    scenarios[index] = _stripScenarioBlobs(processedData);
-
     try {
-        try {
-            localStorage.setItem('howl-chat-scenarios', JSON.stringify(scenarios));
-        } catch (quotaErr) {
-            if (quotaErr.name === 'QuotaExceededError') {
-                // Strip blobs from every entry and retry
-                localStorage.setItem('howl-chat-scenarios', JSON.stringify(scenarios.map(_stripScenarioBlobs)));
-            } else {
-                throw quotaErr;
-            }
-        }
+        await window.ScenarioRepository.save(_stripScenarioBlobs(processedData));
         return true;
     } catch (error) {
         console.error('Failed to update scenario:', error);
@@ -329,7 +295,7 @@ function _stripWorldBlobs(world) {
 
 StorageManager.prototype.storeWorld = async function (worldData) {
     await this.initialize();
-    const worlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
+    const worlds = window.WorldRepository.all();
 
     const processedData = { ...worldData };
     if (!processedData.id) processedData.id = this.generateId();
@@ -379,19 +345,14 @@ StorageManager.prototype.storeWorld = async function (worldData) {
                 await this.deleteImage(oldImg.id, 'world').catch(() => {});
             }
         }
-        worlds[existingIndex] = lsData;
-    } else {
-        worlds.push(lsData);
     }
 
     try {
-        localStorage.setItem('howl-worlds', JSON.stringify(worlds));
-    } catch (quotaErr) {
-        if (quotaErr.name === 'QuotaExceededError') {
-            localStorage.setItem('howl-worlds', JSON.stringify(worlds.map(_stripWorldBlobs)));
-        } else { throw quotaErr; }
+        return await window.WorldRepository.save(lsData);
+    } catch (error) {
+        console.error('Failed to store world:', error);
+        throw error;
     }
-    return processedData;
 };
 
 // ---------------------------------------------------------------------------
@@ -400,23 +361,22 @@ StorageManager.prototype.storeWorld = async function (worldData) {
 
 StorageManager.prototype.deleteWorld = async function (worldId) {
     await this.initialize();
-    const worlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
-    const idx    = worlds.findIndex(w => w.id === worldId);
-    if (idx < 0) return;
+    const world = window.WorldRepository.get(worldId);
+    if (!world) return;
 
-    if (worlds[idx].image?.stored) {
-        await this.deleteImage(worlds[idx].image.id, 'world').catch(() => {});
+    // The canonical delete must succeed before derived media is discarded.
+    await window.WorldRepository.remove(worldId);
+
+    if (world.image?.stored) {
+        await this.deleteImage(world.image.id, 'world').catch(() => {});
     }
-    // Delete multi-image array images from IndexedDB
-    if (worlds[idx].images && Array.isArray(worlds[idx].images)) {
-        for (const img of worlds[idx].images) {
+    if (world.images && Array.isArray(world.images)) {
+        for (const img of world.images) {
             if (img && img.stored && img.id) {
                 await this.deleteImage(img.id, 'world').catch(() => {});
             }
         }
     }
-    worlds.splice(idx, 1);
-    localStorage.setItem('howl-worlds', JSON.stringify(worlds));
 };
 
 // ---------------------------------------------------------------------------
@@ -425,16 +385,18 @@ StorageManager.prototype.deleteWorld = async function (worldId) {
 
 StorageManager.prototype.deleteScenario = async function (index) {
     await this.initialize();
-    const scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+    const scenarios = window.ScenarioRepository.all();
     if (index < 0 || index >= scenarios.length) throw new Error('Invalid scenario index for deletion');
 
     const scenario = scenarios[index];
+    // The canonical delete must succeed before derived media is discarded.
+    await window.ScenarioRepository.remove(scenario.id);
+
     if (scenario.image && scenario.image.stored) {
         try { await this.deleteImage(scenario.image.id, 'scenario'); }
         catch (error) { console.warn('Failed to delete scenario image:', error); }
     }
 
-    // Delete multi-image array images from IndexedDB
     if (scenario.images && Array.isArray(scenario.images)) {
         for (const img of scenario.images) {
             if (img && img.stored && img.id) {
@@ -443,15 +405,7 @@ StorageManager.prototype.deleteScenario = async function (index) {
             }
         }
     }
-
-    scenarios.splice(index, 1);
-    try {
-        localStorage.setItem('howl-chat-scenarios', JSON.stringify(scenarios));
-        return true;
-    } catch (error) {
-        console.error('Failed to delete scenario:', error);
-        throw error;
-    }
+    return true;
 };
 
 // ---------------------------------------------------------------------------

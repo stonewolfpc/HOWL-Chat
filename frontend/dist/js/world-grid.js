@@ -108,12 +108,12 @@ async function copyWorld(worldId) {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };
-    if (window.HOWLStorage) {
-        await window.HOWLStorage.storeWorld(copy).catch(err => console.warn('copyWorld storage failed:', err));
-        ws.worlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
-    } else {
-        ws.worlds.push(copy);
-        localStorage.setItem('howl-worlds', JSON.stringify(ws.worlds));
+    try {
+        await window.WorldRepository.save(copy);
+        ws.worlds = window.WorldRepository.all();
+    } catch (err) {
+        console.warn('copyWorld storage failed:', err);
+        return;
     }
     renderWorldGrid();
 }
@@ -128,11 +128,11 @@ async function deleteWorld(worldId) {
         body:  'The world, its image, and all associated chat references will be removed.',
         onConfirm: async () => {
             if (window.DeleteService) window.DeleteService.detachWorldFromAll(worldId);
-            if (window.HOWLStorage) {
-                await window.HOWLStorage.deleteWorld(worldId).catch(err => console.warn('deleteWorld storage failed:', err));
-            } else {
-                ws.worlds = ws.worlds.filter(w => w.id !== worldId);
-                localStorage.setItem('howl-worlds', JSON.stringify(ws.worlds));
+            try {
+                await window.WorldRepository.remove(worldId);
+            } catch (err) {
+                console.error('deleteWorld storage failed:', err);
+                return;
             }
             await loadWorlds();
         }
@@ -158,7 +158,8 @@ async function loadWorldForUse(worldId) {
 // ---------------------------------------------------------------------------
 
 async function loadWorlds() {
-    let worlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
+    if (window.WorldRepository?.ready) await window.WorldRepository.ready;
+    let worlds = window.WorldRepository.all();
 
     // Rehydrate images from IndexedDB before storing in state
     if (window.HOWLStorage) {

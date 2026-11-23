@@ -20,11 +20,10 @@
 const DeleteService = (() => {
 
     // -----------------------------------------------------------------------
-    // localStorage helpers
+    // Repository helpers
     // -----------------------------------------------------------------------
 
-    function _readLS(key)       { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; } }
-    function _writeLS(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { console.warn('DeleteService _writeLS:', e); } }
+    function _clone(list) { return JSON.parse(JSON.stringify(list || [])); }
 
     // -----------------------------------------------------------------------
     // World detach
@@ -61,18 +60,21 @@ const DeleteService = (() => {
      * - Clears scenario from active chat state
      * @param {string} scenarioId
      */
-    function detachScenarioFromAll(scenarioId) {
-        // Remove from worlds
-        const worlds = _readLS('howl-worlds');
-        let worldsChanged = false;
+    async function detachScenarioFromAll(scenarioId) {
+        // Remove from worlds through the canonical repository.
+        const worlds = _clone(window.WorldRepository.all());
+        const changed = [];
         worlds.forEach(w => {
             if (w.howl && Array.isArray(w.howl.scenarios)) {
                 const before = w.howl.scenarios.length;
                 w.howl.scenarios = w.howl.scenarios.filter(s => s.id !== scenarioId);
-                if (w.howl.scenarios.length !== before) worldsChanged = true;
+                if (w.howl.scenarios.length !== before) changed.push(w);
             }
         });
-        if (worldsChanged) _writeLS('howl-worlds', worlds);
+        for (const world of changed) {
+            try { await window.WorldRepository.save(world); }
+            catch (e) { console.warn('[DeleteService] world scenario detach save failed:', e); }
+        }
 
         // Clear from active chat
         if (window.chatBridge) {
@@ -100,28 +102,34 @@ const DeleteService = (() => {
      */
     async function detachCharacterFromAll(charId) {
         // Remove from scenarios
-        const scenarios = _readLS('howl-chat-scenarios');
-        let scenariosChanged = false;
+        const scenarios = _clone(window.ScenarioRepository.all());
+        const changedScenarios = [];
         scenarios.forEach(s => {
             if (Array.isArray(s.characters)) {
                 const before = s.characters.length;
                 s.characters = s.characters.filter(c => c.id !== charId);
-                if (s.characters.length !== before) scenariosChanged = true;
+                if (s.characters.length !== before) changedScenarios.push(s);
             }
         });
-        if (scenariosChanged) _writeLS('howl-chat-scenarios', scenarios);
+        for (const scenario of changedScenarios) {
+            try { await window.ScenarioRepository.save(scenario); }
+            catch (e) { console.warn('[DeleteService] scenario character detach save failed:', e); }
+        }
 
         // Remove from worlds
-        const worlds = _readLS('howl-worlds');
-        let worldsChanged = false;
+        const worlds = _clone(window.WorldRepository.all());
+        const changedWorlds = [];
         worlds.forEach(w => {
             if (w.howl && Array.isArray(w.howl.characters)) {
                 const before = w.howl.characters.length;
                 w.howl.characters = w.howl.characters.filter(c => c.id !== charId);
-                if (w.howl.characters.length !== before) worldsChanged = true;
+                if (w.howl.characters.length !== before) changedWorlds.push(w);
             }
         });
-        if (worldsChanged) _writeLS('howl-worlds', worlds);
+        for (const world of changedWorlds) {
+            try { await window.WorldRepository.save(world); }
+            catch (e) { console.warn('[DeleteService] world character detach save failed:', e); }
+        }
 
         // Remove from active chat bridge + backend
         if (window.chatBridge) {
@@ -152,28 +160,34 @@ const DeleteService = (() => {
      */
     async function detachLorebookFromAll(lbId) {
         // Remove from worlds
-        const worlds = _readLS('howl-worlds');
-        let worldsChanged = false;
+        const worlds = _clone(window.WorldRepository.all());
+        const changedWorlds = [];
         worlds.forEach(w => {
             if (w.howl && Array.isArray(w.howl.lorebooks)) {
                 const before = w.howl.lorebooks.length;
                 w.howl.lorebooks = w.howl.lorebooks.filter(l => l.id !== lbId);
-                if (w.howl.lorebooks.length !== before) worldsChanged = true;
+                if (w.howl.lorebooks.length !== before) changedWorlds.push(w);
             }
         });
-        if (worldsChanged) _writeLS('howl-worlds', worlds);
+        for (const world of changedWorlds) {
+            try { await window.WorldRepository.save(world); }
+            catch (e) { console.warn('[DeleteService] world lorebook detach save failed:', e); }
+        }
 
         // Remove from scenarios
-        const scenarios = _readLS('howl-chat-scenarios');
-        let scenariosChanged = false;
+        const scenarios = _clone(window.ScenarioRepository.all());
+        const changedScenarios = [];
         scenarios.forEach(s => {
             if (Array.isArray(s.lorebooks)) {
                 const before = s.lorebooks.length;
                 s.lorebooks = s.lorebooks.filter(l => l.id !== lbId);
-                if (s.lorebooks.length !== before) scenariosChanged = true;
+                if (s.lorebooks.length !== before) changedScenarios.push(s);
             }
         });
-        if (scenariosChanged) _writeLS('howl-chat-scenarios', scenarios);
+        for (const scenario of changedScenarios) {
+            try { await window.ScenarioRepository.save(scenario); }
+            catch (e) { console.warn('[DeleteService] scenario lorebook detach save failed:', e); }
+        }
 
         // Remove from characters through the canonical store. Work on a copy so
         // a failed save cannot leave the repository projection mutated.

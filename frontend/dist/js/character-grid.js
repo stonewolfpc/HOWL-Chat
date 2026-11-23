@@ -215,8 +215,8 @@ function deleteCharacter(index, event) {
     window.DeleteConfirm.show({
         title: `Delete "${target.name || 'this character'}"?`,
         body:  'The character and its images will be removed. They will be detached from all scenarios and the active chat. Lorebooks are kept.',
-        onConfirm: () => {
-            if (window.DeleteService) window.DeleteService.detachCharacterFromAll(target.id);
+        onConfirm: async () => {
+            if (window.DeleteService) await window.DeleteService.detachCharacterFromAll(target.id);
             window.CharacterStorage.remove(target.id)
                 .then(() => {
                     cs.characterCache = null;

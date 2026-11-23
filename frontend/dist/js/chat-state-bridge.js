@@ -642,7 +642,7 @@ function _emitScenarioSwapEvent(prev, next) {
 function _enrichWorldFromLocalStorage(world) {
     if (!world || !world.id) return;
     try {
-        const stored = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
+        const stored = window.WorldRepository.all();
         const match  = stored.find(w => w.id === world.id);
         if (!match) return;
         if (!world.name  || world.name  === '') world.name  = match.title || match.name  || world.name;
@@ -666,7 +666,7 @@ function _enrichWorldFromLocalStorage(world) {
 function _enrichScenarioFromLocalStorage(scenario) {
     if (!scenario || !scenario.id) return;
     try {
-        const stored = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+        const stored = window.ScenarioRepository.all();
         const match  = stored.find(s => s.id === scenario.id);
         if (!match) return;
         if (!scenario.name  || scenario.name  === '') scenario.name  = match.title || match.name  || scenario.name;

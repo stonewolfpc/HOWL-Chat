@@ -80,7 +80,7 @@ async function updateScenarioDisplay() {
 }
 
 function openScenarioSelector() {
-    const scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+    const scenarios = window.ScenarioRepository.all();
     const cd        = window.sidebarState.currentChatData;
 
     let attachedScenarios  = [];
@@ -170,7 +170,7 @@ function filterScenarios(searchTerm) {
 }
 
 async function selectScenario(scenarioId) {
-    const scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+    const scenarios = window.ScenarioRepository.all();
     const scenario  = scenarios.find(s => s.id === scenarioId);
     if (!scenario) return;
 

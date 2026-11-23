@@ -154,7 +154,7 @@ function collectScenarioData() {
     baseData.lorebooks = baseData.howl.lorebooks;
 
     if (ss.editingScenarioIndex >= 0) {
-        const scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+        const scenarios = window.ScenarioRepository.all();
         const existing  = scenarios[ss.editingScenarioIndex];
         if (existing?.id) {
             baseData.id = existing.id;

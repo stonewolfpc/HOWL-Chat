@@ -113,7 +113,7 @@ async function loadAvailableScenarios() {
     if (!dropdownItems) return;
 
     try {
-        const scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+        const scenarios = window.ScenarioRepository.all();
         if (scenarios.length === 0) {
             dropdownItems.innerHTML = `<div class="world-dropdown-item disabled"><span class="world-dropdown-item-text">No scenarios created yet</span></div>`;
             window._worldDropdownCache.scenarios = [];

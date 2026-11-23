@@ -30,7 +30,7 @@ async function loadContextData() {
 
 
 function loadScenarios() {
-    const scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+    const scenarios = window.ScenarioRepository.all();
     console.log('Loaded scenarios:', scenarios);
 }
 

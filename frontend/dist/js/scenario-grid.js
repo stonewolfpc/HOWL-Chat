@@ -20,7 +20,8 @@ async function loadScenarios() {
     const grid = document.getElementById('scenario-grid');
     if (!grid) return;
 
-    let scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+    if (window.ScenarioRepository?.ready) await window.ScenarioRepository.ready;
+    let scenarios = window.ScenarioRepository.all();
 
     // Rehydrate images from IndexedDB before rendering
     if (window.HOWLStorage) {
@@ -81,7 +82,7 @@ function editScenarioWrapper(index) { editScenario(index, null); }
 async function editScenario(index, event) {
     if (event) event.stopPropagation();
 
-    let scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+    let scenarios = window.ScenarioRepository.all();
     let scenario  = scenarios[index];
 
     // Rehydrate images from IndexedDB before editing
@@ -157,7 +158,7 @@ function deleteScenarioWrapper(index) { deleteScenario(index, null); }
 async function deleteScenario(index, event) {
     if (event) event.stopPropagation();
 
-    const scenarios    = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+    const scenarios    = window.ScenarioRepository.all();
     const scenario     = scenarios[index];
     const scenarioName = scenario?.title || 'Unnamed scenario';
     const scenarioId   = scenario?.id;
@@ -166,20 +167,13 @@ async function deleteScenario(index, event) {
         title: `Delete "${scenarioName}"?`,
         body:  'The scenario, its image, and all world/chat references will be removed. Lorebooks are kept.',
         onConfirm: async () => {
-            if (window.DeleteService && scenarioId) window.DeleteService.detachScenarioFromAll(scenarioId);
+            if (window.DeleteService && scenarioId) await window.DeleteService.detachScenarioFromAll(scenarioId);
             try {
-                if (!window.HOWLStorage) throw new Error('Storage manager not available');
-                await window.HOWLStorage.deleteScenario(index);
+                if (!scenarioId) throw new Error('Scenario identity is missing');
+                await window.ScenarioRepository.remove(scenarioId);
                 loadScenarios();
             } catch (error) {
                 console.error('Failed to delete scenario:', error);
-                try {
-                    scenarios.splice(index, 1);
-                    localStorage.setItem('howl-chat-scenarios', JSON.stringify(scenarios));
-                    loadScenarios();
-                } catch (fallbackError) {
-                    console.error('Fallback deletion failed:', fallbackError);
-                }
             }
         }
     });

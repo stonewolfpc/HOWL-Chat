@@ -75,13 +75,13 @@ class LorebookManager {
     getLorebooksBySource(source, sourceId) {
         switch (source) {
             case 'world':
-                const world = JSON.parse(localStorage.getItem('howl-worlds') || '[]')
+                const world = window.WorldRepository.all()
                     .find(w => w.id === sourceId);
                 return world && world.howl && world.howl.lorebooks ?
                     this.lorebooks.filter(l => world.howl.lorebooks.some(wl => wl.id === l.id)) : [];
 
             case 'scenario':
-                const scenario = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]')
+                const scenario = window.ScenarioRepository.all()
                     .find(s => s.id === sourceId);
                 return scenario && scenario.lorebooks ?
                     this.lorebooks.filter(l => scenario.lorebooks.some(sl => sl.id === l.id)) : [];
@@ -103,8 +103,8 @@ class LorebookManager {
      * @returns {Object} Source information {type, id, name}
      */
     getLorebookSource(lorebookId) {
-        const worlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
-        const scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+        const worlds = window.WorldRepository.all();
+        const scenarios = window.ScenarioRepository.all();
         const characters = (window.CharacterStorage?.all?.() || []);
 
         // Check worlds
@@ -293,8 +293,8 @@ class LorebookManager {
         window.DeleteConfirm.show({
             title: `Delete "${lorebook.title}"?`,
             body:  'The lorebook entry will be permanently removed and detached from all worlds, scenarios, and characters. Chat sessions will no longer include it.',
-            onConfirm: () => {
-                if (window.DeleteService) window.DeleteService.detachLorebookFromAll(lorebookId);
+            onConfirm: async () => {
+                if (window.DeleteService) await window.DeleteService.detachLorebookFromAll(lorebookId);
                 this.lorebooks = this.lorebooks.filter(l => l.id !== lorebookId);
                 this.saveLorebooks();
                 if (typeof showNotification === 'function') {
@@ -427,7 +427,7 @@ class LorebookManager {
      */
     createLorebookSelectorContent() {
         const currentChatData = window.contextDisplay?.currentChatData || { lorebooks: [], world: null };
-        const worlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
+        const worlds = window.WorldRepository.all();
         const currentWorld = currentChatData.world;
 
         let attachedLorebooks = [];

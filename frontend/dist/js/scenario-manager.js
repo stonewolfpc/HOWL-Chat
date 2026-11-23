@@ -28,21 +28,10 @@ class ScenarioManager {
      */
     loadScenarios() {
         try {
-            this.scenarios = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]');
+            this.scenarios = window.ScenarioRepository.all();
         } catch (error) {
             console.error('Failed to load scenarios:', error);
             this.scenarios = [];
-        }
-    }
-
-    /**
-     * Save scenarios to localStorage
-     */
-    saveScenarios() {
-        try {
-            localStorage.setItem('howl-chat-scenarios', JSON.stringify(this.scenarios));
-        } catch (error) {
-            console.error('Failed to save scenarios:', error);
         }
     }
 
@@ -327,7 +316,7 @@ class ScenarioManager {
     /**
      * Save scenario
      */
-    saveScenario() {
+    async saveScenario() {
         const titleEl = document.getElementById('scenario-title');
         const detailsEl = document.getElementById('scenario-details');
         const objectiveEl = document.getElementById('scenario-objective');
@@ -341,27 +330,28 @@ class ScenarioManager {
             return;
         }
 
+        const existing = this.editingScenarioId ? window.ScenarioRepository.get(this.editingScenarioId) : null;
         const scenarioData = {
-            id: this.editingScenarioId || Date.now().toString(),
+            ...(existing || {}),
+            id: this.editingScenarioId || undefined,
             title: title,
             details: details,
             objective: objective,
             characters: this.selectedCharacters,
             lorebooks: this.selectedLorebooks,
-            createdAt: new Date().toISOString(),
+            createdAt: existing?.createdAt || new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
 
-        if (this.editingScenarioId) {
-            const index = this.scenarios.findIndex(s => s.id === this.editingScenarioId);
-            if (index !== -1) {
-                this.scenarios[index] = scenarioData;
-            }
-        } else {
-            this.scenarios.push(scenarioData);
+        try {
+            await window.ScenarioRepository.save(scenarioData);
+            this.loadScenarios();
+        } catch (error) {
+            console.error('Failed to save scenario:', error);
+            alert('Failed to save scenario: ' + error.message);
+            return;
         }
 
-        this.saveScenarios();
         this.closeScenarioCreationPopup();
 
         // Show success message
@@ -374,13 +364,19 @@ class ScenarioManager {
      * Delete scenario
      * @param {string} scenarioId - Scenario ID to delete
      */
-    deleteScenario(scenarioId) {
+    async deleteScenario(scenarioId) {
         const scenario = this.getScenarioById(scenarioId);
         if (!scenario) return;
 
         if (confirm(`Delete scenario "${scenario.title}"? This action cannot be undone.`)) {
-            this.scenarios = this.scenarios.filter(s => s.id !== scenarioId);
-            this.saveScenarios();
+            try {
+                await window.ScenarioRepository.remove(scenarioId);
+                this.loadScenarios();
+            } catch (error) {
+                console.error('Failed to delete scenario:', error);
+                alert('Failed to delete scenario: ' + error.message);
+                return;
+            }
 
             if (typeof showNotification === 'function') {
                 showNotification(`Scenario deleted: ${scenario.title}`, 'success');

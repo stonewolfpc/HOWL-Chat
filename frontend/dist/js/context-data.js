@@ -182,8 +182,8 @@ class ContextDisplay {
             const stored = localStorage.getItem('howl-chat-current-session');
             if (stored) {
                 const light          = JSON.parse(stored);
-                const allWorlds      = JSON.parse(localStorage.getItem('howl-worlds')            || '[]');
-                const allScenarios   = JSON.parse(localStorage.getItem('howl-chat-scenarios')    || '[]');
+                const allWorlds      = window.WorldRepository.all();
+                const allScenarios   = window.ScenarioRepository.all();
                 const allCharacters  = (window.CharacterStorage?.all?.() || []);
                 const allLorebooks   = JSON.parse(localStorage.getItem('howl-chat-lorebooks')    || '[]');
                 this.currentChatData = {

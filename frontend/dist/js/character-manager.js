@@ -69,7 +69,7 @@ class CharacterManager {
      * @returns {Array} Array of attached characters
      */
     getCharactersForScenario(scenarioId) {
-        const scenario = JSON.parse(localStorage.getItem('howl-chat-scenarios') || '[]')
+        const scenario = window.ScenarioRepository.all()
             .find(s => s.id === scenarioId);
         if (!scenario || !scenario.characters) return [];
 
@@ -84,7 +84,7 @@ class CharacterManager {
      * @returns {Array} Array of attached characters
      */
     getCharactersForWorld(worldId) {
-        const world = JSON.parse(localStorage.getItem('howl-worlds') || '[]')
+        const world = window.WorldRepository.all()
             .find(w => w.id === worldId);
         if (!world || !world.characters) return [];
 

@@ -225,10 +225,10 @@ async function saveWorld() {
     try {
         if (!window.HOWLStorage) throw new Error('Storage manager not available');
         const saved = await window.HOWLStorage.storeWorld(worldData);
-        const lsWorlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
+        const lsWorlds = window.WorldRepository.all();
         const idx = lsWorlds.findIndex(w => w.id === saved.id);
         if (idx >= 0) ws.worlds[idx] = lsWorlds[idx]; else ws.worlds.push(lsWorlds[lsWorlds.length - 1]);
-        ws.worlds = JSON.parse(localStorage.getItem('howl-worlds') || '[]');
+        ws.worlds = window.WorldRepository.all();
     } catch (err) {
         console.error('Failed to save world:', err);
         alert('Failed to save world: ' + err.message);
