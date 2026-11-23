@@ -159,7 +159,7 @@ function initBoardSystem() {
 // ---------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', async () => {
     showRuntimeDebug();
-    restoreState();
+    await restoreState();
     await initPaths();
     initPathListeners();
     bindEvents();

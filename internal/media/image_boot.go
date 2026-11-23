@@ -7,7 +7,6 @@ import (
 	"howl-chat/internal/image/engine/sdcpp"
 	"howl-chat/internal/image/gallery"
 	"howl-chat/internal/image/job"
-	imgsettings "howl-chat/internal/image/settings"
 	imagetypes "howl-chat/internal/image/types"
 	"howl-chat/internal/paths"
 )
@@ -164,9 +163,5 @@ func (i *Image) SaveSettings() error {
 		return fmt.Errorf("image settings store not initialized")
 	}
 	last, opts := i.LastModel()
-	return i.Settings().Save(imgsettings.ImageSettings{
-		EngineConfig:  i.EngineConfig(),
-		LastModel:     last,
-		LastModelOpts: opts,
-	})
+	return i.Settings().SaveEngineSettings(i.EngineConfig(), last, opts)
 }

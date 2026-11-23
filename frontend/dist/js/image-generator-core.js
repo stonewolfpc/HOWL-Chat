@@ -1,6 +1,5 @@
 'use strict';
 
-const IG_STATE_KEY = 'howl-image-gen-state';
 let currentResult = null;
 let models = [];       // full ModelInfo list (diffusion only)
 let scanIndex = null;  // full ScanResult from ScanImageModels
@@ -232,11 +231,14 @@ async function loadModels() {
         const total = models.length + (scanIndex.vaes||[]).length + (scanIndex.loras||[]).length;
         setStatus(`${models.length} model(s) · ${(scanIndex.vaes||[]).length} VAE · ${(scanIndex.loras||[]).length} LoRA discovered`);
 
-        // Restore previously selected model
-        const saved = JSON.parse(localStorage.getItem(IG_STATE_KEY) || '{}');
-        if (saved.model && models.some(m => m.name === saved.model)) {
-            document.getElementById('ig-model').value = saved.model;
-            onModelChange();
+        // Restore previously selected model from the backend-owned projection.
+        if (window.ImageGenerationRepository?.ready) await window.ImageGenerationRepository.ready;
+        const savedModel = window.ImageGenerationRepository?.get('model');
+        if (savedModel && models.some(m => m.name === savedModel)) {
+            document.getElementById('ig-model').value = savedModel;
+            // Restore the saved generation values; do not replace them with the
+            // family preset just because the model is being re-selected.
+            onModelChange(false);
         }
     } catch (err) {
         console.error('[IG] Failed to load models:', err);
@@ -359,7 +361,7 @@ function _populateControlNetDropdown(cns) {
 }
 
 // onModelChange updates UI presets and re-filters secondary dropdowns by family.
-function onModelChange() {
+function onModelChange(applyPreset = true) {
     const name = document.getElementById('ig-model').value;
     if (!name) return;
     const model = models.find(m => m.name === name);
@@ -367,7 +369,7 @@ function onModelChange() {
         autoPopulateModelSpecificFields(model);
         currentModelFamily = model.family || '';
         window.currentModelFamily = currentModelFamily;
-        applyModelPreset(model.family, model.recommended || null);
+        if (applyPreset) applyModelPreset(model.family, model.recommended || null);
         updateLiveModelInfo(model);
         // Re-filter VAE / LoRA / ControlNet for this family
         if (currentModelFamily) refreshCompatibleAssets(currentModelFamily);

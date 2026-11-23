@@ -117,14 +117,31 @@ function saveState() {
         aspectLocked: typeof _aspectLocked !== 'undefined' ? _aspectLocked : true,
         // Note: lastUsedSeed is NOT persisted to avoid reusing bad seeds across reloads
     };
-    localStorage.setItem(IG_STATE_KEY, JSON.stringify(state));
+
+    const repository = window.ImageGenerationRepository;
+    if (!repository) return;
+    const generation = { ...state };
+    delete generation._version;
+    delete generation.currentMode;
+    delete generation.seedLocked;
+    delete generation.aspectLocked;
+    repository.save(generation).catch(err => {
+        console.warn('[IG] Generation settings save failed:', err);
+    });
+    repository.saveUi({
+        currentMode: state.currentMode,
+        seedLocked: state.seedLocked,
+        aspectLocked: state.aspectLocked,
+    });
 }
 
-function restoreState() {
-    const raw = localStorage.getItem(IG_STATE_KEY);
-    if (!raw) return;
+async function restoreState() {
+    const repository = window.ImageGenerationRepository;
+    if (!repository) return;
+    await repository.ready;
     try {
-        const s = JSON.parse(raw);
+        const s = repository.all();
+        const ui = repository.ui();
         if (s.prompt)    document.getElementById('ig-prompt').value    = s.prompt;
         if (s.negative)  document.getElementById('ig-negative').value  = s.negative;
         if (s.model)     document.getElementById('ig-model').value     = s.model;
@@ -241,16 +258,16 @@ function restoreState() {
         if (s.sNoise !== undefined && document.getElementById('ig-s-noise')) document.getElementById('ig-s-noise').value = s.sNoise;
 
         // Restore UI state
-        if (s.currentMode && typeof setWorkflowMode === 'function') {
-            setWorkflowMode(s.currentMode);
+        if (ui.currentMode && typeof setWorkflowMode === 'function') {
+            setWorkflowMode(ui.currentMode);
         }
-        if (s.seedLocked !== undefined) {
-            seedLocked = s.seedLocked;
+        if (ui.seedLocked !== undefined) {
+            seedLocked = ui.seedLocked;
             const lockBtn = document.getElementById('ig-seed-lock');
             if (lockBtn) lockBtn.classList.toggle('ig-locked', seedLocked);
         }
-        if (s.aspectLocked !== undefined && typeof _aspectLocked !== 'undefined') {
-            _aspectLocked = s.aspectLocked;
+        if (ui.aspectLocked !== undefined && typeof _aspectLocked !== 'undefined') {
+            _aspectLocked = ui.aspectLocked;
             const aspectBtn = document.getElementById('ig-aspect-lock');
             if (aspectBtn) {
                 aspectBtn.classList.toggle('active', _aspectLocked);

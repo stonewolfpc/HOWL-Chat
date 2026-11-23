@@ -25,6 +25,8 @@ const HOWL_LOCALSTORAGE_KEYS = [
     'howl-chat-memories',
     'howl-chat-current-chat',
     'howl-chat-image-generator-state',
+    'howl-image-gen-state',
+    'howl-image-generation-cache',
     'howl-theme-mode' // legacy
 ];
 

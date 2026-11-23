@@ -38,6 +38,60 @@ func (a *App) GetImageSettings() imgsettings.ImageSettings {
 	return s
 }
 
+// GetImageGenerationSettings returns the backend-owned generation document and
+// the revision the next save must cite.
+func (a *App) GetImageGenerationSettings() (map[string]interface{}, error) {
+	if a.images == nil || a.images.Settings() == nil {
+		return nil, fmt.Errorf("image settings store not initialised")
+	}
+	document, revision, err := a.images.Settings().LoadGeneration()
+	if err != nil {
+		return nil, fmt.Errorf("GetImageGenerationSettings: %w", err)
+	}
+	document["revision"] = revision
+	return document, nil
+}
+
+// SaveImageGenerationSettings is the only generation-settings write path. A
+// stale or missing base revision is refused instead of overwriting newer values.
+func (a *App) SaveImageGenerationSettings(settings map[string]interface{}, baseRevision string) (map[string]interface{}, error) {
+	if a.images == nil || a.images.Settings() == nil {
+		return nil, fmt.Errorf("image settings store not initialised")
+	}
+	result, err := a.images.Settings().SaveGeneration(settings, baseRevision)
+	if err != nil {
+		return nil, fmt.Errorf("SaveImageGenerationSettings: %w", err)
+	}
+	if result.Status != "saved" && result.Status != "updated" {
+		message := result.Message
+		if message == "" {
+			message = result.Status
+		}
+		return nil, fmt.Errorf("SaveImageGenerationSettings: %s", message)
+	}
+	document := result.Document
+	document["revision"] = result.Revision
+	return document, nil
+}
+
+// ImportImageGenerationSettings seeds the backend from pre-cutover renderer
+// settings only when no generation document exists. It never replaces a saved
+// backend document on a later load.
+func (a *App) ImportImageGenerationSettings(settings map[string]interface{}) (map[string]interface{}, error) {
+	if a.images == nil || a.images.Settings() == nil {
+		return nil, fmt.Errorf("image settings store not initialised")
+	}
+	current, revision, err := a.images.Settings().LoadGeneration()
+	if err != nil {
+		return nil, fmt.Errorf("ImportImageGenerationSettings: %w", err)
+	}
+	if revision != "" || len(current) > 0 {
+		current["revision"] = revision
+		return current, nil
+	}
+	return a.SaveImageGenerationSettings(settings, "")
+}
+
 // GetImageEngineConfig returns the current image engine configuration.
 func (a *App) GetImageEngineConfig() imagetypes.EngineConfig {
 	return a.images.EngineConfig()
