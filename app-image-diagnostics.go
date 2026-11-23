@@ -2,14 +2,12 @@ package main
 
 import (
 	"fmt"
+	"howl-chat/internal/host"
 	"howl-chat/internal/paths"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"regexp"
 	goruntime "runtime"
 	"strings"
-	"sync"
 
 	"howl-chat/internal/image/engine/sdcpp"
 
@@ -22,8 +20,8 @@ import (
 
 // DebugImageEngine returns raw directory contents and engine config for diagnostics.
 func (a *App) DebugImageEngine() map[string]interface{} {
-	result := map[string]interface{}{"engine_nil": a.imageEngine == nil}
-	if a.imageEngine == nil {
+	result := map[string]interface{}{"engine_nil": a.images.Engine() == nil}
+	if a.images.Engine() == nil {
 		return result
 	}
 	cfg := a.GetImageEngineConfig()
@@ -61,12 +59,12 @@ func (a *App) GetAppDiagnostics() map[string]interface{} {
 		"go_total_alloc_mb": fmt.Sprintf("%.1f", float64(m.TotalAlloc)/1024/1024),
 		"go_num_gc":         m.NumGC,
 		"go_goroutines":     goruntime.NumGoroutine(),
-		"engine_nil":        a.imageEngine == nil,
+		"engine_nil":        a.images.Engine() == nil,
 		"model_loaded":      false,
 		"model_name":        "-",
 		"model_family":      "-",
 	}
-	if e, ok := a.imageEngine.(*sdcpp.Engine); ok {
+	if e, ok := a.images.Engine().(*sdcpp.Engine); ok {
 		model := e.GetLoadedModel()
 		if model != nil {
 			result["model_loaded"] = true
@@ -83,7 +81,7 @@ func (a *App) GetAppDiagnostics() map[string]interface{} {
 // running entirely from RAM looked the same as one resident in VRAM.
 func (a *App) GetImagePlacement() map[string]interface{} {
 	out := map[string]interface{}{"known": false}
-	e, ok := a.imageEngine.(*sdcpp.Engine)
+	e, ok := a.images.Engine().(*sdcpp.Engine)
 	if !ok {
 		return out
 	}
@@ -105,19 +103,11 @@ func (a *App) GetImagePlacement() map[string]interface{} {
 // Version checking
 // -----------------------------------------------------------------------
 
-// GetSDServerVersion runs the binary with --help and parses the commit hash.
-// sdVersionCache memoises the sd-server commit per binary path: the image
-// page polls GetSDServerVersion every 2s, and each call used to spawn a
-// console process (visible window flash + CPU churn) instead of reusing
-// the answer.
-var (
-	sdVersionMu    sync.Mutex
-	sdVersionCache = map[string]string{}
-)
-
-// GetSDServerVersion runs the binary once and parses the commit hash.
+// GetSDServerVersion reports the sd-server commit the engine package detects.
+// Probing lives in sdcpp.BinaryVersion so the image domain and this binding
+// share one cache and one implementation instead of spawning the binary twice.
 func (a *App) GetSDServerVersion() string {
-	cfg := a.GetImageEngineConfig()
+	cfg := a.images.EngineConfig()
 	binary := cfg.BinaryPath
 	if binary == "" {
 		binary = sdcpp.FindSDServer()
@@ -125,44 +115,11 @@ func (a *App) GetSDServerVersion() string {
 	if binary == "" {
 		return "not found"
 	}
-
-	sdVersionMu.Lock()
-	cached, ok := sdVersionCache[binary]
-	sdVersionMu.Unlock()
-	if ok {
-		return cached
-	}
-
-	version := "unknown"
-	cmd := exec.Command(binary, "--help")
-	applyHidden(cmd)
-	if out, err := cmd.CombinedOutput(); err == nil {
-		re := regexp.MustCompile(`commit\s+([0-9a-f]+)`)
-		if m := re.FindStringSubmatch(string(out)); len(m) > 1 {
-			version = m[1]
-		}
-	}
-
-	if version != "unknown" {
-		sdVersionMu.Lock()
-		sdVersionCache[binary] = version
-		sdVersionMu.Unlock()
-	}
-	return version
+	return sdcpp.BinaryVersion(binary)
 }
 
-// isOldSDServer returns true for known commits that fail on modern GGUFs.
-// SD3.5 support was added in stable-diffusion.cpp around May 2026.
-// Commits before this cannot load SD3.5 GGUF models.
-func isOldSDServer(commit string) bool {
-	switch commit {
-	case "0665a7f", "3c2d18b", "5f3e8a1":
-		return true
-	}
-	// Any commit before May 2026 likely doesn't support SD3.5
-	// This is a conservative check - users should update to latest
-	return false
-}
+// isOldSDServer reports known commits that fail on modern GGUFs.
+func isOldSDServer(commit string) bool { return sdcpp.IsKnownOldVersion(commit) }
 
 // isFamilySupportedByBackend checks if the current sd-server version supports a model family.
 // SD3.5 requires a very recent stable-diffusion.cpp build (May 2026+).
@@ -189,16 +146,34 @@ func isFamilySupportedByBackend(family string, commit string) bool {
 // File pickers (Wails bindings)
 // -----------------------------------------------------------------------
 
-// OpenImageModelsDirPicker opens a native folder dialog for the image models directory.
-func (a *App) OpenImageModelsDirPicker() (string, error) {
-	modelsDir := a.GetImageEngineConfig().ModelsDir
-	if modelsDir == "" {
-		modelsDir = filepath.Dir(os.Args[0])
+// dialogDefaultDir returns preferred when it is an existing directory, otherwise
+// the running executable's directory. Wails refuses to open a dialog whose
+// DefaultDirectory does not exist, and a stored models dir is exactly what is
+// missing on a first run or after a drive is unplugged — the picker must still
+// open so the user can point at the models.
+func dialogDefaultDir(preferred string) string {
+	if preferred != "" {
+		if info, err := os.Stat(preferred); err == nil && info.IsDir() {
+			return preferred
+		}
 	}
-	dir, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{
-		Title:            "Select Image Models Directory",
-		DefaultDirectory: modelsDir,
-	})
+	if exe, err := os.Executable(); err == nil {
+		return filepath.Dir(exe)
+	}
+	return filepath.Dir(os.Args[0])
+}
+
+// OpenImageModelsDirPicker opens the shell folder chooser for the image models
+// directory.
+//
+// It deliberately does not use runtime.OpenDirectoryDialog: that runs the dialog
+// with the main window as parent, Windows disables the window while it is open,
+// and the focus event on the way back hits go-webview2's Chromium.Focus, whose
+// error callback calls os.Exit(1). Add Folder therefore closed the whole app
+// (observed twice on 2026-11-22). host.ChooseFolder opens a chooser with no
+// owner window, so the app window is never disabled.
+func (a *App) OpenImageModelsDirPicker() (string, error) {
+	dir, err := host.ChooseFolder("Select Image Models Directory", dialogDefaultDir(a.GetImageEngineConfig().ModelsDir))
 	if err != nil {
 		return "", fmt.Errorf("directory dialog: %w", err)
 	}

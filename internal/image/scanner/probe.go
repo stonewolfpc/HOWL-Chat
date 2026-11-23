@@ -44,6 +44,7 @@ type WeightProbe struct {
 	Adaln         bool // Anima net.blocks adaLN modulation
 	LabelEmb      bool // SDXL pooled embedding projection
 	CondEmbedders bool // SDXL dual text encoder stack
+	ClipL         bool // CLIP-L text encoder inside the checkpoint
 	InputBlocks   bool // classic UNet
 	FirstStage    bool // first_stage_model inside a checkpoint
 	EncoderDown   bool
@@ -162,6 +163,8 @@ func (p *WeightProbe) noteKey(key string) {
 		p.LabelEmb = true
 	case strings.Contains(k, "conditioner.embedders.1"):
 		p.CondEmbedders = true
+	case strings.Contains(k, "conditioner.embedders.0"):
+		p.ClipL = true
 	case strings.Contains(k, "input_blocks"):
 		p.InputBlocks = true
 	case strings.Contains(k, "first_stage_model"):

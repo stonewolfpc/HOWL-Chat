@@ -107,17 +107,35 @@
     async function removeImageModelDir(dir) {
         const api = app();
         if (!api || !dir) return;
+        // WebView2 does not show window.confirm, so the raw call returned false
+        // and the folder-row X did nothing at all in the packaged app. The shared
+        // DeleteConfirm modal is the in-app confirmation every other destructive
+        // action on this frontend already uses.
+        const forget = async () => {
+            try {
+                await api.RemoveModelDirectory(dir);
+                await refreshImageModelDirs();
+                if (typeof loadModels === 'function') await loadModels();
+                if (typeof setStatus === 'function') setStatus('Forgot folder ' + shortPath(dir));
+            } catch (err) {
+                if (typeof setStatus === 'function') setStatus('Could not remove folder: ' + err);
+            }
+        };
+        if (window.DeleteConfirm && window.DeleteConfirm.show) {
+            window.DeleteConfirm.show({
+                title: 'Forget this folder?',
+                body: dir,
+                warning: 'Only the registration is removed. Model files on disk stay where they are.',
+                confirmLabel: 'Forget',
+                onConfirm: forget,
+            });
+            return;
+        }
         const ok = typeof confirm === 'function'
-            ? confirm('Forget this folder?\n\n' + dir + '\n\nModel files on disk are not deleted.')
+            ? confirm('Forget this folder? ' + dir + ' — model files on disk are not deleted.')
             : true;
         if (!ok) return;
-        try {
-            await api.RemoveModelDirectory(dir);
-            await refreshImageModelDirs();
-            if (typeof loadModels === 'function') await loadModels();
-        } catch (err) {
-            if (typeof setStatus === 'function') setStatus('Could not remove folder: ' + err);
-        }
+        await forget();
     }
 
     async function rescanImageModelDirs() {

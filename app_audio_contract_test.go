@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"howl-chat/internal/audio"
-	appsettings "howl-chat/internal/settings"
+	"howl-chat/internal/media"
 )
 
 func contractDesiredSettings() audio.DesiredSettings {
@@ -66,12 +66,9 @@ func desiredSettingsMap(t *testing.T, desired audio.DesiredSettings) map[string]
 func newContractTestApp(t *testing.T, factory audio.PipelineFactory) (*App, *audio.Manager) {
 	t.Helper()
 	manager := audio.NewManager(factory)
-	app := &App{
-		settingsStore: appsettings.NewStore(t.TempDir()),
-		appSettings:   map[string]interface{}{},
-		audioManager:  manager,
-	}
-	app.setAudioDesired(audio.DefaultDesiredSettings())
+	app := &App{settings: newTestSettingsAuthority(t, t.TempDir())}
+	app.audio = media.NewAudio(manager, nil, nil, nil)
+	app.audio.SetDesired(audio.DefaultDesiredSettings())
 	t.Cleanup(func() { _ = manager.Close(context.Background()) })
 	return app, manager
 }
@@ -88,10 +85,10 @@ func TestAllAudioSettingsPersistWithoutApplyingAndReportTruthfully(t *testing.T)
 	if err := app.SetSettings(map[string]interface{}{"audio": desiredSettingsMap(t, want)}); err != nil {
 		t.Fatalf("SetSettings: %v", err)
 	}
-	if got := app.currentAudioDesired(); !reflect.DeepEqual(got, want) {
+	if got := app.audio.Desired(); !reflect.DeepEqual(got, want) {
 		t.Fatalf("in-memory desired settings differ:\n got: %+v\nwant: %+v", got, want)
 	}
-	loaded, err := app.settingsStore.Load()
+	loaded, err := app.settings.Store().Load()
 	if err != nil {
 		t.Fatalf("reload settings: %v", err)
 	}
@@ -102,7 +99,7 @@ func TestAllAudioSettingsPersistWithoutApplyingAndReportTruthfully(t *testing.T)
 	if got := audio.DesiredSettingsFromMap(rawAudio); !reflect.DeepEqual(got, want) {
 		t.Fatalf("persisted desired settings differ:\n got: %+v\nwant: %+v", got, want)
 	}
-	if got := app.audioManager.Status().DesiredGen; got != 0 {
+	if got := app.audio.Manager().Status().DesiredGen; got != 0 {
 		t.Fatalf("SetSettings advanced the manager desired generation to %d", got)
 	}
 
@@ -374,7 +371,7 @@ func TestSavedSettingsDoNotActivateAtStartup(t *testing.T) {
 	}
 
 	_ = app.GetAudioStatus()
-	if _, applied := app.audioManager.AppliedSettings(); applied {
+	if _, applied := app.audio.Manager().AppliedSettings(); applied {
 		t.Fatal("persisted settings were applied without an explicit activation")
 	}
 }

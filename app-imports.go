@@ -59,15 +59,15 @@ func (a *App) ListContentImportJournal(category string) ([]contentimport.Operati
 func (a *App) importService(category string) (*contentimport.Service, error) {
 	switch strings.ToLower(strings.TrimSpace(category)) {
 	case "world", "worlds":
-		if a.worldImport == nil {
+		if a.registries.Worlds() == nil {
 			return nil, fmt.Errorf("world import service is not initialised")
 		}
-		return a.worldImport, nil
+		return a.registries.Worlds(), nil
 	case "scenario", "scenarios":
-		if a.scenarioImport == nil {
+		if a.registries.Scenarios() == nil {
 			return nil, fmt.Errorf("scenario import service is not initialised")
 		}
-		return a.scenarioImport, nil
+		return a.registries.Scenarios(), nil
 	default:
 		return nil, fmt.Errorf("unsupported import category %q", category)
 	}

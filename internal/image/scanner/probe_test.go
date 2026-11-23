@@ -1,6 +1,7 @@
 package scanner
 
 import (
+	"bytes"
 	"encoding/binary"
 	"encoding/json"
 	"os"
@@ -239,5 +240,32 @@ func TestScanKeepsSingleFileOutOfBundlePath(t *testing.T) {
 	}
 	if got := idx.Models[0].Family; got != FamilySDXL {
 		t.Fatalf("family = %q, want %q", got, FamilySDXL)
+	}
+}
+
+// A real library contained a .gguf whose header declares an impossible string
+// length. gguf-parser-go allocated from it and panicked, the Add Folder binding
+// never returned, and the Image Generator sat on "Scanning…" for the whole
+// session. One unreadable file must cost that file's probe, not the scan.
+func TestProbeWeightSurvivesMalformedGGUFHeader(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "corrupt.gguf")
+	var buf bytes.Buffer
+	buf.WriteString("GGUF")
+	binary.Write(&buf, binary.LittleEndian, uint32(3))     // version
+	binary.Write(&buf, binary.LittleEndian, uint64(0))     // tensor count
+	binary.Write(&buf, binary.LittleEndian, uint64(1))     // metadata count
+	binary.Write(&buf, binary.LittleEndian, uint64(1<<62)) // key length: impossible
+	if err := os.WriteFile(path, buf.Bytes(), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			t.Fatalf("ProbeWeight panicked on a malformed header: %v", r)
+		}
+	}()
+	p := ProbeWeight(path)
+	if p.TensorCount != 0 || len(p.Metadata) != 0 {
+		t.Fatalf("malformed header produced probe data: %+v", p)
 	}
 }

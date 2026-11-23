@@ -1,6 +1,7 @@
 package scanner
 
 import (
+	"fmt"
 	"strings"
 
 	gguf_parser "github.com/gpustack/gguf-parser-go"
@@ -12,6 +13,19 @@ import (
 // the same bar safetensors already gets. The filename is still the fallback when
 // the header has nothing to say.
 func (p *WeightProbe) inspectGGUF(path string) {
+	// The parser allocates from lengths read out of the file, so a corrupt or
+	// non-GGUF file with a .gguf name panics on the string length it finds. One
+	// such file in a library used to abort the whole scan (the Add Folder call
+	// never returned and the UI sat on "Scanning…"). ProbeWeight promises an
+	// empty probe instead, so a bad header yields no probe and filename rules
+	// stay in charge for that file.
+	defer func() {
+		if r := recover(); r != nil {
+			*p = WeightProbe{Metadata: map[string]string{}}
+			fmt.Printf("[Scanner] skipping malformed GGUF header %s: %v\n", path, r)
+		}
+	}()
+
 	f, err := gguf_parser.ParseGGUFFile(path)
 	if err != nil || f == nil {
 		return

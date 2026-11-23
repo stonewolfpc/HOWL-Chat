@@ -100,10 +100,7 @@ var discoveryMu sync.Mutex
 // ---- preferences ------------------------------------------------------------
 
 func (a *App) discoveryPrefMap() map[string]interface{} {
-	if a.appSettings == nil {
-		return map[string]interface{}{}
-	}
-	if m, ok := a.appSettings[discoverySettingsKey].(map[string]interface{}); ok {
+	if m, ok := a.settings.All()[discoverySettingsKey].(map[string]interface{}); ok {
 		return m
 	}
 	return map[string]interface{}{}
@@ -122,17 +119,14 @@ func (a *App) discoverySuppressed() bool {
 }
 
 func (a *App) writeDiscoveryPrefs(enabled, suppressed bool) error {
-	next := make(map[string]interface{}, len(a.appSettings)+1)
-	for k, v := range a.appSettings {
+	current := a.settings.All()
+	next := make(map[string]interface{}, len(current)+1)
+	for k, v := range current {
 		next[k] = v
 	}
 	next[discoverySettingsKey] = map[string]interface{}{
 		"enabled":      enabled,
 		"never_prompt": suppressed,
-	}
-	if a.settingsStore == nil {
-		a.appSettings = next
-		return nil
 	}
 	return a.SetSettings(next)
 }
@@ -202,7 +196,7 @@ func (a *App) GetModelDiscoveryState() (ModelDiscoveryState, error) {
 		Suppressed: a.discoverySuppressed(),
 	}
 	st.Prompting = st.Enabled && !st.Suppressed
-	if !st.Enabled || a.modelRegistry == nil {
+	if !st.Enabled || a.registries.Models() == nil {
 		return st, nil
 	}
 	recs := a.loadDiscoveryRecords()
@@ -246,7 +240,7 @@ func (a *App) DeferDiscoveredDirectory(path string) error {
 // ScanDiscoveredDirectory classifies a folder, registers it under the kind its
 // contents imply, and populates the matching pickers. It never loads a model.
 func (a *App) ScanDiscoveredDirectory(path string) (ModelDirectory, error) {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return ModelDirectory{}, fmt.Errorf("model registry not initialised")
 	}
 	abs, err := normalizeDirectory(path)
@@ -259,11 +253,11 @@ func (a *App) ScanDiscoveredDirectory(path string) (ModelDirectory, error) {
 	}
 	// A directory keeps the kind it was first added under; contents decide only
 	// for a directory that has never been registered.
-	if existing := a.modelRegistry.KindForPath(abs); existing != "" {
+	if existing := a.registries.Models().KindForPath(abs); existing != "" {
 		kind = existing
 	}
 	count, scanErr := a.scanDirectoryIntoRegistry(abs, kind)
-	if err := a.modelRegistry.RegisterDir(abs, kind); err != nil {
+	if err := a.registries.Models().RegisterDir(abs, kind); err != nil {
 		return ModelDirectory{}, err
 	}
 
@@ -334,7 +328,7 @@ func (a *App) RunSilentModelDiscovery() {
 	if !a.discoveryEnabled() || !a.discoverySuppressed() {
 		return
 	}
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return
 	}
 	for _, candidate := range a.detectModelDirectories() {
@@ -355,7 +349,7 @@ func (a *App) detectModelDirectories() []DiscoveryCandidate {
 	recs := a.loadDiscoveryRecords()
 	roots := map[string]bool{}
 	for _, kind := range []string{registry.KindLLM, registry.KindTTS, registry.KindImage} {
-		for _, dir := range a.modelRegistry.Directories(kind) {
+		for _, dir := range a.registries.Models().Directories(kind) {
 			parent := filepath.Dir(dir)
 			if parent != "" && parent != dir {
 				roots[parent] = true
@@ -385,7 +379,7 @@ func (a *App) detectModelDirectories() []DiscoveryCandidate {
 			if seen[key] {
 				continue
 			}
-			if a.modelRegistry.KindForPath(path) != "" {
+			if a.registries.Models().KindForPath(path) != "" {
 				continue // already scanned
 			}
 			if at, ok := recs.Deferred[path]; ok && now.Sub(at) < discoveryDeferWindow {

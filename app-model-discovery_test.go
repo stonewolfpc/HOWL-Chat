@@ -55,7 +55,7 @@ func TestInspectModelDirectoryIgnoresNonModelFolders(t *testing.T) {
 
 func TestDiscoveryPreferencePersistsAndIsReversible(t *testing.T) {
 	configDir := t.TempDir()
-	app := &App{settingsStore: appsettings.NewStore(configDir)}
+	app := &App{settings: newTestSettingsAuthority(t, configDir)}
 
 	// "Never show again" suppresses prompts but must not disable discovery.
 	if err := app.SetDirectoryDiscovery(false); err != nil {
@@ -70,7 +70,9 @@ func TestDiscoveryPreferencePersistsAndIsReversible(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reload settings: %v", err)
 	}
-	reloaded := &App{appSettings: stored, settingsStore: appsettings.NewStore(configDir)}
+	settings := newTestSettingsAuthority(t, configDir)
+	settings.Adopt(stored)
+	reloaded := &App{settings: settings}
 	if !reloaded.discoverySuppressed() {
 		t.Fatal("suppression did not survive a restart")
 	}

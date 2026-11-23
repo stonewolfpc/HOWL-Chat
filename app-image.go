@@ -2,127 +2,45 @@ package main
 
 import (
 	"fmt"
-	"howl-chat/internal/paths"
 	"os"
-	"path/filepath"
 
 	imageengine "howl-chat/internal/image/engine"
 	"howl-chat/internal/image/engine/sdcpp"
-	"howl-chat/internal/image/gallery"
-	"howl-chat/internal/image/job"
 	"howl-chat/internal/image/registry"
 	imgsettings "howl-chat/internal/image/settings"
 	imagetypes "howl-chat/internal/image/types"
 )
 
 // -----------------------------------------------------------------------
-// Image engine fields are declared in App (app.go):
-//   imageEngine        imageengine.ImageEngine
-//   gallerySvc         *gallery.Service
-//   jobManager         *job.Manager
-//   lastImageModel     string
-//   lastImageModelOpts imagetypes.ModelLoadOptions
-//   imgSettingsStore   *imgsettings.Store
+// The image session is owned by internal/media: the engine, gallery, job
+// manager, settings store and last model selection all live in media.Image.
+// App holds the owner (`images`) and the bindings; it keeps no copy of that
+// state. Generation and model loading remain App clients of the owner and are
+// recorded as retained in docs/architecture/HOC-H0-LEVEL0-2026-11-22.md §3.
 // -----------------------------------------------------------------------
-
-// initImageEngine initialises the image subsystem from persisted settings.
-// Called once from NewApp. Non-fatal: if the binary is absent the engine starts nil.
-func (a *App) initImageEngine() {
-	startupMark("image init: begin")
-	store := imgsettings.NewStore(a.getSettingsDir())
-	a.imgSettingsStore = store
-
-	if reg, err := registry.New(a.getSettingsDir()); err != nil {
-		fmt.Printf("[Registry] Could not load model registry: %v\n", err)
-	} else {
-		a.modelRegistry = reg
-	}
-
-	saved, err := store.Load()
-	if err != nil {
-		fmt.Printf("[ImageEngine] Could not load saved settings: %v\n", err)
-	}
-
-	cfg := saved.EngineConfig
-	if cfg.BinaryPath == "" {
-		cfg.BinaryPath = sdcpp.FindSDServer()
-	}
-	if cfg.ModelsDir == "" {
-		cfg.ModelsDir = filepath.Join(paths.ProjectRoot(), "models")
-	}
-	if cfg.OutputDir == "" {
-		cfg.OutputDir = paths.StatePath("images", "gallery")
-	}
-	if cfg.TempDir == "" {
-		cfg.TempDir = filepath.Join(paths.TempDir(), "howl-image-temp")
-	}
-	if cfg.Port == 0 {
-		cfg.Port = 8081
-	}
-
-	// The configured models directory is an image directory. Recording its kind
-	// is what keeps its contents out of the chat model menu.
-	if cfg.ModelsDir != "" && a.modelRegistry != nil {
-		if err := a.modelRegistry.RegisterDir(cfg.ModelsDir, registry.KindImage); err != nil {
-			fmt.Printf("[Registry] Could not record image models dir: %v\n", err)
-		}
-	}
-
-	startupMark("image init: config ready")
-	a.gallerySvc = gallery.NewService(cfg.OutputDir)
-	imgEngine := sdcpp.NewEngine()
-	if err := imgEngine.Initialize(cfg); err != nil {
-		fmt.Printf("[ImageEngine] Not ready at startup (paths not configured yet): %v\n", err)
-		a.jobManager = job.NewManager(nil)
-		return
-	}
-	a.imageEngine = imgEngine
-	a.jobManager = job.NewManager(imgEngine)
-
-	startupMark("image init: engine initialized")
-	ver := a.GetSDServerVersion()
-	fmt.Printf("[ImageEngine] sd-server commit: %s\n", ver)
-	if isOldSDServer(ver) {
-		fmt.Printf("[ImageEngine] WARNING: sd-server commit %s is outdated. Flux/SD3/SDXL GGUF models may fail. Please update.\n", ver)
-	}
-
-	if saved.LastModel != "" {
-		a.lastImageModel = saved.LastModel
-		a.lastImageModelOpts = saved.LastModelOpts
-		fmt.Printf("[ImageEngine] Restored last model: %q\n", saved.LastModel)
-	}
-}
 
 // saveImageSettings persists the current engine config and last-model state.
 func (a *App) saveImageSettings() {
-	if a.imgSettingsStore == nil {
-		return
-	}
-	cfg := a.GetImageEngineConfig()
-	if err := a.imgSettingsStore.Save(imgsettings.ImageSettings{
-		EngineConfig:  cfg,
-		LastModel:     a.lastImageModel,
-		LastModelOpts: a.lastImageModelOpts,
-	}); err != nil {
-		fmt.Printf("[ImageEngine] Failed to save settings: %v\n", err)
+	// The image domain owns both halves of this record (engine config and last
+	// model), so it owns the write.
+	if err := a.images.SaveSettings(); err != nil {
+		fmt.Printf("[ImageEngine] Failed to save settings: %v", err)
+		fmt.Println()
 	}
 }
 
 // GetImageSettings returns the persisted image engine settings for the frontend.
 func (a *App) GetImageSettings() imgsettings.ImageSettings {
-	if a.imgSettingsStore == nil {
+	if a.images.Settings() == nil {
 		return imgsettings.ImageSettings{}
 	}
-	s, _ := a.imgSettingsStore.Load()
+	s, _ := a.images.Settings().Load()
 	return s
 }
 
 // GetImageEngineConfig returns the current image engine configuration.
 func (a *App) GetImageEngineConfig() imagetypes.EngineConfig {
-	if e, ok := a.imageEngine.(*sdcpp.Engine); ok {
-		return e.GetConfig()
-	}
-	return imagetypes.EngineConfig{}
+	return a.images.EngineConfig()
 }
 
 // SetImageModelsDir updates the models directory, re-initializes the engine, and persists.
@@ -134,8 +52,8 @@ func (a *App) SetImageModelsDir(dir string) error {
 		return fmt.Errorf("models directory not found: %w", err)
 	}
 	// Remember it as an image directory so its models stay out of the chat menu.
-	if a.modelRegistry != nil {
-		if err := a.modelRegistry.RegisterDir(dir, registry.KindImage); err != nil {
+	if a.registries.Models() != nil {
+		if err := a.registries.Models().RegisterDir(dir, registry.KindImage); err != nil {
 			fmt.Printf("[Registry] Could not record image models dir: %v\n", err)
 		}
 	}
@@ -155,30 +73,18 @@ func (a *App) SetSDServerPath(path string) error {
 
 // reinitEngine tears down the current engine, applies a config mutation, and starts fresh.
 func (a *App) reinitEngine(mutate func(*imagetypes.EngineConfig)) error {
-	cfg := a.GetImageEngineConfig()
-	mutate(&cfg)
-	imgEngine := sdcpp.NewEngine()
-	if err := imgEngine.Initialize(cfg); err != nil {
-		return fmt.Errorf("failed to re-initialize image engine: %w", err)
-	}
-	if a.imageEngine != nil {
-		_ = a.imageEngine.Shutdown()
-	}
-	a.imageEngine = imgEngine
-	if a.jobManager != nil {
-		a.jobManager.SetEngine(imgEngine)
-	}
-	a.saveImageSettings()
-	return nil
+	// Engine construction, teardown and persistence are the image domain's
+	// own work now; App only states what changed.
+	return a.images.Reconfigure(mutate)
 }
 
 // UnloadImageModel shuts down the sd-server subprocess and frees model memory.
 func (a *App) UnloadImageModel() error {
-	if a.imageEngine == nil {
+	if a.images.Engine() == nil {
 		return fmt.Errorf("image engine not initialized")
 	}
 	fmt.Printf("[App] UnloadImageModel called\n")
-	return a.imageEngine.Shutdown()
+	return a.images.Engine().Shutdown()
 }
 
 // Ensure interface compliance is checked at compile time.

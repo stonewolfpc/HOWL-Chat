@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"strings"
-	"time"
+	"os/exec"
+	goruntime "runtime"
 
 	"howl-chat/internal/audio"
 	"howl-chat/internal/backend/chat"
@@ -22,47 +22,49 @@ import (
 
 // ---------------------------------------------------------------------------
 // Chat Persistence Wails Bindings
+//
+// These bindings are thin: the collection, its membership and the append log are
+// owned by chat.Conversation, and every route below asks that owner. App holds the
+// handle and translates the renderer's shapes.
 // ---------------------------------------------------------------------------
 
 // GetChatList returns a list of all chat summaries.
 func (a *App) GetChatList() ([]chat.ChatSummary, error) {
-	if a.chatPersistence == nil {
+	if !a.conversation.Bound() {
 		return []chat.ChatSummary{}, fmt.Errorf("chat persistence not initialized")
 	}
-	return a.chatPersistence.GetChatList()
+	return a.conversation.List()
 }
 
 // GetActiveChatMeta returns the metadata for the active chat.
 func (a *App) GetActiveChatMeta() (*chat.ChatMeta, error) {
-	if a.chatPersistence == nil {
+	if !a.conversation.Bound() {
 		return nil, fmt.Errorf("chat persistence not initialized")
 	}
-	return a.chatPersistence.GetActiveChatMeta()
+	return a.conversation.Meta()
 }
 
 // NewChat creates a new chat with the given name.
 func (a *App) NewChat(name string) (*chat.ChatMeta, error) {
-	if a.chatPersistence == nil {
+	if !a.conversation.Bound() {
 		return nil, fmt.Errorf("chat persistence not initialized")
 	}
-	chatData, err := a.chatPersistence.NewChat(name)
+	meta, err := a.conversation.New(name)
 	if err != nil {
 		a.logError(errors.CHATLoadFail, errors.High, "chat.new", "app-chat.go:39", err)
 		return nil, err
 	}
-	a.chatMessages = []map[string]interface{}{}
-	a.triggeredLore = map[string]bool{}
 	if a.memoryService != nil {
-		a.memoryService.SetChatID(chatData.Meta.ID)
+		a.memoryService.SetChatID(meta.ID)
 	}
-	return &chatData.Meta, nil
+	return meta, nil
 }
 
-// SaveChat consolidates the append log into a canonical snapshot.
-// Delegates to performSave() so tracking arrays are always recomputed
-// from the current in-memory state — never reads stale meta from disk.
+// SaveChat consolidates the append log into a canonical snapshot. Membership and
+// tracking arrays are recomputed by the conversation from its session — never read
+// from stale meta on disk.
 func (a *App) SaveChat() error {
-	if a.chatPersistence == nil {
+	if !a.conversation.Bound() {
 		return fmt.Errorf("chat persistence not initialized")
 	}
 	return a.performSave()
@@ -70,42 +72,29 @@ func (a *App) SaveChat() error {
 
 // SaveChatAs creates a copy of the current chat with a new name.
 func (a *App) SaveChatAs(name string) (*chat.ChatMeta, error) {
-	if a.chatPersistence == nil {
+	if !a.conversation.Bound() {
 		return nil, fmt.Errorf("chat persistence not initialized")
 	}
-	lastChatID := a.chatPersistence.GetLastChatID()
-	if lastChatID == "" {
-		return nil, fmt.Errorf("no active chat to save")
-	}
-	chatData, err := a.chatPersistence.SaveChatAs(lastChatID, name)
+	meta, err := a.conversation.SaveAs(name)
 	if err != nil {
 		a.logError(errors.CHATSaveFail, errors.High, "chat.saveas", "app-chat.go:95", err)
 		return nil, err
 	}
 	if a.memoryService != nil {
-		a.memoryService.SetChatID(chatData.Meta.ID)
+		a.memoryService.SetChatID(meta.ID)
 	}
-	return &chatData.Meta, nil
+	return meta, nil
 }
 
 // LoadChat loads a chat by ID, saving the current session first.
 func (a *App) LoadChat(chatID string) (*chat.ChatData, error) {
-	if a.chatPersistence == nil {
+	if !a.conversation.Bound() {
 		return nil, fmt.Errorf("chat persistence not initialized")
 	}
-	if lastChatID := a.chatPersistence.GetLastChatID(); lastChatID != "" && lastChatID != chatID {
-		if err := a.performSave(); err != nil {
-			fmt.Printf("Warning: Failed to save current chat: %v\n", err)
-		}
-	}
-	chatData, err := a.chatPersistence.LoadChat(chatID)
+	chatData, err := a.conversation.Load(chatID)
 	if err != nil {
 		a.logError(errors.CHATLoadFail, errors.High, "chat.load", "app-chat.go:115", err)
 		return nil, err
-	}
-	a.updateAppStateFromChat(chatData)
-	if err := a.chatPersistence.SetLastChatID(chatID); err != nil {
-		return nil, fmt.Errorf("failed to set active chat: %w", err)
 	}
 	if a.memoryService != nil {
 		a.memoryService.SetChatID(chatID)
@@ -115,38 +104,64 @@ func (a *App) LoadChat(chatID string) (*chat.ChatData, error) {
 
 // DeleteChat deletes a chat by ID and wipes its directory from disk.
 func (a *App) DeleteChat(chatID string) error {
-	if a.chatPersistence == nil {
+	if !a.conversation.Bound() {
 		return fmt.Errorf("chat persistence not initialized")
 	}
-	if a.chatPersistence.GetLastChatID() == chatID {
-		a.world = nil
-		a.scenario = nil
-		a.characters = []*chat.CharacterContext{}
-		a.lorebooks = nil
-		a.chatMessages = []map[string]interface{}{}
-		a.triggeredLore = map[string]bool{}
+	return a.conversation.Delete(chatID)
+}
+
+// GetChatDirectory reports where a conversation's files live, so the deletion
+// confirmation can tell the user where to look if Windows blocks the delete.
+func (a *App) GetChatDirectory(chatID string) (string, error) {
+	if !a.conversation.Bound() {
+		return "", fmt.Errorf("chat persistence not initialized")
 	}
-	return a.chatPersistence.DeleteChat(chatID)
+	return a.conversation.Directory(chatID)
+}
+
+// OpenChatDirectory opens a conversation's directory in the system file browser.
+// It is the clickable half of that notice; a failure to open is reported to the
+// caller but never blocks deletion.
+func (a *App) OpenChatDirectory(chatID string) error {
+	dir, err := a.GetChatDirectory(chatID)
+	if err != nil {
+		return err
+	}
+
+	var cmd *exec.Cmd
+	switch goruntime.GOOS {
+	case "windows":
+		cmd = exec.Command("explorer.exe", dir)
+	case "darwin":
+		cmd = exec.Command("open", dir)
+	default:
+		cmd = exec.Command("xdg-open", dir)
+	}
+	if err := cmd.Start(); err != nil {
+		fmt.Printf("[OpenChatDirectory] failed to open %s: %v\n", dir, err)
+		return fmt.Errorf("failed to open %s: %w", dir, err)
+	}
+	fmt.Printf("[OpenChatDirectory] opened %s\n", dir)
+	// Explorer reports a non-zero exit code even on success, so the process is
+	// reaped without treating its status as a result.
+	go func() { _ = cmd.Wait() }()
+	return nil
 }
 
 // ClearWorldFromSession removes the active world and persists.
 func (a *App) ClearWorldFromSession() error {
-	a.world = nil
-	if a.chatPersistence != nil {
-		if chatID := a.chatPersistence.GetLastChatID(); chatID != "" {
-			_ = a.performSave()
-		}
+	a.session().ClearWorld()
+	if a.conversation.ActiveID() != "" {
+		a.performSaveLogged("app-chat.go")
 	}
 	return nil
 }
 
 // ClearScenarioFromSession removes the active scenario and persists.
 func (a *App) ClearScenarioFromSession() error {
-	a.scenario = nil
-	if a.chatPersistence != nil {
-		if chatID := a.chatPersistence.GetLastChatID(); chatID != "" {
-			_ = a.performSave()
-		}
+	a.session().ClearScenario()
+	if a.conversation.ActiveID() != "" {
+		a.performSaveLogged("app-chat.go")
 	}
 	return nil
 }
@@ -169,22 +184,14 @@ func (a *App) SendMessage(message string) (string, error) {
 	if err := a.ensureAcceptingWork("send message"); err != nil {
 		return "", err
 	}
-	if a.httpClient == nil {
+	if a.engine.Client() == nil {
 		return "", fmt.Errorf("llama client not initialized")
 	}
-	a.recordUserTurn(message)
-	messages := a.buildPromptMessages()
-	response, err := a.httpClient.GenerateChat(messages, a.buildInferenceOptions())
+	response, err := a.turn().Complete(nil, message, chat.Attribution{Sender: "AI"})
 	if err != nil {
 		return "", err
 	}
-	// Reasoning is display-only. Stripping here keeps a thought out of history and
-	// out of the next prompt on the non-streaming path too, not just the streamed one.
-	response = stripThinkBlocks(response)
-	a.chatMessages = append(a.chatMessages, map[string]interface{}{
-		"role": "assistant", "content": response, "timestamp": time.Now().Format(time.RFC3339),
-	})
-	if a.chatPersistence != nil {
+	if a.conversation.Bound() {
 		go func() {
 			if err := a.performSave(); err != nil {
 				fmt.Printf("Autosave failed: %v\n", err)
@@ -205,33 +212,37 @@ func (a *App) SendMessageStream(message string) error {
 
 // LoadChatData returns the current backend chat state as a frontend-compatible map.
 func (a *App) LoadChatData() (map[string]interface{}, error) {
-	if a.world != nil || a.scenario != nil || len(a.characters) > 0 || len(a.lorebooks) > 0 {
+	world := a.session().World()
+	scenario := a.session().Scenario()
+	characters := a.session().Characters()
+	lorebooks := a.session().Lorebooks()
+	if world != nil || scenario != nil || len(characters) > 0 || len(lorebooks) > 0 {
 		var worldMap map[string]interface{}
-		if a.world != nil {
+		if world != nil {
 			imagePath := ""
-			if a.world.Image != nil {
-				imagePath = a.world.Image.Path
+			if world.Image != nil {
+				imagePath = world.Image.Path
 			}
 			worldMap = map[string]interface{}{
-				"id": a.world.ID, "name": a.world.Name,
-				"description": a.world.Description, "image": imagePath,
+				"id": world.ID, "name": world.Name,
+				"description": world.Description, "image": imagePath,
 			}
 		}
 
 		var scenarioMap map[string]interface{}
-		if a.scenario != nil {
+		if scenario != nil {
 			imagePath := ""
-			if a.scenario.Image != nil {
-				imagePath = a.scenario.Image.Path
+			if scenario.Image != nil {
+				imagePath = scenario.Image.Path
 			}
 			scenarioMap = map[string]interface{}{
-				"id": a.scenario.ID, "name": a.scenario.Name,
-				"description": a.scenario.Description, "image": imagePath,
+				"id": scenario.ID, "name": scenario.Name,
+				"description": scenario.Description, "image": imagePath,
 			}
 		}
 
-		charactersSlice := make([]map[string]interface{}, len(a.characters))
-		for i, char := range a.characters {
+		charactersSlice := make([]map[string]interface{}, len(characters))
+		for i, char := range characters {
 			imagePath := ""
 			if char.Image != nil {
 				imagePath = char.Image.Path
@@ -243,8 +254,8 @@ func (a *App) LoadChatData() (map[string]interface{}, error) {
 			}
 		}
 
-		lorebooksInterface := make([]interface{}, len(a.lorebooks))
-		for i, lb := range a.lorebooks {
+		lorebooksInterface := make([]interface{}, len(lorebooks))
+		for i, lb := range lorebooks {
 			lorebooksInterface[i] = map[string]interface{}{
 				"id": lb.ID, "name": lb.Name, "title": lb.Title,
 				"description": lb.Description, "content": lb.Content,
@@ -301,10 +312,10 @@ func (a *App) SaveChatData(data map[string]interface{}) error {
 	if err != nil {
 		return fmt.Errorf("failed to convert frontend data: %w", err)
 	}
-	if a.chatPersistence == nil {
-		return nil
-	}
-	return a.chatPersistence.SaveChat(chatData)
+	// The frontend payload is not evidence that a conversation exists. If the
+	// membership authority does not claim this id and its folder, the payload is a
+	// cached or stale session and is refused instead of becoming a chat.
+	return a.conversation.SaveRecord(chatData)
 }
 
 // ---------------------------------------------------------------------------
@@ -312,223 +323,65 @@ func (a *App) SaveChatData(data map[string]interface{}) error {
 // ---------------------------------------------------------------------------
 
 func (a *App) performSave() error {
-	lastChatID := a.chatPersistence.GetLastChatID()
-	if lastChatID == "" {
-		return fmt.Errorf("no active chat to save")
+	if !a.conversation.Bound() {
+		return fmt.Errorf("chat persistence not initialized")
 	}
-	chatData, err := a.chatPersistence.LoadChat(lastChatID)
+	return a.conversation.Save()
+}
+
+// performSaveLogged persists and reports a failure instead of discarding it.
+// A refusal (busy, re-entrant, deleted) is a real outcome, and silence about it
+// is exactly what V3-27 makes non-conforming.
+func (a *App) performSaveLogged(site string) {
+	if err := a.performSave(); err != nil {
+		a.logError(errors.CHATSaveFail, errors.High, "chat.save", site, err)
+	}
+}
+
+// performFinalSave persists the active conversation once, on shutdown.
+//
+// Companions, then the log, then the snapshot are written under a single lock
+// hold, so stale log lines, deleted messages and legacy DOM-scrape entries cannot
+// survive the rewrite, and a chat that was never loaded keeps its stored history
+// instead of being truncated.
+func (a *App) performFinalSave() error {
+	count, err := a.conversation.FinalSave()
 	if err != nil {
 		return err
 	}
-	a.updateChatDataFromAppState(chatData)
-	return a.chatPersistence.SaveChat(chatData)
-}
-
-func (a *App) performFinalSave() error {
-	if err := a.performSave(); err != nil {
-		return fmt.Errorf("final save: %w", err)
+	if count > 0 || a.conversation.ActiveID() != "" {
+		fmt.Println("[FinalSave] committed history with", count, "entries")
 	}
-	if a.chatPersistence == nil {
-		return nil
-	}
-	chatID := a.chatPersistence.GetLastChatID()
-	if chatID == "" {
-		return nil
-	}
-	// On exit, rewrite the append log from the state that was just persisted, so
-	// stale lines (duplicate appends, deleted messages, legacy DOM-scrape entries)
-	// cannot survive into the next launch. Sourced from the saved chat data rather
-	// than a bare in-memory list: a chat that was never loaded this session keeps
-	// its existing history instead of being truncated to nothing.
-	chatData, err := a.chatPersistence.LoadChat(chatID)
-	if err != nil {
-		return fmt.Errorf("final history reload: %w", err)
-	}
-	a.updateChatDataFromAppState(chatData)
-	if err := a.chatPersistence.RewriteHistory(chatID, chatData.History); err != nil {
-		return fmt.Errorf("final history rewrite: %w", err)
-	}
-	fmt.Println("[FinalSave] rewrote history.ndjson with", len(chatData.History), "entries")
 	return nil
 }
 
-// recordUserTurn appends a user turn to the in-memory history unless the
-// immediately preceding message is already the identical user turn.
-// The frontend records the user's message via AppendChatMessage before it
-// starts inference; without this guard the same turn is appended a second
-// time here and buildPromptMessages() sends it to the model twice.
-func (a *App) recordUserTurn(content string) {
-	if n := len(a.chatMessages); n > 0 {
-		if role, _ := a.chatMessages[n-1]["role"].(string); role == "user" {
-			if prev, _ := a.chatMessages[n-1]["content"].(string); prev == content {
-				return
-			}
-		}
-	}
-	a.chatMessages = append(a.chatMessages, map[string]interface{}{
-		"role": "user", "content": content, "timestamp": time.Now().Format(time.RFC3339),
-	})
-}
-
-func (a *App) buildChatHistory() []chat.ChatHistory {
-	history := make([]chat.ChatHistory, 0, len(a.chatMessages))
-	for _, msg := range a.chatMessages {
-		role, _ := msg["role"].(string)
-		content, _ := msg["content"].(string)
-		if strings.TrimSpace(content) == "" {
-			continue
-		}
-		sender := "System"
-		switch role {
-		case "user":
-			if s, ok := msg["sender"].(string); ok && s != "" {
-				sender = s
-			} else {
-				sender = "User"
-			}
-		case "assistant":
-			if c, ok := msg["character"].(string); ok && c != "" {
-				sender = c
-			} else if s, ok := msg["sender"].(string); ok && s != "" {
-				sender = s
-			} else {
-				sender = "Assistant"
-			}
-		}
-		characterID, _ := msg["characterId"].(string)
-		timestamp, _ := msg["timestamp"].(string)
-		if timestamp == "" {
-			timestamp = time.Now().Format(time.RFC3339)
-		}
-		hasImage, _ := msg["hasImage"].(bool)
-		history = append(history, chat.ChatHistory{
-			ID:          fmt.Sprintf("%d", len(history)),
-			Sender:      sender,
-			Text:        content,
-			Role:        role,
-			Timestamp:   timestamp,
-			HasImage:    hasImage,
-			CharacterID: characterID,
-		})
-	}
-	return history
-}
-
-func (a *App) updateChatDataFromAppState(chatData *chat.ChatData) {
-	history := a.buildChatHistory()
-	if len(history) > 0 || len(chatData.History) == 0 {
-		chatData.History = history
-	}
-	chatData.Meta.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
-	if a.world != nil {
-		chatData.World = a.world
-	}
-	if a.scenario != nil {
-		chatData.Scenario = a.scenario
-	}
-	if a.characters != nil {
-		chatData.Characters = a.characters
-	}
-
-	lorebookItems := make([]interface{}, 0, len(a.lorebooks))
-	lorebookNames := make([]string, 0, len(a.lorebooks))
-	for _, lb := range a.lorebooks {
-		lorebookItems = append(lorebookItems, map[string]interface{}{
-			"id": lb.ID, "title": lb.Title, "content": lb.Content, "tags": lb.Tags,
-		})
-		if lb.Title != "" {
-			lorebookNames = append(lorebookNames, lb.Title)
-		}
-	}
-	chatData.Lorebooks = lorebookItems
-	if chatData.Memories == nil {
-		chatData.Memories = []interface{}{}
-	}
-	if chatData.Meta.WorldName == "" && a.world != nil {
-		chatData.Meta.WorldName = a.world.Name
-	}
-	if chatData.Meta.ScenarioName == "" && a.scenario != nil {
-		chatData.Meta.ScenarioName = a.scenario.Name
-	}
-	if len(a.characters) > 0 {
-		charNames := make([]string, 0, len(a.characters))
-		for _, c := range a.characters {
-			if c != nil && c.Name != "" {
-				charNames = append(charNames, c.Name)
-			}
-		}
-		chatData.Meta.CharacterNames = charNames
-	}
-	chatData.Meta.LorebookNames = lorebookNames
-
-	// Sync tracking arrays from current in-memory state.
-	// Any character/lorebook currently present is considered active.
-	// Clear them from removed lists so they aren't accidentally filtered out.
-	activeCharIds := make([]string, 0, len(a.characters))
-	for _, c := range a.characters {
-		if c != nil && c.ID != "" {
-			activeCharIds = append(activeCharIds, c.ID)
-		}
-	}
-	newRemovedChars := make([]string, 0, len(chatData.Meta.RemovedCharacters))
-	for _, id := range chatData.Meta.RemovedCharacters {
-		if !containsString(activeCharIds, id) {
-			newRemovedChars = append(newRemovedChars, id)
-		}
-	}
-	chatData.Meta.ActiveCharacters = activeCharIds
-	chatData.Meta.RemovedCharacters = newRemovedChars
-	chatData.Meta.AddedCharacters = []string{}
-
-	activeBookIds := make([]string, 0, len(a.lorebooks))
-	for _, lb := range a.lorebooks {
-		if lb.ID != "" {
-			activeBookIds = append(activeBookIds, lb.ID)
-		}
-	}
-	newRemovedBooks := make([]string, 0, len(chatData.Meta.RemovedLorebooks))
-	for _, id := range chatData.Meta.RemovedLorebooks {
-		if !containsString(activeBookIds, id) {
-			newRemovedBooks = append(newRemovedBooks, id)
-		}
-	}
-	chatData.Meta.ActiveLorebooks = activeBookIds
-	chatData.Meta.RemovedLorebooks = newRemovedBooks
-	chatData.Meta.AddedLorebooks = []string{}
-}
-
-func (a *App) updateAppStateFromChat(chatData *chat.ChatData) {
-	a.chatMessages = []map[string]interface{}{}
-	for _, h := range chatData.History {
+// sessionEntriesToMaps projects session turns into the renderer's message shape.
+// The binding contract is unchanged; only its source moved into the domain.
+func sessionEntriesToMaps(entries []chat.SessionEntry) []map[string]interface{} {
+	out := make([]map[string]interface{}, 0, len(entries))
+	for _, entry := range entries {
 		msg := map[string]interface{}{
-			"role": h.Role, "content": h.Text,
+			"role":    entry.Role,
+			"content": entry.Content,
 		}
-		// Preserve sender/character info so frontend can display who said what
-		if h.Sender != "" && h.Sender != "User" && h.Sender != "Assistant" && h.Sender != "System" {
-			if h.Role == "assistant" {
-				msg["character"] = h.Sender
-			} else {
-				msg["sender"] = h.Sender
-			}
-		} else if h.Sender != "" && h.Sender != "System" {
-			msg["sender"] = h.Sender
+		if entry.Sender != "" {
+			msg["sender"] = entry.Sender
 		}
-		if h.Timestamp != "" {
-			msg["timestamp"] = h.Timestamp
+		if entry.Character != "" {
+			msg["character"] = entry.Character
 		}
-		if h.HasImage {
+		if entry.Timestamp != "" {
+			msg["timestamp"] = entry.Timestamp
+		}
+		if entry.HasImage {
 			msg["hasImage"] = true
 		}
-		if h.CharacterID != "" {
-			msg["characterId"] = h.CharacterID
+		if entry.CharacterID != "" {
+			msg["characterId"] = entry.CharacterID
 		}
-		a.chatMessages = append(a.chatMessages, msg)
+		out = append(out, msg)
 	}
-
-	a.world = chatData.World
-	a.scenario = chatData.Scenario
-	a.characters = chatData.Characters
-	a.triggeredLore = map[string]bool{}
+	return out
 }
 
 // ---------------------------------------------------------------------------
@@ -696,43 +549,26 @@ func (a *App) parseLorebookEntryFromMap(m map[string]interface{}) (lorebook.Entr
 // ---------------------------------------------------------------------------
 
 func (a *App) GetSettings() map[string]interface{} {
-	if a.appSettings == nil {
-		return make(map[string]interface{})
-	}
-	return a.appSettings
+	return a.settings.All()
 }
 
 func (a *App) SetSettings(settings map[string]interface{}) error {
-	if a.settingsStore == nil {
+	if a.settings == nil {
 		return fmt.Errorf("settings store not initialized")
 	}
-	a.appSettings = settings
-
-	// Keep legacy sampler/model fields in sync so existing bindings still work.
-	// The sections are REPLACED, not merged: callers send the whole settings
-	// object, so a key missing from it means the user's value is gone. Merging
-	// kept stale sampler values alive and made a cleared section look applied -
-	// which silently overrode the per-family defaults.
-	if sampler, ok := settings["sampler"].(map[string]interface{}); ok {
-		a.samplerSettings = make(map[string]interface{}, len(sampler))
-		for k, v := range sampler {
-			a.samplerSettings[k] = v
-		}
-	}
-	if model, ok := settings["model"].(map[string]interface{}); ok {
-		a.modelSettings = make(map[string]interface{}, len(model))
-		for k, v := range model {
-			a.modelSettings[k] = v
-		}
-	}
-	if err := a.settingsStore.Save(settings); err != nil {
+	// The authority replaces the document and the sampler/model sections it
+	// carries, then persists it. The sections are REPLACED, not merged: callers
+	// send the whole settings object, so a key missing from it means the user's
+	// value is gone.
+	if err := a.settings.Replace(settings); err != nil {
 		return err
 	}
 	// Saving is not applying. Keep the complete requested contract current so
 	// status can distinguish a saved value from the active generation.
 	if rawAudio, ok := settings["audio"].(map[string]interface{}); ok {
-		a.setAudioDesired(audio.DesiredSettingsFromMap(rawAudio))
-		a.setAudioApplyError("")
+		a.audio.SetDesired(audio.DesiredSettingsFromMap(rawAudio))
+		a.audio.SetApplyError("")
 	}
+
 	return nil
 }

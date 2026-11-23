@@ -9,7 +9,7 @@ package main
 //   - GetTTSModels  — return all registered TTS voice models from any directory
 //   - RescanAllDirs — re-walk every remembered directory to pick up newly added files
 //
-// On startup, RescanAllDirs is called automatically from initImageEngine so new
+// On startup, RescanAllDirs runs as Level 0 background work so new
 // models dropped into any previously registered directory appear without any
 // manual action from the user.
 
@@ -69,76 +69,76 @@ type TTSModelInfo struct {
 // files are not registered as chat models; Whisper and other legacy assets
 // stay on their own ASR/inventory routes.
 func (a *App) ScanLLMDir(dir string) ([]LLMModelInfo, error) {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return nil, fmt.Errorf("model registry not initialised")
 	}
-	entries, seen, err := scanDirForType(dir, registry.KindLLM, []string{".gguf"}, a.modelRegistry.Lookup)
+	entries, seen, err := scanDirForType(dir, registry.KindLLM, []string{".gguf"}, a.registries.Models().Lookup)
 	if err != nil {
 		return nil, err
 	}
-	if _, _, err := a.modelRegistry.SyncDir(dir, entries, seen); err != nil {
+	if _, _, err := a.registries.Models().SyncDir(dir, entries, seen); err != nil {
 		a.logError(errors.REGModelAddFail, errors.High, "registry.llm.merge", "app-model-registry.go:74", err)
 		return nil, err
 	}
-	if err := a.modelRegistry.RegisterDir(dir, registry.KindLLM); err != nil {
+	if err := a.registries.Models().RegisterDir(dir, registry.KindLLM); err != nil {
 		a.logErrorSilent(errors.REGModelAddFail, errors.Medium, "registry.llm.dir", "app-model-registry.go", err)
 	}
-	return llmInfos(a.modelRegistry.ByTypeInDirs("llm", registry.KindLLM)), nil
+	return llmInfos(a.registries.Models().ByTypeInDirs("llm", registry.KindLLM)), nil
 }
 
 // ScanTTSDir walks dir for Piper .onnx voice model files, registers them,
 // and remembers the directory for future auto-rescans.
 func (a *App) ScanTTSDir(dir string) ([]TTSModelInfo, error) {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return nil, fmt.Errorf("model registry not initialised")
 	}
-	entries, seen, err := scanDirForType(dir, registry.KindTTS, []string{".onnx"}, a.modelRegistry.Lookup)
+	entries, seen, err := scanDirForType(dir, registry.KindTTS, []string{".onnx"}, a.registries.Models().Lookup)
 	if err != nil {
 		return nil, err
 	}
-	if _, _, err := a.modelRegistry.SyncDir(dir, entries, seen); err != nil {
+	if _, _, err := a.registries.Models().SyncDir(dir, entries, seen); err != nil {
 		a.logError(errors.REGModelAddFail, errors.High, "registry.tts.merge", "app-model-registry.go:93", err)
 		return nil, err
 	}
-	if err := a.modelRegistry.RegisterDir(dir, registry.KindTTS); err != nil {
+	if err := a.registries.Models().RegisterDir(dir, registry.KindTTS); err != nil {
 		a.logErrorSilent(errors.REGModelAddFail, errors.Medium, "registry.tts.dir", "app-model-registry.go", err)
 	}
-	return ttsInfos(a.modelRegistry.ByTypeInDirs("tts", registry.KindTTS)), nil
+	return ttsInfos(a.registries.Models().ByTypeInDirs("tts", registry.KindTTS)), nil
 }
 
 // GetRegisteredLLMDirs returns all directories currently registered for LLM scanning.
 func (a *App) GetRegisteredLLMDirs() ([]string, error) {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return []string{}, fmt.Errorf("model registry not initialised")
 	}
-	return a.modelRegistry.Directories(registry.KindLLM), nil
+	return a.registries.Models().Directories(registry.KindLLM), nil
 }
 
 // GetLLMModels returns all registered LLM models from every known directory,
 // pruning any whose files have been deleted from disk.
 func (a *App) GetLLMModels() ([]LLMModelInfo, error) {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return []LLMModelInfo{}, fmt.Errorf("model registry not initialised")
 	}
-	return llmInfos(a.modelRegistry.ByTypeInDirs("llm", registry.KindLLM)), nil
+	return llmInfos(a.registries.Models().ByTypeInDirs("llm", registry.KindLLM)), nil
 }
 
 // RemoveLLMModel removes a single model entry from the registry by its path.
 // Does NOT delete the underlying file from disk.
 func (a *App) RemoveLLMModel(path string) error {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return fmt.Errorf("model registry not initialised")
 	}
-	return a.modelRegistry.Remove(path)
+	return a.registries.Models().Remove(path)
 }
 
 // UnregisterLLMDir removes a directory from the LLM scan list and also
 // removes all registered models whose path lives inside that directory.
 func (a *App) UnregisterLLMDir(dir string) error {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return fmt.Errorf("model registry not initialised")
 	}
-	return a.modelRegistry.UnregisterDir(dir)
+	return a.registries.Models().UnregisterDir(dir)
 }
 
 // GetLLMModelDetails returns enriched metadata and memory estimates for a single model path.
@@ -151,11 +151,11 @@ func (a *App) GetLLMModelDetails(path string) (*LLMModelDetail, error) {
 
 	gpuLayers := 0
 	ctxSize := 4096
-	if a.modelSettings != nil {
-		if gl, ok := a.modelSettings["gpu_layers"].(int); ok {
+	if a.settings.Model() != nil {
+		if gl, ok := a.settings.Model()["gpu_layers"].(int); ok {
 			gpuLayers = gl
 		}
-		if cs, ok := a.modelSettings["context_size"].(int); ok {
+		if cs, ok := a.settings.Model()["context_size"].(int); ok {
 			ctxSize = cs
 		}
 	}
@@ -193,17 +193,17 @@ func (a *App) GetLLMModelDetails(path string) (*LLMModelDetail, error) {
 // GetTTSModels returns all registered TTS voice models from every known
 // directory, pruning any whose files have been deleted from disk.
 func (a *App) GetTTSModels() ([]TTSModelInfo, error) {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return []TTSModelInfo{}, fmt.Errorf("model registry not initialised")
 	}
-	return ttsInfos(a.modelRegistry.ByTypeInDirs("tts", registry.KindTTS)), nil
+	return ttsInfos(a.registries.Models().ByTypeInDirs("tts", registry.KindTTS)), nil
 }
 
 // RescanAllDirs re-walks every previously registered directory and merges
 // any new files into the registry. Called automatically on startup.
 // Non-fatal: errors per directory are logged, not returned.
 func (a *App) RescanAllDirs() {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return
 	}
 	// Image directories keep their persisted entries across restarts and are
@@ -211,7 +211,7 @@ func (a *App) RescanAllDirs() {
 	// keeps startup cheap for users with very large model folders.
 	startupMark("rescan: start")
 	for _, kind := range []string{registry.KindLLM, registry.KindTTS} {
-		for _, dir := range a.modelRegistry.Directories(kind) {
+		for _, dir := range a.registries.Models().Directories(kind) {
 			if _, err := os.Stat(dir); err != nil {
 				continue // drive unplugged or directory gone
 			}

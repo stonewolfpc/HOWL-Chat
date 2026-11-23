@@ -13,6 +13,7 @@ import (
 
 	"howl-chat/internal/audio"
 	audiotypes "howl-chat/internal/audio/types"
+	"howl-chat/internal/media"
 )
 
 type appFakePipeline struct {
@@ -107,33 +108,39 @@ func desiredWithBackend(settings audio.Settings) audio.DesiredSettings {
 func newAudioTestApp(t *testing.T, factory audio.PipelineFactory) (*App, *audio.Manager) {
 	t.Helper()
 	manager := audio.NewManager(factory)
-	app := &App{audioManager: manager}
+	app := newAudioTestAppWithManager(manager)
 	t.Cleanup(func() {
 		_ = manager.Close(context.Background())
 	})
 	return app, manager
 }
 
-// A1: App owns exactly one manager and no direct pipeline field.
+// A1: the Media domain owns exactly one manager and no direct pipeline field;
+// App holds the owner, not the manager.
 func TestA1SingleManagerOwnership(t *testing.T) {
 	appType := reflect.TypeOf(App{})
 	if _, ok := appType.FieldByName("audioPipeline"); ok {
 		t.Fatal("App still has an audioPipeline field")
 	}
-	field, ok := appType.FieldByName("audioManager")
-	if !ok {
-		t.Fatal("App has no audioManager field")
+	if _, ok := appType.FieldByName("audioManager"); ok {
+		t.Fatal("App still has an audioManager field; the Media domain owns it")
 	}
-	managerType := reflect.TypeOf((*audio.Manager)(nil))
-	if field.Type != managerType {
-		t.Fatalf("audioManager type = %v, want %v", field.Type, managerType)
+	field, ok := appType.FieldByName("audio")
+	if !ok {
+		t.Fatal("App has no audio owner field")
+	}
+	ownerType := reflect.TypeOf((*media.Audio)(nil))
+	if field.Type != ownerType {
+		t.Fatalf("audio field type = %v, want %v", field.Type, ownerType)
 	}
 
+	managerType := reflect.TypeOf((*audio.Manager)(nil))
+	pipelineType := reflect.TypeOf((*audio.Pipeline)(nil))
+	ownerStruct := reflect.TypeOf(media.Audio{})
 	managerFields := 0
 	pipelineFields := 0
-	pipelineType := reflect.TypeOf((*audio.Pipeline)(nil))
-	for i := 0; i < appType.NumField(); i++ {
-		fieldType := appType.Field(i).Type
+	for i := 0; i < ownerStruct.NumField(); i++ {
+		fieldType := ownerStruct.Field(i).Type
 		if fieldType == managerType {
 			managerFields++
 		}
@@ -142,10 +149,10 @@ func TestA1SingleManagerOwnership(t *testing.T) {
 		}
 	}
 	if managerFields != 1 {
-		t.Fatalf("manager fields = %d, want exactly 1", managerFields)
+		t.Fatalf("manager fields in media.Audio = %d, want exactly 1", managerFields)
 	}
 	if pipelineFields != 0 {
-		t.Fatalf("direct pipeline fields = %d, want 0", pipelineFields)
+		t.Fatalf("direct pipeline fields in media.Audio = %d, want 0", pipelineFields)
 	}
 }
 

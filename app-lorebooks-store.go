@@ -15,10 +15,10 @@ import (
 // derived cache and the legacy source for the explicit import.
 
 func (a *App) lorebookBackend() (*lorebookstore.Store, error) {
-	if a.lorebookStore == nil {
+	if a.registries.Lorebooks() == nil {
 		return nil, fmt.Errorf("lorebook store not initialised")
 	}
-	return a.lorebookStore, nil
+	return a.registries.Lorebooks(), nil
 }
 
 // GetLorebookStoreStatus reports ownership state without listing entries.
@@ -110,11 +110,11 @@ func (a *App) RollbackLorebookImport() (lorebookstore.ImportResult, error) {
 // browser library list). Legacy scoped lore loaded from world/scenario/character
 // files is not library-owned and keeps its own lifecycle until it is migrated.
 func (a *App) mergeCanonicalLore(entries []lorebook.Entry, libraryOwned bool) []lorebook.Entry {
-	if a.lorebookStore == nil || (len(entries) == 0 && !libraryOwned) {
+	if a.registries.Lorebooks() == nil || (len(entries) == 0 && !libraryOwned) {
 		return entries
 	}
 
-	list := a.lorebookStore.List()
+	list := a.registries.Lorebooks().List()
 	if !list.Cutover {
 		return entries
 	}
@@ -189,10 +189,10 @@ func canonicalViewComplete(list lorebookstore.ListResult) bool {
 // canonicalLorebook returns one canonical entry by ID, if the store is cut over
 // and the entry currently exists.
 func (a *App) canonicalLorebook(id string) (lorebook.Entry, bool) {
-	if a.lorebookStore == nil || id == "" {
+	if a.registries.Lorebooks() == nil || id == "" {
 		return lorebook.Entry{}, false
 	}
-	list := a.lorebookStore.List()
+	list := a.registries.Lorebooks().List()
 	if !list.Cutover {
 		return lorebook.Entry{}, false
 	}
@@ -246,10 +246,10 @@ func (a *App) GetLorebookStoreDiagnostics() (map[string]interface{}, error) {
 // creates or registers one on the user's behalf.
 func (a *App) EnsureLorebookLibrary() (map[string]interface{}, error) {
 	out := map[string]interface{}{"configured": false}
-	if a.contentLibraries == nil {
+	if a.registries.Libraries() == nil {
 		return out, nil
 	}
-	reg, ok := a.contentLibraries.DefaultSave(library.Lorebooks)
+	reg, ok := a.registries.Libraries().DefaultSave(library.Lorebooks)
 	if !ok {
 		return out, nil
 	}

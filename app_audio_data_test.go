@@ -229,7 +229,7 @@ func TestTranscribedTextPersistsInChatHistory(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewPersistenceManagerWithDir: %v", err)
 	}
-	app.chatPersistence = persistence
+	app.conversation = chat.NewActiveConversation(persistence)
 	meta, err := app.NewChat("audio-history-test")
 	if err != nil {
 		t.Fatalf("NewChat: %v", err)

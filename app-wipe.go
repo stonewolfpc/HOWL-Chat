@@ -6,9 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-
-	"howl-chat/internal/backend/chat"
-	"howl-chat/internal/backend/lorebook"
 )
 
 // These are variables so failure-injection tests can exercise the wipe
@@ -31,20 +28,20 @@ var (
 func (a *App) WipeAllData() error {
 	fmt.Println("[Wipe] Starting application content wipe...")
 
-	if a.chatPersistence == nil {
+	if !a.conversation.Bound() {
 		return fmt.Errorf("content wipe not started: chat persistence is not initialized")
 	}
-	if a.gallerySvc == nil {
+	if a.images.Gallery() == nil {
 		return fmt.Errorf("content wipe not started: gallery service is not initialized")
 	}
-	chatRoot := a.chatPersistence.RootDir()
-	galleryDir := a.gallerySvc.BaseDir()
+	chatRoot := a.conversation.RootDir()
+	galleryDir := a.images.Gallery().BaseDir()
 	if chatRoot == "" || galleryDir == "" {
 		return fmt.Errorf("content wipe not started: application content root is empty")
 	}
 
 	chatsDir := filepath.Join(chatRoot, "chats")
-	oldLastChatID := a.chatPersistence.GetLastChatID()
+	oldLastChatID := a.conversation.ActiveID()
 
 	chatStage, err := stageContentRoot(chatsDir)
 	if err != nil {
@@ -59,28 +56,23 @@ func (a *App) WipeAllData() error {
 	}
 
 	// At this point both roots are recoverable if a state reset fails.
-	if err := a.chatPersistence.SetLastChatID(""); err != nil {
+	if err := a.conversation.SetActiveID(""); err != nil {
 		restoreErr := restoreStagedRoots(chatStage, chatsDir, galleryStage, galleryDir)
 		if restoreErr != nil {
 			return fmt.Errorf("content wipe not completed: reset active chat: %w; root restore: %v", err, restoreErr)
 		}
 		return fmt.Errorf("content wipe not completed: reset active chat: %w", err)
 	}
-	if a.contentInventory != nil {
-		if err := a.contentInventory.Clear(); err != nil {
-			pointerErr := a.chatPersistence.SetLastChatID(oldLastChatID)
+	if a.registries.Inventory() != nil {
+		if err := a.registries.Inventory().Clear(); err != nil {
+			pointerErr := a.conversation.SetActiveID(oldLastChatID)
 			restoreErr := restoreStagedRoots(chatStage, chatsDir, galleryStage, galleryDir)
 			return fmt.Errorf("content wipe not completed: clear inventory: %w; pointer restore: %v; root restore: %v", err, pointerErr, restoreErr)
 		}
 	}
 
 	// The logical wipe has succeeded. Reset in-memory state only now.
-	a.characters = []*chat.CharacterContext{}
-	a.world = nil
-	a.scenario = nil
-	a.lorebooks = []lorebook.Entry{}
-	a.chatMessages = []map[string]interface{}{}
-	a.triggeredLore = make(map[string]bool)
+	a.session().Reset()
 	if a.memoryService != nil {
 		a.memoryService.SetChatID("")
 	}

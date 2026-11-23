@@ -50,7 +50,7 @@ func (a *App) GetTTSVoiceCatalog(engine string) (TTSVoiceCatalog, error) {
 	engine = strings.ToLower(strings.TrimSpace(engine))
 	inherited := engine == ""
 	if inherited {
-		engine = strings.ToLower(strings.TrimSpace(a.currentAudioDesired().TTSEngine))
+		engine = strings.ToLower(strings.TrimSpace(a.audio.Desired().TTSEngine))
 	}
 	if engine == "" || engine == "auto" {
 		return TTSVoiceCatalog{
@@ -97,10 +97,10 @@ func (a *App) GetTTSVoiceCatalog(engine string) (TTSVoiceCatalog, error) {
 }
 
 func (a *App) registeredPiperEntries() []registry.Entry {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return nil
 	}
-	return a.modelRegistry.ByTypeInDirs("tts", registry.KindTTS)
+	return a.registries.Models().ByTypeInDirs("tts", registry.KindTTS)
 }
 
 func buildPiperVoiceCatalog(catalog TTSVoiceCatalog, entries []registry.Entry, profile audiotypes.TTSModelProfile) TTSVoiceCatalog {

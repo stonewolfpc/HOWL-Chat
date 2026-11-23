@@ -27,10 +27,14 @@ const DeleteConfirm = (() => {
      * @param {object} opts
      * @param {string}   opts.title      - Bold heading, e.g. 'Delete "My World"?'
      * @param {string}   [opts.body]     - Optional detail line
+     * @param {string}   [opts.note]     - Optional trusted HTML note (may contain #dc-open-dir)
      * @param {function} opts.onConfirm  - Called when user clicks Delete
      * @param {function} [opts.onCancel] - Called when user cancels (optional)
+     * @param {string}   [opts.warning]  - Optional warning line; defaults to the irreversible-deletion sentence
+     * @param {string}   [opts.confirmLabel] - Optional confirm button label; defaults to 'Delete'
+     * @param {function} [opts.onOpenDirectory] - Called when the #dc-open-dir link is clicked
      */
-    function show({ title, body, onConfirm, onCancel }) {
+    function show({ title, body, note, warning, confirmLabel, onConfirm, onCancel, onOpenDirectory }) {
         _removeExisting();
 
         const overlay = document.createElement('div');
@@ -45,6 +49,10 @@ const DeleteConfirm = (() => {
             ? `<p style="color:var(--text-secondary);margin:8px 0 0;font-size:14px;">${body}</p>`
             : '';
 
+        const noteHtml = note
+            ? `<p style="color:var(--text-secondary);margin:10px 0 0;font-size:13px;line-height:1.45;">${note}</p>`
+            : '';
+
         overlay.innerHTML = `
             <div style="
                 background:#1e1e28; border:1px solid rgba(255,80,80,0.3);
@@ -53,8 +61,9 @@ const DeleteConfirm = (() => {
             ">
                 <h3 style="color:#fff;margin:0 0 4px;font-size:18px;">${title}</h3>
                 ${bodyText}
+                ${noteHtml}
                 <p style="color:#ff6b6b;font-weight:600;margin:16px 0 0;font-size:13px; display:flex; align-items:center; gap:6px;">
-                    <span class="icon icon-warning" style="width:14px;height:14px;"></span> Deletion is permanent and cannot be undone.
+                    <span class="icon icon-warning" style="width:14px;height:14px;"></span> ${warning || 'Deletion is permanent and cannot be undone.'}
                 </p>
                 <div style="display:flex;gap:12px;margin-top:24px;">
                     <button id="dc-cancel" style="
@@ -66,7 +75,7 @@ const DeleteConfirm = (() => {
                         flex:1;padding:10px;background:rgba(220,50,50,0.85);
                         border:1px solid rgba(255,80,80,0.4);color:#fff;
                         border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;
-                    ">Delete</button>
+                    ">${confirmLabel || 'Delete'}</button>
                 </div>
             </div>
         `;
@@ -77,6 +86,14 @@ const DeleteConfirm = (() => {
             overlay.remove();
             if (typeof onCancel === 'function') onCancel();
         });
+
+        const openLink = overlay.querySelector('#dc-open-dir');
+        if (openLink && typeof onOpenDirectory === 'function') {
+            openLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                onOpenDirectory();
+            });
+        }
 
         overlay.querySelector('#dc-confirm').addEventListener('click', () => {
             overlay.remove();

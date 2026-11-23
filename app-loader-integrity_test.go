@@ -117,7 +117,7 @@ func TestLoadModelRejectsVocoderBeforeSpawning(t *testing.T) {
 	if !strings.Contains(err.Error(), "vocoder") {
 		t.Fatalf("error = %v, want it to identify the vocoder", err)
 	}
-	if app.serverProc != nil {
+	if app.level0().Processes.Current() != nil {
 		t.Fatal("LoadModel started a server for a rejected asset")
 	}
 }
@@ -151,7 +151,8 @@ func TestRejectedLoadLeavesTheRunningServerAlive(t *testing.T) {
 		_ = child.Wait()
 	}()
 
-	app := &App{serverProc: child, loaderDiagnosticsDir: t.TempDir()}
+	app := &App{loaderDiagnosticsDir: t.TempDir()}
+	app.level0().Processes.Adopt(child, nil)
 	path := writeLoadTestGGUF(t, t.TempDir(), "vocoder.gguf", map[string]any{
 		"general.architecture": "this model cannot be used as LLM, use it via --model-vocoder in TTS examples",
 	})
@@ -162,7 +163,7 @@ func TestRejectedLoadLeavesTheRunningServerAlive(t *testing.T) {
 	if child.ProcessState != nil {
 		t.Fatal("a rejected load stopped the already-running llama-server")
 	}
-	if got := app.serverProc; got != child {
+	if got := app.level0().Processes.Current(); got != child {
 		t.Fatal("a rejected load replaced the running server handle")
 	}
 }
@@ -247,7 +248,7 @@ func TestLoadModelRejectsTaskIneligibleModelsBeforeSpawning(t *testing.T) {
 			if !strings.Contains(err.Error(), test.wantText) {
 				t.Fatalf("error = %v, want %q", err, test.wantText)
 			}
-			if app.serverProc != nil {
+			if app.level0().Processes.Current() != nil {
 				t.Fatal("LoadModel started a server for a task-ineligible model")
 			}
 		})
@@ -268,7 +269,7 @@ func TestLoadModelRejectsWhisperComponentBinBeforeSpawning(t *testing.T) {
 	if !strings.Contains(err.Error(), "denied for chat by default") {
 		t.Fatalf("error = %v, want the legacy default-deny explanation", err)
 	}
-	if app.serverProc != nil {
+	if app.level0().Processes.Current() != nil {
 		t.Fatal("LoadModel started a server for a legacy .bin")
 	}
 }

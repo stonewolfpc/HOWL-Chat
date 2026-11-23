@@ -12,27 +12,26 @@ import (
 // impersonal world facts, then the character card, then the scene, with the
 // rules that must survive a long chat restated at depth 0.
 func TestBuildPromptMessagesOrder(t *testing.T) {
-	app := &App{
-		world: &chat.WorldContext{World: entities.World{
-			Name: "Aethermoor", Description: "WorldDesc", KeyFacts: []string{"WorldFact"},
+	app := testApp()
+	app.session().SetWorld(&chat.WorldContext{World: entities.World{
+		Name: "Aethermoor", Description: "WorldDesc", KeyFacts: []string{"WorldFact"},
+	}})
+	app.session().SetScenario(&chat.ScenarioContext{Scenario: entities.Scenario{
+		Name: "Revolt", Description: "ScenarioDesc", KeyDetails: []string{"ScenarioDetail"},
+	}})
+	app.session().SetCharacters([]*chat.CharacterContext{
+		{Character: entities.Character{
+			Name: "Doren", Personality: "CharPersonality", Backstory: "CharBackstory",
+			Goals: []string{"CharGoal"}, Relationships: []string{"CharRelation"},
 		}},
-		scenario: &chat.ScenarioContext{Scenario: entities.Scenario{
-			Name: "Revolt", Description: "ScenarioDesc", KeyDetails: []string{"ScenarioDetail"},
-		}},
-		characters: []*chat.CharacterContext{
-			{Character: entities.Character{
-				Name: "Doren", Personality: "CharPersonality", Backstory: "CharBackstory",
-				Goals: []string{"CharGoal"}, Relationships: []string{"CharRelation"},
-			}},
-		},
-		chatMessages: []map[string]interface{}{
-			{"role": "user", "content": "first turn"},
-			{"role": "assistant", "content": "reply"},
-			{"role": "user", "content": "second turn"},
-		},
-	}
+	})
+	app.setTestMessages([]map[string]interface{}{
+		{"role": "user", "content": "first turn"},
+		{"role": "assistant", "content": "reply"},
+		{"role": "user", "content": "second turn"},
+	})
 
-	messages := app.buildPromptMessages()
+	messages := promptMessages(app)
 	if len(messages) == 0 || messages[0].Role != "system" {
 		t.Fatalf("expected a leading system message, got %#v", messages)
 	}
@@ -68,18 +67,19 @@ func TestBuildPromptMessagesOrder(t *testing.T) {
 	if strings.Contains(firstContent, "[System note:") {
 		t.Errorf("depth-0 note leaked into an earlier turn: %q", firstContent)
 	}
-	if len(app.chatMessages) != 3 {
-		t.Errorf("chatMessages was mutated, length = %d", len(app.chatMessages))
+	if app.session().Len() != 3 {
+		t.Errorf("session history was mutated, length = %d", app.session().Len())
 	}
-	if stored, _ := app.chatMessages[2]["content"].(string); strings.Contains(stored, "[System note:") {
+	if stored := app.session().Entries()[2].Content; strings.Contains(stored, "[System note:") {
 		t.Errorf("depth-0 note was written into stored history: %q", stored)
 	}
 }
 
 // A prompt with no roleplay context loaded must not grow roleplay scaffolding.
 func TestBuildPromptMessagesWithoutContext(t *testing.T) {
-	app := &App{chatMessages: []map[string]interface{}{{"role": "user", "content": "hi"}}}
-	messages := app.buildPromptMessages()
+	app := testApp()
+	app.setTestMessages([]map[string]interface{}{{"role": "user", "content": "hi"}})
+	messages := promptMessages(app)
 	system, _ := messages[0].Content.(string)
 	if !strings.Contains(system, "helpful, knowledgeable assistant") {
 		t.Errorf("expected assistant system prompt, got %q", system)

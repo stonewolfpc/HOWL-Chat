@@ -113,16 +113,16 @@ func (a *App) presentCompanions(modelName string) map[string]string {
 // missing-companion error, it produces a load that fails deep inside sd-server
 // with a message that names nothing useful.
 func (a *App) findCompatibleCompanion(family, role string) string {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return ""
 	}
 	bestPath := ""
 	bestRank := 3
-	for _, e := range a.modelRegistry.All() {
+	for _, e := range a.registries.Models().All() {
 		if e.Path == "" || e.Type != role {
 			continue
 		}
-		if a.modelRegistry.KindForPath(e.Path) != registry.KindImage {
+		if a.registries.Models().KindForPath(e.Path) != registry.KindImage {
 			continue
 		}
 		if ok, _ := deps.Compatible(family, role, filepath.Base(e.Path)); !ok {
@@ -304,7 +304,7 @@ func (a *App) DownloadModelDependencies(modelName string) (DependencyReport, err
 // has no architecture marker to key on, so the role is taken from the catalogue
 // that requested it rather than guessed a second time.
 func (a *App) registerCompanion(path, role, family string) {
-	if a.modelRegistry == nil || path == "" {
+	if a.registries.Models() == nil || path == "" {
 		return
 	}
 	info, err := os.Stat(path)
@@ -320,7 +320,7 @@ func (a *App) registerCompanion(path, role, family string) {
 		SizeMB:   float64(info.Size()) / (1024 * 1024),
 		FileSize: info.Size(),
 	}
-	if err := a.modelRegistry.MergeEntries([]registry.Entry{entry}); err != nil {
+	if err := a.registries.Models().MergeEntries([]registry.Entry{entry}); err != nil {
 		a.logErrorSilent(errors.REGModelAddFail, errors.Medium, "registry.companion", "app-image-deps.go", err)
 	}
 }

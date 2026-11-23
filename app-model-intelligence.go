@@ -12,13 +12,13 @@ import (
 // is cached by file size and modification time; it is not a claim that the
 // runtime can load the model.
 func (a *App) GetModelCatalog() ([]modelintel.Profile, error) {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return []modelintel.Profile{}, fmt.Errorf("model registry not initialised")
 	}
-	if a.modelIntel == nil {
+	if a.registries.Intel() == nil {
 		return []modelintel.Profile{}, fmt.Errorf("model intelligence cache not initialised")
 	}
-	entries := a.modelRegistry.All()
+	entries := a.registries.Models().All()
 	out := make([]modelintel.Profile, 0, len(entries))
 	for _, entry := range entries {
 		profile, err := a.modelProfile(entry)
@@ -32,13 +32,13 @@ func (a *App) GetModelCatalog() ([]modelintel.Profile, error) {
 
 // GetModelIntelligence returns the shared profile for one registered path.
 func (a *App) GetModelIntelligence(path string) (modelintel.Profile, error) {
-	if a.modelIntel == nil {
+	if a.registries.Intel() == nil {
 		return modelintel.Profile{}, fmt.Errorf("model intelligence cache not initialised")
 	}
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return modelintel.Profile{}, fmt.Errorf("model registry not initialised")
 	}
-	entry, ok := a.modelRegistry.Lookup(path)
+	entry, ok := a.registries.Models().Lookup(path)
 	if !ok {
 		return modelintel.Profile{}, fmt.Errorf("model is not registered: %s", path)
 	}
@@ -55,7 +55,7 @@ func (a *App) modelProfile(entry registry.Entry) (modelintel.Profile, error) {
 		size, modNS = info.Size(), info.ModTime().UnixNano()
 	}
 	artifacts := modelintel.InspectArtifacts(entry.Path)
-	if cached, ok := a.modelIntel.Get(entry.Path, size, modNS, artifacts.Fingerprint); ok {
+	if cached, ok := a.registries.Intel().Get(entry.Path, size, modNS, artifacts.Fingerprint); ok {
 		cached.Available = available
 		return cached, nil
 	}
@@ -70,7 +70,7 @@ func (a *App) modelProfile(entry registry.Entry) (modelintel.Profile, error) {
 		ModTimeNS: modNS,
 	}, artifacts)
 	profile.Available = available
-	if err := a.modelIntel.Put(profile); err != nil {
+	if err := a.registries.Intel().Put(profile); err != nil {
 		return profile, err
 	}
 	return profile, nil

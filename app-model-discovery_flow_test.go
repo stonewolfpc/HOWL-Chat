@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"howl-chat/internal/image/registry"
-	appsettings "howl-chat/internal/settings"
+	"howl-chat/internal/registries"
 )
 
 // writeDiscoveryGGUF writes a minimal GGUF v3 header so classification runs
@@ -187,9 +187,9 @@ func TestDiscoveryPromptDetectionDeferSuppressAndSilentScan(t *testing.T) {
 
 	recordsDir := t.TempDir()
 	app := &App{
-		modelRegistry:        reg,
+		registries:           registries.Compose(registries.Parts{Models: reg}),
 		discoveryDirOverride: recordsDir,
-		settingsStore:        appsettings.NewStore(t.TempDir()),
+		settings:             newTestSettingsAuthority(t, t.TempDir()),
 	}
 
 	state, err := app.GetModelDiscoveryState()
@@ -209,9 +209,9 @@ func TestDiscoveryPromptDetectionDeferSuppressAndSilentScan(t *testing.T) {
 		t.Fatalf("DeferDiscoveredDirectory: %v", err)
 	}
 	restarted := &App{
-		modelRegistry:        reg,
+		registries:           registries.Compose(registries.Parts{Models: reg}),
 		discoveryDirOverride: recordsDir,
-		settingsStore:        appsettings.NewStore(t.TempDir()),
+		settings:             newTestSettingsAuthority(t, t.TempDir()),
 	}
 	state, _ = restarted.GetModelDiscoveryState()
 	if state.Candidate != nil || state.Deferred != 1 {

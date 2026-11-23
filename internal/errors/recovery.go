@@ -29,8 +29,9 @@ func RecoverFromPanic(operation string, handler func(*TrackedError)) {
 }
 
 // RecoverSilent recovers from a panic without surfacing to user.
-// Use for background cleanup goroutines.
-func RecoverSilent(operation string, logger *Logger) {
+// Use for background cleanup goroutines. Any silent log sink satisfies the
+// parameter (the diagnostics owner's logger is the production one).
+func RecoverSilent(operation string, logger interface{ Log(*TrackedError) }) {
 	if r := recover(); r != nil {
 		err := New(
 			SYSPanicRecovered,

@@ -27,14 +27,14 @@ func (a *App) beginManagedAudio(ctx context.Context) (*audio.Operation, context.
 	if err := a.ensureAcceptingWork("audio operation"); err != nil {
 		return nil, nil, nil, nil, err
 	}
-	if a.audioManager == nil {
+	if a.audio.Manager() == nil {
 		return nil, nil, nil, nil, fmt.Errorf("audio manager not initialized")
 	}
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	op, opCtx := a.audioManager.BeginOperation(ctx, 0)
-	lease, err := a.audioManager.Acquire(opCtx)
+	op, opCtx := a.audio.Manager().BeginOperation(ctx, 0)
+	lease, err := a.audio.Manager().Acquire(opCtx)
 	if err != nil {
 		op.End()
 		return nil, nil, nil, nil, err
@@ -224,7 +224,7 @@ func parseVoiceOverrideJSON(voiceJSON string) (*audiotypes.VoiceOverride, error)
 // GetAudioStatus returns the current manager snapshot in the temporary 5A
 // shape expected by the existing frontend.
 func (a *App) GetAudioStatus() map[string]interface{} {
-	if a.audioManager == nil {
+	if a.audio.Manager() == nil {
 		return map[string]interface{}{
 			"asr_ready":         false,
 			"asr_readiness":     "not-ready",
@@ -244,11 +244,11 @@ func (a *App) GetAudioStatus() map[string]interface{} {
 			// the build and the installed assets can do, not what a running
 			// generation happens to have loaded.
 			"capabilities": audioCapabilityRecords(),
-			"mic":          microphoneStatusRecord(microphoneStatusNow()),
-			"settings":     audio.BuildSettingsReport(a.currentAudioDesired(), audio.Settings{}, false, audio.Status{}, "audio manager not initialized"),
+			"mic":          microphoneStatusRecord(microphonePresenceNow()),
+			"settings":     audio.BuildSettingsReport(a.audio.Desired(), audio.Settings{}, false, audio.Status{}, "audio manager not initialized"),
 		}
 	}
-	status := a.audioManager.Status()
+	status := a.audio.Manager().Status()
 	errorCount := 0
 	if status.ASR.Error != "" {
 		errorCount++
@@ -256,7 +256,10 @@ func (a *App) GetAudioStatus() map[string]interface{} {
 	if status.TTS.Error != "" {
 		errorCount++
 	}
-	mic := microphoneStatusNow()
+	// A status read must never open a capture stream: this runs on every Chat
+	// page load and tab return, and initializing the capture client is what
+	// Windows turns into a system-wide level change for other applications' audio.
+	mic := microphonePresenceNow()
 	readiness, readinessDetail := a.audioReadiness(status, mic)
 	active := status.Phase != "closing" && status.Phase != "closed" && status.Phase != "closed_with_errors"
 
@@ -268,7 +271,7 @@ func (a *App) GetAudioStatus() map[string]interface{} {
 	// capability fields. It is not the settings contract and must never be used
 	// as proof that the full desired configuration was applied; settings is the
 	// authoritative per-setting report.
-	installed, installedOK := a.audioManager.AppliedSettings()
+	installed, installedOK := a.audio.Manager().AppliedSettings()
 	var applied interface{}
 	if installedOK {
 		applied = map[string]interface{}{
@@ -278,7 +281,7 @@ func (a *App) GetAudioStatus() map[string]interface{} {
 			"tts_engine":  installed.TTSEngine,
 		}
 	}
-	settingsReport := audio.BuildSettingsReport(a.currentAudioDesired(), installed, installedOK, status, a.audioLastApplyError())
+	settingsReport := audio.BuildSettingsReport(a.audio.Desired(), installed, installedOK, status, a.audio.LastApplyError())
 	return map[string]interface{}{
 		// asr_ready is limited to locally initialized engines. A remote engine
 		// can be applied successfully and still have no locally proven readiness;
@@ -315,7 +318,7 @@ func (a *App) GetAudioStatus() map[string]interface{} {
 // Local adapters must be initialized; remote adapters are never presented as
 // locally ready merely because their client accepted configuration.
 func (a *App) audioReadiness(status audio.Status, mic MicrophoneStatus) (string, string) {
-	if !status.ASR.Requested && !a.asrActivationPending.Load() {
+	if !status.ASR.Requested && !a.audio.ASRPending() {
 		return "disabled", "ASR is disabled"
 	}
 	// Capture availability is checked before engine readiness: a loaded model
@@ -323,10 +326,10 @@ func (a *App) audioReadiness(status audio.Status, mic MicrophoneStatus) (string,
 	if !mic.Usable() {
 		return "mic-unavailable", mic.Message
 	}
-	if a.audioManager == nil {
+	if a.audio.Manager() == nil {
 		return "not-ready", "audio manager not initialized"
 	}
-	engine := strings.TrimSpace(a.audioManager.Desired().ASREngine)
+	engine := strings.TrimSpace(a.audio.Manager().Desired().ASREngine)
 	if engine == "" || engine == "auto" {
 		return "unconfigured", "select an explicit ASR engine"
 	}
@@ -359,10 +362,10 @@ func audioCapabilityRecords() []capability.Record {
 // GetTTSAvailableVoices returns the list of available voice names from the
 // current TTS engine. Voice enumeration only needs a generation lease.
 func (a *App) GetTTSAvailableVoices() []string {
-	if a.audioManager == nil {
+	if a.audio.Manager() == nil {
 		return nil
 	}
-	lease, err := a.audioManager.Acquire(context.Background())
+	lease, err := a.audio.Manager().Acquire(context.Background())
 	if err != nil {
 		return nil
 	}
@@ -391,125 +394,12 @@ func (a *App) ApplyAudioSettings(desired audio.DesiredSettings) error {
 	return a.applyAudioSettings(desired)
 }
 
-func (a *App) setAudioDesired(desired audio.DesiredSettings) {
-	a.audioDesiredMu.Lock()
-	a.audioDesired = desired
-	a.audioDesiredSet = true
-	a.audioDesiredMu.Unlock()
-}
-
-func (a *App) currentAudioDesired() audio.DesiredSettings {
-	a.audioDesiredMu.RLock()
-	defer a.audioDesiredMu.RUnlock()
-	if !a.audioDesiredSet {
-		return audio.DefaultDesiredSettings()
-	}
-	return a.audioDesired
-}
-
-func (a *App) setAudioApplyError(message string) {
-	a.audioDesiredMu.Lock()
-	a.audioApplyErr = message
-	a.audioDesiredMu.Unlock()
-}
-
-func (a *App) audioLastApplyError() string {
-	a.audioDesiredMu.RLock()
-	defer a.audioDesiredMu.RUnlock()
-	return a.audioApplyErr
-}
-
-// applyAudioSettings is the explicit activation path. The requested full
-// contract is stored before validation so status can explain exactly which
-// values were rejected. Only settings.Backend() is eligible for adoption by the
-// manager; unsupported fields never become Applied merely because they were
-// saved.
-//
-// ASR activation is gated on Windows capture availability. The probe runs before
-// the manager builds a generation, so a missing or unusable microphone cannot
-// allocate a model or reserve VRAM, and it runs again after the build so a device
-// that disappears mid-initialization is torn down instead of left loaded.
-func (a *App) applyAudioSettings(desired audio.DesiredSettings) error {
-	if err := a.ensureAcceptingWork("audio settings"); err != nil {
-		return err
-	}
-	a.setAudioDesired(desired)
-	issues := desired.Validate()
-	if audio.HasBackendValidationIssue(desired, issues) {
-		err := &audio.SettingsValidationError{Issues: issues}
-		a.setAudioApplyError(err.Error())
-		return err
-	}
-	if a.audioManager == nil {
-		err := fmt.Errorf("audio manager not initialized")
-		a.setAudioApplyError(err.Error())
-		return err
-	}
-
-	// A previous failure belongs to the previous attempt. Clear it only after
-	// the new request has been recorded and the manager is available.
-	a.setAudioApplyError("")
-	settings := desired.Backend()
-
-	if !settings.ASREnabled {
-		a.asrActivationPending.Store(false)
-		_, _, err := a.audioManager.Apply(context.Background(), settings)
-		if err != nil {
-			a.setAudioApplyError(err.Error())
-			a.logError(errors.ASRModelLoadFail, errors.High, "audio.apply", "app-audio.go:applyAudioSettings",
-				fmt.Errorf("apply ASR engine %q: %w", settings.ASREngine, err))
-		}
-		return err
-	}
-
-	// From here on the user has explicitly asked for ASR. Keep the request
-	// visible to status until a generation is both applied and still backed by
-	// a usable microphone.
-	a.asrActivationPending.Store(true)
-
-	mic := microphoneStatusNow()
-	if !mic.Usable() {
-		err := &MicrophoneUnavailableError{Status: mic}
-		a.setAudioApplyError(err.Error())
-		a.logError(errors.ASRMicUnavailable, errors.High, "audio.apply.mic", "app-audio.go:applyAudioSettings", err)
-		return err
-	}
-
-	if _, _, err := a.audioManager.Apply(context.Background(), settings); err != nil {
-		a.setAudioApplyError(err.Error())
-		a.logError(errors.ASRModelLoadFail, errors.High, "audio.apply", "app-audio.go:applyAudioSettings",
-			fmt.Errorf("apply ASR engine %q: %w", settings.ASREngine, err))
-		return err
-	}
-
-	after := microphoneStatusNow()
-	if !after.Usable() {
-		// The microphone disappeared while the model was loading. Retire the ASR
-		// capability in the same manager so no generation keeps a loaded model
-		// with no capture path. TTS, if requested, is preserved.
-		ttsOnly := settings
-		ttsOnly.ASREnabled = false
-		if _, _, abortErr := a.audioManager.Apply(context.Background(), ttsOnly); abortErr != nil {
-			a.logError(errors.ASRMicUnavailable, errors.High, "audio.apply.mic.abort",
-				"app-audio.go:applyAudioSettings", abortErr)
-		}
-		a.asrActivationPending.Store(true)
-		err := &MicrophoneUnavailableError{Status: after}
-		a.setAudioApplyError(err.Error())
-		a.logError(errors.ASRMicUnavailable, errors.High, "audio.apply.mic.lost", "app-audio.go:applyAudioSettings", err)
-		return err
-	}
-	a.asrActivationPending.Store(false)
-	a.setAudioApplyError("")
-	return nil
-}
-
 // EnableAudioASR toggles the ASR recognizer without discarding the desired TTS
 // engine or the persisted non-operational settings. The previous implementation
 // rebuilt the settings from one boolean, which silently reset an explicit engine
 // chosen in the settings panel.
 func (a *App) EnableAudioASR(enabled bool) error {
-	desired := a.currentAudioDesired()
+	desired := a.audio.Desired()
 	desired.ASREnabled = enabled
 	return a.applyAudioSettings(desired)
 }
@@ -517,7 +407,7 @@ func (a *App) EnableAudioASR(enabled bool) error {
 // EnableAudioTTS toggles the TTS synthesizer without discarding the desired
 // ASR engine or the persisted non-operational settings.
 func (a *App) EnableAudioTTS(enabled bool) error {
-	desired := a.currentAudioDesired()
+	desired := a.audio.Desired()
 	desired.TTSEnabled = enabled
 	return a.applyAudioSettings(desired)
 }

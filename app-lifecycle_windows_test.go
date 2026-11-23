@@ -16,10 +16,10 @@ func TestStopLlamaServerKillsAndWaitsThroughMonitor(t *testing.T) {
 	monitor := waitMonitor(cmd)
 
 	app := &App{}
-	app.adoptLlamaServer(cmd, monitor)
+	app.level0().Processes.Adopt(cmd, monitor.wait)
 
 	start := time.Now()
-	if err := app.stopLlamaServer(5 * time.Second); err != nil {
+	if err := app.level0().Processes.Stop(5 * time.Second); err != nil {
 		t.Fatalf("stopLlamaServer: %v", err)
 	}
 	if monitor.isAlive() {
@@ -28,7 +28,7 @@ func TestStopLlamaServerKillsAndWaitsThroughMonitor(t *testing.T) {
 	if elapsed := time.Since(start); elapsed > 5*time.Second {
 		t.Fatalf("stop took %s, want bounded exit", elapsed)
 	}
-	if cmd, _ := app.currentLlamaServer(); cmd != nil {
+	if cmd := app.level0().Processes.Current(); cmd != nil {
 		t.Fatal("server reference was not released")
 	}
 }

@@ -107,8 +107,8 @@ func familySamplingDefaults(opts *llama.InferenceOptions, family string) string 
 
 // familyName reports the loaded model's family for logs and the sampler binding.
 func (a *App) familyName() string {
-	if a.currentModelProfile != nil && a.currentModelProfile.Family != "" {
-		return a.currentModelProfile.Family
+	if a.engine.Profile() != nil && a.engine.Profile().Family != "" {
+		return a.engine.Profile().Family
 	}
 	return ""
 }

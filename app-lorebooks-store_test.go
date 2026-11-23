@@ -9,6 +9,7 @@ import (
 
 	"howl-chat/internal/library"
 	"howl-chat/internal/lorebookstore"
+	"howl-chat/internal/registries"
 )
 
 func newLorebookApp(t *testing.T) (*App, string) {
@@ -27,10 +28,8 @@ func newLorebookApp(t *testing.T) (*App, string) {
 	}); err != nil {
 		t.Fatalf("register root: %v", err)
 	}
-	app := &App{
-		contentLibraries: reg,
-		lorebookStore:    lorebookstore.New(reg, t.TempDir()),
-	}
+	app := testApp()
+	app.registries = registries.Compose(registries.Parts{Libraries: reg, Lorebooks: lorebookstore.New(reg, t.TempDir())})
 	return app, root
 }
 
@@ -136,7 +135,7 @@ func TestSetLorebooksResolvesCanonicalContent(t *testing.T) {
 		t.Fatalf("canonical edit: %v", err)
 	}
 
-	app.chatMessages = []map[string]interface{}{{"role": "user", "content": "I touch the sigil."}}
+	app.setTestMessages([]map[string]interface{}{{"role": "user", "content": "I touch the sigil."}})
 	snapshot := []map[string]interface{}{
 		{"id": "lore-1", "title": "Sigil", "content": "stale text", "triggerPhrases": []string{"sigil"}, "enabled": false},
 	}
@@ -174,7 +173,7 @@ func TestDeletedCanonicalEntryDoesNotResurrect(t *testing.T) {
 		t.Fatalf("import: %v", err)
 	}
 
-	app.chatMessages = []map[string]interface{}{{"role": "user", "content": "the token"}}
+	app.setTestMessages([]map[string]interface{}{{"role": "user", "content": "the token"}})
 	snapshot := []map[string]interface{}{
 		{"id": "lore-1", "title": "Old", "content": "old snapshot", "triggerPhrases": []string{"token"}, "enabled": true},
 		{"id": "lore-2", "title": "Kept", "content": "kept snapshot", "triggerPhrases": []string{"token"}, "enabled": true},
@@ -182,8 +181,8 @@ func TestDeletedCanonicalEntryDoesNotResurrect(t *testing.T) {
 	if err := app.SetLorebooks(snapshot); err != nil {
 		t.Fatalf("set: %v", err)
 	}
-	if len(app.lorebooks) != 2 {
-		t.Fatalf("pool = %d entries, want 2", len(app.lorebooks))
+	if len(app.sessionLorebooks()) != 2 {
+		t.Fatalf("pool = %d entries, want 2", len(app.sessionLorebooks()))
 	}
 
 	if _, err := app.DeleteLorebook("lore-1"); err != nil {
@@ -192,8 +191,8 @@ func TestDeletedCanonicalEntryDoesNotResurrect(t *testing.T) {
 	if err := app.SetLorebooks(snapshot); err != nil {
 		t.Fatalf("set after delete: %v", err)
 	}
-	if len(app.lorebooks) != 1 || app.lorebooks[0].ID != "lore-2" {
-		t.Fatalf("deleted entry survived through the snapshot: %+v", app.lorebooks)
+	if len(app.sessionLorebooks()) != 1 || app.sessionLorebooks()[0].ID != "lore-2" {
+		t.Fatalf("deleted entry survived through the snapshot: %+v", app.sessionLorebooks())
 	}
 	system := promptSystem(t, app)
 	if strings.Contains(system, "old canon") || strings.Contains(system, "old snapshot") {
@@ -212,16 +211,16 @@ func TestDisconnectedRootKeepsLastKnownEntry(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	app.chatMessages = []map[string]interface{}{{"role": "user", "content": "the token"}}
+	app.setTestMessages([]map[string]interface{}{{"role": "user", "content": "the token"}})
 	if err := app.SetLorebooks([]map[string]interface{}{
 		{"id": "lore-1", "title": "Offline", "content": "snapshot", "triggerPhrases": []string{"token"}, "enabled": true},
 	}); err != nil {
 		t.Fatalf("set: %v", err)
 	}
-	if len(app.lorebooks) != 1 {
-		t.Fatalf("incomplete canonical view dropped the last-known entry: %+v", app.lorebooks)
+	if len(app.sessionLorebooks()) != 1 {
+		t.Fatalf("incomplete canonical view dropped the last-known entry: %+v", app.sessionLorebooks())
 	}
-	if !app.lorebooks[0].Stale {
+	if !app.sessionLorebooks()[0].Stale {
 		t.Fatal("last-known entry from an unavailable root must be marked stale")
 	}
 	if system := promptSystem(t, app); strings.Contains(system, "offline canon") || strings.Contains(system, "snapshot") {
@@ -248,8 +247,8 @@ func TestReconnectedRootRestoresCanonicalContent(t *testing.T) {
 	if err := app.SetLorebooks(snapshot); err != nil {
 		t.Fatalf("set offline: %v", err)
 	}
-	if len(app.lorebooks) != 1 || !app.lorebooks[0].Stale {
-		t.Fatalf("offline root entry = %+v, want one stale entry", app.lorebooks)
+	if len(app.sessionLorebooks()) != 1 || !app.sessionLorebooks()[0].Stale {
+		t.Fatalf("offline root entry = %+v, want one stale entry", app.sessionLorebooks())
 	}
 
 	if err := os.Rename(offline, root); err != nil {
@@ -258,11 +257,11 @@ func TestReconnectedRootRestoresCanonicalContent(t *testing.T) {
 	if err := app.SetLorebooks(snapshot); err != nil {
 		t.Fatalf("set online: %v", err)
 	}
-	if len(app.lorebooks) != 1 || app.lorebooks[0].Stale {
-		t.Fatalf("reconnected entry = %+v, want one current entry", app.lorebooks)
+	if len(app.sessionLorebooks()) != 1 || app.sessionLorebooks()[0].Stale {
+		t.Fatalf("reconnected entry = %+v, want one current entry", app.sessionLorebooks())
 	}
-	if app.lorebooks[0].Content != "canon text" {
-		t.Fatalf("content = %q, want canonical text", app.lorebooks[0].Content)
+	if app.sessionLorebooks()[0].Content != "canon text" {
+		t.Fatalf("content = %q, want canonical text", app.sessionLorebooks()[0].Content)
 	}
 }
 
@@ -289,12 +288,12 @@ func TestEnablingLorebookCreatedAfterChatSave(t *testing.T) {
 		t.Fatalf("save result = %+v", saved)
 	}
 
-	app.chatMessages = []map[string]interface{}{{"role": "user", "content": "I light the beacon."}}
+	app.setTestMessages([]map[string]interface{}{{"role": "user", "content": "I light the beacon."}})
 	if err := app.UpdateLorebookContext([]string{saved.ID}); err != nil {
 		t.Fatalf("update context: %v", err)
 	}
-	if len(app.lorebooks) != 1 || !app.lorebooks[0].Enabled {
-		t.Fatalf("new canonical entry was not attached and enabled: %+v", app.lorebooks)
+	if len(app.sessionLorebooks()) != 1 || !app.sessionLorebooks()[0].Enabled {
+		t.Fatalf("new canonical entry was not attached and enabled: %+v", app.sessionLorebooks())
 	}
 	if system := promptSystem(t, app); !strings.Contains(system, "pale beacon") {
 		t.Fatalf("new canonical entry did not reach the prompt:\n%s", system)
@@ -303,20 +302,20 @@ func TestEnablingLorebookCreatedAfterChatSave(t *testing.T) {
 
 // Before cutover nothing changes: the browser store stays the source.
 func TestSetLorebooksKeepsSnapshotBeforeCutover(t *testing.T) {
-	app := &App{}
+	app := testApp()
 	if err := app.SetLorebooks([]map[string]interface{}{
 		{"id": "lore-1", "title": "Legacy", "content": "legacy text"},
 	}); err != nil {
 		t.Fatalf("set: %v", err)
 	}
-	if len(app.lorebooks) != 1 || app.lorebooks[0].Content != "legacy text" {
-		t.Fatalf("snapshot was rewritten before cutover: %+v", app.lorebooks)
+	if len(app.sessionLorebooks()) != 1 || app.sessionLorebooks()[0].Content != "legacy text" {
+		t.Fatalf("snapshot was rewritten before cutover: %+v", app.sessionLorebooks())
 	}
 }
 
 func promptSystem(t *testing.T, app *App) string {
 	t.Helper()
-	messages := app.buildPromptMessages()
+	messages := promptMessages(app)
 	if len(messages) == 0 {
 		t.Fatal("no prompt messages")
 	}

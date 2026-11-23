@@ -46,7 +46,7 @@
     <link rel="stylesheet" href="css/tutorials.css?v=41">
     <script src="js/html-utils.js?v=41"></script>
     <script src="js/menu.js?v=41"></script>
-    <script src="js/navigation.js?v=41"></script>
+    <script src="js/navigation.js?v=42"></script>
     <script src="js/theme.js?v=41"></script>
     <script src="js/storage-manager.js?v=41"></script>
     <script src="js/storage-indexeddb.js?v=41"></script>
@@ -62,7 +62,7 @@
     <script src="js/chat-actions.js?v=41"></script>
     <script src="js/chat-input.js?v=41"></script>
     <script src="js/chat-model.js?v=42"></script>
-    <script src="js/chat.js?v=41"></script>
+    <script src="js/chat.js?v=45"></script>
     <script src="js/audio-wav.js?v=42"></script>
     <script src="js/audio-service.js?v=42"></script>
     <script src="js/settings-state.js?v=41"></script>
@@ -71,7 +71,7 @@
     <script src="js/real-settings.js?v=41"></script>
     <script src="js/model-directory.js?v=1"></script>
     <script src="js/content-libraries.js?v=1"></script>
-    <script src="js/chat-session.js?v=41"></script>
+    <script src="js/chat-session.js?v=46"></script>
     <script src="js/loading-progress.js?v=41"></script>
     <script src="js/error-system.js?v=41"></script>
     <script src="js/error-handler.js?v=41"></script>
@@ -106,11 +106,11 @@
     <script src="js/context-panels.js?v=41"></script>
     <script src="js/context-selectors.js?v=41"></script>
     <script src="js/context-display.js?v=41"></script>
-    <script src="js/data-sync.js?v=41"></script>
-    <script src="js/delete-confirm.js?v=41"></script>
+    <script src="js/data-sync.js?v=43"></script>
+    <script src="js/delete-confirm.js?v=45"></script>
     <script src="js/delete-service.js?v=41"></script>
     <script src="js/sidebar-state.js?v=41"></script>
-    <script src="js/sidebar-session.js?v=41"></script>
+    <script src="js/sidebar-session.js?v=48"></script>
     <script src="js/sidebar-characters.js?v=41"></script>
     <script src="js/character-memories.js?v=41"></script>
     <script src="js/sidebar-context-world.js?v=41"></script>
@@ -119,7 +119,7 @@
     <script src="js/sidebar-context.js?v=41"></script>
     <script src="js/sidebar-panels.js?v=41"></script>
     <script src="js/memory-candidates-menu.js?v=41"></script>
-    <script src="js/chat-state-bridge.js?v=41"></script>
+    <script src="js/chat-state-bridge.js?v=42"></script>
 </head>
 <body>    <!-- Ambient Background Effects (from Artherius) -->
     <div class="ambient-bg">
@@ -1463,6 +1463,34 @@
                             <div class="setting-description">Permanently delete all application data</div>
                             <div class="setting-actions">
                                 <button class="setting-btn danger" onclick="clearAllData()">Clear All Data</button>
+                            </div>
+                        </div>
+
+                        <!-- Error Reporting -->
+                        <div class="setting-card">
+                            <label class="setting-label" for="error-reporting-enabled">Error Reporting</label>
+                            <div class="setting-description">Send privacy-safe crash reports to the maintainers</div>
+                            <div class="setting-control">
+                                <label class="setting-toggle">
+                                    <input type="checkbox" id="error-reporting-enabled"
+                                           onchange="ErrorSettings.setEnabled(this.checked)">
+                                    <span class="setting-toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Error Log -->
+                        <div class="setting-card">
+                            <div class="setting-label">Recent Errors</div>
+                            <div class="setting-description">Codes, operations and locations only. No messages, prompts or model names.</div>
+                            <div class="setting-actions">
+                                <button class="setting-btn" onclick="ErrorSettings.refresh()">Refresh</button>
+                                <button class="setting-btn" onclick="ErrorSettings.preview()">Preview Report</button>
+                                <button class="setting-btn" id="error-report-send" onclick="ErrorSettings.send()" disabled>Send Report</button>
+                            </div>
+                            <div id="error-report-status" class="setting-description" role="status"></div>
+                            <div id="error-log-list" style="margin-top:8px;max-height:180px;overflow-y:auto;font-size:12px;font-family:monospace;background:var(--bg-tertiary);padding:8px;border-radius:4px;color:var(--text-secondary);">
+                                <em>Loading...</em>
                             </div>
                         </div>
 

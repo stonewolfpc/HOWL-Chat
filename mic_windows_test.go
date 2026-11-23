@@ -16,6 +16,13 @@ func useWASAPIProbe(t *testing.T, probe func(uint32) wasapiProbeOutcome) {
 	t.Cleanup(func() { wasapiProbe = prev })
 }
 
+func useWASAPIPresenceProbe(t *testing.T, probe func(uint32) wasapiProbeOutcome) {
+	t.Helper()
+	prev := wasapiPresenceProbe
+	wasapiPresenceProbe = probe
+	t.Cleanup(func() { wasapiPresenceProbe = prev })
+}
+
 func successfulWASAPIOutcome(role uint32, hz uint32, channels uint16, bits uint16) wasapiProbeOutcome {
 	return wasapiProbeOutcome{
 		EndpointFound: true,
@@ -47,6 +54,8 @@ type fakeWASAPIBackend struct {
 	acquired        int
 	released        int
 	freed           int
+	activated       int
+	initialized     int
 }
 
 func (f *fakeWASAPIBackend) createEnumerator() (unsafe.Pointer, uint32) {
@@ -77,6 +86,7 @@ func (f *fakeWASAPIBackend) getState(_ unsafe.Pointer) (uint32, uint32) {
 }
 
 func (f *fakeWASAPIBackend) activate(_ unsafe.Pointer) (unsafe.Pointer, uint32) {
+	f.activated++
 	if f.activateHR != sOK {
 		return nil, f.activateHR
 	}
@@ -92,6 +102,7 @@ func (f *fakeWASAPIBackend) getMixFormat(_ unsafe.Pointer) (*waveFormatEx, uint3
 }
 
 func (f *fakeWASAPIBackend) initialize(_ unsafe.Pointer, _ *waveFormatEx) uint32 {
+	f.initialized++
 	return f.initHR
 }
 
@@ -352,6 +363,82 @@ func TestRunWASAPIProbeCleanupOnEveryPath(t *testing.T) {
 				t.Fatalf("freed format pointers = %d, want %d", test.backend.freed, test.wantFreed)
 			}
 		})
+	}
+}
+
+// TestPresenceProbeNeverActivatesOrInitializes pins the property the status path
+// depends on: presence costs one enumerator plus the endpoint object, and never
+// calls IMMDevice::Activate, GetMixFormat, or IAudioClient::Initialize. Those are
+// what create a capture session and make Windows change other audio.
+func TestPresenceProbeNeverActivatesOrInitializes(t *testing.T) {
+	backend := &fakeWASAPIBackend{state: deviceStateActive}
+
+	outcome := runWASAPIPresence(eConsole, backend)
+	if outcome.Stage != stagePresence {
+		t.Fatalf("stage = %q, want %q", outcome.Stage, stagePresence)
+	}
+	if outcome.Initialized {
+		t.Fatal("the presence probe reported an initialized stream")
+	}
+	if !outcome.EndpointFound {
+		t.Fatal("the presence probe did not record the endpoint")
+	}
+	if backend.activated != 0 {
+		t.Fatalf("IMMDevice::Activate called %d time(s) on a status read", backend.activated)
+	}
+	if backend.initialized != 0 {
+		t.Fatalf("IAudioClient::Initialize called %d time(s) on a status read", backend.initialized)
+	}
+	if backend.freed != 0 {
+		t.Fatalf("format pointers freed = %d, want 0", backend.freed)
+	}
+	if backend.acquired != 2 || backend.released != 2 {
+		t.Fatalf("acquired %d object(s), released %d; want 2 and 2 (enumerator plus endpoint)", backend.acquired, backend.released)
+	}
+
+	state, detail := classifyWASAPIOutcome(outcome)
+	if state != MicStateReady {
+		t.Fatalf("state = %q, want ready", state)
+	}
+	if !strings.Contains(detail, "present and active") || !strings.Contains(detail, "capture was not opened") {
+		t.Fatalf("detail = %q, want presence-only wording", detail)
+	}
+}
+
+func TestCapturePresenceStatusUsesConsoleRoleAndPresenceDetail(t *testing.T) {
+	useWASAPIPresenceProbe(t, func(role uint32) wasapiProbeOutcome {
+		return wasapiProbeOutcome{Stage: stagePresence, EndpointFound: true, Role: role}
+	})
+
+	status := probeCapturePresence()
+	if status.State != MicStateReady {
+		t.Fatalf("state = %q, want ready", status.State)
+	}
+	if status.Role != "console" {
+		t.Fatalf("role = %q, want console", status.Role)
+	}
+	if status.DeviceCount != 1 {
+		t.Fatalf("device count = %d, want 1", status.DeviceCount)
+	}
+	if strings.Contains(status.Detail, "initialized") {
+		t.Fatalf("detail = %q, must not claim initialization; no stream was opened", status.Detail)
+	}
+}
+
+func TestCapturePresenceKeepsExactNoDeviceStatus(t *testing.T) {
+	useWASAPIPresenceProbe(t, func(role uint32) wasapiProbeOutcome {
+		return wasapiProbeOutcome{Stage: stageGetDefault, HRESULT: eNotFound, Role: role}
+	})
+
+	status := probeCapturePresence()
+	if status.State != MicStateNoDevice {
+		t.Fatalf("state = %q, want no-device", status.State)
+	}
+	if status.Message != MicrophoneNoDeviceMessage {
+		t.Fatalf("message = %q, want exact %q", status.Message, MicrophoneNoDeviceMessage)
+	}
+	if status.Role != "console" {
+		t.Fatalf("role = %q, want console", status.Role)
 	}
 }
 

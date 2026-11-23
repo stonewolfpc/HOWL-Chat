@@ -8,3 +8,10 @@ package main
 func probeMicrophone() MicrophoneStatus {
 	return unsupportedMicrophoneStatus()
 }
+
+// probeCapturePresence is the presence-level counterpart and fails closed for the
+// same reason: this platform has no implemented way to prove the capture
+// endpoint exists, so it never reports ready.
+func probeCapturePresence() MicrophoneStatus {
+	return unsupportedMicrophoneStatus()
+}

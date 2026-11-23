@@ -13,10 +13,11 @@ import (
 	"sync"
 
 	"howl-chat/internal/backend/llama"
+	appruntime "howl-chat/internal/runtime"
 )
 
 type promptCapture struct {
-	inner   inferenceClient
+	inner   appruntime.Client
 	mu      sync.Mutex
 	last    []llama.ChatMessage
 	calls   int
@@ -24,7 +25,7 @@ type promptCapture struct {
 	forbid  []string
 }
 
-func wrapInferenceCapture(inner inferenceClient) inferenceClient {
+func wrapInferenceCapture(inner appruntime.Client) appruntime.Client {
 	capture := &promptCapture{
 		inner:   inner,
 		require: splitMarkers(os.Getenv("HOWL_CAPTURE_REQUIRE")),
@@ -120,7 +121,7 @@ func (c *promptCapture) reply() string {
 // GetPromptCapture reports the messages seen at the inference boundary. It is
 // available only in a promptcapture build; prompts stay in memory.
 func (a *App) GetPromptCapture() map[string]interface{} {
-	capture, ok := a.httpClient.(*promptCapture)
+	capture, ok := a.engine.Client().(*promptCapture)
 	if !ok {
 		return map[string]interface{}{"enabled": false}
 	}

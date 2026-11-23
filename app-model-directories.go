@@ -34,18 +34,18 @@ type ModelDirectory struct {
 // GetModelDirectories lists every remembered directory with its kind, whether
 // it is still on disk, and how many models are indexed under it.
 func (a *App) GetModelDirectories() ([]ModelDirectory, error) {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return []ModelDirectory{}, fmt.Errorf("model registry not initialised")
 	}
-	dirs := a.modelRegistry.Directories("")
+	dirs := a.registries.Models().Directories("")
 	out := make([]ModelDirectory, 0, len(dirs))
 	for _, dir := range dirs {
 		info, err := os.Stat(dir)
 		out = append(out, ModelDirectory{
 			Path:   dir,
-			Kind:   a.modelRegistry.KindForPath(dir),
+			Kind:   a.registries.Models().KindForPath(dir),
 			Exists: err == nil && info.IsDir(),
-			Models: len(a.modelRegistry.EntriesUnderDir(dir)),
+			Models: len(a.registries.Models().EntriesUnderDir(dir)),
 		})
 	}
 	return out, nil
@@ -55,7 +55,7 @@ func (a *App) GetModelDirectories() ([]ModelDirectory, error) {
 // it. A directory can only have one kind: re-adding it as a different kind is
 // refused rather than silently moving models between menus.
 func (a *App) AddModelDirectory(dir, kind string) (ModelDirectory, error) {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return ModelDirectory{}, fmt.Errorf("model registry not initialised")
 	}
 	dir = strings.TrimSpace(dir)
@@ -76,12 +76,12 @@ func (a *App) AddModelDirectory(dir, kind string) (ModelDirectory, error) {
 	if !info.IsDir() {
 		return ModelDirectory{}, fmt.Errorf("%q is not a directory", abs)
 	}
-	if existing := a.modelRegistry.KindForPath(abs); existing != "" && existing != kind {
+	if existing := a.registries.Models().KindForPath(abs); existing != "" && existing != kind {
 		return ModelDirectory{}, fmt.Errorf("%q is already added as %q; remove it before adding it as %q", abs, existing, kind)
 	}
 
 	count, scanErr := a.scanDirectoryIntoRegistry(abs, kind)
-	if err := a.modelRegistry.RegisterDir(abs, kind); err != nil {
+	if err := a.registries.Models().RegisterDir(abs, kind); err != nil {
 		return ModelDirectory{}, err
 	}
 	if scanErr != nil {
@@ -94,13 +94,13 @@ func (a *App) AddModelDirectory(dir, kind string) (ModelDirectory, error) {
 // RemoveModelDirectory forgets a directory and every model indexed under it.
 // Files on disk are never deleted, moved or modified.
 func (a *App) RemoveModelDirectory(dir string) error {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return fmt.Errorf("model registry not initialised")
 	}
 	if strings.TrimSpace(dir) == "" {
 		return fmt.Errorf("directory path is empty")
 	}
-	return a.modelRegistry.UnregisterDir(dir)
+	return a.registries.Models().UnregisterDir(dir)
 }
 
 // RefreshModelDirectories rescans every remembered directory (or only one kind
@@ -108,17 +108,17 @@ func (a *App) RemoveModelDirectory(dir string) error {
 // disappear. Missing directories are skipped, not forgotten: an unplugged drive
 // keeps its place in the list.
 func (a *App) RefreshModelDirectories(kind string) ([]ModelDirectory, error) {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return []ModelDirectory{}, fmt.Errorf("model registry not initialised")
 	}
 	if kind != "" && !registry.ValidKind(kind) {
 		return []ModelDirectory{}, fmt.Errorf("unknown directory kind %q", kind)
 	}
-	for _, dir := range a.modelRegistry.Directories(kind) {
+	for _, dir := range a.registries.Models().Directories(kind) {
 		if _, err := os.Stat(dir); err != nil {
 			continue
 		}
-		if _, err := a.scanDirectoryIntoRegistry(dir, a.modelRegistry.KindForPath(dir)); err != nil {
+		if _, err := a.scanDirectoryIntoRegistry(dir, a.registries.Models().KindForPath(dir)); err != nil {
 			a.logErrorSilent(errors.REGModelListFail, errors.Medium, "registry.dir.refresh", "app-model-directories.go", err)
 		}
 	}
@@ -130,7 +130,7 @@ func (a *App) RefreshModelDirectories(kind string) ([]ModelDirectory, error) {
 // their families and companion file slots; chat and voice directories only need
 // extension matching plus the GGUF architecture check.
 func (a *App) scanDirectoryIntoRegistry(dir, kind string) (int, error) {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return 0, fmt.Errorf("model registry not initialised")
 	}
 	switch kind {
@@ -139,11 +139,11 @@ func (a *App) scanDirectoryIntoRegistry(dir, kind string) (int, error) {
 		if kind == registry.KindTTS {
 			exts = []string{".onnx"}
 		}
-		entries, seen, err := scanDirForType(dir, kind, exts, a.modelRegistry.Lookup)
+		entries, seen, err := scanDirForType(dir, kind, exts, a.registries.Models().Lookup)
 		if err != nil {
 			return 0, err
 		}
-		added, removed, err := a.modelRegistry.SyncDir(dir, entries, seen)
+		added, removed, err := a.registries.Models().SyncDir(dir, entries, seen)
 		if err != nil {
 			return 0, err
 		}
@@ -155,7 +155,7 @@ func (a *App) scanDirectoryIntoRegistry(dir, kind string) (int, error) {
 	case registry.KindImage:
 		sc := scanner.New(dir)
 		sc.SetKnown(func(path string) (scanner.KnownEntry, bool) {
-			e, ok := a.modelRegistry.Lookup(path)
+			e, ok := a.registries.Models().Lookup(path)
 			if !ok {
 				return scanner.KnownEntry{}, false
 			}
@@ -175,7 +175,7 @@ func (a *App) scanDirectoryIntoRegistry(dir, kind string) (int, error) {
 		if err != nil {
 			return 0, err
 		}
-		added, removed, err := a.modelRegistry.SyncIndex(dir, idx)
+		added, removed, err := a.registries.Models().SyncIndex(dir, idx)
 		if err != nil {
 			return 0, err
 		}

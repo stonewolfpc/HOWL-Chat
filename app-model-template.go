@@ -15,8 +15,9 @@ import (
 // is worse than no template at all. Here a template the user typed is respected,
 // while a template this app injected for a previous family is replaced.
 func (a *App) spawnSettingsFor(profile *types.ModelProfile) map[string]interface{} {
-	out := make(map[string]interface{}, len(a.modelSettings)+1)
-	for k, v := range a.modelSettings {
+	live := a.settings.Model()
+	out := make(map[string]interface{}, len(live)+1)
+	for k, v := range live {
 		out[k] = v
 	}
 	if profile == nil || profile.Template == "" {
@@ -24,9 +25,9 @@ func (a *App) spawnSettingsFor(profile *types.ModelProfile) map[string]interface
 		return out
 	}
 	current, _ := out["custom_jinja_template"].(string)
-	if current == "" || current == a.autoTemplate {
+	if current == "" || current == a.engine.AutoTemplate() {
 		out["custom_jinja_template"] = profile.Template
-		a.autoTemplate = profile.Template
+		a.engine.SetAutoTemplate(profile.Template)
 		fmt.Printf("[LoadModel] chat template: model-native for family %q (%d bytes)\n",
 			profile.Family, len(profile.Template))
 	} else {

@@ -18,15 +18,15 @@ func (a *App) ResetApplicationSettings(defaults map[string]interface{}) error {
 	if defaults == nil {
 		return fmt.Errorf("reset settings: defaults are required")
 	}
-	if a.settingsStore == nil {
+	if a.settings.Store() == nil {
 		return fmt.Errorf("reset settings: settings store not initialized")
 	}
-	if a.imgSettingsStore == nil {
+	if a.images.Settings() == nil {
 		return fmt.Errorf("reset settings: image settings store not initialized")
 	}
 
-	previousSettings := a.appSettings
-	if _, err := a.imgSettingsStore.Load(); err != nil {
+	previousSettings := a.settings.All()
+	if _, err := a.images.Settings().Load(); err != nil {
 		return fmt.Errorf("reset settings: read image settings: %w", err)
 	}
 
@@ -34,18 +34,17 @@ func (a *App) ResetApplicationSettings(defaults map[string]interface{}) error {
 		return fmt.Errorf("reset settings: write application settings: %w", err)
 	}
 
-	if a.imageEngine != nil {
-		if err := a.imageEngine.Shutdown(); err != nil {
+	if a.images.Engine() != nil {
+		if err := a.images.Engine().Shutdown(); err != nil {
 			_ = a.SetSettings(previousSettings)
 			return fmt.Errorf("reset settings: stop image engine: %w", err)
 		}
 	}
-	if err := a.imgSettingsStore.Save(imgsettings.ImageSettings{}); err != nil {
+	if err := a.images.Settings().Save(imgsettings.ImageSettings{}); err != nil {
 		_ = a.SetSettings(previousSettings)
 		return fmt.Errorf("reset settings: write image settings: %w", err)
 	}
-	a.lastImageModel = ""
-	a.lastImageModelOpts = imagetypes.ModelLoadOptions{}
+	a.images.SetLastModel("", imagetypes.ModelLoadOptions{})
 	return nil
 }
 
@@ -53,18 +52,17 @@ func (a *App) ResetApplicationSettings(defaults map[string]interface{}) error {
 // reset calls the same storage path so there is one definition of "image
 // settings defaults".
 func (a *App) ResetImageSettings() error {
-	if a.imgSettingsStore == nil {
+	if a.images.Settings() == nil {
 		return fmt.Errorf("image settings store not initialized")
 	}
-	if a.imageEngine != nil {
-		if err := a.imageEngine.Shutdown(); err != nil {
+	if a.images.Engine() != nil {
+		if err := a.images.Engine().Shutdown(); err != nil {
 			return fmt.Errorf("stop image engine: %w", err)
 		}
 	}
-	if err := a.imgSettingsStore.Save(imgsettings.ImageSettings{}); err != nil {
+	if err := a.images.Settings().Save(imgsettings.ImageSettings{}); err != nil {
 		return fmt.Errorf("write image settings: %w", err)
 	}
-	a.lastImageModel = ""
-	a.lastImageModelOpts = imagetypes.ModelLoadOptions{}
+	a.images.SetLastModel("", imagetypes.ModelLoadOptions{})
 	return nil
 }

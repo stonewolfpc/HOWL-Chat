@@ -8,10 +8,12 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"howl-chat/internal/host"
 )
 
 func TestShutdownCoordinatorRunsOnceUnderConcurrency(t *testing.T) {
-	coord := &shutdownCoordinator{}
+	gate := host.NewGate()
 	var calls atomic.Int32
 	started := make(chan struct{})
 	release := make(chan struct{})
@@ -27,7 +29,7 @@ func TestShutdownCoordinatorRunsOnceUnderConcurrency(t *testing.T) {
 	errs := make(chan error, callers)
 	for i := 0; i < callers; i++ {
 		go func() {
-			errs <- coord.run(context.Background(), fn)
+			errs <- gate.Once(context.Background(), fn)
 		}()
 	}
 
@@ -46,23 +48,23 @@ func TestShutdownCoordinatorRunsOnceUnderConcurrency(t *testing.T) {
 }
 
 func TestShutdownCoordinatorReturnsTheSameError(t *testing.T) {
-	coord := &shutdownCoordinator{}
+	gate := host.NewGate()
 	want := stderrors.New("shutdown failed")
-	if err := coord.run(context.Background(), func(context.Context) error { return want }); !stderrors.Is(err, want) {
+	if err := gate.Once(context.Background(), func(context.Context) error { return want }); !stderrors.Is(err, want) {
 		t.Fatalf("first error = %v, want %v", err, want)
 	}
-	if err := coord.run(context.Background(), func(context.Context) error { return nil }); !stderrors.Is(err, want) {
+	if err := gate.Once(context.Background(), func(context.Context) error { return nil }); !stderrors.Is(err, want) {
 		t.Fatalf("repeated error = %v, want the first result %v", err, want)
 	}
 }
 
 func TestShutdownCoordinatorRecoversPanicAndLetsWaitersFinish(t *testing.T) {
-	coord := &shutdownCoordinator{}
+	gate := host.NewGate()
 	started := make(chan struct{})
 	done := make(chan error, 1)
 	go func() {
 		close(started)
-		done <- coord.run(context.Background(), func(context.Context) error {
+		done <- gate.Once(context.Background(), func(context.Context) error {
 			panic("cleanup panic")
 		})
 	}()
@@ -78,7 +80,7 @@ func TestShutdownCoordinatorRecoversPanicAndLetsWaitersFinish(t *testing.T) {
 	}
 
 	second := make(chan error, 1)
-	go func() { second <- coord.run(context.Background(), func(context.Context) error { return nil }) }()
+	go func() { second <- gate.Once(context.Background(), func(context.Context) error { return nil }) }()
 	select {
 	case err := <-second:
 		if err == nil || !strings.Contains(err.Error(), "shutdown panicked") {
@@ -97,7 +99,7 @@ func TestShutdownWithNilComponentsIsIdempotent(t *testing.T) {
 	if err := app.shutdown(context.Background()); err != nil {
 		t.Fatalf("second shutdown: %v", err)
 	}
-	if !app.shuttingDown.Load() {
+	if !app.level0().Gate.Stopping() {
 		t.Fatal("shutdown did not close the work gate")
 	}
 }

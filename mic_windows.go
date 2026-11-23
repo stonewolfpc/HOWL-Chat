@@ -55,6 +55,9 @@ const (
 	stageCOM        wasapiStage = "com"
 	stageGetDefault             = "get-default-endpoint"
 	stageState                  = "device-state"
+	// stagePresence marks a presence-only probe: the endpoint exists and is
+	// active, and no capture stream was opened.
+	stagePresence   wasapiStage = "presence"
 	stageActivate               = "activate"
 	stageMixFormat              = "mix-format"
 	stageInitialize             = "initialize"
@@ -115,6 +118,11 @@ var (
 // endpoint's own mix format, then releases everything. It never calls Start and
 // never receives samples, so "ready" means only that endpoint initialization
 // succeeded; it does not mean a recording or transcription succeeded.
+//
+// Initializing a capture client is a system-wide audio event: Windows treats an
+// active capture stream as communications activity and changes the level of
+// other applications' playback. This probe therefore belongs only to explicit
+// activation (applyAudioSettings). Status reads use probeCapturePresence.
 func probeMicrophone() MicrophoneStatus {
 	outcome := wasapiProbe(defaultCaptureRole)
 	state, detail := classifyWASAPIOutcome(outcome)
@@ -123,7 +131,22 @@ func probeMicrophone() MicrophoneStatus {
 	return status
 }
 
-var wasapiProbe = probeWASAPIDefaultCapture
+// probeCapturePresence asks only whether the default console capture endpoint
+// exists and is active. It never activates the endpoint, initializes a client,
+// or creates a stream, so it leaves the Windows capture state and every other
+// application's audio untouched.
+func probeCapturePresence() MicrophoneStatus {
+	outcome := wasapiPresenceProbe(defaultCaptureRole)
+	state, detail := classifyWASAPIOutcome(outcome)
+	status := newMicrophoneStatus(state, detail, boolToCount(outcome.EndpointFound))
+	status.Role = wasapiRoleName(outcome.Role)
+	return status
+}
+
+var (
+	wasapiProbe         = probeWASAPIDefaultCapture
+	wasapiPresenceProbe = probeWASAPIDefaultCapturePresence
+)
 
 // wasapiBackend is the narrow COM surface used by the probe. It exists so the
 // cleanup contract can be tested deterministically on every failure path; the
@@ -142,6 +165,16 @@ type wasapiBackend interface {
 // runWASAPIProbe acquires and releases every object with defers, including all
 // early-return paths. It never starts the stream.
 func runWASAPIProbe(role uint32, backend wasapiBackend) wasapiProbeOutcome {
+	return runWASAPIProbeLevel(role, backend, true)
+}
+
+// runWASAPIPresence stops as soon as the endpoint's state is known. It is the
+// only capture check safe to run repeatedly: nothing is activated or opened.
+func runWASAPIPresence(role uint32, backend wasapiBackend) wasapiProbeOutcome {
+	return runWASAPIProbeLevel(role, backend, false)
+}
+
+func runWASAPIProbeLevel(role uint32, backend wasapiBackend, openStream bool) wasapiProbeOutcome {
 	out := wasapiProbeOutcome{Role: role}
 
 	enumerator, hr := backend.createEnumerator()
@@ -171,6 +204,13 @@ func runWASAPIProbe(role uint32, backend wasapiBackend) wasapiProbeOutcome {
 	if state != deviceStateActive {
 		out.Stage = stageState
 		out.HRESULT = sOK
+		return out
+	}
+
+	if !openStream {
+		// Presence only: an active endpoint is the whole answer. IMMDevice
+		// is released without ever being activated.
+		out.Stage = stagePresence
 		return out
 	}
 
@@ -216,6 +256,18 @@ func runWASAPIProbe(role uint32, backend wasapiBackend) wasapiProbeOutcome {
 }
 
 func probeWASAPIDefaultCapture(role uint32) wasapiProbeOutcome {
+	return withCOMProbe(role, func(backend wasapiBackend) wasapiProbeOutcome {
+		return runWASAPIProbe(role, backend)
+	})
+}
+
+func probeWASAPIDefaultCapturePresence(role uint32) wasapiProbeOutcome {
+	return withCOMProbe(role, func(backend wasapiBackend) wasapiProbeOutcome {
+		return runWASAPIPresence(role, backend)
+	})
+}
+
+func withCOMProbe(role uint32, run func(wasapiBackend) wasapiProbeOutcome) wasapiProbeOutcome {
 	// COM apartments are thread-scoped. Keep CoInitializeEx, every interface
 	// call, and CoUninitialize on the same OS thread so the probe never calls
 	// an interface from a thread with a different (or no) COM initialization.
@@ -234,7 +286,7 @@ func probeWASAPIDefaultCapture(role uint32) wasapiProbeOutcome {
 	default:
 		return wasapiProbeOutcome{Stage: stageCOM, HRESULT: hr, Role: role}
 	}
-	return runWASAPIProbe(role, comWASAPIBackend{})
+	return run(comWASAPIBackend{})
 }
 
 type comWASAPIBackend struct{}
@@ -301,6 +353,11 @@ func (comWASAPIBackend) freeFormat(format *waveFormatEx) {
 // without COM or hardware.
 func classifyWASAPIOutcome(out wasapiProbeOutcome) (MicrophoneState, string) {
 	role := wasapiRoleName(out.Role)
+	if out.Stage == stagePresence {
+		// Presence is all this probe proved: the endpoint exists and is active.
+		// No capture client was created, so do not claim initialization.
+		return MicStateReady, fmt.Sprintf("the default %s capture endpoint is present and active in Windows; capture was not opened (no stream, no recording)", role)
+	}
 	if out.Initialized {
 		return MicStateReady, fmt.Sprintf(
 			"the default %s capture endpoint initialized in WASAPI shared mode with its mix format (tag 0x%04X, %d Hz, %d channel(s), %d-bit); recording and transcription were not started",

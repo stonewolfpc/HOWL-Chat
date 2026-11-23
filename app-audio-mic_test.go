@@ -29,11 +29,25 @@ func (p *micTestPipeline) Shutdown(context.Context) error {
 	return nil
 }
 
+// useMicProbe replaces both microphone seams with one probe, so a test that only
+// cares about the reported state does not need to know which level the code
+// under test asks for.
 func useMicProbe(t *testing.T, probe func() MicrophoneStatus) {
 	t.Helper()
-	prev := microphoneProbe
-	microphoneProbe = probe
-	t.Cleanup(func() { microphoneProbe = prev })
+	prevProbe, prevPresence := microphoneProbe, microphonePresenceProbe
+	microphoneProbe, microphonePresenceProbe = probe, probe
+	t.Cleanup(func() {
+		microphoneProbe, microphonePresenceProbe = prevProbe, prevPresence
+	})
+}
+
+// useMicPresenceProbe replaces only the status-read seam. Call it after
+// useMicProbe to observe which level a path actually uses.
+func useMicPresenceProbe(t *testing.T, probe func() MicrophoneStatus) {
+	t.Helper()
+	prev := microphonePresenceProbe
+	microphonePresenceProbe = probe
+	t.Cleanup(func() { microphonePresenceProbe = prev })
 }
 
 func constantMicProbe(status MicrophoneStatus) func() MicrophoneStatus {
@@ -71,7 +85,7 @@ func newMicTestApp(t *testing.T) (*App, *int32, *[]*micTestPipeline) {
 		}
 		return nil
 	}
-	return &App{audioManager: audio.NewManager(factory)}, &factoryCalls, pipelines
+	return newAudioTestAppWithManager(audio.NewManager(factory)), &factoryCalls, pipelines
 }
 
 func micStatusFromReport(t *testing.T, report map[string]interface{}) map[string]interface{} {
@@ -202,10 +216,10 @@ func TestMicrophoneDisappearingDuringInitializationAbortsGeneration(t *testing.T
 		t.Fatalf("pipeline factory calls = %d, want 1", got)
 	}
 
-	if _, applied := app.audioManager.AppliedSettings(); applied {
+	if _, applied := app.audio.Manager().AppliedSettings(); applied {
 		t.Fatal("an ASR generation remained active after the microphone disappeared")
 	}
-	if desired := app.audioManager.Desired(); desired.ASREnabled {
+	if desired := app.audio.Manager().Desired(); desired.ASREnabled {
 		t.Fatal("desired state still requests ASR after the abort")
 	}
 
@@ -264,6 +278,75 @@ func TestMicrophoneRetrySucceedsWithoutRestart(t *testing.T) {
 	}
 }
 
+// TestStatusReadNeverOpensCaptureStream is the regression guard for the audio
+// disturbance reported at startup and on tab return: reading status must use the
+// presence probe, which never activates the endpoint or initializes a capture
+// client. It covers both status branches, including the pre-manager one.
+func TestStatusReadNeverOpensCaptureStream(t *testing.T) {
+	var presenceCalls, initializeCalls int32
+	ready := newMicrophoneStatus(MicStateReady, "", 1)
+	useMicProbe(t, func() MicrophoneStatus {
+		atomic.AddInt32(&initializeCalls, 1)
+		return ready
+	})
+	useMicPresenceProbe(t, func() MicrophoneStatus {
+		atomic.AddInt32(&presenceCalls, 1)
+		return ready
+	})
+
+	app, factoryCalls, _ := newMicTestApp(t)
+	for i := 0; i < 3; i++ {
+		if report := app.GetAudioStatus(); report == nil {
+			t.Fatal("GetAudioStatus returned nil")
+		}
+	}
+	// The manager-less branch: status must still answer, and still without
+	// opening a capture stream.
+	if report := (&App{}).GetAudioStatus(); report == nil {
+		t.Fatal("GetAudioStatus without a manager returned nil")
+	}
+
+	if got := atomic.LoadInt32(&initializeCalls); got != 0 {
+		t.Fatalf("status reads ran the initialize-level probe %d time(s); a status read must not open a capture stream", got)
+	}
+	if got := atomic.LoadInt32(&presenceCalls); got != 4 {
+		t.Fatalf("presence probe calls = %d, want 4", got)
+	}
+	if got := atomic.LoadInt32(factoryCalls); got != 0 {
+		t.Fatalf("status reads built %d generation(s); a status read must not activate audio", got)
+	}
+}
+
+// TestExplicitActivationStillOpensCaptureStream keeps the other half of the
+// contract: the initialize-level probe (the one that proves capture works) is
+// what gates ASR activation, so it must still run exactly twice per apply.
+func TestExplicitActivationStillOpensCaptureStream(t *testing.T) {
+	var initializeCalls, presenceCalls int32
+	ready := newMicrophoneStatus(MicStateReady, "", 1)
+	useMicProbe(t, func() MicrophoneStatus {
+		atomic.AddInt32(&initializeCalls, 1)
+		return ready
+	})
+	useMicPresenceProbe(t, func() MicrophoneStatus {
+		atomic.AddInt32(&presenceCalls, 1)
+		return ready
+	})
+
+	app, factoryCalls, _ := newMicTestApp(t)
+	if err := app.applyAudioSettings(desiredWithBackend(audio.Settings{ASREnabled: true, ASREngine: "whisper-base"})); err != nil {
+		t.Fatalf("ASR activation failed with a ready microphone: %v", err)
+	}
+	if got := atomic.LoadInt32(&initializeCalls); got != 2 {
+		t.Fatalf("initialize-level probe calls during apply = %d, want 2 (before and after the build)", got)
+	}
+	if got := atomic.LoadInt32(&presenceCalls); got != 0 {
+		t.Fatalf("apply used the presence-only probe %d time(s); activation must prove capture works", got)
+	}
+	if got := atomic.LoadInt32(factoryCalls); got != 1 {
+		t.Fatalf("pipeline factory calls = %d, want 1", got)
+	}
+}
+
 func TestPersistedSelectionDoesNotLoadWithoutApply(t *testing.T) {
 	useMicProbe(t, constantMicProbe(newMicrophoneStatus(MicStateReady, "", 1)))
 	app, factoryCalls, _ := newMicTestApp(t)
@@ -275,7 +358,7 @@ func TestPersistedSelectionDoesNotLoadWithoutApply(t *testing.T) {
 	if got := atomic.LoadInt32(factoryCalls); got != 0 {
 		t.Fatalf("factory calls before any explicit apply = %d, want 0", got)
 	}
-	if _, applied := app.audioManager.AppliedSettings(); applied {
+	if _, applied := app.audio.Manager().AppliedSettings(); applied {
 		t.Fatal("a generation was applied without an explicit activation request")
 	}
 }

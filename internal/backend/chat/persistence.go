@@ -4,11 +4,14 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"time"
 
+	"howl-chat/internal/durable"
 	"howl-chat/internal/paths"
 )
 
@@ -16,6 +19,9 @@ import (
 type PersistenceManager struct {
 	rootDir string
 	config  AppConfig
+	// membership is the single authority for collection membership and deletion
+	// intent. It is loaded from the lifecycle log at initialize.
+	membership *Membership
 }
 
 // RootDir reports the application-owned chat root. Callers must use this
@@ -25,6 +31,13 @@ func (pm *PersistenceManager) RootDir() string {
 		return ""
 	}
 	return pm.rootDir
+}
+
+// ChatDirectory reports the on-disk directory for a conversation. It uses the same
+// constructor every mutation uses, so the path shown to a user is the path the
+// application would have written to.
+func (pm *PersistenceManager) ChatDirectory(chatID string) (string, error) {
+	return pm.conversationDir(chatID)
 }
 
 // NewPersistenceManagerWithDir creates a persistence manager rooted at an arbitrary directory.
@@ -77,15 +90,30 @@ func getAppDataDir() (string, error) {
 // initialize creates directories and loads config
 func (pm *PersistenceManager) initialize() error {
 	// Create root directory
-	if err := os.MkdirAll(pm.rootDir, 0755); err != nil {
+	if err := ensureDir(pm.rootDir); err != nil {
 		return fmt.Errorf("failed to create root directory: %w", err)
 	}
 
 	// Create chats directory
 	chatsDir := filepath.Join(pm.rootDir, "chats")
-	if err := os.MkdirAll(chatsDir, 0755); err != nil {
+	if err := ensureDir(chatsDir); err != nil {
 		return fmt.Errorf("failed to create chats directory: %w", err)
 	}
+
+	// Locks live outside chats/ so a lock file can never be a candidate
+	// conversation, and so deletion never removes a directory holding an open
+	// handle.
+	if err := ensureDir(pm.locksDir()); err != nil {
+		return fmt.Errorf("failed to create lock directory: %w", err)
+	}
+
+	// Load the membership authority. This is also where a legacy deleted.ndjson
+	// is absorbed into the lifecycle log, once.
+	membership, err := LoadMembership(pm.rootDir)
+	if err != nil {
+		return fmt.Errorf("failed to load conversation membership: %w", err)
+	}
+	pm.membership = membership
 
 	// Load or create config
 	if err := pm.loadConfig(); err != nil {
@@ -123,12 +151,22 @@ func (pm *PersistenceManager) loadConfig() error {
 func (pm *PersistenceManager) saveConfig() error {
 	configPath := filepath.Join(pm.rootDir, "config.json")
 
+	// LastChatID has one owner (this config) and one serialised write. Two
+	// instances pointing at the same root would otherwise interleave a
+	// read-modify-write: the lock makes the last intent win whole, rather than
+	// leaving a torn file or a silently lost update.
+	unlock, err := durable.LockFile(filepath.Join(pm.rootDir, "config.lock"), 2*time.Second)
+	if err != nil {
+		return fmt.Errorf("failed to lock config: %w", err)
+	}
+	defer unlock()
+
 	data, err := json.MarshalIndent(pm.config, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal config: %w", err)
 	}
 
-	if err := os.WriteFile(configPath, data, 0644); err != nil {
+	if err := writeFileAtomic(configPath, data, 0644); err != nil {
 		return fmt.Errorf("failed to write config file: %w", err)
 	}
 
@@ -143,19 +181,10 @@ func (pm *PersistenceManager) generateChatID() string {
 		now.Hour(), now.Minute(), now.Second())
 }
 
-// NewChat creates a new chat with the given name
-func (pm *PersistenceManager) NewChat(name string) (*ChatData, error) {
-	chatID := pm.generateChatID()
-	chatDir := filepath.Join(pm.rootDir, "chats", chatID)
-
-	// Create chat directory
-	if err := os.MkdirAll(chatDir, 0755); err != nil {
-		return nil, fmt.Errorf("failed to create chat directory: %w", err)
-	}
-
-	// Create chat data
+// newChatData builds a conversation's initial value. It performs no I/O.
+func newChatData(chatID, name string) *ChatData {
 	now := time.Now().UTC()
-	chatData := &ChatData{
+	return &ChatData{
 		Meta: ChatMeta{
 			ID:             chatID,
 			Name:           name,
@@ -173,28 +202,107 @@ func (pm *PersistenceManager) NewChat(name string) (*ChatData, error) {
 		Lorebooks:  []interface{}{},
 		Memories:   []interface{}{},
 	}
-
-	// Save initial chat data
-	if err := pm.SaveChat(chatData); err != nil {
-		return nil, fmt.Errorf("failed to save new chat: %w", err)
-	}
-
-	// Update config to set as last chat
-	pm.config.LastChatID = chatID
-	if err := pm.saveConfig(); err != nil {
-		return nil, fmt.Errorf("failed to update config: %w", err)
-	}
-
-	return chatData, nil
 }
 
-// SaveChat saves all chat data to files
-func (pm *PersistenceManager) SaveChat(chatData *ChatData) error {
-	chatDir := filepath.Join(pm.rootDir, "chats", chatData.Meta.ID)
+// errConversationExists means the generated identifier was already claimed. The
+// caller retries with a new identifier instead of adopting the existing directory.
+var errConversationExists = errors.New("conversation identifier already claimed")
 
-	// Ensure chat directory exists
-	if err := os.MkdirAll(chatDir, 0755); err != nil {
-		return fmt.Errorf("failed to create chat directory: %w", err)
+// NewChat creates a new chat with the given name.
+//
+// Creation claims its directory exclusively. Two creations in the same second no
+// longer share one directory: the second claims a suffixed identifier, so neither
+// can overwrite the other's metadata, companions or history (the data loss row 580
+// observed).
+func (pm *PersistenceManager) NewChat(name string) (*ChatData, error) {
+	baseID := pm.generateChatID()
+	for attempt := 0; attempt < 10; attempt++ {
+		chatID := baseID
+		if attempt > 0 {
+			chatID = fmt.Sprintf("%s-%d", baseID, attempt+1)
+		}
+
+		var created *ChatData
+		err := pm.withChatLock("create", chatID, func() error {
+			chatDir, err := pm.conversationDir(chatID)
+			if err != nil {
+				return err
+			}
+			if err := claimDir(chatDir); err != nil {
+				if errors.Is(err, fs.ErrExist) {
+					return errConversationExists
+				}
+				return fmt.Errorf("failed to claim chat directory: %w", err)
+			}
+			// The directory exists; now it becomes a conversation. A crash between
+			// the claim and this record leaves an orphaned directory, which
+			// reconciliation reports instead of quietly adopting.
+			if err := pm.membership.Create(chatID, name); err != nil {
+				return err
+			}
+			chatData := newChatData(chatID, name)
+			if err := pm.saveChatFilesLocked(chatData, true); err != nil {
+				return fmt.Errorf("failed to save new chat: %w", err)
+			}
+			created = chatData
+			return nil
+		})
+		if errors.Is(err, errConversationExists) {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		return created, nil
+	}
+	return nil, fmt.Errorf("failed to create chat: no unused identifier after 10 attempts")
+}
+
+// SaveChat saves all chat data to files.
+func (pm *PersistenceManager) SaveChat(chatData *ChatData) error {
+	if chatData == nil {
+		return &Refusal{Code: RefusedUnbound, Op: "save", Detail: "no chat data"}
+	}
+	return pm.withChatLock("save", chatData.Meta.ID, func() error {
+		return pm.saveChatLocked(chatData)
+	})
+}
+
+// saveChatLocked is SaveChat inside the held lock. A conversation the user
+// deleted is refused rather than recreated, so a late autosave cannot resurrect
+// it.
+func (pm *PersistenceManager) saveChatLocked(chatData *ChatData) error {
+	return pm.saveChatFilesLocked(chatData, true)
+}
+
+// saveChatFilesLocked writes metadata and companions. The history snapshot is
+// written only when writeSnapshot is set; the final commit writes it last, after
+// the append log, so an interruption cannot leave a snapshot newer than the log.
+func (pm *PersistenceManager) saveChatFilesLocked(chatData *ChatData, writeSnapshot bool) error {
+	chatID := chatData.Meta.ID
+	if pm.deletedSet()[chatID] {
+		return &Refusal{Code: RefusedUnbound, Op: "save", ChatID: chatID, Detail: "conversation was deleted"}
+	}
+	chatDir, err := pm.conversationDir(chatID)
+	if err != nil {
+		return err
+	}
+
+	// A save never recreates a conversation the collection already knows: if its
+	// directory is gone, the save is refused rather than materialising the chat
+	// again around whatever is in memory. An identifier the collection has never
+	// recorded is a first save (import, fixture), so it is recorded as a member
+	// before the write — it can never end up as an unclaimed directory.
+	if statErr := requireExistingDir(chatDir); statErr != nil {
+		if _, known := pm.membership.Member(chatID); known {
+			return &Refusal{Code: RefusedUnbound, Op: "save", ChatID: chatID, Detail: "conversation directory is missing", Err: statErr}
+		}
+		if err := pm.membership.Create(chatID, chatData.Meta.Name); err != nil {
+			return err
+		}
+		if err := ensureDir(chatDir); err != nil {
+			return fmt.Errorf("failed to create chat directory: %w", err)
+		}
 	}
 
 	// Update updated timestamp
@@ -208,8 +316,10 @@ func (pm *PersistenceManager) SaveChat(chatData *ChatData) error {
 	// Save canonical history.json snapshot (atomic write) for fallback/backup only.
 	// The append log (history.ndjson) is the true source of truth and must NOT
 	// be deleted — frontend DOM scraping can corrupt history.json roles/ids.
-	if err := pm.saveJSON(filepath.Join(chatDir, "history.json"), chatData.History); err != nil {
-		return fmt.Errorf("failed to save history.json: %w", err)
+	if writeSnapshot {
+		if err := pm.saveJSON(filepath.Join(chatDir, "history.json"), chatData.History); err != nil {
+			return fmt.Errorf("failed to save history.json: %w", err)
+		}
 	}
 
 	// Save world.json
@@ -254,7 +364,13 @@ func (pm *PersistenceManager) SaveChat(chatData *ChatData) error {
 // missing or corrupt file → log and continue with empty/default.
 // Only meta.json is required (it IS the chat identity).
 func (pm *PersistenceManager) LoadChat(chatID string) (*ChatData, error) {
-	chatDir := filepath.Join(pm.rootDir, "chats", chatID)
+	if pm.deletedSet()[chatID] {
+		return nil, &Refusal{Code: RefusedUnbound, Op: "load", ChatID: chatID, Detail: "conversation was deleted"}
+	}
+	chatDir, err := pm.conversationDir(chatID)
+	if err != nil {
+		return nil, err
+	}
 
 	// Check if chat directory exists
 	if _, err := os.Stat(chatDir); os.IsNotExist(err) {
@@ -433,7 +549,7 @@ func (pm *PersistenceManager) migrateLegacyMeta(chatData *ChatData) {
 	// legacy chat look canonical; the consumer must report it unset instead.
 }
 
-// SaveChatAs creates a copy of the current chat with a new name
+// SaveChatAs creates a copy of the current chat with a new name.
 func (pm *PersistenceManager) SaveChatAs(currentChatID, newName string) (*ChatData, error) {
 	// Load current chat
 	currentChat, err := pm.LoadChat(currentChatID)
@@ -441,94 +557,180 @@ func (pm *PersistenceManager) SaveChatAs(currentChatID, newName string) (*ChatDa
 		return nil, fmt.Errorf("failed to load current chat: %w", err)
 	}
 
-	// Create new chat
-	newChat, err := pm.NewChat(newName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create new chat: %w", err)
+	baseID := pm.generateChatID()
+	for attempt := 0; attempt < 10; attempt++ {
+		chatID := baseID
+		if attempt > 0 {
+			chatID = fmt.Sprintf("%s-%d", baseID, attempt+1)
+		}
+
+		var created *ChatData
+		err = pm.withChatLock("save-as", chatID, func() error {
+			chatDir, err := pm.conversationDir(chatID)
+			if err != nil {
+				return err
+			}
+			if err := claimDir(chatDir); err != nil {
+				if errors.Is(err, fs.ErrExist) {
+					return errConversationExists
+				}
+				return fmt.Errorf("failed to claim chat directory: %w", err)
+			}
+			if err := pm.membership.Create(chatID, newName); err != nil {
+				return err
+			}
+
+			newChat := newChatData(chatID, newName)
+
+			// Copy all data except ID and timestamps
+			newChat.Meta.WorldName = currentChat.Meta.WorldName
+			newChat.Meta.ScenarioName = currentChat.Meta.ScenarioName
+			newChat.Meta.CharacterNames = currentChat.Meta.CharacterNames
+			newChat.Meta.LorebookNames = currentChat.Meta.LorebookNames
+			newChat.History = currentChat.History
+			newChat.World = currentChat.World
+			newChat.Scenario = currentChat.Scenario
+			newChat.Characters = currentChat.Characters
+			newChat.Lorebooks = currentChat.Lorebooks
+			newChat.Memories = currentChat.Memories
+
+			// One write of the finished copy: the destination is never published in
+			// the empty intermediate state the previous implementation wrote first.
+			if err := pm.saveChatFilesLocked(newChat, true); err != nil {
+				return fmt.Errorf("failed to save new chat: %w", err)
+			}
+			created = newChat
+			return nil
+		})
+		if errors.Is(err, errConversationExists) {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		return created, nil
 	}
-
-	// Copy all data except ID and timestamps
-	newChat.Meta.WorldName = currentChat.Meta.WorldName
-	newChat.Meta.ScenarioName = currentChat.Meta.ScenarioName
-	newChat.Meta.CharacterNames = currentChat.Meta.CharacterNames
-	newChat.Meta.LorebookNames = currentChat.Meta.LorebookNames
-	newChat.History = currentChat.History
-	newChat.World = currentChat.World
-	newChat.Scenario = currentChat.Scenario
-	newChat.Characters = currentChat.Characters
-	newChat.Lorebooks = currentChat.Lorebooks
-	newChat.Memories = currentChat.Memories
-
-	// Save the new chat
-	if err := pm.SaveChat(newChat); err != nil {
-		return nil, fmt.Errorf("failed to save new chat: %w", err)
-	}
-
-	return newChat, nil
+	return nil, fmt.Errorf("failed to copy chat: no unused identifier after 10 attempts")
 }
 
-// DeleteChat deletes a chat directory and all its contents.
+// DeleteChat removes a conversation from the visible collection and then makes a
+// best-effort attempt to remove its directory.
+//
+// Deletion is deliberately not a verified operation. Intent is recorded first, so
+// a directory that survives a blocked delete can never reappear as a conversation
+// and a late writer cannot recreate it. No proof of physical destruction is
+// awaited, and an incomplete removal does not restore the item or fail the call.
 func (pm *PersistenceManager) DeleteChat(chatID string) error {
-	chatDir := filepath.Join(pm.rootDir, "chats", chatID)
+	chatDir, err := pm.conversationDir(chatID)
+	if err != nil {
+		return err
+	}
 
-	if err := os.RemoveAll(chatDir); err != nil {
-		return fmt.Errorf("failed to delete chat: %w", err)
+	if err := pm.membership.Delete(chatID, chatDir); err != nil {
+		return fmt.Errorf("failed to record deletion intent: %w", err)
 	}
 
 	if pm.config.LastChatID == chatID {
 		pm.config.LastChatID = ""
 		_ = pm.saveConfig()
 	}
-	return nil
-}
 
-// GetChatList returns a list of all chat summaries
-func (pm *PersistenceManager) GetChatList() ([]ChatSummary, error) {
-	chatsDir := filepath.Join(pm.rootDir, "chats")
-
-	// Read all chat directories
-	entries, err := os.ReadDir(chatsDir)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read chats directory: %w", err)
+	// The Recycle Bin is the target, and there is no permanent-delete fallback in
+	// this code: if the shell refuses, the files stay and are reported.
+	err = pm.withChatLock("delete", chatID, func() error {
+		if err := recycleTree(chatDir); err != nil && !os.IsNotExist(err) {
+			return &DeletionIncomplete{ChatID: chatID, Directory: chatDir, Err: err}
+		}
+		return nil
+	})
+	if err == nil {
+		return nil
 	}
 
-	var summaries []ChatSummary
+	var incomplete *DeletionIncomplete
+	if errors.As(err, &incomplete) || IsRefusal(err, RefusedBusy) {
+		fmt.Printf("[DeleteChat] %s left the collection; its directory may remain at %s: %v\n", chatID, chatDir, err)
+		return nil
+	}
+	return err
+}
 
-	for _, entry := range entries {
-		if !entry.IsDir() {
+// Present reports whether the collection claims this conversation and its
+// directory exists. It is the check every write-into-a-conversation path uses:
+// only a present member may be written to.
+func (pm *PersistenceManager) Present(chatID string) bool {
+	if pm == nil || pm.membership == nil || chatID == "" {
+		return false
+	}
+	if pm.membership.Deleted(chatID) {
+		return false
+	}
+	if _, ok := pm.membership.Member(chatID); !ok {
+		return false
+	}
+	dir, err := pm.conversationDir(chatID)
+	if err != nil {
+		return false
+	}
+	return requireExistingDir(dir) == nil
+}
+
+// GetChatList returns the collection as the membership authority reconciles it.
+//
+// Read-only by construction: present conversations carry their metadata, a
+// claimed conversation whose directory is gone is reported as missing, and a
+// directory nobody claimed is reported as orphaned. Nothing is adopted, repaired
+// or removed here.
+func (pm *PersistenceManager) GetChatList() ([]ChatSummary, error) {
+	chatsDir, err := pm.chatsRoot()
+	if err != nil {
+		return nil, err
+	}
+	conversations, err := pm.membership.Reconcile(chatsDir)
+	if err != nil {
+		return nil, err
+	}
+
+	summaries := make([]ChatSummary, 0, len(conversations))
+	for _, conversation := range conversations {
+		summary := ChatSummary{
+			ID:        conversation.ID,
+			Name:      conversation.Name,
+			State:     string(conversation.State),
+			Directory: conversation.Directory,
+		}
+		if summary.Name == "" {
+			summary.Name = conversation.ID
+		}
+		if conversation.State != StatePresent {
+			summaries = append(summaries, summary)
 			continue
 		}
 
-		chatID := entry.Name()
-		chatDir := filepath.Join(chatsDir, chatID)
-
-		// Load meta.json
 		var meta ChatMeta
-		metaPath := filepath.Join(chatDir, "meta.json")
-		if err := pm.loadJSON(metaPath, &meta); err != nil {
-			// Skip invalid chat directories
+		if err := pm.loadJSON(filepath.Join(conversation.Directory, "meta.json"), &meta); err != nil {
+			// A claimed directory whose metadata cannot be read is still a member;
+			// report it as present with what the authority knows rather than
+			// hiding the conversation from its owner.
+			summaries = append(summaries, summary)
 			continue
 		}
+		if meta.Name != "" {
+			summary.Name = meta.Name
+		}
 
-		// Load history to get message count (ignore error)
-		var history []ChatHistory
-		pm.loadJSON(filepath.Join(chatDir, "history.json"), &history)
-
-		// Parse timestamps
 		createdAt, _ := time.Parse(time.RFC3339, meta.CreatedAt)
 		updatedAt, _ := time.Parse(time.RFC3339, meta.UpdatedAt)
+		summary.CreatedAt = createdAt.Format(time.RFC3339)
+		summary.UpdatedAt = updatedAt.Format(time.RFC3339)
+		summary.WorldName = meta.WorldName
+		summary.ScenarioName = meta.ScenarioName
+		summary.CharacterNames = meta.CharacterNames
+		summary.LorebookNames = meta.LorebookNames
 
-		summary := ChatSummary{
-			ID:             meta.ID,
-			Name:           meta.Name,
-			CreatedAt:      createdAt.Format(time.RFC3339),
-			UpdatedAt:      updatedAt.Format(time.RFC3339),
-			WorldName:      meta.WorldName,
-			ScenarioName:   meta.ScenarioName,
-			CharacterNames: meta.CharacterNames,
-			LorebookNames:  meta.LorebookNames,
-			MessageCount:   len(history),
-		}
+		var history []ChatHistory
+		pm.loadJSON(filepath.Join(conversation.Directory, "history.json"), &history)
+		summary.MessageCount = len(history)
 
 		summaries = append(summaries, summary)
 	}
@@ -553,7 +755,11 @@ func (pm *PersistenceManager) GetActiveChatMeta() (*ChatMeta, error) {
 	if pm.config.LastChatID == "" {
 		return nil, fmt.Errorf("no active chat")
 	}
-	metaPath := filepath.Join(pm.rootDir, "chats", pm.config.LastChatID, "meta.json")
+	chatDir, err := pm.conversationDir(pm.config.LastChatID)
+	if err != nil {
+		return nil, err
+	}
+	metaPath := filepath.Join(chatDir, "meta.json")
 	var meta ChatMeta
 	if err := pm.loadJSON(metaPath, &meta); err != nil {
 		return nil, fmt.Errorf("failed to load meta.json for active chat: %w", err)
@@ -573,11 +779,7 @@ func (pm *PersistenceManager) saveJSON(filename string, data interface{}) error 
 	if err != nil {
 		return err
 	}
-	tmp := filename + ".tmp"
-	if err := os.WriteFile(tmp, jsonData, 0644); err != nil {
-		return err
-	}
-	return os.Rename(tmp, filename)
+	return writeFileAtomic(filename, jsonData, 0644)
 }
 
 // loadHistoryFile reads chat history, preferring the append log over the JSON snapshot.
@@ -633,9 +835,38 @@ func (pm *PersistenceManager) loadHistoryFile(chatDir string) []ChatHistory {
 // and re-appended the surviving messages on top of the log, which left the deleted
 // lines in place for the next load to replay.
 func (pm *PersistenceManager) RewriteHistory(chatID string, entries []ChatHistory) error {
-	chatDir := filepath.Join(pm.rootDir, "chats", chatID)
-	if err := os.MkdirAll(chatDir, 0755); err != nil {
-		return fmt.Errorf("failed to create chat directory: %w", err)
+	return pm.withChatLock("rewrite-history", chatID, func() error {
+		return pm.rewriteHistoryLocked(chatID, entries)
+	})
+}
+
+func (pm *PersistenceManager) rewriteHistoryLocked(chatID string, entries []ChatHistory) error {
+	if pm.deletedSet()[chatID] {
+		return &Refusal{Code: RefusedUnbound, Op: "rewrite-history", ChatID: chatID, Detail: "conversation was deleted"}
+	}
+	chatDir, err := pm.conversationDir(chatID)
+	if err != nil {
+		return err
+	}
+	// A rewrite is never a creation: the conversation exists because the
+	// lifecycle created it, not because something wrote about its identifier.
+	if err := requireExistingDir(chatDir); err != nil {
+		return &Refusal{Code: RefusedUnbound, Op: "rewrite-history", ChatID: chatID, Detail: "conversation directory is missing", Err: err}
+	}
+
+	if err := pm.writeHistoryLogLocked(chatID, entries); err != nil {
+		return err
+	}
+
+	// Keep the JSON snapshot identical so a fallback load sees the same history.
+	return pm.saveJSON(filepath.Join(chatDir, "history.json"), entries)
+}
+
+// writeHistoryLogLocked replaces history.ndjson with the supplied entries.
+func (pm *PersistenceManager) writeHistoryLogLocked(chatID string, entries []ChatHistory) error {
+	chatDir, err := pm.conversationDir(chatID)
+	if err != nil {
+		return err
 	}
 
 	var buf bytes.Buffer
@@ -648,17 +879,43 @@ func (pm *PersistenceManager) RewriteHistory(chatID string, entries []ChatHistor
 		buf.WriteByte(0x0A)
 	}
 
-	ndjsonPath := filepath.Join(chatDir, "history.ndjson")
-	tmp := ndjsonPath + ".tmp"
-	if err := os.WriteFile(tmp, buf.Bytes(), 0644); err != nil {
+	if err := writeFileAtomic(filepath.Join(chatDir, "history.ndjson"), buf.Bytes(), 0644); err != nil {
 		return fmt.Errorf("failed to write history.ndjson: %w", err)
 	}
-	if err := os.Rename(tmp, ndjsonPath); err != nil {
-		return fmt.Errorf("failed to replace history.ndjson: %w", err)
-	}
+	return nil
+}
 
-	// Keep the JSON snapshot identical so a fallback load sees the same history.
-	return pm.saveJSON(filepath.Join(chatDir, "history.json"), entries)
+// CommitChat persists metadata, companions and history as one operation, writing
+// the append log before the JSON snapshot.
+//
+// Ordering is the point. The loader prefers a non-empty log, so an interruption
+// between the two writes can only leave the log newer than the snapshot - the
+// state that loses nothing. The previous shutdown path wrote the snapshot first and
+// then rewrote both, which is why every clean exit passed through "snapshot newer
+// than log" (the window recorded in row 570).
+func (pm *PersistenceManager) CommitChat(chatData *ChatData) error {
+	if chatData == nil {
+		return &Refusal{Code: RefusedUnbound, Op: "commit", Detail: "no chat data"}
+	}
+	// A commit writes into an existing conversation. An identifier the authority
+	// does not claim is a cached session or a stale client — never a reason to
+	// create one.
+	if !pm.Present(chatData.Meta.ID) {
+		return &Refusal{Code: RefusedUnbound, Op: "commit", ChatID: chatData.Meta.ID, Detail: "conversation is not present in the collection"}
+	}
+	return pm.withChatLock("commit", chatData.Meta.ID, func() error {
+		if err := pm.saveChatFilesLocked(chatData, false); err != nil {
+			return err
+		}
+		if err := pm.writeHistoryLogLocked(chatData.Meta.ID, chatData.History); err != nil {
+			return err
+		}
+		chatDir, err := pm.conversationDir(chatData.Meta.ID)
+		if err != nil {
+			return err
+		}
+		return pm.saveJSON(filepath.Join(chatDir, "history.json"), chatData.History)
+	})
 }
 
 // AppendHistoryEntry appends a single entry to history.ndjson using an O(1) file append.
@@ -666,7 +923,24 @@ func (pm *PersistenceManager) RewriteHistory(chatID string, entries []ChatHistor
 // If history.ndjson does not yet exist but history.json does, we migrate the
 // snapshot entries first so old messages are not lost.
 func (pm *PersistenceManager) AppendHistoryEntry(chatID string, entry ChatHistory) error {
-	chatDir := filepath.Join(pm.rootDir, "chats", chatID)
+	return pm.withChatLock("append-history", chatID, func() error {
+		return pm.appendHistoryLocked(chatID, entry)
+	})
+}
+
+func (pm *PersistenceManager) appendHistoryLocked(chatID string, entry ChatHistory) error {
+	if pm.deletedSet()[chatID] {
+		return &Refusal{Code: RefusedUnbound, Op: "append-history", ChatID: chatID, Detail: "conversation was deleted"}
+	}
+	chatDir, err := pm.conversationDir(chatID)
+	if err != nil {
+		return err
+	}
+	// An append is never a creation: a missing directory is reported, never
+	// materialised by the write that mentions the identifier.
+	if err := requireExistingDir(chatDir); err != nil {
+		return &Refusal{Code: RefusedUnbound, Op: "append-history", ChatID: chatID, Detail: "conversation directory is missing", Err: err}
+	}
 	ndjsonPath := filepath.Join(chatDir, "history.ndjson")
 	jsonPath := filepath.Join(chatDir, "history.json")
 
@@ -675,13 +949,17 @@ func (pm *PersistenceManager) AppendHistoryEntry(chatID string, entry ChatHistor
 		if _, err := os.Stat(jsonPath); err == nil {
 			var history []ChatHistory
 			if loadErr := pm.loadJSON(jsonPath, &history); loadErr == nil && len(history) > 0 {
-				f, openErr := os.OpenFile(ndjsonPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-				if openErr == nil {
-					for _, h := range history {
-						line, _ := json.Marshal(h)
-						f.Write(append(line, '\n'))
+				var buf bytes.Buffer
+				for _, h := range history {
+					line, marshalErr := json.Marshal(h)
+					if marshalErr != nil {
+						return fmt.Errorf("failed to marshal migrated history entry: %w", marshalErr)
 					}
-					f.Close()
+					buf.Write(line)
+					buf.WriteByte(0x0A)
+				}
+				if err := writeFileAtomic(ndjsonPath, buf.Bytes(), 0644); err != nil {
+					return fmt.Errorf("failed to migrate history.json: %w", err)
 				}
 			}
 		}
@@ -693,13 +971,7 @@ func (pm *PersistenceManager) AppendHistoryEntry(chatID string, entry ChatHistor
 	}
 	line = append(line, '\n')
 
-	f, err := os.OpenFile(ndjsonPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return fmt.Errorf("failed to open history.ndjson for append: %w", err)
-	}
-	defer f.Close()
-
-	if _, err := f.Write(line); err != nil {
+	if err := appendLine(ndjsonPath, line); err != nil {
 		return fmt.Errorf("failed to append history entry: %w", err)
 	}
 	return nil
@@ -717,13 +989,15 @@ func (pm *PersistenceManager) loadJSON(filename string, data interface{}) error 
 
 // RenameChat renames a chat
 func (pm *PersistenceManager) RenameChat(chatID, newName string) error {
-	chat, err := pm.LoadChat(chatID)
-	if err != nil {
-		return fmt.Errorf("failed to load chat: %w", err)
-	}
+	return pm.withChatLock("rename", chatID, func() error {
+		chat, err := pm.LoadChat(chatID)
+		if err != nil {
+			return fmt.Errorf("failed to load chat: %w", err)
+		}
 
-	chat.Meta.Name = newName
-	chat.Meta.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
+		chat.Meta.Name = newName
+		chat.Meta.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
 
-	return pm.SaveChat(chat)
+		return pm.saveChatLocked(chat)
+	})
 }

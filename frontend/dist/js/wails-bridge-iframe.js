@@ -15,7 +15,13 @@
 (function () {
     'use strict';
 
-    if (window.go) return;                    // native injection wins
+    // A framed document always uses the host bridge. A native binding injected
+    // into a subframe cannot complete a request: the host IPC handler is bound to
+    // the top-level document, so the call's promise never settles and the panel
+    // hangs at "Loading saved audio settings…". Only a top-level document may
+    // prefer a native window.go.
+    var framed = !!(window.parent && window.parent !== window);
+    if (!framed && window.go) return;         // top-level standalone: native injection wins
     if (window.__howlBridgeIframe) return;
 
     var METHODS = [
@@ -196,7 +202,12 @@
         };
     });
 
-    window.go = { main: { App: App } };
+    var hostedGo = { main: { App: App } };
+    try {
+        window.go = hostedGo;
+    } catch (e) {
+        Object.defineProperty(window, 'go', { value: hostedGo, configurable: true, writable: true });
+    }
 
     Object.defineProperty(window, '__howlBridgeIframe', {
         value: bridge,

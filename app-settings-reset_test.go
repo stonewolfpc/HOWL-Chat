@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	imgsettings "howl-chat/internal/image/settings"
+	imagetypes "howl-chat/internal/image/types"
+	"howl-chat/internal/media"
 	appsettings "howl-chat/internal/settings"
 )
 
@@ -15,12 +17,11 @@ func TestResetApplicationSettingsResetsUnifiedAndImageStores(t *testing.T) {
 	if err := imageStore.Save(imgsettings.ImageSettings{LastModel: "old-model"}); err != nil {
 		t.Fatal(err)
 	}
-	app := &App{
-		settingsStore:    appsettings.NewStore(dir),
-		imgSettingsStore: imageStore,
-		appSettings:      map[string]interface{}{"general": map[string]interface{}{"theme": "light"}},
-		lastImageModel:   "old-model",
-	}
+	settings := newTestSettingsAuthority(t, dir)
+	settings.Adopt(map[string]interface{}{"general": map[string]interface{}{"theme": "light"}})
+	app := &App{settings: settings}
+	app.images = media.NewImage(dir)
+	app.images.SetLastModel("old-model", imagetypes.ModelLoadOptions{})
 	defaults := map[string]interface{}{
 		"general": map[string]interface{}{"theme": "dark"},
 	}
@@ -41,15 +42,15 @@ func TestResetApplicationSettingsResetsUnifiedAndImageStores(t *testing.T) {
 	if image.LastModel != "" || image.EngineConfig.ModelsDir != "" {
 		t.Fatalf("image settings = %+v, want zero", image)
 	}
-	if app.lastImageModel != "" {
-		t.Fatalf("lastImageModel = %q, want empty", app.lastImageModel)
+	if app.images.LastModelName() != "" {
+		t.Fatalf("lastImageModel = %q, want empty", app.images.LastModelName())
 	}
 }
 
 func TestResetApplicationSettingsDoesNotTouchCreativeFiles(t *testing.T) {
 	dir := t.TempDir()
-	imageStore := imgsettings.NewStore(dir)
-	app := &App{settingsStore: appsettings.NewStore(dir), imgSettingsStore: imageStore, appSettings: map[string]interface{}{}}
+	app := &App{settings: newTestSettingsAuthority(t, dir)}
+	app.images = media.NewImage(dir)
 	content := filepath.Join(dir, "character.json")
 	if err := os.WriteFile(content, []byte(`{"name":"keep"}`), 0644); err != nil {
 		t.Fatal(err)

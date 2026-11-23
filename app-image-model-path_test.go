@@ -60,3 +60,26 @@ func TestPreferModelPathIsStableAndHandlesEmpty(t *testing.T) {
 		t.Errorf("order changed the pick: %q vs %q", first, second)
 	}
 }
+
+// The picker used to hand Wails a stored models dir as DefaultDirectory, and
+// Wails refuses to open a dialog whose default directory does not exist. On a
+// first run (or after a drive is unplugged) Add Folder therefore failed with
+// "default directory ... does not exist" and no dialog appeared.
+func TestDialogDefaultDirFallsBackWhenPreferredIsMissing(t *testing.T) {
+	missing := filepath.Join(t.TempDir(), "not-there")
+	got := dialogDefaultDir(missing)
+	if got == missing || got == "" {
+		t.Fatalf("dialogDefaultDir(missing) = %q, want an existing fallback directory", got)
+	}
+	info, err := os.Stat(got)
+	if err != nil || !info.IsDir() {
+		t.Fatalf("dialogDefaultDir(missing) = %q, which is not an existing directory", got)
+	}
+}
+
+func TestDialogDefaultDirKeepsExistingPreference(t *testing.T) {
+	dir := t.TempDir()
+	if got := dialogDefaultDir(dir); got != dir {
+		t.Fatalf("dialogDefaultDir(existing) = %q, want %q", got, dir)
+	}
+}

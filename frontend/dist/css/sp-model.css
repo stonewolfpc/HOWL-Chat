@@ -66,6 +66,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    /* The trigger is the only way to open the model list, and a 16px text line
+       is a miss-prone target when the list sits at the bottom of the sidebar.
+       A minimum height plus flex centring keeps the same look with a target
+       that a real pointer cannot slide under. */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    min-height: 34px;
 }
 
 .model-select-trigger:hover {

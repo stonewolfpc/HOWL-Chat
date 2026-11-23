@@ -163,6 +163,7 @@ func (e *Engine) LoadModel(opts types.ModelLoadOptions) error {
 	if err := validateCheckpoint(target); err != nil {
 		return err
 	}
+	dropEmbeddedCompanions(target, opts)
 
 	// A new model gets new numbers; the previous model's placement would be a lie.
 	e.resetPlacement()
@@ -176,6 +177,11 @@ func (e *Engine) LoadModel(opts types.ModelLoadOptions) error {
 	args := e.buildServerArgs(target, opts)
 	fmt.Printf("[ImageEngine] Starting sd-server: %s %v\n", e.config.BinaryPath, args)
 	cmd := exec.Command(e.config.BinaryPath, args...)
+	// sd-server is a console binary. Started without this it opened a Windows
+	// Terminal window over the app for the whole generation (seen on the real
+	// profile at 1129x635 over the WebView); the video engine already hides its
+	// child this way.
+	proc.HideWindow(cmd)
 	stdoutPipe, pipeErr := cmd.StdoutPipe()
 	if pipeErr != nil {
 		return fmt.Errorf("sd-server stdout: %w", pipeErr)

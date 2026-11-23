@@ -124,7 +124,7 @@ func (a *App) FreeVRAMFor(kind, path string) (ModelFitResult, error) {
 // is holding. The image engine is not tracked by the resource registry, so its
 // state is read from the engine itself.
 func (a *App) loadedImageModelInfo() (string, int64) {
-	e, ok := a.imageEngine.(*sdcpp.Engine)
+	e, ok := a.images.Engine().(*sdcpp.Engine)
 	if !ok || e == nil {
 		return "", 0
 	}
@@ -145,8 +145,8 @@ func (a *App) estimateLLMVRAM(path string) int64 {
 	if err != nil || profile == nil {
 		return 0
 	}
-	ctxSize, _ := strconv.Atoi(intSetting(a.modelSettings, "context_size", 4096))
-	gpuLayers, _ := strconv.Atoi(intSetting(a.modelSettings, "gpu_layers", 0))
+	ctxSize, _ := strconv.Atoi(intSetting(a.settings.Model(), "context_size", 4096))
+	gpuLayers, _ := strconv.Atoi(intSetting(a.settings.Model(), "gpu_layers", 0))
 	est := gguf.EstimateMemory(profile, gpuLayers, ctxSize)
 	if est.GPUMB > 0 {
 		return est.GPUMB
@@ -173,8 +173,8 @@ func (a *App) boundControlNetBytes(modelPath string) int64 {
 	dir := ""
 	if modelPath != "" {
 		dir = filepath.Dir(modelPath)
-	} else if a.lastImageModel != "" {
-		dir = filepath.Dir(a.lastImageModel)
+	} else if a.images.LastModelName() != "" {
+		dir = filepath.Dir(a.images.LastModelName())
 	}
 	if dir == "" || dir == "." {
 		dir = a.GetImageEngineConfig().ModelsDir

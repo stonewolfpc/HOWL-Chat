@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"howl-chat/internal/library"
+	"howl-chat/internal/registries"
 )
 
 func TestExportContentItemUsesStableIdentityAndDoesNotOverwrite(t *testing.T) {
@@ -25,7 +26,7 @@ func TestExportContentItemUsesStableIdentityAndDoesNotOverwrite(t *testing.T) {
 	}); err != nil {
 		t.Fatal(err)
 	}
-	app := &App{contentLibraries: reg}
+	app := &App{registries: registries.Compose(registries.Parts{Libraries: reg})}
 	first, err := app.ExportContentItem("characters", "Example World", "world-1", map[string]interface{}{"title": "Example World"}, false)
 	if err != nil {
 		t.Fatal(err)
@@ -82,7 +83,7 @@ func TestExportContentItemRejectsMissingIdentityAndData(t *testing.T) {
 	}); err != nil {
 		t.Fatal(err)
 	}
-	app := &App{contentLibraries: reg}
+	app := &App{registries: registries.Compose(registries.Parts{Libraries: reg})}
 	if _, err := app.ExportContentItem("characters", "", "", nil, false); err == nil {
 		t.Fatal("export without identity or data was accepted")
 	}
@@ -104,7 +105,7 @@ func TestExportContentItemRequiresWritePermissionForReplacement(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	app := &App{contentLibraries: reg}
+	app := &App{registries: registries.Compose(registries.Parts{Libraries: reg})}
 	result, err := app.ExportContentItem("characters", "Scene", "scene-1", map[string]interface{}{"title": "Scene"}, true)
 	if err != nil {
 		t.Fatal(err)
@@ -129,7 +130,7 @@ func TestExportContentItemRefusesCanonicalWorldAndScenarioRoots(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	app := &App{contentLibraries: reg}
+	app := &App{registries: registries.Compose(registries.Parts{Libraries: reg})}
 	for _, category := range []string{"worlds", "scenarios"} {
 		result, err := app.ExportContentItem(category, "Canonical", "item-1", map[string]interface{}{"title": "Canonical"}, false)
 		if err == nil {
@@ -146,7 +147,7 @@ func TestExportContentItemWithoutDestinationReportsUnavailable(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	app := &App{contentLibraries: reg}
+	app := &App{registries: registries.Compose(registries.Parts{Libraries: reg})}
 	result, err := app.ExportContentItem("characters", "Nobody", "nobody", map[string]interface{}{"name": "Nobody"}, false)
 	if err != nil {
 		t.Fatal(err)
@@ -187,7 +188,7 @@ func TestUnavailableRootKeepsLastKnownCharacters(t *testing.T) {
 	}); err != nil {
 		t.Fatal(err)
 	}
-	app := &App{contentLibraries: reg, contentInventory: library.NewInventoryStore(t.TempDir())}
+	app := &App{registries: registries.Compose(registries.Parts{Libraries: reg, Inventory: library.NewInventoryStore(t.TempDir())})}
 	inventory, err := app.GetContentLibraryInventory("characters")
 	if err != nil {
 		t.Fatal(err)
@@ -237,7 +238,7 @@ func TestRemoveContentLibraryDoesNotDeleteFiles(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	app := &App{contentLibraries: reg, contentInventory: library.NewInventoryStore(t.TempDir())}
+	app := &App{registries: registries.Compose(registries.Parts{Libraries: reg, Inventory: library.NewInventoryStore(t.TempDir())})}
 	if err := app.RemoveContentLibrary(added.ID); err != nil {
 		t.Fatal(err)
 	}

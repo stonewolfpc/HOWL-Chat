@@ -10,6 +10,8 @@ import (
 	"howl-chat/internal/backend/chat"
 	"howl-chat/internal/image/gallery"
 	"howl-chat/internal/library"
+	"howl-chat/internal/media"
+	"howl-chat/internal/registries"
 )
 
 type wipeFixture struct {
@@ -51,12 +53,14 @@ func newWipeFixture(t *testing.T) *wipeFixture {
 	if err := inventory.Record("keep-root", []library.Item{{ID: "card", Name: "Keep"}}); err != nil {
 		t.Fatal(err)
 	}
+	app := &App{
+		conversation: chat.NewActiveConversation(manager),
+		registries:   registries.Compose(registries.Parts{Inventory: inventory}),
+	}
+	app.images = media.NewImage("")
+	app.images.SetGallery(gallery.NewService(galleryRoot))
 	return &wipeFixture{
-		app: &App{
-			chatPersistence:  manager,
-			gallerySvc:       gallery.NewService(galleryRoot),
-			contentInventory: inventory,
-		},
+		app:         app,
 		chatRoot:    chatRoot,
 		galleryRoot: galleryRoot,
 		chatsDir:    chatsDir,
@@ -85,10 +89,10 @@ func TestWipeAllDataStagesBothRootsAndResetsState(t *testing.T) {
 	if entries, err := os.ReadDir(f.galleryRoot); err != nil || len(entries) != 0 {
 		t.Fatalf("gallery not emptied: entries=%v err=%v", entries, err)
 	}
-	if got := f.app.chatPersistence.GetLastChatID(); got != "" {
+	if got := f.app.conversation.ActiveID(); got != "" {
 		t.Fatalf("LastChatID = %q, want empty", got)
 	}
-	if _, ok := f.app.contentInventory.Cached("keep-root"); ok {
+	if _, ok := f.app.registries.Inventory().Cached("keep-root"); ok {
 		t.Fatal("inventory cache survived wipe")
 	}
 	if _, err := os.Stat(f.external); err != nil {
@@ -109,10 +113,10 @@ func TestWipeAllDataFirstStageFailureLeavesStateUntouched(t *testing.T) {
 	if _, err := os.Stat(f.galleryRoot); err != nil {
 		t.Fatalf("gallery root changed: %v", err)
 	}
-	if got := f.app.chatPersistence.GetLastChatID(); got != "chat-1" {
+	if got := f.app.conversation.ActiveID(); got != "chat-1" {
 		t.Fatalf("LastChatID = %q, want chat-1", got)
 	}
-	if _, ok := f.app.contentInventory.Cached("keep-root"); !ok {
+	if _, ok := f.app.registries.Inventory().Cached("keep-root"); !ok {
 		t.Fatal("inventory cache was cleared before staging succeeded")
 	}
 }
@@ -137,10 +141,10 @@ func TestWipeAllDataSecondStageFailureRestoresFirstRoot(t *testing.T) {
 	if _, err := os.Stat(f.galleryRoot); err != nil {
 		t.Fatalf("gallery root was not restored: %v", err)
 	}
-	if got := f.app.chatPersistence.GetLastChatID(); got != "chat-1" {
+	if got := f.app.conversation.ActiveID(); got != "chat-1" {
 		t.Fatalf("LastChatID = %q, want chat-1", got)
 	}
-	if _, ok := f.app.contentInventory.Cached("keep-root"); !ok {
+	if _, ok := f.app.registries.Inventory().Cached("keep-root"); !ok {
 		t.Fatal("inventory cache was cleared before both stages succeeded")
 	}
 }
@@ -164,10 +168,10 @@ func TestWipeAllDataCleanupFailureLeavesRecoverableStage(t *testing.T) {
 	}
 	galleryStages, _ := filepath.Glob(filepath.Join(filepath.Dir(f.galleryRoot), ".gallery.howl-wipe-*"))
 	_ = galleryStages // gallery may have been recreated; the error still names any stage
-	if got := f.app.chatPersistence.GetLastChatID(); got != "" {
+	if got := f.app.conversation.ActiveID(); got != "" {
 		t.Fatalf("LastChatID = %q, want empty after logical wipe", got)
 	}
-	if _, ok := f.app.contentInventory.Cached("keep-root"); ok {
+	if _, ok := f.app.registries.Inventory().Cached("keep-root"); ok {
 		t.Fatal("inventory cache survived logical wipe")
 	}
 }

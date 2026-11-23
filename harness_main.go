@@ -97,9 +97,10 @@ func main() {
 	devEventSink = func(name string, args ...interface{}) { hub.publish(name, args) }
 
 	app := NewApp()
-	// startup() binds the error system to Wails events, which needs a real
-	// webview context. Set the context the bindings expect and run the model
-	// scan that startup would normally kick off in the background.
+	// NewApp composes the diagnostics owner and attaches its emitter, so errors
+	// reach devEventSink even though this host never runs Wails' startup. Set
+	// the context the bindings expect and run the model scan that startup would
+	// normally kick off in the background.
 	app.ctx = context.Background()
 	go func() {
 		defer func() {
@@ -118,6 +119,27 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/__rpc", func(w http.ResponseWriter, r *http.Request) { handleRPC(w, r, app) })
 	mux.HandleFunc("/__events", func(w http.ResponseWriter, r *http.Request) { handleEvents(w, r, hub) })
+	// The harness has no window to close, so this is its shutdown control: it
+	// runs the same Level 0 sequence Wails' OnShutdown runs in the packaged app,
+	// then exits. Without it the harness could only be killed, and an orderly
+	// shutdown could never be exercised in this host.
+	mux.HandleFunc("/__shutdown", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("[harness] shutdown requested")
+		err := app.OnShutdownError(context.Background())
+		w.Header().Set("Content-Type", "application/json")
+		if err != nil {
+			_, _ = fmt.Fprintf(w, `{"ok":false,"error":%q}`, err.Error())
+		} else {
+			_, _ = w.Write([]byte(`{"ok":true}`))
+		}
+		if f, ok := w.(http.Flusher); ok {
+			f.Flush()
+		}
+		go func() {
+			time.Sleep(250 * time.Millisecond)
+			os.Exit(0)
+		}()
+	})
 	mux.HandleFunc("/__harness.js", func(w http.ResponseWriter, r *http.Request) {
 		b, err := harnessShim.ReadFile("harness/shim.js")
 		if err != nil {

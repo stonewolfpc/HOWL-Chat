@@ -8,26 +8,26 @@ import (
 )
 
 func dragonLoreApp(chatMessages []map[string]interface{}) *App {
-	return &App{
-		lorebooks: []lorebook.Entry{{
-			ID:               "lb1",
-			Title:            "Dragons",
-			Content:          "Dragons sleep beneath the city.",
-			Enabled:          true,
-			Scope:            lorebook.ScopeWorld,
-			TriggerPhrases:   []string{"dragon"},
-			TriggerMode:      lorebook.TriggerLoose,
-			TriggerDirection: lorebook.TriggerBoth,
-			TriggerFrequency: lorebook.FrequencyAlways,
-			PriorityLevel:    3,
-		}},
-		chatMessages: chatMessages,
-	}
+	app := testApp()
+	app.session().SetLorebooks([]lorebook.Entry{{
+		ID:               "lb1",
+		Title:            "Dragons",
+		Content:          "Dragons sleep beneath the city.",
+		Enabled:          true,
+		Scope:            lorebook.ScopeWorld,
+		TriggerPhrases:   []string{"dragon"},
+		TriggerMode:      lorebook.TriggerLoose,
+		TriggerDirection: lorebook.TriggerBoth,
+		TriggerFrequency: lorebook.FrequencyAlways,
+		PriorityLevel:    3,
+	}})
+	app.setTestMessages(chatMessages)
+	return app
 }
 
 func loreInPrompt(t *testing.T, app *App) string {
 	t.Helper()
-	messages := app.buildPromptMessages()
+	messages := promptMessages(app)
 	if len(messages) == 0 {
 		t.Fatal("no messages built")
 	}
@@ -67,7 +67,7 @@ func TestLoreAbsentWithoutKeyword(t *testing.T) {
 		t.Errorf("lore fired without a keyword:\n%s", system)
 	}
 	empty := &App{}
-	if messages := empty.buildPromptMessages(); len(messages) != 1 {
+	if messages := promptMessages(empty); len(messages) != 1 {
 		t.Errorf("expected only the system message, got %d", len(messages))
 	}
 }

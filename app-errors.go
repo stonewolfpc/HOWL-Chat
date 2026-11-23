@@ -6,46 +6,51 @@ import (
 	"os"
 	"path/filepath"
 
-	"howl-chat/internal/errors"
+	"howl-chat/internal/diagnostics"
+	apperrors "howl-chat/internal/errors"
 )
 
 // ---------------------------------------------------------------------------
 // Error System Integration
+//
+// The diagnostics owner (internal/diagnostics) owns logging, reporting and the
+// UI event payloads. App supplies what is genuinely application policy: where
+// the log lives, the persisted upload preference, the Wails event transport,
+// and the decision to escalate a failure (including Level 0's shutdown sink).
 // ---------------------------------------------------------------------------
 
+// appDiagnosticPort is the application-supplied transport for diagnostics
+// events: the same guarded Wails emission (and harness sink) every other event
+// uses, so an error emitted without a live webview is dropped instead of
+// terminating the process.
+type appDiagnosticPort struct{ app *App }
+
+func (p appDiagnosticPort) Emit(event string, data ...interface{}) {
+	p.app.emitEvent(event, data...)
+}
+
 func (a *App) initErrorSystem() {
-	logDir := filepath.Join(a.getSettingsDir(), "logs")
-	logger, err := errors.NewLogger(logDir)
+	owner, err := diagnostics.Open(diagnostics.Config{
+		LogDir:        filepath.Join(a.getSettingsDir(), "logs"),
+		AppVersion:    "1.0.0",
+		UploadEnabled: a.loadErrorReportingSetting(),
+	})
 	if err != nil {
 		// Fatal to error system but not to app - operate silently without logging
 		return
 	}
-	a.errorLogger = logger
-
-	reporter := errors.NewReporter(logger, "1.0.0")
-	a.errorReporter = reporter
-
-	// Load user preference for upload
-	if enabled := a.loadErrorReportingSetting(); enabled {
-		reporter.SetEnabled(true)
-	}
-
-	// Only create emitter if context is available (after startup)
-	if a.ctx != nil {
-		a.errorEmitter = errors.NewCombinedSink(logger, errors.NewWailsEmitter(a.ctx))
-	}
+	a.diagnostics = owner
 }
 
+// bindErrorEmitter attaches the application's transport. It needs no webview:
+// emitEvent delivers to a host's sink when one exists and drops the Wails call
+// until a context carries an events channel, so binding at composition time
+// lets every host receive diagnostics events as soon as it can consume them.
 func (a *App) bindErrorEmitter() {
-	if a.errorLogger == nil {
+	if a.diagnostics == nil {
 		return
 	}
-	if a.ctx != nil && a.errorEmitter == nil {
-		a.errorEmitter = errors.NewCombinedSink(
-			a.errorLogger,
-			errors.NewWailsEmitter(a.ctx),
-		)
-	}
+	a.diagnostics.Attach(appDiagnosticPort{app: a})
 }
 
 // ---------------------------------------------------------------------------
@@ -54,10 +59,10 @@ func (a *App) bindErrorEmitter() {
 
 // GetErrorLog returns the last N error entries for display in settings.
 func (a *App) GetErrorLog(count int) []map[string]interface{} {
-	if a.errorLogger == nil {
+	if a.diagnostics == nil {
 		return nil
 	}
-	entries := a.errorLogger.ReadRecent(count)
+	entries := a.diagnostics.Entries(count)
 	var result []map[string]interface{}
 	for _, e := range entries {
 		result = append(result, map[string]interface{}{
@@ -73,34 +78,34 @@ func (a *App) GetErrorLog(count int) []map[string]interface{} {
 
 // SetErrorReportingEnabled toggles the Vercel upload feature.
 func (a *App) SetErrorReportingEnabled(enabled bool) {
-	if a.errorReporter == nil {
+	if a.diagnostics == nil {
 		return
 	}
-	a.errorReporter.SetEnabled(enabled)
+	a.diagnostics.SetEnabled(enabled)
 	_ = a.saveErrorReportingSetting(enabled)
 }
 
 // IsErrorReportingEnabled returns the current upload toggle state.
 func (a *App) IsErrorReportingEnabled() bool {
-	if a.errorReporter == nil {
+	if a.diagnostics == nil {
 		return false
 	}
-	return a.errorReporter.IsEnabled()
+	return a.diagnostics.Enabled()
 }
 
 // SendErrorReport manually triggers an upload of recent errors.
 func (a *App) SendErrorReport() (string, error) {
-	if a.errorReporter == nil {
+	if a.diagnostics == nil {
 		return "", fmt.Errorf("error reporter not initialized")
 	}
-	if !a.errorReporter.IsEnabled() {
+	if !a.diagnostics.Enabled() {
 		return "", fmt.Errorf("error reporting is disabled")
 	}
-	report, err := a.errorReporter.BuildReport(50)
+	report, err := a.diagnostics.BuildReport(50)
 	if err != nil {
 		return "", err
 	}
-	if err := a.errorReporter.Upload(report); err != nil {
+	if err := a.diagnostics.Upload(report); err != nil {
 		return "", err
 	}
 	return report.ReportID, nil
@@ -108,10 +113,10 @@ func (a *App) SendErrorReport() (string, error) {
 
 // GetErrorReportPreview returns a preview of what would be uploaded.
 func (a *App) GetErrorReportPreview() (string, error) {
-	if a.errorReporter == nil {
+	if a.diagnostics == nil {
 		return "", fmt.Errorf("error reporter not initialized")
 	}
-	report, err := a.errorReporter.BuildReport(20)
+	report, err := a.diagnostics.BuildReport(20)
 	if err != nil {
 		return "", err
 	}
@@ -152,67 +157,40 @@ func (a *App) saveErrorReportingSetting(enabled bool) error {
 // Convenience methods for subsystems
 // ---------------------------------------------------------------------------
 
-func (a *App) logError(code errors.Code, severity errors.Severity, operation, location string, err error) {
-	if a.errorEmitter == nil {
-		return
-	}
-	a.errorEmitter.Handle(errors.New(code, severity, operation, location, err))
+func (a *App) logError(code apperrors.Code, severity apperrors.Severity, operation, location string, err error) {
+	a.diagnostics.Report(apperrors.New(code, severity, operation, location, err))
 }
 
-func (a *App) logErrorSilent(code errors.Code, severity errors.Severity, operation, location string, err error) {
-	if a.errorEmitter == nil {
-		return
-	}
-	a.errorEmitter.HandleSilent(errors.New(code, severity, operation, location, err))
+func (a *App) logErrorSilent(code apperrors.Code, severity apperrors.Severity, operation, location string, err error) {
+	a.diagnostics.ReportSilent(apperrors.New(code, severity, operation, location, err))
 }
 
 func (a *App) logLLMLoadError(err error, location string) {
-	if a.errorEmitter == nil {
-		return
-	}
-	a.errorEmitter.LogLLMLoad(err, location)
+	a.diagnostics.ReportLLMLoad(err, location)
 }
 
 func (a *App) logLLMCrash(err error, location string) {
-	if a.errorEmitter == nil {
-		return
-	}
-	a.errorEmitter.LogLLMCrash(err, location)
+	a.diagnostics.ReportLLMCrash(err, location)
 }
 
 func (a *App) logImageLoadError(err error, location string) {
-	if a.errorEmitter == nil {
-		return
-	}
-	a.errorEmitter.LogImageLoad(err, location)
+	a.diagnostics.ReportImageLoad(err, location)
 }
 
 func (a *App) logImageGenError(err error, location string) {
-	if a.errorEmitter == nil {
-		return
-	}
-	a.errorEmitter.LogImageGen(err, location)
+	a.diagnostics.ReportImageGen(err, location)
 }
 
 func (a *App) logTTSError(err error, location string) {
-	if a.errorEmitter == nil {
-		return
-	}
-	a.errorEmitter.LogTTSSynth(err, location)
+	a.diagnostics.ReportTTSSynth(err, location)
 }
 
 func (a *App) logChatSaveError(err error, location string) {
-	if a.errorEmitter == nil {
-		return
-	}
-	a.errorEmitter.LogChatSave(err, location)
+	a.diagnostics.ReportChatSave(err, location)
 }
 
 func (a *App) logResourceError(err error, location string) {
-	if a.errorEmitter == nil {
-		return
-	}
-	a.errorEmitter.LogResourceAlloc(err, location)
+	a.diagnostics.ReportResourceAlloc(err, location)
 }
 
 // ---------------------------------------------------------------------------
@@ -222,9 +200,7 @@ func (a *App) logResourceError(err error, location string) {
 func (a *App) withRecovery(operation string, fn func()) {
 	defer func() {
 		if r := recover(); r != nil {
-			if a.errorEmitter != nil {
-				a.errorEmitter.LogSystemPanic(operation, "app-errors.go:recovery", r)
-			}
+			a.diagnostics.ReportPanic(operation, "app-errors.go:recovery", r)
 		}
 	}()
 	fn()
@@ -234,9 +210,7 @@ func (a *App) withRecoveryReturn(operation string, fn func() error) (err error) 
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("recovered from panic in %s: %v", operation, r)
-			if a.errorEmitter != nil {
-				a.errorEmitter.LogSystemPanic(operation, "app-errors.go:recovery-return", r)
-			}
+			a.diagnostics.ReportPanic(operation, "app-errors.go:recovery-return", r)
 		}
 	}()
 	return fn()

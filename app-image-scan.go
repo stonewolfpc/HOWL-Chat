@@ -100,8 +100,8 @@ func (a *App) imageDirectories() []string {
 		seen[key] = true
 		dirs = append(dirs, dir)
 	}
-	if a.modelRegistry != nil {
-		for _, dir := range a.modelRegistry.Directories(registry.KindImage) {
+	if a.registries.Models() != nil {
+		for _, dir := range a.registries.Models().Directories(registry.KindImage) {
 			add(dir)
 		}
 	}
@@ -111,10 +111,10 @@ func (a *App) imageDirectories() []string {
 
 // imageModelResult returns the image-kind slice of the registry as a ScanResult.
 func (a *App) imageModelResult() ScanResult {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return ScanResult{}
 	}
-	return indexToResult(a.modelRegistry.ToModelIndexForKind(registry.KindImage))
+	return indexToResult(a.registries.Models().ToModelIndexForKind(registry.KindImage))
 }
 
 // ScanImageModels scans every image directory, merges the results into the
@@ -140,9 +140,9 @@ func (a *App) ScanImageModels() (ScanResult, error) {
 		// SyncIndex merges the scanned entries AND prunes stale entries under
 		// this directory (e.g. a diffusion bundle that is now split into
 		// individual ControlNet entries). Without pruning the old bundle entry
-			// would persist alongside the new ControlNets.
-		if a.modelRegistry != nil {
-			if _, _, err := a.modelRegistry.SyncIndex(dir, idx); err != nil {
+		// would persist alongside the new ControlNets.
+		if a.registries.Models() != nil {
+			if _, _, err := a.registries.Models().SyncIndex(dir, idx); err != nil {
 				a.logErrorSilent(errors.REGModelAddFail, errors.Medium, "registry.sync", "app-image-scan.go", err)
 			}
 		}
@@ -159,7 +159,7 @@ func (a *App) ScanImageModels() (ScanResult, error) {
 // GetModelIndex returns the cached scan index without a full rescan.
 // Falls back to a fresh scan if no cache exists.
 func (a *App) GetModelIndex() (ScanResult, error) {
-	if a.modelRegistry != nil {
+	if a.registries.Models() != nil {
 		return a.imageModelResult(), nil
 	}
 	cfg := a.GetImageEngineConfig()
@@ -182,10 +182,10 @@ func (a *App) GetModelIndex() (ScanResult, error) {
 func (a *App) GetCompatibleAssets(family string) (FilteredAssets, error) {
 	// Build a combined index from the registry (all registered directories).
 	var idx scanner.ModelIndex
-	if a.modelRegistry != nil {
+	if a.registries.Models() != nil {
 		// Image directories only: a chat directory's files must never show up
 		// as a VAE, LoRA or ControlNet.
-		idx = a.modelRegistry.ToModelIndexForKind(registry.KindImage)
+		idx = a.registries.Models().ToModelIndexForKind(registry.KindImage)
 	} else {
 		// Fallback: scan ModelsDir only when registry is unavailable.
 		cfg := a.GetImageEngineConfig()
@@ -256,8 +256,8 @@ func (a *App) InstallAssets(move bool) (InstallSummary, error) {
 		return InstallSummary{}, fmt.Errorf("install failed: %w", err)
 	}
 	// SyncIndex merges the scanned entries AND prunes stale entries.
-	if a.modelRegistry != nil {
-		if _, _, err := a.modelRegistry.SyncIndex(cfg.ModelsDir, idx); err != nil {
+	if a.registries.Models() != nil {
+		if _, _, err := a.registries.Models().SyncIndex(cfg.ModelsDir, idx); err != nil {
 			a.logErrorSilent(errors.REGModelAddFail, errors.Medium, "registry.sync", "app-image-scan.go", err)
 		}
 	}
@@ -268,29 +268,29 @@ func (a *App) InstallAssets(move bool) (InstallSummary, error) {
 // registry. Missing files stay registered for a later reconnection, but are not
 // offered by the picker while unavailable.
 func (a *App) GetRegisteredModels() (ScanResult, error) {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return ScanResult{}, fmt.Errorf("model registry not initialised")
 	}
-	idx := a.modelRegistry.ToModelIndexForKind(registry.KindImage)
+	idx := a.registries.Models().ToModelIndexForKind(registry.KindImage)
 	return indexToResult(idx), nil
 }
 
 // UnregisterModel removes a single model from the persistent registry by its
 // absolute file path. The file itself is not touched.
 func (a *App) UnregisterModel(path string) error {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return fmt.Errorf("model registry not initialised")
 	}
-	return a.modelRegistry.Remove(path)
+	return a.registries.Models().Remove(path)
 }
 
 // mergeIntoRegistry merges a scan result into the persistent registry.
 // Non-fatal: logs and continues if the registry is unavailable.
 func (a *App) mergeIntoRegistry(idx scanner.ModelIndex) {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return
 	}
-	if err := a.modelRegistry.Merge(idx); err != nil {
+	if err := a.registries.Models().Merge(idx); err != nil {
 		a.logErrorSilent(errors.REGModelAddFail, errors.Medium, "registry.merge", "app-image-scan.go:211", err)
 	}
 }
@@ -299,7 +299,7 @@ func (a *App) mergeIntoRegistry(idx scanner.ModelIndex) {
 // result (matched by absolute path). This ensures every scan path returns
 // the full cross-directory catalogue to the frontend.
 func (a *App) mergeRegistryIntoResult(result ScanResult) ScanResult {
-	if a.modelRegistry == nil {
+	if a.registries.Models() == nil {
 		return result
 	}
 	// Build seen-path sets per category.
@@ -340,7 +340,7 @@ func (a *App) mergeRegistryIntoResult(result ScanResult) ScanResult {
 		seenClipG[a.Path] = struct{}{}
 	}
 
-	for _, e := range a.modelRegistry.All() {
+	for _, e := range a.registries.Models().All() {
 		info := registryEntryToAssetInfo(e)
 		switch scanner.AssetType(e.Type) {
 		case scanner.AssetDiffusion:

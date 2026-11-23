@@ -3,86 +3,48 @@ package main
 import (
 	"context"
 	"fmt"
-	"os/exec"
 	"sync"
-	"sync/atomic"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"howl-chat/internal/audio"
 	"howl-chat/internal/backend/chat"
-	"howl-chat/internal/backend/llama"
-	"howl-chat/internal/backend/lorebook"
 	"howl-chat/internal/backend/memory"
-	"howl-chat/internal/backend/model"
 	"howl-chat/internal/backend/rag"
-	"howl-chat/internal/backend/types"
-	"howl-chat/internal/contentimport"
-	"howl-chat/internal/errors"
-	imageengine "howl-chat/internal/image/engine"
-	"howl-chat/internal/image/gallery"
-	"howl-chat/internal/image/job"
-	"howl-chat/internal/image/registry"
-	imgsettings "howl-chat/internal/image/settings"
-	imagetypes "howl-chat/internal/image/types"
-	"howl-chat/internal/library"
-	"howl-chat/internal/lorebookstore"
-	"howl-chat/internal/modelintel"
-	"howl-chat/internal/paths"
-	appsettings "howl-chat/internal/settings"
+	"howl-chat/internal/diagnostics"
+	"howl-chat/internal/host"
+	"howl-chat/internal/media"
+	"howl-chat/internal/registries"
+	appruntime "howl-chat/internal/runtime"
 )
-
-// inferenceClient is the exact inference surface the app uses. *llama.HTTPClient
-// implements it in production. It exists so a recorder can sit at the same call
-// point in tests, without a second prompt-assembly route or a live model.
-type inferenceClient interface {
-	GenerateChat(messages []llama.ChatMessage, options *llama.InferenceOptions) (string, error)
-	GenerateChatStream(messages []llama.ChatMessage, options *llama.InferenceOptions, callback llama.TokenCallback) error
-	GenerateChatStreamWithImage(messages []llama.ChatMessage, imageData []byte, options *llama.InferenceOptions, callback llama.TokenCallback) error
-	CancelRequest()
-	GetContextSize() int
-	GetLoadedModel() (map[string]interface{}, error)
-	Health() error
-	IsLoaded() bool
-}
 
 // App represents Wails application
 // Contains application context and backend services
 type App struct {
-	ctx             context.Context
-	httpClient      inferenceClient
-	serverProc      *exec.Cmd
-	samplerSettings map[string]interface{}
-	modelSettings   map[string]interface{}
-	modelSettingsMu sync.RWMutex // Protects modelSettings concurrent access
-	appSettings     map[string]interface{}
-	settingsStore   *appsettings.Store
-	chatMessages    []map[string]interface{}
-	world           *chat.WorldContext
-	scenario        *chat.ScenarioContext
-	characters      []*chat.CharacterContext
-	lorebooks       []lorebook.Entry
-	triggeredLore   map[string]bool
-	streamMu        sync.Mutex
-	streamCancel    context.CancelFunc
-	streamGen       uint64
-	chatPersistence *chat.PersistenceManager
+	ctx context.Context
 
-	// Lifecycle ownership. shuttingDown is read by all new-work entry points;
-	// shutdownCoord makes cleanup single-entry; serverMu protects the llama
-	// process and its one Wait owner.
-	shuttingDown  atomic.Bool
-	shutdownMu    sync.Mutex
-	shutdownCoord *shutdownCoordinator
-	serverMu      sync.Mutex
-	serverMonitor *processMonitor
+	// Runtime & Resources (internal/runtime). The engine owns the inference
+	// client, the model manager and load progress/stage plus the last load's
+	// profile and injected chat template; the settings authority owns the
+	// unified document, its sampler and model sections and their persistence.
+	// App holds the owners and the Wails bindings, not the state.
+	engine   *appruntime.Engine
+	settings *appruntime.Settings
+	// conversation owns the active conversation: its session (turns, world,
+	// scenario, characters, lorebooks, trigger bookkeeping) and its collection
+	// (membership, append log, snapshots). App holds one handle to the owner and
+	// the Wails bindings; it keeps none of that state in its own fields.
+	conversation *chat.ActiveConversation
 
-	// Model loading progress (updated by LoadModel goroutine, read by GetLoadingProgress/Stage)
-	loadingProgress atomic.Int64 // stores progress*1000 as integer for lock-free reads
-	loadingStage    atomic.Value // stores string
+	// Level 0 — application lifecycle and coordination (internal/host).
+	// The authority owns admission, shutdown sequencing, background joining,
+	// the active stream token and child-process supervision. It owns no domain
+	// state: conversation, model, audio, image and configuration values stay
+	// with their own owners. Transitional ownership in this struct is recorded
+	// in docs/architecture/HOC-H0-LEVEL0-2026-11-22.md.
+	authorityOnce sync.Once
+	authority     *host.Authority
 
 	// Service dependencies
-	modelManager *model.Manager
-	chatService  *chat.Service
+	chatService *chat.Service
 
 	// Memory Service Integration
 	memoryService *memory.Service
@@ -90,42 +52,19 @@ type App struct {
 	// RAG Service Integration
 	ragService *rag.Service
 
-	// Audio Manager Integration
-	audioManager *audio.Manager
+	// Media domain (internal/media). Audio owns the manager, the desired
+	// settings contract, the apply route and the ASR activation intent; Image
+	// owns the image engine session, gallery, jobs, settings store and last
+	// model. App holds the owners and the Wails bindings, not the state.
+	audio  *media.Audio
+	images *media.Image
 
-	// Audio settings contract. The renderer can persist all 34 fields, while
-	// audioManager applies only the four operational fields. audioDesired is the
-	// authoritative request; audioApplyErr is the last explicit application
-	// failure and is never mixed into the manager's effective configuration.
-	audioDesiredMu  sync.RWMutex
-	audioDesired    audio.DesiredSettings
-	audioDesiredSet bool
-	audioApplyErr   string
-
-	// asrActivationPending records that an explicit ASR activation was requested
-	// but could not complete. The microphone gate refuses before the manager
-	// adopts the request, so status uses this flag to keep reporting the actual
-	// microphone condition instead of falling back to "disabled".
-	asrActivationPending atomic.Bool
-
-	// Image Generation Engine
-	imageEngine    imageengine.ImageEngine
-	gallerySvc     *gallery.Service
-	jobManager     *job.Manager
-	lastImageModel string
-	// autoTemplate is the chat template this app injected into the last
-	// model load. It is tracked so a stale auto template can be replaced when
-	// a different family loads, while a user override is left alone.
-	autoTemplate       string
-	lastImageModelOpts imagetypes.ModelLoadOptions
-	imgSettingsStore   *imgsettings.Store
-	modelRegistry      *registry.Registry
-	contentLibraries   *library.Registry
-	contentInventory   *library.InventoryStore
-	worldImport        *contentimport.Service
-	scenarioImport     *contentimport.Service
-	lorebookStore      *lorebookstore.Store
-	modelIntel         *modelintel.Cache
+	// registries is the one handle to the registry authorities: registered
+	// model directories/types, content roots, the inventory snapshot, the
+	// world/scenario import services, canonical lorebooks and the model-profile
+	// cache. The state lives in those domain packages; App holds the composition
+	// owner and the Wails bindings, not seven separate fields.
+	registries *registries.Set
 
 	// loaderDiagnosticsDir overrides where model-load failure records are
 	// written. Empty means <project root>/logs.
@@ -135,189 +74,37 @@ type App struct {
 	// Empty means the normal settings directory.
 	discoveryDirOverride string
 
-	// Error Tracking System
-	errorLogger   *errors.Logger
-	errorReporter *errors.Reporter
-	errorEmitter  *errors.CombinedSink
-
-	// Currently loaded model profile (for capability checks like vision)
-	currentModelProfile *types.ModelProfile
+	// Diagnostics (internal/diagnostics). The owner holds the structured error
+	// log and its rotation, privacy-safe report building/upload, and the UI
+	// event payloads; App supplies the log location, the upload preference and
+	// the Wails event transport (app-errors.go).
+	diagnostics *diagnostics.Owner
 }
 
-// NewApp creates a new instance of the App struct
-// Initializes backend services with llama-server HTTP client
+// NewApp builds the application and runs its ordered composition.
+//
+// Level 0 (internal/host) owns that sequence: it runs the stages from
+// app-boot.go in dependency order, marks readiness, and reports the stage that
+// failed. App supplies the bodies and holds the owner references; it no longer
+// performs startup ordering itself, and the image session is constructed by the
+// image domain rather than here.
 func NewApp() *App {
-	// Children are assigned to the application job at start. Crash cleanup is
-	// handled by KILL_ON_JOB_CLOSE, not by matching executable paths: a second
-	// Howl instance must never be able to reap this instance's model servers.
-	client := llama.NewHTTPClient("localhost", 8080, true)
-
-	// Initialize model manager
-	modelManager := model.NewManager(client)
-
-	// Initialize chat persistence manager
-	chatPersistence, err := chat.NewPersistenceManager()
-	if err != nil {
-		// Log error but don't fail app startup
-		fmt.Printf("Warning: Failed to initialize chat persistence: %v\n", err)
-		chatPersistence = nil
-	}
-
-	// Initialize memory service
-	memoryService := memory.NewService("default") // Default chat ID for initial setup
-
-	// Initialize chat service
-	chatService, err := chat.NewService(modelManager, client, "", "", []string{}, "")
-	if err != nil {
-		fmt.Printf("Warning: Failed to initialize chat service: %v\n", err)
-		chatService = nil
-	}
-
-	// Initialize RAG service (uses llama-server embedding endpoint if available)
-	var ragService *rag.Service
-	var ragEmbedder rag.Embedder
-	if client != nil {
-		ragEmbedder = rag.NewLlamaEmbedder(client)
-	} else {
-		ragEmbedder = rag.NewKeywordEmbedder()
-	}
-	ragService = rag.NewService(paths.StateRoot(), ragEmbedder)
-	if chatService != nil {
-		chatService.SetRAGService(ragService)
-		chatService.SetRAGEnabled(true)
-	}
-
-	// Default sampler settings
-	defaultSettings := map[string]interface{}{
-		"temperature":                0.7,
-		"top_p_enabled":              true,
-		"top_p":                      0.9,
-		"top_k":                      40,
-		"min_p":                      0.05,
-		"repeat_penalty":             1.1,
-		"repeat_last_n":              64,
-		"frequency_penalty_enabled":  true,
-		"frequency_penalty":          0.0,
-		"presence_penalty_enabled":   true,
-		"presence_penalty":           0.0,
-		"typical_p_enabled":          true,
-		"typical_p":                  1.0,
-		"mirostat_enabled":           true,
-		"mirostat":                   0,
-		"mirostat_tau":               5.0,
-		"mirostat_eta":               0.1,
-		"dynamic_temp_range_enabled": true,
-		"dynamic_temp_range":         0.0,
-		"dynamic_temp_exponent":      1.0,
-		"dry_multiplier":             0.0,
-		"dry_allowed_length":         2,
-		"dry_base":                   1.0,
-		"smoothing_factor":           0.0,
-		"smoothing_curve":            1.0,
-		"top_a_enabled":              true,
-		"top_a":                      0.0,
-		"epsilon_cutoff":             0.0,
-		"eta_cutoff":                 0.0,
-		"encoder_repeat_penalty":     1.0,
-		"no_repeat_ngram_size":       0,
-		"seed":                       -1,
-	}
-
 	app := &App{
-		httpClient:      client,
-		serverProc:      nil,
-		samplerSettings: defaultSettings,
-		modelSettings:   make(map[string]interface{}),
-		chatMessages:    []map[string]interface{}{},
-		chatPersistence: chatPersistence,
-		modelManager:    modelManager,
-		chatService:     chatService,
-		memoryService:   memoryService,
-		ragService:      ragService,
-		audioManager:    audio.NewProductionManager(),
+		engine:       appruntime.NewEngine(nil, nil),
+		conversation: chat.NewActiveConversation(nil),
 	}
-
-	// Production is a no-op; a promptcapture build swaps in the test-only recorder.
-	app.httpClient = wrapInferenceCapture(app.httpClient)
-
-	// Initialize unified settings store
-	app.settingsStore = appsettings.NewStore(app.getSettingsDir())
-	if libs, err := library.New(app.getSettingsDir()); err != nil {
-		fmt.Printf("Warning: failed to load content libraries: %v\n", err)
-	} else {
-		app.contentLibraries = libs
-		if chatService != nil {
-			if err := chatService.SetContentLibraries(libs); err != nil {
-				fmt.Printf("Warning: failed to attach world/scenario store: %v\n", err)
-			}
-		}
-		if service, err := contentimport.New(libs, library.Worlds, app.getSettingsDir()); err != nil {
-			fmt.Printf("Warning: failed to initialise world import: %v\n", err)
-		} else {
-			app.worldImport = service
-		}
-		if service, err := contentimport.New(libs, library.Scenarios, app.getSettingsDir()); err != nil {
-			fmt.Printf("Warning: failed to initialise scenario import: %v\n", err)
-		} else {
-			app.scenarioImport = service
-		}
+	// Children of this process are assigned to the application job at start.
+	// Crash cleanup relies on KILL_ON_JOB_CLOSE, not on matching executable
+	// paths: a second Howl instance must never reap this instance's children.
+	if err := app.level0().Lifecycle.Boot(context.Background(), app.bootStages()); err != nil {
+		fmt.Println("[Lifecycle] startup incomplete:", err)
 	}
-	app.contentInventory = library.NewInventoryStore(app.getSettingsDir())
-	app.lorebookStore = lorebookstore.New(app.contentLibraries, app.getSettingsDir())
-	if intel, err := modelintel.NewCache(app.getSettingsDir()); err != nil {
-		fmt.Printf("Warning: failed to load model intelligence cache: %v\n", err)
-	} else {
-		app.modelIntel = intel
-	}
-	loadedSettings, err := app.settingsStore.Load()
-	if err != nil {
-		fmt.Printf("Warning: failed to load unified settings: %v\n", err)
-		loadedSettings = make(map[string]interface{})
-	}
-	app.appSettings = loadedSettings
-
-	// Restore the full desired audio contract without activating anything. The
-	// manager remains untouched until the user explicitly saves or retries.
-	app.setAudioDesired(audio.DefaultDesiredSettings())
-	if rawAudio, ok := loadedSettings["audio"].(map[string]interface{}); ok {
-		app.setAudioDesired(audio.DesiredSettingsFromMap(rawAudio))
-	}
-
-	// Migrate legacy sampler/model settings into unified store if unified is empty
-	if samplerSection, ok := loadedSettings["sampler"].(map[string]interface{}); ok && len(samplerSection) > 0 {
-		for k, v := range samplerSection {
-			app.samplerSettings[k] = v
-		}
-	} else {
-		// No unified sampler section yet — load from legacy file
-		if err := app.loadSamplerSettingsFromFile(); err != nil {
-			fmt.Printf("Warning: failed to load sampler settings from disk: %v\n", err)
-		}
-	}
-	if modelSection, ok := loadedSettings["model"].(map[string]interface{}); ok && len(modelSection) > 0 {
-		for k, v := range modelSection {
-			app.modelSettings[k] = v
-		}
-	} else {
-		// No unified model section yet — load from legacy file
-		if err := app.loadModelSettingsFromFile(); err != nil {
-			fmt.Printf("Warning: failed to load model settings from disk: %v\n", err)
-		}
-	}
-
-	// Initialize image engine from persisted settings (non-fatal)
-	app.initImageEngine()
-
-	app.jobManager.SetOnComplete(func(id string, result *imagetypes.ImageResult) {
-		if app.gallerySvc != nil && result != nil {
-			if err := app.gallerySvc.Save(result); err != nil {
-				fmt.Printf("Warning: failed to save gallery from job %s: %v\n", id, err)
-			} else {
-				fmt.Printf("[App] Job %s result saved to gallery\n", id)
-			}
-		}
-	})
-
+	// Diagnostics is host-independent: its log and reporter need no webview.
+	// Only the event transport needs a UI, and appDiagnosticPort already drops
+	// events until one is attached, so every host that composes an App gets the
+	// same logging and reporting instead of only the Wails startup path.
+	app.initErrorSystem()
+	app.bindErrorEmitter()
 	return app
 }
 
@@ -326,17 +113,17 @@ func NewApp() *App {
 func (a *App) startup(ctx context.Context) {
 	startupMark("OnStartup: webview reached backend")
 	a.ctx = ctx
-	a.initErrorSystem()
-	a.bindErrorEmitter()
+	lifecycle := a.level0().Lifecycle
+	fmt.Println("[lifecycle] webview attached: boot", lifecycle.Epoch(), "ready", lifecycle.Ready())
 	startupMark("OnStartup: init complete")
 
 	// Model scanning is background work: the window is already visible and the
 	// user can interact, so a slow or unplugged model directory must never
 	// delay the first paint.
-	go a.RescanAllDirs()
+	a.level0().Background.Start("rescan", a.RescanAllDirs)
 	// "Never show again" means silent discovery, not no discovery: keep the
 	// pickers accurate in the background without interrupting the user.
-	go a.RunSilentModelDiscovery()
+	a.level0().Background.Start("model discovery", a.RunSilentModelDiscovery)
 	startNativeTestSeam(a)
 }
 
@@ -346,6 +133,14 @@ func (a *App) OnShutdown(ctx context.Context) {
 	if err := a.shutdown(ctx); err != nil {
 		fmt.Printf("Application shutdown completed with errors: %v\n", err)
 	}
+}
+
+// OnShutdownError runs the same sequence and returns its accumulated failure.
+// Wails' shutdown callback cannot return a value, so a host that wants to report
+// a failed stage (the browser harness) uses this form instead of printing and
+// forgetting it.
+func (a *App) OnShutdownError(ctx context.Context) error {
+	return a.shutdown(ctx)
 }
 
 // Chat Management Wails Bindings

@@ -7,8 +7,22 @@
  * @module navigation
  */
 
-// Navigate to a specific page
-function navigateTo(page) {
+// Navigate to a specific page.
+//
+// Leaving Chat is a save boundary: DataSync owns that write, so it is awaited
+// here before the document unloads. Firing it during unload instead left the
+// request aborted mid-flight ("Failed to save chat data") or racing the
+// conversation boundary. One completed save, then navigate.
+async function navigateTo(page) {
+    const dataSync = window.dataSync;
+    if (dataSync?.currentChatId && !window.howlNavigationSaved) {
+        try {
+            await dataSync.saveCurrentChatData();
+            window.howlNavigationSaved = true;
+        } catch (error) {
+            console.error('[navigation] save before leaving failed:', error);
+        }
+    }
     window.location.href = page;
 }
 

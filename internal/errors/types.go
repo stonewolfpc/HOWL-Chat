@@ -302,11 +302,13 @@ func (e *TrackedError) ReportPayload() map[string]interface{} {
 		"operation": e.Operation,
 		"location":  e.Location,
 		"time":      e.Time.Format(time.RFC3339),
-		"ctx":       sanitizeContext(e.Context),
+		"ctx":       SanitizeContext(e.Context),
 	}
 }
 
-func sanitizeContext(ctx map[string]string) map[string]string {
+// SanitizeContext redacts sensitive keys from the free-form context attached to
+// a tracked error. It is shared by report payloads and the diagnostics log.
+func SanitizeContext(ctx map[string]string) map[string]string {
 	clean := make(map[string]string, len(ctx))
 	for k, v := range ctx {
 		if isSensitive(k) {

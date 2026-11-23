@@ -23,43 +23,45 @@ import (
 func (a *App) ensureEngineReady(modelName, jobID string, genOpts ...imagetypes.ImageOptions) error {
 	if len(genOpts) > 0 {
 		o := genOpts[0]
+		loadOpts := a.images.LoadOptions()
 		if o.VAETiling {
-			a.lastImageModelOpts.VAETiling = true
+			loadOpts.VAETiling = true
 		}
 		if o.TemporalTiling {
-			a.lastImageModelOpts.TemporalTiling = true
+			loadOpts.TemporalTiling = true
 		}
 		if o.FlashAttention {
-			a.lastImageModelOpts.FlashAttention = true
+			loadOpts.FlashAttention = true
 		}
 		if o.OffloadToCPU {
-			a.lastImageModelOpts.OffloadToCPU = true
+			loadOpts.OffloadToCPU = true
 		}
 		if o.VAEPath != "" {
-			a.lastImageModelOpts.VAEPath = o.VAEPath
+			loadOpts.VAEPath = o.VAEPath
 		}
 		if o.ClipLPath != "" {
-			a.lastImageModelOpts.ClipLPath = o.ClipLPath
+			loadOpts.ClipLPath = o.ClipLPath
 		}
 		if o.ClipGPath != "" {
-			a.lastImageModelOpts.ClipGPath = o.ClipGPath
+			loadOpts.ClipGPath = o.ClipGPath
 		}
 		if o.T5XXLPath != "" {
-			a.lastImageModelOpts.T5XXLPath = o.T5XXLPath
+			loadOpts.T5XXLPath = o.T5XXLPath
 		}
+		a.images.SetLoadOptions(loadOpts)
 	}
-	if a.imageEngine == nil {
+	if a.images.Engine() == nil {
 		if err := a.lazyInitEngine(); err != nil {
 			return err
 		}
 	}
 	if modelName == "" {
-		modelName = a.lastImageModel
+		modelName = a.images.LastModelName()
 	}
 	if modelName == "" {
 		return fmt.Errorf("no model selected")
 	}
-	loadOpts := a.lastImageModelOpts
+	loadOpts := a.images.LoadOptions()
 	loadOpts.ModelName = modelName
 	loadOpts.ModelPath = a.resolveModelPath(modelName)
 	loadOpts.Family = a.registryFamily(modelName)
@@ -68,7 +70,7 @@ func (a *App) ensureEngineReady(modelName, jobID string, genOpts ...imagetypes.I
 		return err
 	}
 
-	a.lastImageModelOpts = loadOpts
+	a.images.SetLoadOptions(loadOpts)
 	// The job id belongs to this request, not to the remembered model selection:
 	// it is what lets one job's cancellation stop its own load and nothing else.
 	loadOpts.JobID = jobID
@@ -76,11 +78,11 @@ func (a *App) ensureEngineReady(modelName, jobID string, genOpts ...imagetypes.I
 	// Video renders through sd-cli, so resolve the model without spawning
 	// sd-server: only one process should own the GPU at a time.
 	if len(genOpts) > 0 && genOpts[0].Mode == "video" {
-		if eng, ok := a.imageEngine.(*sdcpp.Engine); ok {
+		if eng, ok := a.images.Engine().(*sdcpp.Engine); ok {
 			return eng.SelectModel(loadOpts)
 		}
 	}
-	return a.imageEngine.EnsureReady(modelName, loadOpts)
+	return a.images.Engine().EnsureReady(modelName, loadOpts)
 }
 
 // lazyInitEngine initialises the engine on-demand during generation if it was
@@ -117,7 +119,7 @@ func (a *App) SetActiveImageModel(opts interface{}) (err error) {
 			err = fmt.Errorf("internal panic: %v", r)
 		}
 	}()
-	if a.imageEngine == nil {
+	if a.images.Engine() == nil {
 		return fmt.Errorf("image engine not initialized")
 	}
 
@@ -126,16 +128,16 @@ func (a *App) SetActiveImageModel(opts interface{}) (err error) {
 		return parseErr
 	}
 
-	a.lastImageModel = loadOpts.ModelName
+	a.images.SetActiveModel(loadOpts.ModelName)
 	loadOpts.ModelPath = a.resolveModelPath(loadOpts.ModelName)
 	loadOpts.Family = a.registryFamily(loadOpts.ModelName)
 	a.autofillCompanionModels(&loadOpts)
 	if err := a.validateModelLoadOptions(loadOpts); err != nil {
 		return err
 	}
-	a.lastImageModelOpts = loadOpts
+	a.images.SetLoadOptions(loadOpts)
 	fmt.Printf("[App] SetActiveImageModel: name=%q path=%q\n", loadOpts.ModelName, loadOpts.ModelPath)
-	if err := a.imageEngine.LoadModel(loadOpts); err != nil {
+	if err := a.images.Engine().LoadModel(loadOpts); err != nil {
 		if loadOpts.OffloadToCPU {
 			a.logError(errors.IMGCPUOffloadFail, errors.High, "image.load", "app-image-model.go", err)
 		}
@@ -143,8 +145,8 @@ func (a *App) SetActiveImageModel(opts interface{}) (err error) {
 		return err
 	}
 
-	if a.shuttingDown.Load() {
-		_ = a.imageEngine.Shutdown()
+	if a.level0().Gate.Stopping() {
+		_ = a.images.Engine().Shutdown()
 		return fmt.Errorf("image model load cancelled because Howl is shutting down")
 	}
 
@@ -232,24 +234,24 @@ func parseModelLoadOpts(opts interface{}) (imagetypes.ModelLoadOptions, error) {
 // ListImageModels merges the engine scan with registry entries.
 func (a *App) ListImageModels() ([]imagetypes.ModelInfo, error) {
 	var models []imagetypes.ModelInfo
-	if a.imageEngine != nil {
-		m, err := a.imageEngine.ListModels()
+	if a.images.Engine() != nil {
+		m, err := a.images.Engine().ListModels()
 		if err == nil && m != nil {
 			models = m
 		}
 	}
 
-	if a.modelRegistry != nil {
+	if a.registries.Models() != nil {
 		seen := make(map[string]struct{}, len(models))
 		for _, m := range models {
 			seen[m.Path] = struct{}{}
 		}
-		for _, e := range a.modelRegistry.All() {
+		for _, e := range a.registries.Models().All() {
 			if e.Type != "diffusion" {
 				continue
 			}
 			// Menu boundary: only models living in an image directory.
-			if a.modelRegistry.KindForPath(e.Path) != registry.KindImage {
+			if a.registries.Models().KindForPath(e.Path) != registry.KindImage {
 				continue
 			}
 			if _, ok := seen[e.Path]; ok {
@@ -280,10 +282,10 @@ func (a *App) ListImageModels() ([]imagetypes.ModelInfo, error) {
 
 // ListImageLoRAs scans the models directory for LoRA files.
 func (a *App) ListImageLoRAs() ([]string, error) {
-	if a.imageEngine == nil {
+	if a.images.Engine() == nil {
 		return []string{}, fmt.Errorf("image engine not initialized")
 	}
-	loras, err := a.imageEngine.ListLoRAs()
+	loras, err := a.images.Engine().ListLoRAs()
 	if err != nil {
 		return []string{}, err
 	}
@@ -295,11 +297,11 @@ func (a *App) ListImageLoRAs() ([]string, error) {
 
 // resolveModelPath looks up the absolute file path for a model name from the registry.
 func (a *App) resolveModelPath(name string) string {
-	if a.modelRegistry == nil || name == "" {
+	if a.registries.Models() == nil || name == "" {
 		return ""
 	}
 	var paths []string
-	for _, e := range a.modelRegistry.All() {
+	for _, e := range a.registries.Models().All() {
 		if e.Name == name && e.Path != "" {
 			paths = append(paths, e.Path)
 		}
@@ -351,14 +353,14 @@ func preferModelPath(paths []string, modelsDir string) string {
 }
 
 func (a *App) modelEntryByName(name string) *registry.Entry {
-	if a.modelRegistry == nil || name == "" {
+	if a.registries.Models() == nil || name == "" {
 		return nil
 	}
 	// Resolve the same path the loader will use, so the family and companions
 	// always describe the file that is actually opened.
 	want := a.resolveModelPath(name)
-	for _, e := range a.modelRegistry.All() {
-		if e.Name != name || e.Type != "diffusion" || a.modelRegistry.KindForPath(e.Path) != registry.KindImage {
+	for _, e := range a.registries.Models().All() {
+		if e.Name != name || e.Type != "diffusion" || a.registries.Models().KindForPath(e.Path) != registry.KindImage {
 			continue
 		}
 		if want != "" && filepath.Clean(e.Path) != filepath.Clean(want) {
@@ -442,6 +444,37 @@ func (a *App) autofillCompanionModels(opts *imagetypes.ModelLoadOptions) {
 			opts.VAEPath = a.findCompatibleCompanion(fam, "vae")
 		}
 	}
+
+	// A checkpoint that carries a role inside itself must not be handed a
+	// borrowed file for that role. Every full SDXL .safetensors was given the
+	// index's CLIP-L and a separate VAE, so sd-server loaded the file's UNet
+	// without its CLIP-G and 768x768 renders came back as coloured noise. This
+	// runs last: the fills above are the ones that invent those paths.
+	checkpoint := e.Files["model"]
+	if checkpoint == "" {
+		checkpoint = e.Path
+	}
+	clearEmbeddedCompanions(opts, checkpoint)
+}
+
+// clearEmbeddedCompanions drops companion paths for roles the checkpoint file
+// already carries inside itself. A full SDXL .safetensors holds its VAE and both
+// text encoders; handing sd-server a separate CLIP-L and VAE instead replaced
+// them, left CLIP-G unloaded, and every render came back as coloured noise.
+func clearEmbeddedCompanions(opts *imagetypes.ModelLoadOptions, checkpoint string) {
+	if opts == nil || checkpoint == "" {
+		return
+	}
+	embedded := sdcpp.EmbeddedRoles(checkpoint)
+	if embedded["vae"] {
+		opts.VAEPath = ""
+	}
+	if embedded["clip_l"] {
+		opts.ClipLPath = ""
+	}
+	if embedded["clip_g"] {
+		opts.ClipGPath = ""
+	}
 }
 
 // usableCompanion returns a registry-provided companion path only when it is the
@@ -471,11 +504,11 @@ func usableCompanion(family, role, path string) string {
 // file. Empty when the file was never scanned, which means it cannot be judged
 // and is left alone.
 func (a *App) registryFamilyForPath(path string) string {
-	if a.modelRegistry == nil || path == "" {
+	if a.registries.Models() == nil || path == "" {
 		return ""
 	}
 	want := filepath.Clean(path)
-	for _, e := range a.modelRegistry.All() {
+	for _, e := range a.registries.Models().All() {
 		if filepath.Clean(e.Path) == want {
 			return strings.ToLower(strings.TrimSpace(e.Family))
 		}
@@ -576,10 +609,10 @@ func companionFamilyUsable(targetFamily, fileFamily string) bool {
 // the loaded checkpoint. Family data comes from the image registry, so files
 // that were never scanned (manual paths) are left alone rather than guessed at.
 func (a *App) validateCompanionFamilies(fam string, opts imagetypes.ModelLoadOptions) error {
-	if a.modelRegistry == nil || opts.VAEPath == "" {
+	if a.registries.Models() == nil || opts.VAEPath == "" {
 		return nil
 	}
-	idx := a.modelRegistry.ToModelIndexForKind(registry.KindImage)
+	idx := a.registries.Models().ToModelIndexForKind(registry.KindImage)
 	want := filepath.Clean(opts.VAEPath)
 	for _, v := range idx.VAEs {
 		if filepath.Clean(v.Path) != want {

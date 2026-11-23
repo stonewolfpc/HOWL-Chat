@@ -14,6 +14,8 @@ class DataSync {
         this.currentChatId = null;
         this.autosaveInterval = null;
         this.autosaveDelay = 30000; // 30 seconds
+        this.saveChain = null;
+        this.saveAgain = false;
     }
 
     /**
@@ -136,7 +138,31 @@ class DataSync {
     /**
      * Save current chat data to backend
      */
-    async saveCurrentChatData() {
+    // saveCurrentChatData is the one frontend route into the conversation save.
+    // The conversation boundary refuses a second in-process writer, so overlapping
+    // requests (autosave, navigation cleanup, event saves, beforeunload) must
+    // share one write. A request that arrives while a write is in flight is
+    // coalesced into a single trailing save rather than racing the boundary.
+    saveCurrentChatData() {
+        if (this.saveChain) {
+            this.saveAgain = true;
+            return this.saveChain;
+        }
+        this.saveChain = (async () => {
+            try {
+                await this._writeChatData();
+                while (this.saveAgain) {
+                    this.saveAgain = false;
+                    await this._writeChatData();
+                }
+            } finally {
+                this.saveChain = null;
+            }
+        })();
+        return this.saveChain;
+    }
+
+    async _writeChatData() {
         if (!window.go || !window.go.main || !window.go.main.App) {
             console.error('Backend not available for saving');
             return;
@@ -583,8 +609,9 @@ class DataSync {
             this.autosaveInterval = null;
         }
 
-        // Perform final save
-        if (this.currentChatId) {
+        // Perform final save, unless this document is only unloading because
+        // navigation already completed and awaited that same write.
+        if (this.currentChatId && !window.howlNavigationSaved) {
             this.saveCurrentChatData().catch(error => {
                 console.error('Final save failed:', error);
             });

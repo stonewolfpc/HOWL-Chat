@@ -30,32 +30,20 @@ func (a *App) AddCharacterToChat(character map[string]interface{}) error {
 	if err != nil {
 		return fmt.Errorf("AddCharacterToChat: failed to parse character: %w", err)
 	}
-	fmt.Printf("[TRACE:AddCharacterToChat] id=%s name=%s (total=%d)\n", parsed.ID, parsed.Name, len(a.characters))
-	for i, c := range a.characters {
-		if c.ID == parsed.ID {
-			a.characters[i] = &parsed
-			return nil
-		}
-	}
-	a.characters = append(a.characters, &parsed)
+	fmt.Printf("[TRACE:AddCharacterToChat] id=%s name=%s (total=%d)\n", parsed.ID, parsed.Name, len(a.sessionCharacters()))
+	a.session().UpsertCharacter(&parsed)
 	return nil
 }
 
 // RemoveCharacterFromChat removes a character from the current chat session.
 func (a *App) RemoveCharacterFromChat(characterId string) error {
-	filtered := make([]*chat.CharacterContext, 0, len(a.characters))
-	for _, c := range a.characters {
-		if c != nil && c.ID != characterId {
-			filtered = append(filtered, c)
-		}
-	}
-	a.characters = filtered
+	a.session().RemoveCharacter(characterId)
 	return nil
 }
 
 // ResetSessionCharacters clears the in-memory character list for the current session.
 func (a *App) ResetSessionCharacters() error {
-	a.characters = []*chat.CharacterContext{}
+	a.session().SetCharacters(nil)
 	return nil
 }
 
@@ -236,11 +224,9 @@ func (a *App) AddWorldToChat(worldMap map[string]interface{}) error {
 	if err != nil {
 		return fmt.Errorf("AddWorldToChat: failed to parse world: %w", err)
 	}
-	a.world = &world
-	if a.chatPersistence != nil {
-		if chatID := a.chatPersistence.GetLastChatID(); chatID != "" {
-			_ = a.performSave()
-		}
+	a.session().SetWorld(&world)
+	if a.conversation.ActiveID() != "" {
+		a.performSaveLogged("app-characters.go")
 	}
 	return nil
 }
@@ -251,11 +237,9 @@ func (a *App) AddScenarioToChat(scenario map[string]interface{}) error {
 	if err != nil {
 		return fmt.Errorf("AddScenarioToChat: failed to parse scenario: %w", err)
 	}
-	a.scenario = &parsed
-	if a.chatPersistence != nil {
-		if chatID := a.chatPersistence.GetLastChatID(); chatID != "" {
-			_ = a.performSave()
-		}
+	a.session().SetScenario(&parsed)
+	if a.conversation.ActiveID() != "" {
+		a.performSaveLogged("app-characters.go")
 	}
 	return nil
 }
@@ -267,14 +251,14 @@ func (a *App) AddScenarioToChat(scenario map[string]interface{}) error {
 // loadChatDataFromStorage loads chat state from the active persisted chat.
 // Used as a fallback by LoadChatData when no in-memory state is present.
 func (a *App) loadChatDataFromStorage() (map[string]interface{}, error) {
-	if a.chatPersistence == nil {
+	if !a.conversation.Bound() {
 		return nil, fmt.Errorf("chat persistence not initialized")
 	}
-	chatID := a.chatPersistence.GetLastChatID()
+	chatID := a.conversation.ActiveID()
 	if chatID == "" {
 		return nil, fmt.Errorf("no active chat")
 	}
-	chatData, err := a.chatPersistence.LoadChat(chatID)
+	chatData, err := a.conversation.Store().LoadChat(chatID)
 	if err != nil {
 		a.logError(errors.CHATLoadFail, errors.High, "chat.load", "app-characters.go:172", err)
 		return nil, err
@@ -328,27 +312,25 @@ func (a *App) loadChatDataFromStorage() (map[string]interface{}, error) {
 	}, nil
 }
 
-// saveChatDataToStorage persists the supplied chat state map via chatPersistence.
+// saveChatDataToStorage persists the supplied chat state map through the
+// conversation owner, which refuses a record the collection does not claim.
 func (a *App) saveChatDataToStorage(data map[string]interface{}) error {
-	if a.chatPersistence == nil {
-		return nil
-	}
 	chatData, err := a.convertFrontendDataToChatData(data)
 	if err != nil {
 		return fmt.Errorf("saveChatDataToStorage: %w", err)
 	}
-	return a.chatPersistence.SaveChat(chatData)
+	return a.conversation.SaveRecord(chatData)
 }
 
 // syncAppStateFromChatService pulls the latest world/scenario/character/lorebook
 // state out of the chat.Service into the App fields.
 func (a *App) syncAppStateFromChatService() {
-	a.world = a.chatService.GetWorldData()
-	a.scenario = a.chatService.GetScenarioData()
-	a.characters = a.chatService.GetCharacterData()
+	a.session().SetWorld(a.chatService.GetWorldData())
+	a.session().SetScenario(a.chatService.GetScenarioData())
+	a.session().SetCharacters(a.chatService.GetCharacterData())
 	// Same overlay as SetLorebooks: whichever sync runs last, the prompt pool keeps
 	// canonical text after cutover instead of the chat service's legacy copies.
-	a.lorebooks = a.mergeCanonicalLore(a.chatService.GetAllLorebookEntries(), false)
+	a.session().SetLorebooks(a.mergeCanonicalLore(a.chatService.GetAllLorebookEntries(), false))
 }
 
 // applyChatDataToState keeps backend state in sync with frontend chat state.
@@ -357,24 +339,24 @@ func (a *App) applyChatDataToState(data map[string]interface{}) {
 		world, err := a.parseWorldContextFromMap(worldMap)
 		if err != nil {
 			a.logErrorSilent(errors.WORLDParseFail, errors.Medium, "world.parse", "app-characters.go:237", err)
-			a.world = nil
+			a.session().ClearWorld()
 		} else {
-			a.world = &world
+			a.session().SetWorld(&world)
 		}
 	} else {
-		a.world = nil
+		a.session().ClearWorld()
 	}
 
 	if scenarioMap, ok := data["scenario"].(map[string]interface{}); ok && scenarioMap != nil {
 		scenario, err := a.parseScenarioContextFromMap(scenarioMap)
 		if err != nil {
 			a.logErrorSilent(errors.SCENParseFail, errors.Medium, "scenario.parse", "app-characters.go:249", err)
-			a.scenario = nil
+			a.session().ClearScenario()
 		} else {
-			a.scenario = &scenario
+			a.session().SetScenario(&scenario)
 		}
 	} else {
-		a.scenario = nil
+		a.session().ClearScenario()
 	}
 
 	if charsSlice, ok := data["characters"].([]interface{}); ok {
@@ -389,13 +371,13 @@ func (a *App) applyChatDataToState(data map[string]interface{}) {
 				characters = append(characters, &character)
 			}
 		}
-		a.characters = characters
+		a.session().SetCharacters(characters)
 	} else {
-		a.characters = []*chat.CharacterContext{}
+		a.session().SetCharacters(nil)
 	}
 
 	if lorebooks, ok := data["lorebooks"].([]interface{}); ok {
-		a.lorebooks = make([]lorebook.Entry, 0, len(lorebooks))
+		parsed := make([]lorebook.Entry, 0, len(lorebooks))
 		for _, l := range lorebooks {
 			if lorebookMap, ok := l.(map[string]interface{}); ok {
 				entry, err := lorebook.ParseLorebookEntryFromMap(lorebookMap)
@@ -403,11 +385,12 @@ func (a *App) applyChatDataToState(data map[string]interface{}) {
 					a.logErrorSilent(errors.LOREParseFail, errors.Medium, "lorebook.parse", "app-characters.go:281", err)
 					continue
 				}
-				a.lorebooks = append(a.lorebooks, entry)
+				parsed = append(parsed, entry)
 			}
 		}
+		a.session().SetLorebooks(parsed)
 	} else {
-		a.lorebooks = []lorebook.Entry{}
+		a.session().SetLorebooks(nil)
 	}
 
 	if chatName, ok := data["chatName"].(string); ok {

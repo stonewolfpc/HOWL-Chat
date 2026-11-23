@@ -27,21 +27,21 @@ func privacyEntry(id, title, content string, scope lorebook.Scope, owner, visibi
 }
 
 func privacyLoreApp() *App {
-	return &App{
-		characters: []*chat.CharacterContext{
-			{Character: entities.Character{ID: "char_aria", Name: "Aria"}},
-			{Character: entities.Character{ID: "char_bram", Name: "Bram"}},
-		},
-		lorebooks: []lorebook.Entry{
-			privacyEntry("aria-private", "Aria Secret", "ARIA-SECRET", lorebook.ScopeCharacter, "char_aria", lorebook.VisibilityPrivate),
-			privacyEntry("bram-private", "Bram Secret", "BRAM-SECRET", lorebook.ScopeCharacter, "char_bram", lorebook.VisibilityPrivate),
-			privacyEntry("unowned-private", "Unowned Secret", "UNOWNED-SECRET", lorebook.ScopeCharacter, "", lorebook.VisibilityPrivate),
-			privacyEntry("hidden-world", "Hidden World", "HIDDEN-SECRET", lorebook.ScopeWorld, "", lorebook.VisibilityHidden),
-			privacyEntry("public-unowned", "Public Lore", "PUBLIC-LORE", lorebook.ScopeCharacter, "", lorebook.VisibilityPublic),
-			privacyEntry("legacy-unowned", "Legacy Lore", "LEGACY-LORE", lorebook.ScopeCharacter, "", ""),
-		},
-		chatMessages: []map[string]interface{}{{"role": "user", "content": "I speak of the sigil"}},
-	}
+	app := testApp()
+	app.session().SetCharacters([]*chat.CharacterContext{
+		{Character: entities.Character{ID: "char_aria", Name: "Aria"}},
+		{Character: entities.Character{ID: "char_bram", Name: "Bram"}},
+	})
+	app.session().SetLorebooks([]lorebook.Entry{
+		privacyEntry("aria-private", "Aria Secret", "ARIA-SECRET", lorebook.ScopeCharacter, "char_aria", lorebook.VisibilityPrivate),
+		privacyEntry("bram-private", "Bram Secret", "BRAM-SECRET", lorebook.ScopeCharacter, "char_bram", lorebook.VisibilityPrivate),
+		privacyEntry("unowned-private", "Unowned Secret", "UNOWNED-SECRET", lorebook.ScopeCharacter, "", lorebook.VisibilityPrivate),
+		privacyEntry("hidden-world", "Hidden World", "HIDDEN-SECRET", lorebook.ScopeWorld, "", lorebook.VisibilityHidden),
+		privacyEntry("public-unowned", "Public Lore", "PUBLIC-LORE", lorebook.ScopeCharacter, "", lorebook.VisibilityPublic),
+		privacyEntry("legacy-unowned", "Legacy Lore", "LEGACY-LORE", lorebook.ScopeCharacter, "", ""),
+	})
+	app.setTestMessages([]map[string]interface{}{{"role": "user", "content": "I speak of the sigil"}})
+	return app
 }
 
 // Routing helpers can be right while the assembled prompt is wrong. This checks
@@ -49,7 +49,7 @@ func privacyLoreApp() *App {
 func TestCharacterLorePrivacyInAssembledPrompt(t *testing.T) {
 	app := privacyLoreApp()
 
-	aria := app.resolveCharacterLorePromptBlock("char_aria")
+	aria := app.session().LoreBlockFor("char_aria", 0)
 	if !strings.Contains(aria, "ARIA-SECRET") {
 		t.Fatalf("Aria's own lore missing:\n%s", aria)
 	}
@@ -64,7 +64,7 @@ func TestCharacterLorePrivacyInAssembledPrompt(t *testing.T) {
 		}
 	}
 
-	bram := app.resolveCharacterLorePromptBlock("char_bram")
+	bram := app.session().LoreBlockFor("char_bram", 0)
 	if !strings.Contains(bram, "BRAM-SECRET") {
 		t.Fatalf("Bram's own lore missing:\n%s", bram)
 	}
@@ -75,7 +75,7 @@ func TestCharacterLorePrivacyInAssembledPrompt(t *testing.T) {
 	}
 
 	// Rebuilding for Bram after Aria must not reuse anything from Aria's turn.
-	if again := app.resolveCharacterLorePromptBlock("char_bram"); strings.Contains(again, "ARIA-SECRET") {
+	if again := app.session().LoreBlockFor("char_bram", 0); strings.Contains(again, "ARIA-SECRET") {
 		t.Errorf("Aria's private lore survived a character switch:\n%s", again)
 	}
 
@@ -92,8 +92,8 @@ func TestCharacterLorePrivacyInAssembledPrompt(t *testing.T) {
 			t.Errorf("%s missing from the assembled prompt:\n%s", want, assembled)
 		}
 	}
-	if len(app.chatMessages) != 1 {
-		t.Errorf("prompt assembly mutated chat history: %d messages", len(app.chatMessages))
+	if app.session().Len() != 1 {
+		t.Errorf("prompt assembly mutated chat history: %d messages", app.session().Len())
 	}
 }
 
@@ -124,7 +124,7 @@ func TestBuildCharacterLoreBlockSharesPolicy(t *testing.T) {
 	// A turn without a trigger must not pull the whole library in. Clear the
 	// fixture history first: recent turns are part of the scan, so a previous
 	// mention of the phrase would legitimately match.
-	app.chatMessages = []map[string]interface{}{{"role": "user", "content": "earlier unrelated line"}}
+	app.setTestMessages([]map[string]interface{}{{"role": "user", "content": "earlier unrelated line"}})
 	if block := app.BuildCharacterLoreBlock("char_aria", "I look at the sky"); strings.Contains(block, "ARIA-SECRET") {
 		t.Errorf("untriggered lore was injected:\n%s", block)
 	}
@@ -135,7 +135,9 @@ func TestStaleLoreIsExcludedFromAssembledPrompt(t *testing.T) {
 	app := privacyLoreApp()
 	entry := privacyEntry("stale-1", "Offline", "STALE-SECRET", lorebook.ScopeWorld, "", lorebook.VisibilityPublic)
 	entry.Stale = true
-	app.lorebooks = append(app.lorebooks, entry)
+	pool := app.sessionLorebooks()
+	pool = append(pool, entry)
+	app.session().SetLorebooks(pool)
 
 	system := promptSystem(t, app)
 	if strings.Contains(system, "STALE-SECRET") {

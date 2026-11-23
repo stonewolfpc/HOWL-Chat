@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"howl-chat/internal/paths"
 	"os"
@@ -74,8 +73,8 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		}
 		userMsg := rec.UserMessage()
 		a.logError(errors.LLMArchRejected, errors.Critical, "llm.load.admission", "app-model.go:LoadModel", fmt.Errorf("%s", userMsg))
-		a.loadingProgress.Store(0)
-		a.loadingStage.Store("Rejected")
+		a.engine.SetProgressMilli(0)
+		a.engine.SetStage("Rejected")
 		a.emitEvent("model:error", userMsg)
 		fmt.Printf("[LoadModel] FAIL: %s\n", userMsg)
 		return fmt.Errorf("%s", userMsg)
@@ -105,8 +104,8 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		}
 		userMsg := rec.UserMessage()
 		a.logError(errors.LLMChatTaskRejected, errors.Critical, "llm.load.task", "app-model.go:LoadModel", fmt.Errorf("%s", userMsg))
-		a.loadingProgress.Store(0)
-		a.loadingStage.Store("Rejected")
+		a.engine.SetProgressMilli(0)
+		a.engine.SetStage("Rejected")
 		a.emitEvent("model:error", userMsg)
 		fmt.Printf("[LoadModel] FAIL: %s\n", userMsg)
 		return fmt.Errorf("%s", userMsg)
@@ -137,8 +136,8 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		}
 		userMsg := rec.UserMessage()
 		a.logError(errors.LLMProjectorPairing, errors.Critical, "llm.load.projector", "app-model.go:LoadModel", fmt.Errorf("%s", userMsg))
-		a.loadingProgress.Store(0)
-		a.loadingStage.Store("Rejected")
+		a.engine.SetProgressMilli(0)
+		a.engine.SetStage("Rejected")
 		a.emitEvent("model:error", userMsg)
 		fmt.Printf("[LoadModel] FAIL: %s\n", userMsg)
 		return fmt.Errorf("%s", userMsg)
@@ -151,10 +150,10 @@ func (a *App) LoadModel(modelPath string) (err error) {
 	}
 
 	// Prevent redundant reloads: if the same model is already loaded, skip.
-	if existing, _ := a.currentLlamaServer(); existing != nil && existing.Process != nil {
+	if existing := a.level0().Processes.Current(); existing != nil && existing.Process != nil {
 		fmt.Println("[LoadModel] existing serverProc found")
-		if a.httpClient != nil {
-			if loaded, _ := a.httpClient.GetLoadedModel(); loaded != nil {
+		if a.engine.Client() != nil {
+			if loaded, _ := a.engine.Client().GetLoadedModel(); loaded != nil {
 				if data, ok := loaded["data"].([]interface{}); ok && len(data) > 0 {
 					if first, ok := data[0].(map[string]interface{}); ok {
 						if id, ok := first["id"].(string); ok && id == filepath.Base(modelPath) {
@@ -165,13 +164,13 @@ func (a *App) LoadModel(modelPath string) (err error) {
 				}
 			}
 		}
-		progress := a.loadingProgress.Load()
+		progress := a.engine.ProgressMilli()
 		if progress > 0 && progress < 1000 {
 			fmt.Printf("[LoadModel] load in progress (progress=%d), skipping\n", progress)
 			return nil
 		}
 		fmt.Println("[LoadModel] stopping existing server")
-		if err := a.stopLlamaServer(5 * time.Second); err != nil {
+		if err := a.level0().Processes.Stop(5 * time.Second); err != nil {
 			fmt.Printf("[LoadModel] WARN: existing llama-server did not stop cleanly: %v\n", err)
 		}
 	}
@@ -202,15 +201,10 @@ func (a *App) LoadModel(modelPath string) (err error) {
 			profile.Family, profile.LayerCount, profile.ParameterCount,
 			float64(profile.FileSizeBytes)/(1024*1024), profile.FileType,
 			profile.ArchitectureSpec != nil)
-		if profile.Template != "" {
-			if a.modelSettings == nil {
-				a.modelSettings = make(map[string]interface{})
-			}
-			// The template is NOT written into the saved settings here. Doing
-			// that made the first family's template stick forever: the second
-			// family loaded with if _, exists… still true and was prompted in
-			// the wrong format. It is injected per load in spawnSettingsFor().
-		}
+		// The template is NOT written into the saved settings here. Doing that
+		// made the first family's template stick forever: the second family
+		// loaded with if _, exists… still true and was prompted in the wrong
+		// format. It is injected per load in spawnSettingsFor().
 		fmt.Println("[LoadModel] applying safe defaults")
 		a.applySafeDefaults(profile)
 		fmt.Println("[LoadModel] safe defaults applied")
@@ -243,7 +237,7 @@ func (a *App) LoadModel(modelPath string) (err error) {
 			}
 			fmt.Println(")")
 		}
-		a.currentModelProfile = profile
+		a.engine.SetProfile(profile)
 	}
 
 	// Validate spawn settings before starting server
@@ -252,9 +246,9 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		hw := resource.GetManager().HardwareSnapshot()
 		freeVRAM := int64(float64(hw.FreeVRAMBytes) * 0.85 / 1024 / 1024)
 		freeRAM := int64(float64(hw.FreeRAMBytes) * 0.90 / 1024 / 1024)
-		ctxSize, _ := strconv.Atoi(intSetting(a.modelSettings, "context_size", 4096))
-		gpuLayers, _ := strconv.Atoi(intSetting(a.modelSettings, "gpu_layers", 0))
-		batchSize, _ := strconv.Atoi(intSetting(a.modelSettings, "batch_size", 512))
+		ctxSize, _ := strconv.Atoi(intSetting(a.settings.Model(), "context_size", 4096))
+		gpuLayers, _ := strconv.Atoi(intSetting(a.settings.Model(), "gpu_layers", 0))
+		batchSize, _ := strconv.Atoi(intSetting(a.settings.Model(), "batch_size", 512))
 
 		// Sanity check: if we have a GPU but detected < 1GB free VRAM, detection is likely wrong.
 		if hw.TotalVRAMBytes > 1024*1024*1024 && freeVRAM < 1024 {
@@ -271,13 +265,9 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		fmt.Printf("[LoadModel] validation result: level=%d msg=%q\n", validation.Level, validation.Message)
 
 		forceLoad := false
-		a.modelSettingsMu.RLock()
-		if a.modelSettings != nil {
-			if v, ok := a.modelSettings["force_load"].(bool); ok {
-				forceLoad = v
-			}
+		if v, ok := a.settings.Model()["force_load"].(bool); ok {
+			forceLoad = v
 		}
-		a.modelSettingsMu.RUnlock()
 
 		switch validation.Level {
 		case gguf.ValidationSafe:
@@ -334,25 +324,25 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		userMsg := rec.UserMessage()
 		a.logLLMLoadError(fmt.Errorf("%s", userMsg), "app-model.go:84")
 		fmt.Printf("[LoadModel] FAIL: spawn error: %v\n", err)
-		a.loadingProgress.Store(0)
-		a.loadingStage.Store("Failed")
+		a.engine.SetProgressMilli(0)
+		a.engine.SetStage("Failed")
 		a.emitEvent("model:error", userMsg)
 		return fmt.Errorf("failed to spawn llama-server: %w", err)
 	}
 	activeCmd := cmd
 	fmt.Printf("[LoadModel] llama-server spawned (pid %d)\n", cmd.Process.Pid)
 	pm := waitMonitor(cmd)
-	a.adoptLlamaServer(cmd, pm)
+	a.level0().Processes.Adopt(cmd, pm.wait)
 	// Shutdown may have passed its stop step while the model was being
 	// validated or spawned. Adopt first, then stop the child if that happened:
 	// no child may outlive the shutdown that started during this load.
-	if a.shuttingDown.Load() {
-		_ = a.stopLlamaServer(llamaShutdownTimeout)
+	if a.level0().Gate.Stopping() {
+		_ = a.level0().Processes.Stop(llamaShutdownTimeout)
 		return fmt.Errorf("model load cancelled because Howl is shutting down")
 	}
 
-	a.loadingProgress.Store(0)
-	a.loadingStage.Store("Starting")
+	a.engine.SetProgressMilli(0)
+	a.engine.SetStage("Starting")
 
 	go func() {
 		const maxTicks = 120
@@ -369,22 +359,22 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		for tick := 0; tick < maxTicks; tick++ {
 			time.Sleep(500 * time.Millisecond)
 			pct := int(float64(tick) / float64(maxTicks) * 90.0)
-			a.loadingProgress.Store(int64(pct) * 10)
+			a.engine.SetProgressMilli(int64(pct) * 10)
 			switch {
 			case pct < 20:
-				a.loadingStage.Store("Initializing")
+				a.engine.SetStage("Initializing")
 			case pct < 50:
-				a.loadingStage.Store("Loading weights")
+				a.engine.SetStage("Loading weights")
 			case pct < 80:
-				a.loadingStage.Store("Allocating tensors")
+				a.engine.SetStage("Allocating tensors")
 			default:
-				a.loadingStage.Store("Warming up")
+				a.engine.SetStage("Warming up")
 			}
 			a.emitEvent("model:progress", pct)
 
 			if tick%20 == 0 && tick > 0 {
 				fmt.Printf("[LoadModel] monitor tick %d/%d (%.0f%%), stage=%s, alive=%v\n",
-					tick, maxTicks, float64(pct), a.loadingStage.Load(), pm.isAlive())
+					tick, maxTicks, float64(pct), a.engine.Stage(), pm.isAlive())
 			}
 
 			if !pm.isAlive() {
@@ -394,11 +384,11 @@ func (a *App) LoadModel(modelPath string) (err error) {
 					fitRetries++
 					fmt.Printf("[LoadModel] monitor: GGML_SCHED_MAX_SPLIT_INPUTS crash, retry %d/%d\n", fitRetries, maxFitRetries)
 					a.logLLMCrash(fmt.Errorf("GGML_SCHED_MAX_SPLIT_INPUTS crash, retry %d/%d", fitRetries, maxFitRetries), "app-model.go:118")
-					if err := a.stopLlamaServer(5 * time.Second); err != nil {
+					if err := a.level0().Processes.Stop(5 * time.Second); err != nil {
 						fmt.Printf("[LoadModel] WARN: crashed llama-server did not stop cleanly: %v\n", err)
 					}
 					serverOutput.Reset()
-					if a.shuttingDown.Load() {
+					if a.level0().Gate.Stopping() {
 						fmt.Println("[LoadModel] retry cancelled because Howl is shutting down")
 						return
 					}
@@ -429,9 +419,9 @@ func (a *App) LoadModel(modelPath string) (err error) {
 					}
 					activeCmd = cmd2
 					pm = waitMonitor(cmd2)
-					a.adoptLlamaServer(cmd2, pm)
-					if a.shuttingDown.Load() {
-						_ = a.stopLlamaServer(llamaShutdownTimeout)
+					a.level0().Processes.Adopt(cmd2, pm.wait)
+					if a.level0().Gate.Stopping() {
+						_ = a.level0().Processes.Stop(llamaShutdownTimeout)
 						return
 					}
 					tick = -1
@@ -459,20 +449,20 @@ func (a *App) LoadModel(modelPath string) (err error) {
 				errMsg := rec.UserMessage()
 				fmt.Printf("[LoadModel] monitor: %s\n", rec.Format())
 				a.logLLMCrash(fmt.Errorf("%s", errMsg), "app-model.go:146")
-				a.loadingProgress.Store(0)
-				a.loadingStage.Store("Failed")
+				a.engine.SetProgressMilli(0)
+				a.engine.SetStage("Failed")
 				a.emitEvent("model:error", errMsg)
 				return
 			}
 
-			if a.httpClient == nil {
-				fmt.Println("[LoadModel] monitor: httpClient is nil, cannot health check")
+			if a.engine.Client() == nil {
+				fmt.Println("[LoadModel] monitor: no inference client, cannot health check")
 				continue
 			}
-			if err := a.httpClient.Health(); err == nil {
+			if err := a.engine.Client().Health(); err == nil {
 				fmt.Println("[LoadModel] monitor: server healthy, model loaded")
-				a.loadingProgress.Store(1000)
-				a.loadingStage.Store("Ready")
+				a.engine.SetProgressMilli(1000)
+				a.engine.SetStage("Ready")
 				a.emitEvent("model:progress", 100)
 				a.emitEvent("model:loaded", modelPath)
 				return
@@ -498,19 +488,19 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		}
 		userMsg := rec.UserMessage()
 		a.logError(errors.LLMServerTimeout, errors.High, "llm.load", "app-model.go:172", fmt.Errorf("%s", userMsg))
-		a.loadingProgress.Store(0)
-		a.loadingStage.Store("Timeout")
+		a.engine.SetProgressMilli(0)
+		a.engine.SetStage("Timeout")
 		a.emitEvent("model:error", userMsg)
 	}()
 
 	// Register with resource manager using actual memory estimates
 	modelName := filepath.Base(modelPath)
 	gpuLayers := 0
-	if gl, ok := a.modelSettings["gpu_layers"].(int); ok {
+	if gl, ok := a.settings.Model()["gpu_layers"].(int); ok {
 		gpuLayers = gl
 	}
 	ctxSize := 4096
-	if cs, ok := a.modelSettings["context_size"].(int); ok {
+	if cs, ok := a.settings.Model()["context_size"].(int); ok {
 		ctxSize = cs
 	}
 	var gpuMB, ramMB int64 = int64(gpuLayers) * 100, 4000
@@ -535,12 +525,12 @@ func (a *App) LoadModel(modelPath string) (err error) {
 
 // UnloadModel kills the llama-server process, freeing all model memory.
 func (a *App) UnloadModel() error {
-	if err := a.stopLlamaServer(llamaShutdownTimeout); err != nil {
+	if err := a.level0().Processes.Stop(llamaShutdownTimeout); err != nil {
 		return fmt.Errorf("stop llama-server: %w", err)
 	}
 	fmt.Println("INFO: llama-server stopped, model memory freed")
-	a.loadingProgress.Store(0)
-	a.loadingStage.Store("Unloaded")
+	a.engine.SetProgressMilli(0)
+	a.engine.SetStage("Unloaded")
 	a.emitEvent("model:unloaded")
 
 	// Unregister from resource manager
@@ -553,33 +543,28 @@ func (a *App) UnloadModel() error {
 
 // IsModelLoaded returns true if a model is currently loaded.
 func (a *App) IsModelLoaded() bool {
-	if a.httpClient == nil {
+	if a.engine.Client() == nil {
 		return false
 	}
-	return a.httpClient.IsLoaded()
+	return a.engine.Client().IsLoaded()
 }
 
 // GetLoadingProgress returns the current model loading progress (0.0–1.0).
 func (a *App) GetLoadingProgress() float64 {
-	return float64(a.loadingProgress.Load()) / 1000.0
+	return a.engine.Progress()
 }
 
 // GetLoadingStage returns the current loading stage description.
 func (a *App) GetLoadingStage() string {
-	if v := a.loadingStage.Load(); v != nil {
-		if s, ok := v.(string); ok {
-			return s
-		}
-	}
-	return ""
+	return a.engine.Stage()
 }
 
 // GetLoadedModelName returns the name of the currently loaded model.
 func (a *App) GetLoadedModelName() string {
-	if a.httpClient == nil {
+	if a.engine.Client() == nil {
 		return "No model loaded"
 	}
-	info, err := a.httpClient.GetLoadedModel()
+	info, err := a.engine.Client().GetLoadedModel()
 	if err != nil || info == nil {
 		return "No model loaded"
 	}
@@ -595,13 +580,12 @@ func (a *App) GetLoadedModelName() string {
 
 // GetChatMessages returns all messages in the current chat context.
 func (a *App) GetChatMessages() []map[string]interface{} {
-	return a.chatMessages
+	return a.sessionMessages()
 }
 
 // ClearChat clears the current chat context and triggered lore state.
 func (a *App) ClearChat() error {
-	a.chatMessages = []map[string]interface{}{}
-	a.triggeredLore = map[string]bool{}
+	a.session().ClearEntries()
 	return nil
 }
 
@@ -611,30 +595,22 @@ func (a *App) ClearChat() error {
 
 // GetSamplerSettings returns the current sampler settings.
 func (a *App) GetSamplerSettings() map[string]interface{} {
-	if a.samplerSettings == nil {
-		return map[string]interface{}{}
-	}
-	return a.samplerSettings
+	return a.settings.Sampler()
 }
 
 // SetSamplerSettings updates and persists sampler settings.
 func (a *App) SetSamplerSettings(settings map[string]interface{}) error {
-	a.samplerSettings = settings
-	if err := a.saveSamplerSettingsToFile(); err != nil {
+	a.settings.SetSampler(settings)
+	if err := a.settings.SaveSamplerFile(); err != nil {
 		fmt.Printf("Warning: failed to save sampler settings to disk: %v\n", err)
 	}
 	return nil
 }
 
-// SetModelOptions merges options into modelSettings and persists them.
+// SetModelOptions merges options into the model section and persists them.
 func (a *App) SetModelOptions(options map[string]interface{}) error {
-	if a.modelSettings == nil {
-		a.modelSettings = make(map[string]interface{})
-	}
-	for k, v := range options {
-		a.modelSettings[k] = v
-	}
-	if err := a.saveModelSettingsToFile(); err != nil {
+	a.settings.MergeModel(options)
+	if err := a.settings.SaveModelFile(); err != nil {
 		fmt.Printf("Warning: failed to save model settings to disk: %v\n", err)
 	}
 	return nil
@@ -642,10 +618,7 @@ func (a *App) SetModelOptions(options map[string]interface{}) error {
 
 // GetModelOptions returns the current model options.
 func (a *App) GetModelOptions() map[string]interface{} {
-	if a.modelSettings == nil {
-		return map[string]interface{}{}
-	}
-	return a.modelSettings
+	return a.settings.Model()
 }
 
 // ---------------------------------------------------------------------------
@@ -657,71 +630,6 @@ func (a *App) getSettingsDir() string {
 	settingsDir := paths.InternalConfigDir()
 	_ = os.MkdirAll(settingsDir, 0755)
 	return settingsDir
-}
-
-func (a *App) saveSamplerSettingsToFile() error {
-	if a.samplerSettings == nil {
-		return nil
-	}
-	data, err := json.MarshalIndent(a.samplerSettings, "", "  ")
-	if err != nil {
-		return fmt.Errorf("marshal sampler settings: %w", err)
-	}
-	path := filepath.Join(a.getSettingsDir(), "sampler-settings.json")
-	if err := os.WriteFile(path, data, 0644); err != nil {
-		return fmt.Errorf("write sampler settings: %w", err)
-	}
-	return nil
-}
-
-func (a *App) loadSamplerSettingsFromFile() error {
-	path := filepath.Join(a.getSettingsDir(), "sampler-settings.json")
-	data, err := os.ReadFile(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil
-		}
-		return fmt.Errorf("read sampler settings: %w", err)
-	}
-	var settings map[string]interface{}
-	if err := json.Unmarshal(data, &settings); err != nil {
-		return fmt.Errorf("unmarshal sampler settings: %w", err)
-	}
-	a.samplerSettings = settings
-	return nil
-}
-
-func (a *App) saveModelSettingsToFile() error {
-	if a.modelSettings == nil {
-		return nil
-	}
-	data, err := json.MarshalIndent(a.modelSettings, "", "  ")
-	if err != nil {
-		return fmt.Errorf("marshal model settings: %w", err)
-	}
-	path := filepath.Join(a.getSettingsDir(), "model-settings.json")
-	if err := os.WriteFile(path, data, 0644); err != nil {
-		return fmt.Errorf("write model settings: %w", err)
-	}
-	return nil
-}
-
-func (a *App) loadModelSettingsFromFile() error {
-	path := filepath.Join(a.getSettingsDir(), "model-settings.json")
-	data, err := os.ReadFile(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil
-		}
-		return fmt.Errorf("read model settings: %w", err)
-	}
-	var settings map[string]interface{}
-	if err := json.Unmarshal(data, &settings); err != nil {
-		return fmt.Errorf("unmarshal model settings: %w", err)
-	}
-	a.modelSettings = settings
-
-	return nil
 }
 
 // ---------------------------------------------------------------------------
@@ -742,9 +650,6 @@ func (a *App) GetModelMemoryEstimate(path string, gpuLayers, contextSize int) (*
 // It uses the architecture-aware memory model for accurate estimation.
 func (a *App) applySafeDefaults(profile *types.ModelProfile) {
 	fmt.Println("[applySafeDefaults] enter")
-	if a.modelSettings == nil {
-		a.modelSettings = make(map[string]interface{})
-	}
 
 	fmt.Println("[applySafeDefaults] getting hardware snapshot")
 	hw := resource.GetManager().HardwareSnapshot()
@@ -753,15 +658,15 @@ func (a *App) applySafeDefaults(profile *types.ModelProfile) {
 	fmt.Printf("[applySafeDefaults] freeVRAM=%d freeRAM=%d\n", freeVRAM, freeRAM)
 
 	fmt.Println("[applySafeDefaults] reading settings")
-	ctxSize, _ := strconv.Atoi(intSetting(a.modelSettings, "context_size", 4096))
+	live := a.settings.Model()
+	ctxSize, _ := strconv.Atoi(intSetting(live, "context_size", 4096))
 	if ctxSize > profile.UsableContext && profile.UsableContext > 0 {
 		ctxSize = profile.UsableContext
-		a.modelSettings["context_size"] = ctxSize
 		fmt.Printf("[applySafeDefaults] capped context to %d\n", ctxSize)
 	}
 
-	gpuLayers, _ := strconv.Atoi(intSetting(a.modelSettings, "gpu_layers", 0))
-	batchSize, _ := strconv.Atoi(intSetting(a.modelSettings, "batch_size", 512))
+	gpuLayers, _ := strconv.Atoi(intSetting(live, "gpu_layers", 0))
+	batchSize, _ := strconv.Atoi(intSetting(live, "batch_size", 512))
 	fmt.Printf("[applySafeDefaults] settings: ctx=%d gpuLayers=%d batch=%d\n", ctxSize, gpuLayers, batchSize)
 
 	// Build architecture spec. If profile has the new ArchitectureSpec, use it.
@@ -820,10 +725,12 @@ func (a *App) applySafeDefaults(profile *types.ModelProfile) {
 	fmt.Printf("[applySafeDefaults] final: GPU=%dMB RAM=%dMB ctx=%d gpuLayers=%d batch=%d\n",
 		finalEst.GPUMB, finalEst.RAMMB, ctxSize, gpuLayers, batchSize)
 
-	// Apply clamped settings
-	a.modelSettings["context_size"] = ctxSize
-	a.modelSettings["gpu_layers"] = gpuLayers
-	a.modelSettings["batch_size"] = batchSize
+	// Apply clamped settings through the authority, so the next read sees them.
+	a.settings.MergeModel(map[string]interface{}{
+		"context_size": ctxSize,
+		"gpu_layers":   gpuLayers,
+		"batch_size":   batchSize,
+	})
 	fmt.Println("[applySafeDefaults] done")
 }
 
@@ -869,7 +776,7 @@ func (a *App) LoadModelMetadata(path string) (*types.ModelProfile, error) {
 
 // UpdateRuntimeSettings stores runtime settings for the next model load.
 func (a *App) UpdateRuntimeSettings(settings *types.RuntimeSettings) error {
-	a.modelSettings = map[string]interface{}{
+	a.settings.SetModel(map[string]interface{}{
 		"threads":         settings.Threads,
 		"batch_size":      settings.BatchSize,
 		"context_size":    settings.ContextSize,
@@ -884,20 +791,19 @@ func (a *App) UpdateRuntimeSettings(settings *types.RuntimeSettings) error {
 		"use_mmap":        settings.UseMMap,
 		"use_mlock":       settings.UseMLock,
 		"vocab_only":      settings.VocabOnly,
-	}
+	})
 	return nil
 }
 
 // UpdatePromptSettings stores prompt pipeline settings.
 func (a *App) UpdatePromptSettings(settings *types.PromptSettings) error {
-	if a.modelSettings == nil {
-		a.modelSettings = make(map[string]interface{})
-	}
-	a.modelSettings["prompt_template"] = settings.PromptTemplate
-	a.modelSettings["custom_jinja_template"] = settings.CustomJinjaTemplate
-	a.modelSettings["system_prompt_override"] = settings.SystemPromptOverride
-	a.modelSettings["user_prefix"] = settings.UserPrefix
-	a.modelSettings["assistant_prefix"] = settings.AssistantPrefix
-	a.modelSettings["stop_sequences"] = settings.StopSequences
+	a.settings.MergeModel(map[string]interface{}{
+		"prompt_template":        settings.PromptTemplate,
+		"custom_jinja_template":  settings.CustomJinjaTemplate,
+		"system_prompt_override": settings.SystemPromptOverride,
+		"user_prefix":            settings.UserPrefix,
+		"assistant_prefix":       settings.AssistantPrefix,
+		"stop_sequences":         settings.StopSequences,
+	})
 	return nil
 }

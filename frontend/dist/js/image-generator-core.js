@@ -877,6 +877,7 @@ async function onGenerate() {
     let pollWatchdog = null;
     let lastPollMs = 0;
     let abortReject = null;
+    let watchdogProbing = false;
     progressReal = false;
 
     try {
@@ -961,16 +962,30 @@ async function onGenerate() {
             }, 500);
 
             // Watchdog: one stalled status request must never leave the button on
-            // "Abort" and the bar on "Generating..." forever. If nothing has come
-            // back for 20s, fail with a message that says where the image went.
+            // "Abort" and the bar on "Generating..." forever. It probes once
+            // before declaring the engine lost: Chromium throttles timers in a
+            // hidden tab (the browser harness) and WebView2 does the same to a
+            // minimised window, which paused the 500 ms poll long enough for this
+            // watchdog to fire while the job was still generating — the harness
+            // showed "Lost contact with the image engine" beside a gallery that
+            // already held the finished image.
             lastPollMs = Date.now();
-            pollWatchdog = setInterval(() => {
+            pollWatchdog = setInterval(async () => {
                 if (Date.now() - lastPollMs < 20000) return;
-                if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
-                if (abortReject) {
-                    const fail = abortReject;
-                    abortReject = null;
-                    fail(new Error('Lost contact with the image engine. The job may still finish in the background â€” check the gallery.'));
+                if (watchdogProbing) return;
+                watchdogProbing = true;
+                try {
+                    await window.go.main.App.GetImageJobStatus(activeJobId);
+                    lastPollMs = Date.now();
+                } catch (probeErr) {
+                    if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+                    if (abortReject) {
+                        const fail = abortReject;
+                        abortReject = null;
+                        fail(new Error('Lost contact with the image engine. The job may still finish in the background — check the gallery.'));
+                    }
+                } finally {
+                    watchdogProbing = false;
                 }
             }, 2000);
         });

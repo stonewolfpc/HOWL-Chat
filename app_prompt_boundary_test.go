@@ -11,6 +11,7 @@ import (
 	"howl-chat/internal/backend/llama"
 	"howl-chat/internal/backend/lorebook"
 	entities "howl-chat/internal/backend/types/entities"
+	appruntime "howl-chat/internal/runtime"
 )
 
 // recordingInference sits exactly where the HTTP client sits: it receives the
@@ -79,10 +80,10 @@ func boundaryApp(t *testing.T) (*App, *recordingInference) {
 	t.Helper()
 	app, _ := newLorebookApp(t)
 	recorder := &recordingInference{reply: "The hall answers."}
-	app.httpClient = recorder
-	app.characters = []*chat.CharacterContext{
+	app.engine = appruntime.NewEngine(recorder, nil)
+	app.session().SetCharacters([]*chat.CharacterContext{
 		{Character: entities.Character{Name: "Aria", ID: "char_aria"}},
-	}
+	})
 	return app, recorder
 }
 
@@ -158,7 +159,7 @@ func TestInferenceBoundaryCarriesOnlyCurrentCanonicalLore(t *testing.T) {
 
 	// The reply still lands in history through the normal append path.
 	found := false
-	for _, msg := range app.chatMessages {
+	for _, msg := range app.sessionMessages() {
 		if content, _ := msg["content"].(string); strings.Contains(content, "The hall answers.") {
 			found = true
 		}
@@ -192,8 +193,8 @@ func TestInferenceBoundaryExcludesStaleLore(t *testing.T) {
 	}); err != nil {
 		t.Fatalf("set: %v", err)
 	}
-	if len(app.lorebooks) != 1 || !app.lorebooks[0].Stale {
-		t.Fatalf("pool = %+v, want one stale entry", app.lorebooks)
+	if len(app.sessionLorebooks()) != 1 || !app.sessionLorebooks()[0].Stale {
+		t.Fatalf("pool = %+v, want one stale entry", app.sessionLorebooks())
 	}
 	if err := app.SendMessageStreamWithImage("I whisper the sigil", ""); err != nil {
 		t.Fatalf("send: %v", err)
@@ -211,12 +212,12 @@ func TestInferenceBoundaryExcludesStaleLore(t *testing.T) {
 // pins both the unchanged boundary shape and the policy it must consume.
 func TestCharacterResponseBoundaryUsesSharedLorePolicy(t *testing.T) {
 	app, recorder := boundaryApp(t)
-	app.lorebooks = []lorebook.Entry{
+	app.session().SetLorebooks([]lorebook.Entry{
 		privacyEntry("aria-private", "Aria Secret", "ARIA-SECRET", lorebook.ScopeCharacter, "char_aria", lorebook.VisibilityPrivate),
 		privacyEntry("bram-private", "Bram Secret", "BRAM-SECRET", lorebook.ScopeCharacter, "char_bram", lorebook.VisibilityPrivate),
 		privacyEntry("unowned-private", "Unowned Secret", "UNOWNED-SECRET", lorebook.ScopeCharacter, "", lorebook.VisibilityPrivate),
 		privacyEntry("hidden-world", "Hidden World", "HIDDEN-SECRET", lorebook.ScopeWorld, "", lorebook.VisibilityHidden),
-	}
+	})
 
 	block := app.BuildCharacterLoreBlock("char_aria", "I whisper the sigil")
 	if !strings.Contains(block, "ARIA-SECRET") {
@@ -244,9 +245,9 @@ func TestCharacterResponseBoundaryUsesSharedLorePolicy(t *testing.T) {
 
 func TestCharacterResponseBoundarySendsFrontendPromptOnly(t *testing.T) {
 	app, recorder := boundaryApp(t)
-	app.lorebooks = []lorebook.Entry{
+	app.session().SetLorebooks([]lorebook.Entry{
 		privacyEntry("aria-private", "Aria Secret", "PRIVATE-TEXT", lorebook.ScopeCharacter, "char_aria", lorebook.VisibilityPrivate),
-	}
+	})
 
 	if err := app.GenerateCharacterResponse("FRONTEND-COMPOSED PROMPT", "char_aria"); err != nil {
 		t.Fatalf("generate: %v", err)

@@ -183,6 +183,10 @@ async function loadSavedSessions() {
         savedSessions = chatSummaries.map(summary => ({
             id: summary.id || summary.ID || '',
             name: summary.name || summary.Name || 'Untitled Chat',
+            // Membership state from the backend authority: present, missing or
+            // orphaned. Only a present conversation can be loaded.
+            state: summary.state || summary.State || 'present',
+            directory: summary.directory || summary.Directory || '',
             createdAt: summary.createdAt || summary.CreatedAt || new Date().toISOString(),
             updatedAt: summary.updatedAt || summary.UpdatedAt || new Date().toISOString(),
             metadata: {
@@ -205,6 +209,18 @@ async function loadSavedSessions() {
         _populateSessionFilterDropdowns();
     }
 }
+
+// Show where a conversation lives. Used for the states the authority cannot
+// vouch for, so the user can inspect the folder instead of guessing.
+window.revealChatFolder = async function (chatId, event) {
+    if (event) event.stopPropagation();
+    try {
+        await window.go.main.App.OpenChatDirectory(chatId);
+    } catch (error) {
+        console.error('Failed to open chat directory:', error);
+        showNotification('Could not open the folder: ' + error, 'error');
+    }
+};
 
 // Render session list
 function renderSessionList() {
@@ -258,13 +274,34 @@ function renderSessionList() {
         const safeId = String(session.id).replace(/'/g, "\\'");
         const safeName = String(session.name || 'Unnamed Session').replace(/'/g, "\\'");
         const isSelected = String(session.id) === String(selectedSessionId);
+        const state = session.state || 'present';
+        const isPresent = state === 'present';
+
+        // A conversation the authority cannot vouch for is never offered as
+        // loadable. It is shown, with its folder, because hiding it is how
+        // "missing" became unreportable in the first place.
+        const badge = state === 'missing'
+            ? '<div class="session-item-badge" style="color:#ffb454;margin-top:4px;font-size:12px;">Missing \u2014 its folder is gone</div>'
+            : state === 'orphaned'
+                ? '<div class="session-item-badge" style="color:#ff8c69;margin-top:4px;font-size:12px;">Orphaned folder \u2014 not in the collection</div>'
+                : '';
+        const onClick = isPresent ? ` onclick="selectSession('${safeId}')"` : '';
+        const revealButton = isPresent ? '' : `
+            <button class="session-delete-btn" type="button"
+                onclick="revealChatFolder('${safeId}', event)"
+                title="Show this conversation's folder">
+                <span class="icon icon-folder"></span>
+            </button>`;
+
         return `
         <div class="session-list-item ${isSelected ? 'selected' : ''}"
              data-session-id="${session.id}"
+             data-session-state="${state}"
              role="button"
              tabindex="0"
-             onclick="selectSession('${safeId}')">
+             style="${isPresent ? '' : 'opacity:0.75;'}"${onClick}>
             <div class="session-item-name">${session.name || 'Unnamed Session'}</div>
+            ${badge}
             <div class="session-item-meta">
                 Messages: ${session.metadata.messageCount} |
                 Characters: ${session.metadata.characterCount}
@@ -272,6 +309,7 @@ function renderSessionList() {
             <div class="session-item-date">
                 ${new Date(session.updatedAt).toLocaleString()}
             </div>
+            ${revealButton}
             <button class="session-delete-btn" type="button"
                 onclick="deleteChatSession('${safeId}', '${safeName}', event)"
                 title="Delete chat session">

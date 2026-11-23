@@ -14,10 +14,7 @@ import (
 // the UI calls SetSettings before ApplyAudioSettings.
 func TestAudioSettingsPersistAcrossStoreRestart(t *testing.T) {
 	dir := t.TempDir()
-	app := &App{
-		settingsStore: appsettings.NewStore(dir),
-		appSettings:   map[string]interface{}{},
-	}
+	app := &App{settings: newTestSettingsAuthority(t, dir)}
 	payload := map[string]interface{}{
 		"audio": map[string]interface{}{
 			"asrEnabled": true,
@@ -123,10 +120,7 @@ func TestASRReadinessReportsUnconfiguredAndDisabled(t *testing.T) {
 
 func TestFailedActivationDoesNotEraseSavedSelection(t *testing.T) {
 	dir := t.TempDir()
-	app := &App{
-		settingsStore: appsettings.NewStore(dir),
-		appSettings:   map[string]interface{}{},
-	}
+	app := &App{settings: newTestSettingsAuthority(t, dir)}
 	payload := map[string]interface{}{
 		"audio": map[string]interface{}{
 			"asrEnabled": true,
@@ -138,11 +132,11 @@ func TestFailedActivationDoesNotEraseSavedSelection(t *testing.T) {
 	}
 
 	activationErr := errors.New("whisper is not installed")
-	app.audioManager = audio.NewManager(func(_ context.Context, _ audio.Settings, candidate *audio.Candidate) error {
+	app.audio.SetManager(audio.NewManager(func(_ context.Context, _ audio.Settings, candidate *audio.Candidate) error {
 		*candidate = *appCandidate(&appFakePipeline{}, false, false, activationErr, nil)
 		return nil
-	})
-	t.Cleanup(func() { _ = app.audioManager.Close(context.Background()) })
+	}))
+	t.Cleanup(func() { _ = app.audio.Manager().Close(context.Background()) })
 	if err := app.ApplyAudioSettings(desiredWithBackend(audio.Settings{ASREnabled: true, ASREngine: "whisper-base", TTSEngine: "piper"})); err == nil {
 		t.Fatal("ApplyAudioSettings returned nil for a failed activation")
 	}

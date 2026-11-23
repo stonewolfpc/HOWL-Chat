@@ -19,7 +19,7 @@ func newCharacterOwnershipTestApp(t *testing.T) (*App, *chat.PersistenceManager,
 	if err != nil {
 		t.Fatalf("NewChat: %v", err)
 	}
-	return &App{chatPersistence: pm}, pm, rootDir, chatData.Meta.ID
+	return &App{conversation: chat.NewActiveConversation(pm)}, pm, rootDir, chatData.Meta.ID
 }
 
 func TestCharacterOwnershipSurvivesAppendSaveRestart(t *testing.T) {
@@ -36,7 +36,7 @@ func TestCharacterOwnershipSurvivesAppendSaveRestart(t *testing.T) {
 	}
 
 	// Simulate a fresh application instance restoring the persisted chat.
-	restarted := &App{chatPersistence: pm}
+	restarted := &App{conversation: chat.NewActiveConversation(pm)}
 	loaded, err := restarted.LoadChat(chatID)
 	if err != nil {
 		t.Fatalf("LoadChat: %v", err)
@@ -47,10 +47,10 @@ func TestCharacterOwnershipSurvivesAppendSaveRestart(t *testing.T) {
 	if loaded.History[0].CharacterID != "char_aria" || loaded.History[1].CharacterID != "char_doren" {
 		t.Fatalf("restored owners=%q/%q, want char_aria/char_doren", loaded.History[0].CharacterID, loaded.History[1].CharacterID)
 	}
-	if got, _ := restarted.chatMessages[0]["characterId"].(string); got != "char_aria" {
+	if got := restarted.session().Entries()[0].CharacterID; got != "char_aria" {
 		t.Fatalf("in-memory owner=%q, want char_aria", got)
 	}
-	if got, _ := restarted.chatMessages[1]["characterId"].(string); got != "char_doren" {
+	if got := restarted.session().Entries()[1].CharacterID; got != "char_doren" {
 		t.Fatalf("in-memory owner=%q, want char_doren", got)
 	}
 
@@ -90,7 +90,7 @@ func TestReplaceChatHistoryPreservesCharacterOwner(t *testing.T) {
 	if loaded.History[0].Timestamp != "2026-01-01T00:00:00Z" || !loaded.History[0].HasImage {
 		t.Fatalf("replace metadata=%+v", loaded.History[0])
 	}
-	if got, _ := app.chatMessages[0]["characterId"].(string); got != "char_aria" {
+	if got := app.session().Entries()[0].CharacterID; got != "char_aria" {
 		t.Fatalf("in-memory replace owner=%q", got)
 	}
 	if err := app.performSave(); err != nil {
@@ -117,8 +117,8 @@ func TestLegacyHistoryRemainsUnassignedThroughAppSave(t *testing.T) {
 	if _, err := app.LoadChat(chatID); err != nil {
 		t.Fatalf("LoadChat: %v", err)
 	}
-	if _, exists := app.chatMessages[0]["characterId"]; exists {
-		t.Fatalf("legacy owner was synthesized: %+v", app.chatMessages[0])
+	if app.session().Entries()[0].CharacterID != "" {
+		t.Fatalf("legacy owner was synthesized: %+v", app.session().Entries()[0])
 	}
 	if err := app.performSave(); err != nil {
 		t.Fatalf("performSave: %v", err)

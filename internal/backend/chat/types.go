@@ -100,8 +100,13 @@ type AppConfig struct {
 
 // ChatSummary represents a lightweight summary for chat lists
 type ChatSummary struct {
-	ID             string   `json:"id"`
-	Name           string   `json:"name"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	// State is the reconciled membership state: present, missing or orphaned.
+	State string `json:"state,omitempty"`
+	// Directory is the folder the application would use, reported for every state
+	// so a user can be told where a missing or orphaned conversation lives.
+	Directory      string   `json:"directory,omitempty"`
 	CreatedAt      string   `json:"createdAt"`
 	UpdatedAt      string   `json:"updatedAt"`
 	WorldName      string   `json:"worldName"`

@@ -251,23 +251,40 @@ async function loadChatDataFromStorage() {
         return;
     }
 
-    // Validate: if the cached session refers to a specific chat ID, verify it still exists on backend
+    // The backend membership authority decides whether a cached session may be
+    // restored. A missing or orphaned entry is in the list but is not loadable,
+    // and an unbound cache is not evidence of a conversation at all: pushing
+    // either back would let this shadow copy mint a chat the authority never
+    // created.
     const cachedSessionId = savedData.sessionId || (window.chatBridge && window.chatBridge.getState()?.sessionId);
-    if (cachedSessionId && window.go?.main?.App?.GetChatList) {
+    if (!cachedSessionId) {
+        console.warn('[loadChatDataFromStorage] cached session has no conversation id — discarding it');
+        await window.HOWLStorage.deleteChatData('howl-chat-current-chat').catch(() => {});
+        localStorage.removeItem('howl-chat-current-session');
+        window.sidebarState.resetToDefaultState();
+        await updateContextDisplay();
+        return;
+    }
+    // Fail closed. If the authority cannot confirm the session — no bridge yet,
+    // or a failed call — the cache is discarded. Restoring on an unconfirmed
+    // cache is exactly how a shadow copy mints conversations the backend never
+    // created.
+    let confirmed = false;
+    if (window.go?.main?.App?.GetChatList) {
         try {
             const chats = await window.go.main.App.GetChatList();
-            const exists = (chats || []).some(c => c.id === cachedSessionId);
-            if (!exists) {
-                console.warn('[loadChatDataFromStorage] cached session', cachedSessionId, 'no longer exists on backend — clearing cache');
-                await window.HOWLStorage.deleteChatData('howl-chat-current-chat').catch(() => {});
-                localStorage.removeItem('howl-chat-current-session');
-                window.sidebarState.resetToDefaultState();
-                await updateContextDisplay();
-                return;
-            }
+            confirmed = (chats || []).some(c => c.id === cachedSessionId && (!c.state || c.state === 'present'));
         } catch (err) {
             console.warn('[loadChatDataFromStorage] backend validation failed:', err);
         }
+    }
+    if (!confirmed) {
+        console.warn('[loadChatDataFromStorage] cached session', cachedSessionId, 'is not a present conversation — discarding cache');
+        await window.HOWLStorage.deleteChatData('howl-chat-current-chat').catch(() => {});
+        localStorage.removeItem('howl-chat-current-session');
+        window.sidebarState.resetToDefaultState();
+        await updateContextDisplay();
+        return;
     }
 
     if (window.chatBridge) {

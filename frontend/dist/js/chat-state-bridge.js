@@ -734,15 +734,11 @@ function _syncScenarioAndCharactersToBackend() {
 }
 
 // ---------------------------------------------------------------------------
-// beforeunload — auto-save if there's an active session
+// beforeunload — the conversation save belongs to DataSync, which already
+// listens on beforeunload and serializes overlapping writes. A second raw
+// SaveChat here raced that save into the conversation boundary and was refused
+// as a competing writer, so it is retired rather than kept as a fallback.
 // ---------------------------------------------------------------------------
-
-window.addEventListener('beforeunload', function () {
-    if (!_state.sessionId) return;
-    if (window.go?.main?.App?.SaveChat) {
-        try { window.go.main.App.SaveChat(); } catch (_) {}
-    }
-});
 
 // ---------------------------------------------------------------------------
 // Public API

@@ -1,4 +1,9 @@
-package errors
+// Package diagnostics owns error logging (file, rotation, retention), privacy-safe
+// error reporting, and the UI event payloads built from tracked errors. The
+// application supplies the event transport and all policy (what to escalate,
+// where the log lives, whether uploads are enabled); this package owns only the
+// mechanics of recording and reporting.
+package diagnostics
 
 import (
 	"encoding/json"
@@ -7,6 +12,8 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
+
+	"howl-chat/internal/errors"
 )
 
 // ---------------------------------------------------------------------------
@@ -19,6 +26,7 @@ const (
 	maxLogFiles    = 5
 )
 
+// Logger is the one writer for the structured error log.
 type Logger struct {
 	mu      sync.RWMutex
 	file    *os.File
@@ -49,7 +57,7 @@ func NewLogger(logDir string) (*Logger, error) {
 
 // Log writes a TrackedError to the log file as a single JSON line.
 // Thread-safe. Silent - no console output.
-func (l *Logger) Log(err *TrackedError) {
+func (l *Logger) Log(err *errors.TrackedError) {
 	if l == nil || err == nil {
 		return
 	}
@@ -67,8 +75,8 @@ func (l *Logger) Log(err *TrackedError) {
 		Severity:  err.Severity.String(),
 		Operation: err.Operation,
 		Location:  err.Location,
-		Msg:       err.Err.Error(),
-		Context:   sanitizeContext(err.Context),
+		Msg:       messageOf(err),
+		Context:   errors.SanitizeContext(err.Context),
 	}
 
 	data, _ := json.Marshal(entry)
@@ -84,30 +92,6 @@ func (l *Logger) Log(err *TrackedError) {
 	_ = l.file.Sync()
 
 	l.rotateIfNeeded()
-}
-
-// LogRaw logs a pre-built entry directly. Use for batch operations.
-func (l *Logger) LogRaw(entry logEntry) {
-	if l == nil {
-		return
-	}
-
-	l.mu.RLock()
-	if !l.enabled || l.file == nil {
-		l.mu.RUnlock()
-		return
-	}
-	l.mu.RUnlock()
-
-	data, _ := json.Marshal(entry)
-
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	if l.file == nil {
-		return
-	}
-	_, _ = l.file.Write(data)
-	_, _ = l.file.WriteString("\n")
 }
 
 // SetEnabled toggles logging without closing the file.
@@ -230,6 +214,15 @@ type logEntry struct {
 	Location  string            `json:"loc"`
 	Msg       string            `json:"msg"`
 	Context   map[string]string `json:"ctx,omitempty"`
+}
+
+// messageOf keeps the logged message identical to the old sink: the wrapped
+// error's text, or the code when a tracked error carries no cause.
+func messageOf(err *errors.TrackedError) string {
+	if err.Err != nil {
+		return err.Err.Error()
+	}
+	return string(err.Code)
 }
 
 func splitLines(data []byte) [][]byte {

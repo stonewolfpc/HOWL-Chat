@@ -7,9 +7,11 @@ import "time"
 type MicrophoneState string
 
 const (
-	// MicStateReady means the default capture endpoint was initialized in WASAPI
-	// shared mode with its mix format. It does not mean recording started, audio
-	// samples were received, or transcription succeeded.
+	// MicStateReady means the default capture endpoint is usable: either it was
+	// initialized in WASAPI shared mode with its mix format (initialize-level
+	// probe), or it is present and active (presence-level probe). It does not
+	// mean recording started, audio samples were received, or transcription
+	// succeeded.
 	MicStateReady MicrophoneState = "ready"
 	// MicStateNoDevice means no default capture endpoint was found.
 	MicStateNoDevice MicrophoneState = "no-device"
@@ -46,18 +48,40 @@ type MicrophoneStatus struct {
 }
 
 // Usable reports whether ASR may allocate a model. Ready here means the default
-// endpoint initialized; browser capture and transcription remain unverified.
+// endpoint initialized (full probe) or is present and active (presence probe);
+// browser capture and transcription remain unverified.
 func (s MicrophoneStatus) Usable() bool { return s.State == MicStateReady }
 
-// microphoneProbe is the platform seam. Tests replace it to exercise every
-// state without physical hardware.
-var microphoneProbe = probeMicrophone
+// The two platform seams. Tests replace them to exercise every state without
+// physical hardware.
+var (
+	// microphoneProbe is the initialize-level probe. It opens a shared-mode
+	// capture stream, which Windows counts as communications activity and
+	// answers by changing the level of other applications' playback.
+	microphoneProbe = probeMicrophone
+	// microphonePresenceProbe is the presence-level probe. It never activates
+	// the endpoint or opens a stream.
+	microphonePresenceProbe = probeCapturePresence
+)
 
-// microphoneStatusNow probes capture availability now. Probes are cheap and
-// side-effect free (initialize, then release), so every apply and status read
-// can use a fresh result instead of a startup cache that may be stale.
+// microphoneStatusNow runs the initialize-level probe. It proves the default
+// console capture endpoint can actually be captured from, and it disturbs
+// system audio while it runs, so it belongs only on the explicit activation
+// path (applyAudioSettings). Every status read must use
+// microphonePresenceNow instead.
 func microphoneStatusNow() MicrophoneStatus {
-	status := microphoneProbe()
+	return normalizeMicrophoneStatus(microphoneProbe())
+}
+
+// microphonePresenceNow reports whether the default capture endpoint is present
+// and active without opening a capture stream. Status reads use this: they run
+// on every Chat page load and tab return, and opening a stream there is an
+// audible, system-wide event the user did not ask for.
+func microphonePresenceNow() MicrophoneStatus {
+	return normalizeMicrophoneStatus(microphonePresenceProbe())
+}
+
+func normalizeMicrophoneStatus(status MicrophoneStatus) MicrophoneStatus {
 	if status.State == "" {
 		status.State = MicStateCaptureInitFailed
 	}

@@ -21,22 +21,22 @@ import (
 // Content-library bindings. These expose registration and discovery only;
 // removing a registration never removes a directory or a file.
 func (a *App) GetContentLibraries(category string) ([]library.View, error) {
-	if a.contentLibraries == nil {
+	if a.registries.Libraries() == nil {
 		return []library.View{}, fmt.Errorf("content library registry not initialised")
 	}
 	cat := library.Category(strings.TrimSpace(category))
 	if category != "" && !cat.Valid() {
 		return nil, fmt.Errorf("unknown content category %q", category)
 	}
-	return a.contentLibraries.List(cat), nil
+	return a.registries.Libraries().List(cat), nil
 }
 
 func (a *App) AddContentLibrary(path, category, origin, format string, role int) (library.Registration, error) {
-	if a.contentLibraries == nil {
+	if a.registries.Libraries() == nil {
 		return library.Registration{}, fmt.Errorf("content library registry not initialised")
 	}
 	cat := library.Category(strings.TrimSpace(category))
-	return a.contentLibraries.Add(library.Registration{
+	return a.registries.Libraries().Add(library.Registration{
 		Category: cat,
 		Path:     path,
 		Role:     library.NormalizeRole(library.Role(role)),
@@ -64,30 +64,30 @@ func (a *App) AddDefaultContentLibrary(category string, role int) (library.Regis
 }
 
 func (a *App) RemoveContentLibrary(id string) error {
-	if a.contentLibraries == nil {
+	if a.registries.Libraries() == nil {
 		return fmt.Errorf("content library registry not initialised")
 	}
-	if err := a.contentLibraries.Remove(id); err != nil {
+	if err := a.registries.Libraries().Remove(id); err != nil {
 		return err
 	}
-	if a.contentInventory != nil {
-		a.contentInventory.Forget(id)
+	if a.registries.Inventory() != nil {
+		a.registries.Inventory().Forget(id)
 	}
 	return nil
 }
 
 func (a *App) SetContentLibraryRole(id string, role int) error {
-	if a.contentLibraries == nil {
+	if a.registries.Libraries() == nil {
 		return fmt.Errorf("content library registry not initialised")
 	}
-	return a.contentLibraries.SetRole(id, library.Role(role))
+	return a.registries.Libraries().SetRole(id, library.Role(role))
 }
 
 func (a *App) SetDefaultContentLibrary(id string) error {
-	if a.contentLibraries == nil {
+	if a.registries.Libraries() == nil {
 		return fmt.Errorf("content library registry not initialised")
 	}
-	return a.contentLibraries.SetDefaultSave(id)
+	return a.registries.Libraries().SetDefaultSave(id)
 }
 
 // GetContentLibraryCharacters returns character cards from every readable
@@ -96,12 +96,12 @@ func (a *App) SetDefaultContentLibrary(id string) error {
 // discovered through overlapping roots appears once. No file is modified and
 // no card is imported.
 func (a *App) GetContentLibraryCharacters() ([]library.Item, error) {
-	if a.contentLibraries == nil {
+	if a.registries.Libraries() == nil {
 		return []library.Item{}, fmt.Errorf("content library registry not initialised")
 	}
 	seen := map[string]bool{}
 	out := []library.Item{}
-	for _, view := range a.contentLibraries.List(library.Characters) {
+	for _, view := range a.registries.Libraries().List(library.Characters) {
 		var items []library.Item
 		live := false
 		if view.Readable {
@@ -109,8 +109,8 @@ func (a *App) GetContentLibraryCharacters() ([]library.Item, error) {
 			if err == nil {
 				items = scanned
 				live = true
-				if a.contentInventory != nil {
-					if recordErr := a.contentInventory.Record(view.ID, scanned); recordErr != nil {
+				if a.registries.Inventory() != nil {
+					if recordErr := a.registries.Inventory().Record(view.ID, scanned); recordErr != nil {
 						a.logErrorSilent("SYS-CONTENT-LIBRARY", apperrors.Low, "library.inventory.record", "app-libraries.go", recordErr)
 					}
 				}
@@ -118,8 +118,8 @@ func (a *App) GetContentLibraryCharacters() ([]library.Item, error) {
 				a.logErrorSilent("SYS-CONTENT-LIBRARY", apperrors.Medium, "library.characters.scan", "app-libraries.go", err)
 			}
 		}
-		if !live && a.contentInventory != nil {
-			if cached, ok := a.contentInventory.Cached(view.ID); ok {
+		if !live && a.registries.Inventory() != nil {
+			if cached, ok := a.registries.Inventory().Cached(view.ID); ok {
 				items = cached.Items
 				for i := range items {
 					items[i].Available = false
@@ -144,14 +144,14 @@ func (a *App) GetContentLibraryCharacters() ([]library.Item, error) {
 // last-known snapshot; an unavailable root returns that snapshot marked stale.
 // It never scans a drive recursively beyond the registered root.
 func (a *App) GetContentLibraryInventory(category string) ([]library.InventoryRoot, error) {
-	if a.contentLibraries == nil {
+	if a.registries.Libraries() == nil {
 		return []library.InventoryRoot{}, fmt.Errorf("content library registry not initialised")
 	}
 	cat := library.Category(strings.TrimSpace(category))
 	if category != "" && !cat.Valid() {
 		return nil, fmt.Errorf("unknown content category %q", category)
 	}
-	views := a.contentLibraries.List(cat)
+	views := a.registries.Libraries().List(cat)
 	out := make([]library.InventoryRoot, 0, len(views))
 	for _, view := range views {
 		root := library.InventoryRoot{
@@ -166,8 +166,8 @@ func (a *App) GetContentLibraryInventory(category string) ([]library.InventoryRo
 				root.Scanned = true
 				root.ScannedAt = time.Now().UTC().Format(time.RFC3339)
 				live = true
-				if a.contentInventory != nil {
-					if recordErr := a.contentInventory.Record(view.ID, items); recordErr != nil {
+				if a.registries.Inventory() != nil {
+					if recordErr := a.registries.Inventory().Record(view.ID, items); recordErr != nil {
 						a.logErrorSilent("SYS-CONTENT-LIBRARY", apperrors.Low, "library.inventory.record", "app-libraries.go", recordErr)
 					}
 				}
@@ -176,8 +176,8 @@ func (a *App) GetContentLibraryInventory(category string) ([]library.InventoryRo
 				a.logErrorSilent("SYS-CONTENT-LIBRARY", apperrors.Medium, "library.inventory.scan", "app-libraries.go", err)
 			}
 		}
-		if !live && a.contentInventory != nil {
-			if cached, ok := a.contentInventory.Cached(view.ID); ok {
+		if !live && a.registries.Inventory() != nil {
+			if cached, ok := a.registries.Inventory().Cached(view.ID); ok {
 				root.Items = cached.Items
 				root.ScannedAt = cached.ScannedAt
 				root.Stale = true
@@ -217,7 +217,7 @@ func (a *App) OpenContentDirectoryPicker() (string, error) {
 // worldstore, and a second writer under those roots would break A10.
 func (a *App) ExportContentItem(category, name, itemID string, data map[string]interface{}, replace bool) (library.OperationResult, error) {
 	result := library.OperationResult{Category: library.Category(strings.TrimSpace(category)), ItemID: strings.TrimSpace(itemID)}
-	if a.contentLibraries == nil {
+	if a.registries.Libraries() == nil {
 		return result, fmt.Errorf("content library registry not initialised")
 	}
 	cat := result.Category
@@ -232,7 +232,7 @@ func (a *App) ExportContentItem(category, name, itemID string, data map[string]i
 	case library.Worlds, library.Scenarios:
 		return result, fmt.Errorf("%s export is not available: canonical items are written only by the world/scenario store", cat)
 	}
-	reg, ok := a.contentLibraries.DefaultSave(cat)
+	reg, ok := a.registries.Libraries().DefaultSave(cat)
 	if !ok {
 		result.Status = library.StatusDestinationUnavailable
 		result.Message = "No save destination is configured for " + string(cat) + ". The content was not exported."
@@ -273,9 +273,9 @@ func (a *App) ExportContentItem(category, name, itemID string, data map[string]i
 	relative := filepath.Join(segment, file)
 	var target string
 	if replace {
-		target, err = a.contentLibraries.WriteFile(reg.ID, relative, payload)
+		target, err = a.registries.Libraries().WriteFile(reg.ID, relative, payload)
 	} else {
-		target, err = a.contentLibraries.WriteNewFile(reg.ID, relative, payload)
+		target, err = a.registries.Libraries().WriteNewFile(reg.ID, relative, payload)
 	}
 	if err == nil {
 		result.Target = target
