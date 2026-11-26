@@ -55,6 +55,10 @@ type App struct {
 	// workload leases above own that span.
 	lifecycleGate *resource.LifecycleGate
 	lifecycleOnce sync.Once
+	// residency holds the last measured footprint per workload, kept separate
+	// from the ledger it informs so an observation never becomes an estimate.
+	residency     *residencyRecorder
+	residencyOnce sync.Once
 
 	// Level 0 — application lifecycle and coordination (internal/host).
 	// The authority owns admission, shutdown sequencing, background joining,

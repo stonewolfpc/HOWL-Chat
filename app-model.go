@@ -312,6 +312,10 @@ func (a *App) LoadModel(modelPath string) (err error) {
 	}
 	loadDecision, loadLease := a.admission.Admit(loadRequest)
 	fmt.Printf("[LoadModel] admission: admitted=%t manual=%t %s\n", loadDecision.Admitted, loadDecision.Manual, loadDecision.Reason)
+	// Live device usage at decision time. The difference after the health check
+	// is this start's measured device cost, which is compared with the engine's
+	// own claim before anything is written to the ledger.
+	residencyBeforeMB := loadDecision.Estimate.TotalVRAMMB - loadDecision.Estimate.FreeVRAMMB
 	if !loadDecision.Admitted {
 		a.logError(errors.LLMNoModelLoaded, errors.Critical, "llm.load.admission", "app-model.go:LoadModel", fmt.Errorf("%s", loadDecision.Reason))
 		a.engine.SetProgressMilli(0)
@@ -587,6 +591,22 @@ func (a *App) LoadModel(modelPath string) (err error) {
 				placement := llamabackend.ParsePlacement(serverOutput.Tail(0))
 				placementReport := chatPlacementReport(modelPath, spawnSettings, loadDecision, placement)
 				a.engine.SetChatPlacement(placementReport)
+				// Reconcile the ledger with observation: the larger of the engine's
+				// reported total and the device's own change. The plan stays the
+				// planning bound; it is not the resident truth.
+				ledgerVRAMMB := loadDecision.Estimate.RequiredVRAMMB
+				if snap, snapErr := resource.GetManager().RefreshSnapshot(); snapErr == nil {
+					const mb = int64(1024 * 1024)
+					afterMB := (snap.TotalVRAMBytes - snap.FreeVRAMBytes) / mb
+					observation := resource.NewResidencyObservation(
+						resource.ResourceLLM, modelName,
+						loadDecision.Estimate.RequiredVRAMMB,
+						int64(placement.TotalGPUMB()),
+						afterMB-residencyBeforeMB,
+					)
+					ledgerVRAMMB = observation.LedgerVRAMMB()
+					a.recordResidency(observation)
+				}
 				fmt.Printf("[LoadModel] actual placement: known=%t layers=%d/%d vram=%.0fMB ram=%.0fMB context=%d matches_plan=%t\n",
 					placement.Known, placement.GPULayers, placement.TotalLayers, placement.GPUMB, placement.RAMMB, placement.Context, placementReport.MatchesPlan)
 				// The health check has consumed all the placement evidence. Drop the
@@ -597,7 +617,7 @@ func (a *App) LoadModel(modelPath string) (err error) {
 				// a spawned child is not a loaded model.
 				if !a.registerChatModelAfterHealth(
 					modelName, modelPath,
-					loadDecision.Estimate.RequiredVRAMMB,
+					ledgerVRAMMB,
 					loadDecision.Estimate.RequiredRAMMB,
 					activeCmd, activeHandle,
 				) {

@@ -150,7 +150,7 @@ func (a *App) ensureEngineReadyExecutionLocked(modelName, jobID string, holdVide
 		return fmt.Errorf("image model load cancelled because Howl is shutting down")
 	}
 	if !alreadyLoaded || reload {
-		a.registerImageModel(chosen, decision)
+		a.registerImageModelWithObservation(chosen, decision)
 	}
 	lease.Release()
 	a.emitImagePlacement("load")
@@ -236,7 +236,7 @@ func (a *App) SetActiveImageModel(opts interface{}) (err error) {
 		return fmt.Errorf("image model load cancelled because Howl is shutting down")
 	}
 
-	a.registerImageModel(chosen, decision)
+	a.registerImageModelWithObservation(chosen, decision)
 	lease.Release()
 	a.emitImagePlacement("load")
 	a.saveImageSettings()
@@ -1061,7 +1061,37 @@ func (a *App) invalidateImageRegistrationsIfStopped() {
 	}
 }
 
-func (a *App) registerImageModel(loadOpts imagetypes.ModelLoadOptions, decision resource.AdmissionDecision) {
+// registerImageModelWithObservation records what the engine and the device
+// reported, then registers the conservative figure. The admitted commitment
+// (projected peak) is the planning bound; RequiredVRAMMB alone understated a
+// running engine by its activation and overhead.
+func (a *App) registerImageModelWithObservation(loadOpts imagetypes.ModelLoadOptions, decision resource.AdmissionDecision) {
+	plannedMB := decision.Estimate.CommittedVRAMMB()
+	vramMB := plannedMB
+	var engineReportedMB int64
+	if eng, ok := a.images.Engine().(*sdcpp.Engine); ok && eng != nil {
+		if placement := eng.GetPlacement(); placement.Known {
+			engineReportedMB = int64(placement.VRAMMB)
+		}
+	}
+	beforeMB := decision.Estimate.TotalVRAMMB - decision.Estimate.FreeVRAMMB
+	// sd-server loads weights lazily and reports placement only once a
+	// generation has run, so the honest observation point is post-generation.
+	// Record the baseline here and do not invent a zero-footprint observation.
+	a.noteResidencyBaseline(resource.ResourceImage, plannedMB, beforeMB)
+	if engineReportedMB > 0 {
+		const mb = int64(1024 * 1024)
+		if snap, snapErr := resource.GetManager().RefreshSnapshot(); snapErr == nil {
+			afterMB := (snap.TotalVRAMBytes - snap.FreeVRAMBytes) / mb
+			observation := resource.NewResidencyObservation(resource.ResourceImage, loadOpts.ModelName, plannedMB, engineReportedMB, afterMB-beforeMB)
+			vramMB = observation.LedgerVRAMMB()
+			a.recordResidency(observation)
+		}
+	}
+	a.registerImageModel(loadOpts, decision, vramMB)
+}
+
+func (a *App) registerImageModel(loadOpts imagetypes.ModelLoadOptions, decision resource.AdmissionDecision, vramMB int64) {
 	a.images.SetLoadedOptions(loadOpts)
 	a.unregisterImageModels()
 	name := loadOpts.ModelName
@@ -1072,10 +1102,10 @@ func (a *App) registerImageModel(loadOpts imagetypes.ModelLoadOptions, decision 
 		resource.ResourceImage,
 		name,
 		loadOpts.ModelPath,
-		decision.Estimate.RequiredVRAMMB,
+		vramMB,
 		decision.Estimate.RequiredRAMMB,
 		resource.PriorityImage,
-		decision.Estimate.RequiredVRAMMB > 0,
+		vramMB > 0,
 	)
 }
 

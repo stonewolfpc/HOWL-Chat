@@ -774,7 +774,15 @@ func (a *Authority) pendingLocked() (vram, ram int64) {
 // audio have no projection and commit RequiredVRAMMB. The commitment is never
 // Required + Projected, and a replacement credit is applied to effective free
 // separately rather than subtracted from this commitment.
-func (est AdmissionEstimate) committedVRAMMB() int64 {
+func (est AdmissionEstimate) committedVRAMMB() int64 { return est.CommittedVRAMMB() }
+
+// CommittedVRAMMB is the amount this admission approved. A full image load's
+// projected peak is the total resident + activation + overhead; a resident
+// stage's projected peak is its incremental execution peak. Chat and audio have
+// no projection and commit RequiredVRAMMB. The commitment is never Required +
+// Projected, and a replacement credit is applied to effective free separately
+// rather than subtracted from this commitment.
+func (est AdmissionEstimate) CommittedVRAMMB() int64 {
 	if est.ProjectedPeakVRAMMB > est.RequiredVRAMMB {
 		return est.ProjectedPeakVRAMMB
 	}
