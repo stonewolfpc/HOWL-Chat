@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"howl-chat/internal/image/diagnosis"
 	"howl-chat/internal/image/engine"
 	"howl-chat/internal/image/types"
 )
@@ -236,7 +237,9 @@ func (m *Manager) run(job *types.ImageJob, prepare func(jobID string) (func(), e
 		}
 		if err != nil {
 			// finish() leaves a cancellation that arrived during loading alone.
-			m.finish(job, nil, err)
+			// Classify before it becomes job.Error: a model the engine cannot
+			// identify must not read to the user as a memory problem.
+			m.finish(job, nil, diagnosis.Wrap(diagnosis.StageStartup, err))
 			return
 		}
 	}
@@ -272,7 +275,7 @@ func (m *Manager) run(job *types.ImageJob, prepare func(jobID string) (func(), e
 					stillGenerating := job.Status == statusGenerating
 					m.mu.RUnlock()
 					if stillGenerating {
-						m.finish(job, nil, fmt.Errorf("image engine stopped before finishing: sd-server exited. Check the model file and the engine path."))
+						m.finish(job, nil, diagnosis.Wrap(diagnosis.StageGeneration, fmt.Errorf("image engine stopped before finishing: sd-server exited. Check the model file and the engine path.")))
 						return
 					}
 				}
@@ -332,7 +335,7 @@ func (m *Manager) run(job *types.ImageJob, prepare func(jobID string) (func(), e
 	if finished != nil {
 		finished(job.ID, opts, err)
 	}
-	m.finish(job, result, err)
+	m.finish(job, result, diagnosis.Wrap(diagnosis.StageGeneration, err))
 }
 
 // finish updates job state and cleans up if cancelled.
@@ -356,6 +359,10 @@ func (m *Manager) finish(job *types.ImageJob, result *types.ImageResult, err err
 	if err != nil {
 		job.Status = statusFailed
 		job.Error = err.Error()
+		if d, ok := diagnosis.As(err); ok {
+			fmt.Printf("[ImageDiagnosis] category=%s stage=%s retryable=%t raw=%q\n",
+				d.Category, d.Stage, d.Retryable, d.Raw)
+		}
 		return
 	}
 

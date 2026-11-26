@@ -9,6 +9,7 @@ import (
 	"time"
 
 	apperrors "howl-chat/internal/errors"
+	"howl-chat/internal/image/diagnosis"
 	"howl-chat/internal/image/engine/sdcpp"
 	"howl-chat/internal/image/metadata"
 	imagetypes "howl-chat/internal/image/types"
@@ -88,14 +89,14 @@ func (a *App) GenerateImage(opts imagetypes.ImageOptions) (*imagetypes.ImageResu
 	if opts.Mode == "video" {
 		release, err := a.ensureVideoExecution(opts.ModelName, "", opts)
 		if err != nil {
-			return nil, fmt.Errorf("engine ready failed: %w", err)
+			return nil, diagnosis.Wrap(diagnosis.StageStartup, fmt.Errorf("engine ready failed: %w", err))
 		}
 		videoRelease = release
 		if videoRelease != nil {
 			defer videoRelease()
 		}
 	} else if err := a.ensureEngineReady(opts.ModelName, "", opts); err != nil {
-		return nil, fmt.Errorf("engine ready failed: %w", err)
+		return nil, diagnosis.Wrap(diagnosis.StageStartup, fmt.Errorf("engine ready failed: %w", err))
 	}
 
 	var result *imagetypes.ImageResult
@@ -118,7 +119,9 @@ func (a *App) GenerateImage(opts imagetypes.ImageOptions) (*imagetypes.ImageResu
 		a.reclaimImageEngineAfterGeneration("", opts, genErr)
 		a.emitImagePlacement("generation")
 		a.logImageGenError(genErr, "app-image-generate.go")
-		return nil, genErr
+		// Classify once: the caller gets a category and a next step, not just the
+		// engine's raw text.
+		return nil, diagnosis.Wrap(diagnosis.StageGeneration, genErr)
 	}
 	if a.images.Gallery() != nil && result != nil && (result.ImageData != "" || len(result.Images) > 0) {
 		if err := a.images.Gallery().Save(result); err != nil {
