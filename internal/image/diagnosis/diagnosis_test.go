@@ -8,12 +8,14 @@ import (
 
 func TestCategoriesComeFromTheEngineMessage(t *testing.T) {
 	cases := []struct {
-		name string
+		name  string
 		stage Stage
-		err  string
-		want Category
+		err   string
+		want  Category
 	}{
-		{"hidream family", StageGeneration, `sd-server txt2img error 400: {"error":"cannot identify model family from 'H:\\models\\hidream.gguf'"}`, UnsupportedArchitecture},
+		{"unknown architecture, safetensors", StageGeneration, `sd-server txt2img error 400: {"error":"cannot identify model family from 'H:\\models\\mystery.safetensors'"}`, UnsupportedArchitecture},
+		{"supported architecture, unsupported format", StageGeneration, `sd-server txt2img error 400: {"error":"cannot identify model family from 'H:\\models\\hidream-i1-fast-Q2_K.gguf'"}`, UnsupportedWeightFormat},
+		{"torch checkpoint", StageGeneration, `sd-server txt2img error 400: {"error":"cannot identify model family from 'H:\\models\\HiDream.pt'"}`, UnsupportedWeightFormat},
 		{"missing file", StageStartup, "failed to load model: no such file or directory", InvalidModelFile},
 		{"admission refusal", StageStartup, `cannot start image "x": needs 11761 MB VRAM; 6233 MB available`, InsufficientResources},
 		{"bad backend", StageStartup, "error: unknown argument: --backend diffusion=nowhere", PlacementFailure},
@@ -40,7 +42,10 @@ func TestCategoriesComeFromTheEngineMessage(t *testing.T) {
 // The headline case: the engine does not know the architecture. The user must
 // not be sent to the VRAM settings for it.
 func TestUnsupportedArchitectureDoesNotLookLikeAMemoryProblem(t *testing.T) {
-	d := Diagnose(StageGeneration, errors.New("cannot identify model family from 'hidream.gguf'"))
+	d := Diagnose(StageGeneration, errors.New("cannot identify model family from 'mystery.safetensors'"))
+	if d.Category != UnsupportedArchitecture {
+		t.Fatalf("category = %q, want unsupported_architecture", d.Category)
+	}
 	if d.Category == InsufficientResources {
 		t.Fatal("an unidentifiable architecture must not be classified as a memory problem")
 	}
@@ -56,6 +61,30 @@ func TestUnsupportedArchitectureDoesNotLookLikeAMemoryProblem(t *testing.T) {
 	}
 	if !strings.Contains(d.Describe(), "unsupported_architecture") {
 		t.Fatalf("description must name the category: %s", d.Describe())
+	}
+}
+
+// A rejected GGUF must not be reported as an architecture the engine lacks:
+// the same family is documented as supported in Safetensors, and the user's
+// next action is a different file, not a different engine.
+func TestRejectedFormatIsNotAnUnsupportedArchitecture(t *testing.T) {
+	gguf := Diagnose(StageGeneration, errors.New("cannot identify model family from 'H:\\models\\hidream-i1-fast-Q2_K.gguf'"))
+	safe := Diagnose(StageGeneration, errors.New("cannot identify model family from 'H:\\models\\hidream-i1-dev.safetensors'"))
+
+	if gguf.Category != UnsupportedWeightFormat {
+		t.Fatalf("GGUF rejection category = %q, want unsupported_weight_format", gguf.Category)
+	}
+	if safe.Category != UnsupportedArchitecture {
+		t.Fatalf("safetensors rejection category = %q, want unsupported_architecture", safe.Category)
+	}
+	if gguf.Category == safe.Category {
+		t.Fatal("format rejection and unknown architecture must not share a category")
+	}
+	if !strings.Contains(strings.ToLower(gguf.Suggestion), "safetensors") {
+		t.Fatalf("format rejection must point at the supported release: %s", gguf.Suggestion)
+	}
+	if gguf.Retryable || safe.Retryable {
+		t.Fatal("retrying the same file cannot fix either case")
 	}
 }
 

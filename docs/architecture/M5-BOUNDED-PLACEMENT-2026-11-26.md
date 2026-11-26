@@ -55,7 +55,17 @@ far inside the bound:
 10.7 GB of weights live in RAM; the device delta is 1.8 GB against a 6 GiB cap.
 That is bounded placement working, not an estimate of it.
 
-## HiDream: classification corrected
+## HiDream: classification corrected (and narrowed again)
+
+**Correction, same day.** The paragraph below says "engine-capability-blocked".
+That is too broad. The pinned release `master-1122-3b12781` documents
+HiDream-O1-Image support for **Safetensors**. What failed in this test were
+quantized **GGUF** files, which the project has reported as not yet supported.
+So the verified claim is narrower: *this GGUF variant is not identified by this
+build*; the architecture is documented as supported through another release of
+the same family. Howl must not mark HiDream itself unsupported, and no successful
+HiDream generation is claimed until the Safetensors path is actually run.
+The original paragraph follows, with that limit in mind.
 
 The HiDream-class case does **not** fail on memory on this engine build. Both
 HiDream GGUFs are rejected by the engine itself, before any sampling:
@@ -72,10 +82,16 @@ arrives as a surfaced `txt2img error 400`, and the reclaimer marks the engine
 abandoned and restarts it rather than pretending the job ran.
 
 So the previous "unsafe estimate/launch combination" reading is superseded: the
-verified fact is **engine-capability-blocked**, not a VRAM shortfall. M6/M7 must
-not claim HiDream placement proof on this build. The bounded path is proven on
-Flux instead, which is the same shape of problem (weights ≫ device) with a
-family the engine can identify.
+verified fact is a **format/variant rejection**, not a VRAM shortfall and not an
+absent architecture. M6/M7 must not claim HiDream placement proof until:
+
+1. the documented **Safetensors** HiDream-O1 path is loaded and sampled on the
+   pinned build, and
+2. that run is measured the same way as Flux.
+
+Until then the honest statement is: bounded placement is proven on Flux
+(weights ≫ device, family identified), and the HiDream GGUF files are rejected
+by the engine as unidentifiable.
 
 ## Owners
 

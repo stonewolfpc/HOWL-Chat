@@ -10,6 +10,7 @@ package diagnosis
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"strings"
 )
 
@@ -17,9 +18,16 @@ import (
 type Category string
 
 const (
-	// UnsupportedArchitecture means the engine cannot identify or run this
-	// architecture at all. More VRAM will not help.
+	// UnsupportedArchitecture means the engine does not know this architecture
+	// at all. More VRAM will not help, and neither will another copy of the same
+	// weights.
 	UnsupportedArchitecture Category = "unsupported_architecture"
+	// UnsupportedWeightFormat means the engine could not identify the model from
+	// this file. The architecture may well be supported through another release
+	// of the same family; the quantized/GGUF variant is what failed. This is a
+	// different user action from an unknown architecture, so it is a different
+	// category.
+	UnsupportedWeightFormat Category = "unsupported_weight_format"
 	// InvalidModelFile means the file is missing, truncated, or not a model this
 	// engine can open.
 	InvalidModelFile Category = "invalid_model_file"
@@ -107,11 +115,26 @@ func Diagnose(stage Stage, err error) Diagnosis {
 	d := Diagnosis{Stage: stage, Raw: raw}
 
 	switch {
-	case containsAny(lower, "cannot identify model family", "unsupported model", "unknown model architecture",
-		"model type not supported", "architecture not supported", "unknown architecture"):
+	case containsAny(lower, "cannot identify model family", "could not identify model family",
+		"unable to identify model family", "cannot determine model family", "cannot identify model type"):
+		// Identification failed. Whether that is the architecture or the file
+		// depends on what the engine was handed: a format it does not read says
+		// nothing about the architecture.
+		switch modelFileExt(raw) {
+		case ".gguf", ".pt", ".pth", ".bin":
+			d.Category = UnsupportedWeightFormat
+			d.Summary = "The engine cannot identify the model from this file; this weight format or quantized variant is not supported, even though the architecture may be."
+			d.Suggestion = "Use the original Safetensors release for this model family, or update the engine; memory settings will not change this."
+		default:
+			d.Category = UnsupportedArchitecture
+			d.Summary = "The engine does not know this architecture, so it cannot run it."
+			d.Suggestion = "Choose a model file this engine supports, or update the engine; memory settings will not change this."
+		}
+	case containsAny(lower, "unsupported model", "unknown model architecture", "model type not supported",
+		"architecture not supported", "unknown architecture"):
 		d.Category = UnsupportedArchitecture
-		d.Summary = "This engine build cannot identify the model's architecture, so it cannot run it."
-		d.Suggestion = "Choose a model file this engine supports, or update the engine; changing VRAM settings will not help."
+		d.Summary = "The engine does not know this architecture, so it cannot run it."
+		d.Suggestion = "Choose a model file this engine supports, or update the engine; memory settings will not change this."
 	case containsAny(lower, "no such file", "file not found", "cannot open", "failed to load model",
 		"invalid model", "not a valid", "unsupported format", "unknown format", "unexpected end of file",
 		"corrupt", "truncated"):
@@ -151,6 +174,26 @@ func Diagnose(stage Stage, err error) Diagnosis {
 		d.Retryable = true
 	}
 	return d
+}
+
+// modelFileExt reads the file the engine named. The path is the only reliable
+// signal for format-versus-architecture: the engine reports both as "cannot
+// identify model family".
+func modelFileExt(raw string) string {
+	lower := strings.ToLower(raw)
+	const marker = "from '"
+	if i := strings.Index(lower, marker); i >= 0 {
+		rest := raw[i+len(marker):]
+		if j := strings.Index(rest, "'"); j > 0 {
+			return strings.ToLower(filepath.Ext(rest[:j]))
+		}
+	}
+	for _, ext := range []string{".gguf", ".safetensors", ".sft", ".ckpt", ".pt", ".pth", ".bin"} {
+		if strings.Contains(lower, ext) {
+			return ext
+		}
+	}
+	return ""
 }
 
 func containsAny(haystack string, needles ...string) bool {

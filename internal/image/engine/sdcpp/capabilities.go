@@ -82,6 +82,10 @@ var familyCapabilities = map[string]FamilyCapability{
 
 	// HiDream ships as a full model with external encoders. The engine used to
 	// skip them while the discovery pass required them; the requirement wins.
+	// The pinned release documents HiDream-O1 in Safetensors. Quantized GGUF
+	// HiDream files were rejected by this build as "cannot identify model
+	// family" (verified 2026-11-26), which is a format limitation, not evidence
+	// that the architecture is missing.
 	"hidream": {Companions: []string{"t5xxl", "vae"}, Resolution: 1024, FluxAE: true},
 }
 

@@ -14,7 +14,8 @@ category part of what the user and any later reader see.
 
 | Category | Meaning | Next step it gives |
 |---|---|---|
-| `unsupported_architecture` | The engine cannot identify or run the architecture at all | Use a supported model file or update the engine; VRAM will not help |
+| `unsupported_architecture` | The engine does not know the architecture (Safetensors/checkpoint input) | Use a supported model file or update the engine; memory will not help |
+| `unsupported_weight_format` | The architecture may be supported, but this file's format or quantized variant is not | Use the original Safetensors release for this family, or update the engine |
 | `invalid_model_file` | Missing, truncated, unparseable, or unsupported format | Check the file, re-scan the folder |
 | `insufficient_resources` | Real memory shortfall against the post-reserve budget | Smaller/more quantized model, lower resolution, unload another workload |
 | `placement_failure` | Backend / params-backend / flag rejected | Reset placement to Auto and retry |
@@ -25,6 +26,12 @@ Classification reads the engine's own words (the 400 body, process-exit text,
 admission reason) and keeps those words attached as `engine said: …`. Nothing
 is discarded, and a diagnosis is never re-labelled on its way up: `Wrap` is
 idempotent and preserves the stage of the first classification.
+
+Format and architecture share one engine message ("cannot identify model family
+from '<path>'"), so the file the engine named decides the category: `.gguf`,
+`.pt`/`.pth` and `.bin` are format/variant rejections, `.safetensors`/`.sft`/
+`.ckpt` are architecture rejections. The category is a statement about the file
+the engine was handed, never about a family in general.
 
 `retryable` is set per category so a UI does not offer "try again" for an
 architecture the engine will never identify.
@@ -42,11 +49,12 @@ architecture the engine will never identify.
 ## Evidence (browser dev host, real engine)
 
 HiDream selection, bounded placement admitted and started inside the cap, then
-the engine refused the architecture. Before this slice the job error was the raw
-400; now:
+the engine refused the GGUF file. Before this slice the job error was the raw
+400. With the first classification it read `unsupported_architecture`; after the
+correction below it reads the narrower category:
 
 ```
-[ImageDiagnosis] category=unsupported_architecture stage=generation retryable=false
+[ImageDiagnosis] category=unsupported_weight_format stage=generation retryable=false
   raw="… sd-server txt2img error 400: {\"error\":\"cannot identify model family from
   'H:\\\\AI GGUF\\\\Image models\\\\hidream-i1-fast-Q2_K.gguf'\"}"
 
