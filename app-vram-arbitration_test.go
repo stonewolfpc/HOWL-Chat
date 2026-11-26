@@ -245,7 +245,7 @@ func TestHandoffRefusesWithoutConfirmation(t *testing.T) {
 	rig := newRig(600, 7200, true, chatEntry())
 	app := newHandoffApp(rig)
 
-	fit, err := app.reclaimOther("image", imageWorkload(), false, reclaimTarget{
+	fit, err := app.reclaimOther("image", []resource.AdmissionRequest{imageWorkload()}, false, reclaimTarget{
 		Label:  "chat",
 		Loaded: rig.loaded,
 		Unload: rig.unload,
@@ -273,7 +273,7 @@ func TestHandoffWaitsForPostUnloadTelemetry(t *testing.T) {
 	rig := newRig(600, 7200, true, chatEntry())
 	app := newHandoffApp(rig)
 
-	fit, err := app.reclaimOther("image", imageWorkload(), true, reclaimTarget{
+	fit, err := app.reclaimOther("image", []resource.AdmissionRequest{imageWorkload()}, true, reclaimTarget{
 		Label:  "chat",
 		Loaded: rig.loaded,
 		Unload: rig.unload,
@@ -311,7 +311,7 @@ func TestStaleTelemetryAfterUnloadIsRefused(t *testing.T) {
 	rig.stuck = true
 	app := newHandoffApp(rig)
 
-	fit, err := app.reclaimOther("image", imageWorkload(), true, reclaimTarget{
+	fit, err := app.reclaimOther("image", []resource.AdmissionRequest{imageWorkload()}, true, reclaimTarget{
 		Label:  "chat",
 		Loaded: rig.loaded,
 		Unload: rig.unload,
@@ -337,7 +337,7 @@ func TestFailedUnloadBlocksAdmission(t *testing.T) {
 	rig.unloadErr = errors.New("llama-server pid 1234 did not exit within 5s")
 	app := newHandoffApp(rig)
 
-	fit, err := app.reclaimOther("image", imageWorkload(), true, reclaimTarget{
+	fit, err := app.reclaimOther("image", []resource.AdmissionRequest{imageWorkload()}, true, reclaimTarget{
 		Label:  "chat",
 		Loaded: rig.loaded,
 		Unload: rig.unload,
@@ -367,7 +367,7 @@ func TestReverseHandoffRechecksDeviceBeforeReportingChatReady(t *testing.T) {
 	rig := newRig(600, 7200, true, imageEntry)
 	app := newHandoffApp(rig)
 
-	fit, err := app.reclaimOther("llm", chatWorkload(), true, reclaimTarget{
+	fit, err := app.reclaimOther("llm", []resource.AdmissionRequest{chatWorkload()}, true, reclaimTarget{
 		Label:  "image",
 		Loaded: rig.loaded,
 		Unload: rig.unload,
@@ -403,7 +403,7 @@ func TestReverseHandoffFailsOnStaleDeviceState(t *testing.T) {
 	rig.stuck = true
 	app := newHandoffApp(rig)
 
-	fit, err := app.reclaimOther("llm", chatWorkload(), true, reclaimTarget{
+	fit, err := app.reclaimOther("llm", []resource.AdmissionRequest{chatWorkload()}, true, reclaimTarget{
 		Label:  "image",
 		Loaded: rig.loaded,
 		Unload: rig.unload,

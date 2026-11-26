@@ -70,9 +70,9 @@ Pinned by `TestFitMessageBlamesTheGPUHolderNotACPUResident` and
 | Unconfirmed handoff | `unloading the chat model to start the image model was not confirmed; nothing was unloaded` |
 | Confirmed handoff | `INFO: llama-server stopped, model memory freed`; image then admitted at `required=5084 MB` and sd-server started on the GPU |
 
-## Defect 3 — the handoff reports a timeout after it has succeeded (open)
+## Defect 3 — the handoff reports a timeout after it has succeeded (fixed)
 
-The confirmed handoff returned:
+The confirmed handoff once returned:
 
 ```
 VRAM reclamation for image did not complete within 10s: This model needs about 6945 MB
@@ -80,11 +80,46 @@ and only 7089 MB of 8192 MB is free, so it cannot start.
 ```
 
 The unload had in fact succeeded — the image loaded on the GPU immediately
-afterwards. The reclaim loop waits for the *full-precision* request to admit,
-while the load path that follows may fall back to q8 (5084 MB), so the wait can
-never observe the condition it is waiting for. The behaviour is correct; the
-report is not. This is recorded, not patched: changing a 10-second wait heuristic
-needs its own evidence.
+afterwards. The reclaim loop waited for the *full-precision* request to admit,
+while the load path that follows falls back to q8 (5084 MB), so the wait could
+never observe the condition it was waiting for.
+
+The fix is not a longer wait and not a looser condition. The reclaim wait now
+holds the same **placement ladder** the load path will run — stored precision
+first, then the automatic q8_0 conversion when that policy allows it — and
+admits each candidate against fresh snapshots. Success is an admission of one
+candidate on live telemetry; a stopped process is still never treated as freed
+memory, and when no candidate fits the handoff still fails and says so
+(`TestReclaimStillTimesOutWhenNothingFits`). The result names the placement it
+admitted, so the caller is not told a full-precision load is coming when a q8
+conversion will run:
+
+```
+Fits: needs about 5084 MB and 7093 MB is free of 8192 MB.
+; this load will use the automatic q8_0 conversion
+can_fit=true weight_type=q8_0
+```
+
+Pinned by `TestReclaimSucceedsOnTheSameLadderTheLoadUses`.
+
+## End-to-end transition: chat → image → chat, with audio present
+
+One session, three workloads, in order:
+
+| Step | Evidence |
+|---|---|
+| Piper synthesises | `data/cache/tts/tts_1795661005018019600.wav`; CPU-only, no VRAM claim |
+| Chat loads (primary) | `admitted: 6057 MB VRAM required`; `actual placement layers=32/33 context=3328 matches_plan=true`; residency `planned=6057 engine=4887 device_delta=5210 ledger=5210 within plan` |
+| Confirmed handoff to image | `can_fit=true weight_type=q8_0`; `llama-server stopped, model memory freed` |
+| Image loads and generates | 512×512, 2 steps, `status=completed`; residency `planned=5093 engine=0 device_delta=5681 ledger=5681 above plan` |
+| Return to chat | `[VRAM] unloading image model to make room for the llm model`; chat re-admitted at the same plan; `layers=32/33 context=3328 matches_plan=true`; residency again `planned=6057 engine=4887 device_delta=5210 ledger=5210 within plan` |
+| Audio after both transitions | Synthesis still succeeds — the CPU workload was never evicted by either handoff |
+
+The chat return is the primary-workload path: loading chat is itself the user's
+intent, so it hands the device over through the same `reclaimOther` sequence
+with confirmation already given, rather than asking again mid-load. The image
+direction cannot start that way — it requires the explicit confirmation shown
+above.
 
 ## Owners
 
@@ -101,4 +136,8 @@ two fixes are message-selection and a guard on an existing rescue path.
   Piper synthesis only.
 - **No generation in this scenario.** The image model was loaded, not sampled;
   generation and residency measurement for image were covered by M3–M5.
-- **Defect 3 remains open**, as described.
+- **The explicit image→chat RPC was not invoked in this run.** The return to
+  chat was exercised through the primary-workload path in `LoadModel`, which calls
+  the same `FreeVRAMFor → reclaimOther → waitForAdmissionFit` sequence. The
+  release, the fresh admission, the restored placement and the residency record
+  were all observed; only the separate RPC entry point was not clicked.

@@ -43,7 +43,7 @@ type reclaimTarget struct {
 // other model, then wait for fresh telemetry to admit the same request. Every
 // caller that unloads for the other workload goes through it, so a missing
 // confirmation or an unobserved exit cannot be papered over at one call site.
-func (a *App) reclaimOther(kind string, req resource.AdmissionRequest, confirmed bool, other reclaimTarget) (ModelFitResult, error) {
+func (a *App) reclaimOther(kind string, reqs []resource.AdmissionRequest, confirmed bool, other reclaimTarget) (ModelFitResult, error) {
 	if !confirmed {
 		return ModelFitResult{}, fmt.Errorf("unloading the %s model to start the %s model was not confirmed; nothing was unloaded", other.Label, kind)
 	}
@@ -53,7 +53,7 @@ func (a *App) reclaimOther(kind string, req resource.AdmissionRequest, confirmed
 			return ModelFitResult{}, fmt.Errorf("could not unload the %s model: %w", other.Label, err)
 		}
 	}
-	return a.waitForAdmissionFit(kind, req)
+	return a.waitForAdmissionFit(kind, reqs)
 }
 
 // ModelFitResult answers "will this model fit right now, and what is in the way?"
@@ -65,6 +65,9 @@ type ModelFitResult struct {
 	TotalVRAMMB int64             `json:"total_vram_mb"`
 	Blocking    []LoadedModelInfo `json:"blocking"`
 	Message     string            `json:"message"`
+	// WeightType is the precision the admitted placement will use. It is empty
+	// when the load opens the file at its stored precision.
+	WeightType string `json:"weight_type,omitempty"`
 }
 
 // CheckModelFit reports whether a chat model can load with the VRAM that is
@@ -202,7 +205,7 @@ func (a *App) FreeVRAMFor(kind, path string, confirmed bool) (ModelFitResult, er
 		if err != nil {
 			return ModelFitResult{}, err
 		}
-		return a.reclaimOther("llm", req, confirmed, reclaimTarget{
+		return a.reclaimOther("llm", []resource.AdmissionRequest{req}, confirmed, reclaimTarget{
 			Label:  "image",
 			Loaded: func() bool { name, _ := a.loadedImageModelInfo(); return name != "" },
 			Unload: a.UnloadImageModel,
@@ -218,21 +221,26 @@ func (a *App) FreeVRAMFor(kind, path string, confirmed bool) (ModelFitResult, er
 // live telemetry until the same image admission request fits. confirmed is the
 // user's answer from the fit dialog; without it nothing is unloaded.
 func (a *App) FreeVRAMForImage(opts imagetypes.ImageOptions, confirmed bool) (ModelFitResult, error) {
-	req, err := a.imageAdmissionFor(opts)
+	reqs, err := a.imageAdmissionLadder(opts)
 	if err != nil {
 		return ModelFitResult{}, err
 	}
-	return a.reclaimOther("image", req, confirmed, reclaimTarget{
+	return a.reclaimOther("image", reqs, confirmed, reclaimTarget{
 		Label:  "chat",
 		Loaded: a.IsModelLoaded,
 		Unload: a.UnloadModel,
 	})
 }
 
-// waitForAdmissionFit keeps the same immutable request and re-admits it against
-// fresh hardware snapshots. The only success is a decision that admits that
-// request; a timeout returns the last decision and an explicit error.
-func (a *App) waitForAdmissionFit(kind string, req resource.AdmissionRequest) (ModelFitResult, error) {
+// waitForAdmissionFit keeps each immutable request and re-admits the ladder
+// against fresh hardware snapshots. The ladder is the order the load path will
+// try, so the wait cannot demand a stronger condition than the start that
+// follows: a full-precision request that will fall back to q8_0 must be judged
+// by that fallback, or a successful handoff is reported as a timeout.
+//
+// Success is an admission of one candidate against live telemetry. A dead
+// process is never treated as recovered capacity.
+func (a *App) waitForAdmissionFit(kind string, reqs []resource.AdmissionRequest) (ModelFitResult, error) {
 	deadline := time.NewTimer(vramReleaseTimeout)
 	defer deadline.Stop()
 	ticker := time.NewTicker(vramReleasePoll)
@@ -240,13 +248,19 @@ func (a *App) waitForAdmissionFit(kind string, req resource.AdmissionRequest) (M
 
 	var last ModelFitResult
 	for {
-		fit, err := a.fitAdmissionRequest(kind, req)
-		if err != nil {
-			return fit, err
-		}
-		last = fit
-		if fit.CanFit {
-			return fit, nil
+		for _, req := range reqs {
+			fit, err := a.fitAdmissionRequest(kind, req)
+			if err != nil {
+				return fit, err
+			}
+			if fit.CanFit {
+				fit.WeightType = req.WeightType
+				if req.WeightType != "" {
+					fit.Message += fmt.Sprintf("; this load will use the automatic %s conversion", req.WeightType)
+				}
+				return fit, nil
+			}
+			last = fit
 		}
 		select {
 		case <-deadline.C:
@@ -254,6 +268,26 @@ func (a *App) waitForAdmissionFit(kind string, req resource.AdmissionRequest) (M
 		case <-ticker.C:
 		}
 	}
+}
+
+// imageAdmissionLadder is every request the image load path may start, in the
+// order it tries them: the stored precision first, then the automatic q8_0
+// conversion when that policy would allow it. The handoff and the load must
+// agree on this list.
+func (a *App) imageAdmissionLadder(opts imagetypes.ImageOptions) ([]resource.AdmissionRequest, error) {
+	req, err := a.imageAdmissionFor(opts)
+	if err != nil {
+		return nil, err
+	}
+	ladder := []resource.AdmissionRequest{req}
+	if req.WeightType == "" {
+		if loadOpts, loadErr := a.imageLoadOptionsForGeneration(opts.ModelName, opts); loadErr == nil {
+			if q8, ok := imageAutoQuantizeRequest(req, loadOpts, true); ok {
+				ladder = append(ladder, q8)
+			}
+		}
+	}
+	return ladder, nil
 }
 
 // loadedImageModelInfo returns the image model's display name and the VRAM it
