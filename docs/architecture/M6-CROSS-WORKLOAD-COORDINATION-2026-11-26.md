@@ -121,6 +121,70 @@ with confirmation already given, rather than asking again mid-load. The image
 direction cannot start that way — it requires the explicit confirmation shown
 above.
 
+## Evidence closure 1 — explicit image→chat entry point (browser host)
+
+The primary-load path had been proven; the separate public entry point had not.
+With the image model resident, `FreeVRAMFor("llm", <chat path>, true)` was called
+directly over the harness RPC:
+
+```
+error: none
+can_fit: True required: 6182 free: 7090
+message: Fits: needs about 6182 MB and 7090 MB is free of 8192 MB.
+[VRAM] unloading image model to make room for the llm model
+[LoadModel] actual placement: known=true layers=32/33 vram=4677MB ram=679MB context=3328 matches_plan=true
+```
+
+So the entry point behaves like the mechanism it shares: refuse without consent,
+stop the resident, wait on fresh telemetry, admit, and report. The 6182 MB here
+is the pre-plan request (no fitted plan exists before the load), which is why it
+differs from the 6057 MB the fitted load reports.
+
+## Evidence closure 2 — packaged host pass (WebView2, real input)
+
+Driven with real mouse clicks and keystrokes against the maximised window of the
+packaged app, on the same isolated root, with screenshots read back after every
+step:
+
+| Clicked | Visible afterwards |
+|---|---|
+| Chat panel, typed a message, Enter | Chat loaded: `actual placement layers=32/33 context=3328 matches_plan=true` |
+| Image Generator icon | Panel with `Illustrious-XL-v2.0 (sdxl)` selected, 512×512 |
+| GENERATE | Native `wails.localhost` message box: *Your chat model "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf" is using about 5183 MB, and this one needs about 6945 MB — more than the 1694 MB free of 8192 MB. Unload it and continue?* |
+| OK | `[VRAM] handoff complete: Fits: needs about 6057 MB and 6985 MB is free of 8192 MB.`; sd-server started, a new lighthouse image appeared in the gallery |
+| Chat icon, typed a message | Chat reloaded; `[LoadModel] actual placement: layers=32/33 context=3328 matches_plan=true` |
+
+Residency measured in this host: image `planned=5093 engine=0 device_delta=4501
+ledger=4501 within plan`; chat `planned=6057 engine=4887 device_delta=5223
+ledger=5223 within plan`.
+
+**Host difference recorded:** the handoff confirmation is a native Windows
+message box in the packaged app, not an in-page dialog. The browser host has no
+such surface, so the two hosts ask the same question through different chrome.
+
+## Defect 4 — the first message after a handoff reload can fail (open)
+
+In the packaged host, the message typed immediately after returning to chat
+produced this in the transcript while the reload was still starting:
+
+```
+[Error: failed to send request: Post "http://localhost:8080/v1/chat/completions":
+ dial tcp [::1]:8080: connectex: No connection could be made because the target
+ machine actively refused it.]
+```
+
+The model was listening moments later; the next message streamed normally. The
+send path begins its request as soon as the user submits, while the reload the
+nav transition had begun was still bringing llama-server up, so the first
+request can reach a port that is not open yet.
+
+A defensive guard was written (wait for `/health` while the engine reports a
+loading stage) and then **reverted**: in this failure the send left before the
+load had even entered a loading stage, so the guard never armed and the error
+still appeared. The cause is ordering between the load request and the send,
+not a missing wait inside the send. It is recorded open rather than patched with
+something the host evidence does not support.
+
 ## Owners
 
 Unchanged. Admission decides, the lifecycle gate serialises transitions, the
@@ -130,14 +194,16 @@ two fixes are message-selection and a guard on an existing rescue path.
 
 ## Verified limitations
 
-- **Packaged host not driven** for this scenario; all evidence is the browser
-  dev host over the same bindings.
-- **No ASR run.** ASR needs a microphone and a human speaker; the audio leg is
-  Piper synthesis only.
-- **No generation in this scenario.** The image model was loaded, not sampled;
-  generation and residency measurement for image were covered by M3–M5.
-- **The explicit image→chat RPC was not invoked in this run.** The return to
-  chat was exercised through the primary-workload path in `LoadModel`, which calls
-  the same `FreeVRAMFor → reclaimOther → waitForAdmissionFit` sequence. The
-  release, the fresh admission, the restored placement and the residency record
-  were all observed; only the separate RPC entry point was not clicked.
+- **Packaged host pass covers chat and image only.** It was not extended to a
+  Piper synth or an ASR capture; audio was verified in the browser host.
+- **No ASR run at all.** Capture devices are present (`CORSAIR VOID ELITE
+  Wireless Gaming Headset`, `Realtek High Definition Audio`), but transcription
+  needs a human speaker at the microphone. Nothing here claims ASR works beside
+  a resident workload.
+- **Defect 4 is open**, as described: a message sent in the window between
+  returning to chat and the reload finishing can fail.
+- **Image generation in the packaged host used the 20-step default at 512×512**;
+  the browser run used 2 steps. Neither is a speed measurement.
+- **Screenshot/click driving is physical-screen input**; the packaged window was
+  resized to 1400×900 because the maximised window's DPI scale made coordinate
+  mapping unreliable. Every reported step was read back from a screenshot.
