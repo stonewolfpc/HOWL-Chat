@@ -33,6 +33,13 @@ from '<path>'"), so the file the engine named decides the category: `.gguf`,
 `.ckpt` are architecture rejections. The category is a statement about the file
 the engine was handed, never about a family in general.
 
+Extension is a practical discriminator for the failures observed here, not proof
+that every file with that extension is incompatible: a malformed Safetensors
+file can fail for its own reasons and would be reported as an architecture
+rejection by this rule. `invalid_model_file` covers the parse/IO failures the
+engine names explicitly; the extension rule only resolves the generic
+"cannot identify" message.
+
 `retryable` is set per category so a UI does not offer "try again" for an
 architecture the engine will never identify.
 

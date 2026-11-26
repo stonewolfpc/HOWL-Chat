@@ -305,26 +305,43 @@ func (a *App) boundControlNetBytes(modelPath string) int64 {
 	return size
 }
 
+// workloadLabel names the owner in user-facing text. It follows the resident
+// type, not an assumption that every non-image resident is chat.
+func workloadLabel(kind string) string {
+	switch kind {
+	case "image":
+		return "image model"
+	case "asr":
+		return "speech recognition model"
+	case "tts":
+		return "speech model"
+	default:
+		return "chat model"
+	}
+}
+
 // fitMessage is the user-facing sentence shown in the confirm dialog.
 func fitMessage(r ModelFitResult) string {
 	card := fmt.Sprintf("%d MB", r.TotalVRAMMB)
 	if r.CanFit {
 		return fmt.Sprintf("Fits: needs about %d MB and %d MB is free of %s.", r.RequiredMB, r.FreeVRAMMB, card)
 	}
-	if len(r.Blocking) == 0 {
+	// A RAM-only resident (a CPU speech model, for example) is not what keeps a
+	// GPU request from starting. Naming it as the reason made the dialog blame a
+	// 360 MB Piper registration for a 7 GB VRAM shortfall. Only a resident that
+	// holds GPU memory can be the blocker of a VRAM request.
+	var blocker *LoadedModelInfo
+	for i := range r.Blocking {
+		if r.Blocking[i].GPUMemoryMB > 0 {
+			blocker = &r.Blocking[i]
+			break
+		}
+	}
+	if blocker == nil {
 		return fmt.Sprintf("This model needs about %d MB and only %d MB of %s is free, so it cannot start.",
 			r.RequiredMB, r.FreeVRAMMB, card)
 	}
-	b := r.Blocking[0]
-	what := "chat model"
-	if b.Type == "image" {
-		what = "image model"
-	}
-	headline := fmt.Sprintf("Your %s %q is loaded and this one needs about %d MB, with %d MB free of %s.",
-		what, b.Name, r.RequiredMB, r.FreeVRAMMB, card)
-	if b.GPUMemoryMB > 0 {
-		headline = fmt.Sprintf("Your %s %q is using about %d MB, and this one needs about %d MB — more than the %d MB free of %s.",
-			what, b.Name, b.GPUMemoryMB, r.RequiredMB, r.FreeVRAMMB, card)
-	}
-	return headline + "\n\nUnload it and continue?"
+	what := workloadLabel(blocker.Type)
+	return fmt.Sprintf("Your %s %q is using about %d MB, and this one needs about %d MB — more than the %d MB free of %s.\n\nUnload it and continue?",
+		what, blocker.Name, blocker.GPUMemoryMB, r.RequiredMB, r.FreeVRAMMB, card)
 }

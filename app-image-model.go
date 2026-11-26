@@ -295,7 +295,12 @@ func (a *App) admitImageLoad(loadOpts imagetypes.ModelLoadOptions, gen imagetype
 	// live in system RAM and the engine spends at most --max-vram on the device.
 	// This is the HiDream-class case, where the diffusion file alone is larger
 	// than the card.
-	if !decision.Admitted && startupWillApply && imageBoundedPlacementEligible(chosen) {
+	// Only rescue a model that cannot fit the card at all. When a resident
+	// workload is the blocker, the refusal names it and the user-approved
+	// handoff (FreeVRAMForImage) decides whether that workload is unloaded;
+	// silently degrading to CPU while chat holds the GPU would trade the user's
+	// request for a much slower run they never asked for.
+	if !decision.Admitted && len(decision.Blocking) == 0 && startupWillApply && imageBoundedPlacementEligible(chosen) {
 		budgetMB := decision.Estimate.AvailableVRAMMB
 		budgetGiB := budgetMB / 1024
 		if budgetGiB < 1 {
