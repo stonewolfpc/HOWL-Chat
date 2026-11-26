@@ -80,6 +80,14 @@ func Attach(cmd *exec.Cmd) error {
 // established the child is killed and Start returns the error; it never falls
 // back to an unowned process.
 func Start(cmd *exec.Cmd) error {
+	return StartWithOwnership(cmd, nil)
+}
+
+// StartWithOwnership is Start with one extra step between job assignment and
+// the child's first instruction. owned runs while the child is still suspended,
+// so a caller that must record ownership (the process registry) can fail the
+// start instead of racing the first instruction.
+func StartWithOwnership(cmd *exec.Cmd, owned func() error) error {
 	if cmd == nil {
 		return fmt.Errorf("proc: nil command")
 	}
@@ -99,6 +107,11 @@ func Start(cmd *exec.Cmd) error {
 	}
 	if err := Attach(cmd); err != nil {
 		return failed(err)
+	}
+	if owned != nil {
+		if err := owned(); err != nil {
+			return failed(err)
+		}
 	}
 	if err := resumeProcess(pid); err != nil {
 		return failed(err)

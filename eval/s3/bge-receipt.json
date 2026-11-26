@@ -1,0 +1,58 @@
+{
+  "candidate": "bge-reranker-v2-m3-Q8_0",
+  "artifact": {
+    "repo": "smarttasks/bge-reranker-v2-m3-GGUF",
+    "revision": "fc50d873dcd84a7be9760cfecd31f513d5ebc436",
+    "file": "bge-reranker-v2-m3-Q8_0.gguf",
+    "bytes": 635674432,
+    "sha256": "d32a877b7266f5275172458616824ce6728502416672052c2da795da3389201e",
+    "expected_sha256": "d32a877b7266f5275172458616824ce6728502416672052c2da795da3389201e",
+    "integrity": "PASS",
+    "licence": "Apache-2.0",
+    "base_model": "BAAI/bge-reranker-v2-m3"
+  },
+  "stages": {
+    "1_artifact_integrity": "PASS",
+    "2_compatibility": {
+      "verdict": "PASS",
+      "offload": "25/25 layers",
+      "cuda0_model_buffer_mib": 308.3,
+      "tensors": 393,
+      "pooling": "rank (4) applied by flag; metadata said -1",
+      "endpoint_note": "/v1/rerank returns results sorted by score; use index"
+    },
+    "3_instrument_sanity": "PASS",
+    "4_frozen_behaviour": {
+      "verdict": "INCONCLUSIVE (score-scale mismatch)",
+      "frozen_rule_passed": "6/9",
+      "veto_broken": [
+        "R4"
+      ],
+      "diagnostic_R1_horse": "trainer record ranked first, -1.868 vs -5.954 for the trainer question -> confusion amplified"
+    },
+    "5_resources": {
+      "spawn_to_ready_s": 2.54,
+      "first_call_ms": 21,
+      "warm_p50_ms": 11,
+      "warm_p95_ms": 30,
+      "batched4_p50_ms": 30,
+      "batched4_p95_ms": 43,
+      "vram_delta_mib": 433,
+      "vram_budget_mib": 384,
+      "vram_verdict": "FAIL for full residency",
+      "residual_mib": -9,
+      "rss_mb": 933,
+      "port_closed": true,
+      "partial_offload": "untested",
+      "cpu_path": "untested"
+    }
+  },
+  "apparatus": {
+    "spec_version": "v1.1",
+    "cases_sha256": "ca6dd5b3541f08fbf997b58bb3ddffe1b797a1171ff94900a80ab53b0c9f1c21",
+    "threshold_frozen": 0.3,
+    "modified": false
+  },
+  "defect_raised": "selection rule assumes [0,1] scale; logit candidate undefined. Amendment proposed as v1.2, not applied.",
+  "gate_b": "6/7 open"
+}

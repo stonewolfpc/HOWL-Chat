@@ -5154,3 +5154,59 @@ itself no longer duplicates catalog records.
 
 **Resume token:** `HEKI-CP-2026-11-23-102`
 **Next:** per-domain cutover/rollback markers, then §21.5 item 6.
+
+## HEKI-CP-2026-11-23-103 — the marker audit: four domains are missing cutover evidence
+
+**Result: audit recorded; no code changed.** HOC §21.12
+(`docs/architecture/HOC-H0-LEVEL0-2026-11-22.md`) records the findings. At
+`850d63b`, only lorebooks has a persisted cutover marker. Characters, worlds,
+scenarios and image generation have backend authority but no `cutover` status,
+no cutover journal and no durable rollback. The character, world/scenario and image checkpoints 99–101 describe
+that authority transition, not a marker. Settings and the chat session pointer
+do not need catalog markers: settings has no renderer catalog to import and its
+localStorage key is a derived outage cache, and the pointer stores ids and UI
+selection.
+
+**Owners.** `internal/characterstore` must add marker, journal, status and a
+rollback that reads the journal; `app-characters.go` and
+`character-repository.js` compose it. `internal/worldstore` must do the same per
+category, using or replacing the existing staged-import primitives;
+`app-worlds.go`, `world-repository.js` and `scenario-repository.js` compose it.
+`internal/image/settings` must add marker, journal and rollback for the
+generation document; `app-image.go` and `image-generation-repository.js`
+compose it. `internal/lorebookstore` is complete. No marker is required for
+`internal/runtime.Settings` or `chat-session-pointer.js`.
+
+**Automatic imports.** `character-repository.js`, `world-repository.js`,
+`scenario-repository.js` and `image-generation-repository.js` import during
+`_load()` before any user action. Replacing the raw key with a versioned
+envelope makes this normally one-time, but it is still automatic, unmarked and
+irreversible after reload. Marker work must move those calls behind explicit
+user actions; otherwise it records an unauthorized cutover.
+
+**Lorebook consumers.** There are 22 literal `getItem('howl-chat-lorebooks')`
+read sites in modules outside the repository across chat, story-tools, world,
+scenario and character pages (some modules load on more than one page), plus the
+lorebook page's constant-key fallback at `lorebooks.js:185`; that makes **23
+direct reads** outside the repository. The page table in HOC §21.12 lists the
+exact file:line locations and notes the duplicate story-tools entries. `world.html`,
+`scenario.html`, `character.html` and `story-tools.html` do not load
+`lorebook-repository.js` yet. The reads can move independently of the four
+markers once those pages load the repository and either await `hydrate()` before
+rendering or seed `all()` from the cache while not ready. Outside the repository
+there are two direct `setItem` paths: `lorebook-manager.js:46` and
+`lorebooks.js:194` (through `LOREBOOK_STORAGE_KEY` at `lorebooks.js:8`). The
+manager's `saveLorebook` and `deleteLorebook` have no call sites, so its write
+is dormant; `lorebooks.js:194` is a repository-unavailable fallback. There is
+one reset removal: the key entry at `app-wipe.js:24` and the `removeItem` call
+at line 44, retained intentionally.
+Routing consumers does not authorize retiring `howl-chat-lorebooks`; item 6
+still needs the other domain markers, both-host evidence and authorization.
+
+**Verification.** Documentation-only: `git diff --check`; no build, host or
+user-visible workflow was run. Host verification is required before any marker
+or routing code is called complete.
+
+**Resume token:** `HEKI-CP-2026-11-23-103`
+**Next:** implement the four marker/journal/rollback transitions, then route the
+lorebook consumers as an independent slice; §21.5 item 6 follows.

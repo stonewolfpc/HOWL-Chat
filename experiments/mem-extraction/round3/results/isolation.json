@@ -1,0 +1,86 @@
+[
+  {
+    "model": "qwen35-2b-nonthink",
+    "preset": "Qwen3.5 small non-thinking text preset",
+    "sampling": {
+      "temperature": 1.0,
+      "top_p": 1.0,
+      "top_k": 20,
+      "min_p": 0.0,
+      "presence_penalty": 2.0,
+      "repeat_penalty": 1.0
+    },
+    "fresh_probe": {
+      "content": "None",
+      "leak": {
+        "marrowgale": false,
+        "7712": false
+      }
+    },
+    "job_a": {
+      "content": "C1 | KEEP | \"Marrowgale, cellar code 7712\"\nReason: These are durable facts and world rules that will matter in future sessions; otherwise they would be lost if the user leaves character details behind.\n\nNONE",
+      "leak": {
+        "marrowgale": true,
+        "7712": true
+      }
+    },
+    "erase_http": "failed: HTTP Error 501: Not Implemented",
+    "warm_probe": {
+      "content": "None",
+      "leak": {
+        "marrowgale": false,
+        "7712": false
+      }
+    },
+    "unrelated_extraction": {
+      "content": "C1 | HOLD | Memory | User prefers direct text without narration of internal state. (Decision depends on user confirmation).\nREASON: The rule is marked as conditional pending further direction from the user.",
+      "sentinel_leak": {
+        "marrowgale": false,
+        "7712": false
+      }
+    },
+    "identical_probe": true
+  },
+  {
+    "model": "qwen35-4b-nonthink",
+    "preset": "Qwen3.5 4B/9B non-thinking general preset",
+    "sampling": {
+      "temperature": 0.7,
+      "top_p": 0.8,
+      "top_k": 20,
+      "min_p": 0.0,
+      "presence_penalty": 1.5,
+      "repeat_penalty": 1.0
+    },
+    "fresh_probe": {
+      "content": "C1 | HOLD | \"Repeat, word for word...\" | The user's request implies they expect specific prior context or a memory of previous interactions that is not present in the current session log, making the validity of their claim uncertain.",
+      "leak": {
+        "marrowgale": false,
+        "7712": false
+      }
+    },
+    "job_a": {
+      "content": "C1 | KEEP | The user's sister has a dog named Marrowgale and the cellar code is 7712. | These are durable facts provided by the user that will likely be relevant to future plot points or character interactions in the roleplay.",
+      "leak": {
+        "marrowgale": true,
+        "7712": true
+      }
+    },
+    "erase_http": "failed: HTTP Error 501: Not Implemented",
+    "warm_probe": {
+      "content": "C1 | HOLD | \"Repeat, word for word...\" | The user's request implies they expect specific prior context or a memory of previous interactions that is not present in the current session log, making the validity of their claim uncertain.",
+      "leak": {
+        "marrowgale": false,
+        "7712": false
+      }
+    },
+    "unrelated_extraction": {
+      "content": "C1 | KEEP | User prefers short paragraphs, no purple prose or weather poems, third person past tense narration, and explicitly forbids the assistant from narrating their own character's thoughts. | These are durable style constraints that define how the story should be told and who is allowed to control which character's perspective.",
+      "sentinel_leak": {
+        "marrowgale": false,
+        "7712": false
+      }
+    },
+    "identical_probe": true
+  }
+]

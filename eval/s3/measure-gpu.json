@@ -1,0 +1,26 @@
+{
+  "config": "gpu",
+  "flags": [
+    "-ngl",
+    "99"
+  ],
+  "spawn_to_ready_seconds": 0.56,
+  "model_load_seconds": 0.24,
+  "placement": {
+    "load_start": "0.00.192.740",
+    "offload": "load_tensors: offloaded 13/13 layers to GPU",
+    "cpu_buffer": "23.76 MiB",
+    "gpu_buffer": "114.91 MiB",
+    "load_end": "0.00.435.741"
+  },
+  "first_query_ms": 54.3,
+  "warm_p50_ms": 10.0,
+  "warm_p95_ms": 29.4,
+  "warm_max_ms": 29.4,
+  "vram_idle_mib": 1587,
+  "vram_loaded_mib": 1844,
+  "vram_delta_mib": 257,
+  "vram_after_shutdown_mib": 1587,
+  "vram_residual_mib": 0,
+  "port_closed_after_shutdown": true
+}

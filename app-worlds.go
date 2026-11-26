@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
+	"howl-chat/internal/domaincutover"
 	"howl-chat/internal/library"
-	"howl-chat/internal/paths"
 	"howl-chat/internal/worldstore"
 )
 
@@ -27,40 +26,11 @@ func (a *App) scenarioStore() (*worldstore.Store, error) {
 	return worldstore.New(a.registries.Libraries(), library.Scenarios)
 }
 
-// ensureDefaultLibrary composes the approved user-content directory the first
-// time a category is used without any registered root. It registers that
-// directory in the existing content-library registry; it does not create a
-// second store or move existing files.
-func (a *App) ensureDefaultLibrary(category library.Category) error {
-	reg := a.registries.Libraries()
-	if reg == nil {
-		return fmt.Errorf("content library registry not initialised")
-	}
-	if len(reg.List(category)) > 0 {
-		return nil
-	}
-	dir, err := paths.DefaultContentDir(string(category))
-	if err != nil {
-		return err
-	}
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return fmt.Errorf("create default %s directory: %w", category, err)
-	}
-	_, err = reg.Add(library.Registration{
-		Category:    category,
-		Path:        dir,
-		Role:        library.RoleRead | library.RoleWrite | library.RoleSave,
-		Origin:      library.OriginHowl,
-		Format:      library.FormatHowl,
-		DefaultSave: true,
-	})
-	return err
-}
-
+// listDocuments is a pure read: it never creates a directory or registers a
+// root. An uninitialized or unreadable library yields an empty list, and the
+// state is reported through GetContentReadiness instead of being disguised as a
+// backend error or an empty library.
 func (a *App) listDocuments(store *worldstore.Store, category library.Category) ([]map[string]interface{}, error) {
-	if err := a.ensureDefaultLibrary(category); err != nil {
-		return nil, err
-	}
 	items, err := store.List()
 	if err != nil {
 		return nil, err
@@ -102,13 +72,17 @@ func (a *App) saveDocument(store *worldstore.Store, category library.Category, d
 	if document == nil {
 		return nil, fmt.Errorf("%s: document is required", label)
 	}
-	if err := a.ensureDefaultLibrary(category); err != nil {
-		return nil, err
-	}
 	id, _ := document["id"].(string)
 	id = strings.TrimSpace(id)
 	base, _ := document["revision"].(string)
 	if id == "" {
+		// Only creation goes to the default save root, so only creation is gated
+		// on it. Updates must reach the library that owns the document; refusing
+		// them here would let a read-only default root disable edits to healthy
+		// sibling libraries.
+		if err := a.requireCreateWritable(category, label); err != nil {
+			return nil, err
+		}
 		result, err := store.Save(document)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", label, err)
@@ -131,6 +105,9 @@ func (a *App) saveDocument(store *worldstore.Store, category library.Category, d
 	// it could collide with a copy in an unavailable root.
 	if !search.Complete {
 		return nil, fmt.Errorf("%s: storage is unavailable or incompletely searched; nothing was written", label)
+	}
+	if err := a.requireCreateWritable(category, label); err != nil {
+		return nil, err
 	}
 	delete(document, "revision")
 	result, err := store.Save(document)
@@ -188,11 +165,12 @@ func (a *App) deleteDocument(store *worldstore.Store, id, label string) error {
 	return nil
 }
 
-func (a *App) importDocuments(store *worldstore.Store, category library.Category, documents []interface{}, label string) (int, error) {
-	if err := a.ensureDefaultLibrary(category); err != nil {
-		return 0, err
+func (a *App) importDocuments(store *worldstore.Store, category library.Category, documents []interface{}, label string) (int, []domaincutover.Item, error) {
+	if err := a.requireCreateWritable(category, label); err != nil {
+		return 0, nil, err
 	}
 	imported := 0
+	items := []domaincutover.Item{}
 	for _, raw := range documents {
 		document, ok := raw.(map[string]interface{})
 		if !ok || document == nil {
@@ -204,10 +182,10 @@ func (a *App) importDocuments(store *worldstore.Store, category library.Category
 		}
 		search, err := store.Lookup(id)
 		if err != nil {
-			return imported, fmt.Errorf("%s: %w", label, err)
+			return imported, items, fmt.Errorf("%s: %w", label, err)
 		}
 		if !search.Complete {
-			return imported, fmt.Errorf("%s: storage is unavailable or incompletely searched; nothing was imported", label)
+			return imported, items, fmt.Errorf("%s: storage is unavailable or incompletely searched; nothing was imported", label)
 		}
 		// Canonical content wins. A legacy item only seeds an absent identity, so
 		// a stale renderer array can never overwrite a newer canonical save.
@@ -217,14 +195,22 @@ func (a *App) importDocuments(store *worldstore.Store, category library.Category
 		delete(document, "revision")
 		result, err := store.Save(document)
 		if err != nil {
-			return imported, fmt.Errorf("%s: %w", label, err)
+			return imported, items, fmt.Errorf("%s: %w", label, err)
 		}
 		if result.Status != "saved" {
-			return imported, fmt.Errorf("%s: %s", label, result.Message)
+			return imported, items, fmt.Errorf("%s: %s", label, result.Message)
 		}
+		hashes, _ := store.ItemHashes(result.ID)
+		items = append(items, domaincutover.Item{
+			ID:       result.ID,
+			Action:   "created",
+			Revision: result.Revision,
+			Path:     result.Path,
+			Hashes:   hashes,
+		})
 		imported++
 	}
-	return imported, nil
+	return imported, items, nil
 }
 
 // ImportWorlds seeds canonical storage from the renderer's pre-cutover array.
@@ -234,7 +220,13 @@ func (a *App) ImportWorlds(worlds []interface{}) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	return a.importDocuments(store, library.Worlds, worlds, "ImportWorlds")
+	imported, items, err := a.importDocuments(store, library.Worlds, worlds, "ImportWorlds")
+	if err == nil || len(items) > 0 {
+		if recordErr := a.recordWorldCutover("world", imported, items); recordErr != nil && err == nil {
+			err = recordErr
+		}
+	}
+	return imported, err
 }
 
 func (a *App) ImportScenarios(scenarios []interface{}) (int, error) {
@@ -242,7 +234,13 @@ func (a *App) ImportScenarios(scenarios []interface{}) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	return a.importDocuments(store, library.Scenarios, scenarios, "ImportScenarios")
+	imported, items, err := a.importDocuments(store, library.Scenarios, scenarios, "ImportScenarios")
+	if err == nil || len(items) > 0 {
+		if recordErr := a.recordWorldCutover("scenario", imported, items); recordErr != nil && err == nil {
+			err = recordErr
+		}
+	}
+	return imported, err
 }
 
 func (a *App) DeleteWorld(id string) error {

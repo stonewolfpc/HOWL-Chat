@@ -1,0 +1,198 @@
+[
+  {
+    "score12": 10,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user explicitly confirmed this training as canon fact."
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | temporary break does not impact narrative continuity or character lore."
+      },
+      "M3": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | contradicts m4; user previously denied prior knowledge of trainer."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | initial statement contradicts later claim regarding corvin meeting sable."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user preferences define communication style and pacing during sessions."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | uncertain status requires confirmation before storing uncertain birthday info."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 363,
+    "wall_s": 50.654,
+    "reasoning_chars": 934,
+    "run_code": "kzqpgvun",
+    "label": "qwen35-4b-think-rb256"
+  },
+  {
+    "score12": 12,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user explicitly confirmed this lore detail as canon fact for the character."
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | this is a temporary pause with no lasting impact on the session."
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | fire magic limitation defines the character's abilities and plot constraints effectively."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | conflicting memories require clarification to determine which narrative thread persists."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user preferences guide pacing, ensuring future interactions remain concise."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | marked as uncertain, so confirm validity before adding core character data."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 371,
+    "wall_s": 52.993,
+    "reasoning_chars": 957,
+    "run_code": "vhs9701u",
+    "label": "qwen35-4b-think-rb256"
+  },
+  {
+    "score12": 12,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user confirmed canon status of this specific training relationship."
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | occasional break status is transient and doesn't impact roleplay continuity."
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | core character abilities essential for ongoing gameplay interactions."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | contradictory information requires user clarification on timeline or intent."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user preferences guide pacing and interaction style during rp."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | uncertain canon status noted as 'maybe' needs user verification."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 619,
+    "wall_s": 88.751,
+    "reasoning_chars": 2046,
+    "run_code": "vller9bp",
+    "label": "qwen35-4b-think-rb512"
+  },
+  {
+    "score12": 9,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user explicitly confirmed this lore detail as canon fact for the character."
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 1,
+        "reason": " | real-world absence doesn't affect the story's continuity or character lore."
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | core character traits are essential for roleplay consistency during sessions."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | contradictory user statements require confirmation before updating conflicting memory records."
+      },
+      "M5": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | preferences should be verified to avoid overriding future style changes unintentionally."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | user uncertainty requires clarification if lore accuracy is prioritized over speculation."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 629,
+    "wall_s": 88.709,
+    "reasoning_chars": 2080,
+    "run_code": "bmsswywm",
+    "label": "qwen35-4b-think-rb512"
+  }
+]

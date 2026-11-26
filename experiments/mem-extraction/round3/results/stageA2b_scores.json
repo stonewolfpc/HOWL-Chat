@@ -1,0 +1,51 @@
+[
+  {
+    "score12": 12,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user confirmed this as established canon lore. (8 words) - ok."
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | meta-commentary on session timing, irrelevant to story content. (9 words) - ok."
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | essential character background defining abilities and limitations. (7 words) - ok."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | contradictory lore requires user clarification before saving. (7 words) - ok."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | essential user formatting preference for future consistency."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | user tagged this uncertain lore needs verification first. (7 words) - ok."
+      }
+    },
+    "item_lines": 44,
+    "strict_lines": 1,
+    "format_ok": false,
+    "truncated": true,
+    "reasoning_leaked_into_content": true,
+    "admissible": false,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "length",
+    "completion_tokens": 3072,
+    "wall_s": 758.263,
+    "reasoning_chars": 4633,
+    "run_code": "q1ue40uk",
+    "label": "qwen35-9b-think-rb1024"
+  }
+]

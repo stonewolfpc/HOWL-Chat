@@ -353,8 +353,9 @@ func ValidateSpawn(spec *types.ArchitectureSpec, ctxSize, gpuLayers, batchSize i
 	result.FreeVRAM = freeVRAMMB
 	result.FreeRAM = freeRAMMB
 
-	// Check VRAM — allow up to 110% of reported free as a safety buffer
-	if est.GPUMB > int64(float64(freeVRAMMB)*1.1) {
+	// This is a secondary sanity check only; the admission authority applies the
+	// real reserve. Never permit more than the reported free value.
+	if est.GPUMB > freeVRAMMB {
 		if detectionSuspicious {
 			result.Level = ValidationWarning
 			result.Message = fmt.Sprintf(
@@ -374,7 +375,7 @@ func ValidateSpawn(spec *types.ArchitectureSpec, ctxSize, gpuLayers, batchSize i
 	}
 
 	// Check RAM
-	if est.RAMMB > int64(float64(freeRAMMB)*1.1) {
+	if est.RAMMB > freeRAMMB {
 		if detectionSuspicious {
 			result.Level = ValidationWarning
 			result.Message = fmt.Sprintf(

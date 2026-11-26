@@ -1,0 +1,20 @@
+0.00.120.323 I srv  llama_server: initializing ...
+0.00.120.333 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.120.668 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.130.776 I srv    load_model: loading model 'C:\Users\StoneWolfPC\HOWL_Chat\experiments\lfm25-cpu\round2\models\Qwen3.5-0.8B-Q4_K_M.gguf'
+0.00.936.307 I cmn          init: llama threadpool init, n_threads = 8
+0.01.118.366 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 2048, kv_unified = 'false'
+0.01.126.910 I srv  server_run_i: model loaded
+0.01.126.918 I srv  server_on_li: listening on http://127.0.0.1:5099
+0.01.247.432 I slot get_availabl: id  0 | task -1 | selected slot by LRU, n_tokens = 0, t_last = -1
+0.01.247.485 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.04.633.609 I slot print_timing: id  0 | task 0 | n_gen =    100, tg =  32.07 t/s, tg_3s =  32.39 t/s
+0.07.667.969 I slot print_timing: id  0 | task 0 | n_gen =    199, tg =  32.35 t/s, tg_3s =  32.63 t/s
+0.10.689.566 I slot print_timing: id  0 | task 0 | n_gen =    299, tg =  32.59 t/s, tg_3s =  33.10 t/s
+0.13.715.650 I slot print_timing: id  0 | task 0 | n_gen =    396, tg =  32.46 t/s, tg_3s =  32.05 t/s
+0.13.835.999 I slot print_timing: id  0 | task 0 | prompt eval time =     299.01 ms /   228 tokens (    1.31 ms per token,   762.51 tokens per second)
+0.13.836.006 I slot print_timing: id  0 | task 0 |        eval time =   12289.47 ms /   400 tokens (   30.80 ms per token,    32.47 tokens per second)
+0.13.836.007 I slot print_timing: id  0 | task 0 |       total time =   12588.48 ms /   628 tokens
+0.13.836.007 I slot print_timing: id  0 | task 0 |    graphs reused =        397
+0.13.836.008 I slot print_timing: id  0 | task 0 |   graph reallocs =          2    /     0        (same size) / (changed size)
+0.13.836.047 I slot      release: id  0 | task 0 | stop processing: n_tokens = 627, truncated = 0

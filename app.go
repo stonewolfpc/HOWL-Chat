@@ -14,6 +14,7 @@ import (
 	"howl-chat/internal/host"
 	"howl-chat/internal/media"
 	"howl-chat/internal/registries"
+	"howl-chat/internal/resource"
 	appruntime "howl-chat/internal/runtime"
 )
 
@@ -41,6 +42,17 @@ type App struct {
 	characters  *characterstore.Store
 	characterMu sync.Mutex
 
+	// admission is the single reserve-aware gate every model start consults.
+	// The pointer is the process-wide authority in production; tests replace it
+	// with an isolated instance so they never consult live hardware.
+	admission *resource.Authority
+	// modelStartMu serializes the chat load decision and the stop/spawn that
+	// follows it, so two loads cannot both pass the same free-memory value.
+	modelStartMu sync.Mutex
+	// imageStartMu does the same for image loads, whose job manager can run
+	// several queued starts concurrently.
+	imageStartMu sync.Mutex
+
 	// Level 0 — application lifecycle and coordination (internal/host).
 	// The authority owns admission, shutdown sequencing, background joining,
 	// the active stream token and child-process supervision. It owns no domain
@@ -65,6 +77,19 @@ type App struct {
 	// model. App holds the owners and the Wails bindings, not the state.
 	audio  *media.Audio
 	images *media.Image
+	// imageReclaim is the resident image engine's post-generation policy. It
+	// only decides whether to recycle the already-admitted process; admission
+	// and placement remain with resource.Manager and sd.cpp respectively.
+	imageReclaim imageReclaimPolicy
+	// imageWorkflow is the active workflow's parent lease. It holds engine
+	// identity and the component claims retained across stages. Reclamation is
+	// refused while it is active; it is cleared before the terminal decision.
+	imageWorkflow *resource.WorkflowLease
+	// imageWorkflowRun is the cancellable execution scope for the active
+	// workflow. It is separate from imageStartMu so CancelImageWorkflow can
+	// request cancellation without waiting for the workflow to finish.
+	imageWorkflowRunMu sync.Mutex
+	imageWorkflowRun   *imageWorkflowExecution
 
 	// registries is the one handle to the registry authorities: registered
 	// model directories/types, content roots, the inventory snapshot, the
@@ -72,6 +97,14 @@ type App struct {
 	// cache. The state lives in those domain packages; App holds the composition
 	// owner and the Wails bindings, not seven separate fields.
 	registries *registries.Set
+
+	// Content-library readiness (app-content-roots.go). These fields record what
+	// the filesystem actually allows, as measured by the provisioning probe; the
+	// content-library registry remains the authority for which roots exist.
+	contentMu     sync.Mutex
+	contentProbes map[string]ProvisionReport
+	contentInit   map[string]ProvisionReport
+	contentOps    *contentFSOps // tests inject failing filesystem operations
 
 	// loaderDiagnosticsDir overrides where model-load failure records are
 	// written. Empty means <project root>/logs.
@@ -86,6 +119,10 @@ type App struct {
 	// event payloads; App supplies the log location, the upload preference and
 	// the Wails event transport (app-errors.go).
 	diagnostics *diagnostics.Owner
+	// diagnosticsFallbackErr records why the configured diagnostics log could not
+	// be opened, when startup fell back to a temporary location. It is reported
+	// once so an unwritable log is a visible limitation, not a silent one.
+	diagnosticsFallbackErr error
 }
 
 // NewApp builds the application and runs its ordered composition.
@@ -99,6 +136,7 @@ func NewApp() *App {
 	app := &App{
 		engine:       appruntime.NewEngine(nil, nil),
 		conversation: chat.NewActiveConversation(nil),
+		admission:    resource.DefaultAuthority(),
 	}
 	// Children of this process are assigned to the application job at start.
 	// Crash cleanup relies on KILL_ON_JOB_CLOSE, not on matching executable
@@ -123,6 +161,12 @@ func (a *App) startup(ctx context.Context) {
 	lifecycle := a.level0().Lifecycle
 	fmt.Println("[lifecycle] webview attached: boot", lifecycle.Epoch(), "ready", lifecycle.Ready())
 	startupMark("OnStartup: init complete")
+
+	// The startup log is optional: if it cannot be written, say so and keep
+	// going. Content storage is not optional, so its state is provisioned next
+	// and reported per library (app-content-roots.go); neither step fails a boot.
+	a.verifyOptionalStartupLog()
+	a.initializeContentRoots()
 
 	// Model scanning is background work: the window is already visible and the
 	// user can interact, so a slow or unplugged model directory must never

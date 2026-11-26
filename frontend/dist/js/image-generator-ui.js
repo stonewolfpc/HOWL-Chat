@@ -22,7 +22,6 @@ function saveState() {
         scheduler: document.getElementById('ig-scheduler').value,
         cfg:       document.getElementById('ig-cfg').value,
         guidance:  document.getElementById('ig-guidance').value,
-        slgScale:  document.getElementById('ig-slg-scale').value,
         eta:       document.getElementById('ig-eta').value,
         batch:     document.getElementById('ig-batch').value,
         clipSkip:  document.getElementById('ig-clip-skip').value,
@@ -74,6 +73,10 @@ function saveState() {
         upscaleSeed: document.getElementById('ig-upscale-seed')?.value || '-1',
         ctrlModel: document.getElementById('ig-control-model').value,
         ctrlStrength: document.getElementById('ig-control-strength').value,
+        ipModel: document.getElementById('ig-ip-model')?.value || '',
+        ipVision: document.getElementById('ig-ip-vision')?.value || '',
+        ipStrength: document.getElementById('ig-ip-strength')?.value || '0.7',
+        ipVisionCPU: document.getElementById('ig-ip-vision-cpu')?.checked || false,
         videoFrames: document.getElementById('ig-video-frames')?.value,
         videoFPS:    document.getElementById('ig-video-fps')?.value,
         prediction:  document.getElementById('ig-prediction')?.value,
@@ -82,22 +85,16 @@ function saveState() {
         flowShift:   document.getElementById('ig-flow-shift')?.value,
         vaeTileOverlap: document.getElementById('ig-vae-tile-overlap')?.value,
         disableMetadata: document.getElementById('ig-disable-metadata')?.checked,
-        skipLayerStart: document.getElementById('ig-skip-layer-start')?.value,
-        skipLayerEnd:   document.getElementById('ig-skip-layer-end')?.value,
-        highNoiseSteps: document.getElementById('ig-high-noise-steps')?.value,
-        highNoiseCfg:   document.getElementById('ig-high-noise-cfg')?.value,
-        highNoiseGuidance: document.getElementById('ig-high-noise-guidance')?.value,
-        highNoiseSlg:   document.getElementById('ig-high-noise-slg')?.value,
-        highNoiseEta:   document.getElementById('ig-high-noise-eta')?.value,
-        highNoiseSkipStart: document.getElementById('ig-high-noise-skip-start')?.value,
-        highNoiseSkipEnd:   document.getElementById('ig-high-noise-skip-end')?.value,
         backend:      document.getElementById('ig-backend')?.value,
         paramsBackend: document.getElementById('ig-params-backend')?.value,
         vaeTiling:    document.getElementById('ig-vae-tiling')?.checked,
         temporalTiling: document.getElementById('ig-temporal-tiling')?.checked,
         circular:     document.getElementById('ig-circular')?.checked,
-        flashAttention: document.getElementById('ig-fa')?.checked,
+        flashAttentionMode: document.getElementById('ig-fa')?.value || 'auto',
         offloadToCPU: document.getElementById('ig-offload-cpu')?.checked,
+        // Engine startup flags are part of the same user intent; without this
+        // spread they were restored from a document that never contained them.
+        ...readImageEngineFlags(),
         // Video-specific
         videoFormat: document.getElementById('ig-video-format')?.value || 'mp4',
         videoSeedMode: document.getElementById('ig-video-seed-mode')?.value || 'fixed',
@@ -153,7 +150,6 @@ async function restoreState() {
         if (s.scheduler) document.getElementById('ig-scheduler').value  = s.scheduler;
         if (s.cfg)       document.getElementById('ig-cfg').value       = s.cfg;
         if (s.guidance)  document.getElementById('ig-guidance').value  = s.guidance;
-        if (s.slgScale)  document.getElementById('ig-slg-scale').value  = s.slgScale;
         if (s.eta)       document.getElementById('ig-eta').value       = s.eta;
         if (s.batch)     document.getElementById('ig-batch').value       = s.batch;
         if (s.clipSkip)  document.getElementById('ig-clip-skip').value   = s.clipSkip;
@@ -219,6 +215,16 @@ async function restoreState() {
         if (s.upscaleSeed !== undefined && document.getElementById('ig-upscale-seed')) document.getElementById('ig-upscale-seed').value = s.upscaleSeed;
         if (s.ctrlModel) document.getElementById('ig-control-model').value = s.ctrlModel;
         if (s.ctrlStrength) document.getElementById('ig-control-strength').value = s.ctrlStrength;
+        const ipModelEl = document.getElementById('ig-ip-model');
+        if (ipModelEl && s.ipModel !== undefined && [...ipModelEl.options].some(o => o.value === s.ipModel)) ipModelEl.value = s.ipModel;
+        const ipVisionEl = document.getElementById('ig-ip-vision');
+        if (ipVisionEl && s.ipVision !== undefined && [...ipVisionEl.options].some(o => o.value === s.ipVision)) ipVisionEl.value = s.ipVision;
+        if (s.ipStrength !== undefined && document.getElementById('ig-ip-strength')) {
+            document.getElementById('ig-ip-strength').value = s.ipStrength;
+            const label = document.getElementById('ig-ip-strength-val');
+            if (label) label.textContent = Number(s.ipStrength).toFixed(2);
+        }
+        if (s.ipVisionCPU !== undefined && document.getElementById('ig-ip-vision-cpu')) document.getElementById('ig-ip-vision-cpu').checked = !!s.ipVisionCPU;
         if (s.videoFrames && document.getElementById('ig-video-frames')) document.getElementById('ig-video-frames').value = s.videoFrames;
         if (s.videoFPS && document.getElementById('ig-video-fps')) document.getElementById('ig-video-fps').value = s.videoFPS;
         if (s.prediction !== undefined && document.getElementById('ig-prediction')) document.getElementById('ig-prediction').value = s.prediction;
@@ -227,21 +233,15 @@ async function restoreState() {
         if (s.flowShift !== undefined && document.getElementById('ig-flow-shift')) document.getElementById('ig-flow-shift').value = s.flowShift;
         if (s.vaeTileOverlap !== undefined && document.getElementById('ig-vae-tile-overlap')) document.getElementById('ig-vae-tile-overlap').value = s.vaeTileOverlap;
         if (s.disableMetadata !== undefined && document.getElementById('ig-disable-metadata')) document.getElementById('ig-disable-metadata').checked = s.disableMetadata;
-        if (s.skipLayerStart !== undefined && document.getElementById('ig-skip-layer-start')) document.getElementById('ig-skip-layer-start').value = s.skipLayerStart;
-        if (s.skipLayerEnd !== undefined && document.getElementById('ig-skip-layer-end')) document.getElementById('ig-skip-layer-end').value = s.skipLayerEnd;
-        if (s.highNoiseSteps !== undefined && document.getElementById('ig-high-noise-steps')) document.getElementById('ig-high-noise-steps').value = s.highNoiseSteps;
-        if (s.highNoiseCfg !== undefined && document.getElementById('ig-high-noise-cfg')) document.getElementById('ig-high-noise-cfg').value = s.highNoiseCfg;
-        if (s.highNoiseGuidance !== undefined && document.getElementById('ig-high-noise-guidance')) document.getElementById('ig-high-noise-guidance').value = s.highNoiseGuidance;
-        if (s.highNoiseSlg !== undefined && document.getElementById('ig-high-noise-slg')) document.getElementById('ig-high-noise-slg').value = s.highNoiseSlg;
-        if (s.highNoiseEta !== undefined && document.getElementById('ig-high-noise-eta')) document.getElementById('ig-high-noise-eta').value = s.highNoiseEta;
-        if (s.highNoiseSkipStart !== undefined && document.getElementById('ig-high-noise-skip-start')) document.getElementById('ig-high-noise-skip-start').value = s.highNoiseSkipStart;
-        if (s.highNoiseSkipEnd !== undefined && document.getElementById('ig-high-noise-skip-end')) document.getElementById('ig-high-noise-skip-end').value = s.highNoiseSkipEnd;
         if (s.backend !== undefined && document.getElementById('ig-backend')) document.getElementById('ig-backend').value = s.backend;
         if (s.paramsBackend !== undefined && document.getElementById('ig-params-backend')) document.getElementById('ig-params-backend').value = s.paramsBackend;
         if (s.vaeTiling !== undefined && document.getElementById('ig-vae-tiling')) document.getElementById('ig-vae-tiling').checked = s.vaeTiling;
         if (s.temporalTiling !== undefined && document.getElementById('ig-temporal-tiling')) document.getElementById('ig-temporal-tiling').checked = s.temporalTiling;
         if (s.circular !== undefined && document.getElementById('ig-circular')) document.getElementById('ig-circular').checked = s.circular;
-        if (s.flashAttention !== undefined && document.getElementById('ig-fa')) document.getElementById('ig-fa').checked = s.flashAttention;
+        const faMode = s.flashAttentionMode !== undefined
+            ? s.flashAttentionMode
+            : (s.flashAttention === undefined ? 'auto' : (s.flashAttention ? 'on' : 'auto'));
+        if (document.getElementById('ig-fa')) document.getElementById('ig-fa').value = faMode;
         if (s.offloadToCPU !== undefined && document.getElementById('ig-offload-cpu')) document.getElementById('ig-offload-cpu').checked = s.offloadToCPU;
         // Video restore
         if (s.videoFormat !== undefined && document.getElementById('ig-video-format')) document.getElementById('ig-video-format').value = s.videoFormat;
@@ -282,16 +282,11 @@ async function restoreState() {
 
 function updateLabels() {
     const ids = ['ig-steps', 'ig-cfg', 'ig-strength', 'ig-strength-inpaint', 'ig-outpaint-strength',
-                 'ig-upscale-denoise', 'ig-guidance', 'ig-slg-scale', 'ig-eta',
                  'ig-control-strength', 'ig-video-frames', 'ig-video-fps',
                  'ig-style-strength', 'ig-latent-noise', 'ig-mask-blur',
                  'ig-brush-hardness', 'ig-mask-blur-inpaint', 'ig-mask-feather',
                  'ig-style-strength-inpaint', 'ig-latent-noise-inpaint',
                  'ig-style-strength-outpaint', 'ig-latent-noise-outpaint',
-                 'ig-flow-shift', 'ig-skip-layer-start', 'ig-skip-layer-end',
-                 'ig-vae-tile-overlap', 'ig-high-noise-steps', 'ig-high-noise-cfg',
-                 'ig-high-noise-guidance', 'ig-high-noise-slg', 'ig-high-noise-eta',
-                 'ig-high-noise-skip-start', 'ig-high-noise-skip-end',
                  'ig-upscale-steps', 'ig-upscale-cfg',
                  'ig-video-motion', 'ig-video-denoise',
                  'ig-cfg-rescale', 'ig-face-restore',
@@ -302,7 +297,6 @@ function updateLabels() {
         if (slider && valEl) {
             let val = slider.value;
             if (id === 'ig-flow-shift' && parseFloat(val) === 0) val = 'Auto';
-            if (id === 'ig-high-noise-steps' && parseInt(val, 10) === -1) val = 'Auto';
             valEl.textContent = val;
         }
     });
@@ -314,16 +308,11 @@ function updateLabels() {
 function bindEvents() {
     // Sliders
     const sliderIds = ['ig-steps', 'ig-cfg', 'ig-strength', 'ig-strength-inpaint', 'ig-outpaint-strength',
-                       'ig-upscale-denoise', 'ig-guidance', 'ig-slg-scale', 'ig-eta',
                        'ig-control-strength', 'ig-video-frames', 'ig-video-fps', 'ig-brush-size',
                        'ig-style-strength', 'ig-latent-noise', 'ig-mask-blur',
                        'ig-brush-hardness', 'ig-mask-blur-inpaint', 'ig-mask-feather',
                        'ig-style-strength-inpaint', 'ig-latent-noise-inpaint',
                        'ig-style-strength-outpaint', 'ig-latent-noise-outpaint',
-                       'ig-flow-shift', 'ig-skip-layer-start', 'ig-skip-layer-end',
-                       'ig-vae-tile-overlap', 'ig-high-noise-steps', 'ig-high-noise-cfg',
-                       'ig-high-noise-guidance', 'ig-high-noise-slg', 'ig-high-noise-eta',
-                       'ig-high-noise-skip-start', 'ig-high-noise-skip-end',
                        'ig-upscale-steps', 'ig-upscale-cfg',
                        'ig-video-motion', 'ig-video-denoise',
                        'ig-cfg-rescale', 'ig-face-restore',
@@ -336,7 +325,6 @@ function bindEvents() {
                 if (valEl) {
                     let val = slider.value;
                     if (id === 'ig-flow-shift' && parseFloat(val) === 0) val = 'Auto';
-                    if (id === 'ig-high-noise-steps' && parseInt(val, 10) === -1) val = 'Auto';
                     valEl.textContent = val;
                 }
                 saveState();
@@ -450,18 +438,9 @@ function bindEvents() {
             
             const range = modelRanges[family] || modelRanges['default'];
             
-            // Try to get VRAM info to adjust for available memory
-            let vramGB = 8; // Conservative default
-            if (window.go?.main?.App?.GetGPUInfo) {
-                try {
-                    const gpuInfo = window.go.main.App.GetGPUInfo();
-                    if (gpuInfo && gpuInfo.TotalMemory) {
-                        vramGB = Math.floor(gpuInfo.TotalMemory / 1024); // Convert MB to GB
-                    }
-                } catch (e) {
-                    console.warn('Failed to get GPU info, using default VRAM');
-                }
-            }
+            // Resolution presets are family-based. Actual memory admission is
+            // decided by the backend authority, not inferred from a GPU query.
+            const vramGB = 8; // conservative preset baseline
             
             // Adjust max resolution based on VRAM
             const vramAdjustments = {
@@ -537,6 +516,7 @@ function bindEvents() {
      'ig-upscale-prompt', 'ig-upscale-negative', 'ig-upscale-sampler', 'ig-upscale-seed',
      'ig-video-frames', 'ig-video-fps', 'ig-video-format', 'ig-video-seed-mode', 'ig-video-loop',
      'ig-cfg-rescale', 'ig-face-restore',
+     'ig-ip-model', 'ig-ip-vision', 'ig-ip-strength', 'ig-ip-vision-cpu',
      'ig-s-churn', 'ig-s-tmin', 'ig-s-tmax', 'ig-s-noise'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener('change', saveState);
@@ -574,6 +554,8 @@ function bindEvents() {
                 const context = uploadInput.dataset.context;
                 if (context === 'ig-upload-controlnet') {
                     handleControlNetUpload(e.target.files[0]);
+                } else if (context === 'ig-upload-ip') {
+                    handleIPAdapterUpload(e.target.files[0]);
                 } else if (context === 'ig-upload-mini-video-end') {
                     handleVideoEndUpload(e.target.files[0]);
                 } else if (context === 'ig-upload-mini-img2img-mask') {
@@ -596,9 +578,41 @@ function bindEvents() {
         });
     }
 
+    const ipStrength = document.getElementById('ig-ip-strength');
+    if (ipStrength) {
+        ipStrength.addEventListener('input', () => {
+            const label = document.getElementById('ig-ip-strength-val');
+            if (label) label.textContent = Number(ipStrength.value).toFixed(2);
+        });
+    }
+    const clearIP = document.getElementById('ig-clear-ip');
+    if (clearIP) {
+        clearIP.addEventListener('click', () => {
+            window.ipAdapterImageData = null;
+            const zone = document.getElementById('ig-upload-ip');
+            if (zone) {
+                zone.classList.remove('ig-uploaded');
+                const span = zone.querySelector('span');
+                if (span) span.textContent = 'Drop reference image or click';
+            }
+            const status = document.getElementById('ig-ip-status');
+            if (status) status.textContent = '';
+        });
+    }
+
     // Mini upload zones in Mode Tools panel
     document.querySelectorAll('.ig-upload-mini').forEach(zone => {
-        zone.addEventListener('click', () => {
+        zone.addEventListener('click', async () => {
+            // The packaged WebView2 host uses an ownerless native chooser for the
+            // IP-Adapter reference. WebView2's HTML file chooser disables the
+            // Wails window and can end in a fatal Chromium.Focus exit. The
+            // browser harness keeps the HTML input path, which is its real
+            // supported surface.
+            if (zone.id === 'ig-upload-ip' && !window.__HOWL_HARNESS__ &&
+                window.go?.main?.App?.OpenIPAdapterImagePicker) {
+                await pickIPAdapterImageNatively();
+                return;
+            }
             if (uploadInput) {
                 uploadInput.dataset.context = zone.id;
                 uploadInput.click();
@@ -1231,6 +1245,46 @@ function handleVideoEndUpload(file) {
         setStatus('Video end frame loaded.');
     };
     reader.readAsDataURL(file);
+}
+
+// --- IP-Adapter Reference Upload Handler ---
+function applyIPAdapterData(dataUrl) {
+    if (!dataUrl) return;
+    const commaIdx = dataUrl.indexOf(',');
+    window.ipAdapterImageData = commaIdx >= 0 ? dataUrl.slice(commaIdx + 1) : dataUrl;
+    const zone = document.getElementById('ig-upload-ip');
+    if (zone) {
+        zone.classList.add('ig-uploaded');
+        const span = zone.querySelector('span');
+        if (span) span.textContent = 'Reference image loaded';
+    }
+    const status = document.getElementById('ig-ip-status');
+    if (status) status.textContent = 'Reference ready — it applies to base and refine stages.';
+    setStatus('IP-Adapter reference ready.');
+}
+
+function handleIPAdapterUpload(file) {
+    if (!file.type.startsWith('image/')) {
+        setStatus('Please upload an image file for the IP-Adapter reference.');
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => applyIPAdapterData(e.target.result);
+    reader.readAsDataURL(file);
+}
+
+async function pickIPAdapterImageNatively() {
+    try {
+        const dataUrl = await window.go.main.App.OpenIPAdapterImagePicker();
+        if (!dataUrl) {
+            setStatus('IP-Adapter reference selection cancelled.');
+            return;
+        }
+        applyIPAdapterData(dataUrl);
+    } catch (err) {
+        const message = err && err.message ? err.message : String(err);
+        setStatus('IP-Adapter reference selection failed: ' + message);
+    }
 }
 
 // --- ControlNet Upload Handler ---

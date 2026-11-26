@@ -141,7 +141,7 @@ async function loadAvailableLorebooks() {
 
     try {
         const ss = window.scenarioState;
-        const lorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]')
+        const lorebooks = (window.LorebookRepo ? window.LorebookRepo.all() : [])
             .map(ss.normalizeStoredLorebook).filter(Boolean);
 
         dropdownItems.innerHTML = '';
@@ -177,7 +177,7 @@ function searchScenarioLorebooks(searchTerm) {
     const sortVal = document.querySelector('#scenario-lorebook-dropdown .world-dropdown-sort')?.value || 'name:asc';
     const [field, dir] = sortVal.split(':');
 
-    const all = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]')
+    const all = (window.LorebookRepo ? window.LorebookRepo.all() : [])
         .map(ss.normalizeStoredLorebook).filter(Boolean);
     const term = searchTerm.toLowerCase();
     let filtered = all.filter(l => {

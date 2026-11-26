@@ -6,13 +6,20 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"howl-chat/internal/audio/tts"
 	"howl-chat/internal/audio/types"
 	"howl-chat/internal/paths"
+	"howl-chat/internal/process"
 )
+
+// voicesTimeout bounds the synchronous enumeration path. The interface's
+// GetVoices has no context; VoicesContext carries a caller scope instead.
+const voicesTimeout = 15 * time.Second
 
 // Synthesizer implements TTSSynthesizer using Kokoro ONNX via Python bridge.
 type Synthesizer struct {
@@ -23,6 +30,8 @@ type Synthesizer struct {
 	voicesPath string
 	configPath string
 	outputDir  string
+	registry   *process.Registry
+	childSeq   atomic.Uint64
 
 	// Test seams for interpreter discovery, process execution, and output reads.
 	resolvePython func() (string, error)
@@ -30,10 +39,16 @@ type Synthesizer struct {
 	readFile      func(string) ([]byte, error)
 }
 
-// New returns a Kokoro synthesizer instance.
-func New() *Synthesizer {
+// New returns a Kokoro synthesizer instance. A nil registry falls back to the
+// process-wide one so ownership is never optional.
+func New(registries ...*process.Registry) *Synthesizer {
+	var registry *process.Registry
+	if len(registries) > 0 {
+		registry = registries[0]
+	}
 	return &Synthesizer{
 		BaseSynthesizer: tts.NewBaseSynthesizer(types.TTSKokoro),
+		registry:        registry,
 	}
 }
 
@@ -201,17 +216,32 @@ func (s *Synthesizer) SynthesizeStream(ctx context.Context, req types.SynthesisR
 	return nil
 }
 
-// GetVoices returns available voices from the voices archive.
+// GetVoices returns available voices from the voices archive. The interface has
+// no context, so this path is bounded rather than cancellable; callers that
+// need cancellation use VoicesContext.
 func (s *Synthesizer) GetVoices() []types.Voice {
+	ctx, cancel := context.WithTimeout(context.Background(), voicesTimeout)
+	defer cancel()
+	voices, err := s.VoicesContext(ctx)
+	if err != nil {
+		return nil
+	}
+	return voices
+}
+
+// VoicesContext enumerates voices as a managed, cancellable operation: the
+// child is job-owned and registered, and cancellation terminates its tree and
+// waits for exit before returning.
+func (s *Synthesizer) VoicesContext(ctx context.Context) ([]types.Voice, error) {
 	s.LockCalls()
 	defer s.UnlockCalls()
 
 	if s.voicesPath == "" {
-		return nil
+		return nil, nil
 	}
-	voices, err := s.listVoices()
+	voices, err := s.listVoices(ctx)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	result := make([]types.Voice, 0, len(voices))
 	for _, v := range voices {
@@ -221,7 +251,7 @@ func (s *Synthesizer) GetVoices() []types.Voice {
 			Language: "en",
 		})
 	}
-	return result
+	return result, nil
 }
 
 // SupportsSSML reports SSML support.
@@ -252,42 +282,70 @@ func (s *Synthesizer) runKokoro(ctx context.Context, text, voice string, speed f
 		return err
 	}
 
-	cmd := exec.CommandContext(ctx, s.pythonPath,
-		s.scriptPath,
-		"--text", text,
-		"--voice", voice,
-		"--speed", fmt.Sprintf("%.2f", speed),
-		"--output", outPath,
-		"--model", s.modelPath,
-		"--voices", s.voicesPath,
-		"--config", s.configPath,
-	)
-	output, err := cmd.CombinedOutput()
+	child, err := process.StartChild(s.registry, process.ChildSpec{
+		Role:     process.RoleTTSChild,
+		Instance: "kokoro|" + s.modelPath + "|" + strconv.FormatUint(s.childSeq.Add(1), 10),
+		Path:     s.pythonPath,
+		Args:     args,
+		Capture:  true,
+	})
 	if err != nil {
 		return types.NewAudioError(
 			types.ErrCodeSynthesisFailed,
-			fmt.Sprintf("kokoro synthesis failed: %s", strings.TrimSpace(string(output))),
+			fmt.Sprintf("kokoro could not be started under ownership: %v", err),
+			err,
+		)
+	}
+	if err := child.Wait(ctx, process.DefaultGrace); err != nil {
+		return types.NewAudioError(
+			types.ErrCodeSynthesisFailed,
+			fmt.Sprintf("kokoro synthesis failed: %v: %s", err, strings.TrimSpace(child.Output())),
 			err,
 		)
 	}
 	return nil
 }
 
-func (s *Synthesizer) listVoices() ([]string, error) {
+func (s *Synthesizer) listVoices(ctx context.Context) ([]string, error) {
 	args := []string{s.scriptPath, "--list-voices", "--voices", s.voicesPath}
-	var output []byte
-	var err error
 	if s.runCommand != nil {
-		output, err = s.runCommand(context.Background(), s.pythonPath, args, "")
-	} else {
-		cmd := exec.Command(s.pythonPath, args...)
-		output, err = cmd.Output()
+		output, err := s.runCommand(ctx, s.pythonPath, args, "")
+		if err != nil {
+			return nil, err
+		}
+		return splitVoiceLines(output), nil
 	}
+
+	child, err := process.StartChild(s.registry, process.ChildSpec{
+		Role:     process.RoleTTSChild,
+		Instance: "kokoro-voices|" + s.voicesPath + "|" + strconv.FormatUint(s.childSeq.Add(1), 10),
+		Path:     s.pythonPath,
+		Args:     args,
+		Capture:  true,
+	})
 	if err != nil {
-		return nil, err
+		return nil, types.NewAudioError(types.ErrCodeModelLoadFailed, "kokoro voice enumeration could not start under ownership", err)
 	}
-	lines := strings.Split(strings.TrimSpace(string(output)), "\n")
-	return lines, nil
+	if err := child.Wait(ctx, process.DefaultGrace); err != nil {
+		return nil, types.NewAudioError(types.ErrCodeModelLoadFailed,
+			fmt.Sprintf("kokoro voice enumeration failed: %v: %s", err, strings.TrimSpace(child.Output())), err)
+	}
+	return splitVoiceLines([]byte(child.Output())), nil
+}
+
+func splitVoiceLines(output []byte) []string {
+	text := strings.TrimSpace(string(output))
+	if text == "" {
+		return nil
+	}
+	lines := strings.Split(text, "\n")
+	out := make([]string, 0, len(lines))
+	for _, line := range lines {
+		if trimmed := strings.TrimSpace(line); trimmed != "" {
+			out = append(out, trimmed)
+		}
+	}
+	return out
 }
 
 func (s *Synthesizer) readOutput(path string) ([]byte, error) {

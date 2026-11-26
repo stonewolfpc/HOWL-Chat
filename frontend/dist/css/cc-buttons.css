@@ -59,3 +59,14 @@
     border-color: var(--border-primary);
     box-shadow: none;
 }
+
+/* Speaker playback in progress: same emphasis as the composer TTS button. */
+.bubble-button.playing {
+    background: var(--theme-glow);
+    border-color: var(--theme-color);
+    box-shadow: 0 0 8px var(--theme-glow);
+}
+
+.bubble-button.playing svg {
+    stroke: var(--theme-color);
+}

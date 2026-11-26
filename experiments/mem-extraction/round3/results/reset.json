@@ -1,0 +1,58 @@
+{
+  "label": "qwen35-4b-nonthink",
+  "jobs": [
+    {
+      "name": "A1",
+      "erase_ms": NaN,
+      "case": "C03",
+      "content": "C1 | KEEP | Sable is a fire mage trained at Ossary who burns on both forearms from her first casting attempt and has a deep-seated fear of swimming due to never having learned it. | This establishes core character traits, background history, and a specific phobia that will influence future roleplay interactions.",
+      "reasoning_chars": 0,
+      "cache_n": 0,
+      "prompt_n": 207,
+      "ttft_s": 0.92,
+      "wall_s": 9.83,
+      "finish": "stop"
+    },
+    {
+      "name": "B_adversarial",
+      "erase_ms": NaN,
+      "case": "C17",
+      "content": "NONE",
+      "reasoning_chars": 0,
+      "cache_n": 0,
+      "prompt_n": 239,
+      "ttft_s": 0.86,
+      "wall_s": 1.008,
+      "finish": "stop"
+    },
+    {
+      "name": "A2",
+      "erase_ms": NaN,
+      "case": "C03",
+      "content": "C1 | KEEP | Sable is a fire mage trained at Ossary who burns on both forearms from her first casting attempt and has a deep-seated fear of swimming due to never having learned it. | This establishes core character traits, background history, and a specific phobia that will influence future roleplay interactions.",
+      "reasoning_chars": 0,
+      "cache_n": 0,
+      "prompt_n": 207,
+      "ttft_s": 0.857,
+      "wall_s": 9.775,
+      "finish": "stop"
+    },
+    {
+      "name": "A_fresh",
+      "erase_ms": 0.0,
+      "case": "C03",
+      "content": "C1 | KEEP | Sable is a fire mage trained at Ossary who burns on both forearms from her first casting attempt and has a deep-seated fear of swimming due to never having learned it. | This establishes core character traits, background history, and a specific phobia that will influence future roleplay interactions.",
+      "reasoning_chars": 0,
+      "cache_n": 0,
+      "prompt_n": 207,
+      "ttft_s": 0.916,
+      "wall_s": 9.792,
+      "finish": "stop"
+    }
+  ],
+  "erase_error": "<HTTPError 501: 'Not Implemented'>",
+  "erase_supported": false,
+  "a1_equals_a2": true,
+  "a1_equals_fresh": true,
+  "cache_reused_after_erase": false
+}

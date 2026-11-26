@@ -16,15 +16,14 @@ let modelSettings = {
     batch_size: 512,
     gpu_layers: 0,
     context_size: 4096,
-    kv_cache_size: 4096,
-    kv_cache_type: 'standard',
+    kv_cache_type: 'f16',
 
     // Performance Settings
     rope_mode: 'auto',
     rope_factor: 1.0,
     rope_base: 0,
     tensor_split: 0,
-    flash_attention: false,
+    flash_attention_mode: 'auto',
     offload_kqv: true,
     use_mmap: true,
     use_mlock: false,
@@ -92,7 +91,6 @@ function initSliderValuePairs() {
         { slider: 'thread-count', value: 'thread-count-value', setting: 'threads' },
         { slider: 'batch-size', value: 'batch-size-value', setting: 'batch_size' },
         { slider: 'gpu-layers', value: 'gpu-layers-value', setting: 'gpu_layers' },
-        { slider: 'kv-cache-size', value: 'kv-cache-size-value', setting: 'kv_cache_size' },
         { slider: 'rope-factor', value: 'rope-factor-value', setting: 'rope_factor' },
         { slider: 'tensor-split', value: 'tensor-split-value', setting: 'tensor_split' },
         { slider: 'max-context', value: 'max-context-value', setting: 'context_size' }
@@ -137,6 +135,7 @@ function initDropdowns() {
         { id: 'model-family', setting: 'model_family' },
         { id: 'model-variant', setting: 'model_variant' },
         { id: 'kv-cache-type', setting: 'kv_cache_type' },
+        { id: 'flash-attention-mode', setting: 'flash_attention_mode' },
         { id: 'rope-scaling-mode', setting: 'rope_mode' },
         { id: 'context-rollover-mode', setting: 'context_rollover_mode' },
         { id: 'prompt-template', setting: 'prompt_template' },
@@ -175,6 +174,89 @@ function initTextInputs() {
     });
 }
 
+// The KV location select is a boolean in the engine (offload_kqv). Keeping the
+// mapping here means the saved document still has one authoritative key.
+function initKVLocationControl() {
+    const element = document.getElementById('kv-cache-location');
+    if (!element) return;
+    element.addEventListener('change', function () {
+        modelSettings.offload_kqv = this.value === 'gpu';
+        saveModelSettings();
+    });
+}
+
+// Migrate values written by older builds before the UI reads them. The old KV
+// size duplicated the context control and was never sent; the old KV type
+// offered kernel names the engine does not accept as cache types.
+function normalizeModelSettings() {
+    if (!['f16', 'q8_0', 'q4_0'].includes(modelSettings.kv_cache_type)) {
+        modelSettings.kv_cache_type = 'f16';
+    }
+    if (!['auto', 'on', 'off'].includes(modelSettings.flash_attention_mode)) {
+        modelSettings.flash_attention_mode = modelSettings.flash_attention ? 'on' : 'auto';
+    }
+    delete modelSettings.kv_cache_size;
+    delete modelSettings.flash_attention;
+}
+
+// An option the shipped binary does not advertise becomes unavailable with a
+// visible reason instead of a control that silently does nothing.
+function markSettingUnavailable(element, reason) {
+    if (!element) return;
+    element.disabled = true;
+    element.title = reason;
+    const card = element.closest('.setting-card');
+    if (card && !card.querySelector('[data-capability-reason]')) {
+        const note = document.createElement('div');
+        note.className = 'setting-detail warning';
+        note.setAttribute('data-capability-reason', 'true');
+        note.textContent = reason;
+        card.appendChild(note);
+    }
+}
+
+async function applyLlamaCapabilityGates() {
+    const app = window.go?.main?.App;
+    if (typeof app?.GetLlamaCapabilities !== 'function') return;
+    let caps;
+    try {
+        caps = await app.GetLlamaCapabilities();
+    } catch (e) {
+        console.warn('[model-settings] llama capability probe unavailable:', e);
+        return;
+    }
+    const supports = caps?.supports || {};
+    const build = caps?.version ? `this llama-server (${caps.version})` : 'the shipped llama-server';
+
+    const flash = document.getElementById('flash-attention-mode');
+    if (flash && !supports.flash_attn) {
+        markSettingUnavailable(flash, `${build} does not advertise --flash-attn; Flash Attention cannot be selected.`);
+    }
+
+    const kvType = document.getElementById('kv-cache-type');
+    if (kvType && (!supports.cache_type_k || !supports.cache_type_v)) {
+        for (const option of kvType.options) {
+            if (option.value !== 'f16') {
+                option.disabled = true;
+            }
+        }
+        kvType.title = `${build} does not advertise both --cache-type-k and --cache-type-v; only the standard f16 cache is available.`;
+        const card = kvType.closest('.setting-card');
+        if (card && !card.querySelector('[data-capability-reason]')) {
+            const note = document.createElement('div');
+            note.className = 'setting-detail warning';
+            note.setAttribute('data-capability-reason', 'true');
+            note.textContent = kvType.title;
+            card.appendChild(note);
+        }
+    }
+
+    const kvLocation = document.getElementById('kv-cache-location');
+    if (kvLocation && !supports.kv_offload && !supports.no_kv_offload) {
+        markSettingUnavailable(kvLocation, `${build} does not advertise KV offload control; the engine default is used.`);
+    }
+}
+
 // Save model settings through the settings seam. The seam writes the backend
 // document before any renderer state changes, so there is no second path.
 async function saveModelSettings() {
@@ -192,6 +274,7 @@ async function loadModelSettings() {
     if (settings && Object.keys(settings).length > 0) {
         modelSettings = { ...modelSettings, ...settings };
     }
+    normalizeModelSettings();
     updateUIFromSettings();
 }
 
@@ -202,7 +285,6 @@ function updateUIFromSettings() {
         { slider: 'thread-count', value: 'thread-count-value', setting: 'threads' },
         { slider: 'batch-size', value: 'batch-size-value', setting: 'batch_size' },
         { slider: 'gpu-layers', value: 'gpu-layers-value', setting: 'gpu_layers' },
-        { slider: 'kv-cache-size', value: 'kv-cache-size-value', setting: 'kv_cache_size' },
         { slider: 'rope-factor', value: 'rope-factor-value', setting: 'rope_factor' },
         { slider: 'tensor-split', value: 'tensor-split-value', setting: 'tensor_split' },
         { slider: 'max-context', value: 'max-context-value', setting: 'context_size' }
@@ -223,6 +305,7 @@ function updateUIFromSettings() {
         { id: 'model-family', setting: 'model_family' },
         { id: 'model-variant', setting: 'model_variant' },
         { id: 'kv-cache-type', setting: 'kv_cache_type' },
+        { id: 'flash-attention-mode', setting: 'flash_attention_mode' },
         { id: 'rope-scaling-mode', setting: 'rope_mode' },
         { id: 'context-rollover-mode', setting: 'context_rollover_mode' },
         { id: 'prompt-template', setting: 'prompt_template' },
@@ -252,6 +335,11 @@ function updateUIFromSettings() {
         }
     });
     
+    const kvLocation = document.getElementById('kv-cache-location');
+    if (kvLocation) {
+        kvLocation.value = modelSettings.offload_kqv === false ? 'ram' : 'gpu';
+    }
+
     // Update toggle switches
     const memoryToggle = document.getElementById('memory-integration-toggle');
     if (memoryToggle) {
@@ -281,9 +369,14 @@ document.addEventListener('DOMContentLoaded', function() {
     initSliderValuePairs();
     initDropdowns();
     initTextInputs();
+    initKVLocationControl();
     
-    // Load settings once the authoritative snapshot is in memory.
-    (window.settingsState?.ready || Promise.resolve(true)).then(loadModelSettings);
+    // Load settings once the authoritative snapshot is in memory, then hide or
+    // disable controls the shipped llama-server does not advertise.
+    (window.settingsState?.ready || Promise.resolve(true)).then(async function () {
+        await loadModelSettings();
+        await applyLlamaCapabilityGates();
+    });
 });
 
 // ---------------------------------------------------------------------------

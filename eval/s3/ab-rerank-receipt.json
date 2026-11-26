@@ -1,0 +1,200 @@
+{
+  "ab": {
+    "A": "lexical+subword RRF",
+    "B": "bge rerank of same pool"
+  },
+  "cases_sha256": "ca6dd5b3541f08fbf997b58bb3ddffe1b797a1171ff94900a80ab53b0c9f1c21",
+  "calibration_threshold": -7.921,
+  "rows": [
+    {
+      "id": "R1-horse",
+      "criterion": "R1",
+      "expect": "abstain",
+      "A_top": "rec-0001",
+      "A_ok": false,
+      "B_top": "rec-0001",
+      "B_ok": false,
+      "A_scores": {
+        "rec-0001": 0.03279
+      },
+      "B_scores": {
+        "rec-0001": -1.868,
+        "rec-0006": -10.932,
+        "rec-0007": -11.041,
+        "rec-0003": -11.048
+      }
+    },
+    {
+      "id": "R1-patient",
+      "criterion": "R1",
+      "expect": "rec-0001",
+      "A_top": "rec-0001",
+      "A_ok": true,
+      "B_top": "rec-0001",
+      "B_ok": true,
+      "A_scores": {
+        "rec-0001": 0.03279
+      },
+      "B_scores": {
+        "rec-0001": -1.535,
+        "rec-0006": -11.031,
+        "rec-0007": -11.042,
+        "rec-0003": -11.045
+      }
+    },
+    {
+      "id": "R2-vault-foreign",
+      "criterion": "R2",
+      "expect": "abstain",
+      "A_top": null,
+      "A_ok": true,
+      "B_top": null,
+      "B_ok": true,
+      "A_scores": {},
+      "B_scores": {
+        "rec-0006": -11.01,
+        "rec-0007": -11.03,
+        "rec-0001": -11.03,
+        "rec-0003": -11.041
+      }
+    },
+    {
+      "id": "R2-vault-own",
+      "criterion": "R2",
+      "expect": "rec-0004",
+      "A_top": "rec-0004",
+      "A_ok": true,
+      "B_top": "rec-0004",
+      "B_ok": true,
+      "A_scores": {
+        "rec-0004": 0.03279
+      },
+      "B_scores": {
+        "rec-0004": 0.586,
+        "rec-0005": -11.038
+      }
+    },
+    {
+      "id": "R3-now",
+      "criterion": "R3",
+      "expect": "rec-0007",
+      "A_top": "rec-0002",
+      "A_ok": false,
+      "B_top": "rec-0007",
+      "B_ok": true,
+      "A_scores": {
+        "rec-0007": 0.01639,
+        "rec-0002": 0.01613
+      },
+      "B_scores": {
+        "rec-0007": 1.2,
+        "rec-0002": -0.503
+      }
+    },
+    {
+      "id": "R3-before",
+      "criterion": "R3",
+      "expect": "rec-0002",
+      "A_top": "rec-0002",
+      "A_ok": true,
+      "B_top": "rec-0002",
+      "B_ok": true,
+      "A_scores": {
+        "rec-0007": 0.01639,
+        "rec-0002": 0.01613
+      },
+      "B_scores": {
+        "rec-0002": -1.606,
+        "rec-0007": -2.729
+      }
+    },
+    {
+      "id": "R4-paraphrase",
+      "criterion": "R4",
+      "expect": "rec-0001",
+      "A_top": "rec-0001",
+      "A_ok": true,
+      "B_top": "rec-0001",
+      "B_ok": true,
+      "A_scores": {
+        "rec-0001": 0.01639
+      },
+      "B_scores": {
+        "rec-0001": -5.95,
+        "rec-0006": -10.956,
+        "rec-0007": -11.039,
+        "rec-0003": -11.043
+      }
+    },
+    {
+      "id": "R5-weather",
+      "criterion": "R5",
+      "expect": "abstain",
+      "A_top": null,
+      "A_ok": true,
+      "B_top": null,
+      "B_ok": true,
+      "A_scores": {},
+      "B_scores": {
+        "rec-0006": -11.016,
+        "rec-0007": -11.034,
+        "rec-0003": -11.042,
+        "rec-0001": -11.043
+      }
+    },
+    {
+      "id": "R5-fair",
+      "criterion": "R5",
+      "expect": "abstain",
+      "A_top": null,
+      "A_ok": true,
+      "B_top": null,
+      "B_ok": true,
+      "A_scores": {},
+      "B_scores": {
+        "rec-0001": -10.884,
+        "rec-0007": -10.942,
+        "rec-0006": -11.012,
+        "rec-0003": -11.039
+      }
+    }
+  ],
+  "metrics": {
+    "A": {
+      "correct_retrieval": "4/5",
+      "false_retrievals": 1,
+      "false_retrieval_cases": [
+        "R1-horse"
+      ],
+      "abstention_correct": "3/4"
+    },
+    "B": {
+      "correct_retrieval": "5/5",
+      "false_retrievals": 1,
+      "false_retrieval_cases": [
+        "R1-horse"
+      ],
+      "abstention_correct": "3/4"
+    },
+    "improved": [
+      "R3-now"
+    ],
+    "regressed": [],
+    "totals": {
+      "A": 7,
+      "B": 8,
+      "n": 9
+    },
+    "latency_p50_ms": {
+      "A": 0.5,
+      "B": 34.4
+    }
+  },
+  "horse_case": {
+    "A": "rec-0001",
+    "B": "rec-0001"
+  },
+  "recommendation": "ship as optional capability",
+  "note": "hardware independence: this comparison makes no VRAM assumption",
+  "gate_b": "6/7 open"
+}

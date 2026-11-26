@@ -12,7 +12,9 @@
 | Implementation authorization | **None** |
 | Tests/models/process runs | **0** |
 
-**Labels:** **Owner-approved** · **Proposed** · **Unresolved** · **Observed** · **Unestablished**.
+**Labels:** **Owner-approved** · **Proposed** · **Calculated** · **Unresolved** · **Observed** · **Unestablished**.
+
+**Identifier note:** Clauses suffixed with a letter (`FC2-05a`, `FC2-09a`, `FC2-05b`) are related clauses added without renumbering existing ones, so cross-references from other papers and the register remain valid. Open-question identifiers in §9 use the `FC2-D4-*` form; they identify questions, not clauses, and are cited as such.
 
 ---
 
@@ -35,14 +37,13 @@
 | Field | Obligation |
 |---|---|
 | `prompt_plan_id` | Immutable identity of this finalized plan artifact |
-| `request_id` | Identifies the dispatch attempt; not the plan's identity |
 | `conversation_id` / `state_id` | FC-1 state being composed |
 | `model_identity` | Model artifact and revision |
 | `tokenizer_identity` | Exact tokenizer and version |
 | `chat_template_identity` | Exact template and version |
 | `adapter_identity` | Model-family formatting adapter |
 | `composition_policy_identity` | Composition policy and version governing source selection, ordering, inclusion and trimming eligibility |
-| `privacy_policy_identity` | Privacy and visibility policy and version, where independently versioned |
+| `privacy_policy_identity` | Privacy and visibility policy governing this plan, with its version where the policy is independently versioned |
 | `source_manifest` | Ordered sources and their authority |
 | `segments` | System, world, scenario, character, lore, memory, history, tools, multimodal parts |
 | `token_counts` | Per-segment and total counts from the actual tokenizer |
@@ -53,9 +54,11 @@
 | `transformed` | Summaries, projections or formatting changes, with provenance |
 | `validation_status` | `valid`, `invalid` or `unknown` |
 | `failure_reason` | Explicit reason when not valid |
-| `content_hash` | Hash of the reproducible plan artifact |
+| `content_hash` | Hash of the canonical reproducible plan content, excluding `prompt_plan_id` and `content_hash` themselves |
 
-**FC2-05a (Proposed — plan immutability).** A finalized PromptPlan is immutable. A change to any input, model, tokenizer, template, adapter, composition policy or privacy policy produces a new `prompt_plan_id`; a plan is never edited in place to represent different composition rules. Two plans that differ in governing policy are not equivalent reproducibility inputs even when their state and canonical revisions match.
+**FC2-05a (Proposed — plan immutability).** A finalized PromptPlan is immutable. A change to any input, model, tokenizer, template, adapter, composition policy or privacy policy produces a new `prompt_plan_id`; a plan is never edited in place to represent different composition rules. Two plans that differ in governing policy are not equivalent reproducibility inputs even when their state and canonical revisions match. A plan that cannot name its composition-policy identity, or the privacy policy governing it — with a version identifier where that policy is independently versioned — is not a valid plan (FC2-15).
+
+**FC2-05b (Proposed — plan identity versus dispatch-attempt identity).** `prompt_plan_id` identifies the immutable plan artifact and is bound to its content hash and its composition-policy and privacy-policy identities. `request_id` is not a field of that artifact. A dispatch attempt is recorded separately, in an attempt record that references `prompt_plan_id` and carries its own `request_id`, so an unchanged plan retains its `prompt_plan_id` and hash across attempts while each attempt is identified on its own. Because the attempt lives outside the plan, recording an attempt cannot alter the plan's contents, its identity or its hash. This clause defines identity only. It does not establish retry eligibility or recovery behaviour, and no other clause of this contract does either: whether a further attempt may be made after a dispatch outcome, and how that outcome is recorded and recovered, remain unresolved. FC2-07 and FC2-17–FC2-20 describe composition, dispatch, explicit failure and state preservation; they do not decide retry eligibility or a recovery policy. A changed plan is never recorded under an earlier plan's identity, and a plan whose model, tokenizer, template or adapter identity has changed is recomputed rather than re-dispatched as if it were the same plan (FC2-16, FC2-23).
 
 **FC2-06 (Proposed).** The plan is an auditable execution artifact. It is not a workaround for last-minute trimming and not a promise that the model will behave well.
 
@@ -105,15 +108,15 @@
 
 ## 5. Token accounting and budget
 
-**FC2-13 (Calculated — D4 consequence).** Token accounting uses the actual target model's tokenizer and chat template. Character-count estimates, heuristic ratios and stale persisted counts are not authority.
+**FC2-13 (Owner-approved — D4, with a calculated extension).** Token accounting uses the actual target model's tokenizer and chat template. Character-count estimates, heuristic ratios and stale persisted counts are not authority.
 
 **FC2-14 (Proposed — budget equation).**
 
 `system + world + scenario + character + lore + memory + history + tools + modality + output_reserve <= context_limit`
 
-The left side is the sum of every included segment named in FC2-05 and FC2-08, each counted by the actual target tokenizer, plus the output reserve; an excluded segment contributes zero and is recorded as excluded. The exact segment ordering and reserve policy are model/adapter-specific. The inequality and the need for a reserve are not optional.
+The left side is the sum of every included segment named in FC2-05 and FC2-08, each counted by the actual target tokenizer, plus the output reserve; an excluded segment contributes zero and is recorded as excluded. The exact segment ordering and reserve policy are model/adapter-specific. The inequality and the need for a reserve are not optional. The aggregate governs: a per-segment ceiling never substitutes for it, and the output reserve is counted once per request rather than once per segment.
 
-**FC2-15 (Proposed — unknown state).** If the tokenizer or template is unavailable, the plan status is `unknown`. Howl does not present an estimate as compliance and does not dispatch a budget-dependent request as if it were valid.
+**FC2-15 (Proposed — unknown state).** If the tokenizer or template is unavailable, the plan status is `unknown`. Howl does not present an estimate as compliance and does not dispatch a budget-dependent request as if it were valid. The same applies to an included segment whose token cost cannot be determined: while any included segment's cost is estimated or unknown, the aggregate budget cannot be certified `valid`, and an estimate retained for observability cannot establish that the inequality in FC2-14 is satisfied (FC2-08).
 
 **FC2-16 (Proposed — model change).** Persisted token counts are invalidated when the model, tokenizer or template changes. Counts are recomputed; old counts are never reused as authority.
 
@@ -121,7 +124,7 @@ The left side is the sum of every included segment named in FC2-05 and FC2-08, e
 
 ## 6. Overflow and failure
 
-**FC2-17 (Proposed — explicit failure).** A request that cannot be constructed safely fails explicitly. Howl does not silently send incomplete, invalid or over-budget context.
+**FC2-17 (Owner-approved — D4, explicit failure, with a calculated extension).** A request that cannot be constructed safely fails explicitly. Howl does not silently send incomplete, invalid or over-budget context.
 
 **FC2-18 (Proposed — no silent trimming).** Automatic trimming is not authorized by this contract. Any trimming requires a separate, explicit policy that names eligible segments, records the receipt and preserves the authoritative history. The old D4 A/B/C/D choice is not reinstated here.
 

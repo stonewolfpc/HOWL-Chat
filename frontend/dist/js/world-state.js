@@ -38,7 +38,7 @@ function lorebookKey(lorebook) {
 }
 
 function resolveLorebooksFromRefs(refs) {
-    const allLorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+    const allLorebooks = (window.LorebookRepo ? window.LorebookRepo.all() : []);
     if (!Array.isArray(refs)) return [];
 
     const resolved = refs.map(ref => {

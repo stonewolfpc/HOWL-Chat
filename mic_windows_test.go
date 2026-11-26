@@ -3,6 +3,7 @@
 package main
 
 import (
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -491,7 +492,16 @@ func TestProbeStatusReportsConsoleRoleAndMixFormat(t *testing.T) {
 // test here that can touch a physical endpoint; all other WASAPI tests are
 // deterministic mocks. It asserts only that a known state is returned. A ready
 // result still does not exercise recording or transcription.
+//
+// It is opt-in (HOWL_WASAPI_HOST_TEST=1) because running it opens a shared-mode
+// capture client on the machine's default microphone: on a Bluetooth headset
+// that switches A2DP to HFP and changes every other application's playback for
+// as long as the probe runs. A test suite must not do that to a developer's
+// machine by default.
 func TestProbeMicrophoneOnHost(t *testing.T) {
+	if os.Getenv("HOWL_WASAPI_HOST_TEST") != "1" {
+		t.Skip("set HOWL_WASAPI_HOST_TEST=1 to run the live WASAPI capture probe; it opens the default microphone and changes system audio")
+	}
 	for i := 0; i < 3; i++ {
 		status := probeMicrophone()
 		t.Logf("live WASAPI probe %d: state=%s role=%s count=%d detail=%q", i+1, status.State, status.Role, status.DeviceCount, status.Detail)

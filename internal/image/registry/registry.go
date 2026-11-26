@@ -352,6 +352,10 @@ func buildModelIndex(entries []Entry) scanner.ModelIndex {
 			idx.LoRAs = append(idx.LoRAs, ae)
 		case scanner.AssetControlNet:
 			idx.ControlNets = append(idx.ControlNets, ae)
+		case scanner.AssetIPAdapter:
+			idx.IPAdapters = append(idx.IPAdapters, ae)
+		case scanner.AssetClipVision:
+			idx.ClipVisions = append(idx.ClipVisions, ae)
 		case scanner.AssetEmbedding:
 			idx.Embeddings = append(idx.Embeddings, ae)
 		case scanner.AssetUpscaler:
@@ -465,6 +469,8 @@ func collectEntries(idx scanner.ModelIndex) []scanner.AssetEntry {
 	out = append(out, idx.VAEs...)
 	out = append(out, idx.LoRAs...)
 	out = append(out, idx.ControlNets...)
+	out = append(out, idx.IPAdapters...)
+	out = append(out, idx.ClipVisions...)
 	out = append(out, idx.Embeddings...)
 	out = append(out, idx.Upscalers...)
 	out = append(out, idx.T5XXLs...)

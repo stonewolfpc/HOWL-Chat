@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -35,7 +36,7 @@ func (l *sdcppImageList) UnmarshalJSON(data []byte) error {
 			if obj == nil {
 				continue
 			}
-			for _, key := range []string{"data", "image", "base64", "b64"} {
+			for _, key := range []string{"data", "image", "base64", "b64", "b64_json"} {
 				if v, ok := obj[key].(string); ok && v != "" {
 					out = append(out, v)
 					break
@@ -217,6 +218,38 @@ func newClient(baseURL string) *client {
 	}
 }
 
+// do makes a request cancellation authoritative even when the transport does
+// not honor the request context. A scope that has been cancelled must be able
+// to return and let Shutdown join it; the abandoned transport goroutine is
+// bounded to that one request and its response is closed when it arrives. This
+// does not claim the backend stopped: the generation is settled as cancelled,
+// which is the existing meaning of a closed request.
+func (c *client) do(req *http.Request) (*http.Response, error) {
+	if req == nil {
+		return nil, fmt.Errorf("nil HTTP request")
+	}
+	done := make(chan struct{})
+	var resp *http.Response
+	var err error
+	go func() {
+		resp, err = c.http.Do(req)
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		return resp, err
+	case <-req.Context().Done():
+		go func() {
+			<-done
+			if resp != nil && resp.Body != nil {
+				_ = resp.Body.Close()
+			}
+		}()
+		return nil, req.Context().Err()
+	}
+}
+
 // resetState clears any stale job IDs and cancellation flags.
 func (c *client) resetState() {
 	c.mu.Lock()
@@ -262,6 +295,7 @@ func (c *client) generateSequentialBatch(ctx context.Context, singleGen func(con
 	var firstResult *types.ImageResult
 	var firstSeed = opts.Seed
 	var allImages []string
+	var allMetadatas []types.ImageMetadata
 
 	fmt.Printf("[ImageEngine] Batch: generating %d images sequentially (initial seed=%d)\n", opts.BatchCount, firstSeed)
 
@@ -305,6 +339,13 @@ func (c *client) generateSequentialBatch(ctx context.Context, singleGen func(con
 		// Accumulate all images for batch display
 		if result.ImageData != "" {
 			allImages = append(allImages, result.ImageData)
+			// Each item needs its own metadata row, or the gallery's batch path
+			// falls back to saving only the first image.
+			meta := result.Metadata
+			if len(result.ImageMetadatas) > 0 {
+				meta = result.ImageMetadatas[0]
+			}
+			allMetadatas = append(allMetadatas, meta)
 			fmt.Printf("[ImageEngine] Batch: accumulated image %d/%d\n", i+1, opts.BatchCount)
 		}
 	}
@@ -313,8 +354,10 @@ func (c *client) generateSequentialBatch(ctx context.Context, singleGen func(con
 		return nil, fmt.Errorf("no images generated in batch of %d", opts.BatchCount)
 	}
 
-	// Set all images in the result for batch display
+	// Set all images in the result for batch display and persistence. The
+	// gallery saves one entry per image only when the metadata rows line up.
 	firstResult.Images = allImages
+	firstResult.ImageMetadatas = allMetadatas
 
 	fmt.Printf("[ImageEngine] Batch complete: %d images generated\n", len(allImages))
 
@@ -375,73 +418,63 @@ func convertLoRAs(loras []types.LoRAStrength) []LoRARequest {
 // 2. Does not return progress/preview data for live preview
 // See memory: live-preview-limitation-may2026
 type txt2imgRequest struct {
-	Prompt                  string        `json:"prompt"`
-	NegativePrompt          string        `json:"negative_prompt"`
-	Width                   int           `json:"width"`
-	Height                  int           `json:"height"`
-	Steps                   int           `json:"steps"`
-	Seed                    int64         `json:"seed"`
-	SamplerName             string        `json:"sampler_name"`
-	Preview                 string        `json:"preview,omitempty"`
-	Scheduler               string        `json:"scheduler"`
-	CfgScale                float64       `json:"cfg_scale"`
-	Guidance                float64       `json:"guidance,omitempty"`
-	SlgScale                float64       `json:"slg_scale,omitempty"`
-	SkipLayerStart          float64       `json:"skip_layer_start,omitempty"`
-	SkipLayerEnd            float64       `json:"skip_layer_end,omitempty"`
-	Eta                     float64       `json:"eta,omitempty"`
-	BatchSize               int           `json:"batch_size"`
-	EnableHR                bool          `json:"enable_hr"`
-	HRScale                 float64       `json:"hr_scale"`
-	HRUpscaler              string        `json:"hr_upscaler"`
-	DenoisingStrength       float64       `json:"denoising_strength"`
-	ResizeMode              string        `json:"resize_mode,omitempty"`
-	StyleStrength           float64       `json:"style_strength,omitempty"`
-	PreserveColors          bool          `json:"preserve_colors,omitempty"`
-	MatchHistogram          bool          `json:"match_histogram,omitempty"`
-	LatentNoise             float64       `json:"latent_noise,omitempty"`
-	MaskBlur                int           `json:"mask_blur,omitempty"`
-	MaskInvert              bool          `json:"mask_invert,omitempty"`
-	MaskedContent           string        `json:"masked_content,omitempty"`
-	EdgeBehavior            string        `json:"edge_behavior,omitempty"`
-	UpscaleMethod           string        `json:"upscale_method,omitempty"`
-	UpscaleSharpen          string        `json:"upscale_sharpen,omitempty"`
-	UpscaleAntiArtifact     string        `json:"upscale_anti_artifact,omitempty"`
-	Tiling                  bool          `json:"tiling"`
-	ClipSkip                int           `json:"clip_skip"`
-	LoRAs                   []LoRARequest `json:"loras,omitempty"`
-	ControlNetPath          string        `json:"control_net_path,omitempty"`
-	ControlImage            string        `json:"control_image,omitempty"`
-	ControlStrength         float64       `json:"control_strength,omitempty"`
-	CacheMode               string        `json:"cache_mode,omitempty"`
-	CacheOption             string        `json:"cache_option,omitempty"`
-	VideoFrames             int           `json:"video_frames,omitempty"`
-	FPS                     int           `json:"fps,omitempty"`
-	EndImage                string        `json:"end_image,omitempty"`
-	VideoMotionStrength     float64       `json:"video_motion_strength,omitempty"`
-	VideoSeedMode           string        `json:"video_seed_mode,omitempty"`
-	VideoDenoise            float64       `json:"video_denoise,omitempty"`
-	VideoLoop               bool          `json:"video_loop,omitempty"`
-	Prediction              string        `json:"prediction,omitempty"`
-	RNG                     string        `json:"rng,omitempty"`
-	SamplerRNG              string        `json:"sampler_rng,omitempty"`
-	FlowShift               float64       `json:"flow_shift,omitempty"`
-	VAETileOverlap          float64       `json:"vae_tile_overlap,omitempty"`
-	DisableMetadata         bool          `json:"disable_metadata,omitempty"`
-	CfgRescale              float64       `json:"cfg_rescale,omitempty"`
-	FaceRestore             float64       `json:"face_restore,omitempty"`
-	SChurn                  float64       `json:"s_churn,omitempty"`
-	STmin                   float64       `json:"s_tmin,omitempty"`
-	STmax                   float64       `json:"s_tmax,omitempty"`
-	SNoise                  float64       `json:"s_noise,omitempty"`
-	OutputFormat            string        `json:"output_format,omitempty"`
-	HighNoiseSteps          int           `json:"high_noise_steps,omitempty"`
-	HighNoiseCfgScale       float64       `json:"high_noise_cfg_scale,omitempty"`
-	HighNoiseGuidance       float64       `json:"high_noise_guidance,omitempty"`
-	HighNoiseSlgScale       float64       `json:"high_noise_slg_scale,omitempty"`
-	HighNoiseEta            float64       `json:"high_noise_eta,omitempty"`
-	HighNoiseSkipLayerStart float64       `json:"high_noise_skip_layer_start,omitempty"`
-	HighNoiseSkipLayerEnd   float64       `json:"high_noise_skip_layer_end,omitempty"`
+	Prompt              string        `json:"prompt"`
+	NegativePrompt      string        `json:"negative_prompt"`
+	Width               int           `json:"width"`
+	Height              int           `json:"height"`
+	Steps               int           `json:"steps"`
+	Seed                int64         `json:"seed"`
+	SamplerName         string        `json:"sampler_name"`
+	Preview             string        `json:"preview,omitempty"`
+	Scheduler           string        `json:"scheduler"`
+	CfgScale            float64       `json:"cfg_scale"`
+	Guidance            float64       `json:"guidance,omitempty"`
+	Eta                 float64       `json:"eta,omitempty"`
+	BatchSize           int           `json:"batch_size"`
+	EnableHR            bool          `json:"enable_hr"`
+	HRScale             float64       `json:"hr_scale"`
+	HRUpscaler          string        `json:"hr_upscaler"`
+	DenoisingStrength   float64       `json:"denoising_strength"`
+	ResizeMode          string        `json:"resize_mode,omitempty"`
+	StyleStrength       float64       `json:"style_strength,omitempty"`
+	PreserveColors      bool          `json:"preserve_colors,omitempty"`
+	MatchHistogram      bool          `json:"match_histogram,omitempty"`
+	LatentNoise         float64       `json:"latent_noise,omitempty"`
+	MaskBlur            int           `json:"mask_blur,omitempty"`
+	MaskInvert          bool          `json:"mask_invert,omitempty"`
+	MaskedContent       string        `json:"masked_content,omitempty"`
+	EdgeBehavior        string        `json:"edge_behavior,omitempty"`
+	UpscaleMethod       string        `json:"upscale_method,omitempty"`
+	UpscaleSharpen      string        `json:"upscale_sharpen,omitempty"`
+	UpscaleAntiArtifact string        `json:"upscale_anti_artifact,omitempty"`
+	Tiling              bool          `json:"tiling"`
+	ClipSkip            int           `json:"clip_skip"`
+	LoRAs               []LoRARequest `json:"loras,omitempty"`
+	ControlNetPath      string        `json:"control_net_path,omitempty"`
+	ControlImage        string        `json:"control_image,omitempty"`
+	ControlStrength     float64       `json:"control_strength,omitempty"`
+	CacheMode           string        `json:"cache_mode,omitempty"`
+	CacheOption         string        `json:"cache_option,omitempty"`
+	VideoFrames         int           `json:"video_frames,omitempty"`
+	FPS                 int           `json:"fps,omitempty"`
+	EndImage            string        `json:"end_image,omitempty"`
+	VideoMotionStrength float64       `json:"video_motion_strength,omitempty"`
+	VideoSeedMode       string        `json:"video_seed_mode,omitempty"`
+	VideoDenoise        float64       `json:"video_denoise,omitempty"`
+	VideoLoop           bool          `json:"video_loop,omitempty"`
+	Prediction          string        `json:"prediction,omitempty"`
+	RNG                 string        `json:"rng,omitempty"`
+	SamplerRNG          string        `json:"sampler_rng,omitempty"`
+	FlowShift           float64       `json:"flow_shift,omitempty"`
+	VAETileOverlap      float64       `json:"vae_tile_overlap,omitempty"`
+	DisableMetadata     bool          `json:"disable_metadata,omitempty"`
+	CfgRescale          float64       `json:"cfg_rescale,omitempty"`
+	FaceRestore         float64       `json:"face_restore,omitempty"`
+	SChurn              float64       `json:"s_churn,omitempty"`
+	STmin               float64       `json:"s_tmin,omitempty"`
+	STmax               float64       `json:"s_tmax,omitempty"`
+	SNoise              float64       `json:"s_noise,omitempty"`
+	OutputFormat        string        `json:"output_format,omitempty"`
 }
 
 type txt2imgResponse struct {
@@ -542,23 +575,12 @@ func (c *client) txt2img(ctx context.Context, opts types.ImageOptions) (*types.I
 
 	// Only set DiT-specific parameters for DiT-based models
 	if isDiTModel {
-		reqBody.SlgScale = opts.SlgScale
-		reqBody.SkipLayerStart = opts.SkipLayerStart
-		reqBody.SkipLayerEnd = opts.SkipLayerEnd
 		reqBody.Eta = opts.Eta
 		reqBody.VAETileOverlap = opts.VAETileOverlap
 		reqBody.SChurn = opts.SChurn
 		reqBody.STmin = opts.STmin
 		reqBody.STmax = opts.STmax
 		reqBody.SNoise = opts.SNoise
-		reqBody.HighNoiseSteps = opts.HighNoiseSteps
-		reqBody.HighNoiseCfgScale = opts.HighNoiseCfgScale
-		reqBody.HighNoiseGuidance = opts.HighNoiseGuidance
-		reqBody.HighNoiseSlgScale = opts.HighNoiseSlgScale
-		reqBody.HighNoiseEta = opts.HighNoiseEta
-		reqBody.HighNoiseSkipLayerStart = opts.HighNoiseSkipLayerStart
-		reqBody.HighNoiseSkipLayerEnd = opts.HighNoiseSkipLayerEnd
-		fmt.Printf("[DEBUG] txt2img: Setting DiT parameters - Eta=%v, VAETileOverlap=%v, SlgScale=%v\n", reqBody.Eta, reqBody.VAETileOverlap, reqBody.SlgScale)
 	} else {
 		fmt.Printf("[DEBUG] txt2img: Skipping DiT parameters for non-DiT model\n")
 	}
@@ -583,7 +605,7 @@ func (c *client) txt2img(ctx context.Context, opts types.ImageOptions) (*types.I
 	if err != nil {
 		return nil, notDispatched(fmt.Errorf("build txt2img request: %w", err))
 	}
-	resp, err := c.http.Do(req)
+	resp, err := c.do(req)
 	if err != nil {
 		return nil, fmt.Errorf("sd-server txt2img request failed: %w", err)
 	}
@@ -620,6 +642,181 @@ func (c *client) txt2img(ctx context.Context, opts types.ImageOptions) (*types.I
 	}, nil
 }
 
+// txt2imgNative is the IP-Adapter path for text-to-image. The pinned engine's
+// compatibility route has no IP-Adapter fields, so only the native-IP profile
+// may reach this method.
+func (c *client) txt2imgNative(ctx context.Context, opts types.ImageOptions) (*types.ImageResult, error) {
+	if opts.BatchCount > 1 {
+		return c.generateSequentialBatch(ctx, c.txt2imgNative, opts)
+	}
+	if opts.IPAdapterImagePath == "" {
+		return nil, notDispatched(fmt.Errorf("native IP-Adapter txt2img requires a reference image path"))
+	}
+	ipData, err := os.ReadFile(opts.IPAdapterImagePath)
+	if err != nil {
+		return nil, notDispatched(fmt.Errorf("read IP-Adapter reference image: %w", err))
+	}
+
+	reqBody := nativeImg2ImgRequest{
+		Prompt:            opts.Prompt,
+		NegativePrompt:    opts.NegativePrompt,
+		Width:             opts.Width,
+		Height:            opts.Height,
+		Seed:              opts.Seed,
+		BatchCount:        opts.BatchCount,
+		IPAdapterImage:    base64.StdEncoding.EncodeToString(ipData),
+		IPAdapterStrength: ipAdapterStrengthOrDefault(opts.IPAdapterStrength),
+	}
+	reqBody.SampleParams.SampleSteps = opts.Steps
+	reqBody.SampleParams.SampleMethod = opts.Sampler
+	reqBody.SampleParams.Scheduler = opts.Scheduler
+	reqBody.SampleParams.Guidance.TxtCFG = opts.CfgScale
+	if reqBody.BatchCount <= 0 {
+		reqBody.BatchCount = 1
+	}
+
+	jsonData, err := json.Marshal(reqBody)
+	if err != nil {
+		return nil, notDispatched(fmt.Errorf("marshal native IP txt2img request: %w", err))
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/sdcpp/v1/img_gen", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, notDispatched(fmt.Errorf("build native IP txt2img request: %w", err))
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := c.do(req)
+	if err != nil {
+		return nil, fmt.Errorf("sd-server native IP txt2img request failed: %w", err)
+	}
+	body, _ := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusAccepted {
+		return nil, fmt.Errorf("sd-server native IP txt2img error %d: %s", resp.StatusCode, string(body))
+	}
+	var jobResp struct {
+		ID string `json:"id"`
+	}
+	if err := json.Unmarshal(body, &jobResp); err != nil {
+		return nil, fmt.Errorf("decode native IP txt2img job response: %w", err)
+	}
+	if jobResp.ID == "" {
+		return nil, fmt.Errorf("no job ID in native IP txt2img response")
+	}
+	token := c.setActiveJob(jobResp.ID)
+	job, err := c.pollJob(ctx, jobResp.ID)
+	c.resetActiveJob(token)
+	if err != nil {
+		return nil, err
+	}
+	if len(job.Result.Images) == 0 {
+		return nil, fmt.Errorf("no images in native IP txt2img job result")
+	}
+	return &types.ImageResult{
+		ImageData: job.Result.Images[0],
+		Images:    job.Result.Images,
+		Metadata: types.ImageMetadata{
+			Prompt:         opts.Prompt,
+			NegativePrompt: opts.NegativePrompt,
+			Width:          opts.Width,
+			Height:         opts.Height,
+			Steps:          opts.Steps,
+			Seed:           opts.Seed,
+			Sampler:        opts.Sampler,
+			CfgScale:       opts.CfgScale,
+			Mode:           opts.Mode,
+			CreatedAt:      time.Now().Format(time.RFC3339),
+			Options:        opts,
+		},
+	}, nil
+}
+
+func ipAdapterStrengthOrDefault(v float64) float64 {
+	if v <= 0 {
+		return 1.0
+	}
+	return v
+}
+
+// nativeUpscale uses the c6dfa9d build's native /sdcpp/v1/upscale route. It is
+// synchronous on the builds this profile accepts; a job-shaped response is also
+// accepted so the client does not depend on one response envelope.
+func (c *client) nativeUpscale(ctx context.Context, imagePath, upscalerPath string, tile int) ([]byte, string, error) {
+	if imagePath == "" || upscalerPath == "" {
+		return nil, "", fmt.Errorf("native upscale needs an image and an upscaler path")
+	}
+	data, err := os.ReadFile(imagePath)
+	if err != nil {
+		return nil, "", fmt.Errorf("read upscale input: %w", err)
+	}
+	name := strings.TrimSuffix(filepath.Base(upscalerPath), filepath.Ext(upscalerPath))
+	body := struct {
+		Image        string `json:"image"`
+		Upscaler     string `json:"upscaler"`
+		UpscaleModel string `json:"upscale_model,omitempty"`
+		TileSize     int    `json:"tile_size,omitempty"`
+		Repeats      int    `json:"repeats,omitempty"`
+		OutputFormat string `json:"output_format,omitempty"`
+	}{
+		Image:        base64.StdEncoding.EncodeToString(data),
+		Upscaler:     name,
+		UpscaleModel: name,
+		TileSize:     tile,
+		Repeats:      1,
+		OutputFormat: "png",
+	}
+	jsonData, err := json.Marshal(body)
+	if err != nil {
+		return nil, "", fmt.Errorf("marshal native upscale request: %w", err)
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/sdcpp/v1/upscale", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, "", fmt.Errorf("build native upscale request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := c.do(req)
+	if err != nil {
+		return nil, "", fmt.Errorf("sd-server native upscale request failed: %w", err)
+	}
+	respBody, _ := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusAccepted {
+		return nil, "", fmt.Errorf("sd-server native upscale error %d: %s", resp.StatusCode, string(respBody))
+	}
+
+	var raw map[string]any
+	_ = json.Unmarshal(respBody, &raw)
+	if id, _ := raw["id"].(string); id != "" && len(extractImageStrings(raw)) == 0 {
+		token := c.setActiveJob(id)
+		job, err := c.pollJob(ctx, id)
+		c.resetActiveJob(token)
+		if err != nil {
+			return nil, id, err
+		}
+		return decodeUpscaleImage(job.Result.Images, id)
+	}
+	return decodeUpscaleImage(normalizeImagePayloads(extractImageStrings(raw)), "")
+}
+
+func decodeUpscaleImage(images []string, jobID string) ([]byte, string, error) {
+	if len(images) == 0 {
+		return nil, jobID, fmt.Errorf("no images in native upscale response")
+	}
+	s := strings.TrimSpace(images[0])
+	if strings.HasPrefix(s, "data:image/") {
+		if idx := strings.Index(s, ","); idx >= 0 {
+			s = s[idx+1:]
+		}
+	}
+	decoded, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		return nil, jobID, fmt.Errorf("decode native upscale image: %w", err)
+	}
+	if len(decoded) == 0 {
+		return nil, jobID, fmt.Errorf("native upscale returned an empty image")
+	}
+	return decoded, jobID, nil
+}
+
 // This client deliberately has no cancel-endpoint call.
 //
 // A DELETE /sdcpp/v1/jobs/{id} used to be sent for async jobs, but whether this
@@ -642,7 +839,7 @@ func (c *client) pollJob(ctx context.Context, jobID string) (*sdcppJob, error) {
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.http.Do(req)
+		resp, err := c.do(req)
 		if err != nil {
 			return nil, err
 		}
@@ -689,78 +886,238 @@ func (c *client) pollJob(ctx context.Context, jobID string) (*sdcppJob, error) {
 	}
 }
 
+// nativeImg2ImgRequest is the native async request shape. Unlike the
+// compatibility route, it carries ControlNet input and takes sampling values
+// under sample_params; the flat steps field is ignored there.
+type nativeImg2ImgRequest struct {
+	Prompt            string                    `json:"prompt"`
+	NegativePrompt    string                    `json:"negative_prompt"`
+	InitImagePath     string                    `json:"init_image_path,omitempty"`
+	Width             int                       `json:"width"`
+	Height            int                       `json:"height"`
+	Seed              int64                     `json:"seed"`
+	BatchCount        int                       `json:"batch_count"`
+	DenoisingStrength float64                   `json:"denoising_strength,omitempty"`
+	ControlNetPath    string                    `json:"control_net_path,omitempty"`
+	ControlImage      string                    `json:"control_image,omitempty"`
+	ControlType       string                    `json:"control_type,omitempty"`
+	ControlStrength   float64                   `json:"control_strength,omitempty"`
+	IPAdapterImage    string                    `json:"ip_adapter_image,omitempty"`
+	IPAdapterStrength float64                   `json:"ip_adapter_strength,omitempty"`
+	SampleParams      nativeImg2ImgSampleParams `json:"sample_params"`
+}
+
+type nativeImg2ImgSampleParams struct {
+	SampleSteps  int    `json:"sample_steps"`
+	SampleMethod string `json:"sample_method,omitempty"`
+	Scheduler    string `json:"scheduler,omitempty"`
+	Guidance     struct {
+		TxtCFG float64 `json:"txt_cfg,omitempty"`
+	} `json:"guidance"`
+}
+
 type img2imgRequest struct {
-	Prompt                  string        `json:"prompt"`
-	NegativePrompt          string        `json:"negative_prompt"`
-	InitImages              []string      `json:"init_images"`
-	Mask                    string        `json:"mask,omitempty"`
-	Width                   int           `json:"width"`
-	Height                  int           `json:"height"`
-	Steps                   int           `json:"steps"`
-	Seed                    int64         `json:"seed"`
-	SamplerName             string        `json:"sampler_name"`
-	Preview                 string        `json:"preview,omitempty"`
-	Scheduler               string        `json:"scheduler"`
-	CfgScale                float64       `json:"cfg_scale"`
-	Guidance                float64       `json:"guidance,omitempty"`
-	SlgScale                float64       `json:"slg_scale,omitempty"`
-	SkipLayerStart          float64       `json:"skip_layer_start,omitempty"`
-	SkipLayerEnd            float64       `json:"skip_layer_end,omitempty"`
-	Eta                     float64       `json:"eta,omitempty"`
-	BatchSize               int           `json:"batch_size"`
-	DenoisingStrength       float64       `json:"denoising_strength"`
-	ResizeMode              string        `json:"resize_mode,omitempty"`
-	StyleStrength           float64       `json:"style_strength,omitempty"`
-	PreserveColors          bool          `json:"preserve_colors,omitempty"`
-	MatchHistogram          bool          `json:"match_histogram,omitempty"`
-	LatentNoise             float64       `json:"latent_noise,omitempty"`
-	MaskBlur                int           `json:"mask_blur,omitempty"`
-	MaskInvert              bool          `json:"mask_invert,omitempty"`
-	MaskFeather             int           `json:"mask_feather,omitempty"`
-	MaskedContent           string        `json:"masked_content,omitempty"`
-	EdgeBehavior            string        `json:"edge_behavior,omitempty"`
-	UpscaleMethod           string        `json:"upscale_method,omitempty"`
-	UpscaleSharpen          string        `json:"upscale_sharpen,omitempty"`
-	UpscaleAntiArtifact     string        `json:"upscale_anti_artifact,omitempty"`
-	Tiling                  bool          `json:"tiling"`
-	ClipSkip                int           `json:"clip_skip"`
-	LoRAs                   []LoRARequest `json:"loras,omitempty"`
-	ControlNetPath          string        `json:"control_net_path,omitempty"`
-	ControlImage            string        `json:"control_image,omitempty"`
-	ControlStrength         float64       `json:"control_strength,omitempty"`
-	CacheMode               string        `json:"cache_mode,omitempty"`
-	CacheOption             string        `json:"cache_option,omitempty"`
-	VideoFrames             int           `json:"video_frames,omitempty"`
-	FPS                     int           `json:"fps,omitempty"`
-	EndImage                string        `json:"end_image,omitempty"`
-	VideoMotionStrength     float64       `json:"video_motion_strength,omitempty"`
-	VideoSeedMode           string        `json:"video_seed_mode,omitempty"`
-	VideoDenoise            float64       `json:"video_denoise,omitempty"`
-	VideoLoop               bool          `json:"video_loop,omitempty"`
-	Prediction              string        `json:"prediction,omitempty"`
-	RNG                     string        `json:"rng,omitempty"`
-	SamplerRNG              string        `json:"sampler_rng,omitempty"`
-	FlowShift               float64       `json:"flow_shift,omitempty"`
-	VAETileOverlap          float64       `json:"vae_tile_overlap,omitempty"`
-	DisableMetadata         bool          `json:"disable_metadata,omitempty"`
-	CfgRescale              float64       `json:"cfg_rescale,omitempty"`
-	FaceRestore             float64       `json:"face_restore,omitempty"`
-	SChurn                  float64       `json:"s_churn,omitempty"`
-	STmin                   float64       `json:"s_tmin,omitempty"`
-	STmax                   float64       `json:"s_tmax,omitempty"`
-	SNoise                  float64       `json:"s_noise,omitempty"`
-	OutputFormat            string        `json:"output_format,omitempty"`
-	HighNoiseSteps          int           `json:"high_noise_steps,omitempty"`
-	HighNoiseCfgScale       float64       `json:"high_noise_cfg_scale,omitempty"`
-	HighNoiseGuidance       float64       `json:"high_noise_guidance,omitempty"`
-	HighNoiseSlgScale       float64       `json:"high_noise_slg_scale,omitempty"`
-	HighNoiseEta            float64       `json:"high_noise_eta,omitempty"`
-	HighNoiseSkipLayerStart float64       `json:"high_noise_skip_layer_start,omitempty"`
-	HighNoiseSkipLayerEnd   float64       `json:"high_noise_skip_layer_end,omitempty"`
+	Prompt              string        `json:"prompt"`
+	NegativePrompt      string        `json:"negative_prompt"`
+	InitImages          []string      `json:"init_images"`
+	Mask                string        `json:"mask,omitempty"`
+	Width               int           `json:"width"`
+	Height              int           `json:"height"`
+	Steps               int           `json:"steps"`
+	Seed                int64         `json:"seed"`
+	SamplerName         string        `json:"sampler_name"`
+	Preview             string        `json:"preview,omitempty"`
+	Scheduler           string        `json:"scheduler"`
+	CfgScale            float64       `json:"cfg_scale"`
+	Guidance            float64       `json:"guidance,omitempty"`
+	Eta                 float64       `json:"eta,omitempty"`
+	BatchSize           int           `json:"batch_size"`
+	DenoisingStrength   float64       `json:"denoising_strength"`
+	ResizeMode          string        `json:"resize_mode,omitempty"`
+	StyleStrength       float64       `json:"style_strength,omitempty"`
+	PreserveColors      bool          `json:"preserve_colors,omitempty"`
+	MatchHistogram      bool          `json:"match_histogram,omitempty"`
+	LatentNoise         float64       `json:"latent_noise,omitempty"`
+	MaskBlur            int           `json:"mask_blur,omitempty"`
+	MaskInvert          bool          `json:"mask_invert,omitempty"`
+	MaskFeather         int           `json:"mask_feather,omitempty"`
+	MaskedContent       string        `json:"masked_content,omitempty"`
+	EdgeBehavior        string        `json:"edge_behavior,omitempty"`
+	UpscaleMethod       string        `json:"upscale_method,omitempty"`
+	UpscaleSharpen      string        `json:"upscale_sharpen,omitempty"`
+	UpscaleAntiArtifact string        `json:"upscale_anti_artifact,omitempty"`
+	Tiling              bool          `json:"tiling"`
+	ClipSkip            int           `json:"clip_skip"`
+	LoRAs               []LoRARequest `json:"loras,omitempty"`
+	ControlNetPath      string        `json:"control_net_path,omitempty"`
+	ControlImage        string        `json:"control_image,omitempty"`
+	ControlStrength     float64       `json:"control_strength,omitempty"`
+	CacheMode           string        `json:"cache_mode,omitempty"`
+	CacheOption         string        `json:"cache_option,omitempty"`
+	VideoFrames         int           `json:"video_frames,omitempty"`
+	FPS                 int           `json:"fps,omitempty"`
+	EndImage            string        `json:"end_image,omitempty"`
+	VideoMotionStrength float64       `json:"video_motion_strength,omitempty"`
+	VideoSeedMode       string        `json:"video_seed_mode,omitempty"`
+	VideoDenoise        float64       `json:"video_denoise,omitempty"`
+	VideoLoop           bool          `json:"video_loop,omitempty"`
+	Prediction          string        `json:"prediction,omitempty"`
+	RNG                 string        `json:"rng,omitempty"`
+	SamplerRNG          string        `json:"sampler_rng,omitempty"`
+	FlowShift           float64       `json:"flow_shift,omitempty"`
+	VAETileOverlap      float64       `json:"vae_tile_overlap,omitempty"`
+	DisableMetadata     bool          `json:"disable_metadata,omitempty"`
+	CfgRescale          float64       `json:"cfg_rescale,omitempty"`
+	FaceRestore         float64       `json:"face_restore,omitempty"`
+	SChurn              float64       `json:"s_churn,omitempty"`
+	STmin               float64       `json:"s_tmin,omitempty"`
+	STmax               float64       `json:"s_tmax,omitempty"`
+	SNoise              float64       `json:"s_noise,omitempty"`
+	OutputFormat        string        `json:"output_format,omitempty"`
 }
 
 func (c *client) img2img(ctx context.Context, opts types.ImageOptions) (*types.ImageResult, error) {
+	return c.img2imgWithMode(ctx, opts, false)
+}
+
+// img2imgSync uses the compatibility route, which honours steps. The async
+// native route is kept for the normal UI because it carries live preview, but
+// it ignores the flat steps field in this build (verified: an 8-step request
+// sampled 20); a workflow stage must not advertise a step count the engine does
+// not use.
+func (c *client) img2imgSync(ctx context.Context, opts types.ImageOptions) (*types.ImageResult, error) {
+	return c.img2imgWithMode(ctx, opts, true)
+}
+
+// img2imgNativeControl is the workflow-specific native route. The compatibility
+// route silently ignores ControlNet fields, while this shape loads the
+// ControlNet and carries the requested sampling steps under sample_params.
+// Measured on the installed server: control weights 1415.82 MiB, control compute
+// buffer 122.42 MB VRAM, and a 4-step request sampled 4 steps.
+func (c *client) img2imgNativeControl(ctx context.Context, opts types.ImageOptions) (*types.ImageResult, error) {
 	if opts.BatchCount > 1 {
+		return c.generateSequentialBatch(ctx, c.img2imgNativeControl, opts)
+	}
+	if opts.InitImagePath == "" {
+		return nil, notDispatched(fmt.Errorf("native ControlNet img2img requires an init image path"))
+	}
+	if opts.ControlNetPath == "" {
+		return nil, notDispatched(fmt.Errorf("native ControlNet img2img requires a ControlNet model path"))
+	}
+	if opts.ControlImagePath == "" {
+		return nil, notDispatched(fmt.Errorf("native ControlNet img2img requires a control image path"))
+	}
+	if _, err := os.Stat(opts.InitImagePath); err != nil {
+		return nil, notDispatched(fmt.Errorf("read init image: %w", err))
+	}
+	controlData, err := os.ReadFile(opts.ControlImagePath)
+	if err != nil {
+		return nil, notDispatched(fmt.Errorf("read control image: %w", err))
+	}
+	ipAdapterImage := ""
+	if opts.IPAdapterImagePath != "" {
+		data, err := os.ReadFile(opts.IPAdapterImagePath)
+		if err != nil {
+			return nil, notDispatched(fmt.Errorf("read IP-Adapter reference image: %w", err))
+		}
+		ipAdapterImage = base64.StdEncoding.EncodeToString(data)
+	}
+
+	// The pinned non-IP engine rejects ip_adapter_strength unless an explicit
+	// DGL workflow is running. Keep the field out unless a reference image is
+	// actually being sent, so switching back to the plain profile is valid.
+	ipAdapterStrength := 0.0
+	if ipAdapterImage != "" {
+		ipAdapterStrength = ipAdapterStrengthOrDefault(opts.IPAdapterStrength)
+	}
+	reqBody := nativeImg2ImgRequest{
+		Prompt:            opts.Prompt,
+		NegativePrompt:    opts.NegativePrompt,
+		InitImagePath:     filepath.ToSlash(opts.InitImagePath),
+		Width:             opts.Width,
+		Height:            opts.Height,
+		Seed:              opts.Seed,
+		BatchCount:        opts.BatchCount,
+		DenoisingStrength: opts.Strength,
+		ControlNetPath:    filepath.ToSlash(opts.ControlNetPath),
+		ControlImage:      base64.StdEncoding.EncodeToString(controlData),
+		ControlStrength:   opts.ControlStrength,
+		IPAdapterImage:    ipAdapterImage,
+		IPAdapterStrength: ipAdapterStrength,
+	}
+	reqBody.SampleParams.SampleSteps = opts.Steps
+	reqBody.SampleParams.SampleMethod = opts.Sampler
+	reqBody.SampleParams.Scheduler = opts.Scheduler
+	reqBody.SampleParams.Guidance.TxtCFG = opts.CfgScale
+	if reqBody.BatchCount <= 0 {
+		reqBody.BatchCount = 1
+	}
+	if reqBody.DenoisingStrength <= 0 {
+		reqBody.DenoisingStrength = 0.75
+	}
+
+	jsonData, err := json.Marshal(reqBody)
+	if err != nil {
+		return nil, notDispatched(fmt.Errorf("marshal native img2img request: %w", err))
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/sdcpp/v1/img_gen", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, notDispatched(fmt.Errorf("build native img2img request: %w", err))
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := c.do(req)
+	if err != nil {
+		return nil, fmt.Errorf("sd-server native img2img request failed: %w", err)
+	}
+	body, _ := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusAccepted {
+		return nil, fmt.Errorf("sd-server native img2img error %d: %s", resp.StatusCode, string(body))
+	}
+	var jobResp struct {
+		ID string `json:"id"`
+	}
+	if err := json.Unmarshal(body, &jobResp); err != nil {
+		return nil, fmt.Errorf("decode native img2img job response: %w", err)
+	}
+	if jobResp.ID == "" {
+		return nil, fmt.Errorf("no job ID in native img2img response")
+	}
+
+	token := c.setActiveJob(jobResp.ID)
+	job, err := c.pollJob(ctx, jobResp.ID)
+	c.resetActiveJob(token)
+	if err != nil {
+		return nil, err
+	}
+	if len(job.Result.Images) == 0 {
+		return nil, fmt.Errorf("no images in native img2img job result")
+	}
+
+	return &types.ImageResult{
+		ImageData: job.Result.Images[0],
+		Images:    job.Result.Images,
+		Metadata: types.ImageMetadata{
+			Prompt:         opts.Prompt,
+			NegativePrompt: opts.NegativePrompt,
+			Width:          opts.Width,
+			Height:         opts.Height,
+			Steps:          opts.Steps,
+			Seed:           opts.Seed,
+			Sampler:        opts.Sampler,
+			CfgScale:       opts.CfgScale,
+			Mode:           opts.Mode,
+			CreatedAt:      time.Now().Format(time.RFC3339),
+			Options:        opts,
+		},
+	}, nil
+}
+
+func (c *client) img2imgWithMode(ctx context.Context, opts types.ImageOptions, sync bool) (*types.ImageResult, error) {
+	if opts.BatchCount > 1 {
+		if sync {
+			return c.generateSequentialBatch(ctx, c.img2imgSync, opts)
+		}
 		return c.generateSequentialBatch(ctx, c.img2img, opts)
 	}
 	if opts.InitImagePath == "" {
@@ -862,22 +1219,12 @@ func (c *client) img2img(ctx context.Context, opts types.ImageOptions) (*types.I
 
 	// Only set DiT-specific parameters for DiT-based models
 	if isDiTModel {
-		reqBody.SlgScale = opts.SlgScale
-		reqBody.SkipLayerStart = opts.SkipLayerStart
-		reqBody.SkipLayerEnd = opts.SkipLayerEnd
 		reqBody.Eta = opts.Eta
 		reqBody.VAETileOverlap = opts.VAETileOverlap
 		reqBody.SChurn = opts.SChurn
 		reqBody.STmin = opts.STmin
 		reqBody.STmax = opts.STmax
 		reqBody.SNoise = opts.SNoise
-		reqBody.HighNoiseSteps = opts.HighNoiseSteps
-		reqBody.HighNoiseCfgScale = opts.HighNoiseCfgScale
-		reqBody.HighNoiseGuidance = opts.HighNoiseGuidance
-		reqBody.HighNoiseSlgScale = opts.HighNoiseSlgScale
-		reqBody.HighNoiseEta = opts.HighNoiseEta
-		reqBody.HighNoiseSkipLayerStart = opts.HighNoiseSkipLayerStart
-		reqBody.HighNoiseSkipLayerEnd = opts.HighNoiseSkipLayerEnd
 	}
 	if reqBody.BatchSize <= 0 {
 		reqBody.BatchSize = 1
@@ -891,12 +1238,16 @@ func (c *client) img2img(ctx context.Context, opts types.ImageOptions) (*types.I
 		return nil, notDispatched(fmt.Errorf("marshal img2img request: %w", err))
 	}
 
+	if sync {
+		return c.postImg2ImgSync(ctx, opts, jsonData)
+	}
+
 	// Use async job API for live preview support
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/sdcpp/v1/img_gen", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, notDispatched(fmt.Errorf("build img_gen request: %w", err))
 	}
-	resp, err := c.http.Do(req)
+	resp, err := c.do(req)
 	if err != nil {
 		return nil, fmt.Errorf("sd-server img_gen request failed: %w", err)
 	}
@@ -933,6 +1284,53 @@ func (c *client) img2img(ctx context.Context, opts types.ImageOptions) (*types.I
 	return &types.ImageResult{
 		ImageData: job.Result.Images[0],
 		Images:    job.Result.Images,
+		Metadata: types.ImageMetadata{
+			Prompt:         opts.Prompt,
+			NegativePrompt: opts.NegativePrompt,
+			Width:          opts.Width,
+			Height:         opts.Height,
+			Steps:          opts.Steps,
+			Seed:           opts.Seed,
+			Sampler:        opts.Sampler,
+			CfgScale:       opts.CfgScale,
+			Mode:           opts.Mode,
+			CreatedAt:      time.Now().Format(time.RFC3339),
+			Options:        opts,
+		},
+	}, nil
+}
+
+// postImg2ImgSync sends the same request to the synchronous compatibility route
+// and decodes its images array. It carries no job identity because the response
+// is the completion; the engine's generation slot still serializes it.
+func (c *client) postImg2ImgSync(ctx context.Context, opts types.ImageOptions, jsonData []byte) (*types.ImageResult, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/sdapi/v1/img2img", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, notDispatched(fmt.Errorf("build sync img2img request: %w", err))
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := c.do(req)
+	if err != nil {
+		return nil, fmt.Errorf("sd-server sync img2img request failed: %w", err)
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read sync img2img response: %w", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("sd-server sync img2img error %d: %s", resp.StatusCode, string(body))
+	}
+	var parsed txt2imgResponse
+	if err := json.Unmarshal(body, &parsed); err != nil {
+		return nil, fmt.Errorf("decode sync img2img response: %w", err)
+	}
+	if len(parsed.Images) == 0 {
+		return nil, fmt.Errorf("sync img2img returned no images")
+	}
+	return &types.ImageResult{
+		ImageData: parsed.Images[0],
+		Images:    parsed.Images,
 		Metadata: types.ImageMetadata{
 			Prompt:         opts.Prompt,
 			NegativePrompt: opts.NegativePrompt,
@@ -1061,22 +1459,12 @@ func (c *client) inpaint(ctx context.Context, opts types.ImageOptions) (*types.I
 
 	// Only set DiT-specific parameters for DiT-based models
 	if isDiTModel {
-		reqBody.SlgScale = opts.SlgScale
-		reqBody.SkipLayerStart = opts.SkipLayerStart
-		reqBody.SkipLayerEnd = opts.SkipLayerEnd
 		reqBody.Eta = opts.Eta
 		reqBody.VAETileOverlap = opts.VAETileOverlap
 		reqBody.SChurn = opts.SChurn
 		reqBody.STmin = opts.STmin
 		reqBody.STmax = opts.STmax
 		reqBody.SNoise = opts.SNoise
-		reqBody.HighNoiseSteps = opts.HighNoiseSteps
-		reqBody.HighNoiseCfgScale = opts.HighNoiseCfgScale
-		reqBody.HighNoiseGuidance = opts.HighNoiseGuidance
-		reqBody.HighNoiseSlgScale = opts.HighNoiseSlgScale
-		reqBody.HighNoiseEta = opts.HighNoiseEta
-		reqBody.HighNoiseSkipLayerStart = opts.HighNoiseSkipLayerStart
-		reqBody.HighNoiseSkipLayerEnd = opts.HighNoiseSkipLayerEnd
 	}
 
 	jsonData, err := json.Marshal(reqBody)
@@ -1089,7 +1477,7 @@ func (c *client) inpaint(ctx context.Context, opts types.ImageOptions) (*types.I
 	if err != nil {
 		return nil, notDispatched(fmt.Errorf("build img_gen request: %w", err))
 	}
-	resp, err := c.http.Do(req)
+	resp, err := c.do(req)
 	if err != nil {
 		return nil, fmt.Errorf("sd-server img_gen request failed: %w", err)
 	}
@@ -1162,15 +1550,45 @@ func (c *client) getSamplers() ([]string, error) {
 	return names, nil
 }
 
+// sdcppJobProgress accepts both progress representations this server has
+// shipped: a bare fraction in older builds and an object
+// ({"completed":...,"total":...,"stage":...}) in the current one. Decoding must
+// not turn a live generation into a client-side failure just because the
+// progress field changed shape.
+type sdcppJobProgress float64
+
+func (p *sdcppJobProgress) UnmarshalJSON(data []byte) error {
+	var number float64
+	if err := json.Unmarshal(data, &number); err == nil {
+		*p = sdcppJobProgress(number)
+		return nil
+	}
+	var object struct {
+		Progress  float64 `json:"progress"`
+		Completed float64 `json:"completed"`
+		Total     float64 `json:"total"`
+	}
+	if err := json.Unmarshal(data, &object); err != nil {
+		return nil // an unrecognized progress object is not generation failure
+	}
+	switch {
+	case object.Total > 0:
+		*p = sdcppJobProgress(object.Completed / object.Total)
+	case object.Progress > 0:
+		*p = sdcppJobProgress(object.Progress)
+	}
+	return nil
+}
+
 // sdcppJob represents the native async job response from /sdcpp/v1/jobs/{id}.
 type sdcppJob struct {
-	ID           string  `json:"id"`
-	Status       string  `json:"status"`
-	Progress     float64 `json:"progress"`
-	Step         int     `json:"step"`
-	TotalSteps   int     `json:"total_steps"`
-	PreviewImage string  `json:"preview_image"`
-	Error        string  `json:"error"`
+	ID           string           `json:"id"`
+	Status       string           `json:"status"`
+	Progress     sdcppJobProgress `json:"progress"`
+	Step         int              `json:"step"`
+	TotalSteps   int              `json:"total_steps"`
+	PreviewImage string           `json:"preview_image"`
+	Error        string           `json:"error"`
 	Result       struct {
 		Images sdcppImageList `json:"images"`
 	} `json:"result"`
@@ -1237,10 +1655,10 @@ func (c *client) progress() (types.ProgressInfo, error) {
 	}
 
 	fmt.Printf("[DEBUG] progress() job status: %s, step: %d/%d, progress: %.2f, preview_len: %d\n",
-		job.Status, job.Step, job.TotalSteps, job.Progress, len(job.PreviewImage))
+		job.Status, job.Step, job.TotalSteps, float64(job.Progress), len(job.PreviewImage))
 
 	return types.ProgressInfo{
-		Progress:     job.Progress,
+		Progress:     float64(job.Progress),
 		Step:         job.Step,
 		TotalSteps:   job.TotalSteps,
 		PreviewImage: job.PreviewImage,

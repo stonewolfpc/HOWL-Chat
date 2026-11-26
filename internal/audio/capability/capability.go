@@ -185,9 +185,11 @@ type Env struct {
 	// prove a model can transcribe.
 	LlamaAudio *LlamaRuntimeProbe
 
-	// MeloTTSReachable probes the local MeloTTS service. Nil leaves
-	// reachability unknown (tests); production supplies a bounded TCP check
-	// instead of assuming the service exists.
+	// MeloTTSReachable probes local MeloTTS readiness. Nil leaves it unknown
+	// (tests). The dimension is "is this a ready Howl provider", not "does a
+	// port answer": the application supplies the managed service's ownership
+	// and liveness probe. The capability package's own fallback is a bounded
+	// reachability check and must not be used to advertise an owned provider.
 	MeloTTSReachable func(url string) (bool, string)
 }
 

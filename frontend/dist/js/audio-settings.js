@@ -29,6 +29,14 @@ let _hydrated = false;
 let _hydrationPromise = null;
 let _saving = false;
 let _lastOutcome = null;
+// Set when the user dismissed the panel while an apply was still running. The
+// panel closes when that attempt settles; it never starts a second one and never
+// tears the frame down under a live backend call.
+let _closeRequested = false;
+// A settings read that never answers must surface as a failure. Without a bound
+// the panel sits at "Loading saved audio settings…" forever, and its close
+// button waits on the same promise that will never settle.
+const HYDRATION_TIMEOUT_MS = 8000;
 
 const REMOTE_ASR_ENGINES = new Set(['qwen3-asr-0.6b', 'qwen3-asr-1.7b']);
 const WHISPER_ASR_ENGINES = new Set(['whisper-tiny', 'whisper-base', 'whisper-small']);
@@ -163,7 +171,16 @@ function show(initialTab) {
 // behavior. Once a save and its apply attempt have completed, the close button
 // can dismiss the dialog without writing again.
 async function close() {
-    if (_saving) return;
+    // Dismissal is never gated on readiness. Readiness is a report about what was
+    // applied; it is not permission to leave the panel, and a panel that cannot
+    // be dismissed without quitting the application is a defect.
+    if (_saving) {
+        // An apply is already running. Do not start a second one or remove the
+        // frame under a live backend call; close once this attempt settles.
+        _closeRequested = true;
+        _showProgress('Closing when this operation finishes. The model load continues in the background.');
+        return;
+    }
 
     // A restored lock has no resolvable outcome. Dismissal must not write,
     // apply, retry, or release anything; the lock outlives the panel.
@@ -172,18 +189,34 @@ async function close() {
         return;
     }
 
-    if (_lastOutcome?.saved && _lastOutcome?.applied) {
+    // Bounded: a hydration that never settles must not hold the close button
+    // hostage. Nothing has been written at this point, so dismissing cannot
+    // discard a preference.
+    const hydrationSettled = await Promise.race([
+        _ensureHydrated().then(() => true),
+        new Promise(resolve => setTimeout(() => resolve(false), HYDRATION_TIMEOUT_MS))
+    ]);
+    if (!hydrationSettled || !_hydrated) {
+        if (hydrationSettled) {
+            _setOutcome('Not saved', 'Not applied', 'Readiness unchecked',
+                'Saved audio settings could not be loaded, so closing without overwriting them is not available yet.', 'error');
+        }
         _finishClose();
         return;
     }
-    await _ensureHydrated();
-    if (!_hydrated) {
-        _setOutcome('Not saved', 'Not applied', 'Readiness unchecked',
-            'Saved audio settings could not be loaded, so closing without overwriting them is not available yet.', 'error');
+
+    // A completed attempt is never repeated. However that attempt ended —
+    // applied, partly applied or failed — the close button dismisses the panel.
+    if (_lastOutcome) {
         _finishClose();
         return;
     }
-    return saveAudioSettings();
+
+    // Nothing has been attempted yet, so closing saves and applies once, as this
+    // dialog has always done. It then closes whatever the outcome was.
+    _closeRequested = true;
+    await saveAudioSettings();
+    _settleCloseRequest();
 }
 
 function _finishClose() {
@@ -201,6 +234,15 @@ function _finishClose() {
 }
 
 function _onEsc(e) { if (e.key === 'Escape') { e.preventDefault(); close(); } }
+
+// Close the panel if the user asked to dismiss it while an attempt was running.
+// Idempotent: _finishClose only removes listeners and the frame.
+function _settleCloseRequest() {
+    if (!_closeRequested) return false;
+    _closeRequested = false;
+    _finishClose();
+    return true;
+}
 
 // Auto-init when loaded as standalone page (iframe)
 window.addEventListener('DOMContentLoaded', () => {
@@ -229,7 +271,12 @@ async function _hydrateSettings() {
         if (!window.settingsState?.loadSettings) {
             throw new Error('settings state is unavailable');
         }
-        await window.settingsState.loadSettings();
+        await Promise.race([
+            window.settingsState.loadSettings(),
+            new Promise((_resolve, reject) => setTimeout(
+                () => reject(new Error('the settings backend did not answer within ' + HYDRATION_TIMEOUT_MS + 'ms')),
+                HYDRATION_TIMEOUT_MS))
+        ]);
         _hydrateAllControls();
         _hydrated = true;
         _setOutcome('Not saved', 'Not applied', 'Readiness unchecked', '', '');
@@ -262,6 +309,21 @@ function _setRetryVisible(visible) {
     button.hidden = !visible;
     // Retry must not start a second activation while one may still be running.
     button.disabled = !visible || _activationBusy();
+}
+
+// Progress is real state, not decoration: the bar is indeterminate because the
+// backend reports only that a build is in progress, and the text names the
+// stage the panel is actually waiting on. Nothing here invents a percentage.
+function _showProgress(text) {
+    const box = document.getElementById('audio-apply-progress');
+    const label = document.getElementById('audio-apply-progress-text');
+    if (label) label.textContent = text;
+    if (box) box.hidden = false;
+}
+
+function _hideProgress() {
+    const box = document.getElementById('audio-apply-progress');
+    if (box) box.hidden = true;
 }
 
 function _setOutcome(saved, applied, readiness, detail, tone) {
@@ -590,11 +652,16 @@ function _contractState(audio, status) {
     if (!statuses) return null;
 
     const entries = Object.values(statuses);
-    // Whisper decode options are required only when an explicit Whisper model
-    // is selected. For every other engine the backend must report them as
-    // unsupported (or unavailable while ASR is off), and they must not prevent
-    // the core capability fields from being called applied.
-    const requiredBackendKeys = [...CORE_BACKEND_KEYS];
+    // An engine selection for a capability that is switched off can never be
+    // applied: the backend reports it as unavailable by design ("the capability
+    // is disabled; this selection is saved but not loaded"). Requiring it made
+    // every save with TTS off look like a partial failure and produced a warning
+    // toast even when everything the user asked for was effective.
+    const requiredBackendKeys = CORE_BACKEND_KEYS.filter(key => {
+        if (key === 'asrEngine') return audio?.asrEnabled === true;
+        if (key === 'ttsEngine') return audio?.ttsEnabled === true;
+        return true;
+    });
     if (WHISPER_ASR_ENGINES.has(audio?.asrEngine)) {
         requiredBackendKeys.push(...WHISPER_DECODE_KEYS);
     }
@@ -788,7 +855,7 @@ async function _microphoneFailure() {
     return null;
 }
 
-async function saveAudioSettings() {
+async function _saveAudioSettings() {
     if (_saving) return false;
     await _ensureHydrated();
     if (!_hydrated) return false;
@@ -807,6 +874,7 @@ async function saveAudioSettings() {
 
     try {
         _setOutcome('Saving…', 'Not applied', 'Readiness unchecked', 'Waiting for the settings file write…', 'busy');
+        _showProgress('Saving the preference…');
         await window.settingsState.flushSettings();
     } catch (err) {
         console.error('[audio-settings] save failed:', err);
@@ -830,6 +898,9 @@ async function saveAudioSettings() {
     }
 
     _setOutcome('Saved', 'Applying…', 'Readiness unchecked', 'Applying the full desired audio configuration…', 'busy');
+    _showProgress(audio.asrEnabled
+        ? 'Applying audio settings… Loading the selected speech-recognition model. This can take up to a minute on some systems. You can close this panel; the operation will finish in the background.'
+        : 'Applying audio settings… Updating the audio endpoints.');
     try {
         await _applySnapshot(audio);
     } catch (err) {
@@ -861,6 +932,7 @@ async function saveAudioSettings() {
         return false;
     }
 
+    _showProgress('Model ready. Checking the microphone and readiness…');
     const readiness = await _readReadiness(audio);
     _showApplied(readiness);
     _dispatchParent(audio, readiness);
@@ -871,7 +943,7 @@ async function saveAudioSettings() {
     return true;
 }
 
-async function retryAudioActivation() {
+async function _retryAudioActivation() {
     if (_saving) return false;
     await _ensureHydrated();
     if (!_hydrated) return false;
@@ -893,6 +965,9 @@ async function retryAudioActivation() {
     _setSaveEnabled(false);
     _setRetryVisible(false);
     _setOutcome('Saved', 'Applying…', 'Readiness unchecked', 'Retrying activation with the saved selection…', 'busy');
+    _showProgress(audio.asrEnabled
+        ? 'Applying audio settings… Loading the selected speech-recognition model. This can take up to a minute on some systems. You can close this panel; the operation will finish in the background.'
+        : 'Applying audio settings… Updating the audio endpoints.');
     try {
         await _applySnapshot(audio);
     } catch (err) {
@@ -922,6 +997,7 @@ async function retryAudioActivation() {
         return false;
     }
 
+    _showProgress('Model ready. Checking the microphone and readiness…');
     const readiness = await _readReadiness(audio);
     _showApplied(readiness);
     _dispatchParent(audio, readiness);
@@ -929,6 +1005,26 @@ async function retryAudioActivation() {
     _setSaveEnabled(true);
     if (readiness.closeable) _finishClose();
     return true;
+}
+
+// Every attempt settles the panel's close request, whichever path it took:
+// declaring an outcome must never be a precondition for dismissing the dialog.
+async function saveAudioSettings() {
+    try {
+        return await _saveAudioSettings();
+    } finally {
+        _hideProgress();
+        _settleCloseRequest();
+    }
+}
+
+async function retryAudioActivation() {
+    try {
+        return await _retryAudioActivation();
+    } finally {
+        _hideProgress();
+        _settleCloseRequest();
+    }
 }
 
 async function resetAudioSettings() {

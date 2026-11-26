@@ -1,0 +1,34 @@
+{
+  "version": "v1.2",
+  "inherits": {
+    "spec": "v1.1",
+    "sha256": "f59959f30ec336ae983f1e28d3833567a88c13ca3f723272ba033063bb251b37",
+    "cases_sha256": "ca6dd5b3541f08fbf997b58bb3ddffe1b797a1171ff94900a80ab53b0c9f1c21"
+  },
+  "cases_sha256": "ca6dd5b3541f08fbf997b58bb3ddffe1b797a1171ff94900a80ab53b0c9f1c21",
+  "score_scale": {
+    "policy": "candidate declares raw|prob and its transform before scoring; the transform is recorded, never silent",
+    "transforms_allowed": [
+      "identity",
+      "sigmoid"
+    ]
+  },
+  "ranking_rule": "expected record ranked first among candidates; threshold-free",
+  "abstention_rule": "threshold = midpoint between the highest irrelevant score and the lowest relevant score on these held-out pairs; if the bands overlap, abstention is reported UNCALIBRATABLE rather than fitted anyway",
+  "abstention_note": "calibration uses eval/s3/calibration_set.py only; the nine cases never inform the threshold",
+  "veto_policy": "R4 and R5 are judged on the selection verdict; a ranking failure is reported separately and is never offset by calibration",
+  "conditions": [
+    {
+      "id": "C-SCHEMA",
+      "status": "original condition, preserved",
+      "detail": "records rendered as 'Subject predicate: value'"
+    },
+    {
+      "id": "E-PROSE-RENDER",
+      "status": "registered, not run",
+      "detail": "natural-language rendering is a separate experiment and must not replace C-SCHEMA"
+    }
+  ],
+  "harness_sha256": "63cb7aec91cdbb025a27dc1dfbedee400b00a68209b65e7ec7dcf506e89a16ef",
+  "frozen_on": "2026-11-15"
+}

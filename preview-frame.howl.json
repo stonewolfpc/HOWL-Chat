@@ -1,0 +1,21 @@
+{
+  "name": "preview-frame",
+  "type": "embedding",
+  "family": "",
+  "format": "bin",
+  "size_mb": 0.0041370391845703125,
+  "file_size": 4338,
+  "mod_time_ns": 1793484759875587300,
+  "logic": 5,
+  "files": {
+    "model": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\preview-frame.bin"
+  },
+  "recommended": {
+    "sampler": "",
+    "scheduler": "",
+    "steps": 0,
+    "cfg": 0,
+    "width": 0,
+    "height": 0
+  }
+}

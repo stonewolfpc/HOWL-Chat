@@ -1,0 +1,43 @@
+[
+  {
+    "label": "corpus-4b-nonthink",
+    "base": "qwen35-4b-nonthink",
+    "draws": 3,
+    "max_tokens": 768
+  },
+  {
+    "label": "corpus-lfm120-instruct",
+    "base": "lfm120-instruct-official",
+    "draws": 3,
+    "max_tokens": 512
+  },
+  {
+    "label": "corpus-lfm3-think-512",
+    "base": "lfm3-17b-think",
+    "draws": 2,
+    "budget": 512,
+    "max_tokens": 1024
+  },
+  {
+    "label": "corpus-4b-think-512",
+    "base": "qwen35-4b-think",
+    "draws": 1,
+    "budget": 512,
+    "max_tokens": 1024
+  },
+  {
+    "label": "corpus-lfm120-t08",
+    "base": "lfm120-instruct-official",
+    "draws": 2,
+    "max_tokens": 512,
+    "sampling": {
+      "temperature": 0.8
+    }
+  },
+  {
+    "label": "corpus-lfm3-nonthink",
+    "base": "lfm3-17b-nonthink",
+    "draws": 3,
+    "max_tokens": 512
+  }
+]

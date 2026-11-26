@@ -1,0 +1,76 @@
+{
+  "activation": {
+    "approval": "owner technical review 2026-11-15; activation authorised explicitly",
+    "approved_utc": "2026-11-15T01:55:56Z",
+    "first_call_under_amendment": 5,
+    "journal": "MEMORY-09-CHECKPOINT-2026-11-15.md section 14.6",
+    "previous_sha256": "8b79129da672a4f0cd934f9f15f94b86f277bf296a07b9c90a861d5d1bc9a10f",
+    "previous_status": "PREPARED \u2014 NOT YET IN FORCE"
+  },
+  "amendment_id": "MEMORY-09-S1-AMENDMENT-01",
+  "applies_to": {
+    "calls": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18
+    ],
+    "conditions": [
+      "A",
+      "B"
+    ],
+    "slots": [
+      "S1-A",
+      "S1-B",
+      "S1-C"
+    ]
+  },
+  "params": {
+    "max_tokens": 1024,
+    "temperature": 0.8,
+    "top_p": 0.95
+  },
+  "pins": {
+    "manifest_sha256": "c983f44713622d86a827cb59ff18db30139031e39184057d37fd2a8cd11f73cd",
+    "plan_sha256": "d15ebacea5fe3408fc40117ffbf781f82042fcd9a01293abafab270f7fdac9e9",
+    "schedule_sha256": "baf5ddd2d95a8cabb6de04df3072ec79feed823614be25562e473f07c87de089",
+    "scoring_protocol_sha256": "a7bd720875b92a22567111272554618ef206e596254defaac66b2e29d1b8d650"
+  },
+  "prepared_utc": "2026-11-15T01:45:00Z",
+  "preserved_calls": {
+    "calls": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "regime": "R0-frozen-256",
+    "treatment": "untouched; their record.json files are not edited or relabelled"
+  },
+  "prohibitions": [
+    "no automatic retry",
+    "no further budget increase without a new dated amendment",
+    "no retroactive change to calls 01-04",
+    "no pooling of R0 and R1 observations in a single cell summary",
+    "no change to prompts, fixture, state, schedule, sampler temperature/top_p, scoring rules or termination classification"
+  ],
+  "regime": {
+    "id": "R1-amended-1024",
+    "supersedes_for_future_calls": "R0-frozen-256"
+  },
+  "status": "IN FORCE",
+  "unchanged_params": {
+    "temperature": 0.8,
+    "top_p": 0.95
+  }
+}

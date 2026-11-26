@@ -18,6 +18,7 @@ import (
 	"howl-chat/internal/audio/tts"
 	"howl-chat/internal/audio/types"
 	"howl-chat/internal/paths"
+	"howl-chat/internal/process"
 )
 
 // Client talks to an HTTP MeloTTS deployment.
@@ -33,22 +34,44 @@ type Client struct {
 	httpClient *http.Client
 	baseURL    *url.URL
 	apiKey     string
+	registry   *process.Registry
+	service    *Service
+	// unowned is a provider-unit-test seam only. Production clients own the
+	// local service; a test may point at an httptest server instead.
+	unowned bool
 
 	// readFile is a test seam for proving the stream holds the call lock
 	// through the output read.
 	readFile func(string) ([]byte, error)
 }
 
-// New allocates a synthesizer wired for MeloTTS HTTP backends.
-func New() *Client {
+// New allocates a synthesizer wired for MeloTTS HTTP backends. The client owns
+// the local service it talks to.
+func New(registries ...*process.Registry) *Client {
+	var registry *process.Registry
+	if len(registries) > 0 {
+		registry = registries[0]
+	}
 	return &Client{
 		BaseSynthesizer: tts.NewBaseSynthesizer(types.TTSMeloTTS),
 		httpClient:      &http.Client{Timeout: 8 * time.Minute},
 		apiKey:          strings.TrimSpace(os.Getenv("HOWL_MELOTTS_API_KEY")),
+		registry:        registry,
 	}
 }
 
-// Initialize validates the remote endpoint and caches directories.
+// NewUnownedForTest builds a client that talks to an endpoint it does not own.
+// It exists so provider tests can use an httptest server; production code paths
+// never set unowned and therefore never assume a loopback endpoint is owned.
+func NewUnownedForTest() *Client {
+	c := New()
+	c.unowned = true
+	return c
+}
+
+// Initialize resolves the local endpoint, starts the service when Howl owns it,
+// and caches directories. A service that cannot start or become ready is a real
+// load failure; readiness is never advertised from an unowned listener.
 func (c *Client) Initialize(ctx context.Context, cfg types.TTSConfig) error {
 	c.LockCalls()
 	defer c.UnlockCalls()
@@ -67,6 +90,13 @@ func (c *Client) Initialize(ctx context.Context, cfg types.TTSConfig) error {
 			fmt.Sprintf("MeloTTS base URL invalid (%q): set HOWL_MELOTTS_URL or TTSConfig.ModelPath to http(s)://host:port", raw),
 			err,
 		)
+	}
+	if !c.unowned {
+		service, err := AcquireService(c.registry, u.String())
+		if err != nil {
+			return err
+		}
+		c.service = service
 	}
 	c.baseURL = u
 
@@ -199,11 +229,15 @@ func (c *Client) GetVoices() []types.Voice {
 // SupportsSSML reports Melo inference path (HTTP) does not accept SSML in this adapter.
 func (c *Client) SupportsSSML() bool { return false }
 
-// Release is a noop for HTTP client state.
+// Release drops this client's reference to the owned service. The last
+// reference terminates and reaps it; a failed termination is returned, never
+// hidden behind a successful unload.
 func (c *Client) Release() error {
 	c.LockCalls()
 	defer c.UnlockCalls()
-	return nil
+	service := c.service
+	c.service = nil
+	return ReleaseService(service)
 }
 
 func (c *Client) readOutput(path string) ([]byte, error) {

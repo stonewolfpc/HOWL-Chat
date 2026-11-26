@@ -1,0 +1,134 @@
+[
+  {
+    "file": "LFM2.5-1.2B-Thinking-Q4_K_M.gguf",
+    "dir": "round3",
+    "bytes": 730899072,
+    "sha256": "4a1e1824f71091f368137b6966094461019f6af3a5aadd96033bee59fc9eaeea"
+  },
+  {
+    "file": "LFM3-1.7B-Q4_K_M.gguf",
+    "dir": "round3",
+    "bytes": 1099627808,
+    "sha256": "3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4"
+  },
+  {
+    "file": "Qwen3-1.7B-Q4_K_M.gguf",
+    "dir": "round3",
+    "bytes": 1107409472,
+    "sha256": "b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897"
+  },
+  {
+    "file": "Qwen3.5-4B-Q4_K_M.gguf",
+    "dir": "round3",
+    "bytes": 2740937888,
+    "sha256": "00fe7986ff5f6b463e62455821146049db6f9313603938a70800d1fb69ef11a4"
+  },
+  {
+    "file": "Qwen3.5-9B-Q4_K_M.gguf",
+    "dir": "round3",
+    "bytes": 5680522464,
+    "sha256": "03b74727a860a56338e042c4420bb3f04b2fec5734175f4cb9fa853daf52b7e8"
+  },
+  {
+    "file": "SmolLM3-Q4_K_M.gguf",
+    "dir": "round3",
+    "bytes": 1915305312,
+    "sha256": "8334b850b7bd46238c16b0c550df2138f0889bf433809008cc17a8b05761863e"
+  },
+  {
+    "file": "functiongemma-270m-it-Q4_K_M.gguf",
+    "dir": "round2",
+    "bytes": 253127904,
+    "sha256": "7474135cf63b5de86bd29d2feb92c644d48e9df5e1ac31550662af373c67d0fc"
+  },
+  {
+    "file": "gemma-3-270m-it-Q4_K_M.gguf",
+    "dir": "round2",
+    "bytes": 253115424,
+    "sha256": "b1baabd6b729e4041822220d3e648e00d99cac5df86b10dffb77bcccf0688e39"
+  },
+  {
+    "file": "granite-4.0-350m-Q4_K_M.gguf",
+    "dir": "round2",
+    "bytes": 236985760,
+    "sha256": "771c588a49607f274a2bba3185733607ebe6f74b996ab90e2d6bee0d98bcec52"
+  },
+  {
+    "file": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "dir": "round2",
+    "bytes": 491400032,
+    "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db"
+  },
+  {
+    "file": "qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    "dir": "round2",
+    "bytes": 1117320736,
+    "sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e"
+  },
+  {
+    "file": "Qwen3.5-0.8B-Q4_K_M.gguf",
+    "dir": "round2",
+    "bytes": 532517120,
+    "sha256": "bd258782e35f7f458f8aced1adc053e6e92e89bc735ba3be89d38a06121dc517"
+  },
+  {
+    "file": "Qwen3.5-2B-Q4_K_M.gguf",
+    "dir": "round2",
+    "bytes": 1280835840,
+    "sha256": "aaf42c8b7c3cab2bf3d69c355048d4a0ee9973d48f16c731c0520ee914699223"
+  },
+  {
+    "file": "smollm2-1.7b-instruct-q4_k_m.gguf",
+    "dir": "round2",
+    "bytes": 1055609536,
+    "sha256": "decd2598bc2c8ed08c19adc3c8fdd461ee19ed5708679d1c54ef54a5a30d4f33"
+  },
+  {
+    "file": "LFM2.5-1.2B-Instruct-QAD-Q4_0.gguf",
+    "dir": "round1",
+    "bytes": 695755488,
+    "sha256": "bb741ebb106d543e9de114b843a3d3d73d51c74b5801e69da2abde821a0cb3e1"
+  },
+  {
+    "file": "LFM2.5-230M-QAD-Q4_0.gguf",
+    "dir": "round1",
+    "bytes": 149081056,
+    "sha256": "e75f83268de11b2a1bcfab5f3b5c5c0c97569ddbbc0990aad88437e45b8ba292"
+  },
+  {
+    "file": "LFM2.5-350M-QAD-Q4_0.gguf",
+    "dir": "round1",
+    "bytes": 219312832,
+    "sha256": "3d10b6ab8fc91a919534b9558e266255aca0bbc7f6d015963599aa9e74e05b1d"
+  },
+  {
+    "file": "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
+    "dir": "round3",
+    "bytes": 668788096,
+    "sha256": "9fecc3b3cd76bba89d504f29b616eedf7da85b96540e490ca5824d3f7d2776a0"
+  },
+  {
+    "file": "abl-4b-q4km.gguf",
+    "dir": "round3",
+    "bytes": 2707513696,
+    "sha256": "79e28ecacf84e75b6056cf4059636d435aa9eb67795780f7b7dbc7d32a962741"
+  },
+  {
+    "file": "abl-2b-q4km.gguf",
+    "dir": "round3",
+    "bytes": 1270808032,
+    "sha256": "be3ccca13a9d1bc8b67165ea80bd103cd6151a37ad131183cc7ca388f78d9517"
+  },
+  {
+    "file": "abl-lfm120-q4km.gguf",
+    "dir": "round3",
+    "bytes": 730896000,
+    "sha256": "11731cb404b6267b63dac25710379425e2c1f42b41d0f24b7002fa6f5175530a"
+  },
+  {
+    "file": "abl-lfm3-q4km.gguf",
+    "dir": "round3",
+    "bytes": 1099627040,
+    "sha256": "b145feb7fcc28fd0b4d0c2ef10a0f9ba4cbde17920ef2eb717afc8e8c6209e25"
+  }
+]

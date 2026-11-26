@@ -219,7 +219,7 @@ class CharacterManager {
      * @returns {string} HTML content
      */
     createLorebookSelectorContent() {
-        const lorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+        const lorebooks = (window.LorebookRepo ? window.LorebookRepo.all() : []);
         const selectedIds = this.selectedLorebooks.map(l => l.id);
 
         let content = `
@@ -284,7 +284,7 @@ class CharacterManager {
      * @param {string} lorebookId - Lorebook ID
      */
     toggleLorebookSelection(lorebookId) {
-        const lorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+        const lorebooks = (window.LorebookRepo ? window.LorebookRepo.all() : []);
         const lorebook = lorebooks.find(l => l.id === lorebookId);
         if (!lorebook) return;
 

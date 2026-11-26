@@ -135,8 +135,8 @@ func (s *Scanner) Scan() (ModelIndex, error) {
 	}
 
 	_ = s.store.Save(idx)
-	fmt.Printf("[Scanner] Scan complete: %d models, %d VAEs, %d LoRAs, %d ControlNets, %d embeddings, %d LLMs\n",
-		len(idx.Models), len(idx.VAEs), len(idx.LoRAs), len(idx.ControlNets), len(idx.Embeddings), len(idx.LLMs))
+	fmt.Printf("[Scanner] Scan complete: %d models, %d VAEs, %d LoRAs, %d ControlNets, %d IP-Adapters, %d CLIP-Vision, %d embeddings, %d LLMs\n",
+		len(idx.Models), len(idx.VAEs), len(idx.LoRAs), len(idx.ControlNets), len(idx.IPAdapters), len(idx.ClipVisions), len(idx.Embeddings), len(idx.LLMs))
 	return idx, nil
 }
 
@@ -187,8 +187,17 @@ func (s *Scanner) scanFile(path string, d os.DirEntry) *AssetEntry {
 	// a VAE whose name said nothing was offered as a diffusion model; both
 	// only failed once the engine tried to load them. Family selection has
 	// always trusted the weights first, and the asset type now agrees.
-	if probeKnowsType && (probeType == AssetLLM || probeType == AssetVAE) {
+	if probeKnowsType && (probeType == AssetLLM || probeType == AssetVAE) && nameType != AssetClipVision && nameType != AssetIPAdapter {
 		nameType = probeType
+	}
+	// A converted diffusion GGUF can carry a language-model word in its name:
+	// qwen-image-Q2_K.gguf was filed as a text encoder purely because
+	// ClassifyName reads "qwen" as LLM, even though its header declares
+	// general.architecture=qwen_image and its tensors say diffusion. The probe
+	// already separates a real encoder from a diffusion stack, so a positive
+	// diffusion verdict outranks an LLM verdict taken from the filename.
+	if probeKnowsType && probeType == AssetDiffusion && nameType == AssetLLM {
+		nameType = AssetDiffusion
 	}
 	if nameType == AssetUnknown && probeKnowsType {
 		nameType = probeType
@@ -224,7 +233,9 @@ func (s *Scanner) scanFile(path string, d os.DirEntry) *AssetEntry {
 		// layout still says Flux or SDXL. The filename is only a fallback for
 		// formats whose contents we cannot read.
 		if f, ok := probe.Family(); ok {
-			family = f
+			// The layout can only name the base of a converted GGUF; the
+			// filename may name the member of that base that it really is.
+			family = refineFamilyFromName(f, GuessFamily(stem))
 		} else {
 			family = GuessFamily(stem)
 			if family == FamilyUnknown {
@@ -232,7 +243,7 @@ func (s *Scanner) scanFile(path string, d os.DirEntry) *AssetEntry {
 			}
 			family = upgradeLargeCheckpoint(family, sizeMB)
 		}
-	case AssetLoRA, AssetControlNet, AssetVAE:
+	case AssetLoRA, AssetControlNet, AssetIPAdapter, AssetClipVision, AssetVAE:
 		if f, ok := probe.Family(); ok {
 			family = f
 		} else {
@@ -351,8 +362,8 @@ func (s *Scanner) scanDirBundle(dir string) ([]AssetEntry, bool) {
 	// that are ControlNets but whose filenames say "diffusion_pytorch_model".
 	fileMap := make(map[string]string)
 	var totalMB float64
-	var modelCandidates []string    // files that might be the "model" slot
-	var controlNetFiles []string    // ControlNet safetensors found in this bundle
+	var modelCandidates []string // files that might be the "model" slot
+	var controlNetFiles []string // ControlNet safetensors found in this bundle
 
 	for _, f := range files {
 		if f.IsDir() || !IsModelFile(f.Name()) {
@@ -380,13 +391,19 @@ func (s *Scanner) scanDirBundle(dir string) ([]AssetEntry, bool) {
 		case AssetControlNet:
 			fileMap["control_net"] = fp
 			controlNetFiles = append(controlNetFiles, fp)
+		case AssetIPAdapter:
+			fileMap["ip_adapter"] = fp
+		case AssetClipVision:
+			fileMap["clip_vision"] = fp
 		case AssetLoRA:
 			// LoRAs are indexed on their own, never as bundle components.
 			continue
 		case AssetDiffusion:
 			modelCandidates = append(modelCandidates, fp)
 			if _, exists := fileMap["model"]; !exists || info.Size() > func() int64 {
-				if fi, e := os.Stat(fp); e == nil { return fi.Size() }
+				if fi, e := os.Stat(fp); e == nil {
+					return fi.Size()
+				}
 				return 0
 			}() {
 				fileMap["model"] = fp
@@ -401,7 +418,9 @@ func (s *Scanner) scanDirBundle(dir string) ([]AssetEntry, bool) {
 			default:
 				modelCandidates = append(modelCandidates, fp)
 				if _, exists := fileMap["model"]; !exists || info.Size() > func() int64 {
-					if fi, e := os.Stat(fp); e == nil { return fi.Size() }
+					if fi, e := os.Stat(fp); e == nil {
+						return fi.Size()
+					}
 					return 0
 				}() {
 					fileMap["model"] = fp
@@ -427,6 +446,10 @@ func (s *Scanner) scanDirBundle(dir string) ([]AssetEntry, bool) {
 					if fileMap["control_net"] == "" {
 						fileMap["control_net"] = candidate
 					}
+				case AssetIPAdapter:
+					fileMap["ip_adapter"] = candidate
+				case AssetClipVision:
+					fileMap["clip_vision"] = candidate
 				}
 			}
 			continue
@@ -441,6 +464,10 @@ func (s *Scanner) scanDirBundle(dir string) ([]AssetEntry, bool) {
 			case AssetControlNet:
 				fileMap["control_net"] = candidate // last ControlNet wins in bundle
 				controlNetFiles = append(controlNetFiles, candidate)
+			case AssetIPAdapter:
+				fileMap["ip_adapter"] = candidate
+			case AssetClipVision:
+				fileMap["clip_vision"] = candidate
 			case AssetVAE:
 				fileMap["vae"] = candidate
 			case AssetT5XXL:
@@ -493,13 +520,13 @@ func (s *Scanner) scanDirBundle(dir string) ([]AssetEntry, bool) {
 				cnFamily = GuessFamily(strings.TrimSuffix(filepath.Base(cns), filepath.Ext(cns)))
 			}
 			m := &Manifest{
-				Name:      DisplayName(filepath.Base(cns), filepath.Dir(cns), probe, cnFamily),
-				Logic:     manifestLogicVersion,
-				Type:      AssetControlNet,
-				Family:    cnFamily,
-				Format:    "safetensors",
-				SizeMB:    0,
-				Files:     map[string]string{"control_net": cns},
+				Name:        DisplayName(filepath.Base(cns), filepath.Dir(cns), probe, cnFamily),
+				Logic:       manifestLogicVersion,
+				Type:        AssetControlNet,
+				Family:      cnFamily,
+				Format:      "safetensors",
+				SizeMB:      0,
+				Files:       map[string]string{"control_net": cns},
 				Recommended: buildRecommended(AssetControlNet, cnFamily),
 			}
 			// Try to find a human-readable name for this ControlNet. Bundle-split
@@ -618,6 +645,10 @@ func appendEntry(idx *ModelIndex, e AssetEntry) {
 		idx.LoRAs = append(idx.LoRAs, e)
 	case AssetControlNet:
 		idx.ControlNets = append(idx.ControlNets, e)
+	case AssetIPAdapter:
+		idx.IPAdapters = append(idx.IPAdapters, e)
+	case AssetClipVision:
+		idx.ClipVisions = append(idx.ClipVisions, e)
 	case AssetEmbedding:
 		idx.Embeddings = append(idx.Embeddings, e)
 	case AssetUpscaler:
@@ -730,4 +761,4 @@ func containsAny(s, chars string) bool {
 		}
 	}
 	return false
-}
+}

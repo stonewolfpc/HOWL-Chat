@@ -49,7 +49,7 @@ function getLorebookSourceType(lorebook, cd) {
 function _resolveLorebookDescription(lorebook) {
     if (lorebook.description) return lorebook.description;
     try {
-        const catalog = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+        const catalog = (window.LorebookRepo ? window.LorebookRepo.all() : []);
         const full = catalog.find(l => l.id === lorebook.id);
         return (full && full.description) ? full.description : '';
     } catch (_) { return ''; }
@@ -156,7 +156,7 @@ async function toggleLorebookEnabled(lorebookId) {
 }
 
 function openLorebookSelector() {
-    const allLorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+    const allLorebooks = (window.LorebookRepo ? window.LorebookRepo.all() : []);
     const cd           = window.sidebarState.currentChatData;
     const fe           = window.FilterEngine;
 
@@ -320,7 +320,7 @@ function filterLorebooks(searchTerm) {
 // toggleLorebookSelection(lorebook, element); same name, different job,
 // which is why this one is named for what it does.
 async function toggleChatLorebook(lorebookId) {
-    const lorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+    const lorebooks = (window.LorebookRepo ? window.LorebookRepo.all() : []);
     const lorebook  = lorebooks.find(l => l.id === lorebookId);
     if (!lorebook) return;
 

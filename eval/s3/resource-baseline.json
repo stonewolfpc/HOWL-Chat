@@ -1,0 +1,90 @@
+{
+  "captured_at": "2026-11-15T03:38:29Z",
+  "degraded_mode": {
+    "passed": 4,
+    "probes": [
+      {
+        "abstained": false,
+        "branches_available": [
+          "lexical",
+          "subword"
+        ],
+        "id": "P1",
+        "pass": true,
+        "semantic": {
+          "semantic": "no embedding model authorized or configured; branch reports unavailable rather than faking a fallback"
+        }
+      },
+      {
+        "abstained": true,
+        "branches_available": [
+          "lexical",
+          "subword"
+        ],
+        "id": "P2",
+        "pass": true,
+        "semantic": {
+          "semantic": "no embedding model authorized or configured; branch reports unavailable rather than faking a fallback"
+        }
+      },
+      {
+        "abstained": true,
+        "branches_available": [
+          "lexical",
+          "subword"
+        ],
+        "id": "P3b",
+        "pass": true,
+        "semantic": {
+          "semantic": "no embedding model authorized or configured; branch reports unavailable rather than faking a fallback"
+        }
+      },
+      {
+        "abstained": false,
+        "branches_available": [
+          "lexical",
+          "subword"
+        ],
+        "id": "P4a",
+        "pass": true,
+        "semantic": {
+          "semantic": "no embedding model authorized or configured; branch reports unavailable rather than faking a fallback"
+        }
+      }
+    ],
+    "semantic_available": false,
+    "total": 4
+  },
+  "embedding_model_present": true,
+  "envelope": {
+    "cold_load_seconds_max": 3.0,
+    "cpu_rss_gib_max": 1.0,
+    "index_build_100_records_seconds_max": 2.0,
+    "matrix": [
+      "chat model absent/present",
+      "CPU/GPU",
+      "cold/warm"
+    ],
+    "preferred_execution": "CPU/RAM; GPU only if CPU misses the latency budget",
+    "query_latency_p50_ms_max": 40,
+    "query_latency_p95_ms_max": 120,
+    "unload_residual_mib_max": 64,
+    "vram_overhead_mib_max": 384,
+    "vram_overhead_target": 0
+  },
+  "gpu": {
+    "available": true,
+    "compute_cap": "6.1",
+    "driver": "582.78",
+    "free_mib": 6472,
+    "name": "NVIDIA GeForce GTX 1080",
+    "total_mib": 8192,
+    "used_mib": 1588
+  },
+  "note": "baseline only; no embedding model loaded, nothing downloaded",
+  "ram": {
+    "available_gib": 49.9,
+    "cores": 16,
+    "total_gib": 63.9
+  }
+}

@@ -23,6 +23,7 @@
 
 const CharacterStorage = (() => {
     const CACHE_KEY = 'howl-chat-characters';
+    const LEGACY_BACKUP_KEY = CACHE_KEY + '-cutover-backup';
     const CACHE_VERSION = 2;
     const LEGACY_DB_NAME = 'howl-character-images';
     const LEGACY_DB_VERSION = 1;
@@ -31,6 +32,8 @@ const CharacterStorage = (() => {
     let characters = [];
     let source = 'defaults';
     let loadPromise = null;
+    let cutover = false;
+    let cutoverStatus = null;
 
     function _app() {
         return window.go?.main?.App;
@@ -213,30 +216,36 @@ const CharacterStorage = (() => {
         const app = _app();
         let backendList = null;
 
-        // Explicit, idempotent import of pre-cutover raw localStorage. The raw
-        // array is replaced by the versioned cache once the backend owns it.
-        const legacy = _readLegacy();
-        if (legacy && typeof app?.ImportCharacters === 'function') {
+        if (typeof app?.GetCharacterCutoverStatus === 'function') {
             try {
-                await app.ImportCharacters(legacy);
-                _emit('howl:characters-imported', { count: legacy.length });
+                cutoverStatus = await app.GetCharacterCutoverStatus();
+                cutover = Boolean(cutoverStatus?.cutover);
             } catch (e) {
-                console.warn('[characterRepository] legacy character import failed:', e);
+                console.warn('[characterRepository] cutover status failed:', e);
             }
         }
 
         if (typeof app?.GetCharacters === 'function') {
             try {
                 const list = await app.GetCharacters();
-                if (Array.isArray(list)) {
-                    backendList = list;
-                }
+                if (Array.isArray(list)) backendList = list;
             } catch (e) {
                 console.warn('[characterRepository] backend load failed:', e);
             }
         }
 
         if (backendList) {
+            // Before the explicit cutover an empty canonical list must not erase
+            // the only copy of the user's pre-cutover characters.
+            if (!cutover && backendList.length === 0) {
+                const legacy = _readLegacy();
+                if (legacy) {
+                    characters = _normalize(legacy);
+                    source = 'legacy';
+                    _emit('howl:characters-loaded', { source });
+                    return characters.slice();
+                }
+            }
             characters = _normalize(backendList);
             source = 'backend';
             await _hydrateLegacyImages();
@@ -246,8 +255,14 @@ const CharacterStorage = (() => {
         }
 
         const cached = _readCache();
-        characters = _normalize(cached);
-        source = cached ? 'cache' : 'defaults';
+        if (cached) {
+            characters = _normalize(cached);
+            source = 'cache';
+        } else {
+            const legacy = _readLegacy();
+            characters = _normalize(legacy);
+            source = legacy ? 'legacy' : 'defaults';
+        }
         _emit('howl:characters-loaded', { source });
         return characters.slice();
     }
@@ -309,6 +324,41 @@ const CharacterStorage = (() => {
         return legacy;
     }
 
+    async function importLegacy() {
+        const app = _app();
+        if (typeof app?.ImportCharacters !== 'function') {
+            throw new Error('character backend unavailable');
+        }
+        const legacy = _readLegacy();
+        if (!legacy || legacy.length === 0) {
+            throw new Error('No pre-cutover characters were found in this browser.');
+        }
+        localStorage.setItem(LEGACY_BACKUP_KEY, JSON.stringify(legacy));
+        let result;
+        try {
+            result = await app.ImportCharacters(legacy);
+        } catch (error) {
+            localStorage.removeItem(LEGACY_BACKUP_KEY);
+            throw error;
+        }
+        await loadAll();
+        return result;
+    }
+
+    async function rollback() {
+        const app = _app();
+        if (typeof app?.RollbackCharacters !== 'function') {
+            throw new Error('character backend unavailable');
+        }
+        await app.RollbackCharacters();
+        const backup = localStorage.getItem(LEGACY_BACKUP_KEY);
+        if (backup !== null) {
+            localStorage.setItem(CACHE_KEY, backup);
+            localStorage.removeItem(LEGACY_BACKUP_KEY);
+        }
+        await loadAll();
+    }
+
     // Seed synchronously from the derived cache so pages that read during
     // parsing see the last acknowledged list; the backend refresh follows.
     const seeded = _readCache();
@@ -324,9 +374,13 @@ const CharacterStorage = (() => {
         CACHE_VERSION,
         get source() { return source; },
         get ready() { return ready; },
+        get cutover() { return cutover; },
+        get cutoverStatus() { return cutoverStatus; },
         all() { return characters; },
         get(id) { return _find(id); },
         loadAll,
+        importLegacy,
+        rollback,
         save,
         remove,
         loadImages,

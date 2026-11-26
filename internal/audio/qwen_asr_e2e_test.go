@@ -27,7 +27,7 @@ func TestQwenASRPipelineE2E(t *testing.T) {
 
 	previous := pipelineCapabilityCatalog
 	pipelineCapabilityCatalog = func() []capability.Record {
-		return capability.Catalog(capability.ProductionEnv(ASRModelPathFor, ASRProjectorPathFor, TTSModelPathFor))
+		return ProductionCapabilityRecords()
 	}
 	t.Cleanup(func() { pipelineCapabilityCatalog = previous })
 

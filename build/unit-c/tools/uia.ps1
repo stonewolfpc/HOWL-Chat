@@ -11,7 +11,10 @@ param(
     [string]$OutFile = '',
     [string]$Text = '',
     [int]$X = -1,
-    [int]$Y = -1
+    [int]$Y = -1,
+    # Defaults to the historical unit-c executable. Pass the process name of any
+    # other packaged build (for example howl-chat) to drive that window instead.
+    [string]$ProcessName = 'howl-chat-unit-c'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -43,8 +46,8 @@ public static class W32 {
 Add-Type -TypeDefinition $win32
 
 function Get-AppWindow {
-    $p = Get-Process -Name 'howl-chat-unit-c' -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
-    if (-not $p) { throw 'howl-chat-unit-c window not found' }
+    $p = Get-Process -Name $ProcessName -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
+    if (-not $p) { throw "$ProcessName window not found" }
     if ([W32]::IsIconic($p.MainWindowHandle)) { [void][W32]::ShowWindow($p.MainWindowHandle, 9) }
     [void][W32]::SetForegroundWindow($p.MainWindowHandle)
     Start-Sleep -Milliseconds 250

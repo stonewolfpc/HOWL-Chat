@@ -156,3 +156,19 @@ func TestWaitReadyOrExitStopsWhenTheLoadIsCancelled(t *testing.T) {
 		t.Fatalf("cancel took %v to end the load", elapsed)
 	}
 }
+
+// A process that is killed but not observed to exit must make the unload fail.
+// Returning nil here was how UnloadImageModel could unregister a model whose
+// sd-server was still alive.
+func TestReapStoppedProcessReportsAnUnreapedExit(t *testing.T) {
+	e := NewEngine()
+	e.procDone = make(chan struct{})
+
+	err := e.reapStoppedProcess(10 * time.Millisecond)
+	if err == nil {
+		t.Fatal("an unobserved process exit must be reported as an error")
+	}
+	if !strings.Contains(err.Error(), "did not exit") {
+		t.Fatalf("timeout error = %q, want a did-not-exit explanation", err)
+	}
+}

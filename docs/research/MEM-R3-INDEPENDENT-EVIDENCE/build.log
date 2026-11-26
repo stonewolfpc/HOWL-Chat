@@ -1,0 +1,52 @@
+{
+  "runs": 478,
+  "corpus_runs": 379,
+  "triage_runs": 99,
+  "labels": 43,
+  "files": 15,
+  "packets": 51,
+  "words": 118904,
+  "missing_content": [],
+  "missing_reasoning": [],
+  "oversize": [],
+  "bad_attribution": [],
+  "banned_hits": [],
+  "disagree": [],
+  "duplicate_codes": 191,
+  "max_copies": 2,
+  "empty_content": [
+    "yjyha4dh",
+    "t1hggto0"
+  ],
+  "empty_reasoning": 388,
+  "absent_reasoning_field": 0,
+  "finish": {
+    "stop": 451,
+    "length": 27
+  },
+  "length_by_label": {
+    "abl-4b-nonthink": 1,
+    "qwen35-2b-think": 1,
+    "qwen35-9b-think-rb1024": 1,
+    "corpus-lfm3-think-512": 6,
+    "corpus-lfm3-nonthink": 1,
+    "corpus-tinyllama": 17
+  },
+  "labels_both_kinds": [
+    "abl-2b-nonthink",
+    "abl-4b-nonthink",
+    "abl-lfm120",
+    "qwen35-2b-nonthink"
+  ],
+  "no_prompt_tokens": [],
+  "no_ctx": 379,
+  "no_command": 379,
+  "system": {
+    "/think": 3,
+    "/no_think": 3
+  }
+}
+packets: 51 words: 118904
+missing content: 0 missing reasoning: 0
+oversize: []
+banned hits: []

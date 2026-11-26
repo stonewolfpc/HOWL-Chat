@@ -19,6 +19,8 @@ type ScanResult struct {
 	VAEs        []AssetInfo `json:"vaes"`
 	LoRAs       []AssetInfo `json:"loras"`
 	ControlNets []AssetInfo `json:"controlnets"`
+	IPAdapters  []AssetInfo `json:"ip_adapters"`
+	ClipVisions []AssetInfo `json:"clip_visions"`
 	Embeddings  []AssetInfo `json:"embeddings"`
 	Upscalers   []AssetInfo `json:"upscalers"`
 	T5XXLs      []AssetInfo `json:"t5xxls"`
@@ -54,6 +56,8 @@ type FilteredAssets struct {
 	VAEs        []AssetInfo `json:"vaes"`
 	LoRAs       []AssetInfo `json:"loras"`
 	ControlNets []AssetInfo `json:"controlnets"`
+	IPAdapters  []AssetInfo `json:"ip_adapters"`
+	ClipVisions []AssetInfo `json:"clip_visions"`
 }
 
 // InstalledAssetInfo is the frontend-visible result for one installed asset.
@@ -205,11 +209,15 @@ func (a *App) GetCompatibleAssets(family string) (FilteredAssets, error) {
 	vaes := scanner.FilterVAEsForFamily(idx.VAEs, f)
 	loras := scanner.FilterLoRAsForFamily(idx.LoRAs, f)
 	cns := scanner.FilterControlNetsForFamily(idx.ControlNets, f)
+	ips := scanner.FilterIPAdaptersForFamily(idx.IPAdapters, f)
+	vision := scanner.FilterClipVisionsForFamily(idx.ClipVisions, f)
 
 	return FilteredAssets{
 		VAEs:        entriesToInfos(vaes),
 		LoRAs:       entriesToInfos(loras),
 		ControlNets: entriesToInfos(cns),
+		IPAdapters:  entriesToInfos(ips),
+		ClipVisions: entriesToInfos(vision),
 	}, nil
 }
 
@@ -307,6 +315,8 @@ func (a *App) mergeRegistryIntoResult(result ScanResult) ScanResult {
 	seenVAE := make(map[string]struct{})
 	seenLoRA := make(map[string]struct{})
 	seenCN := make(map[string]struct{})
+	seenIP := make(map[string]struct{})
+	seenVision := make(map[string]struct{})
 	seenEmb := make(map[string]struct{})
 	seenUp := make(map[string]struct{})
 	seenT5 := make(map[string]struct{})
@@ -323,6 +333,12 @@ func (a *App) mergeRegistryIntoResult(result ScanResult) ScanResult {
 	}
 	for _, a := range result.ControlNets {
 		seenCN[a.Path] = struct{}{}
+	}
+	for _, a := range result.IPAdapters {
+		seenIP[a.Path] = struct{}{}
+	}
+	for _, a := range result.ClipVisions {
+		seenVision[a.Path] = struct{}{}
 	}
 	for _, a := range result.Embeddings {
 		seenEmb[a.Path] = struct{}{}
@@ -362,6 +378,16 @@ func (a *App) mergeRegistryIntoResult(result ScanResult) ScanResult {
 			if _, ok := seenCN[e.Path]; !ok {
 				result.ControlNets = append(result.ControlNets, info)
 				seenCN[e.Path] = struct{}{}
+			}
+		case scanner.AssetIPAdapter:
+			if _, ok := seenIP[e.Path]; !ok {
+				result.IPAdapters = append(result.IPAdapters, info)
+				seenIP[e.Path] = struct{}{}
+			}
+		case scanner.AssetClipVision:
+			if _, ok := seenVision[e.Path]; !ok {
+				result.ClipVisions = append(result.ClipVisions, info)
+				seenVision[e.Path] = struct{}{}
 			}
 		case scanner.AssetEmbedding:
 			if _, ok := seenEmb[e.Path]; !ok {
@@ -422,6 +448,8 @@ func indexToResult(idx scanner.ModelIndex) ScanResult {
 		VAEs:        entriesToInfos(idx.VAEs),
 		LoRAs:       entriesToInfos(idx.LoRAs),
 		ControlNets: entriesToInfos(idx.ControlNets),
+		IPAdapters:  entriesToInfos(idx.IPAdapters),
+		ClipVisions: entriesToInfos(idx.ClipVisions),
 		Embeddings:  entriesToInfos(idx.Embeddings),
 		Upscalers:   entriesToInfos(idx.Upscalers),
 		T5XXLs:      entriesToInfos(idx.T5XXLs),

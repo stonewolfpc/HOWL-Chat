@@ -82,6 +82,441 @@ what, and how ownership is proven. Repair is not in scope for the next stage.
 alive and reports it as left alone, or an explicit ownership check refuses the
 kill, with a test.
 
+### T0.6 · The capture probe opens a stream on the ASR apply path
+`app-media.go:16` documents the capture port as presence-level ("it must never
+activate the endpoint or open a stream") but its body calls
+`microphoneStatusNow()`, the initialize-level probe (`mic_status.go:68-74` →
+`mic_windows.go:116`, `:165`): `Activate(IAudioClient)` +
+`Initialize(SHARED, endpoint mix format)`, then release, no `Start`.
+`internal/media/audio.go:171,188` runs that port twice per explicit ASR apply —
+once before the model build and once after it.
+
+Observed 2026-11-23, WH-1000XM4 (Bluetooth Classic, default output and input):
+isolating that exact probe reproduced the reported interference twice (playback
+louder, flat, bass gone, brief dropout, then recovery), while the presence probe
+and two full application launches — one isolated, one real profile — produced no
+endpoint change and no audible difference. A sampler using
+`IMMNotificationClient` plus property-store polling (no `Activate`, no stream)
+recorded zero transitions across both launches. Windows 11 selects HFP instead of
+A2DP whenever an application opens the capture endpoint, and resamples other
+applications' playback on that device to the HFP format (Microsoft, Bluetooth
+Classic audio).
+
+**Not part of this defect:** `GetAudioStatus` used the same initialize-level probe
+on every page load and tab return until `67c1a37` (2026-11-23). Builds older than
+that reproduce the launch symptom; HEAD does not.
+
+**Before any repair:** decide whether ASR activation needs an initialize-level
+probe at all, and make the port match its own contract. The presence probe
+already answers "is there a usable device".
+**Evidence:** a test that applies ASR settings with ASR enabled and asserts the
+capture port is never invoked, plus a live apply on a Bluetooth headset with no
+profile switch.
+
+**Plan (awaiting approval, not implemented):** `captureProbe` returns
+`microphonePresenceNow()` and its comment states presence semantics and why; the
+`MicStateReady` copy stops claiming initialization that no longer happens; the
+initialize-level probe stays as a diagnostics/test seam with no production
+caller; a regression test replaces the initialize seam with one that fails the
+test if called and asserts an ASR apply never reaches it.
+
+**Semantics (settled 2026-11-23, before implementation).**
+`IMMDeviceEnumerator::GetDefaultAudioEndpoint(eCapture, eConsole)` plus
+`IMMDevice::GetState` proves exactly four things: a default console capture
+endpoint is selected, the role resolved, `GetState` returned `S_OK`, and the
+state is `DEVICE_STATE_ACTIVE` (present, enabled, not unplugged).
+It does **not** prove that the endpoint can be opened, that its mix format is
+accepted, that Windows privacy permissions allow capture, that no other client
+holds it, that samples will flow, or that the renderer will pick the same device.
+`DEVICE_STATE_ACTIVE` is a device-state flag, not "in use".
+
+That claim surfaces as `MicrophoneStatus.Message`, which `newMicrophoneStatus`
+sets from `microphoneMessageFor(state)` (`mic_status.go:140-148`) and which the
+UI shows in `audio-settings.js:521` and `audio-service.js:122`. The precise
+probe text already sits in `Detail` and is accurate (`mic_windows.go:356-362`).
+The generic messages therefore have to describe the *gate*, not the device:
+
+| State | Current message | Correction |
+|---|---|---|
+| `ready` | "initialized for shared-mode capture. Recording has not started." | "The Windows default microphone is present and enabled. Recording has not started or been verified." |
+| `unavailable` | "...unavailable (disabled, disconnected, or in use)." | Drop "in use": presence cannot detect it. |
+| `capture-init-failed` | "present but could not be initialized for recording." | "Windows could not confirm a default microphone; the probe failed before any capture was attempted." |
+| `access-denied` | unchanged | Presence can return `E_ACCESSDENIED`; accurate as written. |
+| `no-device` | `MicrophoneNoDeviceMessage` | **Do not reword** — frozen audit contract. |
+
+The `MicStateReady` doc comment (`mic_status.go:8-13`) and `Usable()`
+(`:53-56`) already describe both probe levels correctly; only `MicStateUnavailable`
+(`:19-21`) carries the same "in use" overclaim and gets the same trim.
+
+The regression test must fail when the initialize seam *runs*, not merely when
+the status is wrong: replace `microphoneProbe` with a function that records an
+invocation and calls `t.Fatalf`, drive `captureProbe`, `GetAudioStatus` and an
+ASR-enabled `ApplyAudioSettings`, and assert zero invocations. Add the refusal
+case (presence reports no-device → `CaptureUnavailableError`) so the gate stays
+proven.
+
+### T0.7 · Controlled Folder Access blocked a content-root write, and startup never noticed
+Observed 2026-11-23 19:54:28, during the real-profile launch (`exp6`): Windows
+Defender event **1123** — `C:\Users\StoneWolfPC\HOWL_Chat\build\bin\howl-chat-s1.exe`
+was blocked from modifying `%userprofile%\Documents\Howl`. The block landed 5.6 s
+after process start (19:54:22.72 → 19:54:28.33).
+
+Correction to this entry's first reading: `Documents\Howl` is **not** the state
+root. `paths.StateRoot()` is the project root unless isolation is active
+(`internal/paths/isolation.go:185-190`), so settings, chats, logs and registries
+live under `<root>/config` and were untouched. `Documents\Howl` is the
+**content-library root** (`internal/paths/content.go:25-63`).
+
+Startup still reported success — `[lifecycle] ready: 6 stages in 154ms`, webview
+attached, rescan completed — so a successful startup does **not** prove the app
+had normal access to its content directories, and nothing was surfaced to the user.
+
+**Identified operation.** The blocked write was directory **creation**, not a file
+write: `os.MkdirAll` at `app-worlds.go:47` inside `ensureDefaultLibrary`
+(`app-worlds.go:35-55`), on the path from `paths.DefaultContentDir`
+(`internal/paths/content.go:43-63`) = `<Documents known folder>\Howl\<Category>`.
+Go implements that as `CreateDirectoryW` (`Documents\Howl` first, then the category
+directory), so the denied leaf is `Worlds` or `Scenarios` — whichever the renderer
+asked for first. Both take the identical path and no log line records the attempt.
+
+It is reached from a **read** binding: `listDocuments` (`app-worlds.go:61-62`) ←
+`GetWorlds` (`:78`) / `GetScenarios` (`:90`), driven by the renderer's startup load
+(`world-repository.js:151` inside `_load`, `loadAll()` at module init `:268`;
+`scenario-repository.js:151`). Also reachable from `:106` and `:193`.
+
+**Proof of identity.** After a launch with protection off, `Documents\Howl`
+contains exactly `Scenarios` and `Worlds`, both stamped `2026-11-23 20:25:50` —
+3 s after that process started (20:25:47), the same window in which the protected
+run was blocked. During the blocked run the directory did not exist at all.
+
+**Required or optional:** required for content features, optional for boot. It
+provides the approved save roots for Worlds and Scenarios (and Chats / Lorebooks
+on first use). When it fails silently, `world-repository.js:154`
+(`console.warn('[worldRepository] backend load failed')`) falls back to the stale
+`localStorage` cache or an empty list, the library is never registered so a later
+save has no default root, and every read retries the blocked creation. The user
+loses their worlds/scenarios views and any default-location save without being
+told why. Settings, chats and logs were unaffected — they live under the project
+root, not Documents.
+
+It is also a mutation on a read path: `GetWorlds` creates directories, contrary to
+the rule stated at `app-libraries.go:48-50` that content directories are created by
+explicit user action.
+
+**Repro requirement:** with protection enabled, a launch must show the blocked
+path in the Defender log *and* either write successfully or surface the failure.
+Silent success is the defect.
+
+**Verification plan (four cases plus 3b, injected through code seams, read back
+from disk as well as the screen):**
+
+| # | Case | Injection in a disposable isolated root | Expected result |
+|---|---|---|---|
+| 1 | Existing directory, readable but not writable | Pre-create `content/Worlds` holding one world document; deny write for the current user (`icacls <root>\content\Worlds /deny "%USERNAME%":(W)`), leave read access | Adopted and registered; the existing world is **listed and opens** (viewing works); library status `read-only` with a visible reason; new/save/delete/import disabled and explain why; nothing written (contents and mtimes unchanged); never shown as empty or unavailable |
+| 2 | Missing directory, creation permitted | Fresh isolated root, nothing pre-created | Root and category created, probe file written/read back/removed, registered as default-save, library `ready`; Worlds panel lists and saves. Verify on disk: directories exist, no probe file left, `config/content-libraries.json` holds the registration |
+| 3 | Directory creation denied | `content` exists as a **file** (ENOTDIR); repeat with `content` ACL-denied (`E_ACCESSDENIED`) | Core ready; Worlds library `unavailable`, naming the path and failed step; Scenarios untouched; other panels usable; one diagnostic; nothing created |
+| 3b | One category denied, others permitted | Same as case 3, but only for Worlds; leave `content/Scenarios` absent and creatable | Worlds `unavailable` (creation denied) while Scenarios reaches `ready` and its panel loads and saves; Lorebooks and Chats unaffected; core ready. Proves no status is shared across categories |
+| 4 | Optional logging unavailable | `config/logs` as a file, or ACL-denied | Core ready and usable; one "log unavailable" diagnostic; no library marked unavailable |
+
+Unit level, behind the injected filesystem seam: each of the seven probe steps
+fails independently and reports the right `Step` and classification; a probe
+against an existing writable directory leaves no artifacts; and a readable but
+unwritable library returns its documents with `Readable=true, Writable=false`
+while every mutation binding returns the typed `read-only` refusal.
+
+Both hosts are exercised: packaged desktop (`build/bin/howl-chat-s1.exe`) and the
+browser dev host (`-tags uiharness`), each on its own isolated root. The folder
+picker is a native surface, so "Choose folder" is verified in the desktop app only
+and that difference is recorded rather than treated as equivalent.
+
+**CFA verdict:** still optional. Re-enabling Controlled Folder Access is useful only
+as confirmation that event 1123 reproduces this exact path; because
+`Documents\Howl` now exists, such a run would have to target a fresh category
+directory (e.g. Lorebooks) rather than the parent. The four deterministic isolated
+root cases above are the repeatable gate.
+
+**Readiness vs. this write — the call order**
+1. Process start → `NewApp` (`app.go:119`) → `Lifecycle.Boot(app.bootStages())`.
+2. Six stages (`app-boot.go:38-43`): core services, audio owner, settings store,
+   registries, image domain, inference capture. **None creates or validates a
+   user-content directory.**
+3. `Lifecycle.Boot` sets `ready = firstErr == nil` (`internal/host/lifecycle.go:110`)
+   and prints `[lifecycle] ready: 6 stages` at ≈+154 ms.
+4. `startup()` prints `webview attached … ready` (`app.go:137`), then starts
+   background rescan and model discovery.
+5. Renderer loads → `GetWorlds` → `ensureDefaultLibrary` → `MkdirAll` → denied
+   (≈+5.6 s) → the error returns to JS at `world-repository.js:151` and dies in the
+   `console.warn` at `:154`.
+
+So readiness is declared before the write is even attempted, and the write's error
+never travels toward it. The lifecycle *can* fail a boot (`ready=false`,
+`[lifecycle] startup stopped at "stage"`, `lifecycle.go:110-115`), but
+`app.go:120-121` only prints `[Lifecycle] startup incomplete` and the window opens
+anyway; `Ready()` is consumed solely by the stdout line at `app.go:137`.
+
+**Verdict: a required-write failure is structurally unreachable by the user.** It
+is swallowed twice — the boot gate does not check writability, and the content
+path's error ends in a console warning. Worth stating plainly: `Lifecycle.Ready()`
+has exactly one consumer today, the stdout line at `app.go:137`. Global readiness
+gates nothing. A boot stage that failed on a content library would therefore be
+cosmetic and still invisible, so it is **not** the repair.
+
+#### Revised repair design (after review) — plan only, not implemented
+
+**R1 · Feature-level readiness; the core stays ready.**
+No boot stage fails on content storage. `Lifecycle.Ready()` keeps its current
+meaning (core composition succeeded) and is not reused as a content gate.
+
+The dependency is demonstrated, not assumed. The content-library root is read only
+by: the world/scenario bindings (`app-worlds.go`), cutover rollback
+(`app-cutover.go:144,152`), the chat service's canonical world/scenario/lore load
+(`internal/backend/chat/service.go:107-129` and `loadCanonicalWorld`), which
+already returns `ContextUnavailable` and contributes nothing to the prompt, and
+content import (`internal/contentimport/service.go:34`). None of these runs in a
+boot stage and none is needed for settings, chats, audio or image work, so core
+readiness has no dependency on this root.
+
+Per-library state is one authority in the app layer, behind one binding. **The
+product guarantee it exists to enforce: a storage failure must never masquerade as
+an empty library, a successful save, or a globally broken application.**
+
+Readiness is reported **per content library**, never once for the content system.
+Every entry carries its category and library identity, and each library is
+evaluated on its own path and probe result, so Worlds being unavailable cannot
+imply anything about Scenarios, Lorebooks, Chats or Characters — they are separate
+registrations.
+
+```
+type ContentLibraryState struct {
+    Category  string // worlds | scenarios | lorebooks | chats | characters
+    LibraryID string // registration ID; empty only on the synthesized not-initialized entry
+    Path      string
+    Readable  bool   // content can be listed and opened
+    Writable  bool   // a mutation can succeed (write probe passed)
+    SaveRoot  bool   // designated default save destination
+    Status    string // ready | read-only | not-readable | not-initialized | unavailable
+    Reason    string // user-facing, e.g. "this library is read-only: access denied"
+    Operation string // failed provisioning/probe step, when there was one
+    Retryable bool
+}
+func (a *App) GetContentReadiness() []ContentLibraryState
+```
+
+Reading and modifying are separate capabilities, so there is deliberately **no
+single `Ready` flag**:
+
+| Status | Readable | Writable | Meaning, and what the UI does |
+|---|---|---|---|
+| `ready` | yes | yes | Normal operation |
+| `read-only` | yes | **no** | Existing worlds/scenarios stay visible and openable; create, save, delete and import are disabled with the reason shown. Never hidden, never labelled unavailable |
+| `not-readable` | no | no | Registered but access fails (permission, missing drive, offline). Listed with the reason; cached items shown as stale |
+| `not-initialized` | no | no | No usable library yet. Offer initialization |
+| `unavailable` | no | no | Initialization or access failed for another reason; name the failed step |
+
+Category rollup is derived and never shared: a category is readable when any of
+its libraries is readable, and writable when any readable library with a write
+role passes its probe. A category with no registration produces exactly one
+synthesized `not-initialized` entry. No status is copied between categories.
+
+The chat service's `GetContextStatus()` (`service.go:132-136`) is the existing
+precedent: state is reported, unavailability is displayed, and no data is
+substituted.
+
+**R2 · Provisioning is its own authority; reads never mutate.**
+A new `app-content-roots.go` owns the only provisioning route: resolve
+`paths.DefaultContentDir`, create the root, create the category directory, prove
+writability, register it as default-save. `ensureDefaultLibrary` is removed from
+`listDocuments` (`app-worlds.go:61-62`), `saveDocument` (`:106`) and
+`importDocuments` (`:193`).
+
+- Reads become pure. With no registered root, `GetWorlds`/`GetScenarios` return an
+  empty list **and** feature state `not-initialized` — not an error, so the panel
+  can offer setup instead of presenting a backend failure.
+- A write into an uninitialized category is refused with a typed error naming the
+  missing root; the renderer turns that into the "Set up the default location"
+  action. A save never creates a directory, so a CFA block can no longer hide
+  inside a save.
+- `AddDefaultContentLibrary` (`app-libraries.go:46-58`) keeps its explicit
+  user-action meaning and delegates to the same authority. This removes the second
+  provisioner rather than adding a layer.
+- Initialization runs once, **synchronously from `startup()` before the background
+  scans**, so the renderer's first `GetWorlds` sees a settled state instead of
+  racing provisioning. It never fails the boot; each category's outcome lands in
+  `ContentReadiness` and is logged once.
+- Existing but unregistered default directories are adopted by that step
+  (registration is not a write). A directory that is readable but unwritable is
+  still registered with `Writable=false`: its contents remain visible and
+  openable, and every mutation is refused with a typed `read-only` error rather
+  than the feature being called unavailable.
+
+**R3 · The writeability probe proves what it claims.**
+`ProbeWritable` reports each step separately rather than one boolean:
+
+```
+type ProvisionReport struct {
+    RootCreated     bool // false when the root already existed
+    CategoryCreated bool
+    FileCreated     bool
+    BytesWritten    int
+    ReadBack        bool
+    Cleanup         bool
+    Step            string // the step that failed, "" on success
+    Err             error
+}
+```
+
+Steps: resolve path → create root → create category directory → create a randomly
+named probe file → write N bytes, `Sync`, close → read back and compare → remove
+the probe file → remove the category directory **only** if this call created it and
+it is empty. A pre-existing directory is never removed.
+
+Errors are classified, not stringified: `permission-denied` (`os.ErrPermission` /
+`ERROR_ACCESS_DENIED`), `path-blocked` (a regular file where the directory
+belongs), `read-only` volume, `not-initialized`, `unknown`. A directory that
+already exists but cannot be written is a first-class case: reads succeed and
+return its documents, the probe records `Writable=false`, mutations are refused
+with the `read-only` reason, and nothing claims success.
+
+The probe only ever targets a disposable isolated root, and its filesystem calls
+sit behind an injectable seam so each of the seven steps fails deterministically in
+a unit test without ACLs.
+
+**R4 · Every refusal is surfaced, and viewing is never confused with modifying.**
+- A banner per **library** (category and path named) driven by its status:
+  `read-only` says the content can be viewed but not changed and gives the reason;
+  `not-readable` and `unavailable` give the reason and failed step;
+  `not-initialized` offers "Set up default location" (provisioning), and "Choose
+  folder" stays available (existing picker).
+- Mutating controls — new, save, delete, import — are disabled in a `read-only`
+  library and explain why if used. Viewing and opening stay enabled.
+- One diagnostic per initialization attempt, not one per read. Today
+  `a.logErrorSilent` plus the renderer `console.warn` make every retry invisible.
+- Cached or legacy renderer data is marked stale only when its library is not
+  readable. A `read-only` library's documents are live and must not be marked
+  stale. Today `world-repository.js:154-176` presents the cache as if it were live.
+
+**Unchanged:** `worldstore` envelopes, the registry's shape (`library.View`
+already exposes `Exists/Readable/Writable/Available`), and the existing
+`Documents\Howl` directories.
+
+**Implementation order** (each slice builds, vets and keeps the current suites
+green, and its workflow is driven in-host before the next slice starts):
+1. `app-content-roots.go`: provisioning authority, step-wise probe, error
+   classification, injected filesystem seam. Unit tests fail each probe step.
+2. Remove provisioning from reads/saves/imports; add the typed "not initialized"
+   refusal and `GetContentReadiness`; root tests assert that `GetWorlds` never
+   creates a directory (probe the isolated root before and after).
+3. Call initialization from `startup()` before the background scans; record state;
+   one diagnostic per attempt.
+4. Renderer: per-library banner keyed by status, `read-only` disables mutations
+   while keeping content visible and openable, route save refusals to the banner,
+   and mark cached worlds/scenarios stale only when their library is not readable.
+5. Four cases plus 3b in both hosts, read back from disk and screen, recorded here
+   with the observed results.
+
+#### Implementation and verification (2026-11-24)
+
+Implemented as designed. Files changed:
+- `app-content-roots.go` (new): the single provisioning authority, step-wise
+  write probe (`RootCreated/CategoryCreated/FileCreated/BytesWritten/ReadBack/
+  Cleanup/RootRemoved/CategoryRemoved`, failing `Step`), injected filesystem seam,
+  classified errors, per-library `ContentLibraryState`, derived category rollup,
+  `GetContentReadiness`, `EnsureDefaultContentLibrary`, and the create gate.
+- `app-worlds.go`: `ensureDefaultLibrary` removed. `GetWorlds`/`GetScenarios` are
+  pure reads; creates (`saveDocument`, `importDocuments`) pass through
+  `requireCreateWritable`.
+- `app-libraries.go`: `AddDefaultContentLibrary` and `AddContentLibrary` delegate to
+  the one authority; a user-added read-only root is registered, not rejected.
+- `app.go`, `harness_main.go`: content provisioning/probing runs once before the
+  renderer can read it, in both hosts; the optional log is verified first.
+- `startup_log.go`, `app-errors.go`: an unwritable startup log is reported as a
+  medium `SYS-LOGGING` diagnostic; diagnostics fall back to `paths.TempDir()` so
+  the limitation is reportable instead of vanishing with the logger.
+- `frontend/dist/js/content-readiness.js` (new) + `world-repository.js`,
+  `scenario-repository.js`, `world.html`, `scenario.html`: per-library banner with
+  path/status/reason and a setup action, mutation controls disabled when not
+  writable, cache marked stale only when the library is not readable.
+
+**Observed results** (isolated roots, browser dev host, read from disk as well as
+screen):
+1. **Readable, not writable** (existing `Worlds` with one world; deny
+   `WD,AD,WEA,WA` for the current user): library `read-only`, `readable=true`,
+   `writable=false`; the world still lists; create refused with the read-only
+   reason and the directory unchanged; banner shows path + read-only + reason;
+   Create and Save disabled. Not shown as empty or unavailable.
+2. **Missing, creation permitted**: startup created `content/{Worlds,Scenarios}`
+   and registered both with `default_save`; a world created through the panel UI
+   landed as `Worlds/<id>/world.json`; banner hidden, Create enabled.
+3. **Creation denied**: `content/Worlds` as a file → `worlds unavailable`
+   (retryable false, path named), `scenarios ready`, its directory created; world
+   page showed the reason plus the setup action with Create disabled; scenario page
+   had no banner and Create enabled. Removing the blocker and clicking “Set up
+   default location” provisioned and registered Worlds and cleared the banner.
+4. **Optional logging unavailable** (`config/logs` as a file): Worlds and
+   Scenarios stayed `ready` and writable and pages served. The earlier run
+   recorded **two** `SYS-LOGGING` diagnostics for one condition (diagnostics
+   fallback and the startup-log open); after reconciling, the fallback is now the
+   single report (`logging.initialize`) and a re-run on a fresh root recorded
+   **exactly one** medium `SYS-LOGGING` entry, naming the configured path and the
+   OS error, with the fallback jsonl still written under `temp/howl-diagnostics`.
+
+**Packaged desktop host — UI driven, not just started.** The production build was
+launched on isolated roots and driven with real mouse input and WebView2 windows,
+reading both the rendered window and the files on disk:
+- Fresh root: World page had no banner and an enabled Create; the creation form
+  accepted a typed title and wrote `Worlds/<id>/world.json`, confirmed by the
+  app's own save dialog and by reading the file.
+- `Worlds` denied (`WD,AD,WEA,WA`): banner `Worlds: 1 of 1 libraries needs
+  attention` naming the path and reason, existing world still shown, Create
+  visibly disabled; clicking the disabled control opened nothing and changed
+  nothing on disk.
+- `Worlds` replaced by a file: banner reported `unavailable` (file, not a
+  directory) with the setup action and Create disabled; the Scenarios page had no
+  banner and an enabled Create — one category's failure did not touch the other.
+  Deleting the blocker and clicking “Set up default location” provisioned and
+  registered `Worlds`, cleared the banner and re-enabled Create; the restored
+  world then listed again with no banner.
+- Two libraries: banner `1 of 2 libraries needs attention` listed both paths
+  (default `read-only`, sibling `ready`); Create reflected the default save root
+  and the sibling's world stayed visible and editable.
+
+**Multi-library audit (two worlds libraries).** `saveWritable` was added to the
+category rollup: `writable` stays true when any library can be written (editing
+survives a failing sibling), while create follows the **default save root**. The
+first pass exposed a real defect: `saveDocument` gated every save on the default
+root, so a read-only default refused updates to a document that lived in a
+healthy sibling (`SaveWorld FAILED` with the read-only reason). The gate now
+applies only to creation (no id, or proven absence). Verified both directions
+with a writable sibling owning a world while the default was read-only: the edit
+saved (`Sibling World Edited`) and the read-only root was untouched; with the
+default writable and the sibling read-only, create stayed enabled and the banner
+counted one failure without hiding it. The probe only proves that *new* files
+cannot be created there (a directory-level deny leaves existing files writable),
+so the banner and reason now say “new items refused” instead of claiming all
+changes are refused.
+
+**Tests:** `go build ./...`, `go vet ./...`, `go test -count=1 .` all pass, including
+new coverage that fails each probe step independently, keeps a read-only library
+readable, counts a failing library in the rollup of two, proves a read-only
+sibling does not disable create when the default save root is writable, proves a
+read-only default refuses create while a healthy sibling's update still saves,
+isolates categories, proves `GetWorlds` creates nothing, and lets the probe
+override a registry view it disproves.
+
+**Limitations:** no CFA confirmation run (still optional). The folder picker is a
+native surface and was not exercised (the setup action used the existing default
+location). Form save success surfaces as a native JS alert in the WebView2
+window, which blocks scripted reads until dismissed; outcomes were confirmed from
+the backend log and the files on disk instead. During verification the machine
+showed Controlled Folder Access active and blocked `python.exe` writing under
+`Documents\Codex` — an unrelated application and folder. No Defender setting or
+exclusion was changed, and no test touched `Documents\Howl`.
+
+**Status:** implemented and verified in both hosts, including packaged desktop UI
+interactions (banner, disabled create, category isolation, setup action, restore)
+and the multi-library rollup in both directions. Available for review before any
+commit.
+
 **CHECKPOINT 0** — answer before Tier 1:
 - Did the JSON show 1 copy or 2?
 - Does the bubble render on chat-switch without restart?
@@ -351,6 +786,8 @@ Separate pass, its own stage, after everything above. Look for waste everywhere.
 ## Decision log
 
 Append here as stages close. One line each: date, stage, evidence, result.
+
+- 2026-11-23 · Audio interference investigation (research only, no code change) — reproduced the reported startup interference with one operation: Howl's initialize-level capture probe (`Activate(IAudioClient)` + `Initialize` on the default console capture endpoint) flipped the WH-1000XM4 to HFP and was stage-reported twice. The presence probe, an isolated packaged launch and a real-profile packaged launch all produced no endpoint change (render stayed `Headphones (WH-1000XM4)` 48 kHz/2ch, zero `IMMNotificationClient` events, zero property-store changes) and no audible difference. `GetAudioStatus` called the initialize probe on every page load until `67c1a37`, so pre-23rd builds still show it at launch; HEAD does not. Residual defect recorded as T0.6. Deferred by decision: render-side `GetMixFormat` and session-volume instrumentation (each needs an `Activate`). Evidence: `build/tmp/audio-sampler/logs/exp1_startup.log`, `exp2_presence.log`, `exp3_initialize.log`, `exp4_a2dp_baseline_20261123_195152.log`, `exp5_initialize.log`, `exp6_real_profile.log`.
 
 - 2026-11-04 · Microphone/history tranche (code close-out, live run pending) — replaced the WebM `MediaRecorder`/`blob:` handoff with renderer-side 16 kHz PCM16 WAV capture and a `TranscribeAudioData` binding; temp files are unique and removed on success, error, cancellation, and panic; composer target corrected to `#message-input`. Evidence: root tests, full `internal/audio/...` tests, `go build ./...`, JS syntax, Node WAV header/resample assertions. Not yet evidence: live Wails mic capture, transcript send + conversation reload/history, concurrent chat + ASR, real Whisper. No registry or family-list changes.
 - 2026-11-02 · Image generation settlement guard — source review PASS; stage-recorded tests PASS; independent review PASS; real-app acceptance PASS on verified build `d7e8aacd…` (PID 9252): abort leaves child alive, next request refused as abandoned, Unload/Reload recovers, work admitted after reset. Closed with no code change; the earlier live run had tested a pre-guard 18:59 binary. Unresolved: why the old sd-server exited.

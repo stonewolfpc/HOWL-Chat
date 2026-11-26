@@ -14,6 +14,7 @@ type ResourceType string
 
 const (
 	ResourceLLM   ResourceType = "llm"
+	ResourceASR   ResourceType = "asr"
 	ResourceTTS   ResourceType = "tts"
 	ResourceImage ResourceType = "image"
 )
@@ -30,7 +31,7 @@ type ModelState struct {
 	Loaded       bool         `json:"loaded"`
 	GPUMemoryMB  int64        `json:"gpu_memory_mb"`
 	SystemRAMMB  int64        `json:"system_ram_mb"`
-	Priority     int          `json:"priority"`     // 0 = highest (chat), 10 = lowest (image)
+	Priority     int          `json:"priority"` // 0 = highest (chat), 10 = lowest (image)
 	LastUsed     time.Time    `json:"last_used"`
 	IsGPUOffload bool         `json:"is_gpu_offload"`
 }
@@ -54,6 +55,20 @@ type HardwareSnapshot struct {
 	MemoryTier     string    `json:"memory_tier"`
 	OS             string    `json:"os"`
 	Arch           string    `json:"arch"`
+
+	// GPUs carries the per-device values. The aggregate fields above remain for
+	// existing callers; admission uses the selected device when it is present.
+	GPUs []GPUInfo `json:"gpus,omitempty"`
+	// VRAMLive is true only when GPU used memory was read from a live counter.
+	VRAMLive bool `json:"vram_live"`
+	// VRAMSource names the live detector or fallback path.
+	VRAMSource string `json:"vram_source,omitempty"`
+	// GPUAvailable records that a GPU was detected, even when its memory could
+	// not be read.
+	GPUAvailable bool `json:"gpu_available"`
+	// DetectionError is non-empty when the snapshot cannot support a safe
+	// allocation decision. Admission fails closed on it.
+	DetectionError string `json:"detection_error,omitempty"`
 }
 
 // ---------------------------------------------------------------------------
@@ -74,12 +89,12 @@ type AllocationRequest struct {
 // AllocationResult is the recommended strategy returned by the allocator.
 type AllocationResult struct {
 	UseGPU        bool     `json:"use_gpu"`
-	GPULayers     int      `json:"gpu_layers"`     // -1 = auto/default
+	GPULayers     int      `json:"gpu_layers"` // -1 = auto/default
 	GPUMemoryMB   int64    `json:"gpu_memory_mb"`
 	SystemRAMMB   int64    `json:"system_ram_mb"`
 	ReduceBatch   bool     `json:"reduce_batch"`
 	ReduceContext bool     `json:"reduce_context"`
 	UnloadModels  []string `json:"unload_models"` // Models to unload first
 	Reason        string   `json:"reason"`
-	Confidence    float64  `json:"confidence"`    // 0.0–1.0
+	Confidence    float64  `json:"confidence"` // 0.0–1.0
 }

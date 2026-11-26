@@ -61,7 +61,7 @@ func (b *blockingMeloTransport) RoundTrip(req *http.Request) (*http.Response, er
 
 func meloUnitClient(t *testing.T) *Client {
 	t.Helper()
-	c := New()
+	c := NewUnownedForTest()
 	c.SetInitialized(types.TTSConfig{CacheDir: t.TempDir()})
 	u, err := url.Parse("http://127.0.0.1:9999")
 	if err != nil {

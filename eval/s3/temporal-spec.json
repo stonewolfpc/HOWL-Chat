@@ -1,0 +1,277 @@
+{
+  "experiment": "E-TEMPORAL-SET",
+  "version": "v2",
+  "frozen_on": "2026-11-15",
+  "supersedes": "v1 (cases 8c6f834a) \u2014 withdrawn before any result was used: it compared record ids against expected values, and its scope probe built a pool that bypassed the ownership filter it meant to test",
+  "cases_sha256": "43d744e982a46fa7d6a6c51fc8240ab73eb0a6144789800080dec6c686419611",
+  "cases": [
+    {
+      "id": "T1-current-no-temporal",
+      "criterion": "current_without_temporal_language",
+      "owner": "char-101",
+      "query": "What ship does Mira sail?",
+      "expect": "the Osprey",
+      "expect_abstain": false,
+      "candidates": [
+        {
+          "record_id": "rec-0004",
+          "text": "Mira ship: the Osprey",
+          "value": "the Osprey",
+          "status": "active"
+        },
+        {
+          "record_id": "rec-0004",
+          "text": "Mira ship: the Osprey",
+          "value": "the Osprey",
+          "status": "active"
+        },
+        {
+          "record_id": "rec-0005",
+          "text": "Mira home_port: Vell",
+          "value": "Vell",
+          "status": "active"
+        },
+        {
+          "record_id": "rec-0006",
+          "text": "Mira cargo: salt",
+          "value": "salt",
+          "status": "active"
+        }
+      ]
+    },
+    {
+      "id": "T2-previous",
+      "criterion": "explicit_history",
+      "owner": "char-101",
+      "query": "Which ship was Mira sailing before the Osprey?",
+      "expect": "the Wren",
+      "expect_abstain": false,
+      "candidates": [
+        {
+          "record_id": "rec-0002",
+          "text": "Mira ship: the Kestrel",
+          "value": "the Kestrel",
+          "status": "superseded"
+        },
+        {
+          "record_id": "rec-0003",
+          "text": "Mira ship: the Wren",
+          "value": "the Wren",
+          "status": "superseded"
+        },
+        {
+          "record_id": "rec-0004",
+          "text": "Mira ship: the Osprey",
+          "value": "the Osprey",
+          "status": "active"
+        }
+      ]
+    },
+    {
+      "id": "T3-first",
+      "criterion": "explicit_history_deep",
+      "owner": "char-101",
+      "query": "What was Mira's first ship?",
+      "expect": "the Kestrel",
+      "expect_abstain": false,
+      "candidates": [
+        {
+          "record_id": "rec-0002",
+          "text": "Mira ship: the Kestrel",
+          "value": "the Kestrel",
+          "status": "superseded"
+        },
+        {
+          "record_id": "rec-0003",
+          "text": "Mira ship: the Wren",
+          "value": "the Wren",
+          "status": "superseded"
+        },
+        {
+          "record_id": "rec-0004",
+          "text": "Mira ship: the Osprey",
+          "value": "the Osprey",
+          "status": "active"
+        }
+      ]
+    },
+    {
+      "id": "T4-correction-current",
+      "criterion": "correction_resolves_to_current",
+      "owner": "char-102",
+      "query": "What is Teodor's post?",
+      "expect": "bosun",
+      "expect_abstain": false,
+      "candidates": [
+        {
+          "record_id": "rec-0007",
+          "text": "Teodor post: quartermaster",
+          "value": "quartermaster",
+          "status": "superseded"
+        },
+        {
+          "record_id": "rec-0008",
+          "text": "Teodor post: bosun",
+          "value": "bosun",
+          "status": "active"
+        }
+      ]
+    },
+    {
+      "id": "T5-correction-history",
+      "criterion": "correction_history_reachable",
+      "owner": "char-102",
+      "query": "What was Teodor's post before the correction?",
+      "expect": "quartermaster",
+      "expect_abstain": false,
+      "candidates": [
+        {
+          "record_id": "rec-0007",
+          "text": "Teodor post: quartermaster",
+          "value": "quartermaster",
+          "status": "superseded"
+        },
+        {
+          "record_id": "rec-0008",
+          "text": "Teodor post: bosun",
+          "value": "bosun",
+          "status": "active"
+        }
+      ]
+    },
+    {
+      "id": "T6-conflict",
+      "criterion": "conflicting_timestamps",
+      "owner": "char-102",
+      "query": "What does Teodor owe in harbour dues?",
+      "expect": "five coppers",
+      "expect_abstain": false,
+      "candidates": [
+        {
+          "record_id": "rec-0010",
+          "text": "Teodor harbour_dues: three coppers",
+          "value": "three coppers",
+          "status": "active"
+        },
+        {
+          "record_id": "rec-0011",
+          "text": "Teodor harbour_dues: five coppers",
+          "value": "five coppers",
+          "status": "active"
+        }
+      ]
+    },
+    {
+      "id": "T7-ownership-own",
+      "criterion": "ownership_positive",
+      "owner": "char-102",
+      "query": "What ship does Teodor sail?",
+      "expect": "the Gull",
+      "expect_abstain": false,
+      "candidates": [
+        {
+          "record_id": "rec-0009",
+          "text": "Teodor ship: the Gull",
+          "value": "the Gull",
+          "status": "active"
+        }
+      ]
+    },
+    {
+      "id": "T8-ownership-negation",
+      "criterion": "ownership_negation",
+      "owner": "char-102",
+      "query": "What ship does Teodor sail?",
+      "expect": "the Gull",
+      "expect_abstain": false,
+      "candidates": [
+        {
+          "record_id": "rec-0009",
+          "text": "Teodor ship: the Gull",
+          "value": "the Gull",
+          "status": "active"
+        },
+        {
+          "record_id": "rec-0002",
+          "text": "Mira ship: the Kestrel",
+          "value": "the Kestrel",
+          "status": "superseded"
+        },
+        {
+          "record_id": "rec-0003",
+          "text": "Mira ship: the Wren",
+          "value": "the Wren",
+          "status": "superseded"
+        },
+        {
+          "record_id": "rec-0004",
+          "text": "Mira ship: the Osprey",
+          "value": "the Osprey",
+          "status": "active"
+        }
+      ]
+    },
+    {
+      "id": "T9-distractor",
+      "criterion": "non_temporal_control",
+      "owner": "char-101",
+      "query": "Where is Mira's home port?",
+      "expect": "Vell",
+      "expect_abstain": false,
+      "candidates": [
+        {
+          "record_id": "rec-0004",
+          "text": "Mira ship: the Osprey",
+          "value": "the Osprey",
+          "status": "active"
+        },
+        {
+          "record_id": "rec-0005",
+          "text": "Mira home_port: Vell",
+          "value": "Vell",
+          "status": "active"
+        },
+        {
+          "record_id": "rec-0006",
+          "text": "Mira cargo: salt",
+          "value": "salt",
+          "status": "active"
+        }
+      ]
+    },
+    {
+      "id": "T10-chat-scope-gap",
+      "criterion": "scope_gap_known",
+      "owner": "char-101",
+      "query": "What flag does the fleet sail under?",
+      "expect": null,
+      "expect_abstain": true,
+      "candidates": [
+        {
+          "record_id": "rec-0004",
+          "text": "Mira ship: the Osprey",
+          "value": "the Osprey",
+          "status": "active"
+        },
+        {
+          "record_id": "rec-0005",
+          "text": "Mira home_port: Vell",
+          "value": "Vell",
+          "status": "active"
+        },
+        {
+          "record_id": "rec-0006",
+          "text": "Mira cargo: salt",
+          "value": "salt",
+          "status": "active"
+        }
+      ]
+    }
+  ],
+  "selection_rule": "keep scores >= calibrated threshold; if none, abstain",
+  "threshold_note": "calibrated on this store's held-out pairs at run time; never fitted to these cases",
+  "gap_cases": [
+    "scope_gap_known"
+  ],
+  "isolation_note": "fresh store, new owner ids, new cases; the frozen seven records and the R1-R5 case set are neither referenced nor modified"
+}

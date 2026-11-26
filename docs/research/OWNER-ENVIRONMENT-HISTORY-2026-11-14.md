@@ -66,9 +66,9 @@ It has exactly the signature the investigation has been struggling to explain: i
 
 This is the part of the new information that meets the hash finding, and it cuts in one direction.
 
-The 19:16:03 read was **99.99992 % unbuffered**: 5,335,281,664 B in 1,273 sector-aligned calls with zero short reads, then 4,064 B buffered. The composite hashed to the published value, so **the device served canonical bytes for the body** and the cache served canonical bytes for the tail.
+The 19:16:03 read was **99.99992 % unbuffered**: 5,335,281,664 B in 1,273 sector-aligned calls with zero short reads, then 4,064 B buffered. The composite hashed to the published value, so **the cache-bypassing portion returned canonical bytes**, and the buffered tail did too.
 
-An unbuffered read is served by the device, not by the system cache. So at 19:16:03 the bytes **stored on `G:` hashed to the published artifact**. That makes "the copy from failing `E:` wrote corrupt contents into this file" **disfavoured** — it would require the storage to have been corrected afterwards, and no write is recorded (mtime unchanged since 2026-09-04).
+An unbuffered read does not consult the system file cache — it still passes through the filter stack and the class/port drivers, so "device-level" would be too strong. The supported claim is narrower: at 19:16:03 a cache-bypassing path returned bytes that **hashed to the published artifact**. That makes "the copy from failing `E:` wrote corrupt contents into this file" **disfavoured** — it would require the storage to have been corrected afterwards, and no write is recorded (mtime unchanged since 2026-09-04).
 
 **Stated at its real strength:** disfavoured, not excluded. `/COPY:DAT` can restore a timestamp after a write, so a later repairing write would not necessarily show in metadata; and an unbuffered read is *bypassed* by the cache, not *guaranteed* to bypass every layer in the stack.
 
@@ -95,7 +95,7 @@ The consequence, for S1-B only: the six mismatching digests now point more stron
 | Stale or poisoned cache pages | admissible | **leading candidate** (§5.2) |
 | Memory / memory-controller error in the read path | admissible | **admissible, untested under load** |
 | A filter or agent in the storage stack | admissible | admissible |
-| Genuinely different bytes stored on `G:` | admissible | **disfavoured** — device served canonical bytes at 19:16:03 (§4) |
+| Genuinely different bytes stored on `G:` | admissible | **disfavoured** — the cache-bypassing read returned canonical bytes at 19:16:03 (§4) |
 
 ### 5.2 The narrowing for 19:16:03
 
@@ -103,7 +103,7 @@ Two of the four most attractive mechanisms are now removed or weakened **for the
 
 What remains is dominated by one state that survives both changes: **pages already resident in the system cache**. A cache population survives a drive's removal and survives a driver update. If those pages were filled from wrong reads *before* 13 November, they would keep serving that content afterwards, and a buffered read of them would never touch the device.
 
-The observed shape fits that: the buffered digest `341fb28c…` was recorded **at least three times across hours** and never once matched the device-level digest, while a single unbuffered read produced the canonical content. A resident wrong population explains a stable wrong stream without requiring any fault to be active at 19:16.
+The observed shape fits that: the buffered digest `341fb28c…` was recorded **at least three times across hours** and never once matched the cache-bypassing read's digest, while that single read produced the canonical content. A resident wrong population explains a stable wrong stream without requiring any fault to be active at 19:16.
 
 **This is the leading candidate, not a finding.** It is not established by anything in this record, and it makes a specific prediction that no current evidence tests: a buffered read of a file whose pages were **never** resident should match its unbuffered read. That prediction is exactly what the V-B scratch-file probe would test — a file written and read for the first time, with a known pattern — and it needs gate 1, because it writes to `G:`.
 
@@ -123,7 +123,7 @@ What that implies, stated only as far as the evidence goes:
 
 | File | What is known | What it means for backing up |
 |---|---|---|
-| `S1-B` Gemma | one device-level read matched the publisher's hash | **the copy on `G:` is very likely intact.** Verify future copies with a device-level read, not a cached one |
+| `S1-B` Gemma | one cache-bypassing read matched the repository-verified reference | consistent with an intact copy, **not proof of one** — stability was never demonstrated. Verify future copies with a cache-bypassing read, and treat a single matching read as one observation |
 | `S1-A`, `S1-C` | no reference exists; no authoritative hash obtainable | **integrity unknown and unknowable by hash.** A second independent copy is the only mitigation available |
 | Any file already read by the old stack | a cached stream may be wrong while the disk is right | **re-verify from a fresh process after a restart, or with an unbuffered read**, before trusting a previously computed digest |
 
@@ -133,7 +133,7 @@ The third row is a precaution, not a proven method: it rests on one matched obse
 
 ## 7. Claim ceiling
 
-**Establishes:** that owner-reported environment history materially widens the mechanism list (page-file corruption, driver-stack collision, reduced memory population, a removed source drive); that the source drive can no longer be inspected; that the surviving ingestion manifest is now the best documentary artefact; and that the publisher-hash match constrains — without refuting — the "bad copy from `E:`" explanation for S1-B.
+**Establishes:** that owner-reported environment history materially widens the mechanism list (page-file corruption, driver-stack collision, reduced memory population, a removed source drive); that the source drive can no longer be inspected; that the surviving ingestion manifest is now the best documentary artefact; and that the match against the repository-verified reference constrains — without refuting — the "bad copy from `E:`" explanation for S1-B.
 
 **Does not establish:** that any of these mechanisms caused any observed digest; that the memory subsystem is damaged; that the driver collision produced wrong data rather than crashes; that the OS reinstall predates or postdates the 2026-09-04 mtime; or that the current machine would or would not reproduce the disagreement. Every item in this document is owner-reported, unverified here, and no gate moved.
 

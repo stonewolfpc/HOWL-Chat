@@ -1,0 +1,10 @@
+{
+  "algorithm": "sha256 over the UTF-8 text, no normalisation",
+  "commitments": {
+    "f-003": "fadb7d10aaf77e3bbb52647995ff7ada5651cbca2353b38d03f6641eec1f8b54",
+    "f-013": "8e3f76da7afc0e86357af16682b001f3f4fdbe41f61be0f7194fc8997e885076",
+    "f-023": "78a47f0306509af5af24f9cf2844be34f9fb2b0ed8a85adc605428ecac84521e",
+    "f-033": "40db5a9557541f2a6a6d4ba99eefa879cf03824e477b459a16d7da4d084fb3aa"
+  },
+  "purpose": "Held-out fact commitments. Safe for any code path: ids and digests only, no plaintext."
+}

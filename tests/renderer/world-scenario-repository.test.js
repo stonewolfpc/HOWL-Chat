@@ -149,7 +149,7 @@ for (const kind of CASES) {
         assert.equal(cached[kind.list][0].title, 'backend');
     });
 
-    test(`${kind.label}: a pre-cutover raw array is imported once and replaced by the envelope`, async () => {
+    test(`${kind.label}: a pre-cutover raw array stays browser-owned until an explicit import`, async () => {
         const harness = createHarness(kind, {
             backend: [],
             cache: JSON.stringify([{ id: `${kind.prefix}_legacy`, title: 'Legacy' }]),
@@ -157,11 +157,16 @@ for (const kind of CASES) {
 
         await harness.state.ready;
 
-        assert.ok(harness.operations.indexOf(kind.import) < harness.operations.indexOf(kind.get));
+        assert.equal(harness.operations.includes(kind.import), false);
+        assert.equal(harness.state.source, 'legacy');
         assert.equal(harness.state.all().some(item => item.id === `${kind.prefix}_legacy`), true);
-        const cached = JSON.parse(harness.store.get(kind.key));
-        assert.equal(cached.version, 2);
-        assert.equal(Array.isArray(cached), false);
+        assert.equal(Array.isArray(JSON.parse(harness.store.get(kind.key))), true);
+
+        await harness.state.importLegacy();
+
+        assert.ok(harness.operations.indexOf(kind.import) > 0);
+        assert.equal(harness.state.all().some(item => item.id === `${kind.prefix}_legacy`), true);
+        assert.equal(JSON.parse(harness.store.get(kind.key)).version, 2);
     });
 
     test(`${kind.label}: a save reaches the backend before the projection or cache changes`, async () => {

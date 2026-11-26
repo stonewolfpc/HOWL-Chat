@@ -1,0 +1,305 @@
+{
+  "runs": 478,
+  "corpus_runs": 379,
+  "triage_runs": 99,
+  "labels": 43,
+  "files": 15,
+  "packets": 51,
+  "words": 118904,
+  "missing_content": [],
+  "missing_reasoning": [],
+  "oversize": [],
+  "bad_attribution": [],
+  "banned_hits": [],
+  "disagree": [],
+  "duplicate_codes": 191,
+  "max_copies": 2,
+  "empty_content": [
+    "yjyha4dh",
+    "t1hggto0"
+  ],
+  "empty_reasoning": 388,
+  "absent_reasoning_field": 0,
+  "finish": {
+    "stop": 451,
+    "length": 27
+  },
+  "length_by_label": {
+    "abl-4b-nonthink": 1,
+    "qwen35-2b-think": 1,
+    "qwen35-9b-think-rb1024": 1,
+    "corpus-lfm3-think-512": 6,
+    "corpus-lfm3-nonthink": 1,
+    "corpus-tinyllama": 17
+  },
+  "labels_both_kinds": [
+    "abl-2b-nonthink",
+    "abl-4b-nonthink",
+    "abl-lfm120",
+    "qwen35-2b-nonthink"
+  ],
+  "no_prompt_tokens": [],
+  "no_ctx": 379,
+  "no_command": 379,
+  "system": {
+    "/think": 3,
+    "/no_think": 3
+  },
+  "packet_words": [
+    {
+      "id": "00",
+      "runs": 0,
+      "words": 719
+    },
+    {
+      "id": "01",
+      "runs": 0,
+      "words": 763
+    },
+    {
+      "id": "02A-1",
+      "runs": 18,
+      "words": 3510
+    },
+    {
+      "id": "02A-2",
+      "runs": 4,
+      "words": 1278
+    },
+    {
+      "id": "02B-1",
+      "runs": 18,
+      "words": 3557
+    },
+    {
+      "id": "02B-2",
+      "runs": 3,
+      "words": 1139
+    },
+    {
+      "id": "02C-1",
+      "runs": 18,
+      "words": 3374
+    },
+    {
+      "id": "02C-2",
+      "runs": 3,
+      "words": 769
+    },
+    {
+      "id": "02D-1",
+      "runs": 17,
+      "words": 3558
+    },
+    {
+      "id": "02D-2",
+      "runs": 4,
+      "words": 928
+    },
+    {
+      "id": "02E-1",
+      "runs": 18,
+      "words": 3143
+    },
+    {
+      "id": "02E-2",
+      "runs": 3,
+      "words": 1140
+    },
+    {
+      "id": "02F-1",
+      "runs": 18,
+      "words": 3504
+    },
+    {
+      "id": "02F-2",
+      "runs": 3,
+      "words": 841
+    },
+    {
+      "id": "02G-1",
+      "runs": 18,
+      "words": 3561
+    },
+    {
+      "id": "02G-2",
+      "runs": 3,
+      "words": 1083
+    },
+    {
+      "id": "02H-1",
+      "runs": 18,
+      "words": 3205
+    },
+    {
+      "id": "02H-2",
+      "runs": 3,
+      "words": 930
+    },
+    {
+      "id": "02I-1",
+      "runs": 19,
+      "words": 3485
+    },
+    {
+      "id": "02I-2",
+      "runs": 2,
+      "words": 575
+    },
+    {
+      "id": "02J-1",
+      "runs": 16,
+      "words": 3472
+    },
+    {
+      "id": "02J-2",
+      "runs": 5,
+      "words": 2397
+    },
+    {
+      "id": "02K-1",
+      "runs": 19,
+      "words": 3537
+    },
+    {
+      "id": "02K-2",
+      "runs": 2,
+      "words": 609
+    },
+    {
+      "id": "02L-1",
+      "runs": 17,
+      "words": 3377
+    },
+    {
+      "id": "02L-2",
+      "runs": 4,
+      "words": 1407
+    },
+    {
+      "id": "02M-1",
+      "runs": 18,
+      "words": 3482
+    },
+    {
+      "id": "02M-2",
+      "runs": 3,
+      "words": 966
+    },
+    {
+      "id": "02N-1",
+      "runs": 16,
+      "words": 3074
+    },
+    {
+      "id": "02N-2",
+      "runs": 5,
+      "words": 1632
+    },
+    {
+      "id": "02O-1",
+      "runs": 17,
+      "words": 3380
+    },
+    {
+      "id": "02O-2",
+      "runs": 4,
+      "words": 1267
+    },
+    {
+      "id": "02P-1",
+      "runs": 18,
+      "words": 3297
+    },
+    {
+      "id": "02P-2",
+      "runs": 3,
+      "words": 992
+    },
+    {
+      "id": "02Q-1",
+      "runs": 20,
+      "words": 3535
+    },
+    {
+      "id": "02Q-2",
+      "runs": 1,
+      "words": 510
+    },
+    {
+      "id": "02R-1",
+      "runs": 19,
+      "words": 3508
+    },
+    {
+      "id": "02R-2",
+      "runs": 2,
+      "words": 529
+    },
+    {
+      "id": "03A",
+      "runs": 14,
+      "words": 3287
+    },
+    {
+      "id": "03B",
+      "runs": 21,
+      "words": 2472
+    },
+    {
+      "id": "03C",
+      "runs": 1,
+      "words": 1811
+    },
+    {
+      "id": "03D",
+      "runs": 2,
+      "words": 3237
+    },
+    {
+      "id": "03E",
+      "runs": 2,
+      "words": 2774
+    },
+    {
+      "id": "03F",
+      "runs": 5,
+      "words": 2766
+    },
+    {
+      "id": "03G",
+      "runs": 11,
+      "words": 3512
+    },
+    {
+      "id": "03H",
+      "runs": 17,
+      "words": 3046
+    },
+    {
+      "id": "03I",
+      "runs": 2,
+      "words": 3078
+    },
+    {
+      "id": "03J",
+      "runs": 8,
+      "words": 2978
+    },
+    {
+      "id": "03K",
+      "runs": 6,
+      "words": 3055
+    },
+    {
+      "id": "03L",
+      "runs": 6,
+      "words": 3244
+    },
+    {
+      "id": "03M",
+      "runs": 4,
+      "words": 1611
+    }
+  ]
+}

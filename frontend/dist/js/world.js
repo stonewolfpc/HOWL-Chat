@@ -16,7 +16,7 @@
 
 'use strict';
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
     const onWorldPage = window.location.pathname.includes('world.html') ||
                         window.location.pathname.endsWith('/world') ||
                         !!document.querySelector('#world-creation-overlay');
@@ -32,6 +32,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // form immediately instead of dropping the user on the grid to click again.
     if (new URLSearchParams(window.location.search).get('from') === 'chat') {
         openWorldCreationPopup();
+    }
+
+    try {
+        await window.LorebookRepo.hydrate();
+    } catch (error) {
+        console.error('Failed to refresh the lorebook library:', error);
     }
 
     loadWorlds();

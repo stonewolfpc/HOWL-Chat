@@ -85,7 +85,7 @@ func (a *App) bootCoreServices(context.Context) error {
 // the probe never opens a capture stream; failures escalate through the
 // application logger.
 func (a *App) bootAudioOwner(context.Context) error {
-	a.audio = media.NewAudio(audio.NewProductionManager(),
+	a.audio = media.NewAudio(audio.NewProductionManager(a.level0().Processes.Registry()),
 		func(operation string) error { return a.level0().Gate.Ensure(operation) },
 		a.captureProbe,
 		a.reportAudioFailure)
@@ -142,8 +142,15 @@ func (a *App) bootImageDomain(context.Context) error {
 			}
 			return models.RegisterDir(dir, registry.KindImage)
 		},
-		Logf: func(format string, args ...interface{}) { fmt.Printf(format+"\n", args...) },
+		Logf:            func(format string, args ...interface{}) { fmt.Printf(format+"\n", args...) },
+		ProcessRegistry: a.level0().Processes.Registry(),
+		OnEngineExit:    a.unregisterImageModels,
 	})
+	if err == nil && a.images != nil {
+		if jobs := a.images.Jobs(); jobs != nil {
+			jobs.SetOnFinished(a.reclaimImageEngineAfterGeneration)
+		}
+	}
 	startupMark("image init: done")
 	return err
 }

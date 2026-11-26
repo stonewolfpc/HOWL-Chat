@@ -33,8 +33,11 @@ func (a *App) StartImageJob(opts imagetypes.ImageOptions) (string, error) {
 	if a.images.Jobs() == nil {
 		return "", fmt.Errorf("job manager not initialized")
 	}
-	id := a.images.Jobs().Start(opts, func(jobID string) error {
-		return a.ensureEngineReady(opts.ModelName, jobID, opts)
+	id := a.images.Jobs().StartWithCleanup(opts, func(jobID string) (func(), error) {
+		if opts.Mode == "video" {
+			return a.ensureVideoExecution(opts.ModelName, jobID, opts)
+		}
+		return nil, a.ensureEngineReady(opts.ModelName, jobID, opts)
 	})
 	if id == "" {
 		return "", fmt.Errorf("image job manager is closed")
@@ -81,7 +84,17 @@ func (a *App) GenerateImage(opts imagetypes.ImageOptions) (*imagetypes.ImageResu
 	if err := a.ensureAcceptingWork("image generation"); err != nil {
 		return nil, err
 	}
-	if err := a.ensureEngineReady(opts.ModelName, "", opts); err != nil {
+	var videoRelease func()
+	if opts.Mode == "video" {
+		release, err := a.ensureVideoExecution(opts.ModelName, "", opts)
+		if err != nil {
+			return nil, fmt.Errorf("engine ready failed: %w", err)
+		}
+		videoRelease = release
+		if videoRelease != nil {
+			defer videoRelease()
+		}
+	} else if err := a.ensureEngineReady(opts.ModelName, "", opts); err != nil {
 		return nil, fmt.Errorf("engine ready failed: %w", err)
 	}
 
@@ -99,6 +112,11 @@ func (a *App) GenerateImage(opts imagetypes.ImageOptions) (*imagetypes.ImageResu
 		result, genErr = a.images.Engine().GenerateTxt2Img(opts)
 	}
 	if genErr != nil {
+		// Reclamation must see failed generations too; a failed attempt can leave
+		// the process abandoned or holding transient buffers. The policy reports
+		// its decision, and the result below remains the original error.
+		a.reclaimImageEngineAfterGeneration("", opts, genErr)
+		a.emitImagePlacement("generation")
 		a.logImageGenError(genErr, "app-image-generate.go")
 		return nil, genErr
 	}
@@ -110,6 +128,11 @@ func (a *App) GenerateImage(opts imagetypes.ImageOptions) (*imagetypes.ImageResu
 			result.GalleryError = "Image generated, but the gallery copy was not saved: " + err.Error()
 		}
 	}
+	// One policy decision after every generation. In the normal band this keeps
+	// the same PID and reusable weights; it only recycles when measurement (or a
+	// failed engine state) warrants the cost.
+	a.reclaimImageEngineAfterGeneration("", opts, nil)
+	a.emitImagePlacement("generation")
 	return result, nil
 }
 

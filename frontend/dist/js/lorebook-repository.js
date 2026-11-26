@@ -7,7 +7,7 @@
  * import the browser store is still the source; nothing changes silently.
  *
  * @module lorebook-repository
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 (function () {
@@ -22,6 +22,8 @@
         status: null,
         error: null
     };
+
+    let hydratePromise = null;
 
     function api() {
         return (window.go && window.go.main) ? window.go.main.App : null;
@@ -50,34 +52,47 @@
             String(a.title || a.name || '').localeCompare(String(b.title || b.name || '')));
     }
 
+    // Seed synchronously so a page that renders before the backend answers sees
+    // the last acknowledged cache instead of an empty catalog. Hydration then
+    // replaces it with canonical entries once the backend has answered.
+    state.entries = readCache();
+
     async function hydrate() {
-        const app = api();
-        if (!app || typeof app.ListLorebooks !== 'function') {
-            state.ready = true;
-            state.entries = readCache();
-            return state;
-        }
-        try {
-            const result = await app.ListLorebooks();
-            state.status = result || null;
-            state.cutover = Boolean(result && result.cutover);
-            if (state.cutover) {
-                const items = (result.items || [])
-                    .map(item => item && item.entry)
-                    .filter(Boolean);
-                state.entries = sortEntries(items);
-                writeCache(state.entries);
-            } else {
+        if (hydratePromise) return hydratePromise;
+        hydratePromise = (async () => {
+            const app = api();
+            if (!app || typeof app.ListLorebooks !== 'function') {
+                state.ready = true;
+                state.entries = readCache();
+                return state;
+            }
+            try {
+                const result = await app.ListLorebooks();
+                state.status = result || null;
+                state.cutover = Boolean(result && result.cutover);
+                if (state.cutover) {
+                    const items = (result.items || [])
+                        .map(item => item && item.entry)
+                        .filter(Boolean);
+                    state.entries = sortEntries(items);
+                    writeCache(state.entries);
+                } else {
+                    state.entries = readCache();
+                }
+                state.error = null;
+            } catch (error) {
+                console.error('Failed to read the lorebook library:', error);
+                state.error = error;
                 state.entries = readCache();
             }
-            state.error = null;
-        } catch (error) {
-            console.error('Failed to read the lorebook library:', error);
-            state.error = error;
-            state.entries = readCache();
+            state.ready = true;
+            return state;
+        })();
+        try {
+            return await hydratePromise;
+        } finally {
+            hydratePromise = null;
         }
-        state.ready = true;
-        return state;
     }
 
     async function save(entry, isExisting) {
@@ -135,6 +150,14 @@
         const result = await app.RollbackLorebookImport();
         await hydrate();
         return result;
+    }
+
+    // Begin hydration once the document is ready. Pages may await the same
+    // promise without creating a second backend read.
+    if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+        document.addEventListener('DOMContentLoaded', () => {
+            hydrate().catch(error => console.error('Failed to refresh the lorebook library:', error));
+        });
     }
 
     window.LorebookRepo = {

@@ -4,18 +4,19 @@ import (
 	"context"
 
 	"howl-chat/internal/audio/types"
+	"howl-chat/internal/process"
 )
 
 // NewProductionManager constructs the single production manager. Construction
 // is intentionally provider-free: no model, binary, or network I/O happens
 // until Apply asks the factory to build a generation.
-func NewProductionManager() *Manager {
-	return NewManager(NewProductionFactory())
+func NewProductionManager(registries ...*process.Registry) *Manager {
+	return NewManager(NewProductionFactory(registries...))
 }
 
 // NewProductionFactory returns the production pipeline factory.
-func NewProductionFactory() PipelineFactory {
-	return newProductionFactory(NewPipeline)
+func NewProductionFactory(registries ...*process.Registry) PipelineFactory {
+	return newProductionFactory(func() *Pipeline { return NewManagedPipeline(registries...) })
 }
 
 // newProductionFactory keeps the pipeline constructor injectable for tests

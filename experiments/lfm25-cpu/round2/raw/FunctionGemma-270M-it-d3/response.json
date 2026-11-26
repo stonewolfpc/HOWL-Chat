@@ -1,0 +1,36 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "<start_function_call> viewer | DECISION | REASON | ID | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | REASON | DECISION | DECISION | REASON | DECISION | REASON | DECISION | DECISION | REASON | DECISION | DECISION | REASON | DECISION | REASON | DECISION | DECISION | REASON | DECISION | DECISION | REASON | DECISION | REASON | DECISION | DECISION | REASON | DECISION | DECISION | REASON | DECISION | DECISION | REASON | DECISION | DECISION | REASON | DECISION | DECISION | REASON | DECISION | DECISION | REASON | DECISION | DECISION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION | RESOLUTION"
+      }
+    }
+  ],
+  "created": 1795062011,
+  "model": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\experiments\\lfm25-cpu\\round2\\models\\functiongemma-270m-it-Q4_K_M.gguf",
+  "system_fingerprint": "b12015-a34de8618",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 400,
+    "prompt_tokens": 225,
+    "total_tokens": 625,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-7BcauVJlMyMkCNM1FQrJhLXYgNbqaVdY",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 225,
+    "prompt_ms": 155.478,
+    "prompt_per_token_ms": 0.6910133333333334,
+    "prompt_per_second": 1447.1500791108708,
+    "predicted_n": 400,
+    "predicted_ms": 5295.141,
+    "predicted_per_token_ms": 13.27103007518797,
+    "predicted_per_second": 75.35210110552298
+  }
+}

@@ -333,3 +333,27 @@ func TestAsyncCancellationDoesNotPoisonTheNextJob(t *testing.T) {
 		t.Fatalf("the next job inherited cancellation state: %v", err)
 	}
 }
+
+// Characterization: workflow stages begin generation with no job identity. An
+// empty-id cancel is a no-op, so there is no per-stage cancellation route; only
+// shutdown/reload can close the active request.
+func TestWorkflowStageHasNoCancellationIdentity(t *testing.T) {
+	e := NewEngine()
+	h, err := e.beginGeneration("")
+	if err != nil {
+		t.Fatalf("beginGeneration: %v", err)
+	}
+	t.Cleanup(func() { e.resetGeneration(closeForShutdown) })
+
+	if err := e.CancelJob(""); err != nil {
+		t.Fatalf("CancelJob(empty): %v", err)
+	}
+	if e.GenerationState() != "active" {
+		t.Fatalf("empty-id cancel changed the stage: %s", e.GenerationState())
+	}
+	select {
+	case <-h.done:
+		t.Fatal("empty-id cancel closed the stage execution scope")
+	default:
+	}
+}

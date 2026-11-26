@@ -113,8 +113,10 @@ type meloProbeResult struct {
 var meloProbe meloProbeResult
 
 // probeMeloTTSService checks whether anything is listening at the configured
-// MeloTTS URL. A TCP connection is not a synthesis test, but it replaces a
-// permanent "unknown" with an observed reachability fact. Results are cached
+// MeloTTS URL. Reachability is not readiness: it can be an unrelated process and
+// says nothing about ownership. This fallback exists for pure capability tests;
+// the application replaces it with the managed service's ownership-aware
+// readiness probe (see audio.ProductionCapabilityRecords). Results are cached
 // briefly so status refreshes do not dial on every request.
 func probeMeloTTSService(rawURL string) (bool, string) {
 	rawURL = strings.TrimSpace(rawURL)

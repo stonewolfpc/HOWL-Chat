@@ -11,11 +11,11 @@
 | Status | **PROPOSED — not approved** |
 | Implementation authorization | **None** |
 | Tests/models/process runs | **0** |
-| Revision | **2026-11-21 review revisions** — first: D1 attribution, D2 retention policy, transition semantics, acceptance recheck; second: state identity versus current selection, ordering language, manual deletion boundaries; third: selected-state deletion invariant, privacy-deletion boundary, lore and image acceptance coverage. FC-1 only; FC-2–FC-6 and the register are unchanged |
+| Revision | **2026-11-21 review revisions** — first: D1 attribution, D2 retention policy, transition semantics, acceptance recheck; second: state identity versus current selection, ordering language, manual deletion boundaries; third: selected-state deletion invariant, privacy-deletion boundary, lore and image acceptance coverage; fourth: memory copy semantics (OD-D2-COPY), three data lifecycles, parent-deletion cleanup of memory originals, conversation-owned snapshots, transfer receipts and provenance. FC-1 only; FC-2–FC-6 and the register are unchanged |
 
 **Labels:** **Owner-approved** · **Proposed** · **Unresolved** · **Observed** · **Unestablished**.
 
-**Identifier note:** Clauses suffixed with a letter (for example `FC1-14a`) were added in this revision. Existing identifiers were not renumbered, so cross-references from FC-2–FC-6 and the register remain valid; those documents have not been updated.
+**Identifier note:** Clauses suffixed with a letter (for example `FC1-14a`, and `FC1-22d`–`FC1-22m` added by the memory-copy revision) were added in later revisions. Existing identifiers were not renumbered, so cross-references from FC-2–FC-6 and the register remain valid; those documents have not been updated.
 
 ---
 
@@ -73,7 +73,7 @@
 
 **FC1-10 (Proposed — idempotency).** Repeating an event with the same `idempotency_key` and identical payload returns the existing result and produces no second effect. Reusing a key with a conflicting payload is an explicit error, not a silent overwrite.
 
-**FC1-11 (Proposed — event kinds).** At minimum: conversation created; user turn committed; assistant turn committed; alternative/branch produced; current state selected; snapshot captured; deletion recorded; recovery/reconciliation recorded. Names may change; the semantic distinctions may not.
+**FC1-11 (Proposed — event kinds).** At minimum: conversation created; user turn committed; assistant turn committed; alternative/branch produced; current state selected; snapshot captured; memory copy committed (transfer event); deletion recorded; recovery/reconciliation recorded. Names may change; the semantic distinctions may not.
 
 **FC1-12 (Unresolved — ordering implementation).** D1 establishes an ordered conversation-event ledger, and FC1-01 and FC1-08 carry that requirement; the existence of event ordering is not open. What remains unresolved is how ordering is implemented: concurrent append serialization, sequence assignment and gap policy, multi-process writer authority, and conflict handling. These must be resolved consistently with FC-4 and FC-5 before implementation.
 
@@ -113,11 +113,17 @@
 
 **FC1-14d (Unresolved — selection occurrence identity).** Whether a selection operation or a selection occurrence needs an identity distinct from the selection event is not decided (`FC1-SELECTION-IDENTITY`). This paper allots no `state_id` to a selection and proposes no separate selection-identity scheme; the recorded event's `event_id` is the only identity it currently gives a selection occurrence.
 
-**FC1-15 (Owner-approved — D2, retention and orphanhood).** Howl retains user data by default. Authored content is not automatically deleted because a conversation, world, scenario, character or other related object is deleted. Orphanhood describes a relationship or ownership condition; it does not, by itself, grant permission for automatic deletion of retained authored content. An earlier draft of this clause stated that deletion is permitted only when an object is orphaned; that shorthand is superseded here. Manual deletion from inside the application is the user's deletion authority for retained authored content, as FC1-22 and FC1-22a record.
+**FC1-15 (Owner-approved — D2, retention and orphanhood).** Howl retains user data by default. Authored content is not automatically deleted because a conversation, world, scenario, character or other related object is deleted. Orphanhood describes a relationship or ownership condition; it does not, by itself, grant permission for automatic deletion of retained authored content. An earlier draft of this clause stated that deletion is permitted only when an object is orphaned; that shorthand is superseded here. Manual deletion from inside the application is the user's deletion authority for retained authored content, as FC1-22 and FC1-22a record. This clause governs authored content only. Memory records and conversation reproducibility snapshots have their own directed lifecycles (FC1-22c, FC1-22d, FC1-22e) and are not covered by the authored-content retention rule; the retention-by-default statement here must not be read as retaining them indefinitely.
 
 **FC1-15a (Proposed — orphan status is not deletion authorization).** A missing reference, lack of current use, absence from the current composition, or loss of a parent relationship is not, by itself, authorization to delete an authored object.
 
-**FC1-16 (Proposed — no silent deletion).** No automatic deletion path is authorized. A deletion must name its deletion set and record a receipt. A view being filtered, collapsed, archived or absent from the current screen does not make authored data disposable.
+**FC1-16 (Proposed — no silent deletion).** No independent background deletion path is authorized: nothing is deleted because it is unreferenced, unused, absent from the current composition, archived, filtered out of a view, or discovered by a sweep. Deletion occurs only in three directed forms, and each names its deletion set and records a receipt (FC1-24):
+
+- **explicit user deletion of a named set** — the named-set deletion mechanic that FC1-22a records for authored content. This clause extends that mechanic to memory records and copies as well as authored content; FC1-22a itself remains scoped to authored content and does not govern memory records. It operates on what the named set contains, including an individually selected memory copy owned by the scope the user is deleting from (FC1-22g, FC1-22j), and does not require that the copy's owning parent also be deleted;
+- **parent-triggered cleanup of original memory records** (FC1-22e), which follows the explicit deletion of the parent that owns those originals;
+- **conversation-triggered snapshot deletion** (FC1-22c), which follows the explicit deletion of the conversation that owns those snapshots.
+
+A destination copy is therefore not limited to disappearing when a parent is deleted: the user can delete a selected copy on its own, leaving the original and any other copies in place. A view being filtered, collapsed, archived or absent from the current screen does not make authored data disposable.
 
 ---
 
@@ -158,15 +164,53 @@ There is no silent substitution of the latest revision, a same-name object or a 
 
 **FC1-22b (Proposed — no cascading deletion of authored assets).** No cascading deletion of authored assets is authorized. Deleting a conversation, world, scenario, character or other parent object does not delete the authored objects related to it. Deleting a world does not implicitly delete its scenarios, characters, lore or images. Deleting a scenario does not implicitly delete the characters, lore or images related to it, and the same principle applies to the deletion of characters, lore, images and other authored objects. Deleting a conversation does not delete the authored objects it referenced.
 
-**FC1-22c (Unresolved — conversation-state and event-history retention).** D2 establishes retention by default for authored data. It does not establish the retention policy for conversation events, materialized state history, snapshots or other chat-scoped records. This paper authorizes no automatic retention window for them and claims no broader retention rule than the owner established; the applicable policy is unresolved (`FC1-STATE-RETENTION`).
+**FC1-22c (Unresolved in part — snapshot and chat-scoped retention).** Conversation reproducibility snapshots are owned by the conversation that produced them and are deleted with that conversation; they are not retained as orphans when their owning conversation is deleted (FC1-22d). This lifecycle is directed by the owner. The retention policy for conversation events, materialized state history and other chat-scoped records remains unresolved (`FC1-STATE-RETENTION`); this paper authorizes no automatic retention window for them and claims no broader retention rule than the owner directed.
 
-**FC1-23 (Unresolved — `FC1-D2-ORPHAN`, orphan definition).** What makes a world, scenario, character, persona, lore object, conversation or state “orphaned”? Deleting a chat may orphan chat-associated memories or other chat-scoped records; deleting a world, scenario or character may orphan records that depended on that object. Candidate definitions may include no reachable reference, no owning conversation, no current composition and no retained snapshot. None is selected here. Orphanhood is a condition, not a deletion authorization (FC1-15, FC1-15a).
+**FC1-22d (Proposed — three data lifecycles).** FC-1 distinguishes three data categories. No clause may conflate them, and no retention statement in this paper applies to more than one category.
 
-**FC1-23a (Unresolved — orphaned records).** The precise classification, ownership and handling of chat-scoped memories and other orphaned records is not decided. This paper does not establish an automatic orphan-cleanup policy (`FC1-CHAT-SCOPED`).
+| Category | Lifecycle direction |
+|---|---|
+| User-authored content | Deleted only through explicit user deletion (FC1-22, FC1-22a). Chat deletion and memory cleanup do not delete it. |
+| Memory records | An original record belongs to its owning parent and is cleaned up when that parent is explicitly deleted (FC1-22e). Independently owned copies held elsewhere survive that deletion (FC1-22g, FC1-22i). |
+| Conversation reproducibility snapshots | Owned by the conversation that produced them and deleted with that conversation (FC1-22c). They are not retained as orphans. |
+
+**FC1-22e (Proposed — memory originals and parent-deletion cleanup).** A memory record's original belongs to the scope that owns it. When that owning parent is explicitly deleted, the parent's own original memory records are cleaned up as part of that deletion. This cleanup is a consequence of the deletion the user performed, not an independent cleanup path: it is bounded by the parent being deleted, names its deletion set and records a receipt (FC1-24). Whether a notification or confirmation must precede it, and whether copying is offered only at that point, are unresolved (`FC1-MEMORY-COPY-NOTIFY`, `FC1-MEMORY-COPY-TIMING`).
+
+**FC1-22f (Proposed — transfer creates a copy).** The operation the source records call *transfer* is defined in this paper as creating a copy. A user-authorized transfer preserves the source memory record, which remains owned by its original parent, and creates an independent destination copy. Transfer is not an ownership move, and no clause of this paper may be read as moving ownership from a source to a destination. Earlier recommendations in this review adopted move semantics, under which the transfer would have removed the source record; OD-D2-COPY (2026-11-21) supersedes them. That recommendation is preserved here as superseded rather than erased, and it is not the current direction.
+
+**FC1-22g (Proposed — independent ownership of copies).** A destination copy has its own owning scope and a retention lifecycle independent of the source. For a conversation destination, the owning scope is that conversation; whether a world destination becomes the owning scope of a copy is unresolved (`FC1-MEMORY-COPY-DESTINATION`), and the general statement that a copy has its own owning scope does not settle which scope a world destination is. Deleting one destination's copy does not delete the original or any other copy, and deleting the source parent does not delete copies already created elsewhere.
+
+**FC1-22h (Proposed — provenance snapshot).** A destination copy records provenance at transfer time. At minimum it retains:
+
+- the actor who authorized the copy;
+- the source memory identity;
+- the source chat identity where the source is a conversation;
+- the source-parent identity;
+- the destination identity;
+- the source content hash;
+- the transfer-event identity.
+
+Every destination memory copy carries the literal `transferred_from` marker, and that marker identifies the copy's source through the copied origin references listed above. A destination copy that cannot carry the marker is not created. The marker and the provenance it identifies must survive deletion of the source record; like the provenance itself, the marker is a stored value and must not depend on a live source pointer.
+
+The origin references are copied into the destination record and are never rewritten by the destination; a later edit to the copy does not alter what the copy records about where it came from. The provenance snapshot and the content hash must remain sufficient to identify the source after the source record is deleted. The provenance must not depend on a live pointer to the source record: a copied provenance reference is a stored value, not a live dependency, and the destination does not resolve, fetch or revalidate it against the source. Provenance establishes origin and transfer evidence; it does not establish that the original content was accurate, complete or still available.
+
+**FC1-22i (Proposed — bounded deletion scope).** Deleting a parent deletes that parent's own original memory records and does not expand into independently owned copies held by other parents. The deletion set names the records being removed and refuses to extend to copies outside that parent's ownership. This is a required scope boundary, not an inference from FC1-22b: FC1-22b governs authored objects, and this clause governs memory copies.
+
+**FC1-22j (Proposed — user-authorized selection and transfer-all).** Copying is user-authorized. The user may select individual memory records or transfer all of them, and each is an explicit operation rather than an automatic side effect. Where a copy may be sent — another conversation or a world — is part of the operation, and the destination is named in the transfer event. Switching the active world, scenario or character is not a transfer, a copy or a deletion of memories; it changes selection and composition only (FC1-14). The user interface for this operation is not specified here.
+
+**FC1-22k (Proposed — copies do not carry knowledge relationships).** Copying a memory record does not silently copy its knowledge edges, relationships or other associated records. The destination copy is a record with provenance, not a reconstruction of the source's relational context. The Howl-side behaviour of K-R46 (no events or edges copied) and K-R48 (additivity) remains unresolved and is not settled by this clause; this paper claims no enforcement of either.
+
+**FC1-22l (Proposed — transfer receipt and evidence).** A transfer records an event and a receipt naming the actor, the source chat identity where the source is a conversation, the source parent, the selected source memory identities, the destination identity, the created copies, and for each copy the provenance recorded and its content hash. The receipt records the `transferred_from` marker carried by each created destination copy, with that copy's source and destination identities consistent with FC1-22h. The receipt preserves the origin references as copied at transfer time: it does not rewrite them, and it does not depend on the source record still existing. The receipt is evidence that a copy was made and what it claims to derive from; it is not evidence that the source content was accurate. A transfer that cannot name its source records and its destination is refused. Duplicate suppression follows FC1-10. Destination-side merge and conflict behaviour remains unresolved (`FC1-MEMORY-COPY-MERGE`); this paper requires neither silent merge nor silent overwrite.
+
+**FC1-22m (Proposed — Howl owns the workflow; MEMORY-09 boundary unchanged).** Howl owns the user-facing transfer workflow, the user's authorization, the transfer event, the destination record write, the parent lifecycle, the cleanup, and the associated notifications and receipts. MEMORY-09 exposes no transfer operation and no destination-write interface; that boundary (D-4, Option B) is unchanged and is not superseded by this paper. This clause does not define MEMORY-09's internal memory representation, edge behaviour, retrieval behaviour or integration, and FC-4 continues not to establish memory-record storage authority.
+
+**FC1-23 (Unresolved — `FC1-D2-ORPHAN`, orphan definition).** Orphanhood is a relationship or ownership condition, not a deletion authorization (FC1-15, FC1-15a), and it is not applied indiscriminately across data categories. Authored objects are not orphan candidates under this paper: FC1-22 and FC1-22b keep them retained regardless of references. Ordinary memory records are not treated as orphan candidates either: an original is owned by its parent and is cleaned up with that parent's explicit deletion (FC1-22e); a copy belongs to the scope that owns its destination, which for a conversation destination is that conversation, while whether a world destination owns a copy remains unresolved (`FC1-MEMORY-COPY-DESTINATION`) and is not settled by the general destination-ownership wording in FC1-22g. Conversation reproducibility snapshots are not orphan candidates: they are conversation-owned and deleted with their conversation (FC1-22c). What remains unresolved is the status of records whose lifecycle is not established — legacy records, records of unknown origin, and records left by an interrupted lifecycle such as an interrupted deletion or an interrupted transfer. Whether `orphaned` is retained for those records, or retired in favour of a different classification, is not decided, and this paper does not declare the category empty. Candidate definitions may include no reachable reference, no owning parent, no current composition and no retained snapshot; none is selected here.
+
+**FC1-23a (Unresolved — residual orphaned records).** The cleanup of a parent's own original memory records that follows an explicit parent deletion is directed (FC1-22e) and is not a general orphan-cleanup policy: it is bounded by the deletion the user performed and does not extend to independently owned copies (FC1-22i). The classification, ownership and handling of legacy, unknown-origin and interrupted-lifecycle records remains undecided (`FC1-CHAT-SCOPED`). This paper establishes no sweep, background pass or reference-scanning cleanup for any record type.
 
 **FC1-24 (Proposed — deletion receipt).** A deletion record names the deletion set, the authority, the reason, the affected references, the prior state and the resulting state. A deletion that cannot name its set is refused.
 
-**FC1-25 (Proposed — privacy deletion).** A privacy deletion and an orphan cleanup are not interchangeable. D2's manual-deletion rule for authored content does not prohibit a separately authorized privacy-deletion mechanism. A privacy deletion must have its own explicit authority, scope and evidence requirements, and must not be conflated with orphan cleanup or ordinary deletion. Privacy deletion may require removing content that is still referenced; that policy remains unresolved (`FC1-PRIVACY-DELETE`) and must not be hidden inside `orphaned`.
+**FC1-25 (Proposed — privacy deletion is not a second deletion authority).** A privacy deletion and an orphan cleanup are not interchangeable, and neither is a second authority for deleting authored content. Authored content is deleted only through explicit user deletion (FC1-22, FC1-22a); this paper authorizes no separately authorized mechanism that could delete authored content on its own initiative. A privacy deletion of authored content must therefore be an explicit user deletion that names its set and records a receipt (FC1-24), and it must not be conflated with orphan cleanup or ordinary deletion. Privacy deletion may require removing content that is still referenced; that policy remains unresolved (`FC1-PRIVACY-DELETE`) and must not be hidden inside `orphaned`.
 
 ---
 
@@ -195,7 +239,7 @@ There is no silent substitution of the latest revision, a same-name object or a 
 | Snapshot hash mismatch | `unresolved`; do not claim reproducibility |
 | Deletion interrupted | Report partial/unknown; do not claim complete deletion |
 | Selected state deleted | Selection is recorded explicitly and resolves to a valid retained state or an explicit empty/unresolved condition; no silent reselection, no restored material, no manufactured identity |
-| Parent object deleted | Retained authored assets remain; any orphaned records remain and are reported as unresolved, not cleaned up |
+| Parent object deleted | Retained authored objects remain (FC1-22, FC1-22b). The parent's own original memory records are cleaned up as part of that explicit deletion (FC1-22e). Independently owned copies held by other parents survive (FC1-22g, FC1-22i). A deleted conversation's own reproducibility snapshots are deleted with it (FC1-22c). Records of unknown or interrupted lifecycle remain and are reported as unresolved, not swept (FC1-23a) |
 | Legacy record | Remains unresolved; no synthetic identity |
 
 **FC1-30 (Proposed).** Recovery is not a new source of truth. It reconciles durable records with observed runtime state and records what was recovered, what was inferred and what remains unknown.
@@ -214,9 +258,14 @@ There is no silent substitution of the latest revision, a same-name object or a 
 
 | ID | Question | Status |
 |---|---|---|
-| `FC1-D2-ORPHAN` | What is an orphaned object, and when, if ever, does orphan status authorize deletion? | **Unresolved; orphan status is not deletion authorization** |
-| `FC1-STATE-RETENTION` | What is the retention policy for conversation events, state history, snapshots and other chat-scoped records? | Unresolved; D2 does not establish it |
-| `FC1-CHAT-SCOPED` | How are chat-scoped memories and other orphaned records classified, owned and handled? | Unresolved; no automatic cleanup |
+| `FC1-D2-ORPHAN` | Is `orphaned` retained for legacy, unknown-origin and interrupted-lifecycle records, or retired in favour of another classification? | **Unresolved; not decided, and the category is not declared empty** |
+| `FC1-STATE-RETENTION` | What is the retention policy for conversation events, materialized state history and other chat-scoped records, excluding conversation-owned snapshots? | Unresolved; the snapshot lifecycle is directed, this policy is not |
+| `FC1-CHAT-SCOPED` | How are legacy, unknown-origin and interrupted-lifecycle records classified, owned and handled? | Unresolved; directed lifecycles cover parent-owned originals and copies |
+| `FC1-MEMORY-COPY-NOTIFY` | Is the pre-deletion notification blocking — requiring explicit confirmation or a choice before deletion proceeds — or advisory? | Unresolved; not decided |
+| `FC1-MEMORY-COPY-DESTINATION` | Does attaching a copied memory to a world make the world the owning scope of that copy? | Unresolved; not decided |
+| `FC1-MEMORY-COPY-TIMING` | Is copying available only as part of the deletion workflow, or can it be initiated at any time? | Unresolved; not decided |
+| `FC1-MEMORY-NOTICE-SCOPE` | Does the memory-history deletion notice also cover conversation snapshots, or is snapshot deletion communicated separately? | Unresolved; not decided |
+| `FC1-MEMORY-COPY-MERGE` | How are destination-side merge and conflict resolved when a copy arrives where an equivalent memory already exists? | Unresolved; neither silent merge nor silent overwrite is required or authorized |
 | `FC1-CONCURRENCY` | How are appends serialized, sequences assigned and gaps handled, and who holds multi-process writer authority? | Unresolved; ordering itself is required |
 | `FC1-BRANCH-PREDECESSOR` | How are branch predecessor relationships represented? | Unresolved |
 | `FC1-TURN-MESSAGE` | What is the relationship between a turn and its messages? | Unresolved |
@@ -238,12 +287,12 @@ There is no silent substitution of the latest revision, a same-name object or a 
 5. **Restart:** all state/message/turn identities survive restart.
 6. **Snapshot:** exact canonical revision refs restore; a missing revision produces `degraded`, not latest substitution.
 7. **Manual deletion:** deleting only the objects explicitly included in the operation removes exactly those objects, with a receipt; related and unrelated authored assets remain.
-8. **Parent deletion:** deleting a chat does not delete its worlds, scenarios, characters, lore or images; deleting a world, scenario or character does not delete the authored objects that depended on it — deleting a world leaves its scenarios, characters, lore and images. Deleting a lore object or an image does not delete other authored objects related to it, and deleting other authored objects does not delete lore or images. Resulting orphaned records remain present and are reported as unresolved.
+8. **Parent deletion:** deleting a chat does not delete its worlds, scenarios, characters, lore or images; deleting a world, scenario or character does not delete the authored objects that depended on it — deleting a world leaves its scenarios, characters, lore and images. Deleting a lore object or an image does not delete other authored objects related to it, and deleting other authored objects does not delete lore or images. The parent's own original memory records are cleaned up with the explicit parent deletion, under a receipt that names that set. Independently owned copies held by other conversations or worlds remain, and their provenance still identifies the deleted source. A deleted conversation's own reproducibility snapshots are deleted with it. Records of unknown or interrupted lifecycle remain and are reported as unresolved, not swept.
 9. **Voice:** character voice assignment survives hard flush, character switch and conversation restoration.
 10. **Crash:** recovery reports verified, partial or unknown; no phantom committed state.
 11. **Selected-state deletion:** deleting the currently selected state records the resulting selection explicitly; the selection resolves to a valid retained state or to an explicit empty or unresolved condition. No dangling `current_state_id`, silent fallback, restored deleted material or manufactured state identity is observed.
 
-The complete deletion policy is not testable yet. `FC1-D2-ORPHAN`, `FC1-CHAT-SCOPED` and `FC1-STATE-RETENTION` are unresolved; tests 7 and 8 verify only the authorized manual-deletion boundary and the prohibition on cascading deletion. Test 11 verifies the FC1-13a invariant without deciding the unresolved transition and recovery mechanism.
+The complete deletion policy is not testable yet. `FC1-D2-ORPHAN`, `FC1-CHAT-SCOPED`, `FC1-STATE-RETENTION` and the `FC1-MEMORY-COPY-*` questions are unresolved; tests 7 and 8 verify only the authorized manual-deletion boundary, the prohibition on cascading deletion of authored objects, and the directed parent-deletion cleanup of a parent's own memory originals with the survival of independently owned copies. Test 11 verifies the FC1-13a invariant without deciding the unresolved transition and recovery mechanism.
 
 ---
 
@@ -255,11 +304,13 @@ The complete deletion policy is not testable yet. `FC1-D2-ORPHAN`, `FC1-CHAT-SCO
 | State requirements | `HF1-PLAN-2026-11-21-01` |
 | Readiness | `HFR-CP-2026-11-21-01` |
 | Retention and manual deletion | D2 in `HF-CONTRACT-INTAKE-2026-11-20-01` |
+| Memory copy semantics | OD-D2-COPY (2026-11-21) |
+| Memory transfer provenance and boundaries | `MEMORY-09-CONTRACT-NORMATIVE-2026-11-15.md` (K-R40, K-R45, K-R47); `MEMORY-09-ARCHITECTURE-v9-2026-11-17.md` (rules 31, 45); `MEMORY-09-OWNER-DECISIONS-2026-11-17.md` (Finding 1, D-1, D-4) |
 | Canonical ownership | FC-4 (this set) |
 | Prompt composition | FC-2 (this set) |
 | Multi-character voice | FC-3 (this set) |
 | Evidence | FC-6 (this set) |
 
-**FC1-33 (Observed — no authorization).** This paper is a review draft. It does not approve a schema, authorize implementation, select a storage technology, define `orphaned`, establish a conversation-state retention window, authorize cascading deletion, authorize a privacy-deletion mechanism, or change any protected record.
+**FC1-33 (Observed — no authorization).** This paper is a review draft. It does not approve a schema, authorize implementation, select a storage technology, define `orphaned` for legacy, unknown-origin or interrupted-lifecycle records, establish a conversation-event or state-history retention window, authorize cascading deletion of authored objects, authorize an independent background or reference-scanning cleanup, decide the notification, destination-ownership, timing or notice-scope questions, settle destination-side merge behaviour, establish memory-record storage authority, or authorize a privacy-deletion mechanism. It changes no protected record.
 
-**End of FC-1.** The event ledger owns conversation history; the library owns authored revisions; snapshots bind them; authored content is retained until the user deletes it; orphanhood is a condition, not a deletion authorization.
+**End of FC-1.** The event ledger owns conversation history; the library owns authored revisions; snapshots bind them. Authored content is retained until the user deletes it; a conversation's own memory originals and reproducibility snapshots are cleaned up with its explicit deletion; an independently owned memory copy survives its source with recorded provenance; orphanhood is a condition, not a deletion authorization.

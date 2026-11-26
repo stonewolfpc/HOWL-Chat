@@ -8,6 +8,7 @@ import (
 
 	"howl-chat/internal/diagnostics"
 	apperrors "howl-chat/internal/errors"
+	"howl-chat/internal/paths"
 )
 
 // ---------------------------------------------------------------------------
@@ -36,8 +37,20 @@ func (a *App) initErrorSystem() {
 		UploadEnabled: a.loadErrorReportingSetting(),
 	})
 	if err != nil {
-		// Fatal to error system but not to app - operate silently without logging
-		return
+		// The configured log location is unavailable. Logging is optional, so the
+		// app keeps running; but diagnostics must not vanish, or the limitation
+		// itself becomes unreportable. Retry on a temporary location and remember
+		// the original failure so it is reported once at startup.
+		a.diagnosticsFallbackErr = err
+		fallback, ferr := diagnostics.Open(diagnostics.Config{
+			LogDir:        filepath.Join(paths.TempDir(), "howl-diagnostics"),
+			AppVersion:    "1.0.0",
+			UploadEnabled: false,
+		})
+		if ferr != nil {
+			return
+		}
+		owner = fallback
 	}
 	a.diagnostics = owner
 }

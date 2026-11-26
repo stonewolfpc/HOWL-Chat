@@ -61,6 +61,27 @@ func TestPlacementIgnoresUnrelatedOutput(t *testing.T) {
 	}
 }
 
+func TestPlacementRecordsEngineVAERetry(t *testing.T) {
+	var p Placement
+	for _, line := range []string{
+		`[I] VAE decode compute failed --- vae.cpp:1`,
+		`[I] VAE decode ran out of memory; retrying with spatial tiling --- vae.cpp:2`,
+		`[I] Reducing VAE decode tiles from 1024x1024 to 512x512 image pixels --- vae.cpp:3`,
+	} {
+		next, ok := parsePlacementEvent(line)
+		if !ok {
+			t.Fatalf("event not recognised: %s", line)
+		}
+		p = p.merge(next)
+	}
+	if !p.VAETiled || p.VAETilingNote == "" {
+		t.Fatalf("engine retry was not recorded: %+v", p)
+	}
+	if _, ok := parsePlacementEvent(`[I] listening on: http://127.0.0.1:8081`); ok {
+		t.Fatal("ordinary output must not be read as a VAE retry")
+	}
+}
+
 // The plan and the totals arrive as separate lines, in either order, and the
 // engine must keep both instead of letting the later one erase the earlier.
 func TestPlacementMergeKeepsPlanAndTotals(t *testing.T) {

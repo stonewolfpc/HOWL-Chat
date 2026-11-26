@@ -18,7 +18,13 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', function () {
-    setTimeout(() => {
+    setTimeout(async () => {
+        try {
+            await window.LorebookRepo.hydrate();
+        } catch (error) {
+            console.error('Failed to refresh the lorebook library:', error);
+        }
+
         const load = loadCharacters();
         loadAvailableLorebooks();
         Promise.resolve(load).then(() => {

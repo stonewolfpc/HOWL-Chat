@@ -100,6 +100,33 @@ func TestProbePrefersDeclaredArchitecture(t *testing.T) {
 	}
 }
 
+// A CLIP-Vision image encoder is a vision tower with no text tower. It used to
+// be reported as an LLM and then hidden from the image picker, which made the
+// downloaded ViT-H encoder impossible to select.
+func TestProbeIdentifiesClipVisionFromStructure(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "model.safetensors")
+	writeSafetensors(t, path, nil, map[string][]int{
+		"vision_model.embeddings.class_embedding":               {1280},
+		"vision_model.embeddings.patch_embedding.weight":        {1280, 3, 14, 14},
+		"vision_model.encoder.layers.0.self_attn.q_proj.weight": {1280, 1280},
+		"visual_projection.weight":                              {1024, 1280},
+	})
+
+	if got, ok := ProbeWeight(path).AssetType(); !ok || got != AssetClipVision {
+		t.Fatalf("type = %q (ok=%v), want %q", got, ok, AssetClipVision)
+	}
+
+	scanner := New(dir)
+	idx, err := scanner.Scan()
+	if err != nil {
+		t.Fatalf("scan: %v", err)
+	}
+	if len(idx.ClipVisions) != 1 {
+		t.Fatalf("clip visions = %d, want 1", len(idx.ClipVisions))
+	}
+}
+
 // A standalone VAE is a VAE; a checkpoint that embeds first_stage_model is not.
 func TestProbeDistinguishesVAEFromCheckpoint(t *testing.T) {
 	dir := t.TempDir()

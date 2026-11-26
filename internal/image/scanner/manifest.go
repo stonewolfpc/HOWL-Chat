@@ -12,7 +12,7 @@ const manifestSuffix = ".howl.json"
 // manifestLogicVersion is bumped whenever classification improves. A sidecar
 // written by an older classifier is re-read rather than trusted, so a fixed
 // rule reaches files that were already scanned.
-const manifestLogicVersion = 5
+const manifestLogicVersion = 8
 
 // Recommended holds generation defaults derived from the model family.
 type Recommended struct {
@@ -27,19 +27,19 @@ type Recommended struct {
 // Manifest is the .howl.json sidecar written next to each discovered asset.
 // It is generated once and read on every subsequent scan — making rescans instant.
 type Manifest struct {
-	Name         string            `json:"name"`
-	Type         AssetType         `json:"type"`
-	Family       ModelFamily       `json:"family"`
-	Format       string            `json:"format"` // gguf, safetensors, ckpt, …
-	SizeMB       float64           `json:"size_mb"`
-	FileSize     int64             `json:"file_size,omitempty"`
-	ModTimeNS    int64             `json:"mod_time_ns,omitempty"`
-	Hash         string            `json:"hash,omitempty"`              // SHA256 of the primary model file
-	CivitaiName  string            `json:"civitai_name,omitempty"`     // name from Civitai hash lookup, when metadata title is absent
-	Logic        int               `json:"logic,omitempty"`
-	Files        map[string]string `json:"files,omitempty"`             // sub-file role → abs path
-	VAEPath      string            `json:"vae_path,omitempty"`          // suggested companion VAE
-	Recommended  Recommended       `json:"recommended"`
+	Name        string            `json:"name"`
+	Type        AssetType         `json:"type"`
+	Family      ModelFamily       `json:"family"`
+	Format      string            `json:"format"` // gguf, safetensors, ckpt, …
+	SizeMB      float64           `json:"size_mb"`
+	FileSize    int64             `json:"file_size,omitempty"`
+	ModTimeNS   int64             `json:"mod_time_ns,omitempty"`
+	Hash        string            `json:"hash,omitempty"`         // SHA256 of the primary model file
+	CivitaiName string            `json:"civitai_name,omitempty"` // name from Civitai hash lookup, when metadata title is absent
+	Logic       int               `json:"logic,omitempty"`
+	Files       map[string]string `json:"files,omitempty"`    // sub-file role → abs path
+	VAEPath     string            `json:"vae_path,omitempty"` // suggested companion VAE
+	Recommended Recommended       `json:"recommended"`
 }
 
 // manifestPath returns the sidecar path for a given model file or directory.

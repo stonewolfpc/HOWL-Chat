@@ -9,6 +9,7 @@ import (
 	"howl-chat/internal/image/job"
 	imagetypes "howl-chat/internal/image/types"
 	"howl-chat/internal/paths"
+	"howl-chat/internal/process"
 )
 
 // BootOptions is what the composition root supplies to the image domain: the
@@ -19,6 +20,8 @@ type BootOptions struct {
 	TempDir           string
 	RegisterModelsDir func(dir string) error
 	Logf              func(format string, args ...interface{})
+	ProcessRegistry   *process.Registry
+	OnEngineExit      func()
 }
 
 // Boot constructs the image session this domain owns: gallery, sd-server
@@ -39,6 +42,8 @@ func (i *Image) Boot(opts BootOptions) error {
 	if i.Settings() == nil {
 		return fmt.Errorf("image settings store not initialized")
 	}
+	i.SetProcessRegistry(opts.ProcessRegistry)
+	i.SetOnEngineExit(opts.OnEngineExit)
 
 	saved, err := i.Settings().Load()
 	if err != nil {
@@ -72,7 +77,8 @@ func (i *Image) Boot(opts BootOptions) error {
 
 	i.SetGallery(gallery.NewService(cfg.OutputDir))
 
-	engine := sdcpp.NewEngine()
+	engine := sdcpp.NewEngineWithRegistry(i.ProcessRegistry())
+	engine.SetShutdownHook(i.OnEngineExit())
 	if err := engine.Initialize(cfg); err != nil {
 		logf("[ImageEngine] Not ready at startup (paths not configured yet): %v", err)
 		i.SetJobs(job.NewManager(nil))
@@ -82,9 +88,14 @@ func (i *Image) Boot(opts BootOptions) error {
 	i.SetJobs(job.NewManager(engine))
 
 	version := sdcpp.BinaryVersion(cfg.BinaryPath)
-	logf("[ImageEngine] sd-server commit: %s", version)
-	if sdcpp.IsKnownOldVersion(version) {
-		logf("[ImageEngine] WARNING: sd-server commit %s is outdated. Flux/SD3/SDXL GGUF models may fail. Please update.", version)
+	logf("[ImageEngine] sd-server commit: %s (HOWL pins %s)", version, sdcpp.EngineTag)
+	// Capability questions are answered by the binary, not by a list of "old"
+	// hashes: a probe that fails is the only version fact worth warning about,
+	// because it disables the flag checks for the rest of the session.
+	if caps := sdcpp.ProbeCLI(cfg.BinaryPath); !caps.Probed {
+		logf("[ImageEngine] WARNING: could not read sd-server --help; flag compatibility checks are disabled for %s", cfg.BinaryPath)
+	} else if !sdcpp.PinnedVersionMatches(cfg.BinaryPath) {
+		logf("[ImageEngine] NOTE: sd-server reports %s, HOWL pins %s (%s). Capability tables describe the pinned engine.", version, sdcpp.EngineTag, sdcpp.EngineCommit)
 	}
 
 	if saved.LastModel != "" {
@@ -129,7 +140,8 @@ func (i *Image) Reconfigure(mutate func(*imagetypes.EngineConfig)) error {
 	cfg := i.EngineConfig()
 	mutate(&cfg)
 
-	engine := sdcpp.NewEngine()
+	engine := sdcpp.NewEngineWithRegistry(i.ProcessRegistry())
+	engine.SetShutdownHook(i.OnEngineExit())
 	if err := engine.Initialize(cfg); err != nil {
 		return fmt.Errorf("failed to re-initialize image engine: %w", err)
 	}

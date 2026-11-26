@@ -1,0 +1,33 @@
+['qwen35-4b-nonthink', 'qwen35-4b-think-rb1024', 'qwen3-17b-think-rb1024', 'qwen3-17b-nonthink', 'lfm3-17b-think-rb1024', 'lfm3-17b-nonthink', 'qwen35-2b-think-rb1024', 'lfm120-think-official-rb1024']
+=== qwen35-4b-nonthink ngl=0 budget=None preset=Qwen3.5 4B/9B non-thinking general preset ===
+  d1 13.071s finish=stop tok=90 ok=True
+  d2 10.801s finish=stop tok=79 ok=True
+  d3 11.884s finish=stop tok=87 ok=True
+=== qwen35-4b-think-rb1024 ngl=0 budget=1024 preset=Qwen3.5 4B/9B thinking general preset ===
+  d1 160.483s finish=stop tok=1128 ok=True
+  d2 162.379s finish=stop tok=1144 ok=True
+  d3 163.861s finish=stop tok=1154 ok=True
+=== qwen3-17b-think-rb1024 ngl=0 budget=1024 preset=Qwen3 thinking preset T0.6/top_p0.95 ===
+  d1 20.427s finish=stop tok=396 ok=True
+  d2 21.391s finish=stop tok=418 ok=True
+  d3 37.907s finish=stop tok=719 ok=True
+=== qwen3-17b-nonthink ngl=0 budget=None preset=Qwen3 non-thinking preset T0.7/top_p0.8 ===
+  d1 2.927s finish=stop tok=53 ok=True
+  d2 5.267s finish=stop tok=106 ok=True
+  d3 6.386s finish=stop tok=128 ok=True
+=== lfm3-17b-think-rb1024 ngl=0 budget=1024 preset=LFM3 card: T0.1 / top_k50 / rep1.1 ===
+  d1 55.603s finish=stop tok=1130 ok=True
+  d2 55.169s finish=stop tok=1122 ok=True
+  d3 56.894s finish=stop tok=1157 ok=True
+=== lfm3-17b-nonthink ngl=0 budget=None preset=LFM3 card: T0.1 / top_k50 / rep1.1 ===
+  d1 5.548s finish=stop tok=108 ok=True
+  d2 5.462s finish=stop tok=107 ok=True
+  d3 5.379s finish=stop tok=106 ok=True
+=== qwen35-2b-think-rb1024 ngl=0 budget=1024 preset=Qwen3.5 small thinking text preset ===
+  d1 67.165s finish=stop tok=1111 ok=True
+  d2 68.273s finish=stop tok=1137 ok=True
+  d3 66.237s finish=stop tok=1102 ok=True
+=== lfm120-think-official-rb1024 ngl=0 budget=1024 preset=Liquid AI card: T0.05 / top_k50 / rep1.05 ===
+  d1 100.026s finish=stop tok=2710 ok=True
+  d2 39.777s finish=stop tok=1118 ok=True
+  d3 83.432s finish=stop tok=2274 ok=True

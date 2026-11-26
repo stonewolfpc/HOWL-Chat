@@ -9,12 +9,21 @@ import (
 	"howl-chat/internal/media"
 )
 
-// captureProbe is the Media domain's capture port. It runs the presence-level
-// probe: it must never activate the endpoint or open a stream, because this can
-// run on an explicit ASR activation and must not change other applications'
-// playback levels.
+// captureProbe is the Media domain's capture port. It is a precondition check,
+// not a capture capability: it reports whether Windows selects a default console
+// capture endpoint that is present and enabled (DEVICE_STATE_ACTIVE). It does not
+// prove the endpoint can be opened, that its mix format is accepted, or that
+// recording and transcription will succeed. The renderer owns actual capture and
+// reports those failures itself.
+//
+// It deliberately uses the presence-level probe. Activating a shared-mode
+// capture client is a system-wide audio event: on a Bluetooth headset it makes
+// Windows select HFP over A2DP, resample every other application's playback on
+// that device to 8/16 kHz mono, and change the device's playback level until the
+// client is released. A status read or a precondition check must never cause
+// that; only the user's own recording may.
 func (a *App) captureProbe() (interface{}, bool, string) {
-	status := microphoneStatusNow()
+	status := microphonePresenceNow()
 	return status, status.Usable(), status.Message
 }
 

@@ -127,6 +127,8 @@ func collectAllEntries(idx scanner.ModelIndex) []scanner.AssetEntry {
 	out = append(out, idx.VAEs...)
 	out = append(out, idx.LoRAs...)
 	out = append(out, idx.ControlNets...)
+	out = append(out, idx.IPAdapters...)
+	out = append(out, idx.ClipVisions...)
 	out = append(out, idx.Embeddings...)
 	out = append(out, idx.Upscalers...)
 	return out

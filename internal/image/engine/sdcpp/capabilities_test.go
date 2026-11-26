@@ -84,8 +84,9 @@ func TestBuildServerArgsUsesCapabilityTable(t *testing.T) {
 	}
 }
 
-// Chroma's always-on flags live in the table now, so they cannot be dropped by
-// an edit to the argument builder.
+// Chroma gets its companions and nothing the shipped sd-server rejects: it
+// answers --chroma-disable-dit-mask with "unknown argument" and deprecates
+// --clip-on-cpu, so either flag only stops the launch.
 func TestBuildServerArgsAppliesFamilyFlags(t *testing.T) {
 	e := &Engine{config: types.EngineConfig{Port: 8081}}
 	m := &types.ModelInfo{
@@ -98,13 +99,15 @@ func TestBuildServerArgsAppliesFamilyFlags(t *testing.T) {
 		},
 	}
 	args := strings.Join(e.buildServerArgs(m, types.ModelLoadOptions{}), " ")
-	for _, want := range []string{"--chroma-disable-dit-mask", "--clip-on-cpu", "--t5xxl"} {
+	for _, want := range []string{"--t5xxl", "--vae"} {
 		if !strings.Contains(args, want) {
 			t.Errorf("chroma args missing %s: %s", want, args)
 		}
 	}
-	if strings.Contains(args, "--clip_l") {
-		t.Errorf("chroma has no CLIP-L and must not receive the flag: %s", args)
+	for _, unwanted := range []string{"--clip_l", "--chroma-disable-dit-mask", "--clip-on-cpu"} {
+		if strings.Contains(args, unwanted) {
+			t.Errorf("chroma must not receive %s: %s", unwanted, args)
+		}
 	}
 }
 

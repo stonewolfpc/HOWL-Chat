@@ -126,6 +126,27 @@ function initModelEventListeners() {
             setLoadingStatus('no model loaded', 'default');
         });
 
+        // The load continued, but not with everything the user asked for: for
+        // example a fitted context/layer plan or a CPU fallback. The numbers are
+        // in the message, so surface them instead of logging only.
+        window.runtime.EventsOn('model:warning', (msg) => {
+            console.warn('Model loading warning:', msg);
+            if (typeof showNotification === 'function') {
+                showNotification(msg, 'warning', 12000);
+            }
+        });
+
+        // The engine's own placement after a healthy load. This is separate from
+        // model:warning because it is evidence, not a warning: it reports the
+        // layer split and model buffers llama-server actually allocated, even
+        // when they match Howl's plan.
+        window.runtime.EventsOn('model:placement', (msg) => {
+            console.info('Model placement:', msg);
+            if (typeof showNotification === 'function') {
+                showNotification(msg, 'info', 15000);
+            }
+        });
+
         // Error during loading
         window.runtime.EventsOn('model:error', (err) => {
             updateLoadingProgress(0);

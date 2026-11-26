@@ -201,7 +201,7 @@ async function hydrateFromBackend(chatData) {
     console.log('[hydrateFromBackend] missingBookIds (added-only):', missingBookIds);
     if (missingBookIds.length > 0) {
         try {
-            const allBooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+            const allBooks = (window.LorebookRepo ? window.LorebookRepo.all() : []);
             for (const id of missingBookIds) {
                 const found = allBooks.find(b => b.id === id);
                 if (found) {
@@ -704,7 +704,7 @@ function _enrichCharacterFromRepository(character) {
 function _enrichLorebooksFromLocalStorage(lorebooks) {
     if (!Array.isArray(lorebooks) || lorebooks.length === 0) return lorebooks || [];
     try {
-        const stored = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+        const stored = (window.LorebookRepo ? window.LorebookRepo.all() : []);
         return lorebooks.map(lb => {
             if (!lb || !lb.id) return lb;
             const match = stored.find(s => s.id === lb.id);

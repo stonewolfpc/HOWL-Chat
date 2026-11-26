@@ -1,0 +1,36 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "M1 | KEEP | Canon reference confirms.  \nM2 | REJECT | Sudden shift from training claim.  \nM3 | KEEP | Sable is a fire mage; consistency.  \nM4 | HOLD | Conflicting timelines about training.  \nM5 | KEEP | User prioritizes brevity.  \nM6 | REJECT | Birthday tag is uncertain."
+      }
+    }
+  ],
+  "created": 1795061504,
+  "model": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\experiments\\lfm25-cpu\\models\\LFM2.5-1.2B-Instruct-QAD-Q4_0.gguf",
+  "system_fingerprint": "b12015-a34de8618",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 86,
+    "prompt_tokens": 244,
+    "total_tokens": 330,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-pbFcgsZA9vEJ5JRdIVTCel9YDFvy3REf",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 244,
+    "prompt_ms": 262.936,
+    "prompt_per_token_ms": 1.077606557377049,
+    "prompt_per_second": 927.9824748227705,
+    "predicted_n": 86,
+    "predicted_ms": 2985.43,
+    "predicted_per_token_ms": 35.12270588235294,
+    "predicted_per_second": 28.47161045477536
+  }
+}

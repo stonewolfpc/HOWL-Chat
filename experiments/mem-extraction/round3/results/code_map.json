@@ -1,0 +1,997 @@
+{
+  "da7y2ahx": {
+    "label": "corpus-4b-nonthink",
+    "case": "C01",
+    "draw": 1
+  },
+  "jc7tq2qb": {
+    "label": "corpus-4b-nonthink",
+    "case": "C01",
+    "draw": 2
+  },
+  "hrckg6hd": {
+    "label": "corpus-4b-nonthink",
+    "case": "C01",
+    "draw": 3
+  },
+  "41w4gihk": {
+    "label": "corpus-4b-nonthink",
+    "case": "C02",
+    "draw": 1
+  },
+  "7faz3cal": {
+    "label": "corpus-4b-nonthink",
+    "case": "C02",
+    "draw": 2
+  },
+  "6hqepjgc": {
+    "label": "corpus-4b-nonthink",
+    "case": "C02",
+    "draw": 3
+  },
+  "kl458eev": {
+    "label": "corpus-4b-nonthink",
+    "case": "C03",
+    "draw": 1
+  },
+  "xgza5wzr": {
+    "label": "corpus-4b-nonthink",
+    "case": "C03",
+    "draw": 2
+  },
+  "chkhhwv7": {
+    "label": "corpus-4b-nonthink",
+    "case": "C03",
+    "draw": 3
+  },
+  "boa2v2mz": {
+    "label": "corpus-4b-nonthink",
+    "case": "C04",
+    "draw": 1
+  },
+  "moyk7h7z": {
+    "label": "corpus-4b-nonthink",
+    "case": "C04",
+    "draw": 2
+  },
+  "fkl1qe4g": {
+    "label": "corpus-4b-nonthink",
+    "case": "C04",
+    "draw": 3
+  },
+  "gwku9k8h": {
+    "label": "corpus-4b-nonthink",
+    "case": "C05",
+    "draw": 1
+  },
+  "58zrn1ip": {
+    "label": "corpus-4b-nonthink",
+    "case": "C05",
+    "draw": 2
+  },
+  "pova8bpn": {
+    "label": "corpus-4b-nonthink",
+    "case": "C05",
+    "draw": 3
+  },
+  "02ezb90h": {
+    "label": "corpus-4b-nonthink",
+    "case": "C06",
+    "draw": 1
+  },
+  "8kwk538v": {
+    "label": "corpus-4b-nonthink",
+    "case": "C06",
+    "draw": 2
+  },
+  "0keg5xbt": {
+    "label": "corpus-4b-nonthink",
+    "case": "C06",
+    "draw": 3
+  },
+  "rxeowzey": {
+    "label": "corpus-4b-nonthink",
+    "case": "C07",
+    "draw": 1
+  },
+  "f7i6ucx9": {
+    "label": "corpus-4b-nonthink",
+    "case": "C07",
+    "draw": 2
+  },
+  "oa5tl97s": {
+    "label": "corpus-4b-nonthink",
+    "case": "C07",
+    "draw": 3
+  },
+  "0vrcdu0c": {
+    "label": "corpus-4b-nonthink",
+    "case": "C08",
+    "draw": 1
+  },
+  "sdgh63sv": {
+    "label": "corpus-4b-nonthink",
+    "case": "C08",
+    "draw": 2
+  },
+  "qahlyez3": {
+    "label": "corpus-4b-nonthink",
+    "case": "C08",
+    "draw": 3
+  },
+  "2wd8k7zq": {
+    "label": "corpus-4b-nonthink",
+    "case": "C09",
+    "draw": 1
+  },
+  "1fpf8tid": {
+    "label": "corpus-4b-nonthink",
+    "case": "C09",
+    "draw": 2
+  },
+  "w8n04jpv": {
+    "label": "corpus-4b-nonthink",
+    "case": "C09",
+    "draw": 3
+  },
+  "2b15p3wn": {
+    "label": "corpus-4b-nonthink",
+    "case": "C10",
+    "draw": 1
+  },
+  "fo96ue2z": {
+    "label": "corpus-4b-nonthink",
+    "case": "C10",
+    "draw": 2
+  },
+  "c1xrqyca": {
+    "label": "corpus-4b-nonthink",
+    "case": "C10",
+    "draw": 3
+  },
+  "c47i09o7": {
+    "label": "corpus-4b-nonthink",
+    "case": "C11",
+    "draw": 1
+  },
+  "2mltxy3h": {
+    "label": "corpus-4b-nonthink",
+    "case": "C11",
+    "draw": 2
+  },
+  "0i6ybmif": {
+    "label": "corpus-4b-nonthink",
+    "case": "C11",
+    "draw": 3
+  },
+  "lju6j28m": {
+    "label": "corpus-4b-nonthink",
+    "case": "C12",
+    "draw": 1
+  },
+  "j06olf6e": {
+    "label": "corpus-4b-nonthink",
+    "case": "C12",
+    "draw": 2
+  },
+  "3f92l6va": {
+    "label": "corpus-4b-nonthink",
+    "case": "C12",
+    "draw": 3
+  },
+  "wzx1pw1l": {
+    "label": "corpus-4b-nonthink",
+    "case": "C13",
+    "draw": 1
+  },
+  "0oyt8v77": {
+    "label": "corpus-4b-nonthink",
+    "case": "C13",
+    "draw": 2
+  },
+  "pgp54tpp": {
+    "label": "corpus-4b-nonthink",
+    "case": "C13",
+    "draw": 3
+  },
+  "9ml5rc53": {
+    "label": "corpus-4b-nonthink",
+    "case": "C14",
+    "draw": 1
+  },
+  "h72bu67o": {
+    "label": "corpus-4b-nonthink",
+    "case": "C14",
+    "draw": 2
+  },
+  "1m7pzcv9": {
+    "label": "corpus-4b-nonthink",
+    "case": "C14",
+    "draw": 3
+  },
+  "1gsjt1so": {
+    "label": "corpus-4b-nonthink",
+    "case": "C15",
+    "draw": 1
+  },
+  "zju2qklf": {
+    "label": "corpus-4b-nonthink",
+    "case": "C15",
+    "draw": 2
+  },
+  "bcsr81h1": {
+    "label": "corpus-4b-nonthink",
+    "case": "C15",
+    "draw": 3
+  },
+  "qf3azlw0": {
+    "label": "corpus-4b-nonthink",
+    "case": "C16",
+    "draw": 1
+  },
+  "5ufc25wv": {
+    "label": "corpus-4b-nonthink",
+    "case": "C16",
+    "draw": 2
+  },
+  "l8cdqh92": {
+    "label": "corpus-4b-nonthink",
+    "case": "C16",
+    "draw": 3
+  },
+  "vkoaxitr": {
+    "label": "corpus-4b-nonthink",
+    "case": "C17",
+    "draw": 1
+  },
+  "arqhftrm": {
+    "label": "corpus-4b-nonthink",
+    "case": "C17",
+    "draw": 2
+  },
+  "z4avor13": {
+    "label": "corpus-4b-nonthink",
+    "case": "C17",
+    "draw": 3
+  },
+  "k2wujq4c": {
+    "label": "corpus-4b-nonthink",
+    "case": "C18",
+    "draw": 1
+  },
+  "jjf67xzt": {
+    "label": "corpus-4b-nonthink",
+    "case": "C18",
+    "draw": 2
+  },
+  "2hmmuyhd": {
+    "label": "corpus-4b-nonthink",
+    "case": "C18",
+    "draw": 3
+  },
+  "euibewmb": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C01",
+    "draw": 1
+  },
+  "41ewsrna": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C01",
+    "draw": 2
+  },
+  "jrl6f05f": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C01",
+    "draw": 3
+  },
+  "7pvmpy3z": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C02",
+    "draw": 1
+  },
+  "03b4a74n": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C02",
+    "draw": 2
+  },
+  "9vq2j9ou": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C02",
+    "draw": 3
+  },
+  "1lc3q5h8": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C03",
+    "draw": 1
+  },
+  "dq2we2kg": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C03",
+    "draw": 2
+  },
+  "hw5ojioj": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C03",
+    "draw": 3
+  },
+  "yfrcuwqo": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C04",
+    "draw": 1
+  },
+  "dmv1b02u": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C04",
+    "draw": 2
+  },
+  "fa6xrslj": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C04",
+    "draw": 3
+  },
+  "ja69ru5g": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C05",
+    "draw": 1
+  },
+  "er7kqvb1": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C05",
+    "draw": 2
+  },
+  "6kq22wrl": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C05",
+    "draw": 3
+  },
+  "ijocqvql": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C06",
+    "draw": 1
+  },
+  "lol858ws": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C06",
+    "draw": 2
+  },
+  "xy7owo3j": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C06",
+    "draw": 3
+  },
+  "hnw1x1og": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C07",
+    "draw": 1
+  },
+  "o112u0gv": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C07",
+    "draw": 2
+  },
+  "37s3bhg9": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C07",
+    "draw": 3
+  },
+  "vl8gze0f": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C08",
+    "draw": 1
+  },
+  "g3cfm9hp": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C08",
+    "draw": 2
+  },
+  "cejjp61m": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C08",
+    "draw": 3
+  },
+  "7n68wfwm": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C09",
+    "draw": 1
+  },
+  "am9g546q": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C09",
+    "draw": 2
+  },
+  "u4203avw": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C09",
+    "draw": 3
+  },
+  "njo3oggi": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C10",
+    "draw": 1
+  },
+  "t9s0ve09": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C10",
+    "draw": 2
+  },
+  "ee3ukpn6": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C10",
+    "draw": 3
+  },
+  "bm99eisc": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C11",
+    "draw": 1
+  },
+  "w7wmdv9r": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C11",
+    "draw": 2
+  },
+  "3c2rkui7": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C11",
+    "draw": 3
+  },
+  "frmuuwk5": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C12",
+    "draw": 1
+  },
+  "ij22jeoc": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C12",
+    "draw": 2
+  },
+  "4j2xw619": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C12",
+    "draw": 3
+  },
+  "luqe6lqe": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C13",
+    "draw": 1
+  },
+  "zijgcap7": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C13",
+    "draw": 2
+  },
+  "k2f51lf8": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C13",
+    "draw": 3
+  },
+  "4posvu7n": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C14",
+    "draw": 1
+  },
+  "w4nf53gq": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C14",
+    "draw": 2
+  },
+  "6yiyxbb7": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C14",
+    "draw": 3
+  },
+  "hjrhoayt": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C15",
+    "draw": 1
+  },
+  "wkp6s8fw": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C15",
+    "draw": 2
+  },
+  "smr5b5lo": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C15",
+    "draw": 3
+  },
+  "gfbwiuwi": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C16",
+    "draw": 1
+  },
+  "2l1gi5ta": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C16",
+    "draw": 2
+  },
+  "4vacdiea": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C16",
+    "draw": 3
+  },
+  "05f8vfej": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C17",
+    "draw": 1
+  },
+  "readpkz1": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C17",
+    "draw": 2
+  },
+  "8gyag2hk": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C17",
+    "draw": 3
+  },
+  "h7efkw2d": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C18",
+    "draw": 1
+  },
+  "3pqxkyyl": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C18",
+    "draw": 2
+  },
+  "t5qe1gww": {
+    "label": "corpus-lfm120-instruct",
+    "case": "C18",
+    "draw": 3
+  },
+  "oazcoaw8": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C01",
+    "draw": 1
+  },
+  "54qq3v3w": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C01",
+    "draw": 2
+  },
+  "42g6gw7q": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C02",
+    "draw": 1
+  },
+  "0yds3kny": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C02",
+    "draw": 2
+  },
+  "kug7gup3": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C03",
+    "draw": 1
+  },
+  "6fjzbkzn": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C03",
+    "draw": 2
+  },
+  "d74gtao9": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C04",
+    "draw": 1
+  },
+  "5gxyuv5e": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C04",
+    "draw": 2
+  },
+  "lowm1zik": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C05",
+    "draw": 1
+  },
+  "8q1maguo": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C05",
+    "draw": 2
+  },
+  "nxvtp78k": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C06",
+    "draw": 1
+  },
+  "ipg1mn60": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C06",
+    "draw": 2
+  },
+  "xfiqvtbb": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C07",
+    "draw": 1
+  },
+  "oh2kp9sa": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C07",
+    "draw": 2
+  },
+  "nds7hqaw": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C08",
+    "draw": 1
+  },
+  "ngrqugjm": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C08",
+    "draw": 2
+  },
+  "wvu2586s": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C09",
+    "draw": 1
+  },
+  "mgpxa7zp": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C09",
+    "draw": 2
+  },
+  "29asv4kf": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C10",
+    "draw": 1
+  },
+  "uiu3s599": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C10",
+    "draw": 2
+  },
+  "j4x0yqp5": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C11",
+    "draw": 1
+  },
+  "c04enw6f": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C11",
+    "draw": 2
+  },
+  "3v6qp23o": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C12",
+    "draw": 1
+  },
+  "tyi4az0y": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C12",
+    "draw": 2
+  },
+  "iws648vk": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C13",
+    "draw": 1
+  },
+  "j7378njc": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C13",
+    "draw": 2
+  },
+  "1u67za0x": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C14",
+    "draw": 1
+  },
+  "kbyukf95": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C14",
+    "draw": 2
+  },
+  "x29ccll5": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C15",
+    "draw": 1
+  },
+  "7l1ntpqd": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C15",
+    "draw": 2
+  },
+  "fqu0r73o": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C16",
+    "draw": 1
+  },
+  "2rfx87bo": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C16",
+    "draw": 2
+  },
+  "0ewnc62x": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C17",
+    "draw": 1
+  },
+  "q0v9bbyb": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C17",
+    "draw": 2
+  },
+  "bz375bog": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C18",
+    "draw": 1
+  },
+  "hb10z3tx": {
+    "label": "corpus-lfm3-think-512",
+    "case": "C18",
+    "draw": 2
+  },
+  "jput80yt": {
+    "label": "corpus-4b-think-512",
+    "case": "C01",
+    "draw": 1
+  },
+  "q575o5l9": {
+    "label": "corpus-4b-think-512",
+    "case": "C02",
+    "draw": 1
+  },
+  "mebd8kgd": {
+    "label": "corpus-4b-think-512",
+    "case": "C03",
+    "draw": 1
+  },
+  "b0elqo5f": {
+    "label": "corpus-4b-think-512",
+    "case": "C04",
+    "draw": 1
+  },
+  "bg2hck2t": {
+    "label": "corpus-4b-think-512",
+    "case": "C05",
+    "draw": 1
+  },
+  "vsj9dgnk": {
+    "label": "corpus-4b-think-512",
+    "case": "C06",
+    "draw": 1
+  },
+  "i2k0v8s0": {
+    "label": "corpus-4b-think-512",
+    "case": "C07",
+    "draw": 1
+  },
+  "h3247ejy": {
+    "label": "corpus-4b-think-512",
+    "case": "C08",
+    "draw": 1
+  },
+  "u1evflgw": {
+    "label": "corpus-4b-think-512",
+    "case": "C09",
+    "draw": 1
+  },
+  "o0xw1hlf": {
+    "label": "corpus-4b-think-512",
+    "case": "C10",
+    "draw": 1
+  },
+  "mu08h6b0": {
+    "label": "corpus-4b-think-512",
+    "case": "C11",
+    "draw": 1
+  },
+  "zylyqaux": {
+    "label": "corpus-4b-think-512",
+    "case": "C12",
+    "draw": 1
+  },
+  "34x9syv7": {
+    "label": "corpus-4b-think-512",
+    "case": "C13",
+    "draw": 1
+  },
+  "9xyh7sj0": {
+    "label": "corpus-4b-think-512",
+    "case": "C14",
+    "draw": 1
+  },
+  "1zc1ycfe": {
+    "label": "corpus-4b-think-512",
+    "case": "C15",
+    "draw": 1
+  },
+  "o3o5hn6j": {
+    "label": "corpus-4b-think-512",
+    "case": "C16",
+    "draw": 1
+  },
+  "jo21wmi5": {
+    "label": "corpus-4b-think-512",
+    "case": "C17",
+    "draw": 1
+  },
+  "tmne7m5l": {
+    "label": "corpus-4b-think-512",
+    "case": "C18",
+    "draw": 1
+  },
+  "dgth442y": {
+    "label": "corpus-lfm120-t08",
+    "case": "C01",
+    "draw": 1
+  },
+  "7oci2ogc": {
+    "label": "corpus-lfm120-t08",
+    "case": "C01",
+    "draw": 2
+  },
+  "oru0lclb": {
+    "label": "corpus-lfm120-t08",
+    "case": "C02",
+    "draw": 1
+  },
+  "26ukqanl": {
+    "label": "corpus-lfm120-t08",
+    "case": "C02",
+    "draw": 2
+  },
+  "12fsrtxj": {
+    "label": "corpus-lfm120-t08",
+    "case": "C03",
+    "draw": 1
+  },
+  "bq3oq9l1": {
+    "label": "corpus-lfm120-t08",
+    "case": "C03",
+    "draw": 2
+  },
+  "6ixb61t6": {
+    "label": "corpus-lfm120-t08",
+    "case": "C04",
+    "draw": 1
+  },
+  "cq2nde1d": {
+    "label": "corpus-lfm120-t08",
+    "case": "C04",
+    "draw": 2
+  },
+  "chknnyf3": {
+    "label": "corpus-lfm120-t08",
+    "case": "C05",
+    "draw": 1
+  },
+  "uzo09tjl": {
+    "label": "corpus-lfm120-t08",
+    "case": "C05",
+    "draw": 2
+  },
+  "c9r75fdr": {
+    "label": "corpus-lfm120-t08",
+    "case": "C06",
+    "draw": 1
+  },
+  "ifc11h5r": {
+    "label": "corpus-lfm120-t08",
+    "case": "C06",
+    "draw": 2
+  },
+  "f27b1ggf": {
+    "label": "corpus-lfm120-t08",
+    "case": "C07",
+    "draw": 1
+  },
+  "6bwwbtbx": {
+    "label": "corpus-lfm120-t08",
+    "case": "C07",
+    "draw": 2
+  },
+  "1hbt39r2": {
+    "label": "corpus-lfm120-t08",
+    "case": "C08",
+    "draw": 1
+  },
+  "taqhpkpn": {
+    "label": "corpus-lfm120-t08",
+    "case": "C08",
+    "draw": 2
+  },
+  "fh4qbfv2": {
+    "label": "corpus-lfm120-t08",
+    "case": "C09",
+    "draw": 1
+  },
+  "evp6j9xa": {
+    "label": "corpus-lfm120-t08",
+    "case": "C09",
+    "draw": 2
+  },
+  "758iu45k": {
+    "label": "corpus-lfm120-t08",
+    "case": "C10",
+    "draw": 1
+  },
+  "nxhqtfvv": {
+    "label": "corpus-lfm120-t08",
+    "case": "C10",
+    "draw": 2
+  },
+  "16857ex3": {
+    "label": "corpus-lfm120-t08",
+    "case": "C11",
+    "draw": 1
+  },
+  "uxjxuguf": {
+    "label": "corpus-lfm120-t08",
+    "case": "C11",
+    "draw": 2
+  },
+  "9ojbk8ek": {
+    "label": "corpus-lfm120-t08",
+    "case": "C12",
+    "draw": 1
+  },
+  "h44826yb": {
+    "label": "corpus-lfm120-t08",
+    "case": "C12",
+    "draw": 2
+  },
+  "djgsdmpd": {
+    "label": "corpus-lfm120-t08",
+    "case": "C13",
+    "draw": 1
+  },
+  "q019y7xm": {
+    "label": "corpus-lfm120-t08",
+    "case": "C13",
+    "draw": 2
+  },
+  "5vfwqmxm": {
+    "label": "corpus-lfm120-t08",
+    "case": "C14",
+    "draw": 1
+  },
+  "7fb3h9z1": {
+    "label": "corpus-lfm120-t08",
+    "case": "C14",
+    "draw": 2
+  },
+  "we9aofzt": {
+    "label": "corpus-lfm120-t08",
+    "case": "C15",
+    "draw": 1
+  },
+  "23c75e3c": {
+    "label": "corpus-lfm120-t08",
+    "case": "C15",
+    "draw": 2
+  },
+  "c3e7yd80": {
+    "label": "corpus-lfm120-t08",
+    "case": "C16",
+    "draw": 1
+  },
+  "dzeoymkr": {
+    "label": "corpus-lfm120-t08",
+    "case": "C16",
+    "draw": 2
+  },
+  "y7yno9z7": {
+    "label": "corpus-lfm120-t08",
+    "case": "C17",
+    "draw": 1
+  },
+  "jjt5amq4": {
+    "label": "corpus-lfm120-t08",
+    "case": "C17",
+    "draw": 2
+  },
+  "apc56f1h": {
+    "label": "corpus-lfm120-t08",
+    "case": "C18",
+    "draw": 1
+  },
+  "gtdf0ftp": {
+    "label": "corpus-lfm120-t08",
+    "case": "C18",
+    "draw": 2
+  },
+  "t1hggto0": {
+    "label": "corpus-lfm3-nonthink",
+    "case": "C01",
+    "draw": 1
+  }
+}

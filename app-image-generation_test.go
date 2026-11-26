@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"howl-chat/internal/media"
+	"howl-chat/internal/paths"
 )
 
 func generationNumber(value interface{}) int {
@@ -18,6 +19,7 @@ func generationNumber(value interface{}) int {
 }
 
 func TestImageGenerationBindingsRoundTripAndConflict(t *testing.T) {
+	t.Setenv(paths.IsolationEnvVar, t.TempDir())
 	app := &App{images: media.NewImage(t.TempDir())}
 
 	created, err := app.SaveImageGenerationSettings(map[string]interface{}{"steps": 24, "width": 768}, "")
@@ -49,6 +51,7 @@ func TestImageGenerationBindingsRoundTripAndConflict(t *testing.T) {
 }
 
 func TestImageGenerationImportNeverOverwritesBackend(t *testing.T) {
+	t.Setenv(paths.IsolationEnvVar, t.TempDir())
 	app := &App{images: media.NewImage(t.TempDir())}
 
 	imported, err := app.ImportImageGenerationSettings(map[string]interface{}{"steps": 31, "prompt": "legacy"})
@@ -65,5 +68,35 @@ func TestImageGenerationImportNeverOverwritesBackend(t *testing.T) {
 	}
 	if generationNumber(second["steps"]) != 31 || second["prompt"] != "legacy" {
 		t.Fatalf("second import overwrote backend: %#v", second)
+	}
+}
+
+func TestImageGenerationImportIsJournaledAndRollbackClearsIt(t *testing.T) {
+	t.Setenv(paths.IsolationEnvVar, t.TempDir())
+	app := &App{images: media.NewImage(t.TempDir())}
+
+	if _, err := app.ImportImageGenerationSettings(map[string]interface{}{"steps": 31}); err != nil {
+		t.Fatal(err)
+	}
+	status := app.GetImageGenerationCutoverStatus()
+	if !status.Cutover || !status.RollbackAvailable {
+		t.Fatalf("cutover status after import = %+v", status)
+	}
+	result, err := app.RollbackImageGenerationImport()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Status != "rolled_back" {
+		t.Fatalf("rollback = %+v", result)
+	}
+	loaded, err := app.GetImageGenerationSettings()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(loaded) != 1 || loaded["revision"] != "" {
+		t.Fatalf("rollback left settings: %#v", loaded)
+	}
+	if status := app.GetImageGenerationCutoverStatus(); status.Cutover {
+		t.Fatalf("cutover marker survived rollback: %+v", status)
 	}
 }

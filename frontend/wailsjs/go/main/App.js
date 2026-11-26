@@ -58,8 +58,16 @@ export function CancelImageJob(arg1) {
   return window['go']['main']['App']['CancelImageJob'](arg1);
 }
 
+export function CancelImageWorkflow() {
+  return window['go']['main']['App']['CancelImageWorkflow']();
+}
+
 export function CheckModelFit(arg1, arg2) {
   return window['go']['main']['App']['CheckModelFit'](arg1, arg2);
+}
+
+export function CheckImageFit(arg1) {
+  return window['go']['main']['App']['CheckImageFit'](arg1);
 }
 
 export function ClearChat() {
@@ -162,8 +170,12 @@ export function ExtractImageMetadataFromBase64(arg1) {
   return window['go']['main']['App']['ExtractImageMetadataFromBase64'](arg1);
 }
 
-export function FreeVRAMFor(arg1, arg2) {
-  return window['go']['main']['App']['FreeVRAMFor'](arg1, arg2);
+export function FreeVRAMFor(arg1, arg2, arg3) {
+  return window['go']['main']['App']['FreeVRAMFor'](arg1, arg2, arg3);
+}
+
+export function FreeVRAMForImage(arg1, arg2) {
+  return window['go']['main']['App']['FreeVRAMForImage'](arg1, arg2);
 }
 
 export function GenerateCharacterResponse(arg1, arg2) {
@@ -684,6 +696,10 @@ export function SynthesizeSpeech(arg1) {
 
 export function SynthesizeSpeechWithVoice(arg1, arg2) {
   return window['go']['main']['App']['SynthesizeSpeechWithVoice'](arg1, arg2);
+}
+
+export function GetTTSAudioData(arg1) {
+  return window['go']['main']['App']['GetTTSAudioData'](arg1);
 }
 
 export function TranscribeAudio(arg1) {

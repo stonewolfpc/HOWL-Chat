@@ -1,0 +1,131 @@
+[
+  {
+    "score12": 0,
+    "items": {
+      "M1": {
+        "decision": null,
+        "points": 0
+      },
+      "M2": {
+        "decision": null,
+        "points": 0
+      },
+      "M3": {
+        "decision": null,
+        "points": 0
+      },
+      "M4": {
+        "decision": null,
+        "points": 0
+      },
+      "M5": {
+        "decision": null,
+        "points": 0
+      },
+      "M6": {
+        "decision": null,
+        "points": 0
+      }
+    },
+    "item_lines": 0,
+    "strict_lines": 0,
+    "format_ok": false,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": false,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 305,
+    "wall_s": 9.315,
+    "reasoning_chars": 0,
+    "run_code": "dsq5e8vd",
+    "label": "tinyllama-11b-chat"
+  },
+  {
+    "score12": 0,
+    "items": {
+      "M1": {
+        "decision": null,
+        "points": 0
+      },
+      "M2": {
+        "decision": null,
+        "points": 0
+      },
+      "M3": {
+        "decision": null,
+        "points": 0
+      },
+      "M4": {
+        "decision": null,
+        "points": 0
+      },
+      "M5": {
+        "decision": null,
+        "points": 0
+      },
+      "M6": {
+        "decision": null,
+        "points": 0
+      }
+    },
+    "item_lines": 0,
+    "strict_lines": 0,
+    "format_ok": false,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": false,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 519,
+    "wall_s": 15.675,
+    "reasoning_chars": 0,
+    "run_code": "i01u65j3",
+    "label": "tinyllama-11b-chat"
+  },
+  {
+    "score12": 0,
+    "items": {
+      "M1": {
+        "decision": null,
+        "points": 0
+      },
+      "M2": {
+        "decision": null,
+        "points": 0
+      },
+      "M3": {
+        "decision": null,
+        "points": 0
+      },
+      "M4": {
+        "decision": null,
+        "points": 0
+      },
+      "M5": {
+        "decision": null,
+        "points": 0
+      },
+      "M6": {
+        "decision": null,
+        "points": 0
+      }
+    },
+    "item_lines": 0,
+    "strict_lines": 0,
+    "format_ok": false,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": false,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 464,
+    "wall_s": 13.935,
+    "reasoning_chars": 0,
+    "run_code": "f4rz3v6g",
+    "label": "tinyllama-11b-chat"
+  }
+]

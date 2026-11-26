@@ -1,0 +1,334 @@
+=== lfm120-ins-t03 ngl=0 budget=None preset=T0.3 (one factor off Liquid's 0.1), top_k50, rep1.05 ===
+  d1 2.995s finish=stop tok=78 ok=True
+  d2 2.622s finish=stop tok=74 ok=True
+  d3 2.89s finish=stop tok=81 ok=True
+=== lfm120-ins-t05 ngl=0 budget=None preset=T0.5, top_k50, rep1.05 ===
+  d1 2.786s finish=stop tok=72 ok=True
+  d2 2.491s finish=stop tok=70 ok=True
+  d3 2.814s finish=stop tok=80 ok=True
+=== lfm120-ins-t08 ngl=0 budget=None preset=T0.8 (round-2 shared setting), top_k50, rep1.05 ===
+  d1 3.333s finish=stop tok=88 ok=True
+  d2 2.291s finish=stop tok=65 ok=True
+  d3 2.595s finish=stop tok=73 ok=True
+=== lfm120-ins-t08-rep10 ngl=0 budget=None preset=T0.8 with repetition penalty disabled ===
+  d1 2.653s finish=stop tok=69 ok=True
+  d2 2.569s finish=stop tok=73 ok=True
+  d3 2.624s finish=stop tok=75 ok=True
+=== qwen35-2b-nonthink-pres0 ngl=0 budget=None preset=official T1.0/top_p1.0/top_k20 with presence 0.0 ===
+  d1 6.166s finish=stop tok=93 ok=True
+  d2 11.418s finish=stop tok=185 ok=True
+  d3 4.966s finish=stop tok=80 ok=True
+=== qwen35-2b-nonthink-round2 ngl=0 budget=None preset=round-2 shared chain: T0.8 / top_p0.95 / top_k40 / min_p0.05 ===
+  d1 7.114s finish=stop tok=108 ok=True
+  d2 8.849s finish=stop tok=143 ok=True
+  d3 6.222s finish=stop tok=100 ok=True
+=== lfm3-17b-think-rb512 ngl=0 budget=512 preset=LFM3 card: T0.1 / top_k50 / rep1.1 ===
+  d1 31.592s finish=stop tok=618 ok=True
+  d2 32.139s finish=stop tok=628 ok=True
+=== qwen35-4b-nonthink-gpufull ngl=99 budget=None preset=Qwen3.5 4B/9B non-thinking general preset ===
+  d1 3.212s finish=stop tok=99 ok=True
+  d2 2.722s finish=stop tok=92 ok=True
+=== lfm120-instruct-official-gpufull ngl=99 budget=None preset=Liquid AI card: T0.1 / top_k50 / rep1.05 ===
+  d1 0.598s finish=stop tok=70 ok=True
+  d2 0.649s finish=stop tok=86 ok=True
+[
+  {
+    "run_code": "ybvjr27h",
+    "tag": "gpu-full",
+    "label": "qwen35-4b-nonthink-gpufull",
+    "preset": "Qwen3.5 4B/9B non-thinking general preset",
+    "notes": "",
+    "draw": 1,
+    "seed": 4101,
+    "file": "Qwen3.5-4B-Q4_K_M.gguf",
+    "file_mb": 2740.9,
+    "ngl": 99,
+    "ctx": 4096,
+    "sampling": {
+      "temperature": 0.7,
+      "top_p": 0.8,
+      "top_k": 20,
+      "min_p": 0.0,
+      "presence_penalty": 1.5,
+      "repeat_penalty": 1.0
+    },
+    "max_tokens": 768,
+    "reasoning_budget": null,
+    "reasoning_effort": null,
+    "reasoning_flag": null,
+    "extra_body": {
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    },
+    "system": null,
+    "command": [
+      "C:\\Users\\StoneWolfPC\\HOWL_Chat\\runtime\\llama\\llama-server.exe",
+      "-m",
+      "C:\\Users\\StoneWolfPC\\HOWL_Chat\\experiments\\mem-extraction\\round3\\models\\Qwen3.5-4B-Q4_K_M.gguf",
+      "-c",
+      "4096",
+      "-ngl",
+      "99",
+      "-np",
+      "1",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "5099",
+      "--jinja",
+      "--reasoning-format",
+      "deepseek",
+      "--metrics",
+      "-fa",
+      "on",
+      "--kv-unified"
+    ],
+    "load_s": 2.52,
+    "erase_ms": null,
+    "finish_reason": "stop",
+    "prompt_tokens": 230,
+    "completion_tokens": 99,
+    "ttft_s": 0.362,
+    "thinking_s": 0.0,
+    "answer_s": 2.85,
+    "wall_s": 3.212,
+    "prefill_ms": 344.8,
+    "decode_ms": 2850.1,
+    "decode_tok_s": 34.39,
+    "prefill_tok_s": 666.99,
+    "peak_rss_mb": 3265.6,
+    "peak_vram_mb": 4831,
+    "peak_gpu_util": 99,
+    "kind": "triage"
+  },
+  {
+    "run_code": "jb2epl2i",
+    "tag": "gpu-full",
+    "label": "qwen35-4b-nonthink-gpufull",
+    "preset": "Qwen3.5 4B/9B non-thinking general preset",
+    "notes": "",
+    "draw": 2,
+    "seed": 4102,
+    "file": "Qwen3.5-4B-Q4_K_M.gguf",
+    "file_mb": 2740.9,
+    "ngl": 99,
+    "ctx": 4096,
+    "sampling": {
+      "temperature": 0.7,
+      "top_p": 0.8,
+      "top_k": 20,
+      "min_p": 0.0,
+      "presence_penalty": 1.5,
+      "repeat_penalty": 1.0
+    },
+    "max_tokens": 768,
+    "reasoning_budget": null,
+    "reasoning_effort": null,
+    "reasoning_flag": null,
+    "extra_body": {
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    },
+    "system": null,
+    "command": [
+      "C:\\Users\\StoneWolfPC\\HOWL_Chat\\runtime\\llama\\llama-server.exe",
+      "-m",
+      "C:\\Users\\StoneWolfPC\\HOWL_Chat\\experiments\\mem-extraction\\round3\\models\\Qwen3.5-4B-Q4_K_M.gguf",
+      "-c",
+      "4096",
+      "-ngl",
+      "99",
+      "-np",
+      "1",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "5099",
+      "--jinja",
+      "--reasoning-format",
+      "deepseek",
+      "--metrics",
+      "-fa",
+      "on",
+      "--kv-unified"
+    ],
+    "load_s": 2.52,
+    "erase_ms": null,
+    "finish_reason": "stop",
+    "prompt_tokens": 230,
+    "completion_tokens": 92,
+    "ttft_s": 0.087,
+    "thinking_s": 0.0,
+    "answer_s": 2.636,
+    "wall_s": 2.722,
+    "prefill_ms": 69.5,
+    "decode_ms": 2635.5,
+    "decode_tok_s": 34.53,
+    "prefill_tok_s": 57.54,
+    "peak_rss_mb": 3265.7,
+    "peak_vram_mb": 4831,
+    "peak_gpu_util": 99,
+    "kind": "triage"
+  },
+  {
+    "run_code": "c478nkwh",
+    "tag": "gpu-full",
+    "label": "lfm120-instruct-official-gpufull",
+    "preset": "Liquid AI card: T0.1 / top_k50 / rep1.05",
+    "notes": "",
+    "draw": 1,
+    "seed": 4101,
+    "file": "LFM2.5-1.2B-Instruct-QAD-Q4_0.gguf",
+    "file_mb": 695.8,
+    "ngl": 99,
+    "ctx": 4096,
+    "sampling": {
+      "temperature": 0.1,
+      "top_p": 1.0,
+      "top_k": 50,
+      "min_p": 0.0,
+      "presence_penalty": 0.0,
+      "repeat_penalty": 1.05
+    },
+    "max_tokens": 768,
+    "reasoning_budget": null,
+    "reasoning_effort": null,
+    "reasoning_flag": null,
+    "extra_body": {},
+    "system": null,
+    "command": [
+      "C:\\Users\\StoneWolfPC\\HOWL_Chat\\runtime\\llama\\llama-server.exe",
+      "-m",
+      "C:\\Users\\StoneWolfPC\\HOWL_Chat\\experiments\\lfm25-cpu\\models\\LFM2.5-1.2B-Instruct-QAD-Q4_0.gguf",
+      "-c",
+      "4096",
+      "-ngl",
+      "99",
+      "-np",
+      "1",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "5099",
+      "--jinja",
+      "--reasoning-format",
+      "deepseek",
+      "--metrics",
+      "-fa",
+      "on",
+      "--kv-unified"
+    ],
+    "load_s": 0.86,
+    "erase_ms": null,
+    "finish_reason": "stop",
+    "prompt_tokens": 244,
+    "completion_tokens": 70,
+    "ttft_s": 0.098,
+    "thinking_s": 0.0,
+    "answer_s": 0.499,
+    "wall_s": 0.598,
+    "prefill_ms": 81.9,
+    "decode_ms": 499.3,
+    "decode_tok_s": 138.19,
+    "prefill_tok_s": 2979.35,
+    "peak_rss_mb": 1071.2,
+    "peak_vram_mb": 2741,
+    "peak_gpu_util": 88,
+    "kind": "triage"
+  },
+  {
+    "run_code": "511ergmp",
+    "tag": "gpu-full",
+    "label": "lfm120-instruct-official-gpufull",
+    "preset": "Liquid AI card: T0.1 / top_k50 / rep1.05",
+    "notes": "",
+    "draw": 2,
+    "seed": 4102,
+    "file": "LFM2.5-1.2B-Instruct-QAD-Q4_0.gguf",
+    "file_mb": 695.8,
+    "ngl": 99,
+    "ctx": 4096,
+    "sampling": {
+      "temperature": 0.1,
+      "top_p": 1.0,
+      "top_k": 50,
+      "min_p": 0.0,
+      "presence_penalty": 0.0,
+      "repeat_penalty": 1.05
+    },
+    "max_tokens": 768,
+    "reasoning_budget": null,
+    "reasoning_effort": null,
+    "reasoning_flag": null,
+    "extra_body": {},
+    "system": null,
+    "command": [
+      "C:\\Users\\StoneWolfPC\\HOWL_Chat\\runtime\\llama\\llama-server.exe",
+      "-m",
+      "C:\\Users\\StoneWolfPC\\HOWL_Chat\\experiments\\lfm25-cpu\\models\\LFM2.5-1.2B-Instruct-QAD-Q4_0.gguf",
+      "-c",
+      "4096",
+      "-ngl",
+      "99",
+      "-np",
+      "1",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "5099",
+      "--jinja",
+      "--reasoning-format",
+      "deepseek",
+      "--metrics",
+      "-fa",
+      "on",
+      "--kv-unified"
+    ],
+    "load_s": 0.86,
+    "erase_ms": null,
+    "finish_reason": "stop",
+    "prompt_tokens": 244,
+    "completion_tokens": 86,
+    "ttft_s": 0.033,
+    "thinking_s": 0.0,
+    "answer_s": 0.616,
+    "wall_s": 0.649,
+    "prefill_ms": 7.4,
+    "decode_ms": 615.9,
+    "decode_tok_s": 138.01,
+    "prefill_tok_s": 543.11,
+    "peak_rss_mb": 1071.4,
+    "peak_vram_mb": 2741,
+    "peak_gpu_util": 88,
+    "kind": "triage"
+  }
+]
+Traceback (most recent call last):
+  File "C:\Users\StoneWolfPC\HOWL_Chat\experiments\mem-extraction\round3\run_reset.py", line 62, in <module>
+    main(sys.argv[1] if len(sys.argv) > 1 else "lfm120-instruct-official")
+  File "C:\Users\StoneWolfPC\HOWL_Chat\experiments\mem-extraction\round3\run_reset.py", line 30, in main
+    t_erase = srv.erase_slot()
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\StoneWolfPC\HOWL_Chat\experiments\mem-extraction\round3\harness.py", line 221, in erase_slot
+    with urllib.request.urlopen(req, timeout=30) as r:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\StoneWolfPC\AppData\Local\Programs\Python\Python312\Lib\urllib\request.py", line 215, in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\StoneWolfPC\AppData\Local\Programs\Python\Python312\Lib\urllib\request.py", line 521, in open
+    response = meth(req, response)
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\StoneWolfPC\AppData\Local\Programs\Python\Python312\Lib\urllib\request.py", line 630, in http_response
+    response = self.parent.error(
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\StoneWolfPC\AppData\Local\Programs\Python\Python312\Lib\urllib\request.py", line 559, in error
+    return self._call_chain(*args)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\StoneWolfPC\AppData\Local\Programs\Python\Python312\Lib\urllib\request.py", line 492, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "C:\Users\StoneWolfPC\AppData\Local\Programs\Python\Python312\Lib\urllib\request.py", line 639, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 501: Not Implemented

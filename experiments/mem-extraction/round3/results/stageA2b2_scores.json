@@ -1,0 +1,291 @@
+[
+  {
+    "score12": 7,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | stated as canon"
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | transient event"
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 1,
+        "reason": " | canon"
+      },
+      "M4": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | contradiction"
+      },
+      "M5": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | confirmation needed"
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | maybe canon"
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 471,
+    "wall_s": 41.7,
+    "reasoning_chars": 1736,
+    "run_code": "tgk8076d",
+    "label": "smollm3-3b-think-rb1024"
+  },
+  {
+    "score12": 10,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | consistent with user's canon assertion"
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | short-term, transient event"
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | defining trait for sable's character"
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | contradictory statements require confirmation"
+      },
+      "M5": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | personal preference, not character-defining"
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | uncertain canon status from user tag"
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 403,
+    "wall_s": 35.09,
+    "reasoning_chars": 1374,
+    "run_code": "ckr2t2al",
+    "label": "smollm3-3b-think-rb1024"
+  },
+  {
+    "score12": 10,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | stated as canon"
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | transient time detail"
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | defining character trait"
+      },
+      "M4": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | contradictory statements"
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user preference on interaction style"
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | uncertain note about canon status"
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 545,
+    "wall_s": 47.527,
+    "reasoning_chars": 2114,
+    "run_code": "xvbw9h3m",
+    "label": "smollm3-3b-think-rb1024"
+  },
+  {
+    "score12": 2,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user confirmed as canon by stating it directly. m2 | reject | four-minute wait is transient and not important. m3 | keep | fire mage unable to swim is a nota"
+      },
+      "M2": {
+        "decision": null,
+        "points": 0
+      },
+      "M3": {
+        "decision": null,
+        "points": 0
+      },
+      "M4": {
+        "decision": null,
+        "points": 0
+      },
+      "M5": {
+        "decision": null,
+        "points": 0
+      },
+      "M6": {
+        "decision": null,
+        "points": 0
+      }
+    },
+    "item_lines": 1,
+    "strict_lines": 1,
+    "format_ok": false,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 87,
+    "wall_s": 7.896,
+    "reasoning_chars": 0,
+    "run_code": "zvtwnqsg",
+    "label": "smollm3-3b-nonthink"
+  },
+  {
+    "score12": 10,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | stated as canon by the user"
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | transient, unrelated to story"
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | consistent with fire mage traits"
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | contradiction between statements"
+      },
+      "M5": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | preference noted"
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | tagged as uncertain"
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 61,
+    "wall_s": 5.223,
+    "reasoning_chars": 0,
+    "run_code": "x6dduhk4",
+    "label": "smollm3-3b-nonthink"
+  },
+  {
+    "score12": 12,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | stated as canon by the user"
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | transient or worthless"
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | confirmed as a trait"
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | contradiction needs confirmation"
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | preference of user"
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | uncertain if canon"
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 59,
+    "wall_s": 5.005,
+    "reasoning_chars": 0,
+    "run_code": "1ozvnggg",
+    "label": "smollm3-3b-nonthink"
+  }
+]

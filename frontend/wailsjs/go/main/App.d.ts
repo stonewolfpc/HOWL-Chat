@@ -41,7 +41,11 @@ export function BuildCharacterLoreBlock(arg1:string,arg2:string):Promise<string>
 
 export function CancelImageJob(arg1:string):Promise<void>;
 
+export function CancelImageWorkflow():Promise<void>;
+
 export function CheckModelFit(arg1:string,arg2:string):Promise<main.ModelFitResult>;
+
+export function CheckImageFit(arg1:types.ImageOptions):Promise<main.ModelFitResult>;
 
 export function ClearChat():Promise<void>;
 
@@ -93,7 +97,9 @@ export function ExtractImageMetadata(arg1:string):Promise<metadata.ExtractedMeta
 
 export function ExtractImageMetadataFromBase64(arg1:string):Promise<metadata.ExtractedMetadata>;
 
-export function FreeVRAMFor(arg1:string,arg2:string):Promise<main.ModelFitResult>;
+export function FreeVRAMFor(arg1:string,arg2:string,arg3:boolean):Promise<main.ModelFitResult>;
+
+export function FreeVRAMForImage(arg1:types.ImageOptions,arg2:boolean):Promise<main.ModelFitResult>;
 
 export function GenerateCharacterResponse(arg1:string,arg2:string):Promise<void>;
 
@@ -354,6 +360,7 @@ export function StartImageJob(arg1:types.ImageOptions):Promise<string>;
 export function SynthesizeSpeech(arg1:string):Promise<string>;
 
 export function SynthesizeSpeechWithVoice(arg1:string,arg2:string):Promise<string>;
+export function GetTTSAudioData(arg1:string):Promise<string>;
 
 export function TranscribeAudio(arg1:string):Promise<string>;
 

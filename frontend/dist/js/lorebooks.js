@@ -5,8 +5,6 @@
  * how important it is, and how safely it enters the model context.
  */
 
-const LOREBOOK_STORAGE_KEY = 'howl-chat-lorebooks';
-
 const LOREBOOK_DEFAULTS = {
     title: '',
     content: '',
@@ -178,20 +176,6 @@ function getValue(id) {
     const field = getField(id);
     if (!field) return '';
     return field.type === 'checkbox' ? field.checked : field.value;
-}
-
-function loadLorebooksFromStorage() {
-    try {
-        const saved = JSON.parse(localStorage.getItem(LOREBOOK_STORAGE_KEY) || '[]');
-        lorebooks = Array.isArray(saved) ? saved.map(normalizeLorebook) : [];
-    } catch (error) {
-        console.error('Failed to load lorebooks:', error);
-        lorebooks = [];
-    }
-}
-
-function saveLorebooksToStorage() {
-    localStorage.setItem(LOREBOOK_STORAGE_KEY, JSON.stringify(lorebooks));
 }
 
 function selectLorebookType(type) {
@@ -438,6 +422,12 @@ async function saveLorebook() {
         if (!proceed) return;
     }
 
+    const repo = lorebookRepo();
+    if (!repo) {
+        alert('The lorebook library is not available in this window.');
+        return;
+    }
+
     const previous = lorebooks.slice();
     const index = lorebooks.findIndex(item => item.id === lorebook.id);
     if (index >= 0) {
@@ -447,12 +437,7 @@ async function saveLorebook() {
     }
 
     try {
-        const repo = lorebookRepo();
-        if (repo) {
-            await repo.save(lorebook, index >= 0);
-        } else {
-            saveLorebooksToStorage();
-        }
+        await repo.save(lorebook, index >= 0);
     } catch (error) {
         lorebooks = previous;
         console.error('Failed to save lorebook:', error);
@@ -479,10 +464,10 @@ async function loadLorebooks() {
             lorebooks = (state.entries || []).map(normalizeLorebook);
         } catch (error) {
             console.error('Failed to load lorebooks from the library:', error);
-            loadLorebooksFromStorage();
+            lorebooks = (repo.readCache ? repo.readCache() : []).map(normalizeLorebook);
         }
     } else {
-        loadLorebooksFromStorage();
+        lorebooks = [];
     }
     renderLorebookStoreStatus();
 
@@ -581,14 +566,14 @@ async function deleteLorebookById(id) {
 
     if (!confirm(`Delete "${lorebook.title}"?`)) return;
 
+    const repo = lorebookRepo();
+    if (!repo) {
+        alert('The lorebook library is not available in this window.');
+        return;
+    }
+
     try {
-        const repo = lorebookRepo();
-        if (repo) {
-            await repo.remove(id);
-        } else {
-            lorebooks = lorebooks.filter(item => item.id !== id);
-            saveLorebooksToStorage();
-        }
+        await repo.remove(id);
     } catch (error) {
         console.error('Failed to delete lorebook:', error);
         alert('Failed to delete lorebook. ' + (error?.message || error));
@@ -671,8 +656,8 @@ async function rollbackLorebookLibrary() {
 }
 
 function exportLorebooksForBackend() {
-    loadLorebooksFromStorage();
-    return lorebooks.map(normalizeLorebook);
+    const repo = lorebookRepo();
+    return (repo && repo.all ? repo.all() : []).map(normalizeLorebook);
 }
 
 document.addEventListener('DOMContentLoaded', function() {

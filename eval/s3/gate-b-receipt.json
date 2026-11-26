@@ -1,0 +1,266 @@
+{
+  "branches": {
+    "lexical": {
+      "method": "BM25",
+      "params": {
+        "b": 0.75,
+        "k1": 1.5
+      }
+    },
+    "semantic": {
+      "available": false,
+      "metric": "cosine",
+      "reason": "no embedding model authorized or configured; branch reports unavailable rather than faking a fallback"
+    },
+    "subword": {
+      "dim": 2048,
+      "method": "hashed char n-gram cosine",
+      "metric": "cosine",
+      "n_grams": [
+        3,
+        4,
+        5
+      ],
+      "seed": "s3-subword-v1"
+    }
+  },
+  "embedder_identity": null,
+  "evidence_sha256": "dda8a2c058bd7b724b3b0c2dc05506f57fd3fb08e7c80982b2a34a2d8e232d1f",
+  "formation_frozen": true,
+  "formation_hashes": {
+    "current": {
+      "evidence.py": "19db697a0f82d29f",
+      "formation.py": "d8aac5003c66229d",
+      "records.py": "1432fb63da5ae561"
+    },
+    "identical": true,
+    "recorded": {
+      "evidence.py": "19db697a0f82d29f",
+      "formation.py": "d8aac5003c66229d",
+      "records.py": "1432fb63da5ae561"
+    }
+  },
+  "fusion": {
+    "k": 60,
+    "method": "reciprocal rank fusion",
+    "min_fused": 0.012
+  },
+  "gate": "B",
+  "probes": [
+    {
+      "abstained": false,
+      "branch_values_top2": {
+        "lexical": [],
+        "semantic": [],
+        "subword": [
+          "Corvin Ashgrave of Ossary, and quiet was not part of it"
+        ]
+      },
+      "branches_top": {
+        "lexical": null,
+        "semantic": null,
+        "subword": "rec-0001"
+      },
+      "expected": "trained_by",
+      "fused_top": "rec-0001",
+      "id": "P1",
+      "owner": "char-001",
+      "pass": true,
+      "query": "Who was your trainer, again?",
+      "reason": "selected",
+      "reranked_top": "rec-0001",
+      "selected_values": [
+        "Corvin Ashgrave of Ossary, and quiet was not part of it"
+      ],
+      "semantic_available": false,
+      "why": "lexical paraphrase gap observed in Gate A"
+    },
+    {
+      "abstained": true,
+      "branch_values_top2": {
+        "lexical": [],
+        "semantic": [],
+        "subword": []
+      },
+      "branches_top": {
+        "lexical": null,
+        "semantic": null,
+        "subword": null
+      },
+      "expected": "abstain",
+      "fused_top": null,
+      "id": "P2",
+      "owner": "char-001",
+      "pass": true,
+      "query": "What did you think of the weather?",
+      "reason": "below_min_fused",
+      "reranked_top": null,
+      "selected_values": [],
+      "semantic_available": false,
+      "why": "irrelevant probe must abstain"
+    },
+    {
+      "abstained": false,
+      "branch_values_top2": {
+        "lexical": [
+          "seven-four-nine-one"
+        ],
+        "semantic": [],
+        "subword": [
+          "seven-four-nine-one"
+        ]
+      },
+      "branches_top": {
+        "lexical": "rec-0004",
+        "semantic": null,
+        "subword": "rec-0004"
+      },
+      "expected": "vault_code",
+      "fused_top": "rec-0004",
+      "id": "P3a",
+      "owner": null,
+      "pass": true,
+      "query": "What is the vault code?",
+      "reason": "selected",
+      "reranked_top": "rec-0004",
+      "selected_values": [
+        "seven-four-nine-one"
+      ],
+      "semantic_available": false,
+      "why": "pre-filter contamination is measured, not assumed away"
+    },
+    {
+      "abstained": true,
+      "branch_values_top2": {
+        "lexical": [],
+        "semantic": [],
+        "subword": []
+      },
+      "branches_top": {
+        "lexical": null,
+        "semantic": null,
+        "subword": null
+      },
+      "expected": "abstain",
+      "fused_top": null,
+      "id": "P3b",
+      "owner": "char-001",
+      "pass": true,
+      "query": "What is the vault code?",
+      "reason": "below_min_fused",
+      "reranked_top": null,
+      "selected_values": [],
+      "semantic_available": false,
+      "why": "ownership filter must remove another character's record"
+    },
+    {
+      "abstained": false,
+      "branch_values_top2": {
+        "lexical": [
+          "of debts in the green cabinet now"
+        ],
+        "semantic": [],
+        "subword": [
+          "of debts in the green cabinet now"
+        ]
+      },
+      "branches_top": {
+        "lexical": "rec-0007",
+        "semantic": null,
+        "subword": "rec-0007"
+      },
+      "expected": "green",
+      "fused_top": "rec-0007",
+      "id": "P4a",
+      "owner": "char-001",
+      "pass": true,
+      "query": "Where is the ledger kept now?",
+      "reason": "selected",
+      "reranked_top": "rec-0007",
+      "selected_values": [
+        "of debts in the green cabinet now"
+      ],
+      "semantic_available": false,
+      "why": "current truth"
+    },
+    {
+      "abstained": false,
+      "branch_values_top2": {
+        "lexical": [
+          "of debts in the green cabinet now",
+          "of unpaid debts in the blue cabinet, if you are curious"
+        ],
+        "semantic": [],
+        "subword": []
+      },
+      "branches_top": {
+        "lexical": "rec-0007",
+        "semantic": null,
+        "subword": null
+      },
+      "expected": "blue",
+      "fused_top": "rec-0007",
+      "id": "P4b",
+      "owner": "char-001",
+      "pass": true,
+      "query": "Where was the ledger kept before?",
+      "reason": "selected",
+      "reranked_top": "rec-0002",
+      "selected_values": [
+        "of unpaid debts in the blue cabinet, if you are curious",
+        "of debts in the green cabinet now"
+      ],
+      "semantic_available": false,
+      "why": "history must remain reachable when explicitly asked for"
+    },
+    {
+      "abstained": false,
+      "branch_values_top2": {
+        "lexical": [
+          "Corvin Ashgrave of Ossary, and quiet was not part of it"
+        ],
+        "semantic": [],
+        "subword": [
+          "Corvin Ashgrave of Ossary, and quiet was not part of it"
+        ]
+      },
+      "branches_top": {
+        "lexical": "rec-0001",
+        "semantic": null,
+        "subword": "rec-0001"
+      },
+      "expected": "abstain",
+      "fused_top": "rec-0001",
+      "id": "P5",
+      "owner": "char-001",
+      "pass": false,
+      "query": "Who trained the horse?",
+      "reason": "selected",
+      "reranked_top": "rec-0001",
+      "selected_values": [
+        "Corvin Ashgrave of Ossary, and quiet was not part of it"
+      ],
+      "semantic_available": false,
+      "why": "misleading similarity: shares 'trained' but asks something else"
+    }
+  ],
+  "probes_passed": 6,
+  "probes_total": 7,
+  "records": {
+    "active": 6,
+    "superseded": 1
+  },
+  "reproducibility": {
+    "deterministic": true,
+    "no_model_loaded": true,
+    "note": "no embedding model, no server, no generation"
+  },
+  "rerank": {
+    "coverage_weight": 0.1,
+    "method": "heuristic term-coverage + kind prior (NOT a cross-encoder)",
+    "stale_penalty": 0.02
+  },
+  "result": "PARTIAL",
+  "scope_note": "semantic branch absent by design (no embedder authorized); fused results cannot be attributed to a semantic component",
+  "suite": "s3.evaluate"
+}

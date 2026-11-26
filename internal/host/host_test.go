@@ -145,8 +145,14 @@ func TestProcessesAdoptTakeAndStopWithoutAProcess(t *testing.T) {
 		t.Fatalf("Stop on an empty owner: %v", err)
 	}
 
-	cmd := exec.Command("cmd", "/c", "exit 0") // never started: no Process
-	p.Adopt(cmd, nil)
+	cmd := exec.Command("cmd", "/c", "exit 0")
+	if err := cmd.Start(); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = cmd.Wait() })
+	if _, err := p.Adopt(cmd, nil); err != nil {
+		t.Fatal(err)
+	}
 	if got := p.Current(); got != cmd {
 		t.Fatal("Adopt did not record the process")
 	}

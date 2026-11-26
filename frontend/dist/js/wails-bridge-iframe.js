@@ -203,17 +203,46 @@
     });
 
     var hostedGo = { main: { App: App } };
-    try {
-        window.go = hostedGo;
-    } catch (e) {
-        Object.defineProperty(window, 'go', { value: hostedGo, configurable: true, writable: true });
+
+    // A framed document must never keep a native binding. Wails binds its IPC to
+    // the top-level document, so a native call made from this frame never
+    // settles: the panel then hangs at "Loading saved audio settings…" and its
+    // close button awaits the same dead promise. Replace the binding by every
+    // means available, and if none works say so at once instead of handing the
+    // panel a request that can never resolve.
+    function installHostedGo() {
+        var attempts = [
+            function () { delete window.go; window.go = hostedGo; },
+            function () { window.go = hostedGo; },
+            function () { Object.defineProperty(window, 'go', { value: hostedGo, configurable: true, writable: true }); }
+        ];
+        for (var i = 0; i < attempts.length; i++) {
+            try { attempts[i](); } catch (e) { /* try the next form */ }
+            if (window.go && window.go.main && window.go.main.App === App) return true;
+        }
+        return false;
     }
 
+    // Publish the bridge before any failure path: the panel reads it to decide
+    // whether Save is allowed, so a missing object would read as "native window.go
+    // path" and hand it the very binding this file exists to keep it away from.
     Object.defineProperty(window, '__howlBridgeIframe', {
         value: bridge,
         enumerable: false,
         configurable: false
     });
+
+    if (!installHostedGo()) {
+        bridge.mode = 'unavailable';
+        bridge.reason = 'a backend binding is bound to this frame and cannot be replaced; ' +
+            'a call from here would never settle';
+        clearTimeout(handshakeTimer);
+        console.error('[audio-settings] ' + bridge.reason);
+        window.dispatchEvent(new CustomEvent('howl:bridge-unavailable', {
+            detail: { reason: bridge.reason }
+        }));
+        return;
+    }
 
     post({ __howlBridge: 1, type: 'hello' });
 })();

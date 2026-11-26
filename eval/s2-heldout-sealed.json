@@ -1,0 +1,26 @@
+{
+  "authorised_use": "the evaluation stage under an explicit gate authorisation, and not before",
+  "facts": [
+    {
+      "id": "f-003",
+      "sha256": "fadb7d10aaf77e3bbb52647995ff7ada5651cbca2353b38d03f6641eec1f8b54",
+      "text": "I have never named the founder of the Ossary archive."
+    },
+    {
+      "id": "f-013",
+      "sha256": "8e3f76da7afc0e86357af16682b001f3f4fdbe41f61be0f7194fc8997e885076",
+      "text": "I cannot swim and avoid deep water."
+    },
+    {
+      "id": "f-023",
+      "sha256": "78a47f0306509af5af24f9cf2844be34f9fb2b0ed8a85adc605428ecac84521e",
+      "text": "I owe Sable a favour I have not yet repaid."
+    },
+    {
+      "id": "f-033",
+      "sha256": "40db5a9557541f2a6a6d4ba99eefa879cf03824e477b459a16d7da4d084fb3aa",
+      "text": "I do not trust anyone from the Ashgrave line."
+    }
+  ],
+  "purpose": "SEALED held-out facts. Must not be read by the generator, the injection-selection logic, or anyone tuning the experiment. Procedural seal only: repository access reveals it."
+}

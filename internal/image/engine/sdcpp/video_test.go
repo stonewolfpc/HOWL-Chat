@@ -48,7 +48,7 @@ func TestBuildVideoArgsWan(t *testing.T) {
 			"t5xxl": "t.gguf",
 		},
 	}}
-	args := strings.Join(e.buildVideoArgs(types.ImageOptions{Prompt: "a fox", Seed: 7}, 33, 16, 832, 480, "out.webm"), " ")
+	args := mustVideoArgs(t, e, types.ImageOptions{Prompt: "a fox", Seed: 7}, 33, 16, 832, 480, "out.webm")
 	wants := []string{
 		"-M vid_gen",
 		"--diffusion-model m.gguf",
@@ -78,7 +78,7 @@ func TestBuildVideoArgsAnimateDiffUsesSingleModel(t *testing.T) {
 			"motion_module": "mm.ckpt",
 		},
 	}}
-	args := strings.Join(e.buildVideoArgs(types.ImageOptions{Prompt: "wave"}, 16, 8, 512, 512, "o.webm"), " ")
+	args := mustVideoArgs(t, e, types.ImageOptions{Prompt: "wave"}, 16, 8, 512, 512, "o.webm")
 	if !strings.Contains(args, "-m sd15.safetensors") {
 		t.Fatalf("AnimateDiff should load with -m, got: %s", args)
 	}
@@ -108,7 +108,7 @@ func TestBuildVideoArgsAlwaysTilesVAE(t *testing.T) {
 		Family: "wan",
 		Files:  map[string]string{"model": "m.gguf", "vae": "v.safetensors", "t5xxl": "t.gguf"},
 	}}
-	args := strings.Join(e.buildVideoArgs(types.ImageOptions{Prompt: "a fox"}, 33, 16, 832, 480, "o.webm"), " ")
+	args := mustVideoArgs(t, e, types.ImageOptions{Prompt: "a fox"}, 33, 16, 832, 480, "o.webm")
 	if !strings.Contains(args, "--vae-tiling") {
 		t.Fatalf("video args must always tile the VAE: %s", args)
 	}
@@ -189,4 +189,15 @@ func TestVideoMIME(t *testing.T) {
 			t.Errorf("videoMIME(%q) = %q, want %q", ext, got, want)
 		}
 	}
+}
+
+// mustVideoArgs builds sd-cli's argv and fails the test on a refusal, so a
+// family that the engine no longer supports reads as one clear failure.
+func mustVideoArgs(t *testing.T, e *Engine, opts types.ImageOptions, frames, fps, width, height int, out string) string {
+	t.Helper()
+	args, err := e.buildVideoArgs(opts, frames, fps, width, height, out)
+	if err != nil {
+		t.Fatalf("buildVideoArgs: %v", err)
+	}
+	return strings.Join(args, " ")
 }

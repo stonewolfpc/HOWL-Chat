@@ -31,8 +31,8 @@ func newCharacterVoicePipeline(t *testing.T) (*Pipeline, *providerSet) {
 	}
 	p.ttsSynth = piper
 	p.activeTTSEngine = string(types.TTSPiper)
-	p.ttsEngines = map[string]types.TTSSynthesizer{
-		string(types.TTSPiper): piper,
+	p.ttsProviders = map[string]*ttsProvider{
+		string(types.TTSPiper): {key: string(types.TTSPiper), synth: piper, engine: string(types.TTSPiper)},
 	}
 	p.ttsCache = cache.NewManager(10)
 	p.mu.Unlock()

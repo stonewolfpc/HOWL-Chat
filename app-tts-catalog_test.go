@@ -11,6 +11,11 @@ import (
 
 func TestBuildPiperVoiceCatalogMarksInstalledAndMissingVoices(t *testing.T) {
 	dir := t.TempDir()
+	// buildPiperVoiceCatalog always merges the configured default voice, which
+	// otherwise comes from the user's models/ directory. Point that input at a
+	// path inside this test's temp dir so the fixture owns every voice and a
+	// real installed model cannot decide the default.
+	t.Setenv("HOWL_TTS_PIPER_MODEL", filepath.Join(dir, "default-voice.onnx"))
 	installed := filepath.Join(dir, "present.onnx")
 	if err := os.WriteFile(installed, []byte("model"), 0o600); err != nil {
 		t.Fatal(err)

@@ -1,0 +1,97 @@
+{
+  "gate": "B-resources",
+  "revision_of": "MEMORY-09-S3-EMBEDDER-3 rev2",
+  "corrections": [
+    "GPU offload IS established: 13/13 layers, CUDA0 model buffer 114.91 MiB (default verbosity hid the lines)",
+    "Earlier 'CPU' runs were not CPU: llama-server ignores CUDA_VISIBLE_DEVICES; --device none -ngl 0 required",
+    "16 s cold start was a first-read disk artefact; spawn-to-ready is 0.56 s"
+  ],
+  "embedder": {
+    "repo": "nomic-ai/nomic-embed-text-v1.5-GGUF",
+    "revision": "0188c9bf409793f810680a5a431e7b899c46104c",
+    "file": "nomic-embed-text-v1.5.Q8_0.gguf",
+    "bytes": 146146432,
+    "sha256": "3e24342164b3d94991ba9692fdc0dd08e3fd7362e0aacc396a9a5c54a544c3b7",
+    "dimension": 768,
+    "pooling": "mean",
+    "ctx_size": 2048,
+    "query_prefix": "search_query: ",
+    "document_prefix": "search_document: ",
+    "metric": "cosine",
+    "runtime": "llama-server b10076 (305ba519a)"
+  },
+  "execution": {
+    "cpu": {
+      "config": "cpu",
+      "flags": [
+        "--device",
+        "none",
+        "-ngl",
+        "0"
+      ],
+      "spawn_to_ready_seconds": 0.56,
+      "model_load_seconds": 0.14,
+      "placement": {
+        "load_start": "0.00.194.868",
+        "offload": "load_tensors: offloaded 0/13 layers to GPU",
+        "cpu_buffer": "138.65 MiB",
+        "load_end": "0.00.338.476"
+      },
+      "first_query_ms": 34.7,
+      "warm_p50_ms": 13.4,
+      "warm_p95_ms": 34.2,
+      "warm_max_ms": 34.2,
+      "vram_idle_mib": 1600,
+      "vram_loaded_mib": 1694,
+      "vram_delta_mib": 94,
+      "vram_after_shutdown_mib": 1587,
+      "vram_residual_mib": -13,
+      "port_closed_after_shutdown": true
+    },
+    "gpu": {
+      "config": "gpu",
+      "flags": [
+        "-ngl",
+        "99"
+      ],
+      "spawn_to_ready_seconds": 0.56,
+      "model_load_seconds": 0.24,
+      "placement": {
+        "load_start": "0.00.192.740",
+        "offload": "load_tensors: offloaded 13/13 layers to GPU",
+        "cpu_buffer": "23.76 MiB",
+        "gpu_buffer": "114.91 MiB",
+        "load_end": "0.00.435.741"
+      },
+      "first_query_ms": 54.3,
+      "warm_p50_ms": 10.0,
+      "warm_p95_ms": 29.4,
+      "warm_max_ms": 29.4,
+      "vram_idle_mib": 1587,
+      "vram_loaded_mib": 1844,
+      "vram_delta_mib": 257,
+      "vram_after_shutdown_mib": 1587,
+      "vram_residual_mib": 0,
+      "port_closed_after_shutdown": true
+    }
+  },
+  "verdicts": {
+    "cold_load_budget": "PASS both (0.56 s spawn-to-ready; model load 0.14/0.24 s)",
+    "latency_budget": "PASS both (cpu p50 13.4 / p95 34.2; gpu p50 10.0 / p95 29.4)",
+    "vram_overhead_budget": "PASS both (cpu +94 MiB, gpu +257 MiB; <=384). CPU target 0 MISSED: CUDA build context, not weights.",
+    "residual_budget": "PASS both (cpu -13, gpu 0 MiB)",
+    "gpu_execution": "ESTABLISHED (was previously reported as not established - logging verbosity error)",
+    "cpu_zero_vram": "NOT ACHIEVED with the CUDA build; requires a CPU-only build to test",
+    "adopted_execution": "CPU default; GPU opt-in within budget, must fall back and report"
+  },
+  "probes": {
+    "passed": 6,
+    "total": 7,
+    "result": "PARTIAL",
+    "failing": [
+      "P5"
+    ]
+  },
+  "semantic_threshold": 0.6,
+  "gate_b_status": "PARTIAL - not closed"
+}

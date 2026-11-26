@@ -1,0 +1,36 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "M1 | HOLD | The canon status is uncertain due to user contradiction between stated and user statement.\nM2 | REJECT | User's immediate actions (brb, return) lack causal link or context.\nM3 | REJECT | Contradiction: Sable is a fire mage, yet cannot swim.\nM4 | HOLD | Conflicting claims: never met vs. trained by Corvin.\nM5 | REJECT | Preference for short replies violates user's stated need for brevity.\nM6 | HOLD | Uncertainty over whether the tag \"maybe canon\" is true or false."
+      }
+    }
+  ],
+  "created": 1795062103,
+  "model": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\experiments\\lfm25-cpu\\round2\\models\\Qwen3.5-0.8B-Q4_K_M.gguf",
+  "system_fingerprint": "b12015-a34de8618",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 126,
+    "prompt_tokens": 230,
+    "total_tokens": 356,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-hxeBS0mnLpVWNoobcJcCZPKQ4BHVxQSj",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 230,
+    "prompt_ms": 276.023,
+    "prompt_per_token_ms": 1.2001000000000002,
+    "prompt_per_second": 833.2638946754437,
+    "predicted_n": 126,
+    "predicted_ms": 3785.781,
+    "predicted_per_token_ms": 30.286248,
+    "predicted_per_second": 33.0182860551099
+  }
+}

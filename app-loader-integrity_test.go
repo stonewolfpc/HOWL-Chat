@@ -335,7 +335,7 @@ func TestScanDirForTypeDoesNotRegisterLegacyBinForChat(t *testing.T) {
 
 func TestBuildLlamaServerArgsUsesOnlyThePairedProjector(t *testing.T) {
 	projector := filepath.Join(`C:\voice`, "mmproj-Qwen3-ASR-1.7B-Q8_0.gguf")
-	args := buildLlamaServerArgs("model.gguf", projector, map[string]interface{}{}, false)
+	args := buildLlamaServerArgs("model.gguf", projector, map[string]interface{}{}, false, llamaCapsForTests())
 	joined := strings.Join(args, " ")
 
 	if strings.Count(joined, "--mmproj") != 1 {
@@ -355,7 +355,7 @@ func TestBuildLlamaServerArgsUsesOnlyThePairedProjector(t *testing.T) {
 		t.Fatalf("args = %v, want --fit off when fitParams is false", args)
 	}
 
-	without := buildLlamaServerArgs("model.gguf", "", map[string]interface{}{}, true)
+	without := buildLlamaServerArgs("model.gguf", "", map[string]interface{}{}, true, llamaCapsForTests())
 	if strings.Contains(strings.Join(without, " "), "--mmproj") {
 		t.Fatalf("args = %v, want no projector argument", without)
 	}

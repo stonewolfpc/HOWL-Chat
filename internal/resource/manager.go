@@ -25,7 +25,7 @@ func GetManager() *ResourceManager {
 		instance = &ResourceManager{
 			models: make(map[string]*ModelState),
 		}
-		instance.refreshHardware()
+		_ = instance.refreshHardware()
 		fmt.Println("[ResourceManager] initialization complete")
 	})
 	return instance
@@ -130,13 +130,21 @@ func (rm *ResourceManager) HardwareSnapshot() HardwareSnapshot {
 
 // RefreshHardware updates the stored hardware snapshot with live data.
 func (rm *ResourceManager) RefreshHardware() {
+	_, _ = rm.RefreshSnapshot()
+}
+
+// RefreshSnapshot refreshes and returns the snapshot together with a detection
+// error. Admission uses this form so a failed read can fail closed instead of
+// reusing a stale value.
+func (rm *ResourceManager) RefreshSnapshot() (HardwareSnapshot, error) {
 	rm.mu.Lock()
 	defer rm.mu.Unlock()
-	rm.refreshHardware()
+	err := rm.refreshHardware()
+	return rm.snapshot, err
 }
 
 // refreshHardware must be called with rm.mu held.
-func (rm *ResourceManager) refreshHardware() {
+func (rm *ResourceManager) refreshHardware() error {
 	fmt.Println("[ResourceManager] refreshHardware: calling hw.DetectHardware()")
 	info := hw.DetectHardware()
 	fmt.Println("[ResourceManager] refreshHardware: hw.DetectHardware() returned")
@@ -149,6 +157,9 @@ func (rm *ResourceManager) refreshHardware() {
 
 	gpuTotal, gpuUsed := int64(0), int64(0)
 	gpuName, gpuVendor := "", ""
+	gpus := []GPUInfo(nil)
+	vramSource := "none"
+	vramLive := false
 	fmt.Println("[ResourceManager] refreshHardware: calling queryGPUs() with 3s timeout")
 	gpuCh := make(chan []GPUInfo, 1)
 	go func() {
@@ -159,23 +170,31 @@ func (rm *ResourceManager) refreshHardware() {
 		}
 	}()
 	select {
-	case gpus := <-gpuCh:
-		if gpus != nil {
+	case detected := <-gpuCh:
+		if detected != nil {
+			gpus = detected
 			fmt.Printf("[ResourceManager] refreshHardware: queryGPUs() returned %d GPUs\n", len(gpus))
 			gpuTotal, gpuUsed = sumGPUVRAM(gpus)
 			gpuName = gpus[0].Name
 			gpuVendor = gpus[0].Vendor
+			vramSource = gpus[0].Source
+			if vramSource == "" {
+				vramSource = "detector"
+			}
+			vramLive = gpus[0].Live
 		} else {
 			fmt.Println("[ResourceManager] refreshHardware: queryGPUs() returned empty/failed, using fallback")
 			gpuTotal, gpuUsed = rm.fallbackGPUValues(info, lastTotal)
 			gpuName = lastName
 			gpuVendor = lastVendor
+			vramSource = "fallback"
 		}
 	case <-time.After(3 * time.Second):
 		fmt.Println("[ResourceManager] refreshHardware: queryGPUs() TIMED OUT after 3s, using fallback")
 		gpuTotal, gpuUsed = rm.fallbackGPUValues(info, lastTotal)
 		gpuName = lastName
 		gpuVendor = lastVendor
+		vramSource = "timeout"
 	}
 
 	// Sanity-check: if detection claims < 1 GB total on a system that
@@ -186,8 +205,17 @@ func (rm *ResourceManager) refreshHardware() {
 		gpuTotal = lastTotal
 		gpuName = lastName
 		gpuVendor = lastVendor
+		vramSource = "last-known"
+		vramLive = false
 	}
 	fmt.Println("[ResourceManager] refreshHardware: storing snapshot")
+
+	detectionErr := ""
+	if info.Error != nil {
+		detectionErr = info.Error.Error()
+	} else if info.HasGPU && gpuTotal <= 0 {
+		detectionErr = "a GPU was detected but its VRAM could not be read"
+	}
 
 	rm.snapshot = HardwareSnapshot{
 		Timestamp:      time.Now(),
@@ -203,8 +231,17 @@ func (rm *ResourceManager) refreshHardware() {
 		MemoryTier:     string(info.MemoryTier),
 		OS:             info.OS,
 		Arch:           info.Arch,
+		GPUs:           gpus,
+		VRAMLive:       vramLive,
+		VRAMSource:     vramSource,
+		GPUAvailable:   info.HasGPU || gpuTotal > 0,
+		DetectionError: detectionErr,
 	}
 	rm.lastScan = time.Now()
+	if detectionErr != "" {
+		return fmt.Errorf("%s", detectionErr)
+	}
+	return nil
 }
 
 // fallbackGPUValues returns total and used VRAM when live queries fail.

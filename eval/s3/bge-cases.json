@@ -1,0 +1,314 @@
+{
+  "candidate": "bge-reranker-v2-m3-Q8_0",
+  "spec_version": "v1.1",
+  "cases_sha256": "ca6dd5b3541f08fbf997b58bb3ddffe1b797a1171ff94900a80ab53b0c9f1c21",
+  "threshold_frozen": 0.3,
+  "reading_frozen_rule": {
+    "passed": 6,
+    "total": 9,
+    "veto_broken": [
+      "R4"
+    ],
+    "verdict": "REJECTED (veto)",
+    "cases": [
+      {
+        "id": "R1-horse",
+        "criterion": "R1",
+        "query": "Who trained the horse?",
+        "expect": "abstain",
+        "top": null,
+        "abstained": true,
+        "top_score": -1.868,
+        "scores": {
+          "rec-0001": -1.868,
+          "rec-0006": -10.932,
+          "rec-0007": -11.041,
+          "rec-0003": -11.048
+        },
+        "pass": true,
+        "failure_reason": null
+      },
+      {
+        "id": "R1-patient",
+        "criterion": "R1",
+        "query": "Was Corvin the one who trained you?",
+        "expect": "rec-0001",
+        "top": null,
+        "abstained": true,
+        "top_score": -1.535,
+        "scores": {
+          "rec-0001": -1.535,
+          "rec-0006": -11.032,
+          "rec-0007": -11.042,
+          "rec-0003": -11.045
+        },
+        "pass": false,
+        "failure_reason": "abstained; expected rec-0001"
+      },
+      {
+        "id": "R2-vault-foreign",
+        "criterion": "R2",
+        "query": "What is the vault code?",
+        "expect": "abstain",
+        "top": null,
+        "abstained": true,
+        "top_score": -11.011,
+        "scores": {
+          "rec-0006": -11.011,
+          "rec-0007": -11.03,
+          "rec-0001": -11.03,
+          "rec-0003": -11.041
+        },
+        "pass": true,
+        "failure_reason": null
+      },
+      {
+        "id": "R2-vault-own",
+        "criterion": "R2",
+        "query": "What is the vault code?",
+        "expect": "rec-0004",
+        "top": "rec-0004",
+        "abstained": false,
+        "top_score": 0.586,
+        "scores": {
+          "rec-0004": 0.586,
+          "rec-0005": -11.038
+        },
+        "pass": true,
+        "failure_reason": null
+      },
+      {
+        "id": "R3-now",
+        "criterion": "R3",
+        "query": "Where is the ledger kept now?",
+        "expect": "rec-0007",
+        "top": "rec-0007",
+        "abstained": false,
+        "top_score": 1.2,
+        "scores": {
+          "rec-0007": 1.2,
+          "rec-0002": -0.503
+        },
+        "pass": true,
+        "failure_reason": null
+      },
+      {
+        "id": "R3-before",
+        "criterion": "R3",
+        "query": "Where was the ledger kept before?",
+        "expect": "rec-0002",
+        "top": null,
+        "abstained": true,
+        "top_score": -1.606,
+        "scores": {
+          "rec-0002": -1.606,
+          "rec-0007": -2.729
+        },
+        "pass": false,
+        "failure_reason": "abstained; expected rec-0002"
+      },
+      {
+        "id": "R4-paraphrase",
+        "criterion": "R4",
+        "query": "Who was your trainer, again?",
+        "expect": "rec-0001",
+        "top": null,
+        "abstained": true,
+        "top_score": -5.954,
+        "scores": {
+          "rec-0001": -5.954,
+          "rec-0006": -10.956,
+          "rec-0007": -11.039,
+          "rec-0003": -11.043
+        },
+        "pass": false,
+        "failure_reason": "abstained; expected rec-0001"
+      },
+      {
+        "id": "R5-weather",
+        "criterion": "R5",
+        "query": "What did you think of the weather?",
+        "expect": "abstain",
+        "top": null,
+        "abstained": true,
+        "top_score": -11.011,
+        "scores": {
+          "rec-0006": -11.011,
+          "rec-0007": -11.034,
+          "rec-0003": -11.042,
+          "rec-0001": -11.043
+        },
+        "pass": true,
+        "failure_reason": null
+      },
+      {
+        "id": "R5-fair",
+        "criterion": "R5",
+        "query": "What did you win at the fair?",
+        "expect": "abstain",
+        "top": null,
+        "abstained": true,
+        "top_score": -10.884,
+        "scores": {
+          "rec-0001": -10.884,
+          "rec-0007": -10.942,
+          "rec-0006": -11.014,
+          "rec-0003": -11.039
+        },
+        "pass": true,
+        "failure_reason": null
+      }
+    ]
+  },
+  "reading_diagnostic": [
+    {
+      "id": "R1-horse",
+      "criterion": "R1",
+      "query": "Who trained the horse?",
+      "expect": "abstain",
+      "top": "rec-0001",
+      "top_score": -1.868,
+      "second_score": -10.932,
+      "margin": 9.064,
+      "top_matches_expect": null,
+      "scores": {
+        "rec-0001": -1.868,
+        "rec-0006": -10.932,
+        "rec-0007": -11.041,
+        "rec-0003": -11.048
+      }
+    },
+    {
+      "id": "R1-patient",
+      "criterion": "R1",
+      "query": "Was Corvin the one who trained you?",
+      "expect": "rec-0001",
+      "top": "rec-0001",
+      "top_score": -1.535,
+      "second_score": -11.032,
+      "margin": 9.497,
+      "top_matches_expect": true,
+      "scores": {
+        "rec-0001": -1.535,
+        "rec-0006": -11.032,
+        "rec-0007": -11.042,
+        "rec-0003": -11.045
+      }
+    },
+    {
+      "id": "R2-vault-foreign",
+      "criterion": "R2",
+      "query": "What is the vault code?",
+      "expect": "abstain",
+      "top": "rec-0006",
+      "top_score": -11.011,
+      "second_score": -11.03,
+      "margin": 0.018,
+      "top_matches_expect": null,
+      "scores": {
+        "rec-0006": -11.011,
+        "rec-0007": -11.03,
+        "rec-0001": -11.03,
+        "rec-0003": -11.041
+      }
+    },
+    {
+      "id": "R2-vault-own",
+      "criterion": "R2",
+      "query": "What is the vault code?",
+      "expect": "rec-0004",
+      "top": "rec-0004",
+      "top_score": 0.586,
+      "second_score": -11.038,
+      "margin": 11.624,
+      "top_matches_expect": true,
+      "scores": {
+        "rec-0004": 0.586,
+        "rec-0005": -11.038
+      }
+    },
+    {
+      "id": "R3-now",
+      "criterion": "R3",
+      "query": "Where is the ledger kept now?",
+      "expect": "rec-0007",
+      "top": "rec-0007",
+      "top_score": 1.2,
+      "second_score": -0.503,
+      "margin": 1.704,
+      "top_matches_expect": true,
+      "scores": {
+        "rec-0007": 1.2,
+        "rec-0002": -0.503
+      }
+    },
+    {
+      "id": "R3-before",
+      "criterion": "R3",
+      "query": "Where was the ledger kept before?",
+      "expect": "rec-0002",
+      "top": "rec-0002",
+      "top_score": -1.606,
+      "second_score": -2.729,
+      "margin": 1.122,
+      "top_matches_expect": true,
+      "scores": {
+        "rec-0002": -1.606,
+        "rec-0007": -2.729
+      }
+    },
+    {
+      "id": "R4-paraphrase",
+      "criterion": "R4",
+      "query": "Who was your trainer, again?",
+      "expect": "rec-0001",
+      "top": "rec-0001",
+      "top_score": -5.954,
+      "second_score": -10.956,
+      "margin": 5.003,
+      "top_matches_expect": true,
+      "scores": {
+        "rec-0001": -5.954,
+        "rec-0006": -10.956,
+        "rec-0007": -11.039,
+        "rec-0003": -11.043
+      }
+    },
+    {
+      "id": "R5-weather",
+      "criterion": "R5",
+      "query": "What did you think of the weather?",
+      "expect": "abstain",
+      "top": "rec-0006",
+      "top_score": -11.011,
+      "second_score": -11.034,
+      "margin": 0.023,
+      "top_matches_expect": null,
+      "scores": {
+        "rec-0006": -11.011,
+        "rec-0007": -11.034,
+        "rec-0003": -11.042,
+        "rec-0001": -11.043
+      }
+    },
+    {
+      "id": "R5-fair",
+      "criterion": "R5",
+      "query": "What did you win at the fair?",
+      "expect": "abstain",
+      "top": "rec-0001",
+      "top_score": -10.884,
+      "second_score": -10.942,
+      "margin": 0.058,
+      "top_matches_expect": null,
+      "scores": {
+        "rec-0001": -10.884,
+        "rec-0007": -10.942,
+        "rec-0006": -11.014,
+        "rec-0003": -11.039
+      }
+    }
+  ],
+  "scale_note": "candidate emits raw logits (-11..-6 observed); the frozen 0.30 threshold is defined on harness scale, so reading 1 is a scale-mismatch artefact. No transform applied.",
+  "gate_b": "6/7 open"
+}

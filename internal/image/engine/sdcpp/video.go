@@ -16,6 +16,7 @@ import (
 	"howl-chat/internal/image/types"
 	"howl-chat/internal/paths"
 	"howl-chat/internal/proc"
+	"howl-chat/internal/process"
 )
 
 // videoFamilies lists the architectures sd-cli can render video from in
@@ -113,14 +114,38 @@ func (e *Engine) findSDCLIFor() string {
 
 // stopServer terminates the HTTP server so the CLI run gets the whole GPU.
 // The next image request relaunches it lazily through EnsureReady.
-func (e *Engine) stopServer() {
-	if e.serverProc == nil {
-		return
+func (e *Engine) stopServer() error {
+	p := e.getServerProc()
+	if p == nil {
+		return nil
 	}
-	proc.KillTree(e.serverProc.Pid)
-	_ = e.serverProc.Kill()
-	_, _ = e.serverProc.Wait()
-	e.serverProc = nil
+	// A registered child is stopped through its recorded waiter. The reaper
+	// owns Wait; this route only requests the stop and waits for that signal.
+	if handle := e.processes().Current(process.RoleImageServer); handle != nil && handle.Identity.PID == p.Pid {
+		if err := e.processes().Stop(process.RoleImageServer, 5*time.Second); err != nil {
+			return fmt.Errorf("sd-server pid %d did not stop: %w", p.Pid, err)
+		}
+		e.clearServerProc(p)
+		// sd-server has ended, so its image registration is no longer backed by a
+		// live process. The app/domain owns that transition; the engine only
+		// reports the exit.
+		if hook := e.shutdownHook(); hook != nil {
+			hook()
+		}
+		return nil
+	}
+	// A directly assigned handle (tests, partially initialized engine) has no
+	// registry waiter. Still wait on the reaper's signal, never on Wait itself.
+	proc.KillTree(p.Pid)
+	_ = p.Kill()
+	if err := e.reapStoppedProcess(5 * time.Second); err != nil {
+		return fmt.Errorf("sd-server pid %d did not stop: %w", p.Pid, err)
+	}
+	e.clearServerProc(p)
+	if hook := e.shutdownHook(); hook != nil {
+		hook()
+	}
+	return nil
 }
 
 // SelectModel resolves a model without starting sd-server. Video generation
@@ -175,10 +200,15 @@ func (e *Engine) generateVideo(opts types.ImageOptions) (*types.ImageResult, err
 	}
 
 	outPath := filepath.Join(e.config.OutputDir, fmt.Sprintf("video_%d.%s", nowUnixNano(), ext))
-	args := e.buildVideoArgs(opts, frames, fps, width, height, outPath)
+	args, buildErr := e.buildVideoArgs(opts, frames, fps, width, height, outPath)
+	if buildErr != nil {
+		return nil, buildErr
+	}
 
 	// Free the GPU first: sd-server would otherwise hold the model in VRAM.
-	e.stopServer()
+	if err := e.stopServer(); err != nil {
+		return nil, err
+	}
 
 	fmt.Printf("[ImageEngine] sd-cli %s\n", strings.Join(args, " "))
 	err = e.runVideoCLI(cli, args, outPath, opts.JobID)
@@ -225,7 +255,7 @@ func (e *Engine) generateVideo(opts types.ImageOptions) (*types.ImageResult, err
 }
 
 // buildVideoArgs assembles the sd-cli command line for a video run.
-func (e *Engine) buildVideoArgs(opts types.ImageOptions, frames, fps, width, height int, outPath string) []string {
+func (e *Engine) buildVideoArgs(opts types.ImageOptions, frames, fps, width, height int, outPath string) ([]string, error) {
 	m := e.currentModel
 	family := strings.ToLower(m.Family)
 
@@ -258,6 +288,15 @@ func (e *Engine) buildVideoArgs(opts types.ImageOptions, frames, fps, width, hei
 		args = append(args, "--llm", p)
 	}
 	if p := m.Files["motion_module"]; p != "" {
+		// Motion modules were dropped from the engine line. A build that still
+		// takes the flag keeps working; a build that does not refuses the run
+		// here, by name, instead of launching sd-cli that exits on an unknown
+		// argument and reports a generic failure.
+		caps := probeBinary(e.config.BinaryPath)
+		if caps.Probed && !caps.Accepts("--motion-module") {
+			return nil, fmt.Errorf("model '%s' needs an AnimateDiff motion module, and this sd-server build (%s) no longer supports them: %s",
+				m.Name, caps.Commit, caps.Explain("--motion-module"))
+		}
 		args = append(args, "--motion-module", p)
 	}
 
@@ -305,9 +344,8 @@ func (e *Engine) buildVideoArgs(opts types.ImageOptions, frames, fps, width, hei
 	if opts.TemporalTiling {
 		args = append(args, "--temporal-tiling")
 	}
-	if opts.FlashAttention {
-		args = append(args, "--fa")
-	}
+	// Same tri-state contract as the server path; --fa is deprecated.
+	args = append(args, "--flash-attn", flashAttentionMode(opts.FlashAttentionMode, opts.FlashAttention))
 	if opts.OffloadToCPU {
 		args = append(args, "--offload-to-cpu")
 	}
@@ -320,7 +358,7 @@ func (e *Engine) buildVideoArgs(opts types.ImageOptions, frames, fps, width, hei
 	if opts.DisableMetadata {
 		args = append(args, "--disable-image-metadata")
 	}
-	return args
+	return args, nil
 }
 
 // runVideoCLI executes sd-cli, streaming progress and keeping the tail of the
@@ -339,6 +377,27 @@ func (e *Engine) runVideoCLI(cli string, args []string, outPath string, owner st
 	if err := proc.Start(cmd); err != nil {
 		return fmt.Errorf("start sd-cli: %w", err)
 	}
+	waitDone := make(chan struct{})
+	var waitErr error
+	go func() {
+		waitErr = cmd.Wait()
+		close(waitDone)
+	}()
+	handle, err := e.processes().Register(process.RoleVideoCLI, cmd, func(timeout time.Duration) error {
+		select {
+		case <-waitDone:
+			return nil
+		case <-time.After(timeout):
+			return fmt.Errorf("sd-cli pid %d still running", cmd.Process.Pid)
+		}
+	})
+	if err != nil {
+		proc.KillTree(cmd.Process.Pid)
+		_ = cmd.Process.Kill()
+		<-waitDone
+		return fmt.Errorf("establish sd-cli ownership: %w", err)
+	}
+	defer e.processes().Remove(handle)
 
 	e.videoMu.Lock()
 	e.videoProc = cmd.Process
@@ -367,7 +426,7 @@ func (e *Engine) runVideoCLI(cli string, args []string, outPath string, owner st
 		}
 	}()
 
-	waitErr := cmd.Wait()
+	<-waitDone
 	<-scanDone
 
 	e.videoMu.Lock()

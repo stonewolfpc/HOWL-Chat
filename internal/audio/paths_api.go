@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"howl-chat/internal/audio/capability"
+	"howl-chat/internal/audio/tts/melotts"
 	"howl-chat/internal/audio/types"
 	"howl-chat/internal/paths"
 )
@@ -50,6 +52,11 @@ func TTSModelPathFor(model types.TTSModelType) string {
 	return ttsConfigForModel(model, defaultTTSCacheDir()).ModelPath
 }
 
+// TTSCacheDir reports the directory synthesized audio is written to. Exported
+// so the renderer bridge can confine reads to it; the pipeline writes through
+// the same function, so the two cannot disagree.
+func TTSCacheDir() string { return defaultTTSCacheDir() }
+
 // KokoroVoicesPathFor and KokoroConfigPathFor expose the same archive and
 // vocabulary paths Initialize resolves, so a catalog can report which asset is
 // missing without loading a model or starting Python.
@@ -58,3 +65,13 @@ func KokoroVoicesPathFor() string { return defaultKokoroVoicesPath() }
 func KokoroConfigPathFor() string { return defaultKokoroConfigPath() }
 
 func KokoroScriptPathFor() string { return defaultKokoroScriptPath() }
+
+// ProductionCapabilityRecords is the capability contract the application and
+// the pipeline report. It is capability.ProductionEnv with one dimension made
+// truthful: MeloTTS readiness is the managed service's ownership plus liveness,
+// never a TCP handshake from a process Howl does not own.
+func ProductionCapabilityRecords() []capability.Record {
+	env := capability.ProductionEnv(ASRModelPathFor, ASRProjectorPathFor, TTSModelPathFor)
+	env.MeloTTSReachable = melotts.Readiness
+	return capability.Catalog(env)
+}

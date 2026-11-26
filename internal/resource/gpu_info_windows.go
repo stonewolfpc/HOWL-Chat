@@ -83,6 +83,8 @@ func detectViaNvidiaSMI() []GPUInfo {
 				TotalVRAMBytes: totalBytes,
 				UsedVRAMBytes:  usedBytes,
 				FreeVRAMBytes:  maxInt64(0, totalBytes-usedBytes),
+				Source:         "nvidia-smi",
+				Live:           true,
 			})
 		}
 		ch <- gpus
@@ -160,6 +162,8 @@ func detectViaRegistry() []GPUInfo {
 				TotalVRAMBytes: totalBytes,
 				UsedVRAMBytes:  used,
 				FreeVRAMBytes:  maxInt64(0, totalBytes-used),
+				Source:         "registry",
+				Live:           false,
 			})
 			if !isIntelIGP {
 				foundDiscrete = true
@@ -232,6 +236,8 @@ func detectViaWMI() ([]GPUInfo, error) {
 				TotalVRAMBytes: int64(c.AdapterRAM),
 				UsedVRAMBytes:  used,
 				FreeVRAMBytes:  maxInt64(0, int64(c.AdapterRAM)-used),
+				Source:         "wmi",
+				Live:           false,
 			})
 		}
 		ch <- gpus

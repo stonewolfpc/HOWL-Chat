@@ -16,7 +16,9 @@ const (
 	// MicStateNoDevice means no default capture endpoint was found.
 	MicStateNoDevice MicrophoneState = "no-device"
 	// MicStateUnavailable means the default endpoint exists but is inactive,
-	// disconnected, in use, or otherwise unavailable.
+	// disconnected, or otherwise unavailable. It never means "in use": the
+	// presence probe reads the device-state flag only, and an endpoint in use is
+	// still reported as active by Windows.
 	MicStateUnavailable MicrophoneState = "unavailable"
 	// MicStateAccessDenied is reported only when the API returns access denied.
 	MicStateAccessDenied MicrophoneState = "access-denied"
@@ -64,11 +66,10 @@ var (
 	microphonePresenceProbe = probeCapturePresence
 )
 
-// microphoneStatusNow runs the initialize-level probe. It proves the default
-// console capture endpoint can actually be captured from, and it disturbs
-// system audio while it runs, so it belongs only on the explicit activation
-// path (applyAudioSettings). Every status read must use
-// microphonePresenceNow instead.
+// microphoneStatusNow runs the initialize-level probe. It opens a shared-mode
+// capture client, so it disturbs system audio while it runs, and it belongs to
+// diagnostics and tests only: never a status read, never the capture port, never
+// an apply path. Everything user-facing uses microphonePresenceNow.
 func microphoneStatusNow() MicrophoneStatus {
 	return normalizeMicrophoneStatus(microphoneProbe())
 }
@@ -100,15 +101,18 @@ func normalizeMicrophoneStatus(status MicrophoneStatus) MicrophoneStatus {
 func microphoneMessageFor(state MicrophoneState) string {
 	switch state {
 	case MicStateReady:
-		return "The Windows default microphone endpoint initialized for shared-mode capture. Recording has not started."
+		// The presence probe establishes only that a default console capture
+		// endpoint is selected and enabled. Never claim initialization, an open
+		// device, or that recording will work.
+		return "The Windows default microphone is present and enabled. Recording has not started or been verified."
 	case MicStateNoDevice:
 		return MicrophoneNoDeviceMessage
 	case MicStateUnavailable:
-		return "The Windows default microphone is unavailable (disabled, disconnected, or in use)."
+		return "The Windows default microphone is unavailable (disabled, disconnected, or not present)."
 	case MicStateAccessDenied:
 		return "Windows is blocking microphone access. Allow desktop apps to use the microphone in Windows Settings."
 	case MicStateCaptureInitFailed:
-		return "The Windows default microphone is present but could not be initialized for recording."
+		return "Windows could not confirm a default microphone; the probe failed before any capture was attempted."
 	case MicStateUnsupported:
 		return "Microphone availability cannot be verified on this platform, so speech recognition is unavailable."
 	default:

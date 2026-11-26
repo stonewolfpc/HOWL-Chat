@@ -1,0 +1,36 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "ID | DECISION | REASON\nM1 | Sable was trained by Corvin Ashgrave of Ossary (stated as canon by the user).\nM2 | The user said \"brb\" and returned four minutes later.\nM3 | Sable is a fire mage who cannot swim.\nM4 | The user first said Sable has never met Corvin, then later said Corvin trained her.\nM5 | The user prefers short replies and dislikes long scene descriptions.\nM6 | A note says Sable's birthday is 3 Frostfell, but the user tagged it \"maybe canon\"."
+      }
+    }
+  ],
+  "created": 1795062015,
+  "model": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\experiments\\lfm25-cpu\\round2\\models\\gemma-3-270m-it-Q4_K_M.gguf",
+  "system_fingerprint": "b12015-a34de8618",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 125,
+    "prompt_tokens": 225,
+    "total_tokens": 350,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-FeABgQxLoAJJCrJFzoqgGsWFuohINMRm",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 225,
+    "prompt_ms": 150.728,
+    "prompt_per_token_ms": 0.6699022222222223,
+    "prompt_per_second": 1492.7551616156254,
+    "predicted_n": 125,
+    "predicted_ms": 1610.118,
+    "predicted_per_token_ms": 12.984822580645162,
+    "predicted_per_second": 77.01298911011492
+  }
+}

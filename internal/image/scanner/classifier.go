@@ -14,6 +14,8 @@ const (
 	AssetVAE        AssetType = "vae"
 	AssetLoRA       AssetType = "lora"
 	AssetControlNet AssetType = "controlnet"
+	AssetIPAdapter  AssetType = "ip_adapter"
+	AssetClipVision AssetType = "clip_vision"
 	AssetEmbedding  AssetType = "embedding"
 	AssetUpscaler   AssetType = "upscaler"
 	AssetClipL      AssetType = "clip_l"
@@ -45,6 +47,11 @@ const (
 	FamilyFlux2     ModelFamily = "flux2"
 	FamilyZImage    ModelFamily = "z_image"
 	FamilyQwenImage ModelFamily = "qwen_image"
+	// FamilyKrea2 has a loader path of its own. Its GGUF header carries the
+	// generic base tag qwen_image, but sd-server reports
+	// "Detected model family: Krea2" and then refuses the Qwen2.5-VL encoder, so
+	// classifying it as qwen_image hands it the wrong text component.
+	FamilyKrea2 ModelFamily = "krea2"
 	// Animagine-style Anima DiT: net.blocks with adaLN modulation.
 	FamilyAnima ModelFamily = "anima"
 
@@ -55,6 +62,42 @@ const (
 	FamilyAnimate ModelFamily = "animatediff"
 	FamilyUnknown ModelFamily = ""
 )
+
+// refineFamilyFromName lets a filename pick between two families that share one
+// tensor layout when the weights themselves only identify the base one.
+//
+// Converted GGUFs are the case that needs it: a Chroma, SD3.5 or SD2.1 checkpoint
+// keeps its base model's metadata (flux / sd3 / sd1) and, for SD2.1 and SD3.5,
+// loses the projection width that told them apart, so the layout can name only
+// the base. Treating that as the whole answer handed the engine the wrong
+// family's flags: flux with clip_l for Chroma, sd3 for SD3.5, sd1.5 for SD2.1.
+//
+// The refinement is deliberately narrow. It never crosses an architecture: a
+// file called "flux" whose weights are SDXL stays SDXL, and an unnamed file
+// keeps the weight verdict.
+func refineFamilyFromName(probed, named ModelFamily) ModelFamily {
+	switch probed {
+	case FamilySD15:
+		if named == FamilySD21 {
+			return FamilySD21
+		}
+	case FamilySD3:
+		if named == FamilySD35 {
+			return FamilySD35
+		}
+	case FamilyFlux:
+		if named == FamilyChroma {
+			return FamilyChroma
+		}
+	case FamilyQwenImage:
+		// The one refinement that crosses the header tag, because the loader
+		// overrides it: Krea2 files declare qwen_image and run as Krea2.
+		if named == FamilyKrea2 {
+			return FamilyKrea2
+		}
+	}
+	return probed
+}
 
 // modelExts is the set of file extensions that contain model weights.
 var modelExts = map[string]bool{
@@ -72,9 +115,13 @@ func IsModelFile(name string) bool {
 func ClassifyName(name string) AssetType {
 	lower := strings.ToLower(name)
 	switch {
-	case contains(lower, "controlnet", "control_net", "control-net"):
-		return AssetControlNet
-	case contains(lower, "ip-adapter", "ipadapter"):
+	// CLIP-Vision is an image encoder, not a text encoder. It must be tested
+	// before the generic clip_l/clip_g rules and before ControlNet.
+	case contains(lower, "clip_vision", "clipvision", "clip-vision", "image_encoder", "image-encoder"):
+		return AssetClipVision
+	case contains(lower, "ip-adapter", "ipadapter", "ip_adapter"):
+		return AssetIPAdapter
+	case contains(lower, "controlnet", "control_net", "control-net", "control_v11", "control-v11"):
 		return AssetControlNet
 	case contains(lower, "upscale", "esrgan", "swinir", "4x-", "_4x"):
 		return AssetUpscaler
@@ -171,6 +218,23 @@ func GuessFamily(name string) ModelFamily {
 		}
 	}
 
+	// CLIP-Vision H is shared by SD1.5 and SDXL IP-Adapters; it is not a
+	// text-encoder family. Leave it unknown so compatibility is permissive.
+	if contains(lower, "clip_vision", "clipvision", "clip-vision", "image_encoder", "image-encoder") {
+		return FamilyUnknown
+	}
+
+	// IP-Adapter family is the adapter family, not the base model's filename.
+	if contains(lower, "ip-adapter", "ipadapter", "ip_adapter") {
+		switch {
+		case contains(lower, "sdxl", "sd_xl", "sd-xl", "xl"):
+			return FamilySDXL
+		case contains(lower, "sd15", "sd_1.5", "sd-1.5", "1.5"):
+			return FamilySD15
+		}
+		return FamilyUnknown
+	}
+
 	// CLIP-specific family detection
 	if strings.Contains(lower, "clip") {
 		switch {
@@ -212,6 +276,8 @@ func GuessFamily(name string) ModelFamily {
 		return FamilyFlux2
 	case contains(lower, "z-image", "z_image", "zimage"):
 		return FamilyZImage
+	case contains(lower, "krea2", "krea-2", "krea_2", "krea2_turbo"):
+		return FamilyKrea2
 	case contains(lower, "qwen-image", "qwen_image", "qwenimage"):
 		return FamilyQwenImage
 	case contains(lower, "flux"):
@@ -358,6 +424,26 @@ func CompatibleControlNet(modelFamily, cnFamily ModelFamily) bool {
 		return true
 	}
 	return modelFamily == cnFamily
+}
+
+// CompatibleIPAdapter returns true only for the SD1.5 and SDXL families this
+// integration supports. An unknown adapter family is not accepted: guessing
+// would load weights that cannot project into the selected UNet.
+func CompatibleIPAdapter(modelFamily, adapterFamily ModelFamily) bool {
+	if adapterFamily != FamilySD15 && adapterFamily != FamilySDXL {
+		return false
+	}
+	return modelFamily == adapterFamily
+}
+
+// CompatibleClipVision returns true for the universal ViT-H encoder. A known
+// family must match the adapter family; unknown is accepted because the encoder
+// itself has no SD-family metadata.
+func CompatibleClipVision(modelFamily, visionFamily ModelFamily) bool {
+	if visionFamily == FamilyUnknown {
+		return true
+	}
+	return modelFamily == visionFamily
 }
 
 // ---- helpers ---------------------------------------------------------------

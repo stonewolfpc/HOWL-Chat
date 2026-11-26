@@ -1,0 +1,17 @@
+0.00.117.250 I srv  llama_server: initializing ...
+0.00.117.260 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.117.622 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.124.795 I srv    load_model: loading model 'C:\Users\StoneWolfPC\HOWL_Chat\experiments\lfm25-cpu\models\LFM2.5-230M-QAD-Q4_0.gguf'
+0.00.356.968 I cmn          init: llama threadpool init, n_threads = 8
+0.00.423.204 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 2048, kv_unified = 'false'
+0.00.428.564 W srv          init: chat template supports preserving reasoning, it is enabled by default (may use more tokens, disable via --no-reasoning-preserve)
+0.00.428.600 I srv  server_run_i: model loaded
+0.00.428.603 I srv  server_on_li: listening on http://127.0.0.1:5099
+0.00.518.949 I slot get_availabl: id  0 | task -1 | selected slot by LRU, n_tokens = 0, t_last = -1
+0.00.519.004 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.00.671.073 I slot print_timing: id  0 | task 0 | prompt eval time =      85.41 ms /   244 tokens (    0.35 ms per token,  2856.74 tokens per second)
+0.00.671.080 I slot print_timing: id  0 | task 0 |        eval time =      66.63 ms /    10 tokens (    7.40 ms per token,   135.07 tokens per second)
+0.00.671.081 I slot print_timing: id  0 | task 0 |       total time =     152.04 ms /   254 tokens
+0.00.671.081 I slot print_timing: id  0 | task 0 |    graphs reused =          9
+0.00.671.082 I slot print_timing: id  0 | task 0 |   graph reallocs =          0    /     0        (same size) / (changed size)
+0.00.671.127 I slot      release: id  0 | task 0 | stop processing: n_tokens = 253, truncated = 0

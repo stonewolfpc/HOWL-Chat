@@ -1,0 +1,854 @@
+{
+  "suite": "s3.rerank_eval",
+  "spec_version": "v1.1",
+  "cases_sha256": "ca6dd5b3541f08fbf997b58bb3ddffe1b797a1171ff94900a80ab53b0c9f1c21",
+  "harness_sha256": "f59959f30ec336ae983f1e28d3833567a88c13ca3f723272ba033063bb251b37",
+  "threshold": 0.3,
+  "criteria": {
+    "R1": "agent vs patient",
+    "R2": "subject ownership",
+    "R3": "historical vs current",
+    "R4": "preserve P1 (VETO)",
+    "R5": "preserve abstention (VETO)"
+  },
+  "vetoes": [
+    "R4",
+    "R5"
+  ],
+  "baseline_system_as_is": {
+    "R1-horse": {
+      "probe": "P5",
+      "outcome": "FAIL",
+      "detail": "returns the trainer record"
+    },
+    "R1-patient": {
+      "probe": null,
+      "outcome": "UNTESTED",
+      "detail": "no equivalent probe"
+    },
+    "R2-vault-foreign": {
+      "probe": "P3b",
+      "outcome": "PASS",
+      "detail": "abstains"
+    },
+    "R2-vault-own": {
+      "probe": "P3a",
+      "outcome": "PASS",
+      "detail": "returns vault_code"
+    },
+    "R3-now": {
+      "probe": "P4a",
+      "outcome": "PASS",
+      "detail": "current record"
+    },
+    "R3-before": {
+      "probe": "P4b",
+      "outcome": "PASS",
+      "detail": "history reachable"
+    },
+    "R4-paraphrase": {
+      "probe": "P1",
+      "outcome": "PASS",
+      "detail": "subword + semantic"
+    },
+    "R5-weather": {
+      "probe": "P2",
+      "outcome": "PASS",
+      "detail": "abstains"
+    },
+    "R5-fair": {
+      "probe": null,
+      "outcome": "UNTESTED",
+      "detail": "no equivalent probe"
+    }
+  },
+  "results": [
+    {
+      "reranker": "overlap-baseline",
+      "cases": [
+        {
+          "id": "R1-horse",
+          "criterion": "R1",
+          "query": "Who trained the horse?",
+          "expect": "abstain",
+          "top": "rec-0001",
+          "abstained": false,
+          "top_score": 0.5,
+          "scores": {
+            "rec-0001": 0.5,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": false,
+          "failure_reason": "selected rec-0001 but should have abstained"
+        },
+        {
+          "id": "R1-patient",
+          "criterion": "R1",
+          "query": "Was Corvin the one who trained you?",
+          "expect": "rec-0001",
+          "top": "rec-0001",
+          "abstained": false,
+          "top_score": 1.0,
+          "scores": {
+            "rec-0001": 1.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R2-vault-foreign",
+          "criterion": "R2",
+          "query": "What is the vault code?",
+          "expect": "abstain",
+          "top": null,
+          "abstained": true,
+          "top_score": 0.0,
+          "scores": {
+            "rec-0001": 0.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R2-vault-own",
+          "criterion": "R2",
+          "query": "What is the vault code?",
+          "expect": "rec-0004",
+          "top": "rec-0004",
+          "abstained": false,
+          "top_score": 1.0,
+          "scores": {
+            "rec-0004": 1.0,
+            "rec-0005": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R3-now",
+          "criterion": "R3",
+          "query": "Where is the ledger kept now?",
+          "expect": "rec-0007",
+          "top": "rec-0002",
+          "abstained": false,
+          "top_score": 1.0,
+          "scores": {
+            "rec-0002": 1.0,
+            "rec-0007": 1.0
+          },
+          "pass": false,
+          "failure_reason": "selected rec-0002; expected rec-0007"
+        },
+        {
+          "id": "R3-before",
+          "criterion": "R3",
+          "query": "Where was the ledger kept before?",
+          "expect": "rec-0002",
+          "top": "rec-0002",
+          "abstained": false,
+          "top_score": 1.0,
+          "scores": {
+            "rec-0002": 1.0,
+            "rec-0007": 1.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R4-paraphrase",
+          "criterion": "R4",
+          "query": "Who was your trainer, again?",
+          "expect": "rec-0001",
+          "top": "rec-0001",
+          "abstained": false,
+          "top_score": 1.0,
+          "scores": {
+            "rec-0001": 1.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R5-weather",
+          "criterion": "R5",
+          "query": "What did you think of the weather?",
+          "expect": "abstain",
+          "top": null,
+          "abstained": true,
+          "top_score": 0.0,
+          "scores": {
+            "rec-0001": 0.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R5-fair",
+          "criterion": "R5",
+          "query": "What did you win at the fair?",
+          "expect": "abstain",
+          "top": null,
+          "abstained": true,
+          "top_score": 0.0,
+          "scores": {
+            "rec-0001": 0.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        }
+      ],
+      "per_criterion": {
+        "R1": {
+          "label": "agent vs patient",
+          "passed": 1,
+          "total": 2,
+          "veto": false,
+          "ok": false
+        },
+        "R2": {
+          "label": "subject ownership",
+          "passed": 2,
+          "total": 2,
+          "veto": false,
+          "ok": true
+        },
+        "R3": {
+          "label": "historical vs current",
+          "passed": 1,
+          "total": 2,
+          "veto": false,
+          "ok": false
+        },
+        "R4": {
+          "label": "preserve P1 (VETO)",
+          "passed": 1,
+          "total": 1,
+          "veto": true,
+          "ok": true
+        },
+        "R5": {
+          "label": "preserve abstention (VETO)",
+          "passed": 2,
+          "total": 2,
+          "veto": true,
+          "ok": true
+        }
+      },
+      "veto_broken": [],
+      "order_stable": true,
+      "passed": 7,
+      "total": 9,
+      "verdict": "PARTIAL"
+    },
+    {
+      "reranker": "trap-mock",
+      "cases": [
+        {
+          "id": "R1-horse",
+          "criterion": "R1",
+          "query": "Who trained the horse?",
+          "expect": "abstain",
+          "top": "rec-0001",
+          "abstained": false,
+          "top_score": 1.0,
+          "scores": {
+            "rec-0001": 1.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": false,
+          "failure_reason": "selected rec-0001 but should have abstained"
+        },
+        {
+          "id": "R1-patient",
+          "criterion": "R1",
+          "query": "Was Corvin the one who trained you?",
+          "expect": "rec-0001",
+          "top": "rec-0001",
+          "abstained": false,
+          "top_score": 1.0,
+          "scores": {
+            "rec-0001": 1.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R2-vault-foreign",
+          "criterion": "R2",
+          "query": "What is the vault code?",
+          "expect": "abstain",
+          "top": null,
+          "abstained": true,
+          "top_score": 0.0,
+          "scores": {
+            "rec-0001": 0.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R2-vault-own",
+          "criterion": "R2",
+          "query": "What is the vault code?",
+          "expect": "rec-0004",
+          "top": "rec-0004",
+          "abstained": false,
+          "top_score": 1.0,
+          "scores": {
+            "rec-0004": 1.0,
+            "rec-0005": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R3-now",
+          "criterion": "R3",
+          "query": "Where is the ledger kept now?",
+          "expect": "rec-0007",
+          "top": "rec-0002",
+          "abstained": false,
+          "top_score": 1.0,
+          "scores": {
+            "rec-0002": 1.0,
+            "rec-0007": 1.0
+          },
+          "pass": false,
+          "failure_reason": "selected rec-0002; expected rec-0007"
+        },
+        {
+          "id": "R3-before",
+          "criterion": "R3",
+          "query": "Where was the ledger kept before?",
+          "expect": "rec-0002",
+          "top": "rec-0002",
+          "abstained": false,
+          "top_score": 1.0,
+          "scores": {
+            "rec-0002": 1.0,
+            "rec-0007": 1.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R4-paraphrase",
+          "criterion": "R4",
+          "query": "Who was your trainer, again?",
+          "expect": "rec-0001",
+          "top": "rec-0001",
+          "abstained": false,
+          "top_score": 1.0,
+          "scores": {
+            "rec-0001": 1.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R5-weather",
+          "criterion": "R5",
+          "query": "What did you think of the weather?",
+          "expect": "abstain",
+          "top": null,
+          "abstained": true,
+          "top_score": 0.0,
+          "scores": {
+            "rec-0001": 0.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R5-fair",
+          "criterion": "R5",
+          "query": "What did you win at the fair?",
+          "expect": "abstain",
+          "top": null,
+          "abstained": true,
+          "top_score": 0.0,
+          "scores": {
+            "rec-0001": 0.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        }
+      ],
+      "per_criterion": {
+        "R1": {
+          "label": "agent vs patient",
+          "passed": 1,
+          "total": 2,
+          "veto": false,
+          "ok": false
+        },
+        "R2": {
+          "label": "subject ownership",
+          "passed": 2,
+          "total": 2,
+          "veto": false,
+          "ok": true
+        },
+        "R3": {
+          "label": "historical vs current",
+          "passed": 1,
+          "total": 2,
+          "veto": false,
+          "ok": false
+        },
+        "R4": {
+          "label": "preserve P1 (VETO)",
+          "passed": 1,
+          "total": 1,
+          "veto": true,
+          "ok": true
+        },
+        "R5": {
+          "label": "preserve abstention (VETO)",
+          "passed": 2,
+          "total": 2,
+          "veto": true,
+          "ok": true
+        }
+      },
+      "veto_broken": [],
+      "order_stable": true,
+      "passed": 7,
+      "total": 9,
+      "verdict": "PARTIAL"
+    },
+    {
+      "reranker": "noise-mock",
+      "cases": [
+        {
+          "id": "R1-horse",
+          "criterion": "R1",
+          "query": "Who trained the horse?",
+          "expect": "abstain",
+          "top": "rec-0001",
+          "abstained": false,
+          "top_score": 0.5,
+          "scores": {
+            "rec-0001": 0.5,
+            "rec-0003": 0.5,
+            "rec-0006": 0.5,
+            "rec-0007": 0.5
+          },
+          "pass": false,
+          "failure_reason": "selected rec-0001 but should have abstained"
+        },
+        {
+          "id": "R1-patient",
+          "criterion": "R1",
+          "query": "Was Corvin the one who trained you?",
+          "expect": "rec-0001",
+          "top": "rec-0001",
+          "abstained": false,
+          "top_score": 0.5,
+          "scores": {
+            "rec-0001": 0.5,
+            "rec-0003": 0.5,
+            "rec-0006": 0.5,
+            "rec-0007": 0.5
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R2-vault-foreign",
+          "criterion": "R2",
+          "query": "What is the vault code?",
+          "expect": "abstain",
+          "top": "rec-0001",
+          "abstained": false,
+          "top_score": 0.5,
+          "scores": {
+            "rec-0001": 0.5,
+            "rec-0003": 0.5,
+            "rec-0006": 0.5,
+            "rec-0007": 0.5
+          },
+          "pass": false,
+          "failure_reason": "selected rec-0001 but should have abstained"
+        },
+        {
+          "id": "R2-vault-own",
+          "criterion": "R2",
+          "query": "What is the vault code?",
+          "expect": "rec-0004",
+          "top": "rec-0004",
+          "abstained": false,
+          "top_score": 0.5,
+          "scores": {
+            "rec-0004": 0.5,
+            "rec-0005": 0.5
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R3-now",
+          "criterion": "R3",
+          "query": "Where is the ledger kept now?",
+          "expect": "rec-0007",
+          "top": "rec-0002",
+          "abstained": false,
+          "top_score": 0.5,
+          "scores": {
+            "rec-0002": 0.5,
+            "rec-0007": 0.5
+          },
+          "pass": false,
+          "failure_reason": "selected rec-0002; expected rec-0007"
+        },
+        {
+          "id": "R3-before",
+          "criterion": "R3",
+          "query": "Where was the ledger kept before?",
+          "expect": "rec-0002",
+          "top": "rec-0002",
+          "abstained": false,
+          "top_score": 0.5,
+          "scores": {
+            "rec-0002": 0.5,
+            "rec-0007": 0.5
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R4-paraphrase",
+          "criterion": "R4",
+          "query": "Who was your trainer, again?",
+          "expect": "rec-0001",
+          "top": "rec-0001",
+          "abstained": false,
+          "top_score": 0.5,
+          "scores": {
+            "rec-0001": 0.5,
+            "rec-0003": 0.5,
+            "rec-0006": 0.5,
+            "rec-0007": 0.5
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R5-weather",
+          "criterion": "R5",
+          "query": "What did you think of the weather?",
+          "expect": "abstain",
+          "top": "rec-0001",
+          "abstained": false,
+          "top_score": 0.5,
+          "scores": {
+            "rec-0001": 0.5,
+            "rec-0003": 0.5,
+            "rec-0006": 0.5,
+            "rec-0007": 0.5
+          },
+          "pass": false,
+          "failure_reason": "selected rec-0001 but should have abstained"
+        },
+        {
+          "id": "R5-fair",
+          "criterion": "R5",
+          "query": "What did you win at the fair?",
+          "expect": "abstain",
+          "top": "rec-0001",
+          "abstained": false,
+          "top_score": 0.5,
+          "scores": {
+            "rec-0001": 0.5,
+            "rec-0003": 0.5,
+            "rec-0006": 0.5,
+            "rec-0007": 0.5
+          },
+          "pass": false,
+          "failure_reason": "selected rec-0001 but should have abstained"
+        }
+      ],
+      "per_criterion": {
+        "R1": {
+          "label": "agent vs patient",
+          "passed": 1,
+          "total": 2,
+          "veto": false,
+          "ok": false
+        },
+        "R2": {
+          "label": "subject ownership",
+          "passed": 1,
+          "total": 2,
+          "veto": false,
+          "ok": false
+        },
+        "R3": {
+          "label": "historical vs current",
+          "passed": 1,
+          "total": 2,
+          "veto": false,
+          "ok": false
+        },
+        "R4": {
+          "label": "preserve P1 (VETO)",
+          "passed": 1,
+          "total": 1,
+          "veto": true,
+          "ok": true
+        },
+        "R5": {
+          "label": "preserve abstention (VETO)",
+          "passed": 0,
+          "total": 2,
+          "veto": true,
+          "ok": false
+        }
+      },
+      "veto_broken": [
+        "R5"
+      ],
+      "order_stable": true,
+      "passed": 4,
+      "total": 9,
+      "verdict": "REJECTED (veto)"
+    },
+    {
+      "reranker": "joint-reference-mock",
+      "cases": [
+        {
+          "id": "R1-horse",
+          "criterion": "R1",
+          "query": "Who trained the horse?",
+          "expect": "abstain",
+          "top": null,
+          "abstained": true,
+          "top_score": 0.0,
+          "scores": {
+            "rec-0001": 0.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R1-patient",
+          "criterion": "R1",
+          "query": "Was Corvin the one who trained you?",
+          "expect": "rec-0001",
+          "top": "rec-0001",
+          "abstained": false,
+          "top_score": 1.0,
+          "scores": {
+            "rec-0001": 1.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R2-vault-foreign",
+          "criterion": "R2",
+          "query": "What is the vault code?",
+          "expect": "abstain",
+          "top": null,
+          "abstained": true,
+          "top_score": 0.0,
+          "scores": {
+            "rec-0001": 0.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R2-vault-own",
+          "criterion": "R2",
+          "query": "What is the vault code?",
+          "expect": "rec-0004",
+          "top": "rec-0004",
+          "abstained": false,
+          "top_score": 1.0,
+          "scores": {
+            "rec-0004": 1.0,
+            "rec-0005": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R3-now",
+          "criterion": "R3",
+          "query": "Where is the ledger kept now?",
+          "expect": "rec-0007",
+          "top": "rec-0007",
+          "abstained": false,
+          "top_score": 1.1,
+          "scores": {
+            "rec-0007": 1.1,
+            "rec-0002": 0.9
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R3-before",
+          "criterion": "R3",
+          "query": "Where was the ledger kept before?",
+          "expect": "rec-0002",
+          "top": "rec-0002",
+          "abstained": false,
+          "top_score": 1.1,
+          "scores": {
+            "rec-0002": 1.1,
+            "rec-0007": 1.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R4-paraphrase",
+          "criterion": "R4",
+          "query": "Who was your trainer, again?",
+          "expect": "rec-0001",
+          "top": "rec-0001",
+          "abstained": false,
+          "top_score": 1.0,
+          "scores": {
+            "rec-0001": 1.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R5-weather",
+          "criterion": "R5",
+          "query": "What did you think of the weather?",
+          "expect": "abstain",
+          "top": null,
+          "abstained": true,
+          "top_score": 0.0,
+          "scores": {
+            "rec-0001": 0.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        },
+        {
+          "id": "R5-fair",
+          "criterion": "R5",
+          "query": "What did you win at the fair?",
+          "expect": "abstain",
+          "top": null,
+          "abstained": true,
+          "top_score": 0.0,
+          "scores": {
+            "rec-0001": 0.0,
+            "rec-0003": 0.0,
+            "rec-0006": 0.0,
+            "rec-0007": 0.0
+          },
+          "pass": true,
+          "failure_reason": null
+        }
+      ],
+      "per_criterion": {
+        "R1": {
+          "label": "agent vs patient",
+          "passed": 2,
+          "total": 2,
+          "veto": false,
+          "ok": true
+        },
+        "R2": {
+          "label": "subject ownership",
+          "passed": 2,
+          "total": 2,
+          "veto": false,
+          "ok": true
+        },
+        "R3": {
+          "label": "historical vs current",
+          "passed": 2,
+          "total": 2,
+          "veto": false,
+          "ok": true
+        },
+        "R4": {
+          "label": "preserve P1 (VETO)",
+          "passed": 1,
+          "total": 1,
+          "veto": true,
+          "ok": true
+        },
+        "R5": {
+          "label": "preserve abstention (VETO)",
+          "passed": 2,
+          "total": 2,
+          "veto": true,
+          "ok": true
+        }
+      },
+      "veto_broken": [],
+      "order_stable": true,
+      "passed": 9,
+      "total": 9,
+      "verdict": "ACCEPTABLE"
+    }
+  ],
+  "self_checks": {
+    "trap_not_acceptable": true,
+    "baseline_fails_R1": true,
+    "reference_passes_all": true,
+    "veto_path_fires_and_rejects": true,
+    "scorer_receives_no_label": true,
+    "order_invariance": true
+  },
+  "scope_note": "mock rerankers only; no cross-encoder fetched or run. Mocks prove the harness discriminates; they are not candidates. Nine cases test mechanism, not generalization."
+}

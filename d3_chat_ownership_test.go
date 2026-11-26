@@ -45,7 +45,7 @@ func TestD3ChatServerSpawnOwnership(t *testing.T) {
 	}
 
 	start := func() *exec.Cmd {
-		cmd, err := spawnLlamaServerWithModel(model, "", nil, io.Discard, true)
+		cmd, err := spawnLlamaServerWithModel(model, "", nil, io.Discard, true, llamaCapsForTests())
 		if err != nil {
 			t.Fatalf("spawn chat server: %v", err)
 		}

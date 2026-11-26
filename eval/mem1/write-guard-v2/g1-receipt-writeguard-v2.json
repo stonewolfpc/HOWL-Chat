@@ -1,0 +1,1722 @@
+{
+  "acceptance_criteria": [
+    {
+      "criterion": "zero-model self-check green",
+      "evidence": "142/142 checks",
+      "result": "PASS"
+    },
+    {
+      "criterion": "corrupted-provenance run rejected",
+      "evidence": "N06",
+      "result": "PASS"
+    },
+    {
+      "criterion": "frozen identities verified",
+      "evidence": "A01-A03",
+      "result": "PASS"
+    },
+    {
+      "criterion": "N=16 and 3 matched reps enforced",
+      "evidence": "C01, N04",
+      "result": "PASS"
+    },
+    {
+      "criterion": "13 probes with registered quota",
+      "evidence": "I06, N16",
+      "result": "PASS"
+    },
+    {
+      "criterion": ">=3 rollovers and span departure proved",
+      "evidence": "K01, I08, N17",
+      "result": "PASS"
+    },
+    {
+      "criterion": "per-turn token accounting and shared capacity",
+      "evidence": "G01, N09, N10",
+      "result": "PASS"
+    },
+    {
+      "criterion": "A1/D placebo matched per turn",
+      "evidence": "K05-K07, N13, N14",
+      "result": "PASS"
+    },
+    {
+      "criterion": "M1/M2 with A0 as N/A",
+      "evidence": "I01-I05, K03",
+      "result": "PASS"
+    },
+    {
+      "criterion": "C1/C2, .025, ties, exclusions, 4/39",
+      "evidence": "J01-J10, N21",
+      "result": "PASS"
+    },
+    {
+      "criterion": "vetoes enforced",
+      "evidence": "N08, N19, N07, N06",
+      "result": "PASS"
+    },
+    {
+      "criterion": "fixed-sample stopping, outcome-blind halts",
+      "evidence": "L01, L02, N05, N25",
+      "result": "PASS"
+    },
+    {
+      "criterion": "no model calls or subject runs",
+      "evidence": "K02, N23",
+      "result": "PASS"
+    }
+  ],
+  "calculated": {
+    "checks_passed": 142,
+    "checks_total": 142,
+    "mmd": 0.10256410256410256,
+    "sign_test_thresholds": {
+      "12": 11,
+      "13": 11,
+      "14": 12,
+      "15": 13,
+      "16": 13
+    }
+  },
+  "checks": [
+    {
+      "detail": "8 checked",
+      "id": "A01",
+      "name": "8 frozen S3 artifacts match plan 1.1",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "4 checked",
+      "id": "A02",
+      "name": "4 frozen preregistration documents match the freeze record",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "2 checked",
+      "id": "A03",
+      "name": "plan v3 and G0 receipt unchanged",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "FrozenIdentityError: frozen artifact identity check failed: eval/s3/records.py: sha256 prefix mismatch",
+      "id": "N01",
+      "name": "tampered frozen artifact is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "48 cells",
+      "id": "B01",
+      "name": "seed table covers 16x3 cells",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "1802596798",
+      "id": "B02",
+      "name": "seed derivation is deterministic",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "d064fd5721a00f4ad058ff9d",
+      "id": "B03",
+      "name": "seed table hash is stable",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "1 cell",
+      "id": "B04",
+      "name": "matched seeds across arms verify",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "SeedMissingError: cell (conv-00, 0) arm A0: seed 1 != table 1802596798",
+      "id": "N02",
+      "name": "mismatched seed is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "SeedNotHonouredError: cell (conv-00, 0) arm A0: seed_honoured=False",
+      "id": "N03",
+      "name": "unhonoured seed is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "48 cells",
+      "id": "C01",
+      "name": "run plan is 16 x 3 = 48 cells",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "d064fd5721a00f4ad058ff9d",
+      "id": "C02",
+      "name": "run plan hash is deterministic",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: prereg fixes N=16; got 15 conversations",
+      "id": "N04",
+      "name": "N != 16 is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: planned N=16; refusing to extend to 17: an indeterminate result requires a new preregistra",
+      "id": "N05",
+      "name": "post-hoc extension is refused",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "ProvenanceFabricationError: source_span 'sp-999-01' does not resolve in this conversation",
+      "id": "N06",
+      "name": "record citing a nonexistent span is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "2 versions",
+      "id": "D01",
+      "name": "supersession keeps both versions, one active",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "2 edges",
+      "id": "D02",
+      "name": "edges carry no truth status",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "active=None",
+      "id": "D03",
+      "name": "revocation keeps history and clears current",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "HistoryErasedError: Sable/trained_by: expected >= 2 retained versions, got 1",
+      "id": "N07",
+      "name": "history erasure is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "missing=[]",
+      "id": "E01",
+      "name": "formation captures every planted class",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "2 versions, active=ledger in the green cabinet",
+      "id": "E02",
+      "name": "correction supersedes after rollover",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "status=revoked",
+      "id": "E03",
+      "name": "retraction revokes without deleting",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "12 records",
+      "id": "E04",
+      "name": "every record's source span resolves",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "turn=4",
+      "id": "E05",
+      "name": "formation reaches non-checkpoint turns",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "2 chat records",
+      "id": "E06",
+      "name": "narrator facts are chat-owned when no world is declared",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "vault code absent from world scope",
+      "id": "E07",
+      "name": "character speech is never formed as world state",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "sable=below_min_score, alaric=1",
+      "id": "F01",
+      "name": "ownership: Sable cannot see Alaric's code",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "selected",
+      "id": "F02",
+      "name": "world_state context reaches ambient records",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "abstained",
+      "id": "F03",
+      "name": "retrieval is fail-closed for an unknown perspective",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "below_min_score",
+      "id": "F04",
+      "name": "restricted record is invisible outside its audience",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "OwnershipVetoError: foreign record rec-0004 in selection for char-001",
+      "id": "N08",
+      "name": "foreign record in a selection is a veto",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "12 records, violations=[]",
+      "id": "S01",
+      "name": "ownership kind and visibility scope agree for every record",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "kinds=['character', 'chat']",
+      "id": "S02",
+      "name": "no record is world- or scenario-owned when none was declared",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "10 character records",
+      "id": "S03",
+      "name": "character records keep character ownership",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "[\"rec-0006: 'character' owns scope 'chat_state'\", 'rec-0006: character owns the chat container id']",
+      "id": "S04",
+      "name": "the ownership check fails on a deliberately wrong kind",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: unknown ownership kind: 'banana'",
+      "id": "N26",
+      "name": "an unknown ownership kind is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: owner id 'chat' identifies the chat container; it cannot identify a 'character'",
+      "id": "N27",
+      "name": "a character record cannot own the reserved id",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: fixture-demo-01: character id 'chat' is the conversation container, not a character: narra",
+      "id": "N28",
+      "name": "a character id colliding with the reserved id is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: fixture-demo-01/p36: probe owner 'char-999' is not a declared character ['char-001', 'char",
+      "id": "N29",
+      "name": "a probe naming an undeclared owner is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "[('p41', 'below_min_score', []), ('p42', 'below_min_score', [])]",
+      "id": "S05",
+      "name": "world records are ineligible while their world is inactive",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "[('p41', ['rec-0006']), ('p42', ['rec-0009'])]",
+      "id": "S06",
+      "name": "the same records are eligible again after reactivation",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "11 character probes compared",
+      "id": "S07",
+      "name": "character retrieval is unaffected by world switching",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "2 -> 2",
+      "id": "S08",
+      "name": "deactivation preserves the world's records unchanged",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "2 -> 2",
+      "id": "S09",
+      "name": "reactivation preserves the same records unchanged",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "{'world/world-a': 2} -> {'world/world-a': 2}",
+      "id": "S10",
+      "name": "state transitions create no records and change no store state",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "selected=['rec-0001']",
+      "id": "S12",
+      "name": "scenario record is eligible when scenario and parent are active",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "selected=[]",
+      "id": "S13",
+      "name": "scenario record is ineligible when its scenario is inactive",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "selected=[]",
+      "id": "S14",
+      "name": "scenario record is ineligible when its parent world is inactive",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "other=[], none=[]",
+      "id": "S15",
+      "name": "scenario record is invisible from another scenario or from none",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "character record visible in both states",
+      "id": "S16",
+      "name": "character records are unaffected by scenario state",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "[]",
+      "id": "O01",
+      "name": "visibility table reproduces the v1 oracle for legacy scopes",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: visibility table omits declared scopes ['world']: those records would be unreachable in ev",
+      "id": "O02",
+      "name": "a visibility table that omits a scope is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "[\"char-001/world_state: table=['rec-0003', 'rec-0004'] reference=['rec-0003', 'rec-0004', 'rec-0005']\", \"char-002/world_state: table=['rec-0003'] reference=['rec-0003', 'rec-0005']\", \"chat/world_state",
+      "id": "O03",
+      "name": "the comparison detects a silently dropped scope",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "undeclared state equals the ungated oracle",
+      "id": "O04",
+      "name": "undeclared state leaves gating inert",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "[]",
+      "id": "O05",
+      "name": "the oracle is never imported by production code",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "2 chat records visible",
+      "id": "V01",
+      "name": "C1: chat-owned record is eligible with no state declared",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "2 narrator records",
+      "id": "V02",
+      "name": "C2: a declared active world owns narrator facts, not the chat",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "under world-a=['rec-0001'], under world-b=['rec-0002']",
+      "id": "V03",
+      "name": "C3: switching worlds swaps eligibility without touching records",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "expected=True, got=True",
+      "id": "V04",
+      "name": "C4: scenario eligibility follows declared state",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "expected=False, got=False",
+      "id": "V05",
+      "name": "C5: scenario eligibility follows declared state",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "expected=True, got=True",
+      "id": "V06",
+      "name": "C6: scenario eligibility follows declared state",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "expected=False, got=False",
+      "id": "V07",
+      "name": "C7: scenario eligibility follows declared state",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: fixture-demo-state: turn 2 resolves to 2 active worlds ['world-a', 'world-b']; a declared ",
+      "id": "V08",
+      "name": "C8: two active worlds at one boundary is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "11 probes compared",
+      "id": "V09",
+      "name": "C9: character memory is identical across world transitions",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "2 chat records survive world activation",
+      "id": "V10",
+      "name": "C10: worldless narrator facts stay chat-owned and eligible",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: 'chat' is the chat container, not a world or scenario id",
+      "id": "N30",
+      "name": "the chat id is rejected as a world identity",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: owner id 'same-id' already identifies a 'world' record (rec-0001); ownership would be ambi",
+      "id": "N31",
+      "name": "one id cannot identify two ownership kinds",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "eligible() and retrieve() both require the state arguments",
+      "id": "N32",
+      "name": "omitting the retrieval state is refused, never silently ungated",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "12 records, agreement=1.0, per_scope={'owner': 9, 'restricted': 1, 'world': 0, 'chat_state': 2, 'scenario_state': 0}",
+      "id": "S11",
+      "name": "declared distribution is reproducible from store and expectations",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "TokenAccountingError: turn 0 (): prompt 760 exceeds capacity 900 - reserve 160 = 740",
+      "id": "N09",
+      "name": "over-capacity prompt is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "TokenAccountingError: no token count supplied for this text: counts must come from the runtime, not be estimated",
+      "id": "N10",
+      "name": "unmeasured token count is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "TokenAccountingError: memory_text appears to include the wrapper: pass bullets and header separately ",
+      "id": "N11",
+      "name": "memory text including the wrapper is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "total=109",
+      "id": "G01",
+      "name": "accounting split sums to the total",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "cc0eb1b81508134f35be7785",
+      "id": "H01",
+      "name": "decoy pool hash is stable",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "PlaceboFidelityError: duplicate decoy id d",
+      "id": "N12",
+      "name": "duplicate decoy id is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "PlaceboFidelityError: no 2-decoy subset matches 10000 tokens within +/-3: arm D cannot be token-matched this tur",
+      "id": "N13",
+      "name": "unmatchable placebo is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "PlaceboFidelityError: block shape differs: A1=['header', 'bullet:source+confidence'] D=['header', 'bullet']",
+      "id": "N14",
+      "name": "structural mismatch is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DecoyLeakError: decoy leaks relevance for probe 'p40': terms ['tea']",
+      "id": "N15",
+      "name": "decoy answering the probe is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: expected 13 probes, got 12",
+      "id": "N16",
+      "name": "probe quota violation is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DroppedSpanStillPresentError: p36: span sp-004-01 is absent but no rollover records dropping it — absence cannot be attr",
+      "id": "N17",
+      "name": "probe whose span has not verifiably departed is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "CORRECT",
+      "id": "I01",
+      "name": "M1 classifies a correct answer",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ABSTAIN_INAPPROPRIATE",
+      "id": "I02",
+      "name": "M1 classifies an inappropriate abstention",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "MALFORMED",
+      "id": "I03",
+      "name": "M1 classifies a malformed response",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "credit 1",
+      "id": "I04",
+      "name": "M1 credits a correct abstention on an unanswerable probe",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "N/A",
+      "id": "I05",
+      "name": "M2 is N/A for A0 and never zero",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProhibitedAggregateError: composite scores are prohibited: report M1 and M2 separately (Amend. 1 §4)",
+      "id": "N18",
+      "name": "composite score is refused",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "TemporalVetoError: p37: selected rec-0003 is superseded but the probe asks for current truth",
+      "id": "N19",
+      "name": "stale value presented as current is a veto",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "ReceiptFieldError: p (A1): missing or invalid receipt fields: ['response_text']",
+      "id": "N20",
+      "name": "receipt missing a required field is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "1.000",
+      "id": "I06",
+      "name": "M1 over the conversation is 1.0 on scripted correct answers",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "10 supported",
+      "id": "I07",
+      "name": "A1 marks supported answers where evidence was displaced",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "12 probes",
+      "id": "I08",
+      "name": "every scored probe proves its span had left the window",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "{12: 11, 13: 11, 14: 12, 15: 13, 16: 13}",
+      "id": "J01",
+      "name": "sign-test thresholds match Amend. 2 (11,11,12,13,13)",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "p(13/16)=0.02127, p(12/16)=0.07681",
+      "id": "J02",
+      "name": "alpha .025 is the per-claim level",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "n_eff=1, ties=2, median=0.0, median_without_ties=0.3",
+      "id": "J03",
+      "name": "ties leave n_eff but stay in the median",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "0.30000000000000004",
+      "id": "J04",
+      "name": "median of an even count averages the central two",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "supported",
+      "id": "J05",
+      "name": "16/16 concordant at 4/39 median is supported",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "significant_but_negligible",
+      "id": "J06",
+      "name": "significant but below 4/39 is not a claim",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "indeterminate",
+      "id": "J07",
+      "name": "n_eff below 12 is indeterminate",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "excluded=4 > 2",
+      "id": "J08",
+      "name": "more than two exclusions is indeterminate",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "InvalidPairScoredError: invalid pairs still carry arm values: ['c']",
+      "id": "N21",
+      "name": "invalid pair carrying values is refused",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "{'indeterminate': 'indeterminate', 'full': 'full_capability_claim', 'net_only': 'net_only', 'regression': 'regression'}",
+      "id": "J09",
+      "name": "C1 and C2 are reported separately",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "run_failed",
+      "id": "J10",
+      "name": "a veto overrides every aggregate",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "13 receipts, 39 rollovers",
+      "id": "K01",
+      "name": "A1 produces 13 receipts and >=3 rollovers",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "0",
+      "id": "K02",
+      "name": "A1 makes no model calls",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "13 x N/A",
+      "id": "K03",
+      "name": "A0 has no records and M2 is N/A everywhere",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "1.000",
+      "id": "K04",
+      "name": "A0 still yields a real M1",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "12 matched probe turns",
+      "id": "K05",
+      "name": "arm D matches A1 per turn on count and tokens",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "dec-*",
+      "id": "K06",
+      "name": "arm D block cites only declared decoys",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "12 turns compared",
+      "id": "K07",
+      "name": "D block shape is identical to A1 block shape per turn",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ArmInertError: arm A2 is inert until its proposals are approved; it cannot run as validation",
+      "id": "N22",
+      "name": "arm A2 is inert while proposals are unapproved",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "ExecutionNotAuthorised: a network responder requires G4 authorization, which has not been granted",
+      "id": "N23",
+      "name": "network responder is refused during G1",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "PlaceboFidelityError: arm D needs A1's block for turn 1 to match per turn",
+      "id": "N24",
+      "name": "arm D without A1 reference block is refused",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "one seed, three arms",
+      "id": "K08",
+      "name": "the three arms used the identical seed for the cell",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "13 flagged",
+      "id": "K09",
+      "name": "arm C is flagged plumbing-only and excluded from the primary",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "98f0ff40251ac7cb29f65445",
+      "id": "K10",
+      "name": "A1 is deterministic across repeats",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "2 halts",
+      "id": "L01",
+      "name": "incomplete sample halts on instrument grounds",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "1872 expected probes",
+      "id": "L02",
+      "name": "complete healthy sample has no halt",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: fixed sample is 48 cells; got 47",
+      "id": "N25",
+      "name": "fixed sample size is enforced",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "17 B, sidecar matches",
+      "id": "WG01",
+      "name": "a new destination is created exclusively with a verified sidecar",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProtectedEvidenceError; hash unchanged",
+      "id": "WG02",
+      "name": "an existing protected receipt is refused, bytes unchanged",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProtectedEvidenceError; hash unchanged",
+      "id": "WG03",
+      "name": "an existing protected sidecar is refused, bytes unchanged",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProtectedEvidenceError; bytes unchanged",
+      "id": "WG04",
+      "name": "a case-only filename variant is refused",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProtectedEvidenceError via G1-REC~1.JSO",
+      "id": "WG05",
+      "name": "an 8.3 short-name alias is refused before any write",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "SKIP: symlink creation unavailable (OSError: [WinError 1314] A required privilege is not held by the clien)",
+      "id": "WG06",
+      "name": "an existing symlink to a protected receipt is refused",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "FileExistsError; both names unchanged",
+      "id": "WG07",
+      "name": "an existing hardlink to a protected receipt is refused",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProtectedEvidenceError",
+      "id": "WG08",
+      "name": "a relative traversal path to protected evidence is refused",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProtectedEvidenceError",
+      "id": "WG09",
+      "name": "an absolute path alias to protected evidence is refused",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProtectedEvidenceError via 8.3 parent (symlinked parent unavailable on this host)",
+      "id": "WG10",
+      "name": "a substituted parent path does not bypass the guard",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProtectedEvidenceError; nothing created",
+      "id": "WG11",
+      "name": "protected identity unavailable fails closed with no file",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProtectedEvidenceError; empty artifact left (identity unknown, so no unlink)",
+      "id": "WG12",
+      "name": "unverifiable handle identity fails closed with zero bytes",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "FileExistsError",
+      "id": "WG13",
+      "name": "a repeated exclusive creation is refused",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "FileExistsError; bytes unchanged",
+      "id": "WG14",
+      "name": "an existing non-protected destination is not replaced",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "O_EXCL bypassed: refused on handle identity, 0 bytes written",
+      "id": "WG15",
+      "name": "identity is verified on the opened handle before the first byte",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "4/4 v2 artifacts identified, set size 12",
+      "id": "WG16",
+      "name": "all four accepted v2 artifacts are in the protected identity set",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProtectedEvidenceError; hash unchanged",
+      "id": "WG17",
+      "name": "the v2 self-test receipt is refused, bytes unchanged",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProtectedEvidenceError; hash unchanged",
+      "id": "WG18",
+      "name": "the v2 self-test sidecar is refused, bytes unchanged",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProtectedEvidenceError; hash unchanged",
+      "id": "WG19",
+      "name": "the v2 review receipt is refused, bytes unchanged",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProtectedEvidenceError; hash unchanged",
+      "id": "WG20",
+      "name": "the v2 review sidecar is refused, bytes unchanged",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProtectedEvidenceError; bytes unchanged",
+      "id": "WG21",
+      "name": "a case-variant alias of the v2 receipt is refused",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "ProtectedEvidenceError via G1-REV~1.JSO",
+      "id": "WG22",
+      "name": "an 8.3 alias of the v2 review receipt is refused",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "FileExistsError; both names unchanged",
+      "id": "WG23",
+      "name": "a hardlink to the v2 receipt is refused",
+      "negative": false,
+      "passed": true
+    },
+    {
+      "detail": "O_EXCL bypassed on a v2 hardlink: refused on identity, 0 bytes written",
+      "id": "WG24",
+      "name": "v2 handle identity is checked before the first byte",
+      "negative": false,
+      "passed": true
+    }
+  ],
+  "checks_passed": 142,
+  "checks_total": 142,
+  "components": [
+    {
+      "file": "model.py",
+      "responsibility": "A' model: records, acquisition events, knowledge edges, supersession, revocation"
+    },
+    {
+      "file": "form.py",
+      "responsibility": "deterministic formation from genuine spans; no model, RQ-MF-01 untouched"
+    },
+    {
+      "file": "retrieve.py",
+      "responsibility": "context-explicit retrieval; eligibility before ranking; fail-closed ownership"
+    },
+    {
+      "file": "assemble.py",
+      "responsibility": "wrapper, citation and shape signature (placebo structural fidelity)"
+    },
+    {
+      "file": "tokens.py",
+      "responsibility": "measured per-turn accounting; memory competes with history"
+    },
+    {
+      "file": "placebo.py",
+      "responsibility": "declared decoy pool; per-turn count/token/shape matching; irrelevance proof"
+    },
+    {
+      "file": "conversation.py",
+      "responsibility": "long-conversation driver; arms A0/A1/A2/C/D; run plan for N=16"
+    },
+    {
+      "file": "probe.py",
+      "responsibility": "probe quota enforcement, span-departure assertion, receipts"
+    },
+    {
+      "file": "score.py",
+      "responsibility": "M1 and M2 definitions; A0 -> N/A; temporal veto; composite score refused"
+    },
+    {
+      "file": "stats.py",
+      "responsibility": "C1/C2, exact sign test, alpha=.025, ties, exclusions, median, 4/39 MMD"
+    },
+    {
+      "file": "stopping.py",
+      "responsibility": "fixed-sample stopping; outcome-blind instrument halts only"
+    },
+    {
+      "file": "seeds.py",
+      "responsibility": "seed derivation and mechanical cross-arm matching"
+    },
+    {
+      "file": "distribution.py",
+      "responsibility": "declared-vs-assigned scope report; outside the probe receipt"
+    },
+    {
+      "file": "identity.py",
+      "responsibility": "frozen artifact and frozen preregistration verification"
+    },
+    {
+      "file": "receipts.py",
+      "responsibility": "this receipt; exclusive create + handle identity + write-once"
+    },
+    {
+      "file": "writeguard.py",
+      "responsibility": "adversarial tests for the protected write path"
+    },
+    {
+      "file": "selftest.py",
+      "responsibility": "zero-model self-check and negative tests"
+    },
+    {
+      "file": "fixtures.py",
+      "responsibility": "synthetic G1 fixtures (not experimental cases)"
+    }
+  ],
+  "confirmations": {
+    "c1_or_c2_results": "none: G4 not executed",
+    "commits_or_pushes": 0,
+    "counter_used": "whitespace-words-test-only (G4 must use runtime accounting)",
+    "experimental_model_calls": 0,
+    "fixtures_are_experimental_cases": false,
+    "frozen_artifacts_modified": false,
+    "g4_authorized": false,
+    "g4_executed": false,
+    "howl_chat_modified": false,
+    "network_clients_imported": false,
+    "s3_modified": false,
+    "scored_experimental_observations": 0,
+    "subject_runs_executed": 0
+  },
+  "dependencies": [
+    {
+      "match": true,
+      "path": "eval/s3/rerank-spec.json",
+      "read_only": true,
+      "role": "frozen artifact (plan 1.1)",
+      "sha256": "bbf400c225e6c90a20a6c40da920b567e2d9137a6ede6f3399507df8bff804e2"
+    },
+    {
+      "match": true,
+      "path": "eval/s3/rerank-spec-v1.2.json",
+      "read_only": true,
+      "role": "frozen artifact (plan 1.1)",
+      "sha256": "5414d0a7ced42386de67c8f989b00d8f31cd7efecf8d9408bb80021544b001c5"
+    },
+    {
+      "match": true,
+      "path": "eval/s3/rerank_eval.py",
+      "read_only": true,
+      "role": "frozen artifact (plan 1.1)",
+      "sha256": "f59959f30ec336ae983f1e28d3833567a88c13ca3f723272ba033063bb251b37"
+    },
+    {
+      "match": true,
+      "path": "eval/s3/rerank_set.py",
+      "read_only": true,
+      "role": "frozen artifact (plan 1.1)",
+      "sha256": "23badd5e7825718dbaa72dc1c133cc41318df75c28e2cce68af7466dd30664d1"
+    },
+    {
+      "match": true,
+      "path": "eval/s3/formation.py",
+      "read_only": true,
+      "role": "frozen artifact (plan 1.1)",
+      "sha256": "d8aac5003c66229da532f32ff4f0f39c4439d85787697020931461163a29f59d"
+    },
+    {
+      "match": true,
+      "path": "eval/s3/records.py",
+      "read_only": true,
+      "role": "frozen artifact (plan 1.1)",
+      "sha256": "1432fb63da5ae561e32b5190a8642ee0b6b7249a3586bd25b99b9e9de7b3de96"
+    },
+    {
+      "match": true,
+      "path": "eval/s3/evidence.py",
+      "read_only": true,
+      "role": "frozen artifact (plan 1.1)",
+      "sha256": "19db697a0f82d29f1a1578e60418ac85aca0d6b59122daca4c12743cbf837aae"
+    },
+    {
+      "match": true,
+      "path": "eval/s3/temporal-spec.json",
+      "read_only": true,
+      "role": "frozen artifact (plan 1.1)",
+      "sha256": "43d81e07e236df8c0128ec8e2c86a99c188514a75265892fb10d5ad7049bd93a"
+    },
+    {
+      "match": true,
+      "path": "eval/s3/context.py",
+      "read_only": true,
+      "role": "imported S3 module (reused unmodified)",
+      "sha256": "66ad8c4e2dee1e1500476f32d831034d19237789d7b9858bdff4678119fa5a0c"
+    },
+    {
+      "match": true,
+      "path": "eval/s3/evidence.py",
+      "read_only": true,
+      "role": "imported S3 module (reused unmodified)",
+      "sha256": "19db697a0f82d29f1a1578e60418ac85aca0d6b59122daca4c12743cbf837aae"
+    },
+    {
+      "match": true,
+      "path": "eval/s3/__init__.py",
+      "read_only": true,
+      "role": "imported S3 module (reused unmodified)",
+      "sha256": "2155c5b7639e0bf7e2310ab5cbb452b0591120bec427ac4c5cff307d78b52b54"
+    }
+  ],
+  "environment": {
+    "package": "eval/mem1",
+    "python": "3.12.10"
+  },
+  "evidence": {
+    "description": "protected-set coverage correction: all twelve reference artifacts identity-protected; G1 zero-model check set including WG01-WG24",
+    "guard": {
+      "exclusive_create": true,
+      "handle_identity_before_write": true,
+      "protected_files": 12
+    },
+    "protected_set": {
+      "accepted_v2": 4,
+      "excluded": "write-guard-v1/ and write-guard-v2/ outputs",
+      "stage1": 8
+    },
+    "references": {
+      "eval/mem1/g1-receipt.json": "41cc95ff0ccee6ae573535b61d7ccf2a125974bc50164acaae6ae9e2d1e70d26",
+      "eval/mem1/g1-receipt.json.sha256": "a930d039727819e15227317f6b8f13e9f7e7db57a11686a7596dce96ec9454aa",
+      "eval/mem1/g1-review-receipt-r2.json": "3b69f1f9ab4ca03e52d05775244338404e4d6c6182fb22de0ad0d7f5f32b1e8d",
+      "eval/mem1/g1-review-receipt-r2.json.sha256": "fae6e614b1e3afe1257ff474d0cfa9f17c3ce3931d2afe7c404ed13255fcacc6",
+      "eval/mem1/g1-review-receipt.json": "3a4aae7608703d3ec8c80095b1bfcf5da0fe6492c50d4722e8e25c7636e2b130",
+      "eval/mem1/g1-review-receipt.json.sha256": "4d81510263d8db44f4899b353bd365929c549a89d7034e5c756ea3af5b640067",
+      "eval/mem1/g4-preflight-receipt.json": "1b6d8c0465fee21a9cacb4ff08f87169eaa69317447f6f781f8e3f7a5eb65d2e",
+      "eval/mem1/g4-preflight-receipt.json.sha256": "19b6da2c9caa39880d8d01249bc277e244a1cfa3ce15db3e87934550c807f92e",
+      "eval/mem1/v2/g1-receipt-u1u2-v2.json": "bc5766f975fb070421ebcb3fc587c4dde088ae94aa5c4019b6eed4aa08d53ad3",
+      "eval/mem1/v2/g1-receipt-u1u2-v2.json.sha256": "64352aca15ba452f3c52f357e3284d14eaf4c2729b187ce2b792d3c6905f8138",
+      "eval/mem1/v2/g1-review-receipt-u1u2-v2.json": "38cc18571dd50a12403d0a45c357630ba8bfbcd38fbb4a1509ed7e6b3fcb6df9",
+      "eval/mem1/v2/g1-review-receipt-u1u2-v2.json.sha256": "46fc51afb0adbb61998bdbafecfa724159e1246a994d7600992826accf27803a"
+    },
+    "semantics": {
+      "gated_owner_kinds": [
+        "world",
+        "scenario"
+      ],
+      "owner_kinds": [
+        "character",
+        "chat",
+        "world",
+        "scenario"
+      ],
+      "scopes": [
+        "owner",
+        "restricted",
+        "world",
+        "chat_state",
+        "scenario_state"
+      ]
+    },
+    "set": "write-guard-v2",
+    "supersedes": "eval/mem1/write-guard-v1/g1-receipt-writeguard-v1.json",
+    "supersedes_note": "write-guard-v1 is preserved unchanged as the record of the narrower eight-artifact implementation; its claims are not retroactively extended to this generation",
+    "supersession": {
+      "edited_or_rejustified": 14,
+      "mapping_changed": [
+        "S01",
+        "S11"
+      ],
+      "rejustified": [
+        "E07",
+        "F02"
+      ],
+      "replace": [
+        "E06",
+        "S02",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S12"
+      ],
+      "reviewed": 21,
+      "unaffected": [
+        "S03",
+        "F01",
+        "K06",
+        "N26",
+        "N27",
+        "N28",
+        "N29"
+      ]
+    }
+  },
+  "frozen_identity": {
+    "frozen_artifacts": [
+      {
+        "actual": "bbf400c225e6c90a20a6c40da920b567e2d9137a6ede6f3399507df8bff804e2",
+        "expected_prefix": "bbf400c225e6c90a",
+        "match": true,
+        "path": "eval/s3/rerank-spec.json",
+        "reason": ""
+      },
+      {
+        "actual": "5414d0a7ced42386de67c8f989b00d8f31cd7efecf8d9408bb80021544b001c5",
+        "expected_prefix": "5414d0a7ced42386",
+        "match": true,
+        "path": "eval/s3/rerank-spec-v1.2.json",
+        "reason": ""
+      },
+      {
+        "actual": "f59959f30ec336ae983f1e28d3833567a88c13ca3f723272ba033063bb251b37",
+        "expected_prefix": "f59959f30ec336ae",
+        "match": true,
+        "path": "eval/s3/rerank_eval.py",
+        "reason": ""
+      },
+      {
+        "actual": "23badd5e7825718dbaa72dc1c133cc41318df75c28e2cce68af7466dd30664d1",
+        "expected_prefix": "23badd5e7825718d",
+        "match": true,
+        "path": "eval/s3/rerank_set.py",
+        "reason": ""
+      },
+      {
+        "actual": "d8aac5003c66229da532f32ff4f0f39c4439d85787697020931461163a29f59d",
+        "expected_prefix": "d8aac5003c66229d",
+        "match": true,
+        "path": "eval/s3/formation.py",
+        "reason": ""
+      },
+      {
+        "actual": "1432fb63da5ae561e32b5190a8642ee0b6b7249a3586bd25b99b9e9de7b3de96",
+        "expected_prefix": "1432fb63da5ae561",
+        "match": true,
+        "path": "eval/s3/records.py",
+        "reason": ""
+      },
+      {
+        "actual": "19db697a0f82d29f1a1578e60418ac85aca0d6b59122daca4c12743cbf837aae",
+        "expected_prefix": "19db697a0f82d29f",
+        "match": true,
+        "path": "eval/s3/evidence.py",
+        "reason": ""
+      },
+      {
+        "actual": "43d81e07e236df8c0128ec8e2c86a99c188514a75265892fb10d5ad7049bd93a",
+        "expected_prefix": "43d81e07e236df8c",
+        "match": true,
+        "path": "eval/s3/temporal-spec.json",
+        "reason": ""
+      }
+    ],
+    "frozen_preregistration": [
+      {
+        "actual": "8c788a96ea6a866d4fd06e13496ddbfa46b649da5a5e0c8ef9bace960844ff12",
+        "expected": "8c788a96ea6a866d4fd06e13496ddbfa46b649da5a5e0c8ef9bace960844ff12",
+        "match": true,
+        "path": "docs/research/MEMORY-09-PREREGISTRATION-2026-11-15.md",
+        "reason": ""
+      },
+      {
+        "actual": "975033401ae1beaa9caaa5d5ae55aab0ca3ddb4f5159eb41e9feb8e01a4c9b1a",
+        "expected": "975033401ae1beaa9caaa5d5ae55aab0ca3ddb4f5159eb41e9feb8e01a4c9b1a",
+        "match": true,
+        "path": "docs/research/MEMORY-09-PREREGISTRATION-AMENDMENT-1-2026-11-15.md",
+        "reason": ""
+      },
+      {
+        "actual": "c3ffd7ed735ed4cf68f8b455555af2a1d10eb38273b07a756f269076cd917f8f",
+        "expected": "c3ffd7ed735ed4cf68f8b455555af2a1d10eb38273b07a756f269076cd917f8f",
+        "match": true,
+        "path": "docs/research/MEMORY-09-PREREGISTRATION-AMENDMENT-2-2026-11-15.md",
+        "reason": ""
+      },
+      {
+        "actual": "c5af036265b03662b26feaf40d358ad08c3063fa0055c72d2fb0c2f41c236281",
+        "expected": "c5af036265b03662b26feaf40d358ad08c3063fa0055c72d2fb0c2f41c236281",
+        "match": true,
+        "path": "docs/research/MEMORY-09-PREREGISTRATION-AMENDMENT-3-2026-11-15.md",
+        "reason": ""
+      }
+    ],
+    "preserved_documents": [
+      {
+        "actual": "6c4078bd8c1fd29f1c74691afd0e25273000ac8bbddf6cc5c7f162bcfbe6bbb9",
+        "expected": "6c4078bd8c1fd29f1c74691afd0e25273000ac8bbddf6cc5c7f162bcfbe6bbb9",
+        "match": true,
+        "path": "docs/research/MEMORY-09-EXPERIMENT-PLAN-2026-11-15.md",
+        "reason": ""
+      },
+      {
+        "actual": "5c245283c1712ed59ade4ab51f6310b35b4ad428d6b446061c50b6f577f162d0",
+        "expected": "5c245283c1712ed59ade4ab51f6310b35b4ad428d6b446061c50b6f577f162d0",
+        "match": true,
+        "path": "docs/research/MEMORY-09-G0-PREFLIGHT-2026-11-15.md",
+        "reason": ""
+      }
+    ]
+  },
+  "gate": "G1",
+  "inferred": {
+    "g4_executed": false,
+    "note": "G1 makes no claim about capability; no result exists to interpret"
+  },
+  "instrument_version": "0.1.0-g1",
+  "limitations": [
+    "synthetic fixtures only; they are not the experimental case set",
+    "whitespace token counter is a test instrument, not model tokenization",
+    "M2 for the correction probe (p47) is structurally unmeasurable under frozen A1: no prompt-facing history context exists. Recorded as an architecture limitation (F1), not as a result and not as a failed implementation test",
+    "M2 for the retraction probe (p48) is supported by an explicit retraction event record that cites its own span and references the retracted record",
+    "no model call was made, so nothing here speaks to model behaviour"
+  ],
+  "negative_checks": [
+    {
+      "detail": "FrozenIdentityError: frozen artifact identity check failed: eval/s3/records.py: sha256 prefix mismatch",
+      "id": "N01",
+      "name": "tampered frozen artifact is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "SeedMissingError: cell (conv-00, 0) arm A0: seed 1 != table 1802596798",
+      "id": "N02",
+      "name": "mismatched seed is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "SeedNotHonouredError: cell (conv-00, 0) arm A0: seed_honoured=False",
+      "id": "N03",
+      "name": "unhonoured seed is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: prereg fixes N=16; got 15 conversations",
+      "id": "N04",
+      "name": "N != 16 is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: planned N=16; refusing to extend to 17: an indeterminate result requires a new preregistra",
+      "id": "N05",
+      "name": "post-hoc extension is refused",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "ProvenanceFabricationError: source_span 'sp-999-01' does not resolve in this conversation",
+      "id": "N06",
+      "name": "record citing a nonexistent span is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "HistoryErasedError: Sable/trained_by: expected >= 2 retained versions, got 1",
+      "id": "N07",
+      "name": "history erasure is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "OwnershipVetoError: foreign record rec-0004 in selection for char-001",
+      "id": "N08",
+      "name": "foreign record in a selection is a veto",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: unknown ownership kind: 'banana'",
+      "id": "N26",
+      "name": "an unknown ownership kind is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: owner id 'chat' identifies the chat container; it cannot identify a 'character'",
+      "id": "N27",
+      "name": "a character record cannot own the reserved id",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: fixture-demo-01: character id 'chat' is the conversation container, not a character: narra",
+      "id": "N28",
+      "name": "a character id colliding with the reserved id is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: fixture-demo-01/p36: probe owner 'char-999' is not a declared character ['char-001', 'char",
+      "id": "N29",
+      "name": "a probe naming an undeclared owner is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: visibility table omits declared scopes ['world']: those records would be unreachable in ev",
+      "id": "O02",
+      "name": "a visibility table that omits a scope is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: fixture-demo-state: turn 2 resolves to 2 active worlds ['world-a', 'world-b']; a declared ",
+      "id": "V08",
+      "name": "C8: two active worlds at one boundary is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: 'chat' is the chat container, not a world or scenario id",
+      "id": "N30",
+      "name": "the chat id is rejected as a world identity",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: owner id 'same-id' already identifies a 'world' record (rec-0001); ownership would be ambi",
+      "id": "N31",
+      "name": "one id cannot identify two ownership kinds",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "TokenAccountingError: turn 0 (): prompt 760 exceeds capacity 900 - reserve 160 = 740",
+      "id": "N09",
+      "name": "over-capacity prompt is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "TokenAccountingError: no token count supplied for this text: counts must come from the runtime, not be estimated",
+      "id": "N10",
+      "name": "unmeasured token count is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "TokenAccountingError: memory_text appears to include the wrapper: pass bullets and header separately ",
+      "id": "N11",
+      "name": "memory text including the wrapper is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "PlaceboFidelityError: duplicate decoy id d",
+      "id": "N12",
+      "name": "duplicate decoy id is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "PlaceboFidelityError: no 2-decoy subset matches 10000 tokens within +/-3: arm D cannot be token-matched this tur",
+      "id": "N13",
+      "name": "unmatchable placebo is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "PlaceboFidelityError: block shape differs: A1=['header', 'bullet:source+confidence'] D=['header', 'bullet']",
+      "id": "N14",
+      "name": "structural mismatch is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DecoyLeakError: decoy leaks relevance for probe 'p40': terms ['tea']",
+      "id": "N15",
+      "name": "decoy answering the probe is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: expected 13 probes, got 12",
+      "id": "N16",
+      "name": "probe quota violation is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DroppedSpanStillPresentError: p36: span sp-004-01 is absent but no rollover records dropping it — absence cannot be attr",
+      "id": "N17",
+      "name": "probe whose span has not verifiably departed is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "ProhibitedAggregateError: composite scores are prohibited: report M1 and M2 separately (Amend. 1 §4)",
+      "id": "N18",
+      "name": "composite score is refused",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "TemporalVetoError: p37: selected rec-0003 is superseded but the probe asks for current truth",
+      "id": "N19",
+      "name": "stale value presented as current is a veto",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "ReceiptFieldError: p (A1): missing or invalid receipt fields: ['response_text']",
+      "id": "N20",
+      "name": "receipt missing a required field is rejected",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "InvalidPairScoredError: invalid pairs still carry arm values: ['c']",
+      "id": "N21",
+      "name": "invalid pair carrying values is refused",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "ArmInertError: arm A2 is inert until its proposals are approved; it cannot run as validation",
+      "id": "N22",
+      "name": "arm A2 is inert while proposals are unapproved",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "ExecutionNotAuthorised: a network responder requires G4 authorization, which has not been granted",
+      "id": "N23",
+      "name": "network responder is refused during G1",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "PlaceboFidelityError: arm D needs A1's block for turn 1 to match per turn",
+      "id": "N24",
+      "name": "arm D without A1 reference block is refused",
+      "negative": true,
+      "passed": true
+    },
+    {
+      "detail": "DesignViolationError: fixed sample is 48 cells; got 47",
+      "id": "N25",
+      "name": "fixed sample size is enforced",
+      "negative": true,
+      "passed": true
+    }
+  ],
+  "observed": {
+    "a0_receipts": 13,
+    "a1_receipts": 13,
+    "a1_rollovers": 39,
+    "a1_supported": 10,
+    "c_receipts": 13,
+    "d_receipts": 13
+  },
+  "package_sha256": "2fd5cb5e41c6437020346b38c85ee475f6f6a832ee814e6b4de64521d12691ca",
+  "source_sha256": {
+    "__init__.py": "3ed5fe9b73d04c7031a658587ed58f3ad0ed265bf9cde74d6b637e4f46ee8a32",
+    "assemble.py": "08046aa2a8fff72a49f72c6205e686d052bac1e392a52f95e233fba8b97ce736",
+    "conversation.py": "fa1d9ce630462fa9afa0922bef891cdc4cf471b6156c9f4823f490cbf0d972e3",
+    "distribution.py": "a47c7a697121cfea757c921131829d38c4830aab83d1cf5047a8c5300df720bf",
+    "errors.py": "fca9d961b143d9895fa1f25ac273b55d625585fb13cc6738f9085426786f748e",
+    "fixtures.py": "8300396d3de9c61a7c2f39b732cf562cb2e507877988d04101d6ac2f73350427",
+    "form.py": "f472052738388bab5a9a9e8231adf485c24c2f63bb49ea262a8ad4d56e19df49",
+    "identity.py": "15508f6b7f95f0094de27689d7cef17c3ddb7f177fe36388dc82d1b542c054df",
+    "model.py": "813cdbff56c01ae4fbe0e074346937fec74026f7a1b2b1a9dd7ca10cf4133b9e",
+    "oracle.py": "bacd20ae0a5d3937d01d8415c2b00f1afd33be3f2fd6e9a435e0935f6640cfdd",
+    "p5.py": "8d9d6c35d0156818b19ce8a92c4bcffe091c6c37c32efc292e5607fc625ef7fb",
+    "placebo.py": "44633b15fe987cf274a1fc40bca638f699d26928581d11d58fa4eb2d0319ce2f",
+    "preflight.py": "f74791d767bf4e1c1be0793dbce3187f3a9d50096901a7388a0a5a22363835cd",
+    "probe.py": "c0ac16201ff7bb4a0105221505ba00d2a3fb1351f7a6543db871c15c684bb0fd",
+    "receipts.py": "04abb1a81d8305265dbd4aca14494d1b903112479164053d61095218de24f130",
+    "retrieve.py": "84f90b5ce0b3619f2130b4a1966a615e4ddf28cc6fcb72bf9955f6628ed23a4f",
+    "review.py": "f19494cf1286e3775c45983a734c32efcd37bb370b7f23e1c805b06e17b7f976",
+    "score.py": "1397798931cf51ad575a2763ecabe045af865cd6641e4c41c80a1352982e060d",
+    "seeds.py": "eceb55d9bee66631366f0c98c1e679936cdd3e45afa540da5b0fc0e27a5f9f75",
+    "selftest.py": "469f546ab980291becbf6445bd126b7a52d911f520c4d1058980a01dc5a7fa7f",
+    "stats.py": "d93bb380b7e55ced035541582c3e2e525dabc78efeba14e184ee09a173cdd941",
+    "stopping.py": "1ac755738454a1d3562d66244f0ffb3f26defc7a060eaf8652b58349e541257f",
+    "tokens.py": "6bc1cd4af7cfa14c47aab1970f943e301a4ca4a3931c8202d031335ead8320ce",
+    "writeguard.py": "dd527f0847374c6c58e572d56ccab160a8af1fceca7e72ab708b1d2de63946b6"
+  },
+  "status": "PASS",
+  "suite": "mem1.selftest"
+}

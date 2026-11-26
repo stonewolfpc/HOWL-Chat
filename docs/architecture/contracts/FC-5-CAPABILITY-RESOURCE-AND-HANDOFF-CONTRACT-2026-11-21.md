@@ -14,6 +14,8 @@
 
 **Labels:** **Owner-approved** · **Proposed** · **Unresolved** · **Observed** · **Unestablished**.
 
+**Identifier note:** Existing letter-suffixed clauses include `FC5-22a` and `FC5-22b`. This amendment adds `FC5-26a` as a related clause without renumbering any existing clause, so cross-references from other papers and the register remain valid. Clauses numbered above the highest existing clause (`FC5-27`–`FC5-31`) continue that sequence and are placed by subject rather than by number: numbering follows the highest existing clause while document order follows subject, so FC5-27–FC5-31 appear consecutively in §4 and FC5-26a appears in §10 after them despite its lower number. Identifiers of the form `FC5-CONFIG-RETENTION` identify questions, not clauses, and are cited as such.
+
 ---
 
 ## 1. Contract decision
@@ -73,6 +75,8 @@
 
 ## 4. Handoff phases
 
+This section defines the handoff phase sequence and the two configuration records that accompany it: a record of the configuration decision taken for an operation, and a record of what Howl constructed for a launch attempt. The records are defined at the end of this section (FC5-27–FC5-31). They are not phases of the sequence in FC5-12, and no row of that table is satisfied by either record.
+
 **FC5-12 (Proposed — required sequence).**
 
 | Phase | Required outcome | Failure behavior |
@@ -94,6 +98,91 @@
 **FC5-14 (Owner-approved — HRA-18).** Unload means actual release as far as the platform can demonstrate. Stopping inference is not release if weights, runtime allocations, caches, workspaces or job-owned processes remain.
 
 **FC5-15 (Owner-approved — HRA-22).** Failed handoffs recover cleanly: no misleading ready state, no silent model/placement substitution, no destroyed user work.
+
+**FC5-27 (Proposed — configuration decision record).**
+
+An operation's configuration is decided in three distinguishable stages, and each stage is recorded:
+
+| Stage | Recorded content |
+|---|---|
+| User intent | What the user asked for, captured at the operation boundary before application defaults are merged |
+| Application defaults | The defaults Howl applied, each named with the identity of the policy that supplied it, distinguishable from user intent |
+| Configuration grant | The configuration values Howl permits for this request, the adjustment made to each value where the grant diverges from the request, the stated reason for each adjustment, and the identity of the granting decision |
+
+User intent is not reconstructed from merged or persisted settings. A stored settings value that already contains an application default is not evidence that the user chose that value. Where intent was not captured — for example because the operation began from persisted settings rather than from a request — the record states that, and does not present a merged value as intent.
+
+The configuration grant is not FC-5 admission. Admission decides whether a workload may proceed under capability and resource policy. The configuration grant decides which configuration values Howl permits for that request. The two decisions may constrain one another, but neither substitutes for the other and neither is evidence for the other. A grant is also not a reservation state: it is not recorded in FC5-09's `state` values, and an existing reservation implies no grant.
+
+The configuration grant is not a claim-ladder level (FC5-22a). It is a configuration decision and carries no evidence maturity of its own.
+
+This clause defines the record's content and the distinction between its stages. It does not specify which component writes the record, where it is stored, or in what format beyond the distinctions above (FC5-30, FC5-31).
+
+---
+
+**FC5-28 (Proposed — launch construction record).**
+
+For each launch attempt, Howl records what it constructed, expressed per relevant setting or argument:
+
+| Disposition | Required content |
+|---|---|
+| `emitted` | The option and the value emitted |
+| `omitted` | The option and an explicit reason |
+| `transformed` | The option, the requested value, the emitted value, the kind of transformation, and its provenance |
+
+The kind of transformation distinguishes a semantic value change from a representation-only change. A semantic change alters the effective value or its meaning. A representation-only change expresses the same effective value differently — spelling, ordering, formatting, or the field or flag form used — and does not alter what the runtime would be asked to do. The two are recorded as different kinds, because they carry different consequences for a later reader.
+
+An omission reason preserves the distinction that explains it. At minimum the record separates: never requested; requested, not emitted, and left at the application default; conditionally excluded by a stated condition; and requested but dropped as unsupported. These are distinct reasons and are not collapsed into one unspecified reason.
+
+The second of these is an omission only while the default remains in effect and no value is emitted in place of the request. Where Howl substitutes an application default for the requested value and emits a value, the outcome is `transformed`, not `omitted`. Its kind is determined by comparing the effective values, not by the fact of substitution: where the substituted default differs from the requested value in effect, the change is semantic; where the substituted default is equivalent to the requested value, the substitution is still recorded, but the kind is representation-only, because the effective configuration did not change. A substitution is never described as a semantic change on the strength of the substitution alone.
+
+Where construction performs a derivation — applying a default, clamping a value, resolving an unsupported request, conditionally excluding an option — the record states that derivation's provenance: the stage that performed it, the identity of the governing policy where one exists, and the build identity associated with the construction record, reusing FC-6's `build_identity` with the meaning FC6-06 and FC6-07 already give it. Where no governing policy identity exists, the record states that rather than inventing one.
+
+The build identity recorded here is the one associated with the record. Recording it does not assert that this build performed the derivation for this attempt. Where that relationship is established, the record states it at the strength the evidence supports; where it is not, the record states the association only and its provenance is correspondingly weaker. This clause creates no identity for a derivation and no registry of derivation rules.
+
+Record B describes construction only. What that construction does not establish is stated in FC5-30.
+
+---
+
+**FC5-29 (Proposed — identities, references and retry).**
+
+Each configuration decision record has its own identity. Each launch construction record has its own identity and references the configuration decision record it derives from.
+
+The construction identity is FC-5's own and is capability-agnostic: it applies to text, vision, audio and other operations alike, and there is one identity per construction attempt. It is not `request_id`, `prompt_plan_id` or `reservation_id`, which identify a prompt-dispatch attempt (FC2-05b), a composition artifact and a reservation respectively; none of those scopes is a launch construction attempt.
+
+A reservation reference is recorded when a reservation has been established for the attempt. It is never universally mandatory. FC5-12 places reservation before load and does not state where construction falls relative to it, so a construction record is not invalid for want of a reservation, and an absent reference is not a claim that no reservation existed.
+
+One configuration decision can support more than one construction attempt. The configuration decision identity remains the common reference across those attempts; each construction record retains its own distinct identity. This identity relationship does not establish any retention or persistence guarantee (FC5-31).
+
+A genuine change to the configuration decision produces a new decision identity, and the earlier decision record is not rewritten to represent it. A failed construction record is subject to whatever retention policy is eventually established (FC5-31). This clause does not establish that policy.
+
+---
+
+**FC5-30 (Proposed — configuration records are not runtime evidence).**
+
+Neither record authorizes, implements or proves any of the following, and neither may be cited as evidence for any of them:
+
+- configuration recording or storage infrastructure;
+- observation or monitoring of a process;
+- collection of runtime telemetry;
+- verification that an argument, option or value was accepted by a runtime;
+- backend or execution identity;
+- allocation, loading, hardware execution, or workload readiness.
+
+A configuration grant is a decision about permitted values. A launch construction record is a description of what Howl constructed. Neither establishes what a runtime accepted, what was allocated, what loaded, what executed, or whether a workload became ready. Those runtime facts remain governed by their applicable contracts. This clause attributes no evidence obligation to any other contract or phase, and does not claim that any phase or paper owes backend identity, hardware-execution evidence or runtime telemetry.
+
+Readiness remains FC-5's own phase claim (FC5-22). This clause does not extend FC-5 to backend identity, hardware execution or runtime telemetry, and neither record becomes readiness evidence because FC-5 owns readiness. The records are not promoted into readiness claims, not even when they are complete and mutually consistent.
+
+---
+
+**FC5-31 (Unresolved — configuration-record retention).**
+
+This clause defines no retention behaviour and does not qualify FC5-27–FC5-30. Those clauses require the records to be defined and to carry their identities and references; they do not establish that a record is written to durable storage, that it survives a process exit or restart, that it is retained for any duration, where it is held, what owns it, what scope it has, or how it is redacted.
+
+`DQ-HRA-04` asks which **reservation** records survive a crash; it does not answer these questions for configuration records. D2's retention-by-default governs authored content and does not reach application settings or launch records. Configuration-record retention is therefore not established by the provisions governing these records: nothing in FC5-27–FC5-30, `DQ-HRA-04` or D2's retention-by-default requires these records to persist. This clause does not decide whether any other provision constrains where or how they may be stored.
+
+Open question, minted here: `FC5-CONFIG-RETENTION` — what retention, storage, scope and redaction policy applies to configuration decision records and launch construction records?
+
+This clause is not a `DQ-HRA-*` question, is not inherited from `HRA-DB-2026-11-21-01`, and decides none of the points it lists.
 
 ---
 
@@ -209,5 +298,7 @@ Neither `unknown` nor `failed` may be promoted to ready, complete or successful.
 | Evidence | FC-6 (this set) |
 
 **FC5-26 (Observed — no authorization).** This paper does not implement a broker, lease registry, process supervisor, telemetry provider, model loader or admission gate. It does not resolve the DQ-HRA questions, authorize M4, or claim T0.5 closure.
+
+**FC5-26a (Proposed — boundary pointer).** FC5-26's exclusion list is not exhaustive. The configuration records defined in §4 introduce boundaries that list does not name: FC5-30 states what those records neither authorize nor prove, and it applies to both records. This clause points to that boundary and does not restate it.
 
 **End of FC-5.** Admission is not residency, readiness is not process start, release is not unload return, and a per-instance ledger is not global safety.

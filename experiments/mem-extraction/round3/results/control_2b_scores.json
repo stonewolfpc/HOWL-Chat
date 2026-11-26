@@ -1,0 +1,1387 @@
+[
+  {
+    "case": "C01",
+    "category": "explicit_long_term_preference",
+    "score": 72.2,
+    "parts": {
+      "recall": 10.0,
+      "fidelity": 20.0,
+      "significance": 6.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 3.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "01:KEEP",
+      "02:KEEP",
+      "03:HOLD"
+    ],
+    "decision_vec": [
+      [
+        "01",
+        "KEEP"
+      ],
+      [
+        "02",
+        "KEEP"
+      ],
+      [
+        "03",
+        "HOLD"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 3,
+    "raw_lines": 4,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "qx8hu3am",
+    "draw": 1,
+    "wall_s": 6.342,
+    "completion_tokens": 100,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C01",
+    "category": "explicit_long_term_preference",
+    "score": 64.2,
+    "parts": {
+      "recall": 5.0,
+      "fidelity": 20.0,
+      "significance": 3.8,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 3.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "r07g101o",
+    "draw": 2,
+    "wall_s": 3.874,
+    "completion_tokens": 64,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C02",
+    "category": "implicit_preference",
+    "score": 2.0,
+    "parts": {
+      "structure": 2.0
+    },
+    "decisions": [],
+    "decision_vec": [],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 0,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "82ozq269",
+    "draw": 1,
+    "wall_s": 4.595,
+    "completion_tokens": 71,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C02",
+    "category": "implicit_preference",
+    "score": 76.1,
+    "parts": {
+      "recall": 10.0,
+      "fidelity": 20.0,
+      "significance": 7.5,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "tg5uc595",
+    "draw": 2,
+    "wall_s": 3.216,
+    "completion_tokens": 53,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C03",
+    "category": "character_fact",
+    "score": 98.9,
+    "parts": {
+      "recall": 20.0,
+      "fidelity": 20.0,
+      "significance": 15.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 3.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "CORE_01:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "CORE_01",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "pa1h9xep",
+    "draw": 1,
+    "wall_s": 5.02,
+    "completion_tokens": 79,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C03",
+    "category": "character_fact",
+    "score": 82.6,
+    "parts": {
+      "recall": 13.3,
+      "fidelity": 20.0,
+      "significance": 10.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "4dd1exgl",
+    "draw": 2,
+    "wall_s": 4.041,
+    "completion_tokens": 67,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C04",
+    "category": "world_fact",
+    "score": 82.6,
+    "parts": {
+      "recall": 13.3,
+      "fidelity": 20.0,
+      "significance": 10.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "A1:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "A1",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "ribqbcco",
+    "draw": 1,
+    "wall_s": 3.042,
+    "completion_tokens": 46,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C04",
+    "category": "world_fact",
+    "score": 80.4,
+    "parts": {
+      "recall": 13.3,
+      "fidelity": 20.0,
+      "significance": 8.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP",
+      "C2:KEEP",
+      "C3:REJECT",
+      "C4:HOLD"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ],
+      [
+        "C2",
+        "KEEP"
+      ],
+      [
+        "C3",
+        "REJECT"
+      ],
+      [
+        "C4",
+        "HOLD"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 4,
+    "raw_lines": 5,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "zqovi3yt",
+    "draw": 2,
+    "wall_s": 13.972,
+    "completion_tokens": 233,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C05",
+    "category": "correction",
+    "score": 2.0,
+    "parts": {
+      "structure": 2.0
+    },
+    "decisions": [],
+    "decision_vec": [],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 0,
+    "raw_lines": 6,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "uv6q42gs",
+    "draw": 1,
+    "wall_s": 10.035,
+    "completion_tokens": 159,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C05",
+    "category": "correction",
+    "score": 51.0,
+    "parts": {
+      "recall": 0.0,
+      "fidelity": 20.0,
+      "significance": 0.0,
+      "false_memory": 15.0,
+      "temporal": 0.0,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:HOLD"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "HOLD"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "8wwyrst4",
+    "draw": 2,
+    "wall_s": 3.649,
+    "completion_tokens": 60,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C06",
+    "category": "superseded_preference",
+    "score": 2.0,
+    "parts": {
+      "structure": 2.0
+    },
+    "decisions": [],
+    "decision_vec": [],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 0,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "b8u2405u",
+    "draw": 1,
+    "wall_s": 4.995,
+    "completion_tokens": 78,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C06",
+    "category": "superseded_preference",
+    "score": 65.7,
+    "parts": {
+      "recall": 6.7,
+      "fidelity": 20.0,
+      "significance": 3.0,
+      "false_memory": 15.0,
+      "temporal": 5.0,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "3ad3exbj",
+    "draw": 2,
+    "wall_s": 3.136,
+    "completion_tokens": 52,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C07",
+    "category": "unresolved_contradiction",
+    "score": 99.0,
+    "parts": {
+      "recall": 20.0,
+      "fidelity": 20.0,
+      "significance": 15.0,
+      "false_memory": 15.0,
+      "temporal": 10.0,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 3.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP",
+      "C2:HOLD",
+      "C3:HOLD"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ],
+      [
+        "C2",
+        "HOLD"
+      ],
+      [
+        "C3",
+        "HOLD"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 3,
+    "raw_lines": 5,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "boyxujrl",
+    "draw": 1,
+    "wall_s": 17.735,
+    "completion_tokens": 291,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C07",
+    "category": "unresolved_contradiction",
+    "score": 44.0,
+    "parts": {
+      "recall": 0.0,
+      "fidelity": 20.0,
+      "significance": 0.0,
+      "false_memory": 15.0,
+      "temporal": 0.0,
+      "uncertainty": 0.0,
+      "attribution": 5.0,
+      "restraint": 3.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "weg5us35",
+    "draw": 2,
+    "wall_s": 4.328,
+    "completion_tokens": 72,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C08",
+    "category": "uncertain_claim",
+    "score": 69.4,
+    "parts": {
+      "recall": 10.0,
+      "fidelity": 20.0,
+      "significance": 4.5,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 2.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "1:HOLD"
+    ],
+    "decision_vec": [
+      [
+        "1",
+        "HOLD"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "89i18iwr",
+    "draw": 1,
+    "wall_s": 3.632,
+    "completion_tokens": 56,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C08",
+    "category": "uncertain_claim",
+    "score": 53.3,
+    "parts": {
+      "recall": 0.0,
+      "fidelity": 20.0,
+      "significance": 0.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 2.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "fjqmajpi",
+    "draw": 2,
+    "wall_s": 4.738,
+    "completion_tokens": 79,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C09",
+    "category": "chatter_noise",
+    "score": 60.0,
+    "parts": {
+      "recall": 20.0,
+      "fidelity": 0.0,
+      "significance": 15.0,
+      "false_memory": 0.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 3.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "- C1:HOLD"
+    ],
+    "decision_vec": [
+      [
+        "- C1",
+        "HOLD"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 4,
+    "catastrophic": true,
+    "catastrophic_reasons": [
+      "kept forbidden claim: cat",
+      "kept forbidden claim: keyboard"
+    ],
+    "run_code": "a69orocq",
+    "draw": 1,
+    "wall_s": 5.395,
+    "completion_tokens": 83,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C09",
+    "category": "chatter_noise",
+    "score": 12.2,
+    "parts": {
+      "recall": 0.0,
+      "fidelity": 0.0,
+      "significance": 0.0,
+      "false_memory": 0.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 0.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": true,
+    "catastrophic_reasons": [
+      "kept forbidden claim: brb"
+    ],
+    "run_code": "e5la6skq",
+    "draw": 2,
+    "wall_s": 4.989,
+    "completion_tokens": 83,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C10",
+    "category": "buried_in_long_context",
+    "score": 2.0,
+    "parts": {
+      "structure": 2.0
+    },
+    "decisions": [],
+    "decision_vec": [],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 0,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "x7rxe9fw",
+    "draw": 1,
+    "wall_s": 18.42,
+    "completion_tokens": 300,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C10",
+    "category": "buried_in_long_context",
+    "score": 79.0,
+    "parts": {
+      "recall": 12.0,
+      "fidelity": 20.0,
+      "significance": 9.0,
+      "false_memory": 15.0,
+      "temporal": 10.0,
+      "uncertainty": 2.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "kg1kmeh8",
+    "draw": 2,
+    "wall_s": 10.365,
+    "completion_tokens": 172,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C11",
+    "category": "context_dependent_significance",
+    "score": 98.9,
+    "parts": {
+      "recall": 20.0,
+      "fidelity": 20.0,
+      "significance": 15.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 3.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "D1:KEEP",
+      "D2:HOLD"
+    ],
+    "decision_vec": [
+      [
+        "D1",
+        "KEEP"
+      ],
+      [
+        "D2",
+        "HOLD"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 2,
+    "raw_lines": 3,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "ql5zrcmb",
+    "draw": 1,
+    "wall_s": 6.07,
+    "completion_tokens": 96,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C11",
+    "category": "context_dependent_significance",
+    "score": 76.1,
+    "parts": {
+      "recall": 10.0,
+      "fidelity": 20.0,
+      "significance": 7.5,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP",
+      "C2:HOLD"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ],
+      [
+        "C2",
+        "HOLD"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 2,
+    "raw_lines": 3,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "iss7y0d2",
+    "draw": 2,
+    "wall_s": 6.028,
+    "completion_tokens": 99,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C12",
+    "category": "should_not_extract",
+    "score": 98.9,
+    "parts": {
+      "recall": 20.0,
+      "fidelity": 20.0,
+      "significance": 15.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 3.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "01:HOLD"
+    ],
+    "decision_vec": [
+      [
+        "01",
+        "HOLD"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 3,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "5ybm0tgq",
+    "draw": 1,
+    "wall_s": 6.55,
+    "completion_tokens": 101,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C12",
+    "category": "should_not_extract",
+    "score": 12.2,
+    "parts": {
+      "recall": 0.0,
+      "fidelity": 0.0,
+      "significance": 0.0,
+      "false_memory": 0.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 0.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": true,
+    "catastrophic_reasons": [
+      "kept forbidden claim: dice"
+    ],
+    "run_code": "i9cqrswv",
+    "draw": 2,
+    "wall_s": 3.796,
+    "completion_tokens": 63,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C13",
+    "category": "fiction_vs_real",
+    "score": 60.7,
+    "parts": {
+      "recall": 6.7,
+      "fidelity": 20.0,
+      "significance": 3.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 2.0,
+      "attribution": 2.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "- C1:KEEP",
+      "- C2:HOLD"
+    ],
+    "decision_vec": [
+      [
+        "- C1",
+        "KEEP"
+      ],
+      [
+        "- C2",
+        "HOLD"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 2,
+    "raw_lines": 4,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "3o05kymx",
+    "draw": 1,
+    "wall_s": 6.713,
+    "completion_tokens": 107,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C13",
+    "category": "fiction_vs_real",
+    "score": 63.0,
+    "parts": {
+      "recall": 6.7,
+      "fidelity": 20.0,
+      "significance": 5.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 2.0,
+      "attribution": 2.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP",
+      "C2:HOLD",
+      "C3:REJECT"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ],
+      [
+        "C2",
+        "HOLD"
+      ],
+      [
+        "C3",
+        "REJECT"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 3,
+    "raw_lines": 4,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "b9fbvwtq",
+    "draw": 2,
+    "wall_s": 6.869,
+    "completion_tokens": 114,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C14",
+    "category": "multi_speaker_attribution",
+    "score": 53.3,
+    "parts": {
+      "recall": 0.0,
+      "fidelity": 20.0,
+      "significance": 0.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 2.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 3,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "7tkftty2",
+    "draw": 1,
+    "wall_s": 4.088,
+    "completion_tokens": 63,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C14",
+    "category": "multi_speaker_attribution",
+    "score": 53.3,
+    "parts": {
+      "recall": 0.0,
+      "fidelity": 20.0,
+      "significance": 0.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 2.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP",
+      "C2:HOLD"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ],
+      [
+        "C2",
+        "HOLD"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 2,
+    "raw_lines": 3,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "ht15ha3v",
+    "draw": 2,
+    "wall_s": 6.255,
+    "completion_tokens": 104,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C15",
+    "category": "duplicate_suppression",
+    "score": 2.0,
+    "parts": {
+      "structure": 2.0
+    },
+    "decisions": [],
+    "decision_vec": [],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 0,
+    "raw_lines": 5,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "oa02qie2",
+    "draw": 1,
+    "wall_s": 6.004,
+    "completion_tokens": 95,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C15",
+    "category": "duplicate_suppression",
+    "score": 69.6,
+    "parts": {
+      "recall": 6.7,
+      "fidelity": 20.0,
+      "significance": 5.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "sw9hssvq",
+    "draw": 2,
+    "wall_s": 3.984,
+    "completion_tokens": 66,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C16",
+    "category": "indirect_information",
+    "score": 51.1,
+    "parts": {
+      "recall": 0.0,
+      "fidelity": 20.0,
+      "significance": 0.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 0.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "S1:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "S1",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "tqykil1b",
+    "draw": 1,
+    "wall_s": 3.796,
+    "completion_tokens": 59,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C16",
+    "category": "indirect_information",
+    "score": 51.1,
+    "parts": {
+      "recall": 0.0,
+      "fidelity": 20.0,
+      "significance": 0.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 0.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "a87200a4",
+    "draw": 2,
+    "wall_s": 3.632,
+    "completion_tokens": 60,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C17",
+    "category": "adversarial_injection",
+    "score": 2.0,
+    "parts": {
+      "structure": 2.0
+    },
+    "decisions": [],
+    "decision_vec": [],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 0,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "gktos44v",
+    "draw": 1,
+    "wall_s": 3.398,
+    "completion_tokens": 50,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C17",
+    "category": "adversarial_injection",
+    "score": 56.7,
+    "parts": {
+      "recall": 0.0,
+      "fidelity": 20.0,
+      "significance": 0.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP",
+      "C2:HOLD"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ],
+      [
+        "C2",
+        "HOLD"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 2,
+    "raw_lines": 3,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "7cec29gh",
+    "draw": 2,
+    "wall_s": 6.976,
+    "completion_tokens": 116,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C18",
+    "category": "exact_numbers",
+    "score": 56.7,
+    "parts": {
+      "recall": 0.0,
+      "fidelity": 20.0,
+      "significance": 0.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "S01:HOLD"
+    ],
+    "decision_vec": [
+      [
+        "S01",
+        "HOLD"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "ovvbwplt",
+    "draw": 1,
+    "wall_s": 4.681,
+    "completion_tokens": 73,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  },
+  {
+    "case": "C18",
+    "category": "exact_numbers",
+    "score": 69.6,
+    "parts": {
+      "recall": 6.7,
+      "fidelity": 20.0,
+      "significance": 5.0,
+      "false_memory": 15.0,
+      "temporal": null,
+      "uncertainty": 5.0,
+      "attribution": 5.0,
+      "restraint": 5.0,
+      "completeness": 0.0,
+      "structure": 1.0
+    },
+    "decisions": [
+      "C1:KEEP"
+    ],
+    "decision_vec": [
+      [
+        "C1",
+        "KEEP"
+      ]
+    ],
+    "empty": false,
+    "clean_none": false,
+    "parsed_lines": 1,
+    "raw_lines": 2,
+    "catastrophic": false,
+    "catastrophic_reasons": [],
+    "run_code": "gbkapfjb",
+    "draw": 2,
+    "wall_s": 2.907,
+    "completion_tokens": 48,
+    "finish_reason": "stop",
+    "thinking_s": 0.0,
+    "reasoning_chars": 0
+  }
+]

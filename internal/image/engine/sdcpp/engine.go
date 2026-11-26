@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -18,6 +19,7 @@ import (
 	"howl-chat/internal/image/engine"
 	"howl-chat/internal/image/scanner"
 	"howl-chat/internal/image/types"
+	"howl-chat/internal/process"
 )
 
 // TODO: Implement HuggingFace repo link support for image models
@@ -27,17 +29,39 @@ import (
 // - Consider adding model card preview or metadata fetching from HuggingFace API
 // - Reference: https://huggingface.co/docs/huggingface_hub/guides/huggingface_hub_py
 
+// childProcesses is the process authority this engine needs. It is an
+// interface so a test can observe the stop route without a production test
+// hook; the composition root always supplies the shared registry.
+type childProcesses interface {
+	Register(role process.Role, cmd *exec.Cmd, waiter func(time.Duration) error) (*process.Handle, error)
+	Current(role process.Role) *process.Handle
+	Lookup(identity process.Identity) *process.Handle
+	Remove(handle *process.Handle)
+	Stop(role process.Role, timeout time.Duration) error
+}
+
 // Engine implements engine.ImageEngine using stable-diffusion.cpp sd-server.
 type Engine struct {
 	config       types.EngineConfig
 	currentModel *types.ModelInfo
 	serverProc   *os.Process
 
+	// processRegistry records the identity and single Wait owner for sd-server
+	// and sd-cli. It may be shared with the composition root.
+	processRegistry childProcesses
+	registryOnce    sync.Once
+
 	// The goroutine in supervisor.go owns Wait() for serverProc; these carry its
 	// verdict to everything that needs to know whether the engine is alive.
 	procMu   sync.Mutex
 	procDone chan struct{}
 	procExit error
+
+	// onShutdown reports that this engine's process and execution scope have
+	// ended. The app/domain owns registration invalidation; the engine never
+	// mutates the resource registry itself.
+	shutdownMu sync.Mutex
+	onShutdown func()
 
 	// loadRun serializes loads: two jobs asking for different models would
 	// otherwise kill and replace each other's process mid-read.
@@ -79,13 +103,63 @@ type Engine struct {
 	// placement is where sd-server put this model's weights (see placement.go).
 	placement   Placement
 	placementMu sync.Mutex
+	// footprints are Howl's own measurements of the child's allocation (see
+	// footprint.go), needed because this build does not report component totals.
+	footprints  map[string]Footprint
+	footprintMu sync.Mutex
+
+	// workload is the last image request this engine ran. Placement is only
+	// interpretable next to the resolution/batch that caused its decode and
+	// activation footprint, so the report must carry both.
+	workload   imageWorkload
+	workloadMu sync.Mutex
+}
+
+type imageWorkload struct {
+	Width, Height, Batch, Steps int
+	RecordedAt                  time.Time
+}
+
+// RecordWorkload stores the request dimensions for the placement report.
+func (e *Engine) RecordWorkload(width, height, batch, steps int) {
+	e.workloadMu.Lock()
+	e.workload = imageWorkload{Width: width, Height: height, Batch: batch, Steps: steps, RecordedAt: time.Now()}
+	e.workloadMu.Unlock()
+}
+
+// LastWorkload returns the last request dimensions and when they were recorded.
+func (e *Engine) LastWorkload() (width, height, batch, steps int, at time.Time) {
+	e.workloadMu.Lock()
+	defer e.workloadMu.Unlock()
+	w := e.workload
+	return w.Width, w.Height, w.Batch, w.Steps, w.RecordedAt
 }
 
 var _ engine.ImageEngine = (*Engine)(nil)
 
-// NewEngine creates an uninitialized sdcpp engine.
+// NewEngine creates an uninitialized sdcpp engine with its own process registry.
 func NewEngine() *Engine {
-	return &Engine{}
+	return &Engine{processRegistry: process.NewRegistry()}
+}
+
+// NewEngineWithRegistry creates an engine that records its children in the
+// supplied registry, so the composition root can own one process authority.
+func NewEngineWithRegistry(registry *process.Registry) *Engine {
+	if registry == nil {
+		registry = process.NewRegistry()
+	}
+	return &Engine{processRegistry: registry}
+}
+
+// processes returns the engine's process registry, creating one for a
+// hand-built Engine in tests.
+func (e *Engine) processes() childProcesses {
+	e.registryOnce.Do(func() {
+		if e.processRegistry == nil {
+			e.processRegistry = process.NewRegistry()
+		}
+	})
+	return e.processRegistry
 }
 
 // Initialize validates the binary and directories.
@@ -110,6 +184,9 @@ func (e *Engine) Initialize(config types.EngineConfig) error {
 	}
 	if config.Port == 0 {
 		config.Port = 8081 // default, different from llama-server 8080
+	}
+	if config.IPAdapterBinaryPath == "" {
+		config.IPAdapterBinaryPath = FindIPAdapterServer()
 	}
 
 	for _, d := range []string{config.OutputDir, config.TempDir} {
@@ -151,8 +228,10 @@ func (e *Engine) LoadModel(opts types.ModelLoadOptions) error {
 	// for its signal instead of calling Wait() on the same command twice.
 	if prev := e.getServerProc(); prev != nil {
 		_ = prev.Kill()
-		e.reapStoppedProcess(5 * time.Second)
-		e.setServerProc(nil)
+		if err := e.reapStoppedProcess(5 * time.Second); err != nil {
+			return fmt.Errorf("stop previous sd-server: %w", err)
+		}
+		e.clearServerProc(prev)
 		// The process that could have owned a generation is gone, which is the one
 		// completion this engine can confirm without the backend's help.
 		e.resetGeneration(closeForReload)
@@ -165,8 +244,10 @@ func (e *Engine) LoadModel(opts types.ModelLoadOptions) error {
 	}
 	dropEmbeddedCompanions(target, opts)
 
-	// A new model gets new numbers; the previous model's placement would be a lie.
+	// A new model gets new numbers; the previous model's placement and process
+	// footprint would be a lie.
 	e.resetPlacement()
+	e.resetFootprints()
 
 	// The user may have cancelled during the disk work above, before a process
 	// existed to kill.
@@ -174,9 +255,20 @@ func (e *Engine) LoadModel(opts types.ModelLoadOptions) error {
 		return errLoadCancelled
 	}
 
+	binary, err := e.engineBinaryFor(opts)
+	if err != nil {
+		return err
+	}
 	args := e.buildServerArgs(target, opts)
-	fmt.Printf("[ImageEngine] Starting sd-server: %s %v\n", e.config.BinaryPath, args)
-	cmd := exec.Command(e.config.BinaryPath, args...)
+	// Ask the binary, not a table, whether it takes this argv. sd-server exits on
+	// the first unknown argument, which used to surface as a load timeout and a
+	// blamed binary version; naming the flag here is the refusal itself.
+	if unsupported := UnsupportedFlags(binary, args); len(unsupported) > 0 {
+		return fmt.Errorf("this sd-server build cannot start model '%s': %s. Nothing was started.",
+			target.Name, strings.Join(unsupported, "; "))
+	}
+	fmt.Printf("[ImageEngine] Starting sd-server (%s): %s %v\n", effectiveEngineProfile(opts), binary, args)
+	cmd := exec.Command(binary, args...)
 	// sd-server is a console binary. Started without this it opened a Windows
 	// Terminal window over the app for the whole generation (seen on the real
 	// profile at 1129x635 over the WebView); the video engine already hides its
@@ -193,8 +285,17 @@ func (e *Engine) LoadModel(opts types.ModelLoadOptions) error {
 		return fmt.Errorf("failed to start sd-server: %w", err)
 	}
 	e.setServerProc(cmd.Process)
-	// Exactly one goroutine reaps this child; everything else reads its verdict.
-	e.startProcessReaper(cmd)
+	// Identity is established before the reaper starts. A second sd-server
+	// cannot overwrite this slot, and a reused PID cannot inherit this
+	// registration. The reaper is still the only goroutine that calls Wait.
+	done := make(chan struct{})
+	handle, err := e.adoptServerProcess(cmd, done)
+	if err != nil {
+		proc.KillTree(cmd.Process.Pid)
+		_ = cmd.Process.Kill()
+		return fmt.Errorf("failed to establish sd-server ownership: %w", err)
+	}
+	e.startProcessReaperWithHandle(cmd, handle)
 	go e.pumpServerOutput(stdoutPipe)
 	e.currentModel = target
 
@@ -235,7 +336,19 @@ func (e *Engine) LoadModel(opts types.ModelLoadOptions) error {
 		return fmt.Errorf("sd-server did not become ready in %s: %w%s",
 			timeout.Round(time.Second), err, stderrTail(stderrBuf, 900))
 	}
+	// Capture the resident allocation now that loading is finished, before any
+	// sampling buffers exist. This is the actual after-load evidence.
+	e.recordFootprint("load")
 	return nil
+}
+
+// ServerPID reports the current sd-server child pid, or 0 when no process is
+// owned. Reclamation uses it to tie a measurement baseline to one process.
+func (e *Engine) ServerPID() int {
+	if p := e.getServerProc(); p != nil {
+		return p.Pid
+	}
+	return 0
 }
 
 // IsRunning reports whether the sd-server child still exists. This is a process
@@ -290,8 +403,41 @@ func (e *Engine) GetConfig() types.EngineConfig {
 	return e.config
 }
 
+func effectiveEngineProfile(opts types.ModelLoadOptions) string {
+	if opts.EngineProfile == types.EngineProfileIPAdapter {
+		return types.EngineProfileIPAdapter
+	}
+	return types.EngineProfileDefault
+}
+
+// engineBinaryFor resolves the capability-routed profile. Only one engine runs
+// at a time; the IP profile replaces the default process through the same
+// LoadModel path, admission and reclamation owner.
+func (e *Engine) engineBinaryFor(opts types.ModelLoadOptions) (string, error) {
+	if opts.EngineProfile != types.EngineProfileIPAdapter {
+		return e.config.BinaryPath, nil
+	}
+	binary := strings.TrimSpace(e.config.IPAdapterBinaryPath)
+	if binary == "" {
+		binary = FindIPAdapterServer()
+	}
+	if binary == "" {
+		return "", fmt.Errorf("native IP-Adapter needs the c6dfa9d engine profile, but no IP-capable sd-server was found. Set image engine config ip_adapter_binary_path or place it at runtime/stablediffusion-ip/sd-server.exe.")
+	}
+	if _, err := os.Stat(binary); err != nil {
+		return "", fmt.Errorf("native IP-Adapter engine is not accessible at %s: %w", binary, err)
+	}
+	return binary, nil
+}
+
 // GenerateTxt2Img creates an image from a text prompt via sd-server HTTP API.
 func (e *Engine) GenerateTxt2Img(opts types.ImageOptions) (*types.ImageResult, error) {
+	return e.GenerateTxt2ImgContext(context.Background(), opts)
+}
+
+// GenerateTxt2ImgContext is the workflow path: its generation scope is a child
+// of ctx, so cancellation reaches the active request instead of being ignored.
+func (e *Engine) GenerateTxt2ImgContext(ctx context.Context, opts types.ImageOptions) (*types.ImageResult, error) {
 	if e.httpClient == nil {
 		return nil, fmt.Errorf("engine not initialized")
 	}
@@ -299,12 +445,18 @@ func (e *Engine) GenerateTxt2Img(opts types.ImageOptions) (*types.ImageResult, e
 		fmt.Printf("[ImageEngine] GenerateTxt2Img: currentModel is nil (engine=%p, httpClient=%p)\n", e, e.httpClient)
 		return nil, fmt.Errorf("no model loaded")
 	}
-	h, err := e.beginGeneration(opts.JobID)
+	e.RecordWorkload(opts.Width, opts.Height, opts.BatchCount, opts.Steps)
+	h, err := e.beginGenerationWithContext(opts.JobID, ctx)
 	if err != nil {
 		return nil, err
 	}
 	e.resetServerProgress()
-	result, err := e.httpClient.txt2img(h.ctx, opts)
+	var result *types.ImageResult
+	if opts.IPAdapterImagePath != "" || opts.IPAdapterPath != "" {
+		result, err = e.httpClient.txt2imgNative(h.ctx, opts)
+	} else {
+		result, err = e.httpClient.txt2img(h.ctx, opts)
+	}
 	if err := e.settleGeneration(h, err); err != nil {
 		return nil, err
 	}
@@ -321,6 +473,7 @@ func (e *Engine) GenerateImg2Img(opts types.ImageOptions) (*types.ImageResult, e
 	if e.currentModel == nil {
 		return nil, fmt.Errorf("no model loaded")
 	}
+	e.RecordWorkload(opts.Width, opts.Height, opts.BatchCount, opts.Steps)
 	h, err := e.beginGeneration(opts.JobID)
 	if err != nil {
 		return nil, err
@@ -332,6 +485,85 @@ func (e *Engine) GenerateImg2Img(opts types.ImageOptions) (*types.ImageResult, e
 	return result, nil
 }
 
+// GenerateImg2ImgSync is the workflow path for img2img: it uses the
+// synchronous compatibility route because the async route ignores the requested
+// steps in this build. It has no live preview, but a sequential stage reports
+// its result when it completes anyway.
+func (e *Engine) GenerateImg2ImgSync(opts types.ImageOptions) (*types.ImageResult, error) {
+	if e.httpClient == nil {
+		return nil, fmt.Errorf("engine not initialized")
+	}
+	if e.currentModel == nil {
+		return nil, fmt.Errorf("no model loaded")
+	}
+	e.RecordWorkload(opts.Width, opts.Height, opts.BatchCount, opts.Steps)
+	h, err := e.beginGeneration(opts.JobID)
+	if err != nil {
+		return nil, err
+	}
+	result, err := e.httpClient.img2imgSync(h.ctx, opts)
+	if err := e.settleGeneration(h, err); err != nil {
+		return nil, err
+	}
+	result.Metadata.Model = e.currentModel.Name
+	result.Metadata.Family = e.currentModel.Family
+	return result, nil
+}
+
+// GenerateImg2ImgNativeControl is the workflow path for a ControlNet-conditioned
+// img2img stage. The compatibility route accepts the same JSON fields but does
+// not load or apply the ControlNet (verified: control and no-control requests
+// produced the identical output hash). The native async route does, and honours
+// steps when they are sent under sample_params.
+func (e *Engine) GenerateImg2ImgNativeControl(opts types.ImageOptions) (*types.ImageResult, error) {
+	return e.GenerateImg2ImgNativeControlContext(context.Background(), opts)
+}
+
+// GenerateImg2ImgNativeControlContext binds the ControlNet stage to the
+// workflow's cancellation scope.
+func (e *Engine) GenerateImg2ImgNativeControlContext(ctx context.Context, opts types.ImageOptions) (*types.ImageResult, error) {
+	if e.httpClient == nil {
+		return nil, fmt.Errorf("engine not initialized")
+	}
+	if e.currentModel == nil {
+		return nil, fmt.Errorf("no model loaded")
+	}
+	e.RecordWorkload(opts.Width, opts.Height, opts.BatchCount, opts.Steps)
+	h, err := e.beginGenerationWithContext(opts.JobID, ctx)
+	if err != nil {
+		return nil, err
+	}
+	result, err := e.httpClient.img2imgNativeControl(h.ctx, opts)
+	if err := e.settleGeneration(h, err); err != nil {
+		return nil, err
+	}
+	result.Metadata.Model = e.currentModel.Name
+	result.Metadata.Family = e.currentModel.Family
+	return result, nil
+}
+
+// NativeUpscale runs the IP-profile engine's native ESRGAN upscale. The
+// workflow calls this only when the selected profile advertises the route; the
+// pinned engine has no such endpoint and remains on the DGL path.
+func (e *Engine) NativeUpscale(ctx context.Context, imagePath, upscalerPath string, tile int) ([]byte, string, error) {
+	if e.httpClient == nil {
+		return nil, "", fmt.Errorf("engine not initialized")
+	}
+	if e.currentModel == nil {
+		return nil, "", fmt.Errorf("no model loaded")
+	}
+	e.RecordWorkload(0, 0, 0, 0)
+	h, err := e.beginGenerationWithContext("", ctx)
+	if err != nil {
+		return nil, "", err
+	}
+	data, jobID, err := e.httpClient.nativeUpscale(h.ctx, imagePath, upscalerPath, tile)
+	if err := e.settleGeneration(h, err); err != nil {
+		return nil, jobID, err
+	}
+	return data, jobID, nil
+}
+
 // GenerateInpaint fills a masked region of an image.
 func (e *Engine) GenerateInpaint(opts types.ImageOptions) (*types.ImageResult, error) {
 	if e.httpClient == nil {
@@ -340,6 +572,7 @@ func (e *Engine) GenerateInpaint(opts types.ImageOptions) (*types.ImageResult, e
 	if e.currentModel == nil {
 		return nil, fmt.Errorf("no model loaded")
 	}
+	e.RecordWorkload(opts.Width, opts.Height, opts.BatchCount, opts.Steps)
 	h, err := e.beginGeneration(opts.JobID)
 	if err != nil {
 		return nil, err
@@ -415,22 +648,57 @@ func (e *Engine) CancelJob(jobID string) error {
 	return nil
 }
 
-// Shutdown kills the server process and resets client state.
+// SetShutdownHook records the one observer that invalidates registration after
+// this engine has ended. It is set before the engine is used.
+func (e *Engine) SetShutdownHook(fn func()) {
+	e.shutdownMu.Lock()
+	e.onShutdown = fn
+	e.shutdownMu.Unlock()
+}
+
+func (e *Engine) shutdownHook() func() {
+	e.shutdownMu.Lock()
+	defer e.shutdownMu.Unlock()
+	return e.onShutdown
+}
+
+// Shutdown cancels and joins the active generation scope, kills the server
+// process, and reports that the engine ended. It does not mutate resource
+// registrations; that is the app/domain's transition in response to this exit.
 func (e *Engine) Shutdown() error {
 	e.cancelVideo()
+
+	// Capture the active scope before resetting the slot, cancel it, then join
+	// the request goroutine. The transport wrapper makes cancellation sufficient
+	// to return even when the transport itself ignores the context.
+	e.genMu.Lock()
+	var generationDone <-chan struct{}
+	if e.genHandle != nil {
+		generationDone = e.genHandle.done
+	}
+	e.genMu.Unlock()
+	e.resetGeneration(closeForShutdown)
+	if generationDone != nil {
+		<-generationDone
+	}
+
 	if cur := e.getServerProc(); cur != nil {
 		proc.KillTree(cur.Pid)
 		_ = cur.Kill()
-		e.reapStoppedProcess(5 * time.Second)
-		e.setServerProc(nil)
+		if err := e.reapStoppedProcess(5 * time.Second); err != nil {
+			return fmt.Errorf("sd-server pid %d did not exit: %w", cur.Pid, err)
+		}
+		e.clearServerProc(cur)
 	}
-	// Reset only after the child is gone, matching the load path: releasing the
-	// slot first would briefly advertise an engine whose process is being killed.
-	e.resetGeneration(closeForShutdown)
+	e.resetPlacement()
+	e.resetFootprints()
 	if e.httpClient != nil {
 		e.httpClient.resetState()
 	}
 	e.currentModel = nil
+	if hook := e.shutdownHook(); hook != nil {
+		hook()
+	}
 	return nil
 }
 
@@ -482,8 +750,15 @@ func (e *Engine) buildServerArgs(m *types.ModelInfo, opts types.ModelLoadOptions
 		}
 	}
 	args = append(args, cap.ExtraFlags...)
-	if m.Files["clip_vision"] != "" {
-		args = append(args, "--clip_vision", m.Files["clip_vision"])
+	clipVisionPath := m.Files["clip_vision"]
+	if opts.ClipVisionPath != "" {
+		clipVisionPath = opts.ClipVisionPath
+	}
+	if clipVisionPath != "" {
+		args = append(args, "--clip_vision", clipVisionPath)
+	}
+	if opts.IPAdapterPath != "" {
+		args = append(args, "--ip-adapter", opts.IPAdapterPath)
 	}
 	if m.Files["taesd"] != "" {
 		args = append(args, "--taesd", m.Files["taesd"])
@@ -491,10 +766,24 @@ func (e *Engine) buildServerArgs(m *types.ModelInfo, opts types.ModelLoadOptions
 		// decoded by the real VAE or quality drops.
 		args = append(args, "--taesd-preview-only")
 	}
-	if m.Files["control_net"] != "" {
+	controlNetPath := m.Files["control_net"]
+	if opts.ControlNetPath != "" {
+		controlNetPath = opts.ControlNetPath
+	}
+	if controlNetPath != "" {
 		// sd-server spells this with hyphens; "--control_net" is rejected as an
 		// unknown argument and the server refuses to start at all.
-		args = append(args, "--control-net", m.Files["control_net"])
+		args = append(args, "--control-net", controlNetPath)
+	}
+	if opts.UpscalerDir != "" {
+		// The installed sd-server authorizes DGL file access through its model
+		// roots. --hires-upscalers-dir alone did not make the upscaler readable
+		// from a DGL script (verified 2026-11-24: "file model read denied"), while
+		// adding the directory as a model root did. Emit both: the dedicated flag
+		// is what hires-fix uses, and the model root is what this build's DGL
+		// allowlist consults.
+		args = append(args, "--model-dir", opts.UpscalerDir)
+		args = append(args, "--hires-upscalers-dir", opts.UpscalerDir)
 	}
 
 	// Family flags (Chroma's DiT-mask switches) come from the table above.
@@ -505,14 +794,61 @@ func (e *Engine) buildServerArgs(m *types.ModelInfo, opts types.ModelLoadOptions
 	// reserves that much free VRAM, so -1 keeps 1 GiB back for sampling buffers.
 	// An explicit --params-backend would disable auto-fit, which is why it is
 	// only sent when the user asks for it.
-	args = append(args, "--max-vram", "-1")
+	//
+	// Ownership: admission decides POLICY (may this workload start, given the
+	// budget we are about to hand sd-server); sd-server's backend_fit decides
+	// PLACEMENT (which module's params live in VRAM). The budget below is the
+	// number admission was told to assume, so the two cannot drift.
+	maxVRAM := -1
+	if opts.MaxVRAM != nil {
+		maxVRAM = *opts.MaxVRAM
+	}
+	args = append(args, "--max-vram", strconv.Itoa(maxVRAM))
 
 	// STARTUP FLAGS from ModelLoadOptions
-	if opts.Backend != "" {
-		args = append(args, "--backend", opts.Backend)
+	backend := opts.Backend
+	if opts.ControlNetCPU {
+		if backend == "" {
+			backend = "controlnet=cpu"
+		} else if !strings.Contains(backend, "controlnet=") {
+			backend += ",controlnet=cpu"
+		}
+	}
+	if opts.ClipVisionCPU {
+		if backend == "" {
+			backend = "clip_vision=cpu"
+		} else if !strings.Contains(backend, "clip_vision=") {
+			backend += ",clip_vision=cpu"
+		}
+	}
+	if backend != "" {
+		args = append(args, "--backend", backend)
 	}
 	if opts.ParamsBackend != "" {
 		args = append(args, "--params-backend", opts.ParamsBackend)
+	}
+	// On-load quantization: sd-server converts weights to this type while
+	// loading, so a full f16 checkpoint can be resident when it otherwise is not.
+	if opts.WeightType != "" {
+		args = append(args, "--type", opts.WeightType)
+	}
+	if opts.ConditioningCacheSize > 0 {
+		args = append(args, "--conditioning-cache-size", strconv.Itoa(opts.ConditioningCacheSize))
+	}
+	if opts.MMap {
+		args = append(args, "--mmap")
+	}
+	// Idle-release timer (opt-in). sd-server unloads model components from RAM
+	// and VRAM after this many idle seconds. -1 disables the timer and is the
+	// engine's own default, so absence never changes behaviour: a value is only
+	// sent when a caller asks for it. Staging TTL is not forwarded: the engine
+	// already releases staged copies when a component finishes.
+	//
+	// The c6dfa9d IP profile predates this flag. Omitting it leaves the engine's
+	// own default (disabled), which is the same -1 the default profile uses; the
+	// IP profile's process is still reclaimed by Howl's single owner.
+	if opts.WeightResidencyTTL != nil && opts.EngineProfile != types.EngineProfileIPAdapter {
+		args = append(args, "--weight-residency-ttl", strconv.Itoa(*opts.WeightResidencyTTL))
 	}
 	if opts.VAETiling {
 		args = append(args, "--vae-tiling")
@@ -523,10 +859,10 @@ func (e *Engine) buildServerArgs(m *types.ModelInfo, opts types.ModelLoadOptions
 	if opts.Circular {
 		args = append(args, "--circular")
 	}
-	if opts.FlashAttention {
-		// --fa is a deprecated alias in current sd.cpp builds.
-		args = append(args, "--flash-attn", "on")
-	}
+	// Always send the mode, including auto. The old boolean could not express
+	// "off": unchecked meant no flag, which the engine treats as auto. A mode is
+	// the only truthful representation of the control.
+	args = append(args, "--flash-attn", flashAttentionMode(opts.FlashAttentionMode, opts.FlashAttention))
 	if opts.OffloadToCPU {
 		args = append(args, "--offload-to-cpu")
 	}
@@ -541,6 +877,24 @@ func (e *Engine) buildServerArgs(m *types.ModelInfo, opts types.ModelLoadOptions
 	}
 
 	return args
+}
+
+// flashAttentionMode resolves the tri-state control. Legacy callers that only
+// set the boolean keep their old intent: true meant on, false meant the engine's
+// auto default.
+func flashAttentionMode(mode string, legacy bool) string {
+	switch strings.ToLower(strings.TrimSpace(mode)) {
+	case "auto":
+		return "auto"
+	case "on":
+		return "on"
+	case "off":
+		return "off"
+	}
+	if legacy {
+		return "on"
+	}
+	return "auto"
 }
 
 func defaultThreads() int {
@@ -571,6 +925,28 @@ func FindSDServer() string {
 }
 
 func findSDServer() string { return FindSDServer() }
+
+// FindIPAdapterServer locates the native-IP engine profile. It is a compatibility
+// bridge: one alternate binary, replaced through the normal LoadModel path, not
+// a second resident engine and not a growing set of per-feature binaries.
+func FindIPAdapterServer() string {
+	if p := strings.TrimSpace(os.Getenv("HOWL_IP_ENGINE")); p != "" {
+		return p
+	}
+	exeDir := filepath.Dir(os.Args[0])
+	candidates := []string{
+		filepath.Join(exeDir, "runtime", "stablediffusion-ip", "sd-server.exe"),
+		filepath.Join(paths.ProjectRoot(), "runtime", "stablediffusion-ip", "sd-server.exe"),
+		filepath.Join(paths.ProjectRoot(), "build", "engine-baseline", "backup-c6dfa9d", "sd-server.exe"),
+		filepath.Join(paths.ProjectRoot(), "build", "engine-baseline", "backup-c6dfa9d", "sd-server"),
+	}
+	for _, c := range candidates {
+		if _, err := os.Stat(c); err == nil {
+			return c
+		}
+	}
+	return ""
+}
 
 // resolveTarget finds the model described by opts and applies manual
 // companion overrides. It starts no process, so a video run can resolve its

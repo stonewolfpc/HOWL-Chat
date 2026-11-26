@@ -1,0 +1,4 @@
+=== tinyllama-11b-chat ngl=0 budget=None preset=TinyLlama card: T0.7 / top_k50 / top_p0.95 ===
+  d1 9.315s finish=stop tok=305 ok=True
+  d2 15.675s finish=stop tok=519 ok=True
+  d3 13.935s finish=stop tok=464 ok=True

@@ -1,0 +1,36 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "M1 | KEEP | REJECT | HOLD |"
+      }
+    }
+  ],
+  "created": 1795061451,
+  "model": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\experiments\\lfm25-cpu\\models\\LFM2.5-230M-QAD-Q4_0.gguf",
+  "system_fingerprint": "b12015-a34de8618",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 14,
+    "prompt_tokens": 244,
+    "total_tokens": 258,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-M4pNq4J30ZLGdhOqCWP9fnj1yiRhgtAZ",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 244,
+    "prompt_ms": 1753.621,
+    "prompt_per_token_ms": 7.186971311475411,
+    "prompt_per_second": 139.14066950612474,
+    "predicted_n": 14,
+    "predicted_ms": 102.928,
+    "predicted_per_token_ms": 7.917538461538461,
+    "predicted_per_second": 126.30188092647288
+  }
+}

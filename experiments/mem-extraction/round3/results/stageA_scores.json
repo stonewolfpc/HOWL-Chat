@@ -1,0 +1,756 @@
+[
+  {
+    "score12": 8,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | canon confirmation from user"
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | transient reference to \"brb\""
+      },
+      "M3": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | needs clarification on fire mage traits"
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | conflicting training details"
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 1,
+        "reason": " | preferred concise format"
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 1,
+        "reason": " | birthday ambiguity requires verification"
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 78,
+    "wall_s": 2.788,
+    "reasoning_chars": 0,
+    "run_code": "ez3jx5az",
+    "label": "lfm120-instruct-official"
+  },
+  {
+    "score12": 8,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | canon confirmation from user"
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | transient reference to \"brb\""
+      },
+      "M3": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | needs clarification on mage abilities"
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | conflicting training details"
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 1,
+        "reason": " | prefers concise responses"
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 1,
+        "reason": " | birthday ambiguity requires verification"
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 77,
+    "wall_s": 2.55,
+    "reasoning_chars": 0,
+    "run_code": "xswefny0",
+    "label": "lfm120-instruct-official"
+  },
+  {
+    "score12": 8,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | canon confirmation from user"
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | transient reference to \"brb\""
+      },
+      "M3": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | needs clarification on fire mage traits"
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | conflicting training details"
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 1,
+        "reason": " | preferred concise format"
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 1,
+        "reason": " | birthday ambiguity requires verification"
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 78,
+    "wall_s": 2.551,
+    "reasoning_chars": 0,
+    "run_code": "f5fp8urt",
+    "label": "lfm120-instruct-official"
+  },
+  {
+    "score12": 1,
+    "items": {
+      "M1": {
+        "decision": null,
+        "points": 0
+      },
+      "M2": {
+        "decision": null,
+        "points": 0
+      },
+      "M3": {
+        "decision": null,
+        "points": 0
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 1,
+        "reason": ""
+      },
+      "M5": {
+        "decision": null,
+        "points": 0
+      },
+      "M6": {
+        "decision": null,
+        "points": 0
+      }
+    },
+    "item_lines": 1,
+    "strict_lines": 0,
+    "format_ok": false,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 16,
+    "wall_s": 0.26,
+    "reasoning_chars": 0,
+    "run_code": "2mc6gqwt",
+    "label": "lfm350-official"
+  },
+  {
+    "score12": 1,
+    "items": {
+      "M1": {
+        "decision": null,
+        "points": 0
+      },
+      "M2": {
+        "decision": null,
+        "points": 0
+      },
+      "M3": {
+        "decision": null,
+        "points": 0
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 1,
+        "reason": ""
+      },
+      "M5": {
+        "decision": null,
+        "points": 0
+      },
+      "M6": {
+        "decision": null,
+        "points": 0
+      }
+    },
+    "item_lines": 1,
+    "strict_lines": 0,
+    "format_ok": false,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 16,
+    "wall_s": 0.189,
+    "reasoning_chars": 0,
+    "run_code": "clo369ah",
+    "label": "lfm350-official"
+  },
+  {
+    "score12": 1,
+    "items": {
+      "M1": {
+        "decision": null,
+        "points": 0
+      },
+      "M2": {
+        "decision": null,
+        "points": 0
+      },
+      "M3": {
+        "decision": null,
+        "points": 0
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 1,
+        "reason": ""
+      },
+      "M5": {
+        "decision": null,
+        "points": 0
+      },
+      "M6": {
+        "decision": null,
+        "points": 0
+      }
+    },
+    "item_lines": 1,
+    "strict_lines": 0,
+    "format_ok": false,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 16,
+    "wall_s": 0.19,
+    "reasoning_chars": 0,
+    "run_code": "qehp1jfg",
+    "label": "lfm350-official"
+  },
+  {
+    "score12": 5,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | confirmed canon."
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | transient."
+      },
+      "M3": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | necessitates swimming ability."
+      },
+      "M4": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | contradiction."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 1,
+        "reason": " | short replies preferred."
+      },
+      "M6": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | uncertain."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 2453,
+    "wall_s": 91.051,
+    "reasoning_chars": 8954,
+    "run_code": "qzgwlj6w",
+    "label": "lfm120-think-official"
+  },
+  {
+    "score12": 8,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | canonical"
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 1,
+        "reason": " | conflicting info"
+      },
+      "M3": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | limitation"
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | conflict"
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 1,
+        "reason": " | needs confirmation"
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | uncertain"
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 2949,
+    "wall_s": 109.477,
+    "reasoning_chars": 10968,
+    "run_code": "e2rnuks4",
+    "label": "lfm120-think-official"
+  },
+  {
+    "score12": 2,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | confirmed training source."
+      },
+      "M2": {
+        "decision": null,
+        "points": 0
+      },
+      "M3": {
+        "decision": null,
+        "points": 0
+      },
+      "M4": {
+        "decision": null,
+        "points": 0
+      },
+      "M5": {
+        "decision": null,
+        "points": 0
+      },
+      "M6": {
+        "decision": null,
+        "points": 0
+      }
+    },
+    "item_lines": 1,
+    "strict_lines": 1,
+    "format_ok": false,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 1717,
+    "wall_s": 61.711,
+    "reasoning_chars": 6478,
+    "run_code": "4qbwuujq",
+    "label": "lfm120-think-official"
+  },
+  {
+    "score12": 6,
+    "items": {
+      "M1": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | reason (user explicitly stated training was canon)"
+      },
+      "M2": {
+        "decision": "KEEP",
+        "points": 0,
+        "reason": " | reason (user confirmed via conversation flow)"
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | reason (factually correct character detail consistent with lore)"
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | reason (conflicts between initial lack of contact later and claimed training fact)"
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | reason (\"brb\" = no long scene; explicit desire for brevity matches stated preference)"
+      },
+      "M6": {
+        "decision": null,
+        "points": 0
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 0,
+    "format_ok": false,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 134,
+    "wall_s": 4.091,
+    "reasoning_chars": 0,
+    "run_code": "m5abmcdd",
+    "label": "qwen35-08b-nonthink"
+  },
+  {
+    "score12": 1,
+    "items": {
+      "M1": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " because while corvin was canonized by the user, he may act differently on real world grounds; need to confirm with user."
+      },
+      "M2": {
+        "decision": null,
+        "points": 0
+      },
+      "M3": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " as stated fact contradicts her magical class definition and lore."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 1,
+        "reason": " based on ambiguous timeline; sable could have been trained in another realm or time."
+      },
+      "M5": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " because \"preference\" isn't confirmed data and doesn't affect canonical training validity for memory."
+      },
+      "M6": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " as explicitly contradictory; user's tag conflicts with the text provided."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 0,
+    "format_ok": false,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 134,
+    "wall_s": 3.865,
+    "reasoning_chars": 0,
+    "run_code": "uszmntyz",
+    "label": "qwen35-08b-nonthink"
+  },
+  {
+    "score12": 2,
+    "items": {
+      "M1": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " (user stated she was trained by ashgrave as canon)"
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " (short reply to brb doesn't match established timeline or lore conflict? no. muted reply is valid.)"
+      },
+      "M3": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " (fire mage cannot swim = false premise unless clarified later?)"
+      },
+      "M4": {
+        "decision": "KEEP",
+        "points": 0,
+        "reason": " (establishing the order of events matches user's history, no contradiction)"
+      },
+      "M5": {
+        "decision": null,
+        "points": 0
+      },
+      "M6": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " (contradiction: birthday date versus tags. two paths unclear?)"
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 0,
+    "format_ok": false,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 120,
+    "wall_s": 3.441,
+    "reasoning_chars": 0,
+    "run_code": "ipsh93qy",
+    "label": "qwen35-08b-nonthink"
+  },
+  {
+    "score12": 4,
+    "items": {
+      "M1": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | stated as canon by unverified user input; verify source material first."
+      },
+      "M2": {
+        "decision": "KEEP",
+        "points": 0,
+        "reason": " | user interaction confirmed via dialogue history provided in session log."
+      },
+      "M3": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | inconsistent with established lore; fire mage typically has elemental affinities requiring water, not a hard inability to swim."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | contradictory phrasing indicates user may be confused; awaiting clarification."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | prefered by the user; aligns on content style and response brevity constraints."
+      },
+      "M6": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | inconsistent with canonical data points in the session log regarding sable's birthday location."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 136,
+    "wall_s": 8.476,
+    "reasoning_chars": 0,
+    "run_code": "r75w0fsb",
+    "label": "qwen35-2b-nonthink"
+  },
+  {
+    "score12": 3,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user defined explicit canon law for this session."
+      },
+      "M2": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | dependent on current context window; verify timing."
+      },
+      "M3": {
+        "decision": null,
+        "points": 0
+      },
+      "M4": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | inconsistent statement: user previously confirmed she met corvin."
+      },
+      "M5": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | requires confirmation before applying to writing style."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 1,
+        "reason": " | ambiguous marker requiring user verification for status."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 5,
+    "format_ok": false,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 100,
+    "wall_s": 5.977,
+    "reasoning_chars": 0,
+    "run_code": "3penv5qb",
+    "label": "qwen35-2b-nonthink"
+  },
+  {
+    "score12": 6,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | canonized by user as fact; establish clear lore anchor."
+      },
+      "M2": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | timing unclear without confirmation on exact duration."
+      },
+      "M3": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | contradicted by m4 regarding meeting corvin; inconsistent history."
+      },
+      "M4": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | contradicts m1 if assumed fixed canon status from inception."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | instruction preference for brevity is established and clear."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | ambiguous date vs. \"maybe\" tag needs user confirmation to resolve."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 110,
+    "wall_s": 6.569,
+    "reasoning_chars": 0,
+    "run_code": "0rhp3xav",
+    "label": "qwen35-2b-nonthink"
+  },
+  {
+    "score12": 0,
+    "items": {
+      "M1": {
+        "decision": null,
+        "points": 0
+      },
+      "M2": {
+        "decision": null,
+        "points": 0
+      },
+      "M3": {
+        "decision": null,
+        "points": 0
+      },
+      "M4": {
+        "decision": null,
+        "points": 0
+      },
+      "M5": {
+        "decision": null,
+        "points": 0
+      },
+      "M6": {
+        "decision": null,
+        "points": 0
+      }
+    },
+    "item_lines": 0,
+    "strict_lines": 0,
+    "format_ok": false,
+    "truncated": true,
+    "reasoning_leaked_into_content": false,
+    "admissible": false,
+    "invented": [],
+    "empty": true,
+    "finish_reason": "length",
+    "completion_tokens": 3072,
+    "wall_s": 190.28,
+    "reasoning_chars": 12649,
+    "run_code": "yjyha4dh",
+    "label": "qwen35-2b-think"
+  }
+]

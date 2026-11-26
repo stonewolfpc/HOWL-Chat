@@ -1,0 +1,28 @@
+[
+  {"label": "lfm120-ins-t03", "base": "lfm120-instruct-official",
+   "sampling": {"temperature": 0.3},
+   "preset": "T0.3 (one factor off Liquid's 0.1), top_k50, rep1.05",
+   "notes": "Stage B: temperature only"},
+  {"label": "lfm120-ins-t05", "base": "lfm120-instruct-official",
+   "sampling": {"temperature": 0.5},
+   "preset": "T0.5, top_k50, rep1.05",
+   "notes": "Stage B: temperature only"},
+  {"label": "lfm120-ins-t08", "base": "lfm120-instruct-official",
+   "sampling": {"temperature": 0.8},
+   "preset": "T0.8 (round-2 shared setting), top_k50, rep1.05",
+   "notes": "Stage B: reproduces round 2 temperature under the tuned chain"},
+  {"label": "lfm120-ins-t08-rep10", "base": "lfm120-instruct-official",
+   "sampling": {"temperature": 0.8, "repeat_penalty": 1.0},
+   "preset": "T0.8 with repetition penalty disabled",
+   "notes": "Stage B: repetition penalty only, at the better temperature"},
+
+  {"label": "qwen35-2b-nonthink-pres0", "base": "qwen35-2b-nonthink",
+   "sampling": {"presence_penalty": 0.0},
+   "preset": "official T1.0/top_p1.0/top_k20 with presence 0.0",
+   "notes": "Stage B: isolates the presence_penalty=2.0 in Qwen's own non-thinking preset"},
+  {"label": "qwen35-2b-nonthink-round2", "base": "qwen35-2b-nonthink",
+   "sampling": {"temperature": 0.8, "top_p": 0.95, "top_k": 40, "min_p": 0.05,
+                "presence_penalty": 0.0, "repeat_penalty": 1.0},
+   "preset": "round-2 shared chain: T0.8 / top_p0.95 / top_k40 / min_p0.05",
+   "notes": "Stage B: direct reproduction of the 9.33/12 round-2 condition"}
+]

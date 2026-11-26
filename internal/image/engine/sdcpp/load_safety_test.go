@@ -36,17 +36,16 @@ func writeGGUF(t *testing.T, dir string, kv uint64) string {
 	return path
 }
 
-func TestValidateCheckpointRejectsGGUFWithoutMetadata(t *testing.T) {
+// A GGUF with no key/value pairs is not automatically unusable: sd.cpp identifies
+// a classic full checkpoint from its tensor layout, and a metadata-stripped SD2.1
+// Q8 conversion loads and samples in the shipped sd-server. The pre-launch gate
+// therefore warns and lets the engine decide, instead of refusing a working file.
+// A file that genuinely cannot be identified still fails fast, and the ready-or-
+// exit path names version detection as the cause.
+func TestValidateCheckpointLaunchesGGUFWithoutMetadata(t *testing.T) {
 	path := writeGGUF(t, t.TempDir(), 0)
-	err := validateCheckpoint(&types.ModelInfo{Files: map[string]string{"model": path}})
-	if err == nil {
-		t.Fatal("a GGUF with no metadata must be rejected before launch")
-	}
-	if !strings.Contains(err.Error(), "no metadata") {
-		t.Errorf("error does not name the real cause: %v", err)
-	}
-	if strings.Contains(err.Error(), "update your sd-server") {
-		t.Error("error blames the binary version for a broken file")
+	if err := validateCheckpoint(&types.ModelInfo{Files: map[string]string{"model": path}}); err != nil {
+		t.Fatalf("a metadata-stripped GGUF must reach the engine, got: %v", err)
 	}
 }
 
@@ -159,6 +158,51 @@ func TestParamsBackendOnlySentWhenRequested(t *testing.T) {
 	}
 }
 
+// The hardware settings must reach sd-server verbatim and stay opt-in: the
+// default argv is exactly what it was before they existed (--max-vram -1, no
+// --type, no cache flags).
+func TestEngineHardwareFlagsReachArgv(t *testing.T) {
+	e := &Engine{config: types.EngineConfig{Port: 8081}}
+	m := &types.ModelInfo{Family: "sdxl", Files: map[string]string{"model": `E:\m.safetensors`}}
+
+	def := strings.Join(e.buildServerArgs(m, types.ModelLoadOptions{}), " ")
+	if !strings.Contains(def, "--max-vram -1") {
+		t.Fatalf("default budget must remain -1: %s", def)
+	}
+	for _, flag := range []string{"--type", "--cache-mode", "--conditioning-cache-size", "--mmap"} {
+		if strings.Contains(def, flag) {
+			t.Errorf("%s sent by default; it must stay opt-in: %s", flag, def)
+		}
+	}
+
+	budget := 0
+	custom := strings.Join(e.buildServerArgs(m, types.ModelLoadOptions{
+		MaxVRAM:               &budget,
+		WeightType:            "q8_0",
+		CacheMode:             "ucache",
+		CacheOption:           "threshold=1.5",
+		ConditioningCacheSize: 8,
+		MMap:                  true,
+	}), " ")
+	for _, want := range []string{
+		"--max-vram 0",
+		"--type q8_0",
+		"--cache-mode ucache",
+		"--cache-option threshold=1.5",
+		"--conditioning-cache-size 8",
+		"--mmap",
+	} {
+		if !strings.Contains(custom, want) {
+			t.Errorf("%q missing from argv: %s", want, custom)
+		}
+	}
+
+	reserveTwo := -2
+	if got := strings.Join(e.buildServerArgs(m, types.ModelLoadOptions{MaxVRAM: &reserveTwo}), " "); !strings.Contains(got, "--max-vram -2") {
+		t.Errorf("negative budget must pass through verbatim: %s", got)
+	}
+}
+
 // Z-Image must arrive with the split-component flag and both companions; that
 // combination is what actually loads on this machine.
 func TestZImageArgsCarryDiffusionModelAndCompanions(t *testing.T) {
@@ -184,3 +228,57 @@ func TestZImageArgsCarryDiffusionModelAndCompanions(t *testing.T) {
 }
 
 var _ = time.Second
+
+// A full checkpoint carries its own text encoder, and attaching a different one
+// is not harmless: SD2.1 uses OpenCLIP-H (1024-wide context), so an external
+// 768-wide CLIP-L made sd-server abort mid-sampling on ggml_can_mul_mat.
+func TestClassicCheckpointFamiliesTakeNoExternalConditioner(t *testing.T) {
+	e := &Engine{config: types.EngineConfig{Port: 8081}}
+	for _, family := range []string{"sd1.5", "sd2.1"} {
+		m := &types.ModelInfo{
+			Family: family,
+			Files: map[string]string{
+				"model":  `E:\m.gguf`,
+				"clip_l": `E:\clip_l.safetensors`,
+			},
+		}
+		args := strings.Join(e.buildServerArgs(m, types.ModelLoadOptions{}), " ")
+		if strings.Contains(args, "--clip_l") {
+			t.Errorf("%s was handed an external CLIP-L: %s", family, args)
+		}
+	}
+}
+
+// Chroma decodes with the Flux autoencoder, so the shared-group table must say
+// so; otherwise the Flux AE on disk reads as a mismatched VAE and the family
+// cannot start.
+func TestChromaSharesTheFluxAutoencoder(t *testing.T) {
+	if !SharesAutoencoder("chroma", "flux") {
+		t.Fatal("chroma must accept the Flux autoencoder")
+	}
+	if SharesAutoencoder("chroma", "qwen_image") {
+		t.Fatal("chroma must not accept the Qwen-Image autoencoder")
+	}
+}
+
+// SD 3.5 decodes with the SD3 autoencoder, the same fact scanner.CompatibleVAE
+// records. Both owners must agree or a present sd3_vae reads as missing.
+func TestSD35SharesTheSD3Autoencoder(t *testing.T) {
+	if !SharesAutoencoder("sd3.5", "sd3") {
+		t.Fatal("sd3.5 must accept the SD3 autoencoder")
+	}
+	if SharesAutoencoder("sd3.5", "flux") {
+		t.Fatal("sd3.5 must not accept the Flux autoencoder")
+	}
+}
+
+// HiDream decodes with the Flux autoencoder, so a present ae.safetensors must
+// not read as a missing VAE (it did, and the family could not start).
+func TestHiDreamSharesTheFluxAutoencoder(t *testing.T) {
+	if !SharesAutoencoder("hidream", "flux") {
+		t.Fatal("hidream must accept the Flux autoencoder")
+	}
+	if SharesAutoencoder("hidream", "sd3") {
+		t.Fatal("hidream must not accept the SD3 autoencoder")
+	}
+}

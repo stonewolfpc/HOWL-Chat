@@ -371,9 +371,12 @@ func TestPipelineR8LazyTTSOwnership(t *testing.T) {
 		}
 	}
 
+	// Residency contract: the active engine and the current voice stay loaded;
+	// the superseded voice is reclaimed when the next voice is loaded, so
+	// repeated voice changes cannot accumulate providers forever.
 	ids := ttsIDs(p.loader.GetLoadedModels())
-	if len(ids) != 3 {
-		t.Fatalf("tracked TTS ids = %v, want 3", ids)
+	if len(ids) != 2 {
+		t.Fatalf("tracked TTS ids = %v, want the active engine plus the current voice", ids)
 	}
 	seen := map[string]bool{}
 	for _, id := range ids {
@@ -381,6 +384,9 @@ func TestPipelineR8LazyTTSOwnership(t *testing.T) {
 			t.Fatalf("duplicate TTS id %q", id)
 		}
 		seen[id] = true
+	}
+	if got := set.tts[types.TTSPiper].releaseCalls.Load(); got != 1 {
+		t.Fatalf("superseded voice release calls = %d, want 1 controlled reclamation", got)
 	}
 
 	failedVoice := "test-voice-three"
@@ -394,8 +400,8 @@ func TestPipelineR8LazyTTSOwnership(t *testing.T) {
 	if err := p.ensureTTSVoice(context.Background(), failedVoice); err == nil {
 		t.Fatal("ensureTTSVoice succeeded, want failure")
 	}
-	if got := len(ttsIDs(p.loader.GetLoadedModels())); got != 3 {
-		t.Fatalf("tracked TTS ids after failed replacement = %d, want 3", got)
+	if got := len(ttsIDs(p.loader.GetLoadedModels())); got != 2 {
+		t.Fatalf("tracked TTS ids after failed replacement = %d, want the still-resident 2", got)
 	}
 	if p.loadedVoice != voices[1] {
 		t.Fatalf("active voice = %q, want %q", p.loadedVoice, voices[1])
@@ -538,7 +544,7 @@ func TestPipelineManagerR2StrictReplacement(t *testing.T) {
 	manager, sets := scriptedManager(t, []providerBehavior{{}, {asrInitErr: asrErr}})
 	mustApply(t, manager, settingsBoth)
 
-	status, _, err := manager.Apply(context.Background(), settingsBoth)
+	status, _, err := manager.Apply(context.Background(), settingsBothReplaced)
 	if !errors.Is(err, asrErr) {
 		t.Fatalf("replacement error = %v, want ASR error", err)
 	}

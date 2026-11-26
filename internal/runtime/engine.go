@@ -29,19 +29,37 @@ type Client interface {
 	IsLoaded() bool
 }
 
+// ChatPlacement is the last chat load's plan and the placement the engine
+// reported. It is a record for the user, not an admission input: the next load
+// reads the resource ledger, never this report.
+type ChatPlacement struct {
+	Model            string          `json:"model"`
+	PlanSource       string          `json:"plan_source"`
+	PlannedGPULayers int             `json:"planned_gpu_layers"`
+	PlannedContext   int             `json:"planned_context"`
+	PlannedBatch     int             `json:"planned_batch"`
+	PlannedVRAMMB    int64           `json:"planned_vram_mb"`
+	PlannedRAMMB     int64           `json:"planned_ram_mb"`
+	Actual           llama.Placement `json:"actual"`
+	MatchesPlan      bool            `json:"matches_plan"`
+	Message          string          `json:"message"`
+}
+
 // Engine is the runtime's engine owner: the inference client, the model
 // manager built on it, load progress and stage, and the bookkeeping for the
-// last load (the profile and the chat template this app injected).
+// last load (the profile, the chat template this app injected, and the
+// placement the engine reported).
 //
 // A nil *Engine is an absent runtime, not a second state store: reads return
 // zero values and writes are dropped. That keeps a partially constructed App
 // (tests, probes) working without duplicating progress fields on it.
 type Engine struct {
-	mu           sync.RWMutex
-	client       Client
-	models       *model.Manager
-	profile      *types.ModelProfile
-	autoTemplate string
+	mu            sync.RWMutex
+	client        Client
+	models        *model.Manager
+	profile       *types.ModelProfile
+	autoTemplate  string
+	chatPlacement *ChatPlacement
 
 	// Load progress is lock-free so the progress poller never waits on a load.
 	// progress stores progress*1000 as an integer.
@@ -174,5 +192,27 @@ func (e *Engine) SetAutoTemplate(template string) {
 	}
 	e.mu.Lock()
 	e.autoTemplate = template
+	e.mu.Unlock()
+}
+
+// ChatPlacement returns the last load's plan/actual report, or nil before a
+// load has reached a healthy server.
+func (e *Engine) ChatPlacement() *ChatPlacement {
+	if e == nil {
+		return nil
+	}
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+	return e.chatPlacement
+}
+
+// SetChatPlacement records the plan and observed placement for the last load.
+// A nil report clears it, which is what an unload or a failed load does.
+func (e *Engine) SetChatPlacement(placement *ChatPlacement) {
+	if e == nil {
+		return
+	}
+	e.mu.Lock()
+	e.chatPlacement = placement
 	e.mu.Unlock()
 }

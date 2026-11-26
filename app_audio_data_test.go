@@ -177,9 +177,13 @@ func TestMicrophoneServiceUsesWAVDataBindingAndComposer(t *testing.T) {
 		t.Fatalf("read audio service: %v", err)
 	}
 	text := string(service)
+	// Object URLs are legitimate for browser playback (the TTS path turns the
+	// GetTTSAudioData bytes into a blob URL). The boundary this test guards is
+	// the old capture handoff: a browser object URL passed to the backend as if
+	// it were a filesystem path.
 	for _, forbidden := range []string{
 		"MediaRecorder",
-		"createObjectURL",
+		"saveBlobToTempFile",
 		"getElementById('chat-input')",
 		"TranscribeAudio(tempPath)",
 	} {

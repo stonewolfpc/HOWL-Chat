@@ -1,0 +1,214 @@
+alone {'wall_s': 1.727, 'ttft_s': 0.274, 'peak_rss_mb': 1097.5, 'peak_vram_mb': 2027}
+with primary {'wall_s': 1.731, 'ttft_s': 0.264, 'peak_rss_mb': 1097.9, 'peak_vram_mb': 7298, 'primary_vram_mb': 7298}
+{
+ "primary": "qwen35-9b-think ngl99",
+ "extract": "lfm120-instruct-official ngl0",
+ "alone": {
+  "wall_s": 1.727,
+  "ttft_s": 0.274,
+  "peak_rss_mb": 1097.5,
+  "peak_vram_mb": 2027
+ },
+ "with_primary": {
+  "wall_s": 1.731,
+  "ttft_s": 0.264,
+  "peak_rss_mb": 1097.9,
+  "peak_vram_mb": 7298,
+  "primary_vram_mb": 7298
+ }
+}
+SKIP complete corpus-4b-nonthink
+SKIP complete corpus-lfm120-instruct
+SKIP complete corpus-lfm3-think-512
+SKIP complete corpus-4b-think-512
+=== corpus corpus-lfm120-t08 cases=18 draws=2 budget=None ===
+  C01 d1    1.7s fin=stop tok=45
+  C01 d2    1.3s fin=stop tok=39
+  C02 d1    2.3s fin=stop tok=64
+  C02 d2    1.5s fin=stop tok=45
+  C03 d1    3.7s fin=stop tok=109
+  C03 d2    2.7s fin=stop tok=83
+  C04 d1    2.2s fin=stop tok=61
+  C04 d2    1.8s fin=stop tok=55
+  C05 d1    2.7s fin=stop tok=78
+  C05 d2    1.5s fin=stop tok=45
+  C06 d1    1.5s fin=stop tok=39
+  C06 d2    1.7s fin=stop tok=52
+  C07 d1    0.6s fin=stop tok=11
+  C07 d2    2.2s fin=stop tok=65
+  C08 d1    2.1s fin=stop tok=60
+  C08 d2    1.8s fin=stop tok=54
+  C09 d1    1.0s fin=stop tok=26
+  C09 d2    0.7s fin=stop tok=21
+  C10 d1    3.4s fin=stop tok=96
+  C10 d2    1.9s fin=stop tok=57
+  C11 d1    2.4s fin=stop tok=68
+  C11 d2    1.4s fin=stop tok=41
+  C12 d1    2.1s fin=stop tok=57
+  C12 d2    1.8s fin=stop tok=55
+  C13 d1    1.5s fin=stop tok=36
+  C13 d2    1.6s fin=stop tok=49
+  C14 d1    3.4s fin=stop tok=97
+  C14 d2    1.7s fin=stop tok=52
+  C15 d1    4.2s fin=stop tok=122
+  C15 d2    2.0s fin=stop tok=61
+  C16 d1    1.8s fin=stop tok=49
+  C16 d2    1.4s fin=stop tok=41
+  C17 d1    2.3s fin=stop tok=65
+  C17 d2    1.2s fin=stop tok=35
+  C18 d1    1.5s fin=stop tok=41
+  C18 d2    1.6s fin=stop tok=49
+TOTAL 198
+=== qwen35-2b-nonthink-r2cap ngl=0 budget=None preset=round-2 chain with the round-2 400-token cap and 2048 ctx ===
+  d1 6.695s finish=stop tok=108 ok=True
+  d2 8.429s finish=stop tok=143 ok=True
+  d3 5.898s finish=stop tok=100 ok=True
+=== lfm120-ins-r2cap ngl=0 budget=None preset=round-2 chain + round-2 cap, LFM at the shared sampler ===
+  d1 2.487s finish=stop tok=69 ok=True
+  d2 2.42s finish=stop tok=73 ok=True
+  d3 2.45s finish=stop tok=74 ok=True
+=== qwen35-4b-nonthink-gpufull ngl=99 budget=None preset=Qwen3.5 4B/9B non-thinking general preset ===
+  d1 2.556s finish=stop tok=99 ok=True
+  d2 2.206s finish=stop tok=92 ok=True
+[
+  {
+    "run_code": "k4bewsj2",
+    "tag": "gpu-full-qwen35-4b-nonthink-gpufull",
+    "label": "qwen35-4b-nonthink-gpufull",
+    "preset": "Qwen3.5 4B/9B non-thinking general preset",
+    "notes": "",
+    "draw": 1,
+    "seed": 4101,
+    "file": "Qwen3.5-4B-Q4_K_M.gguf",
+    "file_mb": 2740.9,
+    "ngl": 99,
+    "ctx": 4096,
+    "sampling": {
+      "temperature": 0.7,
+      "top_p": 0.8,
+      "top_k": 20,
+      "min_p": 0.0,
+      "presence_penalty": 1.5,
+      "repeat_penalty": 1.0
+    },
+    "max_tokens": 768,
+    "reasoning_budget": null,
+    "reasoning_effort": null,
+    "reasoning_flag": null,
+    "extra_body": {
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    },
+    "system": null,
+    "command": [
+      "C:\\Users\\StoneWolfPC\\HOWL_Chat\\runtime\\llama\\llama-server.exe",
+      "-m",
+      "C:\\Users\\StoneWolfPC\\HOWL_Chat\\experiments\\mem-extraction\\round3\\models\\Qwen3.5-4B-Q4_K_M.gguf",
+      "-c",
+      "4096",
+      "-ngl",
+      "99",
+      "-np",
+      "1",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "5099",
+      "--jinja",
+      "--reasoning-format",
+      "deepseek",
+      "--metrics",
+      "-fa",
+      "on",
+      "--kv-unified"
+    ],
+    "load_s": 2.41,
+    "erase_ms": null,
+    "finish_reason": "stop",
+    "prompt_tokens": 230,
+    "completion_tokens": 99,
+    "ttft_s": 0.289,
+    "thinking_s": 0.0,
+    "answer_s": 2.267,
+    "wall_s": 2.556,
+    "prefill_ms": 262.9,
+    "decode_ms": 2267.2,
+    "decode_tok_s": 43.23,
+    "prefill_tok_s": 874.87,
+    "peak_rss_mb": 3265.5,
+    "peak_vram_mb": 4833,
+    "peak_gpu_util": 96,
+    "kind": "triage"
+  },
+  {
+    "run_code": "ewktjzvh",
+    "tag": "gpu-full-qwen35-4b-nonthink-gpufull",
+    "label": "qwen35-4b-nonthink-gpufull",
+    "preset": "Qwen3.5 4B/9B non-thinking general preset",
+    "notes": "",
+    "draw": 2,
+    "seed": 4102,
+    "file": "Qwen3.5-4B-Q4_K_M.gguf",
+    "file_mb": 2740.9,
+    "ngl": 99,
+    "ctx": 4096,
+    "sampling": {
+      "temperature": 0.7,
+      "top_p": 0.8,
+      "top_k": 20,
+      "min_p": 0.0,
+      "presence_penalty": 1.5,
+      "repeat_penalty": 1.0
+    },
+    "max_tokens": 768,
+    "reasoning_budget": null,
+    "reasoning_effort": null,
+    "reasoning_flag": null,
+    "extra_body": {
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    },
+    "system": null,
+    "command": [
+      "C:\\Users\\StoneWolfPC\\HOWL_Chat\\runtime\\llama\\llama-server.exe",
+      "-m",
+      "C:\\Users\\StoneWolfPC\\HOWL_Chat\\experiments\\mem-extraction\\round3\\models\\Qwen3.5-4B-Q4_K_M.gguf",
+      "-c",
+      "4096",
+      "-ngl",
+      "99",
+      "-np",
+      "1",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "5099",
+      "--jinja",
+      "--reasoning-format",
+      "deepseek",
+      "--metrics",
+      "-fa",
+      "on",
+      "--kv-unified"
+    ],
+    "load_s": 2.41,
+    "erase_ms": null,
+    "finish_reason": "stop",
+    "prompt_tokens": 230,
+    "completion_tokens": 92,
+    "ttft_s": 0.074,
+    "thinking_s": 0.0,
+    "answer_s": 2.132,
+    "wall_s": 2.206,
+    "prefill_ms": 56.6,
+    "decode_ms": 2131.4,
+    "decode_tok_s": 42.69,
+    "prefill_tok_s": 70.71,
+    "peak_rss_mb": 3265.7,
+    "peak_vram_mb": 4833,
+    "peak_gpu_util": 96,
+    "kind": "triage"
+  }
+]

@@ -99,6 +99,11 @@ func (a *App) ImportCharacters(characters []interface{}) ([]map[string]interface
 		}
 	}
 	results, err := a.characterStore().Import(documents)
+	if len(results) > 0 {
+		if recordErr := a.recordCharacterCutover(results); recordErr != nil && err == nil {
+			err = recordErr
+		}
+	}
 	if err != nil {
 		a.logError(errors.CHARSaveFail, errors.High, "character.import", "app-characters.go", err)
 		return nil, fmt.Errorf("ImportCharacters: %w", err)
@@ -116,28 +121,6 @@ func (a *App) ImportCharacters(characters []interface{}) ([]map[string]interface
 		out = append(out, entry)
 	}
 	return out, nil
-}
-
-// RollbackCharacters restores what an ImportCharacters call replaced.
-func (a *App) RollbackCharacters(results []interface{}) error {
-	entries := make([]characterstore.ImportResult, 0, len(results))
-	for _, raw := range results {
-		result, ok := raw.(map[string]interface{})
-		if !ok || result == nil {
-			continue
-		}
-		entry := characterstore.ImportResult{}
-		entry.ID, _ = result["id"].(string)
-		entry.Status, _ = result["status"].(string)
-		entry.Revision, _ = result["revision"].(string)
-		entry.Previous, _ = result["previous"].(map[string]interface{})
-		entries = append(entries, entry)
-	}
-	if err := a.characterStore().Rollback(entries); err != nil {
-		a.logError(errors.CHARSaveFail, errors.High, "character.rollback", "app-characters.go", err)
-		return fmt.Errorf("RollbackCharacters: %w", err)
-	}
-	return nil
 }
 
 // getCharactersDir resolves the Characters directory path (cwd or exe dir).

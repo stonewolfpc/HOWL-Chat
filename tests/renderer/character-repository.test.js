@@ -123,7 +123,7 @@ test('a conflicting versioned cache cannot override the backend list', async () 
     assert.equal(cached.characters[0].description, 'backend');
 });
 
-test('a pre-cutover raw array is imported once and replaced by the envelope', async () => {
+test('a pre-cutover raw array stays browser-owned until an explicit import', async () => {
     const harness = createHarness({
         backend: [],
         cache: JSON.stringify([{ id: 'chr_legacy', name: 'Legacy' }]),
@@ -131,11 +131,16 @@ test('a pre-cutover raw array is imported once and replaced by the envelope', as
 
     await harness.state.ready;
 
-    assert.ok(harness.operations.indexOf('ImportCharacters') < harness.operations.indexOf('GetCharacters'));
+    assert.equal(harness.operations.includes('ImportCharacters'), false);
+    assert.equal(harness.state.source, 'legacy');
     assert.equal(harness.state.all().some(c => c.id === 'chr_legacy'), true);
-    const cached = JSON.parse(harness.store.get(CACHE_KEY));
-    assert.equal(cached.version, 2);
-    assert.equal(Array.isArray(cached), false);
+    assert.equal(Array.isArray(JSON.parse(harness.store.get(CACHE_KEY))), true);
+
+    await harness.state.importLegacy();
+
+    assert.ok(harness.operations.indexOf('ImportCharacters') > 0);
+    assert.equal(harness.state.all().some(c => c.id === 'chr_legacy'), true);
+    assert.equal(JSON.parse(harness.store.get(CACHE_KEY)).version, 2);
 });
 
 test('a save reaches the backend before the projection or cache changes', async () => {

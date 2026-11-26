@@ -40,7 +40,7 @@ async function syncLorebooks() {
         }
     }
     try {
-        const lorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+        const lorebooks = (window.LorebookRepo ? window.LorebookRepo.all() : []);
         window.go.main.App.SetLorebooks(Array.isArray(lorebooks) ? lorebooks : []).catch(error => {
             console.error('Failed to sync lorebooks:', error);
         });
@@ -345,6 +345,7 @@ async function streamSingleCharacterResponse(message, character) {
             <div class="chat-text"></div>
             <div class="chat-think"></div>
             <div class="chat-bubble-buttons">
+                <button class="bubble-button icon-button" onclick="window.AudioService && AudioService.speakMessage(this)" title="Speak this message">${ICONS.speaker}</button>
                 <button class="bubble-button icon-button" onclick="regenerateMessage(this)" title="Regenerate">${ICONS.regenerate}</button>
                 <button class="bubble-button icon-button" onclick="previousMessage(this)" title="Previous" id="prev-btn">${ICONS.previous}</button>
                 <button class="bubble-button icon-button" onclick="nextMessage(this)" title="Next" id="next-btn">${ICONS.next}</button>
@@ -476,6 +477,7 @@ async function streamAssistantResponseFromBackend(message) {
         <div class="chat-text"></div>
         <div class="chat-think"></div>
         <div class="chat-bubble-buttons">
+            <button class="bubble-button icon-button" onclick="window.AudioService && AudioService.speakMessage(this)" title="Speak this message">${ICONS.speaker}</button>
             <button class="bubble-button icon-button" onclick="regenerateMessage(this)" title="Regenerate">${ICONS.regenerate}</button>
             <button class="bubble-button icon-button" onclick="previousMessage(this)" title="Previous" id="prev-btn">${ICONS.previous}</button>
             <button class="bubble-button icon-button" onclick="nextMessage(this)" title="Next" id="next-btn">${ICONS.next}</button>
@@ -595,6 +597,7 @@ async function streamAssistantResponseFromBackendWithImage(message, imageData) {
         <div class="chat-text"></div>
         <div class="chat-think"></div>
         <div class="chat-bubble-buttons">
+            <button class="bubble-button icon-button" onclick="window.AudioService && AudioService.speakMessage(this)" title="Speak this message">${ICONS.speaker}</button>
             <button class="bubble-button icon-button" onclick="regenerateMessage(this)" title="Regenerate">${ICONS.regenerate}</button>
             <button class="bubble-button icon-button" onclick="previousMessage(this)" title="Previous" id="prev-btn">${ICONS.previous}</button>
             <button class="bubble-button icon-button" onclick="nextMessage(this)" title="Next" id="next-btn">${ICONS.next}</button>

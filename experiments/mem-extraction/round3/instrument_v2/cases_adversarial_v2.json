@@ -1,0 +1,121 @@
+{
+  "version": 2,
+  "written": "2026-11-19",
+  "status": "REFERENCE ONLY — no inference has been run on these cases. They define the ownership/scope and atomicity distinctions the v2 instrument must be able to score. They are not evidence about any model.",
+  "schema_note": "Same required/forbidden schema as corpus.json, plus optional temporal_ids, attribution_forbidden, compound_ok, noise_markers and an ownership block. The ownership block is declarative: the evaluator cannot infer ownership from free text.",
+  "cases": [
+    {
+      "id": "O01",
+      "category": "character_belief_not_world_fact",
+      "length": "short",
+      "conversation": "[user] Jim: \"The king is a criminal. He sold the northern road to the guild.\"\n[user] Lisa: \"That's not true. The king is wonderful — he rebuilt the harbour after the flood.\"\n[user] Bob: \"I've served him twenty years. The king is honorable, whatever the rumours say.\"\n[assistant] The three of them let the argument drop and drank.",
+      "required": [],
+      "forbidden": [],
+      "notes": "Three incompatible beliefs about the same topic. None establishes the objective truth about the king. Correct behaviour is to keep three separate character-scoped beliefs (or store none), never one world fact.",
+      "ownership": {
+        "scenario": "court",
+        "characters": {
+          "jim": ["Jim"],
+          "lisa": ["Lisa"],
+          "bob": ["Bob"]
+        },
+        "scenario_markers": {
+          "court": ["king", "throne", "court"],
+          "harbour": ["harbour", "tide", "dock", "flood"]
+        },
+        "claims": [
+          {
+            "id": "K1",
+            "topic": "king",
+            "topic_hints": ["king"],
+            "holders": ["jim"],
+            "scope": "character_belief",
+            "polarity": "negative",
+            "polarity_hints": ["criminal", "sold", "traitor"],
+            "exclusive": true,
+            "must_not_promote": true
+          },
+          {
+            "id": "K2",
+            "topic": "king",
+            "topic_hints": ["king"],
+            "holders": ["lisa"],
+            "scope": "character_belief",
+            "polarity": "positive",
+            "polarity_hints": ["wonderful", "rebuilt", "generous"],
+            "exclusive": true,
+            "must_not_promote": true
+          },
+          {
+            "id": "K3",
+            "topic": "king",
+            "topic_hints": ["king"],
+            "holders": ["bob"],
+            "scope": "character_belief",
+            "polarity": "positive",
+            "polarity_hints": ["honorable", "honourable", "served"],
+            "exclusive": true,
+            "must_not_promote": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "O02",
+      "category": "private_disclosure_recipient",
+      "length": "short",
+      "conversation": "[user] Jim (to Lisa, quietly): \"The vault code is 4417. Don't tell Bob.\"\n[user] Lisa: \"I won't.\"\n[assistant] Bob was across the room, studying the fire.",
+      "required": [],
+      "forbidden": [],
+      "notes": "A disclosure with named recipients. Jim's private knowledge may become Lisa's knowledge; it must not become Bob's knowledge or an unattributed world fact. The conversation layer establishes the disclosure event and its recipients; the memory mechanism must not infer exposure.",
+      "ownership": {
+        "scenario": "court",
+        "characters": {
+          "jim": ["Jim"],
+          "lisa": ["Lisa"],
+          "bob": ["Bob"]
+        },
+        "claims": [
+          {
+            "id": "D1",
+            "topic": "vault code",
+            "topic_hints": ["vault", "4417"],
+            "holders": ["jim", "lisa"],
+            "scope": "participant_disclosure",
+            "polarity": "neutral",
+            "exclusive": true,
+            "must_not_promote": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "O03",
+      "category": "scenario_boundary",
+      "length": "short",
+      "conversation": "[user] (scene: the harbour at low tide) The dockmaster says the tide gate jams every winter.\n[assistant] The gate groaned somewhere below the pier.\n[user] (scene change: the king's court, three weeks later) A herald announces the winter levy.",
+      "required": [],
+      "forbidden": [],
+      "notes": "The tide-gate fact is true in the harbour scene. It must not silently migrate into a court-scene memory record as though it were a court fact.",
+      "ownership": {
+        "scenario": "court",
+        "characters": {},
+        "scenario_markers": {
+          "court": ["court", "herald", "levy"],
+          "harbour": ["harbour", "tide", "dock", "gate", "pier"]
+        },
+        "claims": []
+      }
+    },
+    {
+      "id": "O04",
+      "category": "legitimate_joint_fact",
+      "length": "short",
+      "conversation": "[user] Halden trained Sable as a cartographer at Ossary for nine years, and she still uses his compass.",
+      "required": [],
+      "forbidden": [],
+      "notes": "Control for the atomicity rule: one subject, one event, several details. This must be judged a legitimate compound, not a merge of distinct facts. Splitting it is not required and is not penalised.",
+      "compound_ok": [["J1", "J2", "J3"]]
+    }
+  ]
+}

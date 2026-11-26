@@ -74,7 +74,7 @@ function getScenarioLorebookRefs(scenario) {
 }
 
 function lorebookToRef(lorebook) {
-    const all = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]')
+    const all = (window.LorebookRepo ? window.LorebookRepo.all() : [])
         .map(normalizeStoredLorebook).filter(Boolean);
     const refId    = (lorebook?.id || '').toString().trim().toLowerCase();
     const canonical = refId ? all.find(lb => (lb.id || '').toString().trim().toLowerCase() === refId) : null;
@@ -89,7 +89,7 @@ function lorebookToRef(lorebook) {
 }
 
 function resolveLorebooksFromRefs(refs) {
-    const all = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]')
+    const all = (window.LorebookRepo ? window.LorebookRepo.all() : [])
         .map(normalizeStoredLorebook).filter(Boolean);
     if (!Array.isArray(refs)) return [];
     return refs.map(rawRef => {

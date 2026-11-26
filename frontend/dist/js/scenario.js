@@ -17,11 +17,17 @@
 
 'use strict';
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
     const scenarioGrid    = document.getElementById('scenario-grid');
     const scenarioOverlay = document.getElementById('scenario-creation-overlay');
 
     if (scenarioGrid && scenarioOverlay) {
+        try {
+            await window.LorebookRepo.hydrate();
+        } catch (error) {
+            console.error('Failed to refresh the lorebook library:', error);
+        }
+
         loadScenarios();
         loadAvailableLorebooks();
 

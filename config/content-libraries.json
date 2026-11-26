@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "4bdae2f538f5534fa77627cb",
+      "category": "scenarios",
+      "path": "C:\\Users\\StoneWolfPC\\Documents\\Howl\\Scenarios",
+      "role": 7,
+      "origin": "howl",
+      "format": "howl",
+      "default_save": true,
+      "created_at": "2026-11-24T02:25:50Z"
+    },
+    {
+      "id": "bc8faa948c9624d8e520a868",
+      "category": "worlds",
+      "path": "C:\\Users\\StoneWolfPC\\Documents\\Howl\\Worlds",
+      "role": 7,
+      "origin": "howl",
+      "format": "howl",
+      "default_save": true,
+      "created_at": "2026-11-24T02:25:50Z"
+    }
+  ]
+}

@@ -366,6 +366,18 @@ func (r *Resolver) ResolveProjector(model ModelFile, profile *types.ASRModelProf
 		return ModelFile{Path: override, Type: model.Type, Source: ModelSourceEnv}, nil
 	}
 
+	// A companion beside its own model is the pairing. Identical filenames in two
+	// configured directories are mirrors of one inventory, not two candidates:
+	// the shared resolver treats that as ambiguity and refuses to load a model
+	// whose projector is right next to it. Only a projector that is not beside
+	// the model goes through the shared search, where ambiguity stays an error.
+	if name := strings.TrimSpace(profile.ProjectorFile); name != "" {
+		beside := filepath.Join(filepath.Dir(model.Path), name)
+		if r.isRegular(beside) {
+			return ModelFile{Path: beside, Type: model.Type, Source: ModelSourceFlat}, nil
+		}
+	}
+
 	// The registry's ProjectorFile is an explicit identity: when present the
 	// shared resolver looks for exactly that file and never substitutes a
 	// different projector from the directory. Without it, the shared resolver

@@ -1,0 +1,36 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "M1 | KEEP | User stated canon status directly.\nM2 | REJECT | User's \"brb\" response is not a factual event to remember.\nM3 | HOLD | Cannot confirm Sable's profession beyond \"can't swim.\"\nM4 | HOLD | Conflicting info: never met vs. trained by Corvin.\nM5 | REJECT | User explicitly dislikes long descriptions.\nM6 | REJECT | Note says \"maybe canon,\" conflicting with stated canon."
+      }
+    }
+  ],
+  "created": 1795062109,
+  "model": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\experiments\\lfm25-cpu\\round2\\models\\Qwen3.5-0.8B-Q4_K_M.gguf",
+  "system_fingerprint": "b12015-a34de8618",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 102,
+    "prompt_tokens": 230,
+    "total_tokens": 332,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-eJ6lZsS2SrEBESwZVRNk5R7HfPiTOpHK",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 230,
+    "prompt_ms": 271.695,
+    "prompt_per_token_ms": 1.181282608695652,
+    "prompt_per_second": 846.5374776863763,
+    "predicted_n": 102,
+    "predicted_ms": 3047.373,
+    "predicted_per_token_ms": 30.172009900990098,
+    "predicted_per_second": 33.14330080367582
+  }
+}

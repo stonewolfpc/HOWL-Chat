@@ -1,0 +1,66 @@
+{
+  "checks": {
+    "joint_scoring": {
+      "pass": true,
+      "trainer_doc_under_trainer_query": -5.954,
+      "trainer_doc_under_tea_query": -11.049,
+      "delta": 5.096,
+      "note": "delta ~0 would mean the runtime is not scoring the pair jointly"
+    },
+    "rank_discrimination": {
+      "pass": true,
+      "relevant": -5.954,
+      "irrelevant": -11.043
+    },
+    "reproducibility": {
+      "pass": true,
+      "values": [
+        [
+          -5.9537,
+          -11.0431
+        ],
+        [
+          -5.9537,
+          -11.0431
+        ],
+        [
+          -5.9537,
+          -11.0431
+        ]
+      ],
+      "max_drift": 0.0
+    },
+    "order_invariance": {
+      "pass": true,
+      "forward": [
+        -5.954,
+        -11.043
+      ],
+      "reversed": [
+        -11.043,
+        -5.954
+      ]
+    },
+    "nondegenerate": {
+      "pass": true,
+      "values": [
+        -6.001,
+        -11.043,
+        -10.854
+      ]
+    },
+    "score_scale": {
+      "raw_range_observed": [
+        -11.043,
+        -6.001
+      ],
+      "sigmoid_of_examples": [
+        0.00247,
+        1.6e-05,
+        1.9e-05
+      ],
+      "interpretation": "raw logits, not probabilities; frozen threshold 0.30 is not on this scale"
+    }
+  },
+  "stage3": "PASS"
+}

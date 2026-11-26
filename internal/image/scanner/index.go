@@ -29,6 +29,8 @@ type ModelIndex struct {
 	VAEs        []AssetEntry `json:"vaes"`
 	LoRAs       []AssetEntry `json:"loras"`
 	ControlNets []AssetEntry `json:"controlnets"`
+	IPAdapters  []AssetEntry `json:"ip_adapters"`
+	ClipVisions []AssetEntry `json:"clip_visions"`
 	Embeddings  []AssetEntry `json:"embeddings"`
 	Upscalers   []AssetEntry `json:"upscalers"`
 	T5XXLs      []AssetEntry `json:"t5xxls"`
@@ -106,6 +108,29 @@ func FilterControlNetsForFamily(cns []AssetEntry, family ModelFamily) []AssetEnt
 	for _, c := range cns {
 		if CompatibleControlNet(family, c.Family) {
 			out = append(out, c)
+		}
+	}
+	return out
+}
+
+// FilterIPAdaptersForFamily returns IP-Adapters compatible with the model family.
+func FilterIPAdaptersForFamily(adapters []AssetEntry, family ModelFamily) []AssetEntry {
+	var out []AssetEntry
+	for _, a := range adapters {
+		if CompatibleIPAdapter(family, a.Family) {
+			out = append(out, a)
+		}
+	}
+	return out
+}
+
+// FilterClipVisionsForFamily returns CLIP-Vision encoders compatible with the
+// model family. The ViT-H encoder is shared, so unknown-family entries pass.
+func FilterClipVisionsForFamily(vision []AssetEntry, family ModelFamily) []AssetEntry {
+	var out []AssetEntry
+	for _, v := range vision {
+		if CompatibleClipVision(family, v.Family) {
+			out = append(out, v)
 		}
 	}
 	return out

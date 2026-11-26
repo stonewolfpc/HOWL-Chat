@@ -176,7 +176,7 @@ async function autoLoadDefaultModel() {
 
     updateModelDisplay('Loading...');
     // The image model holds VRAM this one needs; ask before pulling it out.
-    if (!(await requestVRAMArbitration('llm', modelPath))) {
+    if (!(await requestVRAMArbitration('llm', savedPath))) {
         console.log('[VRAM] chat model load cancelled by user');
         updateModelDisplay('Load cancelled');
         return;
@@ -329,18 +329,32 @@ async function scanLLMDirectory() {
 // first, say so and let the user decide. Returns false when the user cancels.
 async function requestVRAMArbitration(kind, path) {
     const app = window.go?.main?.App;
-    if (!app?.CheckModelFit) return true;
+    if (!app?.CheckModelFit) {
+        alert('This build cannot verify VRAM fit; refusing to start a model blindly.');
+        return false;
+    }
     try {
         let fit = await app.CheckModelFit(kind, path || '');
-        if (fit.can_fit || !fit.blocking || fit.blocking.length === 0) return true;
-        if (!confirm(fit.message)) return false;
+        if (fit.can_fit) return true;
+        if (!fit.blocking || fit.blocking.length === 0) {
+            alert(fit.message);
+            return false;
+        }
+        // The backend unloads only on this answer, so hand it the user's
+        // decision rather than a constant.
+        const approved = confirm(fit.message);
+        if (!approved) return false;
         updateModelDisplay('Unloading the other model…');
-        fit = await app.FreeVRAMFor(kind, path || '');
+        fit = await app.FreeVRAMFor(kind, path || '', approved);
         if (!fit.can_fit) { alert(fit.message); updateModelDisplay('No model loaded'); return false; }
         return true;
     } catch (err) {
-        console.warn('[VRAM] arbitration check failed, continuing:', err);
-        return true;
+        // A failed fit check is not permission to start. The backend authority
+        // will still refuse if the allocation is unsafe; do not silently claim
+        // the model fits when the check could not run.
+        console.error('[VRAM] arbitration check failed:', err);
+        alert('Could not verify available VRAM: ' + err);
+        return false;
     }
 }
 
@@ -360,6 +374,13 @@ async function _loadModelByPath(modelPath) {
     if (!modelPath.toLowerCase().endsWith('.gguf') && !modelPath.toLowerCase().endsWith('.bin')) {
         console.error('Invalid model file extension:', modelPath);
         alert('Please select a .gguf or .bin model file.');
+        return;
+    }
+    // Manual selection is a model start too: ask before the backend stops the
+    // model that is currently holding the VRAM.
+    if (!(await requestVRAMArbitration('llm', modelPath))) {
+        console.log('[VRAM] chat model load cancelled by user');
+        updateModelDisplay('Load cancelled');
         return;
     }
     setModelLoading(true);

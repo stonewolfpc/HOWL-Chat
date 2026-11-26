@@ -1,0 +1,135 @@
+{
+  "baseline_id": "S1-readiness-baseline-1.2",
+  "version": "1.2",
+  "frozen_at": "2026-11-15",
+  "supersedes": "S1-readiness-baseline-1.1",
+  "note": "S1-v1.2 re-baselines S1-B to the repository-verified content hash after a ten-read stability probe. Experimental controls, runtime profile, prompts, fixture and schedule are unchanged from v1.1; v1 and v1.1 remain on disk unedited as history.",
+  "rebaseline": {
+    "slot": "S1-B",
+    "field": "models[1].sha256",
+    "from": "b5b1913e44aa64d2c12b6159bb782774dd98362528211ac830860595d293ede0",
+    "to": "d0027dd3a9128d9323e9f282c8bf010a8526c46477584535991dc1a869b56e96",
+    "reason": "The superseded value was recorded on 2026-11-14 from a buffered read whose result is no longer reproducible. Ten independent reads on 2026-11-15 across two read paths returned the new value with one file identity, and that value equals the repository-hosted LFS pointer. The original value was never a reference-independent truth; it was one reading.",
+    "evidence": [
+      {
+        "doc": "docs/research/MEMORY-09-S1B-STABILITY-RESULT-2026-11-15.md",
+        "sha256": "2a9acb6ec307d5a0fd514de4d122828dde557b12b87bd015c8fcac758990ac30",
+        "claim": "L-2"
+      },
+      {
+        "doc": "docs/research/S1B-READ-STABILITY-PROBE-2026-11-14.md",
+        "sha256": "7045d20cdb29370c5b537567904ec03c2d8fcef2dce92ba224a3c1d98a4272a2",
+        "claim": "pre-registration"
+      },
+      {
+        "runs": "eval/runs/S1B-STAB-20261115T000423Z/",
+        "reads": 10,
+        "distinct_digests": 1
+      }
+    ],
+    "reference": {
+      "class": "repository-verified",
+      "source": "git-lfs pointer, HauhauCS/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive",
+      "publisher_verified": false
+    },
+    "unresolved": "No explanation for the six non-matching digests or for the disappearance of the 341fb28c buffered stream. Not attributable to any component.",
+    "generations_at_rebaseline": 0,
+    "rebaseline_does_not_establish": [
+      "history of the local copy",
+      "cause of the earlier digests",
+      "hardware health"
+    ]
+  },
+  "runtime_profile": {
+    "gpu_layers": 20,
+    "context": 20480,
+    "applies_to": "models up to 12B; above 12B the layer count is determined experimentally per model",
+    "vram_target_percent": 90,
+    "vram_hard_floor_free_mib": 400,
+    "recovery_tolerance_mib": 250,
+    "gpu_abort_temp_c": 78,
+    "gpu_warn_temp_c": 74,
+    "quantkv": "q8_0",
+    "threads": 8,
+    "batchsize": 512,
+    "host": "127.0.0.1"
+  },
+  "fixture": {
+    "id": "F-ST-01-S1",
+    "version": "1",
+    "sha256": "3dd41c8ea03c4101295e1bded40824cc3c41de99c154a285ef7fe5af0966412d"
+  },
+  "state_sha256": "aa98d95faf1d18d910c4ba124c0e8d3bf688d3a6d5feee4ca5ff05d30b9d5700",
+  "prompts": {
+    "A": "076de19e9087bb4a3b3d39464516c3417495aa82e27c7efccb971283cd075af7",
+    "B": "97213346a4ac7ec9a0f3f363ee8f9c15fb73cc0667bdfcc80c03bdb8e385b998"
+  },
+  "params": {
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "max_tokens": 256
+  },
+  "schedule": {
+    "planned_calls": 18,
+    "retry_allowance": 12,
+    "hard_ceiling": 30,
+    "reps_per_condition": 3,
+    "conditions": ["A", "B"],
+    "truncation_policy": "data; never retried"
+  },
+  "plan": {
+    "path": "docs/research/corpus/MEMORY-09-LOCAL-S1-EXECUTION-PLAN-2026-11-14.md",
+    "sha256": "d15ebacea5fe3408fc40117ffbf781f82042fcd9a01293abafab270f7fdac9e9",
+    "bytes": 12074
+  },
+  "models": [
+    {
+      "slot": "S1-A",
+      "file": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+      "path": "G:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+      "bytes": 5627044224,
+      "sha256": "2ca636d9e81d3d23ca9b60c234fe185d30ec082eeba69ce770fdb0c76559a4f5",
+      "arch": "qwen35",
+      "layers": 32,
+      "advertised_context": 262144,
+      "status": "requires qualification at S1-v1.2 profile"
+    },
+    {
+      "slot": "S1-B",
+      "file": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
+      "path": "G:\\AI GGUF\\GGUF\\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
+      "bytes": 5335285728,
+      "sha256": "d0027dd3a9128d9323e9f282c8bf010a8526c46477584535991dc1a869b56e96",
+      "arch": "gemma4",
+      "layers": 42,
+      "advertised_context": 131072,
+      "status": "requires qualification at S1-v1.2 profile"
+    },
+    {
+      "slot": "S1-C",
+      "file": "LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+      "path": "G:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+      "bytes": 5155565440,
+      "sha256": "f820ef3f78704ffcaaeed061f29a28b398c1d348d69aca43a142b63e4d1c5c7e",
+      "arch": "lfm2moe",
+      "layers": 24,
+      "advertised_context": 128000,
+      "status": "requires qualification at S1-v1.2 profile"
+    }
+  ],
+  "preset_reference": {
+    "path": "H:\\AI apps\\qwen 9b.kcpps",
+    "bytes": 3591,
+    "sha256": "9ed540a5da4954f102f92fb70de26b87607eef8068446bbcc786f9f1f3a8db2b",
+    "note": "L3 reference only; its model path is stale and its sampler keys are absent"
+  },
+  "offline_checks_at_freeze": 89,
+  "qualification": {
+    "generations": 0,
+    "counts_against_ceiling": false,
+    "citable_about_memory_09": false
+  },
+  "superseded_records": {
+    "note": "The v1 qualification records (36/8192 and 20/8192) remain filed as history. They qualified the models, not the profile. The S1-B digest b5b1913e is preserved here as the value this version replaced."
+  }
+}

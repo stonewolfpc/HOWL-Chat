@@ -15,6 +15,7 @@
 package loader
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -110,6 +111,53 @@ func SafeConsole(w io.Writer) io.Writer {
 		return io.Discard
 	}
 	return consoleWriter{w: w}
+}
+
+// LoadPhaseWriter forwards child output until the engine says the model is
+// loaded, then discards the rest. Placement evidence is produced during load;
+// inference logging at that verbosity can contain prompt and sampled text. The
+// guard keeps that content out of the bounded capture and any failure record.
+//
+// A line is forwarded whole, so a "model loaded" marker split across writes is
+// still recognized. The marker line itself is forwarded; a partial line before
+// the marker is completed by the next write.
+type LoadPhaseWriter struct {
+	mu      sync.Mutex
+	dst     io.Writer
+	loaded  bool
+	pending []byte
+}
+
+// NewLoadPhaseWriter wraps dst. A nil destination discards everything.
+func NewLoadPhaseWriter(dst io.Writer) *LoadPhaseWriter {
+	if dst == nil {
+		dst = io.Discard
+	}
+	return &LoadPhaseWriter{dst: dst}
+}
+
+func (w *LoadPhaseWriter) Write(p []byte) (int, error) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	if w.loaded {
+		return len(p), nil
+	}
+	data := append(w.pending, p...)
+	w.pending = nil
+	for {
+		newline := bytes.IndexByte(data, '\n')
+		if newline < 0 {
+			w.pending = append(w.pending[:0], data...)
+			return len(p), nil
+		}
+		line := data[:newline+1]
+		data = data[newline+1:]
+		_, _ = w.dst.Write(line)
+		if strings.Contains(strings.ToLower(string(line)), "model loaded") {
+			w.loaded = true
+			return len(p), nil
+		}
+	}
 }
 
 type consoleWriter struct{ w io.Writer }

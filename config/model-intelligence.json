@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "models": [
+    {
+      "path": "G:\\AI GGUF\\GGUF\\c4ai-command-r7b-12-2024-abliterated-Q4_K_M.gguf",
+      "name": "c4ai-command-r7b-12-2024-abliterated-Q4_K_M",
+      "format": "gguf",
+      "architecture": "cohere2",
+      "family": "cohere2",
+      "capabilities": [
+        "chat"
+      ],
+      "runtimes": [
+        "llama.cpp"
+      ],
+      "evidence": "verified",
+      "source": "model metadata",
+      "available": true,
+      "size_bytes": 5057010336,
+      "mod_time_ns": 1791658348024289100,
+      "updated_at": "2026-11-23T22:46:59Z"
+    }
+  ]
+}

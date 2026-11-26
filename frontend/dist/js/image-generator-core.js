@@ -1,5 +1,101 @@
 'use strict';
 
+// sd-server's --max-vram is a GiB budget. An empty field is left undefined so the
+// backend applies its own default; 0 is a deliberate value meaning "use the
+// device's current free memory", and Howl turns that into a positive post-reserve
+// cap so the engine cannot spend the 10% reserve.
+function readImageMaxVRAM() {
+    const el = document.getElementById('ig-max-vram');
+    if (!el || el.value === '') return undefined;
+    const n = parseInt(el.value, 10);
+    return Number.isFinite(n) ? n : undefined;
+}
+
+function readImageOptionalInt(id) {
+    const el = document.getElementById(id);
+    if (!el || el.value === '') return undefined;
+    const n = parseInt(el.value, 10);
+    return Number.isFinite(n) ? n : undefined;
+}
+
+// Engine hardware settings shared by the explicit load path and a generation
+// request that lazily boots the engine, so both send the same values.
+function readImageEngineFlags() {
+    return {
+        max_vram: readImageMaxVRAM(),
+        weight_type: document.getElementById('ig-weight-type')?.value || '',
+        cache_mode: document.getElementById('ig-cache-mode')?.value || '',
+        cache_option: document.getElementById('ig-cache-option')?.value || '',
+        conditioning_cache_size: parseInt(document.getElementById('ig-cond-cache')?.value || '0', 10) || 0,
+        mmap: document.getElementById('ig-mmap')?.checked || false,
+        // A blank field means the timer is disabled. Send -1 explicitly so
+        // clearing a previously saved value actually disables it instead of
+        // preserving the resident engine's old startup flag.
+        weight_residency_ttl: readImageOptionalInt('ig-weight-residency-ttl') ?? -1,
+    };
+}
+
+// The image page has no other owner for backend warnings. The load path emits
+// them after admission chooses a fallback, so the trade is visible where the
+// user is working rather than only in the console.
+if (window.runtime?.EventsOn) {
+    window.runtime.EventsOn('image:warning', (message) => {
+        console.warn('[IG] hardware warning:', message);
+        if (typeof showNotification === 'function') showNotification(message, 'warning', 12000);
+        if (typeof setStatus === 'function') setStatus(message);
+    });
+    // The load path emits the same plan/actual report the binding returns, so
+    // the card appears without waiting for a generation.
+    window.runtime.EventsOn('image:placement', (report) => {
+        renderImagePlacement(report, report?.phase);
+    });
+    // The reclamation policy emits this after a recycle. Refresh the card from
+    // the binding rather than reconstructing the policy report in the browser.
+    window.runtime.EventsOn('image:reclaim', async () => {
+        try {
+            const p = await window.go?.main?.App?.GetImagePlacement?.();
+            renderImagePlacement(p, p?.phase || 'generation');
+        } catch (err) {
+            console.warn('[IG] reclaim report refresh failed:', err);
+        }
+    });
+}
+
+// The persisted generation document is the authority for these settings: apply
+// it to the panel once the repository has loaded, so what the user sees is what
+// the backend will send (an empty field means "sd.cpp default").
+async function applyPersistedEngineFlags() {
+    try {
+        const repo = window.ImageGenerationRepository;
+        if (!repo) return;
+        await repo.ready;
+        const doc = repo.all() || {};
+        const set = (id, val) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (el.type === 'checkbox') el.checked = !!val;
+            else el.value = (val === undefined || val === null) ? '' : String(val);
+        };
+        set('ig-max-vram', doc.max_vram);
+        set('ig-weight-type', doc.weight_type || '');
+        set('ig-cache-mode', doc.cache_mode || '');
+        set('ig-cache-option', doc.cache_option || '');
+        set('ig-cond-cache', doc.conditioning_cache_size);
+        set('ig-mmap', doc.mmap);
+        set('ig-fa', doc.flash_attention_mode || (doc.flash_attention ? 'on' : 'auto'));
+        set('ig-weight-residency-ttl', doc.weight_residency_ttl);
+    } catch (err) {
+        console.warn('[IG] engine flag restore failed:', err);
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyPersistedEngineFlags);
+} else {
+    applyPersistedEngineFlags();
+}
+window.addEventListener('howl:image-generation-loaded', applyPersistedEngineFlags);
+
 let currentResult = null;
 let models = [];       // full ModelInfo list (diffusion only)
 let scanIndex = null;  // full ScanResult from ScanImageModels
@@ -8,62 +104,25 @@ let lastUsedSeed = -1;
 let currentModelFamily = '';
 let generationInFlight = false;
 
-// VRAM Check for Generation
-async function checkVRAMForGeneration(opts) {
-    try {
-        // Get GPU info from backend
-        const gpuInfo = window.go?.main?.App?.GetGPUInfo?.();
-        if (!gpuInfo || !gpuInfo.TotalMemory) {
-            return { willExceedVRAM: false, estimatedVRAM: 0, availableVRAM: 0 };
+// A generation request must not read a live LoRA array after the user has
+// confirmed the workload. Copy the values into an immutable snapshot so the
+// preflight, unload re-admission and backend job all receive the same set.
+function snapshotGenerationLoRAs(loras) {
+    const source = Array.isArray(loras) ? loras : [];
+    return Object.freeze(source.map(lora => {
+        if (typeof lora === 'string') {
+            return Object.freeze({ name: lora, strength: 1, enabled: true });
         }
-        
-        const availableVRAM = gpuInfo.TotalMemory; // in MB
-        const freeVRAM = gpuInfo.FreeMemory || (availableVRAM * 0.7); // estimate if not provided
-        
-        // Estimate VRAM needed based on resolution and model family
-        // Base estimate: ~2MB per pixel for high-quality generation
-        const pixels = opts.width * opts.height;
-        const baseVRAM = (pixels * 2) / (1024 * 1024); // Convert to MB
-        
-        // Model family multiplier
-        const family = (window.currentModelFamily || '').toLowerCase();
-        const modelMultipliers = {
-            'flux': 1.5,
-            'sdxl': 1.3,
-            'sd3': 1.4,
-            'chroma': 1.5,
-            'sd2.1': 1.0,
-            'sd21': 1.0,
-            'default': 1.0
-        };
-        const multiplier = modelMultipliers[family] || modelMultipliers['default'];
-        
-        // Batch size multiplier
-        const batchMultiplier = opts.batch_count || 1;
-        
-        // Steps multiplier (more steps = more VRAM for intermediate activations)
-        const stepsMultiplier = 1 + (opts.steps / 100) * 0.2;
-        
-        // CFG scale multiplier
-        const cfgMultiplier = 1 + (opts.cfg_scale / 10) * 0.1;
-        
-        const estimatedVRAM = Math.floor(baseVRAM * multiplier * batchMultiplier * stepsMultiplier * cfgMultiplier);
-        
-        // Will exceed if estimated > free VRAM with some buffer
-        const willExceedVRAM = estimatedVRAM > (freeVRAM * 0.9); // 10% buffer
-        
-        console.log(`[VRAM Check] Estimated: ${estimatedVRAM} MB, Available: ${freeVRAM} MB, Exceed: ${willExceedVRAM}`);
-        
-        return {
-            willExceedVRAM,
-            estimatedVRAM,
-            availableVRAM: freeVRAM
-        };
-    } catch (e) {
-        console.warn('VRAM check failed:', e);
-        return { willExceedVRAM: false, estimatedVRAM: 0, availableVRAM: 0 };
-    }
+        const strength = lora ? Number(lora.strength) : 1;
+        return Object.freeze({
+            name: lora && typeof lora.name === 'string' ? lora.name : '',
+            strength: Number.isFinite(strength) ? strength : 1,
+            enabled: lora ? Boolean(lora.enabled) : false,
+        });
+    }));
 }
+window.snapshotGenerationLoRAs = snapshotGenerationLoRAs;
+
 window.currentModelFamily = currentModelFamily; // keep in sync below via setter
 
 // ---------------------------------------------------------------------------
@@ -207,9 +266,9 @@ async function loadModels() {
         if (!scanIndex) {
             // Legacy fallback
             const legacy = await app.ListImageModels();
-            scanIndex = { models: legacy || [], vaes: [], loras: [], controlnets: [], embeddings: [], upscalers: [], t5xxls: [], clip_ls: [], clip_gs: [] };
+            scanIndex = { models: legacy || [], vaes: [], loras: [], controlnets: [], ip_adapters: [], clip_visions: [], embeddings: [], upscalers: [], t5xxls: [], clip_ls: [], clip_gs: [] };
         }
-        if (!scanIndex) scanIndex = { models: [], vaes: [], loras: [], controlnets: [], embeddings: [], upscalers: [], t5xxls: [], clip_ls: [], clip_gs: [] };
+        if (!scanIndex) scanIndex = { models: [], vaes: [], loras: [], controlnets: [], ip_adapters: [], clip_visions: [], embeddings: [], upscalers: [], t5xxls: [], clip_ls: [], clip_gs: [] };
 
         models = scanIndex.models || [];
         console.log('[IG] Scan:', models.length, 'models,', (scanIndex.vaes||[]).length, 'VAEs,',
@@ -220,6 +279,8 @@ async function loadModels() {
         _populateVAEDropdown(scanIndex.vaes || []);
         _populateLoRAList(scanIndex.loras || []);
         _populateControlNetDropdown(scanIndex.controlnets || []);
+        _populateIPAdapterDropdown(scanIndex.ip_adapters || []);
+        _populateClipVisionDropdown(scanIndex.clip_visions || []);
         _populateT5XXLDropdown(scanIndex.t5xxls || []);
         _populateClipLDropdown(scanIndex.clip_ls || []);
         _populateClipGDropdown(scanIndex.clip_gs || []);
@@ -255,6 +316,8 @@ async function refreshCompatibleAssets(family) {
         _populateVAEDropdown(filtered.vaes || []);
         _populateLoRAList(filtered.loras || []);
         _populateControlNetDropdown(filtered.controlnets || []);
+        _populateIPAdapterDropdown(filtered.ip_adapters || []);
+        _populateClipVisionDropdown(filtered.clip_visions || []);
     } catch (err) {
         console.warn('[IG] GetCompatibleAssets failed, using full index:', err);
     }
@@ -360,6 +423,34 @@ function _populateControlNetDropdown(cns) {
     }
 }
 
+function _populateIPAdapterDropdown(adapters) {
+    const sel = document.getElementById('ig-ip-model');
+    if (!sel) return;
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">None</option>';
+    adapters.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a.path;
+        opt.textContent = `${a.name} [${a.family || 'unknown'}]`;
+        sel.appendChild(opt);
+    });
+    if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
+}
+
+function _populateClipVisionDropdown(visions) {
+    const sel = document.getElementById('ig-ip-vision');
+    if (!sel) return;
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">None</option>';
+    visions.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v.path;
+        opt.textContent = `${v.name} [${v.family || 'shared'}]`;
+        sel.appendChild(opt);
+    });
+    if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
+}
+
 // onModelChange updates UI presets and re-filters secondary dropdowns by family.
 function onModelChange(applyPreset = true) {
     const name = document.getElementById('ig-model').value;
@@ -463,9 +554,10 @@ async function setModel(name) {
             vae_tiling: document.getElementById('ig-vae-tiling')?.checked || false,
             temporal_tiling: document.getElementById('ig-temporal-tiling')?.checked || false,
             circular: document.getElementById('ig-circular')?.checked || false,
-            flash_attention: document.getElementById('ig-fa')?.checked || false,
+            flash_attention_mode: document.getElementById('ig-fa')?.value || 'auto',
             offload_to_cpu: document.getElementById('ig-offload-cpu')?.checked || false,
             disable_metadata: document.getElementById('ig-disable-metadata')?.checked || false,
+            ...readImageEngineFlags(),
         };
         console.log('[IG] Loading model with config:', opts);
         await window.go.main.App.SetActiveImageModel(opts);
@@ -478,6 +570,7 @@ async function setModel(name) {
         setStatus('Model ready: ' + name);
         if (statusEl) { statusEl.textContent = 'Loaded: ' + name.replace(/^.*[\\/]/, ''); statusEl.className = 'ig-panel-status ig-status-loaded'; }
         updateDiagnostics('loadDone');
+        reportImageExecution('load');
     } catch (err) {
         const msg = err.message || String(err);
         let displayMsg = 'Error loading model: ' + msg;
@@ -489,6 +582,7 @@ async function setModel(name) {
         setStatus(displayMsg);
         if (statusEl) { statusEl.textContent = 'Error'; statusEl.className = 'ig-panel-status ig-status-error'; }
         updateDiagnostics('error', msg);
+        reportImageExecution('failed');
     }
 }
 
@@ -591,21 +685,45 @@ function _familyDefaults(family) {
 // ---------------------------------------------------------------------------
 // VRAM arbitration before generation: sd-server needs GPU room for the
 // checkpoint, and a loaded chat model is holding most of the card.
-async function requestImageVRAMArbitration() {
+async function requestImageVRAMArbitration(opts) {
     const app = window.go?.main?.App;
-    if (!app?.CheckModelFit) return true;
-    try {
-        let fit = await app.CheckModelFit('image', '');
-        if (fit.can_fit || !fit.blocking || fit.blocking.length === 0) return true;
-        if (!confirm(fit.message)) return false;
-        setStatus('Unloading the chat model…');
-        fit = await app.FreeVRAMFor('image', '');
-        if (!fit.can_fit) { alert(fit.message); setStatus('Not enough VRAM'); return false; }
-        return true;
-    } catch (err) {
-        console.warn('[VRAM] arbitration check failed, continuing:', err);
-        return true;
+    if (!app?.CheckImageFit || !app?.FreeVRAMForImage) {
+        const message = 'This build cannot verify VRAM fit; refusing to start an image model blindly.';
+        alert(message);
+        return { ok: false, error: message };
     }
+    try {
+        let fit = await app.CheckImageFit(opts);
+        if (fit.can_fit) return { ok: true };
+        if (!fit.blocking || fit.blocking.length === 0) {
+            alert(fit.message);
+            return { ok: false, error: fit.message || 'Not enough VRAM' };
+        }
+        // The backend unloads only on this answer, so hand it the user's
+        // decision rather than a constant.
+        const approved = confirm(fit.message);
+        if (!approved) return { ok: false };
+        setStatus('Unloading the chat model…');
+        fit = await app.FreeVRAMForImage(opts, approved);
+        if (!fit.can_fit) {
+            alert(fit.message);
+            return { ok: false, error: fit.message || 'Not enough VRAM' };
+        }
+        return { ok: true };
+    } catch (err) {
+        console.error('[VRAM] arbitration check failed:', err);
+        const message = 'Could not verify available VRAM: ' + (err.message || err);
+        alert(message);
+        return { ok: false, error: message };
+    }
+}
+
+function imageGenerationStartStatus(opts) {
+    if (opts.backend === 'cpu') return 'Generating on CPU — this is not a GPU reclamation result.';
+    if (opts.offload_to_cpu) {
+        return 'CPU offload is active; a constrained VRAM budget runs diffusion on CPU (slower), otherwise weights are staged from RAM.';
+    }
+    return 'Generating...';
 }
 
 async function onGenerate() {
@@ -629,13 +747,6 @@ async function onGenerate() {
     // Generating auto-loads the model, so check its files before the run starts.
     if (window.ImageDeps && !(await window.ImageDeps.ensureReady(modelSel.value))) {
         setStatus('Generation cancelled — the model is missing required files.');
-        generationInFlight = false;
-        return;
-    }
-
-    // The chat model is holding the VRAM; ask before unloading it.
-    if (!(await requestImageVRAMArbitration())) {
-        setStatus('Cancelled — not enough VRAM with the chat model loaded.');
         generationInFlight = false;
         return;
     }
@@ -687,6 +798,8 @@ async function onGenerate() {
             setStatus('Please upload an image first.');
             btn.disabled = false;
             hideSpinner();
+            stopProgressBar();
+            generationInFlight = false;
             return;
         }
         try {
@@ -726,8 +839,34 @@ async function onGenerate() {
         return;
     }
 
-    // Handle video end image if present
-    let endImagePath = '';
+    // IP-Adapter reference image is per-request. The adapter and CLIP-Vision
+    // encoder are startup slots selected in the IP-Adapter panel.
+    const ipAdapterPath = document.getElementById('ig-ip-model')?.value || '';
+	const clipVisionPath = document.getElementById('ig-ip-vision')?.value || '';
+	let ipAdapterImagePath = '';
+	if (ipAdapterPath && window.ipAdapterImageData) {
+		try {
+			ipAdapterImagePath = await window.go.main.App.SaveTempImage(window.ipAdapterImageData);
+		} catch (err) {
+			setStatus('IP-Adapter reference upload failed: ' + (err.message || err));
+			btn.disabled = false;
+			hideSpinner();
+			generationInFlight = false;
+			return;
+		}
+	}
+	if (ipAdapterPath || clipVisionPath) {
+		if (!ipAdapterPath || !clipVisionPath || !ipAdapterImagePath) {
+			setStatus('IP-Adapter needs an adapter, a CLIP-Vision encoder and a reference image.');
+			btn.disabled = false;
+			hideSpinner();
+			generationInFlight = false;
+			return;
+		}
+	}
+
+	// Handle video end image if present
+	let endImagePath = '';
     if (currentMode === 'video' && window.videoEndImageData) {
         try {
             endImagePath = await window.go.main.App.SaveTempImage(window.videoEndImageData);
@@ -756,7 +895,6 @@ async function onGenerate() {
         scheduler:       document.getElementById('ig-scheduler').value,
         cfg_scale:       parseFloat(document.getElementById('ig-cfg').value),
         guidance:        parseFloat(document.getElementById('ig-guidance')?.value || '3.5'),
-        slg_scale:       parseFloat(document.getElementById('ig-slg-scale')?.value || '0'),
         eta:             parseFloat(document.getElementById('ig-eta')?.value || '0'),
         batch_count:     parseInt(document.getElementById('ig-batch').value, 10) || 1,
         mode:            currentMode || 'txt2img',
@@ -768,7 +906,13 @@ async function onGenerate() {
         control_net_path: document.getElementById('ig-control-model')?.value || '',
         control_image_path: controlNetPath,
         control_strength: parseFloat(document.getElementById('ig-control-strength')?.value || '0.9'),
-        loras:           window.activeLoRAs || [],
+        ip_adapter_path: ipAdapterPath,
+        clip_vision_path: clipVisionPath,
+        ip_adapter_image_path: ipAdapterImagePath,
+        ip_adapter_strength: parseFloat(document.getElementById('ig-ip-strength')?.value || '0.7'),
+        clip_vision_cpu: document.getElementById('ig-ip-vision-cpu')?.checked || false,
+        engine_profile: ipAdapterPath ? 'sdcpp-c6dfa9d-ip' : '',
+        loras:           snapshotGenerationLoRAs(window.activeLoRAs),
         enable_hr:       document.getElementById('ig-hires-enable')?.checked || false,
         hr_scale:        parseFloat(document.getElementById('ig-hr-scale')?.value || '2'),
         hr_upscaler:     document.getElementById('ig-hr-upscaler')?.value || '',
@@ -828,15 +972,6 @@ async function onGenerate() {
         flow_shift:      parseFloat(document.getElementById('ig-flow-shift')?.value || '0'),
         vae_tile_overlap: parseFloat(document.getElementById('ig-vae-tile-overlap')?.value || '0.5'),
         disable_metadata: document.getElementById('ig-disable-metadata')?.checked || false,
-        skip_layer_start: parseFloat(document.getElementById('ig-skip-layer-start')?.value || '0.01'),
-        skip_layer_end:   parseFloat(document.getElementById('ig-skip-layer-end')?.value || '0.2'),
-        high_noise_steps:          parseInt(document.getElementById('ig-high-noise-steps')?.value || '-1', 10),
-        high_noise_cfg_scale:      parseFloat(document.getElementById('ig-high-noise-cfg')?.value || '7'),
-        high_noise_guidance:       parseFloat(document.getElementById('ig-high-noise-guidance')?.value || '3.5'),
-        high_noise_slg_scale:      parseFloat(document.getElementById('ig-high-noise-slg')?.value || '0'),
-        high_noise_eta:            parseFloat(document.getElementById('ig-high-noise-eta')?.value || '0'),
-        high_noise_skip_layer_start: parseFloat(document.getElementById('ig-high-noise-skip-start')?.value || '0.01'),
-        high_noise_skip_layer_end:   parseFloat(document.getElementById('ig-high-noise-skip-end')?.value || '0.2'),
         // Video-specific
         output_format:     document.getElementById('ig-video-format')?.value || 'webm',
         video_seed_mode:  document.getElementById('ig-video-seed-mode')?.value || 'fixed',
@@ -851,27 +986,26 @@ async function onGenerate() {
         s_tmax:           parseFloat(document.getElementById('ig-s-tmax')?.value || '50'),
         s_noise:          parseFloat(document.getElementById('ig-s-noise')?.value || '1'),
         // Model startup flags forwarded to lazy-load path
+        backend:          document.getElementById('ig-backend')?.value || '',
+        params_backend:   document.getElementById('ig-params-backend')?.value || '',
         vae_tiling:       document.getElementById('ig-vae-tiling')?.checked || false,
         temporal_tiling:  document.getElementById('ig-temporal-tiling')?.checked || false,
-        flash_attention:  document.getElementById('ig-fa')?.checked || false,
+        circular:         document.getElementById('ig-circular')?.checked || false,
+        flash_attention_mode: document.getElementById('ig-fa')?.value || 'auto',
         offload_to_cpu:   document.getElementById('ig-offload-cpu')?.checked || false,
+        ...readImageEngineFlags(),
     };
 
-    // VRAM check before generation
-    const vramCheck = await checkVRAMForGeneration(opts);
-    if (vramCheck.willExceedVRAM) {
-        const proceed = confirm(
-            'You don\'t have enough VRAM for this task.\n\n' +
-            'Some of this will use your system RAM instead.\n' +
-            'The image will take longer to appear, please be patient.\n\n' +
-            `Estimated VRAM needed: ${vramCheck.estimatedVRAM} MB\n` +
-            `Available VRAM: ${vramCheck.availableVRAM} MB\n\n` +
-            'Click OK to proceed with CPU/RAM fallback, or Cancel to adjust settings.'
-        );
-        if (!proceed) {
-            setStatus('Cancelled');
-            return;
-        }
+    // The fit check and the unload must use the same real workload that the
+    // backend will admit. A GPU-required run has no CPU-continue path.
+    const fit = await requestImageVRAMArbitration(opts);
+    if (!fit.ok) {
+        btn.disabled = false;
+        hideSpinner();
+        stopProgressBar();
+        generationInFlight = false;
+        setStatus(fit.error ? 'Error: ' + fit.error : 'Cancelled — the requested image does not fit on the GPU.');
+        return;
     }
 
     let activeJobId = null;
@@ -889,6 +1023,7 @@ async function onGenerate() {
             displayResult(currentResult);
             setStatus('Done!');
             updateDiagnostics('genDone');
+            reportImageExecution('generation');
             if (window.loadHistoryPanel) window.loadHistoryPanel();
             return;
         }
@@ -901,7 +1036,7 @@ async function onGenerate() {
             const msg = String(cbErr?.message || cbErr);
             throw cbErr;
         }
-        setStatus('Generating...');
+        setStatus(imageGenerationStartStatus(opts));
         showSpinner();
 
         // Update button to Abort
@@ -998,6 +1133,7 @@ async function onGenerate() {
         displayResult(currentResult);
         setStatus('Done!');
         updateDiagnostics('genDone');
+        reportImageExecution('generation');
         if (window.loadHistoryPanel) window.loadHistoryPanel();
     } catch (err) {
         console.error('Generation failed:', err);
@@ -1107,7 +1243,6 @@ function populateOptionsFromHistory(opts, clearModel) {
     set('ig-scheduler', opts.scheduler);
     set('ig-cfg', opts.cfg_scale);
     set('ig-guidance', opts.guidance);
-    set('ig-slg-scale', opts.slg_scale);
     set('ig-eta', opts.eta);
     set('ig-batch', opts.batch_count);
     set('ig-clip-skip', opts.clip_skip);
@@ -1131,22 +1266,19 @@ function populateOptionsFromHistory(opts, clearModel) {
     set('ig-flow-shift', opts.flow_shift);
     set('ig-vae-tile-overlap', opts.vae_tile_overlap);
     set('ig-disable-metadata', opts.disable_metadata);
-    set('ig-skip-layer-start', opts.skip_layer_start);
-    set('ig-skip-layer-end', opts.skip_layer_end);
-    set('ig-high-noise-steps', opts.high_noise_steps);
-    set('ig-high-noise-cfg', opts.high_noise_cfg_scale);
-    set('ig-high-noise-guidance', opts.high_noise_guidance);
-    set('ig-high-noise-slg', opts.high_noise_slg_scale);
-    set('ig-high-noise-eta', opts.high_noise_eta);
-    set('ig-high-noise-skip-start', opts.high_noise_skip_layer_start);
-    set('ig-high-noise-skip-end', opts.high_noise_skip_layer_end);
     set('ig-backend', opts.backend);
     set('ig-params-backend', opts.params_backend);
     set('ig-vae-tiling', opts.vae_tiling);
     set('ig-temporal-tiling', opts.temporal_tiling);
     set('ig-circular', opts.circular);
-    set('ig-fa', opts.flash_attention);
+    set('ig-fa', opts.flash_attention_mode || (opts.flash_attention ? 'on' : 'auto'));
     set('ig-offload-cpu', opts.offload_to_cpu);
+    set('ig-max-vram', (opts.max_vram === undefined || opts.max_vram === null) ? '' : opts.max_vram);
+    set('ig-weight-type', opts.weight_type);
+    set('ig-cache-mode', opts.cache_mode);
+    set('ig-cache-option', opts.cache_option);
+    set('ig-cond-cache', (opts.conditioning_cache_size === undefined) ? '' : opts.conditioning_cache_size);
+    set('ig-mmap', opts.mmap);
     set('ig-hires-enable', opts.enable_hr);
     set('ig-hr-scale', opts.hr_scale);
     set('ig-hr-upscaler', opts.hr_upscaler);
@@ -1220,6 +1352,114 @@ function showPreviewImage(b64) {
     // sizing class they paint at natural size in the middle of the canvas and
     // leave black bands around them. .ig-live-preview scales them to the canvas.
     area.innerHTML = `<img class="ig-live-preview" src="${prefix}${b64}" alt="Preview" style="opacity:0.85;filter:contrast(1.05);">`;
+}
+
+let _lastVAETilingNote = '';
+let _lastPlacementNotice = '';
+
+function imagePlacementMB(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n) || n <= 0) return '0 MB';
+    return n >= 1024 ? (n / 1024).toFixed(1) + ' GB' : Math.round(n) + ' MB';
+}
+
+// Surface the engine's own placement, not only Howl's plan. The card stays
+// visible so a later look still shows where the resident model lives; the
+// notification is only for a new load or a real divergence.
+function renderImagePlacement(p, phase) {
+    const card = document.getElementById('ig-placement-card');
+    if (!card) return;
+    if (!p?.known) {
+        card.style.display = 'none';
+        return;
+    }
+    const labels = {
+        load: 'after load',
+        generation: 'after generation',
+        status: 'current',
+        failed: 'load failed',
+        unloaded: 'unloaded',
+    };
+    const actual = p.actual || {};
+    const plan = p.plan || {};
+    const theory = p.theoretical || {};
+    const live = p.live || {};
+    const reclaim = p.reclaim || {};
+    const summaryEl = document.getElementById('ig-placement-summary');
+    const phaseEl = document.getElementById('ig-placement-phase');
+    const bodyEl = document.getElementById('ig-placement-body');
+
+    card.style.display = 'block';
+    if (phaseEl) phaseEl.textContent = labels[phase] || labels.status;
+    if (summaryEl) {
+        summaryEl.textContent = p.summary || 'Engine placement reported.';
+        summaryEl.classList.toggle('is-divergent', Boolean(p.divergence));
+    }
+    if (bodyEl) {
+        const components = Object.entries(actual.componentMB || {}).map(([name, mb]) => {
+            return `${name}: ${imagePlacementMB(mb)} ${actual.components?.[name] || 'unknown'}`;
+        });
+        const workload = theory.width
+            ? `${theory.width}x${theory.height}, batch ${theory.batch || 1}, ${theory.steps || 0} steps`
+            : 'no generation workload measured yet';
+        const process = actual.process || {};
+        const footprint = ['load', 'generation']
+            .filter((phase) => process[phase]?.known)
+            .map((phase) => `${phase}: ${imagePlacementMB(process[phase].workingSetMB)}`)
+            .join(', ');
+        const budget = plan.maxVRAMGiB
+            ? `${plan.maxVRAMGiB} GiB${plan.autoMaxVRAM ? ' (derived post-reserve cap)' : ' (explicit)'}`
+            : 'auto / engine default';
+        bodyEl.textContent = [
+            `Theoretical: ${imagePlacementMB(theory.weightsMB)} weights (${theory.weightType || 'stored type'}), ${imagePlacementMB(theory.activationMB)} decode activation, ${imagePlacementMB(theory.residentNeedMB)} resident need. Workload: ${workload}.`,
+            `Planned: ${plan.description || 'not reported'}. Budget: ${budget}. Backend: ${plan.backend || 'auto'}; params: ${plan.paramsBackend || 'auto'}; offload: ${plan.offloadToCPU ? 'on' : 'off'}; VAE tiling: ${plan.vaeTiling ? 'on' : 'off'}.`,
+            actual.known
+                ? `Actual engine report: ${imagePlacementMB(actual.vramMB)} in VRAM, ${imagePlacementMB(actual.ramMB)} in RAM. Engine auto-fit: ${actual.backends || 'not reported'}.`
+                : 'Actual engine report: this sd-server build did not publish per-component residency.',
+            footprint ? `Measured sd-server process working set: ${footprint}.` : 'Process working set: not measured.',
+            components.length ? `Components: ${components.join('; ')}.` : 'Components: not reported by the engine.',
+            `Live device at capture: ${imagePlacementMB(live.usedVRAMMB)} used of ${imagePlacementMB(live.totalVRAMMB)}, ${imagePlacementMB(live.freeVRAMMB)} free; 10% reserve ${live.reserveHeld ? 'held' : 'NOT held'} (${imagePlacementMB(live.reserveMB)}).`,
+            `Reclamation policy: ${reclaim.policy || 'measurement-gated process recycle'}. Baseline: ${imagePlacementMB(reclaim.baselineMB)} (${reclaim.baselineSource || 'not established'}); band ${imagePlacementMB(reclaim.bandMB)}; threshold ${imagePlacementMB(reclaim.thresholdMB)}; reclaim events ${reclaim.reclaims || 0}. ${reclaim.summary || ''}`,
+            p.divergence ? `Divergence: ${p.divergence}` : 'Plan and engine report agree, or auto-fit made no module claim.',
+        ].join('\n');
+    }
+
+    const key = `${phase}|${p.summary}|${p.divergence || ''}`;
+    if (key === _lastPlacementNotice) return;
+    _lastPlacementNotice = key;
+    if (phase === 'load' || phase === 'generation' || p.divergence) {
+        const note = p.divergence
+            ? (actual.known ? 'Engine placement differs from the plan: ' : 'Engine placement unverified: ') + p.divergence
+            : p.summary;
+        if (typeof showNotification === 'function') {
+            showNotification(note, p.divergence ? 'warning' : 'info', 15000);
+        } else if (p.divergence && typeof setStatus === 'function') {
+            setStatus(note);
+        }
+    }
+}
+
+// sd.cpp's own VAE retry is an execution fact, not a failure. It is emitted
+// only when the engine had to tile after our estimate did not pre-enable it.
+// Do not repeat the same notice on every poll/result.
+async function reportImageExecution(phase = 'status') {
+    try {
+        const p = await window.go?.main?.App?.GetImagePlacement?.();
+        renderImagePlacement(p, phase);
+        if (p?.vaeTiled && p.vaeTilingNote && p.vaeTilingNote !== _lastVAETilingNote) {
+            _lastVAETilingNote = p.vaeTilingNote;
+            const note = 'sd.cpp tiled the VAE decode because it did not fit: ' + p.vaeTilingNote;
+            if (typeof showNotification === 'function') {
+                showNotification(note, 'warning', 12000);
+            } else if (typeof setStatus === 'function') {
+                // The image generator page does not load the main notification
+                // helper; without this fallback the engine retry would be silent.
+                setStatus(note);
+            }
+        }
+    } catch (err) {
+        console.warn('[IG] placement check failed:', err);
+    }
 }
 
 function displayResult(result) {

@@ -1,0 +1,36 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "M1 | KEEP | Canon status confirmed by user.\nM2 | HOLD | User preference on short replies not yet set.\nM3 | KEEP | Character trait explicitly defined.\nM4 | HOLD | Contradiction detected regarding training history.\nM5 | KEEP | Explicit user preference on interaction style.\nM6 | HOLD | Uncertainty on birthday canon status pending confirmation."
+      }
+    }
+  ],
+  "created": 1795062124,
+  "model": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\experiments\\lfm25-cpu\\round2\\models\\Qwen3.5-2B-Q4_K_M.gguf",
+  "system_fingerprint": "b12015-a34de8618",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 80,
+    "prompt_tokens": 230,
+    "total_tokens": 310,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-2pR4sMLKKmYQd3rUjLpBRyQgLcC1frMp",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 230,
+    "prompt_ms": 457.624,
+    "prompt_per_token_ms": 1.9896695652173915,
+    "prompt_per_second": 502.5960176913798,
+    "predicted_n": 80,
+    "predicted_ms": 4983.475,
+    "predicted_per_token_ms": 63.08196202531646,
+    "predicted_per_second": 15.85239215607583
+  }
+}

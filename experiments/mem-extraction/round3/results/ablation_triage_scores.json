@@ -1,0 +1,735 @@
+[
+  {
+    "score12": 12,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | explicitly stated as canon by the user."
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | too transient for long-term memory retention."
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | core character trait relevant to future interactions."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | contradiction requires clarification before storage."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | essential preference for ongoing roleplay management."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | uncertainty tag necessitates user confirmation."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 86,
+    "wall_s": 12.425,
+    "reasoning_chars": 0,
+    "run_code": "yevx1ezy",
+    "label": "abl-4b-nonthink"
+  },
+  {
+    "score12": 11,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user confirmed this as canon fact."
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 1,
+        "reason": " | four minutes is too short to remember."
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | core character trait established for future reference."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | contradiction requires user clarification before storage."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | critical preference affecting all future responses."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | uncertainty tag (\"maybe\") prevents definitive recording."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 86,
+    "wall_s": 11.987,
+    "reasoning_chars": 0,
+    "run_code": "edonxrej",
+    "label": "abl-4b-nonthink"
+  },
+  {
+    "score12": 11,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user explicitly stated this as canon fact."
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 1,
+        "reason": " | time-based event irrelevant to roleplay lore."
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | core character trait defining sable's abilities."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | contradiction requires user confirmation of current truth."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | important preference for future gameplay interaction."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | uncertain canon status needs verification before storing."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 89,
+    "wall_s": 12.506,
+    "reasoning_chars": 0,
+    "run_code": "76nsusg0",
+    "label": "abl-4b-nonthink"
+  },
+  {
+    "score12": 12,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user confirmed canon status, establishing significant backstory detail."
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | transient break time does not impact core roleplay history or facts."
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | defines core character abilities and weaknesses."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | contradicts earlier lore stating no prior meeting. needs confirmation."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | consistent user preference for pacing, aids future memory filtering."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | uncertain canon status requires user verification before storing facts."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 618,
+    "wall_s": 86.883,
+    "reasoning_chars": 2038,
+    "run_code": "s50bt6ac",
+    "label": "abl-4b-think-512"
+  },
+  {
+    "score12": 12,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user confirmed canon core lore fact."
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | transient timeout note irrelevant to plot or character history."
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | core character attribute relevant to future encounters."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | contradictory history requires clarification on canon before storing."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | valid style preferences improve session flow and user experience."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | uncertain \"maybe\" tag requires confirmation of birthdate accuracy first."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 612,
+    "wall_s": 86.159,
+    "reasoning_chars": 1992,
+    "run_code": "2gaalwf2",
+    "label": "abl-4b-think-512"
+  },
+  {
+    "score12": 12,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user confirmed canon; essential backstory for character identity."
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | temporary absence had no narrative impact; discard for brevity."
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | confirmed character ability restriction aids gameplay consistency."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | contradictory lore needs resolution before final storage."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user preferences guide pacing and reply length consistently."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | tagged as maybe canon; requires user verification on date."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 613,
+    "wall_s": 86.279,
+    "reasoning_chars": 1898,
+    "run_code": "hkzlgvub",
+    "label": "abl-4b-think-512"
+  },
+  {
+    "score12": 4,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | official canon history from the world."
+      },
+      "M2": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | timing of 'brb' needs confirmation for timeline accuracy."
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | fire mage specialization and physical limitation is solid fact."
+      },
+      "M4": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | first statement contradicts user's later correction; drop both."
+      },
+      "M5": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | user preference remains ambiguous until seen in action."
+      },
+      "M6": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | 'maybe canon' tag indicates indecision to ignore the conflict."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 101,
+    "wall_s": 6.481,
+    "reasoning_chars": 0,
+    "run_code": "tpuay55u",
+    "label": "abl-2b-nonthink"
+  },
+  {
+    "score12": 5,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 1,
+        "reason": " | established lore alignment for a major character."
+      },
+      "M2": {
+        "decision": null,
+        "points": 0
+      },
+      "M3": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | vague; needs confirmation before finalizing sable's full skill set."
+      },
+      "M4": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | contradicts the earlier explicit statement about not knowing corvin."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | direct preference matches user intent for concise interactions."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | inconclusive regarding canon status of an obscure event marker."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 5,
+    "format_ok": false,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 103,
+    "wall_s": 6.202,
+    "reasoning_chars": 0,
+    "run_code": "x5vjtnbo",
+    "label": "abl-2b-nonthink"
+  },
+  {
+    "score12": 6,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user stated as canon by user for narrative grounding."
+      },
+      "M2": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | needs confirmation before deciding if this should be a specific detail or general knowledge."
+      },
+      "M3": {
+        "decision": null,
+        "points": 0
+      },
+      "M4": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | contradicts m2 which implies she already meets him; the timeline issue makes it volatile."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user is explicit about preference for brevity in their writing habits."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | needs confirmation before deciding if \"frostfell\" has shifted canon or remains ambiguous."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 5,
+    "format_ok": false,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 123,
+    "wall_s": 7.349,
+    "reasoning_chars": 0,
+    "run_code": "fdxemh4v",
+    "label": "abl-2b-nonthink"
+  },
+  {
+    "score12": 6,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | canon confirmation needed"
+      },
+      "M2": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | contradictory timelines"
+      },
+      "M3": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | fire mage limitations"
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 1,
+        "reason": " | prior consistency check"
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 1,
+        "reason": " | preferred brevity"
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | uncertain birth details"
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 68,
+    "wall_s": 2.533,
+    "reasoning_chars": 0,
+    "run_code": "2sqh27z3",
+    "label": "abl-lfm120"
+  },
+  {
+    "score12": 6,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | canon confirmation needed"
+      },
+      "M2": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | contradictory info"
+      },
+      "M3": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | fire mage limitation"
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 1,
+        "reason": " | training sequence unclear"
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | preference for brevity"
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 1,
+        "reason": " | birthday ambiguity"
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 67,
+    "wall_s": 2.242,
+    "reasoning_chars": 0,
+    "run_code": "5apuk073",
+    "label": "abl-lfm120"
+  },
+  {
+    "score12": 8,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | canon confirmation needed"
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | transient reference"
+      },
+      "M3": {
+        "decision": "HOLD",
+        "points": 0,
+        "reason": " | needs clarification"
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 1,
+        "reason": " | training sequence unclear"
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | preference for brevity"
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 1,
+        "reason": " | birthday ambiguity"
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 64,
+    "wall_s": 2.149,
+    "reasoning_chars": 0,
+    "run_code": "zmtxgxu0",
+    "label": "abl-lfm120"
+  },
+  {
+    "score12": 11,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | stated as canon by the user, durable training fact."
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | brief \"brb\" return, transient and not lasting."
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | fire mage who cannot swim is a core trait."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | first said never met corvin, later says trained her\u2014contradictory."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 1,
+        "reason": " | user prefers short replies, dislikes long scenes."
+      },
+      "M6": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | birthday note uncertain (\"maybe canon\"); needs confirmation."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 634,
+    "wall_s": 30.993,
+    "reasoning_chars": 2061,
+    "run_code": "0bil3r3p",
+    "label": "abl-lfm3-think-512"
+  },
+  {
+    "score12": 8,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user marked as canon; training detail durable."
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 1,
+        "reason": " | brief pause, not lasting info worth long-term memory."
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | fire mage who cannot swim is a core trait."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | contradictory statements about meeting corvin; needs confirmation."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 1,
+        "reason": " | user prefers short replies and dislikes long scenes."
+      },
+      "M6": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | birthday \"maybe canon\" uncertain, less durable than other facts."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 629,
+    "wall_s": 30.751,
+    "reasoning_chars": 1971,
+    "run_code": "3nbtpxch",
+    "label": "abl-lfm3-think-512"
+  },
+  {
+    "score12": 10,
+    "items": {
+      "M1": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | canon training by corvin ashgrave of ossary confirmed."
+      },
+      "M2": {
+        "decision": "REJECT",
+        "points": 2,
+        "reason": " | transient \"brb\" pause, not durable info."
+      },
+      "M3": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | fire mage who cannot swim is a core trait."
+      },
+      "M4": {
+        "decision": "HOLD",
+        "points": 2,
+        "reason": " | contradictory statements about meeting/teaching corvin; needs confirmation."
+      },
+      "M5": {
+        "decision": "KEEP",
+        "points": 2,
+        "reason": " | user's short-reply preference is a lasting style note."
+      },
+      "M6": {
+        "decision": "REJECT",
+        "points": 0,
+        "reason": " | birthday \"maybe canon\" is uncertain, not durable enough."
+      }
+    },
+    "item_lines": 6,
+    "strict_lines": 6,
+    "format_ok": true,
+    "truncated": false,
+    "reasoning_leaked_into_content": false,
+    "admissible": true,
+    "invented": [],
+    "empty": false,
+    "finish_reason": "stop",
+    "completion_tokens": 650,
+    "wall_s": 32.151,
+    "reasoning_chars": 2029,
+    "run_code": "504okf6p",
+    "label": "abl-lfm3-think-512"
+  }
+]

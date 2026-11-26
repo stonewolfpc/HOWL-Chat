@@ -22,6 +22,8 @@ import (
 	"howl-chat/internal/audio/tts/piper"
 	"howl-chat/internal/audio/types"
 	"howl-chat/internal/paths"
+	"howl-chat/internal/process"
+	"howl-chat/internal/resource"
 )
 
 // Pipeline composes ASR, TTS, and optional multimodal processing.
@@ -37,14 +39,25 @@ type Pipeline struct {
 
 	asrRecognizer   types.ASRRecognizer
 	ttsSynth        types.TTSSynthesizer
-	ttsEngines      map[string]types.TTSSynthesizer
+	ttsProviders    map[string]*ttsProvider
 	activeTTSEngine string
+	// activeTTSKey is the provider p.ttsSynth currently refers to.
+	activeTTSKey string
+	// globalTTSKey is the configured engine's provider. It is the fallback for
+	// requests that inherit the engine, so it stays resident for the
+	// generation's lifetime even after a voice swap.
+	globalTTSKey    string
+	ttsRegistry     *process.Registry
+	audioRegistered map[string]audioRegistration
 	multimodal      types.MultimodalBridge
 	ttsCache        types.AudioCache
 	ttsCacheMu      sync.Mutex
 	ttsCacheCalls   map[string]*ttsCacheCall
 	loadedVoice     string // Configured voice model for the active synthesizer
 	initialization  initOutcome
+	// admission is the shared reserve-aware authority. It is nil in unit tests
+	// that construct a bare pipeline; production injects the process authority.
+	admission *resource.Authority
 }
 
 type capabilityInit struct {
@@ -86,15 +99,35 @@ func (o initOutcome) aggregateError() error {
 	return errors.Join(errs...)
 }
 
-// NewPipeline creates an empty pipeline with modular runtime loader.
-func NewPipeline() *Pipeline {
-	loader := runtime.NewModelLoader()
-	registerBuiltins(loader)
-	return &Pipeline{
-		loader:        loader,
-		ttsEngines:    make(map[string]types.TTSSynthesizer),
-		ttsCacheCalls: make(map[string]*ttsCacheCall),
+// NewPipeline creates an empty pipeline with modular runtime loader. A nil
+// registry falls back to the process-wide one, so ownership is never optional.
+func NewPipeline(registries ...*process.Registry) *Pipeline {
+	var registry *process.Registry
+	if len(registries) > 0 {
+		registry = registries[0]
 	}
+	if registry == nil {
+		registry = process.DefaultRegistry()
+	}
+	loader := runtime.NewModelLoader()
+	registerBuiltins(loader, registry)
+	return &Pipeline{
+		loader:          loader,
+		ttsRegistry:     registry,
+		ttsProviders:    make(map[string]*ttsProvider),
+		audioRegistered: make(map[string]audioRegistration),
+		ttsCacheCalls:   make(map[string]*ttsCacheCall),
+	}
+}
+
+// NewManagedPipeline is the production constructor. It attaches the single
+// process-wide admission authority and the composition root's process
+// registry; NewPipeline stays admission-free for provider tests that do not
+// represent a real model start.
+func NewManagedPipeline(registries ...*process.Registry) *Pipeline {
+	p := NewPipeline(registries...)
+	p.admission = resource.DefaultAuthority()
+	return p
 }
 
 // Initialize resolves and loads configured capability providers.
@@ -119,8 +152,11 @@ func (p *Pipeline) Initialize(ctx context.Context, config types.PipelineConfig) 
 	p.ttsCacheMu.Lock()
 	p.ttsCacheCalls = make(map[string]*ttsCacheCall)
 	p.ttsCacheMu.Unlock()
-	p.ttsEngines = make(map[string]types.TTSSynthesizer)
+	if p.ttsProviders == nil {
+		p.ttsProviders = make(map[string]*ttsProvider)
+	}
 	p.activeTTSEngine = ""
+	p.activeTTSKey = ""
 	p.planner = constraints
 	p.initialization = initOutcome{
 		asr: capabilityInit{requested: config.ASREnabled},
@@ -162,15 +198,16 @@ func (p *Pipeline) Initialize(ctx context.Context, config types.PipelineConfig) 
 		p.mu.Lock()
 		p.initialization.tts = outcome
 		p.ttsSynth = nil
-		p.ttsEngines = make(map[string]types.TTSSynthesizer)
 		p.activeTTSEngine = ""
+		p.activeTTSKey = ""
 		p.loadedVoice = ""
 		p.status.TTSReady = false
 		if outcome.ready {
 			p.ttsSynth = synth
 			p.loadedVoice = loadedVoice
 			p.activeTTSEngine = ttsEngine
-			p.ttsEngines[ttsEngineKey(ttsEngine, "")] = synth
+			p.activeTTSKey = ttsEngineKey(ttsEngine, "")
+			p.globalTTSKey = p.activeTTSKey
 			p.status.TTSReady = true
 		}
 		p.mu.Unlock()
@@ -231,6 +268,7 @@ func (p *Pipeline) ProcessAudioMessage(ctx context.Context, msg types.AudioMessa
 // never installed into Pipeline.config or Pipeline.ttsSynth.
 type resolvedTTS struct {
 	synth         types.TTSSynthesizer
+	provider      *ttsProvider
 	engine        string
 	voice         string
 	voicePath     string
@@ -297,12 +335,14 @@ func (p *Pipeline) resolveTTSRequest(ctx context.Context, override *types.VoiceO
 	}
 
 	synth := activeSynth
+	provider := p.activeProvider()
 	if !inheritEngine && engine != activeEngine {
-		loaded, err := p.loadTTSForRequest(ctx, engine, voice)
+		loaded, loadedProvider, err := p.loadTTSForRequest(ctx, engine, voice)
 		if err != nil {
 			return resolvedTTS{}, wrapCharacterVoiceError(characterID, err)
 		}
 		synth = loaded
+		provider = loadedProvider
 	}
 
 	voicePath, err := ttsVoicePath(engine, voice)
@@ -353,6 +393,7 @@ func (p *Pipeline) resolveTTSRequest(ctx context.Context, override *types.VoiceO
 
 	return resolvedTTS{
 		synth:         synth,
+		provider:      provider,
 		engine:        engine,
 		voice:         voice,
 		voicePath:     voicePath,
@@ -415,44 +456,63 @@ func validateTTSVoice(synth types.TTSSynthesizer, engine, voice string) error {
 // loadTTSForRequest loads an explicit engine without changing the active global
 // binding. Piper is keyed by its request model path so a later character cannot
 // inherit another Piper voice model by accident.
-func (p *Pipeline) loadTTSForRequest(ctx context.Context, engine, voice string) (types.TTSSynthesizer, error) {
+func (p *Pipeline) loadTTSForRequest(ctx context.Context, engine, voice string) (types.TTSSynthesizer, *ttsProvider, error) {
 	p.lifecycleMu.RLock()
 	defer p.lifecycleMu.RUnlock()
 	p.ttsLoadMu.Lock()
 	defer p.ttsLoadMu.Unlock()
 
 	if p.loader == nil {
-		return nil, types.NewAudioError(types.ErrCodeModelNotFound,
+		return nil, nil, types.NewAudioError(types.ErrCodeModelNotFound,
 			fmt.Sprintf("cannot load TTS engine %q without a model loader", engine), nil)
 	}
 	voicePath, err := ttsVoicePath(engine, voice)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	key := ttsEngineKey(engine, voicePath)
-	p.mu.RLock()
-	if synth, ok := p.ttsEngines[key]; ok {
-		p.mu.RUnlock()
-		return synth, nil
+	if existing := p.providerByKey(key); existing != nil {
+		return existing.synth, existing, nil
 	}
-	p.mu.RUnlock()
 
 	cfg := ttsConfigForModel(types.TTSModelType(engine), defaultTTSCacheDir())
 	if voicePath != "" {
 		cfg.ModelPath = voicePath
 	}
-	synth, err := p.loader.LoadTTS(ctx, engine, cfg)
+	req, lease, reqErr := p.ttsResidencyRequest(engine, cfg.ModelPath)
+	if reqErr != nil {
+		return nil, nil, types.NewAudioError(types.ErrCodeModelLoadFailed,
+			fmt.Sprintf("admit TTS engine %q: %v", engine, reqErr), reqErr)
+	}
+	synth, loaderID, err := p.loader.LoadTTSWithID(ctx, engine, cfg)
 	if err != nil {
-		return nil, types.NewAudioError(types.ErrCodeModelLoadFailed,
+		lease.Release()
+		return nil, nil, types.NewAudioError(types.ErrCodeModelLoadFailed,
 			fmt.Sprintf("load TTS engine %q: %v", engine, err), err)
 	}
-	p.mu.Lock()
-	if p.ttsEngines == nil {
-		p.ttsEngines = make(map[string]types.TTSSynthesizer)
+	registered := p.registerAudio(resource.ResourceTTS, key, cfg.ModelPath, req, lease)
+	provider := &ttsProvider{
+		key:        key,
+		synth:      synth,
+		engine:     engine,
+		voicePath:  voicePath,
+		loaderID:   loaderID,
+		modelName:  key,
+		registered: registered,
 	}
-	p.ttsEngines[key] = synth
+	p.mu.Lock()
+	p.registerTTSResidencyLocked(provider)
 	p.mu.Unlock()
-	return synth, nil
+
+	// The new provider is installed; request-scoped engines from earlier
+	// requests become reclaimable now. Reclamation runs after a successful load
+	// so a failed load never costs the caller a working provider, and it
+	// protects the provider just installed.
+	if err := p.reclaimIdleTTSProvidersLocked(key); err != nil {
+		p.recordError()
+		fmt.Printf("WARN: reclaim idle TTS providers after loading %q: %v\n", engine, err)
+	}
+	return synth, provider, nil
 }
 
 func ttsEngineKey(engine, voicePath string) string {
@@ -508,36 +568,73 @@ func (p *Pipeline) GetStatus() types.PipelineStatus {
 	return p.status
 }
 
-// GetTTSVoices returns available voices from the current TTS synthesizer.
+// GetTTSVoices returns available voices from the current TTS synthesizer. The
+// interface has no context, so this path is bounded; callers that need a
+// cancellable scope use GetTTSVoicesContext.
 func (p *Pipeline) GetTTSVoices() []types.Voice {
-	p.mu.RLock()
-	synth := p.ttsSynth
-	p.mu.RUnlock()
-	if synth == nil {
+	ctx, cancel := boundedVoiceContext()
+	defer cancel()
+	voices, err := p.GetTTSVoicesContext(ctx)
+	if err != nil {
+		p.recordError()
 		return nil
 	}
-	return synth.GetVoices()
+	return voices
 }
 
-// Shutdown releases loaded resources through loader lifecycle.
+// Shutdown releases loaded resources through their owners. The order matters:
+// owned processes are settled first, then residency is released, then this
+// pipeline's registrations are removed. A process that cannot be confirmed
+// dead, or a provider that is still executing, is reported instead of being
+// treated as cleanly stopped.
 func (p *Pipeline) Shutdown(ctx context.Context) error {
 	_ = ctx
 	p.lifecycleMu.Lock()
 	defer p.lifecycleMu.Unlock()
 
-	ids := p.loader.GetLoadedModels()
 	var errs []error
-	for _, id := range ids {
+
+	if err := p.stopOwnedTTSChildren(); err != nil {
+		errs = append(errs, err)
+	}
+
+	p.ttsLoadMu.Lock()
+	p.mu.Lock()
+	providers := make([]*ttsProvider, 0, len(p.ttsProviders))
+	for _, provider := range p.ttsProviders {
+		providers = append(providers, provider)
+	}
+	p.mu.Unlock()
+	p.ttsLoadMu.Unlock()
+	for _, provider := range providers {
+		if err := p.unloadTTSProvider(provider); err != nil {
+			// A refused or failed unload keeps its residency and registration;
+			// the run loop deletes only what it actually released.
+			errs = append(errs, err)
+		}
+	}
+
+	// Loader entries without a provider table entry (ASR, or a provider whose
+	// registration could not be released) are settled here.
+	for _, id := range p.loader.GetLoadedModels() {
 		if err := p.loader.Unload(id); err != nil {
 			errs = append(errs, fmt.Errorf("unload %s: %w", id, err))
 		}
 	}
 
+	// Remove exactly what this pipeline registered, never a global sweep of
+	// audio models another owner may be using. A model whose provider is still
+	// retained keeps its registration.
+	p.releaseOwnedAudioRegistrations()
+
 	p.mu.Lock()
 	p.asrRecognizer = nil
-	p.ttsSynth = nil
-	p.ttsEngines = make(map[string]types.TTSSynthesizer)
+	if len(p.ttsProviders) == 0 {
+		p.ttsSynth = nil
+	}
 	p.activeTTSEngine = ""
+	p.activeTTSKey = ""
+	p.globalTTSKey = ""
 	p.multimodal = nil
 	p.loadedVoice = ""
 	p.status.ASRReady = false
@@ -553,7 +650,7 @@ func (p *Pipeline) Shutdown(ctx context.Context) error {
 // provider outcomes can be exercised without installed audio assets;
 // production always reads the probed environment.
 var pipelineCapabilityCatalog = func() []capability.Record {
-	return capability.Catalog(capability.ProductionEnv(ASRModelPathFor, ASRProjectorPathFor, TTSModelPathFor))
+	return ProductionCapabilityRecords()
 }
 
 // asrCandidatesFor resolves the engines one Apply may load.
@@ -661,6 +758,79 @@ func asrDecodeConfigFor(config types.PipelineConfig) types.ASRConfig {
 	}
 }
 
+func (p *Pipeline) admitAudio(req resource.AdmissionRequest) (*resource.AdmissionLease, error) {
+	if p.admission == nil {
+		return nil, nil
+	}
+	decision, lease := p.admission.Admit(req)
+	if !decision.Admitted {
+		return nil, fmt.Errorf("%s", decision.Reason)
+	}
+	return lease, nil
+}
+
+// registerAudio converts an admission lease into a resident registration and
+// records that this pipeline owns it. The lease is released at the same moment:
+// holding both would count the same bytes as a pending reservation and as a
+// resident model.
+func (p *Pipeline) registerAudio(kind resource.ResourceType, name, path string, req resource.AdmissionRequest, lease *resource.AdmissionLease) bool {
+	registered := false
+	if p.admission != nil {
+		priority := resource.PriorityASR
+		if kind == resource.ResourceTTS {
+			priority = resource.PriorityTTS
+		}
+		resource.GetManager().RegisterModel(kind, name, path, req.AudioVRAMMB, req.AudioRAMMB, priority, req.RequireGPU)
+		p.mu.Lock()
+		if p.audioRegistered == nil {
+			p.audioRegistered = make(map[string]audioRegistration)
+		}
+		p.audioRegistered[audioRegKey(kind, name)] = audioRegistration{kind: kind, name: name}
+		p.mu.Unlock()
+		registered = true
+	}
+	lease.Release()
+	return registered
+}
+
+func asrAdmissionRequest(modelType types.ASRModelType) (resource.AdmissionRequest, error) {
+	profile, ok := types.GetASRProfile(modelType)
+	if !ok {
+		return resource.AdmissionRequest{}, fmt.Errorf("cannot admit ASR %s: no model profile is registered; refusing to load without a memory estimate", modelType)
+	}
+	const mb = int64(1024 * 1024)
+	return resource.AdmissionRequest{
+		Kind:        resource.ResourceASR,
+		Name:        string(modelType),
+		Path:        ASRModelPathFor(modelType),
+		AudioVRAMMB: profile.VRAMBytes / mb,
+		AudioRAMMB:  (profile.RAMBytes + profile.ModelSizeBytes) / mb,
+		RequireGPU:  profile.Runtime == types.RuntimeLlamaServerASR && profile.VRAMBytes > 0,
+		DeviceIndex: 0,
+	}, nil
+}
+
+func ttsAdmissionRequest(engine, modelPath string) (resource.AdmissionRequest, error) {
+	profile, ok := types.GetTTSProfile(types.TTSModelType(engine))
+	if !ok {
+		return resource.AdmissionRequest{}, fmt.Errorf("cannot admit TTS %s: no model profile is registered; refusing to load without a memory estimate", engine)
+	}
+	const mb = int64(1024 * 1024)
+	ramMB := (profile.RAMBytes + profile.ModelSizeBytes) / mb
+	if info, err := os.Stat(modelPath); err == nil && !info.IsDir() {
+		ramMB += info.Size() / mb
+	}
+	return resource.AdmissionRequest{
+		Kind:        resource.ResourceTTS,
+		Name:        engine,
+		Path:        modelPath,
+		AudioVRAMMB: profile.VRAMBytes / mb,
+		AudioRAMMB:  ramMB,
+		RequireGPU:  profile.VRAMBytes > 0,
+		DeviceIndex: 0,
+	}, nil
+}
+
 func (p *Pipeline) initASR(ctx context.Context, candidates []types.ASRModelType, config types.PipelineConfig) (types.ASRRecognizer, capabilityInit) {
 	out := capabilityInit{requested: true}
 	if len(candidates) == 0 {
@@ -671,9 +841,26 @@ func (p *Pipeline) initASR(ctx context.Context, candidates []types.ASRModelType,
 	recognizers := make([]types.ASRRecognizer, 0, len(selected))
 	recMap := make(map[types.ASRModelType]types.ASRRecognizer)
 	ownedIDs := make([]string, 0, len(selected))
+	type admittedASR struct {
+		modelType types.ASRModelType
+		path      string
+		req       resource.AdmissionRequest
+		lease     *resource.AdmissionLease
+	}
+	admitted := make([]admittedASR, 0, len(selected))
 	var errs []error
 	decode := asrDecodeConfigFor(config)
 	for _, modelType := range selected {
+		req, reqErr := asrAdmissionRequest(modelType)
+		if reqErr != nil {
+			errs = append(errs, reqErr)
+			continue
+		}
+		lease, admitErr := p.admitAudio(req)
+		if admitErr != nil {
+			errs = append(errs, fmt.Errorf("admit ASR %s: %w", modelType, admitErr))
+			continue
+		}
 		rec, err := p.loader.LoadASR(ctx, string(modelType), types.ASRConfig{
 			ModelPath:     ASRModelPathFor(modelType),
 			ProjectorPath: ASRProjectorPathFor(modelType),
@@ -684,12 +871,14 @@ func (p *Pipeline) initASR(ctx context.Context, candidates []types.ASRModelType,
 			BestOf:        decode.BestOf,
 		})
 		if err != nil {
+			lease.Release()
 			errs = append(errs, fmt.Errorf("load ASR %s: %w", modelType, err))
 			continue
 		}
 		ownedIDs = append(ownedIDs, asrLoaderID(string(modelType)))
 		recognizers = append(recognizers, rec)
 		recMap[modelType] = rec
+		admitted = append(admitted, admittedASR{modelType: modelType, path: ASRModelPathFor(modelType), req: req, lease: lease})
 	}
 	if len(recognizers) == 0 {
 		out.err = errors.Join(errs...)
@@ -713,8 +902,14 @@ func (p *Pipeline) initASR(ctx context.Context, candidates []types.ASRModelType,
 				cleanupErrs = append(cleanupErrs, fmt.Errorf("unload %s: %w", id, unloadErr))
 			}
 		}
+		for _, loaded := range admitted {
+			loaded.lease.Release()
+		}
 		out.err = errors.Join(cleanupErrs...)
 		return nil, out
+	}
+	for _, loaded := range admitted {
+		p.registerAudio(resource.ResourceASR, string(loaded.modelType), loaded.path, loaded.req, loaded.lease)
 	}
 	out.ready = true
 	return chain, out
@@ -730,11 +925,29 @@ func (p *Pipeline) initTTS(ctx context.Context, candidates []types.TTSModelType)
 	var errs []error
 	for _, candidate := range candidates {
 		cfg := ttsConfigForModel(candidate, cacheDir)
-		synth, err := p.loader.LoadTTS(ctx, string(candidate), cfg)
+		req, lease, reqErr := p.ttsResidencyRequest(string(candidate), cfg.ModelPath)
+		if reqErr != nil {
+			errs = append(errs, fmt.Errorf("admit TTS %s: %w", candidate, reqErr))
+			continue
+		}
+		synth, loaderID, err := p.loader.LoadTTSWithID(ctx, string(candidate), cfg)
 		if err != nil {
+			lease.Release()
 			errs = append(errs, fmt.Errorf("load TTS %s: %w", candidate, err))
 			continue
 		}
+		key := ttsEngineKey(string(candidate), "")
+		registered := p.registerAudio(resource.ResourceTTS, key, cfg.ModelPath, req, lease)
+		p.mu.Lock()
+		p.registerTTSResidencyLocked(&ttsProvider{
+			key:        key,
+			synth:      synth,
+			engine:     string(candidate),
+			loaderID:   loaderID,
+			modelName:  key,
+			registered: registered,
+		})
+		p.mu.Unlock()
 		out.ready = true
 		return synth, cfg.ModelPath, string(candidate), out
 	}
@@ -773,15 +986,51 @@ func (p *Pipeline) ensureTTSVoice(ctx context.Context, voiceName string) error {
 		CacheDir:     cacheDir,
 		CacheEnabled: true,
 	}
-	newSynth, err := p.loader.LoadTTS(ctx, string(types.TTSPiper), cfg)
+	key := ttsEngineKey(string(types.TTSPiper), modelPath)
+	if existing := p.providerByKey(key); existing != nil {
+		p.mu.Lock()
+		p.ttsSynth = existing.synth
+		p.loadedVoice = voiceName
+		p.activeTTSKey = key
+		p.mu.Unlock()
+		return nil
+	}
+
+	req, lease, reqErr := p.ttsResidencyRequest(string(types.TTSPiper), modelPath)
+	if reqErr != nil {
+		return types.NewAudioError(types.ErrCodeModelLoadFailed,
+			fmt.Sprintf("admit voice %s: %v", voiceName, reqErr), reqErr)
+	}
+	newSynth, loaderID, err := p.loader.LoadTTSWithID(ctx, string(types.TTSPiper), cfg)
 	if err != nil {
+		lease.Release()
 		return types.NewAudioError(types.ErrCodeModelLoadFailed,
 			fmt.Sprintf("failed to load voice %s", voiceName), err)
 	}
+	registered := p.registerAudio(resource.ResourceTTS, key, modelPath, req, lease)
+	provider := &ttsProvider{
+		key:        key,
+		synth:      newSynth,
+		engine:     string(types.TTSPiper),
+		voicePath:  modelPath,
+		loaderID:   loaderID,
+		modelName:  key,
+		registered: registered,
+	}
 	p.mu.Lock()
+	p.registerTTSResidencyLocked(provider)
 	p.ttsSynth = newSynth
 	p.loadedVoice = voiceName
+	p.activeTTSKey = key
 	p.mu.Unlock()
+
+	// The new voice is active; the voice it superseded is now idle and becomes
+	// reclaimable. Reclamation happens only after the replacement succeeded, so
+	// a failed voice load leaves the previous voice working.
+	if err := p.reclaimIdleTTSProvidersLocked(key); err != nil {
+		p.recordError()
+		fmt.Printf("WARN: reclaim idle TTS providers after loading voice %s: %v\n", voiceName, err)
+	}
 	fmt.Printf("INFO: loaded TTS voice: %s\n", voiceName)
 	return nil
 }
@@ -860,7 +1109,12 @@ func (p *Pipeline) synthesizeWithCache(ctx context.Context, cacheStore types.Aud
 		return cached.AudioPath, nil
 	}
 
+	// Active synthesis holds the provider's execution lease. Residency remains
+	// until an explicit controlled reclamation; the lease only proves the
+	// provider is in use while this call runs.
+	release := p.acquireTTSExecution(resolved.provider)
 	out, err := resolved.synth.Synthesize(ctx, req, nil)
+	release()
 	if err != nil {
 		p.finishTTSCacheCall(key, call, "", err)
 		return "", err
@@ -902,16 +1156,16 @@ func (p *Pipeline) recordError() {
 	p.mu.Unlock()
 }
 
-func registerBuiltins(loader *runtime.ModelLoader) {
+func registerBuiltins(loader *runtime.ModelLoader, registry *process.Registry) {
 	loader.RegisterASR(types.ASRWhisperTiny, func() types.ASRRecognizer { return whisper.New(types.ASRWhisperTiny) })
 	loader.RegisterASR(types.ASRWhisperBase, func() types.ASRRecognizer { return whisper.New(types.ASRWhisperBase) })
 	loader.RegisterASR(types.ASRWhisperSmall, func() types.ASRRecognizer { return whisper.New(types.ASRWhisperSmall) })
 	loader.RegisterASR(types.ASRQwen3ASR06B, func() types.ASRRecognizer { return qwen.NewClient(os.Getenv("HOWL_QWEN_API_KEY")) })
 	loader.RegisterASR(types.ASRQwen3ASR17B, func() types.ASRRecognizer { return qwen.NewClient(os.Getenv("HOWL_QWEN_API_KEY")) })
 	loader.RegisterASR(types.ASRQwen3ASR17BLocal, func() types.ASRRecognizer { return llama.New() })
-	loader.RegisterTTS(types.TTSPiper, func() types.TTSSynthesizer { return piper.New() })
-	loader.RegisterTTS(types.TTSMeloTTS, func() types.TTSSynthesizer { return melotts.New() })
-	loader.RegisterTTS(types.TTSKokoro, func() types.TTSSynthesizer { return kokoro.New() })
+	loader.RegisterTTS(types.TTSPiper, func() types.TTSSynthesizer { return piper.New(registry) })
+	loader.RegisterTTS(types.TTSMeloTTS, func() types.TTSSynthesizer { return melotts.New(registry) })
+	loader.RegisterTTS(types.TTSKokoro, func() types.TTSSynthesizer { return kokoro.New(registry) })
 }
 
 func parseTier(raw string) types.MemoryTier {

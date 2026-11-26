@@ -1,0 +1,1553 @@
+{
+  "blocks": 2,
+  "characters": 4,
+  "client_messages_before_reply": 4,
+  "heldout_commitments": {
+    "f-003": "fadb7d10aaf77e3bbb52647995ff7ada5651cbca2353b38d03f6641eec1f8b54",
+    "f-013": "8e3f76da7afc0e86357af16682b001f3f4fdbe41f61be0f7194fc8997e885076",
+    "f-023": "78a47f0306509af5af24f9cf2844be34f9fb2b0ed8a85adc605428ecac84521e",
+    "f-033": "40db5a9557541f2a6a6d4ba99eefa879cf03824e477b459a16d7da4d084fb3aa"
+  },
+  "heldout_commitments_only": true,
+  "planned_generations": 48,
+  "schedule_id": "S2-schedule-draft-v2-4msg",
+  "schedule_sha256": "5545e3a46d9db5653127a3eb4d950b5ade631a367063a09483378f2bdbae51f8",
+  "seed": 20261115,
+  "status": "DRAFT \u2014 design only; not authorised, not executable",
+  "trials": [
+    {
+      "arm": "probed",
+      "block": 1,
+      "character": "char-001",
+      "character_name": "Sable",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-001",
+        "f-002"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Sable.\nKnown:\n- The person who trained me was Corvin Ashgrave of Ossary.\n- I keep a ledger of unpaid debts in the blue cabinet.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Remind me \u2014 who trained you?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 1
+    },
+    {
+      "arm": "distractor",
+      "block": 1,
+      "character": "char-001",
+      "character_name": "Sable",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-002"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Sable.\nKnown:\n- I keep a ledger of unpaid debts in the blue cabinet.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Remind me \u2014 who trained you?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 2
+    },
+    {
+      "arm": "foreign",
+      "block": 1,
+      "character": "char-001",
+      "character_name": "Sable",
+      "donor_character": "char-002",
+      "injected_fact_ids": [
+        "f-011"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Sable.\nKnown:\n- The vault code is seven-four-nine-one.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Remind me \u2014 who trained you?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": "char-001->char-002",
+      "total_messages_including_reply": 5,
+      "trial": 3
+    },
+    {
+      "arm": "probed",
+      "block": 1,
+      "character": "char-001",
+      "character_name": "Sable",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-001",
+        "f-002"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Sable.\nKnown:\n- The person who trained me was Corvin Ashgrave of Ossary.\n- I keep a ledger of unpaid debts in the blue cabinet.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Remind me \u2014 who trained you?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 4
+    },
+    {
+      "arm": "control",
+      "block": 1,
+      "character": "char-001",
+      "character_name": "Sable",
+      "donor_character": null,
+      "injected_fact_ids": [],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Sable.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Remind me \u2014 who trained you?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 5
+    },
+    {
+      "arm": "probed",
+      "block": 1,
+      "character": "char-001",
+      "character_name": "Sable",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-001",
+        "f-002"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Sable.\nKnown:\n- The person who trained me was Corvin Ashgrave of Ossary.\n- I keep a ledger of unpaid debts in the blue cabinet.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Remind me \u2014 who trained you?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 6
+    },
+    {
+      "arm": "probed",
+      "block": 1,
+      "character": "char-002",
+      "character_name": "Alaric",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-011",
+        "f-012"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Alaric.\nKnown:\n- The vault code is seven-four-nine-one.\n- I served four years in the Ninth Company.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 7
+    },
+    {
+      "arm": "control",
+      "block": 1,
+      "character": "char-002",
+      "character_name": "Alaric",
+      "donor_character": null,
+      "injected_fact_ids": [],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Alaric.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 8
+    },
+    {
+      "arm": "foreign",
+      "block": 1,
+      "character": "char-002",
+      "character_name": "Alaric",
+      "donor_character": "char-003",
+      "injected_fact_ids": [
+        "f-021"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Alaric.\nKnown:\n- I have never been told the vault code.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": "char-002->char-003",
+      "total_messages_including_reply": 5,
+      "trial": 9
+    },
+    {
+      "arm": "probed",
+      "block": 1,
+      "character": "char-002",
+      "character_name": "Alaric",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-011",
+        "f-012"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Alaric.\nKnown:\n- The vault code is seven-four-nine-one.\n- I served four years in the Ninth Company.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 10
+    },
+    {
+      "arm": "distractor",
+      "block": 1,
+      "character": "char-002",
+      "character_name": "Alaric",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-012"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Alaric.\nKnown:\n- I served four years in the Ninth Company.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 11
+    },
+    {
+      "arm": "probed",
+      "block": 1,
+      "character": "char-002",
+      "character_name": "Alaric",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-011",
+        "f-012"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Alaric.\nKnown:\n- The vault code is seven-four-nine-one.\n- I served four years in the Ninth Company.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 12
+    },
+    {
+      "arm": "probed",
+      "block": 1,
+      "character": "char-003",
+      "character_name": "Brynn",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-021",
+        "f-022"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Brynn.\nKnown:\n- I have never been told the vault code.\n- I was apprenticed to a cartographer in the low city.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 13
+    },
+    {
+      "arm": "distractor",
+      "block": 1,
+      "character": "char-003",
+      "character_name": "Brynn",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-022"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Brynn.\nKnown:\n- I was apprenticed to a cartographer in the low city.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 14
+    },
+    {
+      "arm": "probed",
+      "block": 1,
+      "character": "char-003",
+      "character_name": "Brynn",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-021",
+        "f-022"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Brynn.\nKnown:\n- I have never been told the vault code.\n- I was apprenticed to a cartographer in the low city.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 15
+    },
+    {
+      "arm": "foreign",
+      "block": 1,
+      "character": "char-003",
+      "character_name": "Brynn",
+      "donor_character": "char-004",
+      "injected_fact_ids": [
+        "f-031"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Brynn.\nKnown:\n- I keep the eastern lighthouse and its lamp.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": "char-003->char-004",
+      "total_messages_including_reply": 5,
+      "trial": 16
+    },
+    {
+      "arm": "probed",
+      "block": 1,
+      "character": "char-003",
+      "character_name": "Brynn",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-021"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Brynn.\nKnown:\n- I have never been told the vault code.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 17
+    },
+    {
+      "arm": "control",
+      "block": 1,
+      "character": "char-003",
+      "character_name": "Brynn",
+      "donor_character": null,
+      "injected_fact_ids": [],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Brynn.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 18
+    },
+    {
+      "arm": "probed",
+      "block": 1,
+      "character": "char-004",
+      "character_name": "Mireille",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-031",
+        "f-032"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Mireille.\nKnown:\n- I keep the eastern lighthouse and its lamp.\n- I speak three languages, none of them well.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Who keeps the eastern lighthouse?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 19
+    },
+    {
+      "arm": "control",
+      "block": 1,
+      "character": "char-004",
+      "character_name": "Mireille",
+      "donor_character": null,
+      "injected_fact_ids": [],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Mireille.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Who keeps the eastern lighthouse?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 20
+    },
+    {
+      "arm": "probed",
+      "block": 1,
+      "character": "char-004",
+      "character_name": "Mireille",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-031"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Mireille.\nKnown:\n- I keep the eastern lighthouse and its lamp.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Who keeps the eastern lighthouse?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 21
+    },
+    {
+      "arm": "foreign",
+      "block": 1,
+      "character": "char-004",
+      "character_name": "Mireille",
+      "donor_character": "char-001",
+      "injected_fact_ids": [
+        "f-001"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Mireille.\nKnown:\n- The person who trained me was Corvin Ashgrave of Ossary.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Who keeps the eastern lighthouse?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": "char-004->char-001",
+      "total_messages_including_reply": 5,
+      "trial": 22
+    },
+    {
+      "arm": "distractor",
+      "block": 1,
+      "character": "char-004",
+      "character_name": "Mireille",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-032"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Mireille.\nKnown:\n- I speak three languages, none of them well.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Who keeps the eastern lighthouse?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 23
+    },
+    {
+      "arm": "probed",
+      "block": 1,
+      "character": "char-004",
+      "character_name": "Mireille",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-031",
+        "f-032"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Mireille.\nKnown:\n- I keep the eastern lighthouse and its lamp.\n- I speak three languages, none of them well.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Who keeps the eastern lighthouse?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 24
+    },
+    {
+      "arm": "probed",
+      "block": 2,
+      "character": "char-001",
+      "character_name": "Sable",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-001"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Sable.\nKnown:\n- The person who trained me was Corvin Ashgrave of Ossary.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Remind me \u2014 who trained you?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 25
+    },
+    {
+      "arm": "probed",
+      "block": 2,
+      "character": "char-001",
+      "character_name": "Sable",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-001"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Sable.\nKnown:\n- The person who trained me was Corvin Ashgrave of Ossary.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Remind me \u2014 who trained you?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 26
+    },
+    {
+      "arm": "control",
+      "block": 2,
+      "character": "char-001",
+      "character_name": "Sable",
+      "donor_character": null,
+      "injected_fact_ids": [],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Sable.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Remind me \u2014 who trained you?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 27
+    },
+    {
+      "arm": "foreign",
+      "block": 2,
+      "character": "char-001",
+      "character_name": "Sable",
+      "donor_character": "char-003",
+      "injected_fact_ids": [
+        "f-021"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Sable.\nKnown:\n- I have never been told the vault code.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Remind me \u2014 who trained you?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": "char-001->char-003",
+      "total_messages_including_reply": 5,
+      "trial": 28
+    },
+    {
+      "arm": "distractor",
+      "block": 2,
+      "character": "char-001",
+      "character_name": "Sable",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-002"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Sable.\nKnown:\n- I keep a ledger of unpaid debts in the blue cabinet.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Remind me \u2014 who trained you?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 29
+    },
+    {
+      "arm": "probed",
+      "block": 2,
+      "character": "char-001",
+      "character_name": "Sable",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-001"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Sable.\nKnown:\n- The person who trained me was Corvin Ashgrave of Ossary.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Remind me \u2014 who trained you?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 30
+    },
+    {
+      "arm": "distractor",
+      "block": 2,
+      "character": "char-002",
+      "character_name": "Alaric",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-012"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Alaric.\nKnown:\n- I served four years in the Ninth Company.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 31
+    },
+    {
+      "arm": "probed",
+      "block": 2,
+      "character": "char-002",
+      "character_name": "Alaric",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-011"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Alaric.\nKnown:\n- The vault code is seven-four-nine-one.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 32
+    },
+    {
+      "arm": "control",
+      "block": 2,
+      "character": "char-002",
+      "character_name": "Alaric",
+      "donor_character": null,
+      "injected_fact_ids": [],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Alaric.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 33
+    },
+    {
+      "arm": "probed",
+      "block": 2,
+      "character": "char-002",
+      "character_name": "Alaric",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-011"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Alaric.\nKnown:\n- The vault code is seven-four-nine-one.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 34
+    },
+    {
+      "arm": "foreign",
+      "block": 2,
+      "character": "char-002",
+      "character_name": "Alaric",
+      "donor_character": "char-004",
+      "injected_fact_ids": [
+        "f-031"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Alaric.\nKnown:\n- I keep the eastern lighthouse and its lamp.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": "char-002->char-004",
+      "total_messages_including_reply": 5,
+      "trial": 35
+    },
+    {
+      "arm": "probed",
+      "block": 2,
+      "character": "char-002",
+      "character_name": "Alaric",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-011"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Alaric.\nKnown:\n- The vault code is seven-four-nine-one.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 36
+    },
+    {
+      "arm": "probed",
+      "block": 2,
+      "character": "char-003",
+      "character_name": "Brynn",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-021"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Brynn.\nKnown:\n- I have never been told the vault code.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 37
+    },
+    {
+      "arm": "foreign",
+      "block": 2,
+      "character": "char-003",
+      "character_name": "Brynn",
+      "donor_character": "char-001",
+      "injected_fact_ids": [
+        "f-001"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Brynn.\nKnown:\n- The person who trained me was Corvin Ashgrave of Ossary.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": "char-003->char-001",
+      "total_messages_including_reply": 5,
+      "trial": 38
+    },
+    {
+      "arm": "probed",
+      "block": 2,
+      "character": "char-003",
+      "character_name": "Brynn",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-021",
+        "f-022"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Brynn.\nKnown:\n- I have never been told the vault code.\n- I was apprenticed to a cartographer in the low city.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 39
+    },
+    {
+      "arm": "distractor",
+      "block": 2,
+      "character": "char-003",
+      "character_name": "Brynn",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-022"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Brynn.\nKnown:\n- I was apprenticed to a cartographer in the low city.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 40
+    },
+    {
+      "arm": "control",
+      "block": 2,
+      "character": "char-003",
+      "character_name": "Brynn",
+      "donor_character": null,
+      "injected_fact_ids": [],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Brynn.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 41
+    },
+    {
+      "arm": "probed",
+      "block": 2,
+      "character": "char-003",
+      "character_name": "Brynn",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-021",
+        "f-022"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Brynn.\nKnown:\n- I have never been told the vault code.\n- I was apprenticed to a cartographer in the low city.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "What is the vault code?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 42
+    },
+    {
+      "arm": "probed",
+      "block": 2,
+      "character": "char-004",
+      "character_name": "Mireille",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-031",
+        "f-032"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Mireille.\nKnown:\n- I keep the eastern lighthouse and its lamp.\n- I speak three languages, none of them well.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Who keeps the eastern lighthouse?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 43
+    },
+    {
+      "arm": "foreign",
+      "block": 2,
+      "character": "char-004",
+      "character_name": "Mireille",
+      "donor_character": "char-002",
+      "injected_fact_ids": [
+        "f-011"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Mireille.\nKnown:\n- The vault code is seven-four-nine-one.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Who keeps the eastern lighthouse?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": "char-004->char-002",
+      "total_messages_including_reply": 5,
+      "trial": 44
+    },
+    {
+      "arm": "control",
+      "block": 2,
+      "character": "char-004",
+      "character_name": "Mireille",
+      "donor_character": null,
+      "injected_fact_ids": [],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Mireille.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Who keeps the eastern lighthouse?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 45
+    },
+    {
+      "arm": "distractor",
+      "block": 2,
+      "character": "char-004",
+      "character_name": "Mireille",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-032"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Mireille.\nKnown:\n- I speak three languages, none of them well.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Who keeps the eastern lighthouse?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 46
+    },
+    {
+      "arm": "probed",
+      "block": 2,
+      "character": "char-004",
+      "character_name": "Mireille",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-031"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Mireille.\nKnown:\n- I keep the eastern lighthouse and its lamp.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Who keeps the eastern lighthouse?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 47
+    },
+    {
+      "arm": "probed",
+      "block": 2,
+      "character": "char-004",
+      "character_name": "Mireille",
+      "donor_character": null,
+      "injected_fact_ids": [
+        "f-031"
+      ],
+      "input_messages": 4,
+      "messages": [
+        {
+          "content": "You are Mireille.\nKnown:\n- I keep the eastern lighthouse and its lamp.",
+          "role": "system"
+        },
+        {
+          "content": "The road south was worse than I remembered.",
+          "role": "user"
+        },
+        {
+          "content": "Then you came the long way. Sit down before you fall down.",
+          "role": "assistant"
+        },
+        {
+          "content": "Who keeps the eastern lighthouse?",
+          "role": "user"
+        }
+      ],
+      "ordered_pair": null,
+      "total_messages_including_reply": 5,
+      "trial": 48
+    }
+  ],
+  "trials_per_character_per_block": 6
+}

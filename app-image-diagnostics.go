@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"howl-chat/internal/host"
 	"howl-chat/internal/paths"
+	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	goruntime "runtime"
@@ -75,33 +78,54 @@ func (a *App) GetAppDiagnostics() map[string]interface{} {
 	return result
 }
 
-// GetImagePlacement reports where the loaded model's weights actually live.
-// On a card that cannot hold the model, sd-server keeps them in system RAM and
-// streams them per step; the app used to report "loaded" either way, so a model
-// running entirely from RAM looked the same as one resident in VRAM.
+// GetImagePlacement reports the theoretical requirement, the plan Howl sent,
+// and where sd-server actually put the loaded model's weights. The actual half
+// is diagnostic only; it never feeds back into admission.
 func (a *App) GetImagePlacement() map[string]interface{} {
-	out := map[string]interface{}{"known": false}
-	e, ok := a.images.Engine().(*sdcpp.Engine)
-	if !ok {
-		return out
-	}
-	p := e.GetPlacement()
-	out["known"] = p.Known
-	out["vramMB"] = p.VRAMMB
-	out["ramMB"] = p.RAMMB
-	out["components"] = p.Components
-	out["backends"] = p.Backends
-	out["offloaded"] = p.Offloaded()
-	if model := e.GetLoadedModel(); model != nil {
-		out["model"] = model.Name
-		out["family"] = model.Family
-	}
-	return out
+	return a.buildImagePlacementReport("status")
 }
 
 // -----------------------------------------------------------------------
 // Version checking
 // -----------------------------------------------------------------------
+
+// ImageEngineCapabilities answers the four capability questions in one place,
+// each from its own authority:
+//
+//	CLI   — cli_* : parsed from the binary's own --help (does it take the flag?)
+//	API   — api_* : the server's /sdcpp/v1/capabilities (does it implement it?)
+//	Model — families : loading contracts this build knows
+//
+// Whether a capability was actually activated is answered by the generation
+// that used it, not by this list.
+func (a *App) ImageEngineCapabilities() map[string]interface{} {
+	cfg := a.images.EngineConfig()
+	binary := cfg.BinaryPath
+	if binary == "" {
+		binary = sdcpp.FindSDServer()
+	}
+	cli := sdcpp.ProbeCLI(binary)
+	out := map[string]interface{}{
+		"binary":         binary,
+		"commit":         sdcpp.BinaryVersion(binary),
+		"pinned_tag":     sdcpp.EngineTag,
+		"pinned_commit":  sdcpp.EngineCommit,
+		"cli_probed":     cli.Probed,
+		"cli_flag_count": len(cli.Flags),
+		"families":       sdcpp.SupportedFamilies(),
+	}
+	port := cfg.Port
+	if port == 0 {
+		port = 8081
+	}
+	api := sdcpp.ProbeAPI(fmt.Sprintf("http://127.0.0.1:%d", port))
+	out["api_reached"] = api.Reached
+	out["api_features"] = api.Features
+	out["api_modes"] = api.Modes
+	out["api_samplers"] = api.Samplers
+	out["api_schedulers"] = api.Schedulers
+	return out
+}
 
 // GetSDServerVersion reports the sd-server commit the engine package detects.
 // Probing lives in sdcpp.BinaryVersion so the image domain and this binding
@@ -118,29 +142,10 @@ func (a *App) GetSDServerVersion() string {
 	return sdcpp.BinaryVersion(binary)
 }
 
-// isOldSDServer reports known commits that fail on modern GGUFs.
-func isOldSDServer(commit string) bool { return sdcpp.IsKnownOldVersion(commit) }
-
-// isFamilySupportedByBackend checks if the current sd-server version supports a model family.
-// SD3.5 requires a very recent stable-diffusion.cpp build (May 2026+).
-func isFamilySupportedByBackend(family string, commit string) bool {
-	familyLower := strings.ToLower(family)
-
-	// SD3.5 requires latest stable-diffusion.cpp
-	if familyLower == "sd3.5" {
-		// For now, assume only "unknown" or very recent commits support SD3.5
-		// Users should update to latest to get SD3.5 support
-		if commit == "unknown" {
-			return false // conservative: assume unknown means old
-		}
-		// If we can verify the commit is from May 2026 or later, return true
-		// For now, be conservative and require user to update
-		return false
-	}
-
-	// All other families (SD1.5, SD2.1, SDXL, SD3, Flux, Chroma, etc.) are supported
-	return true
-}
+// Version-based family gates used to live here: a commit blacklist and a rule
+// that reported SD 3.5 as unsupported on every build. Neither had a caller, and
+// both contradicted observed behaviour (SD 3.5 generates on the pinned engine).
+// Capability is answered by sdcpp.ProbeCLI against the binary in use.
 
 // -----------------------------------------------------------------------
 // File pickers (Wails bindings)
@@ -178,6 +183,37 @@ func (a *App) OpenImageModelsDirPicker() (string, error) {
 		return "", fmt.Errorf("directory dialog: %w", err)
 	}
 	return dir, nil
+}
+
+// OpenIPAdapterImagePicker opens the ownerless native image chooser and returns
+// the selected file as a data URL. It is the packaged host's real reference-image
+// path: the HTML file input routes through WebView2's owned file chooser, which
+// disables the Wails window and can end in the same fatal Chromium.Focus exit as
+// the old directory picker. The browser harness keeps its HTML input.
+func (a *App) OpenIPAdapterImagePicker() (string, error) {
+	path, err := host.ChooseFile(
+		"Select IP-Adapter Reference Image",
+		dialogDefaultDir(a.GetImageEngineConfig().ModelsDir),
+		"Images (*.png;*.jpg;*.jpeg;*.webp;*.bmp)\x00*.png;*.jpg;*.jpeg;*.webp;*.bmp\x00All files (*.*)\x00*.*\x00",
+		"png",
+	)
+	if err != nil {
+		return "", fmt.Errorf("reference-image dialog: %w", err)
+	}
+	if path == "" {
+		log.Printf("[ImagePicker] reference image selection cancelled")
+		return "", nil
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("read reference image: %w", err)
+	}
+	mime := http.DetectContentType(data)
+	if !strings.HasPrefix(mime, "image/") {
+		return "", fmt.Errorf("reference image %q is not an image (%s)", path, mime)
+	}
+	log.Printf("[ImagePicker] reference image selected path=%q bytes=%d mime=%s", path, len(data), mime)
+	return "data:" + mime + ";base64," + base64.StdEncoding.EncodeToString(data), nil
 }
 
 // OpenSDServerFilePicker opens a file dialog for selecting the sd-server binary.

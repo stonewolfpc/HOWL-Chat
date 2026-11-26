@@ -44,9 +44,14 @@
     padding: 6px 16px;
     border-radius: 8px;
     pointer-events: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* Errors name measured MB/floor values. A nowrap bar truncated those
+       numbers, so a refusal could be visible yet unreadable. Wrap long status
+       text instead of ellipsizing it. */
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+    line-height: 1.35;
     flex: 1;
     text-align: center;
     border: 1px solid var(--border-secondary);

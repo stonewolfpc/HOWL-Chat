@@ -109,7 +109,7 @@ test('backend generation settings beat a conflicting derived cache', async () =>
     assert.equal(JSON.parse(harness.store.get(CACHE_KEY)).settings.steps, '30');
 });
 
-test('a pre-cutover IG_STATE_KEY is imported once and reduced to UI state', async () => {
+test('a pre-cutover IG_STATE_KEY stays browser-owned until an explicit import', async () => {
     const harness = createHarness({
         backend: { revision: '' },
         storage: {
@@ -126,14 +126,16 @@ test('a pre-cutover IG_STATE_KEY is imported once and reduced to UI state', asyn
 
     await harness.state.ready;
 
-    assert.ok(harness.operations.indexOf('ImportImageGenerationSettings') < harness.operations.indexOf('GetImageGenerationSettings'));
+    assert.equal(harness.operations.includes('ImportImageGenerationSettings'), false);
+    assert.equal(harness.state.source, 'legacy');
     assert.equal(harness.state.get('steps'), '30');
-    const ui = JSON.parse(harness.store.get(UI_KEY));
-    assert.equal(ui.version, 3);
-    assert.deepEqual(ui.ui, { currentMode: 'inpaint', seedLocked: true, aspectLocked: false });
-    assert.equal(Object.prototype.hasOwnProperty.call(ui, 'steps'), false);
-    assert.equal(Object.prototype.hasOwnProperty.call(ui.ui, 'prompt'), false);
-    assert.equal(JSON.parse(harness.store.get(CACHE_KEY)).settings.steps, '30');
+    assert.equal(JSON.parse(harness.store.get(UI_KEY))._version, 2);
+
+    await harness.state.importLegacy();
+
+    assert.ok(harness.operations.indexOf('ImportImageGenerationSettings') > 0);
+    assert.equal(harness.backend().steps, '30');
+    assert.equal(harness.state.get('steps'), '30');
 });
 
 test('a save changes the projection and cache only after acknowledgement', async () => {

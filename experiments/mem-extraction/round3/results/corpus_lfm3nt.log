@@ -1,0 +1,7 @@
+SKIP complete corpus-4b-nonthink
+SKIP complete corpus-lfm120-instruct
+SKIP complete corpus-lfm3-think-512
+SKIP complete corpus-4b-think-512
+SKIP complete corpus-lfm120-t08
+=== corpus corpus-lfm3-nonthink cases=18 draws=3 budget=None ===
+  C01 d1   25.1s fin=length tok=512

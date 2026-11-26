@@ -172,6 +172,27 @@ func (s *Store) SaveGeneration(document map[string]interface{}, baseRevision str
 	return result, nil
 }
 
+// ClearGeneration removes the generation document. It is used only by the
+// explicit rollback of the image generation cutover.
+func (s *Store) ClearGeneration() (GenerationSaveResult, error) {
+	result := GenerationSaveResult{Status: "write_failed"}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	current, err := s.loadLocked()
+	if err != nil {
+		return result, err
+	}
+	result.CurrentRevision = effectiveRevision(current.Generation, current.GenerationRevision)
+	current.Generation = nil
+	current.GenerationRevision = ""
+	if err := s.saveLocked(current); err != nil {
+		result.Message = err.Error()
+		return result, err
+	}
+	result.Status = "cleared"
+	return result, nil
+}
+
 func effectiveRevision(document map[string]interface{}, stored string) string {
 	if stored != "" {
 		return stored

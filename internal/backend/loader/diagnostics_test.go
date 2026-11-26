@@ -143,6 +143,49 @@ func TestLargeOutputStaysBounded(t *testing.T) {
 	}
 }
 
+func TestLoadPhaseWriterDropsInferenceContentAfterModelLoaded(t *testing.T) {
+	var dst strings.Builder
+	w := NewLoadPhaseWriter(&dst)
+
+	// The marker can be split across writes. The lines before it, including the
+	// placement evidence, must survive; everything after it is inference content.
+	_, _ = w.Write([]byte("load_tensors: offloaded 8/29 layers to GPU\n"))
+	_, _ = w.Write([]byte("server_run_i: model loaded\n"))
+	_, _ = w.Write([]byte("prompt: USER SECRET\n"))
+	_, _ = w.Write([]byte("sampled token\n"))
+
+	got := dst.String()
+	if !strings.Contains(got, "offloaded 8/29 layers to GPU") {
+		t.Fatalf("placement line was lost: %q", got)
+	}
+	if strings.Contains(got, "USER SECRET") || strings.Contains(got, "sampled token") {
+		t.Fatalf("load-phase guard forwarded inference content: %q", got)
+	}
+}
+
+func TestLoadPhaseWriterKeepsFailureOutputBeforeModelLoaded(t *testing.T) {
+	var dst strings.Builder
+	w := NewLoadPhaseWriter(&dst)
+	_, _ = w.Write([]byte("llama_model_load: error loading model: bad architecture\n"))
+	if !strings.Contains(dst.String(), "bad architecture") {
+		t.Fatalf("pre-load failure output was dropped: %q", dst.String())
+	}
+}
+
+func TestLoadPhaseWriterWaitsForACompleteMarkerLine(t *testing.T) {
+	var dst strings.Builder
+	w := NewLoadPhaseWriter(&dst)
+	_, _ = w.Write([]byte("server_run_i: model "))
+	if strings.Contains(dst.String(), "model") {
+		t.Fatalf("partial line was forwarded before completion: %q", dst.String())
+	}
+	_, _ = w.Write([]byte("loaded\n"))
+	_, _ = w.Write([]byte("prompt: SECRET\n"))
+	if !strings.Contains(dst.String(), "model loaded") || strings.Contains(dst.String(), "SECRET") {
+		t.Fatalf("split marker handling is wrong: %q", dst.String())
+	}
+}
+
 func TestFailureRecordCarriesUsefulDetailsAndPersists(t *testing.T) {
 	capture := NewCapture(1024)
 	_, _ = capture.Write([]byte("llama_model_load: error loading model: unknown architecture\n"))

@@ -1,0 +1,211 @@
+{
+  "protocol": "v1.2",
+  "candidate": "bge-reranker-v2-m3-Q8_0",
+  "declared_scale": "raw_logit",
+  "transform": "identity",
+  "cases_sha256": "ca6dd5b3541f08fbf997b58bb3ddffe1b797a1171ff94900a80ab53b0c9f1c21",
+  "calibration": {
+    "relevant": {
+      "C1": -2.978,
+      "C2": -4.81,
+      "C3": 0.528,
+      "C4": 1.009
+    },
+    "irrelevant": {
+      "C5": -11.047,
+      "C6": -11.033,
+      "C7": -11.042,
+      "C8": -11.033
+    },
+    "min_relevant": -4.81,
+    "max_irrelevant": -11.033,
+    "separation": 6.223,
+    "threshold": -7.921,
+    "calibratable": true
+  },
+  "rows": [
+    {
+      "id": "R1-horse",
+      "criterion": "R1",
+      "expect": "abstain",
+      "ranking_top": "rec-0001",
+      "ranking_score": -1.868,
+      "ranking_ok": null,
+      "selection_top": "rec-0001",
+      "abstained": false,
+      "selection_ok": false,
+      "scores": {
+        "rec-0001": -1.868,
+        "rec-0006": -10.932,
+        "rec-0007": -11.041,
+        "rec-0003": -11.048
+      }
+    },
+    {
+      "id": "R1-patient",
+      "criterion": "R1",
+      "expect": "rec-0001",
+      "ranking_top": "rec-0001",
+      "ranking_score": -1.535,
+      "ranking_ok": true,
+      "selection_top": "rec-0001",
+      "abstained": false,
+      "selection_ok": true,
+      "scores": {
+        "rec-0001": -1.535,
+        "rec-0006": -11.031,
+        "rec-0007": -11.042,
+        "rec-0003": -11.045
+      }
+    },
+    {
+      "id": "R2-vault-foreign",
+      "criterion": "R2",
+      "expect": "abstain",
+      "ranking_top": "rec-0006",
+      "ranking_score": -11.01,
+      "ranking_ok": null,
+      "selection_top": null,
+      "abstained": true,
+      "selection_ok": true,
+      "scores": {
+        "rec-0006": -11.01,
+        "rec-0007": -11.03,
+        "rec-0001": -11.03,
+        "rec-0003": -11.041
+      }
+    },
+    {
+      "id": "R2-vault-own",
+      "criterion": "R2",
+      "expect": "rec-0004",
+      "ranking_top": "rec-0004",
+      "ranking_score": 0.586,
+      "ranking_ok": true,
+      "selection_top": "rec-0004",
+      "abstained": false,
+      "selection_ok": true,
+      "scores": {
+        "rec-0004": 0.586,
+        "rec-0005": -11.038
+      }
+    },
+    {
+      "id": "R3-now",
+      "criterion": "R3",
+      "expect": "rec-0007",
+      "ranking_top": "rec-0007",
+      "ranking_score": 1.2,
+      "ranking_ok": true,
+      "selection_top": "rec-0007",
+      "abstained": false,
+      "selection_ok": true,
+      "scores": {
+        "rec-0007": 1.2,
+        "rec-0002": -0.503
+      }
+    },
+    {
+      "id": "R3-before",
+      "criterion": "R3",
+      "expect": "rec-0002",
+      "ranking_top": "rec-0002",
+      "ranking_score": -1.606,
+      "ranking_ok": true,
+      "selection_top": "rec-0002",
+      "abstained": false,
+      "selection_ok": true,
+      "scores": {
+        "rec-0002": -1.606,
+        "rec-0007": -2.729
+      }
+    },
+    {
+      "id": "R4-paraphrase",
+      "criterion": "R4",
+      "expect": "rec-0001",
+      "ranking_top": "rec-0001",
+      "ranking_score": -5.95,
+      "ranking_ok": true,
+      "selection_top": "rec-0001",
+      "abstained": false,
+      "selection_ok": true,
+      "scores": {
+        "rec-0001": -5.95,
+        "rec-0006": -10.956,
+        "rec-0007": -11.039,
+        "rec-0003": -11.043
+      }
+    },
+    {
+      "id": "R5-weather",
+      "criterion": "R5",
+      "expect": "abstain",
+      "ranking_top": "rec-0006",
+      "ranking_score": -11.016,
+      "ranking_ok": null,
+      "selection_top": null,
+      "abstained": true,
+      "selection_ok": true,
+      "scores": {
+        "rec-0006": -11.016,
+        "rec-0007": -11.034,
+        "rec-0003": -11.042,
+        "rec-0001": -11.043
+      }
+    },
+    {
+      "id": "R5-fair",
+      "criterion": "R5",
+      "expect": "abstain",
+      "ranking_top": "rec-0001",
+      "ranking_score": -10.884,
+      "ranking_ok": null,
+      "selection_top": null,
+      "abstained": true,
+      "selection_ok": true,
+      "scores": {
+        "rec-0001": -10.884,
+        "rec-0007": -10.942,
+        "rec-0006": -11.012,
+        "rec-0003": -11.039
+      }
+    }
+  ],
+  "per_criterion": {
+    "R1": {
+      "selection_ok": false,
+      "ranking_ok": true,
+      "veto": false
+    },
+    "R2": {
+      "selection_ok": true,
+      "ranking_ok": true,
+      "veto": false
+    },
+    "R3": {
+      "selection_ok": true,
+      "ranking_ok": true,
+      "veto": false
+    },
+    "R4": {
+      "selection_ok": true,
+      "ranking_ok": true,
+      "veto": true
+    },
+    "R5": {
+      "selection_ok": true,
+      "ranking_ok": true,
+      "veto": true
+    }
+  },
+  "veto_broken_selection": [],
+  "veto_broken_ranking": [],
+  "verdicts": {
+    "ranking": "PASS",
+    "selection": "PASS",
+    "subject_distinction": "FAIL"
+  },
+  "note": "ranking and abstention judged separately; calibration cannot convert a wrong ranking into a pass",
+  "gate_b": "6/7 open"
+}

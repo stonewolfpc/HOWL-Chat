@@ -53,6 +53,12 @@ func (f *fakeEngine) GenerateTxt2Img(types.ImageOptions) (*types.ImageResult, er
 	return &types.ImageResult{Path: "x.png"}, nil
 }
 
+func (f *fakeEngine) GenerateVideo(types.ImageOptions) (*types.ImageResult, error) {
+	<-f.generate
+	f.generated.Add(1)
+	return &types.ImageResult{Path: "x.mp4"}, nil
+}
+
 func newFakeEngine() *fakeEngine {
 	f := &fakeEngine{generate: make(chan struct{})}
 	f.alive.Store(true)
@@ -119,6 +125,29 @@ func TestStartReturnsWhileLoadingIsStillRunning(t *testing.T) {
 	close(release)
 	close(eng.generate)
 	waitUntil(t, 3*time.Second, func() bool { return m.Status(id).Status == "completed" })
+}
+
+// The video execution lease is prepared before generation and released only
+// after the CLI-backed generation returns, not when the model resolves.
+func TestVideoExecutionHasLease(t *testing.T) {
+	eng := newFakeEngine()
+	m := NewManager(eng)
+
+	var released atomic.Int32
+	id := m.StartWithCleanup(types.ImageOptions{Mode: "video"}, func(string) (func(), error) {
+		return func() { released.Add(1) }, nil
+	})
+
+	waitUntil(t, 3*time.Second, func() bool { return m.Status(id).Status == "generating" })
+	if got := released.Load(); got != 0 {
+		t.Fatalf("lease released %d times before generation returned", got)
+	}
+
+	close(eng.generate)
+	waitUntil(t, 3*time.Second, func() bool { return m.Status(id).Status == "completed" })
+	if got := released.Load(); got != 1 {
+		t.Fatalf("lease released %d times after generation, want exactly 1", got)
+	}
 }
 
 func TestLoadingSucceedsAndAdvancesToGeneration(t *testing.T) {

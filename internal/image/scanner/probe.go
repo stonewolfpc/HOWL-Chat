@@ -293,6 +293,11 @@ func (p WeightProbe) AssetType() (AssetType, bool) {
 		return AssetClipG, true
 	case p.TextModel:
 		return AssetClipL, true
+	// CLIP-Vision is an image encoder, not a language model. A vision-only
+	// tower is the IP-Adapter image encoder; a multimodal LLM also carries a
+	// text model and stays on the LLM path below.
+	case p.VisionModel && !p.TextModel:
+		return AssetClipVision, true
 	case p.VisionModel:
 		return AssetLLM, true
 	}

@@ -8,6 +8,11 @@ type GPUInfo struct {
 	TotalVRAMBytes int64  `json:"total_vram_bytes"`
 	UsedVRAMBytes  int64  `json:"used_vram_bytes"`
 	FreeVRAMBytes  int64  `json:"free_vram_bytes"`
+	// Source names the detector that produced these values. Live is true only
+	// when UsedVRAMBytes came from a live GPU counter, not from Howl's own model
+	// registry. Admission refuses GPU starts when Live is false.
+	Source string `json:"source,omitempty"`
+	Live   bool   `json:"live"`
 }
 
 // gpuDetector is the platform-specific implementation.

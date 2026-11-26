@@ -22,6 +22,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 )
 
 type generationState int
@@ -114,6 +115,18 @@ type genHandle struct {
 	// second settlement cannot transition the slot or re-describe the context that
 	// cleanup cancelled. Guarded by Engine.genMu.
 	settled bool
+	// done closes when the request has returned and the generation has settled.
+	// Shutdown joins this, not the backend's work: cancellation is not proof the
+	// backend stopped, but it is proof this execution scope is no longer running.
+	done     chan struct{}
+	doneOnce sync.Once
+}
+
+func (h *genHandle) finish() {
+	if h == nil {
+		return
+	}
+	h.doneOnce.Do(func() { close(h.done) })
 }
 
 // processConfirmedGone reports whether the watched child has exited, which is
@@ -137,6 +150,21 @@ func (e *Engine) processConfirmedGone() bool {
 // (GenerateImage and SetActiveImageModel), but it can never be cancelled: see
 // cancelGeneration.
 func (e *Engine) beginGeneration(jobID string) (*genHandle, error) {
+	return e.beginGenerationWithContext(jobID, context.Background())
+}
+
+// beginGenerationWithContext binds a generation's execution scope to the
+// caller's cancellation. A cancelled parent is refused before a slot is taken;
+// otherwise the generation context is a child, so the caller can stop the
+// request while Shutdown still owns the final join and process termination.
+func (e *Engine) beginGenerationWithContext(jobID string, parent context.Context) (*genHandle, error) {
+	if parent == nil {
+		parent = context.Background()
+	}
+	if err := parent.Err(); err != nil {
+		return nil, err
+	}
+
 	// A confirmed exit ends whatever the process was doing: release the slot so a
 	// fresh child can generate without a restart of the app.
 	if e.generationBusy() && e.processConfirmedGone() {
@@ -153,9 +181,9 @@ func (e *Engine) beginGeneration(jobID string) (*genHandle, error) {
 		return nil, fmt.Errorf("%w (owner %q)", errEngineUnavailable, e.genOwner)
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(parent)
 	e.genSeq++
-	h := &genHandle{token: e.genSeq, ctx: ctx, owner: jobID, cancel: cancel, close: closeNone}
+	h := &genHandle{token: e.genSeq, ctx: ctx, owner: jobID, cancel: cancel, close: closeNone, done: make(chan struct{})}
 	e.genState = genActive
 	e.genOwner = jobID
 	e.genCancel = cancel
@@ -201,6 +229,7 @@ func (e *Engine) endGeneration(h *genHandle, outcome genOutcome) genClose {
 	h.token = 0
 	e.genMu.Unlock()
 	h.cancel()
+	h.finish()
 	return reason
 }
 
@@ -211,16 +240,36 @@ func (e *Engine) settleGeneration(h *genHandle, err error) error {
 	if h == nil {
 		return err
 	}
+	outcome := genOutcomeCompleted
+	if err != nil {
+		outcome = classifyGeneration(h.ctx.Err() != nil, err)
+	}
+	return e.settleGenerationAs(h, err, outcome)
+}
+
+// settleGenerationKnown is for a backend that explicitly reported a terminal
+// state even when the result is an error. A DGL job that says "failed" has
+// finished; treating it as an abandoned generation would recycle a healthy
+// process for no reason and hide the definite backend answer behind "unknown".
+func (e *Engine) settleGenerationKnown(h *genHandle, err error) error {
+	return e.settleGenerationAs(h, err, genOutcomeCompleted)
+}
+
+func (e *Engine) settleGenerationAs(h *genHandle, err error, outcome genOutcome) error {
 	if e.handleSettled(h) {
 		// This generation already reported. Describing it again would read the
 		// context cleanup cancelled and call an ordinary late error a client
 		// cancellation — the mislabelling this file exists to prevent.
+		h.finish()
 		if err == nil {
 			return fmt.Errorf("%w", errGenerationSettled)
 		}
 		return fmt.Errorf("%w (later error not reported: %v)", errGenerationSettled, err)
 	}
-	outcome := classifyGeneration(h.ctx.Err() != nil, err)
+	// Measure after the request returned, while the process that did the work is
+	// still the same one that loaded the weights. A failed request is recorded
+	// too: its allocation is exactly what a later diagnosis needs.
+	e.recordFootprint("generation")
 	reason := e.endGeneration(h, outcome)
 	if err == nil {
 		return nil

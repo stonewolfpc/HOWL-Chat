@@ -98,6 +98,7 @@ function addAssistantMessage(sender, text, characterId = null) {
             ${senderHTML}
             <div class="chat-text">${text}</div>
             <div class="chat-bubble-buttons">
+                <button class="bubble-button icon-button" onclick="window.AudioService && AudioService.speakMessage(this)" title="Speak this message">${ICONS.speaker}</button>
                 <button class="bubble-button icon-button" onclick="regenerateMessage(this)" title="Regenerate">${ICONS.regenerate}</button>
                 <button class="bubble-button icon-button" onclick="previousMessage(this)" title="Previous" id="prev-btn">${ICONS.previous}</button>
                 <button class="bubble-button icon-button" onclick="nextMessage(this)" title="Next" id="next-btn">${ICONS.next}</button>

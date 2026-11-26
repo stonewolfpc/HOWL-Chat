@@ -362,8 +362,12 @@ func TestConcurrentDifferentConfigurationsRemainIsolated(t *testing.T) {
 	p, set := newCachePipeline(t)
 	kokoro := set.tts[types.TTSKokoro]
 	melo := set.tts[types.TTSMeloTTS]
-	kokoro.delay = 10 * time.Millisecond
-	melo.delay = 10 * time.Millisecond
+	// Keep both leaders busy long enough that every launch reaches the
+	// request-coalescing gate before either leader can populate the cache.
+	// Ten milliseconds was shorter than scheduler delay under a full-suite run,
+	// which let late requests turn into ordinary cache hits.
+	kokoro.delay = 250 * time.Millisecond
+	melo.delay = 250 * time.Millisecond
 
 	const rounds = 6
 	start := make(chan struct{})

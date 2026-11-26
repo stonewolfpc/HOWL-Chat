@@ -36,31 +36,41 @@ func (a *App) AddContentLibrary(path, category, origin, format string, role int)
 		return library.Registration{}, fmt.Errorf("content library registry not initialised")
 	}
 	cat := library.Category(strings.TrimSpace(category))
-	return a.registries.Libraries().Add(library.Registration{
+	registration, err := a.registries.Libraries().Add(library.Registration{
 		Category: cat,
 		Path:     path,
 		Role:     library.NormalizeRole(library.Role(role)),
 		Origin:   library.Origin(strings.TrimSpace(origin)),
 		Format:   library.Format(strings.TrimSpace(format)),
 	})
+	if err != nil {
+		return library.Registration{}, err
+	}
+	// A user-added root is probed once, here, rather than on every read. A
+	// readable but unwritable root is still registered: its content stays
+	// visible and only mutations are refused.
+	if registration.Role.CanWrite() || registration.Role.CanSave() {
+		report := probeContentDir(a.contentOpsOrDefault(), string(cat), registration.Path, false)
+		a.recordProbe(registration.ID, report)
+	}
+	return registration, nil
 }
 
 // AddDefaultContentLibrary creates the approved Documents/Pictures/Videos
 // location for a category and registers it as a Howl-owned save root. It is an
-// explicit user action; merely reading settings never creates or moves data.
+// explicit user action and delegates to the one provisioning authority
+// (app-content-roots.go); merely reading content never creates or moves data.
 func (a *App) AddDefaultContentLibrary(category string, role int) (library.Registration, error) {
 	cat := library.Category(strings.TrimSpace(category))
 	if !cat.Valid() {
 		return library.Registration{}, fmt.Errorf("unknown content category %q", category)
 	}
-	dir, err := paths.DefaultContentDir(string(cat))
-	if err != nil {
-		return library.Registration{}, err
+	report, registration := a.provisionDefaultRoot(cat, library.Role(role))
+	if report.Err != nil {
+		a.recordInit(cat, report)
+		return library.Registration{}, fmt.Errorf("%s", report.Reason)
 	}
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return library.Registration{}, fmt.Errorf("create default content directory: %w", err)
-	}
-	return a.AddContentLibrary(dir, string(cat), string(library.OriginHowl), string(library.FormatHowl), role)
+	return registration, nil
 }
 
 func (a *App) RemoveContentLibrary(id string) error {

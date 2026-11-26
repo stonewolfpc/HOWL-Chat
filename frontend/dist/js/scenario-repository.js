@@ -16,11 +16,14 @@
 
 const ScenarioStorage = (() => {
     const CACHE_KEY = 'howl-chat-scenarios';
+    const LEGACY_BACKUP_KEY = CACHE_KEY + '-cutover-backup';
     const CACHE_VERSION = 2;
 
     let scenarios = [];
     let source = 'defaults';
     let loadPromise = null;
+    let cutover = false;
+    let cutoverStatus = null;
 
     function _app() {
         return window.go?.main?.App;
@@ -132,19 +135,17 @@ const ScenarioStorage = (() => {
 
     async function _load() {
         const app = _app();
-        const legacy = _readLegacy();
-        let legacyFailed = false;
-        if (legacy && typeof app?.ImportScenarios === 'function') {
+        let backendList = null;
+
+        if (typeof app?.GetScenarioCutoverStatus === 'function') {
             try {
-                const imported = await app.ImportScenarios(legacy);
-                _emit('howl:scenarios-imported', { count: imported });
+                cutoverStatus = await app.GetScenarioCutoverStatus();
+                cutover = Boolean(cutoverStatus?.cutover);
             } catch (e) {
-                legacyFailed = true;
-                console.warn('[scenarioRepository] legacy scenario import failed:', e);
+                console.warn('[scenarioRepository] cutover status failed:', e);
             }
         }
 
-        let backendList = null;
         if (typeof app?.GetScenarios === 'function') {
             try {
                 const list = await app.GetScenarios();
@@ -154,14 +155,22 @@ const ScenarioStorage = (() => {
             }
         }
 
+        // Storage state is reported separately from the document list: an
+        // uninitialized or read-only library is a per-library state, not an
+        // error and not an empty library.
+        window.ContentReadiness?.refresh?.();
+
         if (backendList) {
-            // A failed import must not erase data the user can still see: keep the
-            // raw array as a documented migration fallback and do not rewrite it.
-            if (legacyFailed && legacy && backendList.length === 0) {
-                scenarios = _normalize(legacy);
-                source = 'legacy';
-                _emit('howl:scenarios-loaded', { source });
-                return scenarios.slice();
+            // Before the explicit cutover an empty canonical list must not erase
+            // the only copy of the user's pre-cutover documents.
+            if (!cutover && backendList.length === 0) {
+                const legacy = _readLegacy();
+                if (legacy) {
+                    scenarios = _normalize(legacy);
+                    source = 'legacy';
+                    _emit('howl:scenarios-loaded', { source });
+                    return scenarios.slice();
+                }
             }
             scenarios = _normalize(backendList);
             source = 'backend';
@@ -171,9 +180,18 @@ const ScenarioStorage = (() => {
         }
 
         const cached = _readCache();
-        scenarios = _normalize(cached);
-        source = cached ? 'cache' : 'defaults';
-        _emit('howl:scenarios-loaded', { source });
+        if (cached) {
+            scenarios = _normalize(cached);
+            source = 'cache';
+        } else {
+            const legacy = _readLegacy();
+            scenarios = _normalize(legacy);
+            source = legacy ? 'legacy' : 'defaults';
+        }
+        _emit('howl:scenarios-loaded', {
+            source,
+            stale: window.ContentReadiness?.canRead?.('scenarios') === false,
+        });
         return scenarios.slice();
     }
 
@@ -195,7 +213,15 @@ const ScenarioStorage = (() => {
         if (!merged.createdAt) merged.createdAt = new Date().toISOString();
         merged.updatedAt = new Date().toISOString();
 
-        const saved = await app.SaveScenario(merged);
+        let saved;
+        try {
+            saved = await app.SaveScenario(merged);
+        } catch (error) {
+            // The backend refused the write and said why. Refresh the reported
+            // state so the panel explains it instead of looking empty.
+            window.ContentReadiness?.refresh?.();
+            throw error;
+        }
         if (!saved || typeof saved !== 'object') throw new Error('scenario backend returned no document');
         const record = _normalizeOne(saved);
         _replace(record);
@@ -207,10 +233,51 @@ const ScenarioStorage = (() => {
     async function remove(id) {
         const app = _app();
         if (typeof app?.DeleteScenario !== 'function') throw new Error('scenario backend unavailable');
-        await app.DeleteScenario(id);
+        try {
+            await app.DeleteScenario(id);
+        } catch (error) {
+            window.ContentReadiness?.refresh?.();
+            throw error;
+        }
         scenarios = scenarios.filter(w => w.id !== id);
         _writeCache();
         _emit('howl:scenario-deleted', { id });
+    }
+
+    async function importLegacy() {
+        const app = _app();
+        if (typeof app?.ImportScenarios !== 'function') {
+            throw new Error('scenario backend unavailable');
+        }
+        const legacy = _readLegacy();
+        if (!legacy || legacy.length === 0) {
+            throw new Error('No pre-cutover scenarios were found in this browser.');
+        }
+        localStorage.setItem(LEGACY_BACKUP_KEY, JSON.stringify(legacy));
+        let result;
+        try {
+            result = await app.ImportScenarios(legacy);
+        } catch (error) {
+            localStorage.removeItem(LEGACY_BACKUP_KEY);
+            throw error;
+        }
+        await loadAll();
+        return result;
+    }
+
+    async function rollback() {
+        const app = _app();
+        if (typeof app?.RollbackScenarios !== 'function') {
+            throw new Error('scenario backend unavailable');
+        }
+        const result = await app.RollbackScenarios();
+        const backup = localStorage.getItem(LEGACY_BACKUP_KEY);
+        if (backup !== null) {
+            localStorage.setItem(CACHE_KEY, backup);
+            localStorage.removeItem(LEGACY_BACKUP_KEY);
+        }
+        await loadAll();
+        return result;
     }
 
     const seeded = _readCache();
@@ -226,9 +293,13 @@ const ScenarioStorage = (() => {
         CACHE_VERSION,
         get source() { return source; },
         get ready() { return ready; },
+        get cutover() { return cutover; },
+        get cutoverStatus() { return cutoverStatus; },
         all() { return scenarios; },
         get(id) { return _find(id); },
         loadAll,
+        importLegacy,
+        rollback,
         save,
         remove,
         mergeRecord,

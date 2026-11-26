@@ -6,12 +6,15 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"howl-chat/internal/audio/tts"
 	"howl-chat/internal/audio/types"
 	"howl-chat/internal/paths"
+	"howl-chat/internal/process"
 )
 
 // Synthesizer implements TTSSynthesizer using Piper CLI.
@@ -20,17 +23,26 @@ type Synthesizer struct {
 	piperPath string
 	modelPath string
 	outputDir string
+	registry  *process.Registry
+	childSeq  atomic.Uint64
 
-	// Test seams for binary discovery, process execution, and output reads.
+	// Test seam for process execution. Production always starts a job-owned,
+	// registered child; only provider unit tests replace the runner.
 	resolveBinary func() (string, error)
 	runCommand    func(context.Context, string, []string, string) ([]byte, error)
 	readFile      func(string) ([]byte, error)
 }
 
-// New returns a Piper synthesizer instance.
-func New() *Synthesizer {
+// New returns a Piper synthesizer instance. A nil registry falls back to the
+// process-wide one so ownership is never optional.
+func New(registries ...*process.Registry) *Synthesizer {
+	var registry *process.Registry
+	if len(registries) > 0 {
+		registry = registries[0]
+	}
 	return &Synthesizer{
 		BaseSynthesizer: tts.NewBaseSynthesizer(types.TTSPiper),
+		registry:        registry,
 	}
 }
 
@@ -206,13 +218,28 @@ func (s *Synthesizer) runPiper(ctx context.Context, req types.SynthesisRequest, 
 		return err
 	}
 
-	cmd := exec.CommandContext(ctx, s.piperPath, args...)
-	cmd.Stdin = strings.NewReader(req.Text)
-	output, err := cmd.CombinedOutput()
+	// One registered, job-owned child per synthesis. Cancellation force-kills
+	// the whole tree and the provider does not return before the registered
+	// waiter observed exit; an unconfirmed exit is an error, not success.
+	child, err := process.StartChild(s.registry, process.ChildSpec{
+		Role:     process.RoleTTSChild,
+		Instance: "piper|" + modelPath + "|" + strconv.FormatUint(s.childSeq.Add(1), 10),
+		Path:     s.piperPath,
+		Args:     args,
+		Stdin:    []byte(req.Text),
+		Capture:  true,
+	})
 	if err != nil {
 		return types.NewAudioError(
 			types.ErrCodeSynthesisFailed,
-			fmt.Sprintf("piper synthesis failed: %s", strings.TrimSpace(string(output))),
+			fmt.Sprintf("piper could not be started under ownership: %v", err),
+			err,
+		)
+	}
+	if err := child.Wait(ctx, process.DefaultGrace); err != nil {
+		return types.NewAudioError(
+			types.ErrCodeSynthesisFailed,
+			fmt.Sprintf("piper synthesis failed: %v: %s", err, strings.TrimSpace(child.Output())),
 			err,
 		)
 	}

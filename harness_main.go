@@ -102,6 +102,12 @@ func main() {
 	// the context the bindings expect and run the model scan that startup would
 	// normally kick off in the background.
 	app.ctx = context.Background()
+	// Wails runs App.startup when the webview attaches. This host has no webview,
+	// so the startup work the renderer depends on runs here: the optional log is
+	// verified, then content roots are provisioned or probed before any page
+	// reads them, never from a read.
+	app.verifyOptionalStartupLog()
+	app.initializeContentRoots()
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {

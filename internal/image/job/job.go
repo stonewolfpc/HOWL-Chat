@@ -29,6 +29,11 @@ type Manager struct {
 	jobs       map[string]*types.ImageJob
 	engine     engine.ImageEngine
 	onComplete func(id string, result *types.ImageResult)
+	// onFinished runs after every generation attempt, success or failure, before
+	// the job reaches its terminal status. The image lifecycle uses it to make
+	// one measurement-gated reclamation decision while the job still owns the
+	// generation window.
+	onFinished func(id string, opts types.ImageOptions, err error)
 	closed     bool
 }
 
@@ -54,6 +59,17 @@ func (m *Manager) SetOnComplete(fn func(id string, result *types.ImageResult)) {
 	m.onComplete = fn
 }
 
+// SetOnFinished registers a callback fired after a generation attempt returns,
+// whether it succeeded or failed. It runs synchronously before the terminal job
+// status is published so a reclamation restart cannot race the next job's
+// prepare phase; a policy that must not hold the job manager lock merely reads
+// its callback under a short RLock before calling it.
+func (m *Manager) SetOnFinished(fn func(id string, opts types.ImageOptions, err error)) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.onFinished = fn
+}
+
 // Start registers a job, launches it, and returns its id.
 //
 // prepare, when non-nil, runs inside the job before generation. That is where
@@ -61,6 +77,19 @@ func (m *Manager) SetOnComplete(fn func(id string, result *types.ImageResult)) {
 // (where this used to happen) a slow load blocked the caller, could not be
 // observed, and could not be cancelled.
 func (m *Manager) Start(opts types.ImageOptions, prepare func(jobID string) error) string {
+	var withCleanup func(jobID string) (func(), error)
+	if prepare != nil {
+		withCleanup = func(jobID string) (func(), error) {
+			return nil, prepare(jobID)
+		}
+	}
+	return m.StartWithCleanup(opts, withCleanup)
+}
+
+// StartWithCleanup runs prepare before generation and releases its returned
+// cleanup after the generation attempt, on every path. It is how an execution
+// lease held for the whole child process is closed exactly once.
+func (m *Manager) StartWithCleanup(opts types.ImageOptions, prepare func(jobID string) (func(), error)) string {
 	m.mu.Lock()
 	if m.closed {
 		m.mu.Unlock()
@@ -188,7 +217,7 @@ func (m *Manager) transition(job *types.ImageJob, from, to string) bool {
 }
 
 // run executes one job: load the model if needed, then generate.
-func (m *Manager) run(job *types.ImageJob, prepare func(jobID string) error) {
+func (m *Manager) run(job *types.ImageJob, prepare func(jobID string) (func(), error)) {
 	if m.engine == nil {
 		m.finish(job, nil, fmt.Errorf("image engine not initialized"))
 		return
@@ -201,7 +230,11 @@ func (m *Manager) run(job *types.ImageJob, prepare func(jobID string) error) {
 		if !m.transition(job, statusQueued, statusLoading) {
 			return // cancelled before it started
 		}
-		if err := prepare(job.ID); err != nil {
+		cleanup, err := prepare(job.ID)
+		if cleanup != nil {
+			defer cleanup()
+		}
+		if err != nil {
 			// finish() leaves a cancellation that arrived during loading alone.
 			m.finish(job, nil, err)
 			return
@@ -289,6 +322,16 @@ func (m *Manager) run(job *types.ImageJob, prepare func(jobID string) error) {
 	}
 
 	close(progressDone)
+	// This is the lifecycle boundary for reclamation: the generation has
+	// returned, its footprint is recorded, and the job is still marked
+	// generating. The callback may reload the engine, so a new job waits on the
+	// lifecycle lock rather than racing the restart.
+	m.mu.RLock()
+	finished := m.onFinished
+	m.mu.RUnlock()
+	if finished != nil {
+		finished(job.ID, opts, err)
+	}
 	m.finish(job, result, err)
 }
 

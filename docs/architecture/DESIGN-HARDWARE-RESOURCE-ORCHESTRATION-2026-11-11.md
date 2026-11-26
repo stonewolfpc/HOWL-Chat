@@ -1,7 +1,8 @@
 # Design — hardware detection and resource orchestration
 
-**Status:** Proposed architecture design; no implementation authorization  
+**Status:** Proposed architecture design; first evidence slice implemented 2026-11-24
 **Date:** 2026-11-11  
+**Implementation evidence:** `docs/plans/CHAT-PLACEMENT-EVIDENCE-2026-11-24.md`
 **Owner input:** `ODA-09` (automatic hardware detection and optimization are core), `UD-01` (per-chat models)  
 **Plan sources:** `REC-M-03`, `REC-M-07`, `REC-M-08`, `REC-M-15`, `REC-M-16`, `CWP-15a/15b`, `CWP-08a/08b`  
 **Related design:** `DESIGN-MEMORY-CONTINUITY-2026-11-11.md`, `RECONCILED-ARCHITECTURE-PLAN-2026-11-11.md`
@@ -390,3 +391,22 @@ These references inform the design; they do not establish Howl runtime behavior.
 - Auto-evicting a busy model.
 - Claiming release without observation.
 - Running any hardware or benchmark investigation under this design.
+
+## 17. First implementation slice — chat plan versus actual placement
+
+Implemented 2026-11-24, before the rest of this design:
+
+- `resource.Authority` still owns the estimate and admission decision.
+- `LoadModel` records the spawn plan (context, batch, GPU layers).
+- After health, `llama.ParsePlacement` reads llama-server's own `offloaded
+  N/M layers`, model/KV/compute buffer sizes, context and batch at log
+  verbosity 4.
+- `runtime.Engine` holds the last report; `model:placement` shows it in both
+  supported hosts.
+- The report is diagnostic only. It does not become an admission input, and it
+  is cleared on stop, failure and unload.
+
+This establishes the plan/actual boundary in §7.2 for chat only. It does not
+implement leases for TTS/ASR, iGPU selection, storage residency, release
+verification, or continuous reconciliation. See the evidence plan for measured
+values, ownership and limitations.

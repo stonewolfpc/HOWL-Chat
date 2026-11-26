@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"howl-chat/internal/audio"
 	"howl-chat/internal/audio/capability"
@@ -206,6 +207,81 @@ func (a *App) SynthesizeSpeechWithVoice(text string, voiceJSON string) (string, 
 	return result.AudioOutputPath, nil
 }
 
+// maxTTSAudioBytes bounds what the renderer may pull back through the bridge.
+// A spoken reply is seconds of audio, not minutes; the limit mirrors the ASR
+// payload bound so a corrupt cache entry cannot flood the WebView.
+const maxTTSAudioBytes = 64 << 20
+
+// GetTTSAudioData returns a synthesized WAV as a data URL. SynthesizeSpeech
+// hands the renderer a cache path, and a page cannot play a Windows filesystem
+// path as media: the browser resolves it against the page origin and the load
+// fails. The bytes cross the binding instead. The path must be inside the TTS
+// cache, so this binding cannot read files the renderer was never given.
+func (a *App) GetTTSAudioData(audioPath string) (string, error) {
+	path, err := resolveTTSCacheFile(audioPath)
+	if err != nil {
+		return "", err
+	}
+	info, err := os.Stat(path)
+	if err != nil {
+		return "", fmt.Errorf("tts audio %s: %w", filepath.Base(path), err)
+	}
+	if info.Size() > maxTTSAudioBytes {
+		return "", fmt.Errorf("tts audio exceeds %d bytes", maxTTSAudioBytes)
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("read tts audio: %w", err)
+	}
+	if !isWAVData(data) {
+		return "", fmt.Errorf("tts audio is not a WAV file")
+	}
+	return "data:audio/wav;base64," + base64.StdEncoding.EncodeToString(data), nil
+}
+
+// resolveTTSCacheFile confines a renderer-supplied path to the TTS cache. The
+// comparison runs on cleaned absolute paths after resolving symlinks, so a
+// link planted inside the cache cannot reach outside it.
+func resolveTTSCacheFile(audioPath string) (string, error) {
+	trimmed := strings.TrimSpace(audioPath)
+	if trimmed == "" {
+		return "", fmt.Errorf("tts audio path is empty")
+	}
+	root, err := filepath.Abs(audio.TTSCacheDir())
+	if err != nil {
+		return "", fmt.Errorf("resolve tts cache dir: %w", err)
+	}
+	target, err := filepath.Abs(trimmed)
+	if err != nil {
+		return "", fmt.Errorf("resolve tts audio path: %w", err)
+	}
+	if resolved, linkErr := filepath.EvalSymlinks(root); linkErr == nil {
+		root = resolved
+	}
+	if resolved, linkErr := filepath.EvalSymlinks(target); linkErr == nil {
+		target = resolved
+	}
+	if !strings.EqualFold(filepath.Ext(target), ".wav") {
+		return "", fmt.Errorf("tts audio path must be a .wav file")
+	}
+	if !withinTTSAudioDir(root, target) {
+		return "", fmt.Errorf("tts audio path is outside the tts cache")
+	}
+	return target, nil
+}
+
+// withinTTSAudioDir reports whether target is strictly below root. Windows
+// paths compare case-insensitively; the equal case is a directory, not a file.
+func withinTTSAudioDir(root, target string) bool {
+	root = filepath.Clean(root)
+	target = filepath.Clean(target)
+	if strings.EqualFold(root, target) {
+		return false
+	}
+	prefix := strings.ToLower(root + string(os.PathSeparator))
+	return strings.HasPrefix(strings.ToLower(target), prefix)
+}
+
 // parseVoiceOverrideJSON preserves malformed requests as errors rather than
 // silently asking the active voice to speak. An empty payload means no
 // override; a non-empty payload is always an explicit request, including an
@@ -356,26 +432,44 @@ func (a *App) audioReadiness(status audio.Status, mic MicrophoneStatus) (string,
 // audioCapabilityRecords builds the capability contract from the same path
 // policies the pipeline loads with.
 func audioCapabilityRecords() []capability.Record {
-	return capability.Catalog(capability.ProductionEnv(audio.ASRModelPathFor, audio.ASRProjectorPathFor, audio.TTSModelPathFor))
+	return audio.ProductionCapabilityRecords()
+}
+
+// managedVoiceEnumerator is implemented by the real pipeline. Enumeration is a
+// managed operation with its own cancellation scope; the ManagedPipeline
+// interface stays minimal so test doubles are not forced to implement it.
+type managedVoiceEnumerator interface {
+	GetTTSVoicesContext(context.Context) ([]audiotypes.Voice, error)
 }
 
 // GetTTSAvailableVoices returns the list of available voice names from the
-// current TTS engine. Voice enumeration only needs a generation lease.
+// current TTS engine. Enumeration is a registered operation with a bounded,
+// cancellable scope: a provider that spawns a process is cancelled and reaped
+// through it, and shutdown cancels it like any other audio operation.
 func (a *App) GetTTSAvailableVoices() []string {
-	if a.audio.Manager() == nil {
-		return nil
-	}
-	lease, err := a.audio.Manager().Acquire(context.Background())
+	op, opCtx, lease, pipeline, err := a.beginManagedAudio(context.Background())
 	if err != nil {
 		return nil
 	}
+	defer op.End()
 	defer lease.Release()
-
-	pipeline := lease.Pipeline()
 	if pipeline == nil {
 		return nil
 	}
-	voices := pipeline.GetTTSVoices()
+
+	ctx, cancel := context.WithTimeout(opCtx, 20*time.Second)
+	defer cancel()
+
+	var voices []audiotypes.Voice
+	if enumerator, ok := pipeline.(managedVoiceEnumerator); ok {
+		voices, err = enumerator.GetTTSVoicesContext(ctx)
+	} else {
+		voices = pipeline.GetTTSVoices()
+	}
+	if err != nil {
+		a.logError(errors.TTSSynthesizeFail, errors.Medium, "tts.voices", "app-audio.go:GetTTSAvailableVoices", err)
+		return nil
+	}
 	result := make([]string, 0, len(voices))
 	for _, v := range voices {
 		result = append(result, v.ID)

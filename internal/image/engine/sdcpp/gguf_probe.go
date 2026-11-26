@@ -69,9 +69,16 @@ func validateCheckpoint(target *types.ModelInfo) error {
 		return nil
 	}
 	if h.KVCount == 0 {
-		return fmt.Errorf("'%s' has no metadata: 0 key/value pairs with %d tensors. "+
-			"stable-diffusion.cpp reads the architecture from that metadata, so this file can never load. "+
-			"It is an incomplete or stripped GGUF rather than an sd-server version problem — download the model again or use another copy.",
+		// Measured counterexample: a classic full checkpoint converted to GGUF
+		// with no key/value pairs (stable-diffusion-v2-1-Q8_0) loads and samples
+		// in sd-server, because sd.cpp identifies that layout from its tensor
+		// names rather than from metadata. Refusing here claimed such a file
+		// "can never load", which was false and blocked a working SD2.1.
+		//
+		// The engine still fails fast on a file it truly cannot identify:
+		// waitReadyOrExit watches the child, and its "get sd version from file
+		// failed" branch explains the real cause instead of blaming a version.
+		fmt.Printf("[ImageEngine] %s has 0 GGUF metadata pairs with %d tensors; letting sd-server identify it from tensor layout\n",
 			filepath.Base(path), h.TensorCount)
 	}
 	return nil

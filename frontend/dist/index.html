@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="css/panel-components.css?v=41">
     <link rel="stylesheet" href="css/character-components.css?v=41">
     <link rel="stylesheet" href="css/chat-components.css?v=41">
-    <link rel="stylesheet" href="css/input-components.css?v=41">
+    <link rel="stylesheet" href="css/input-components.css?v=42">
     <link rel="stylesheet" href="css/world-components.css?v=41">
     <link rel="stylesheet" href="css/animations.css?v=41">
     <link rel="stylesheet" href="css/ambient.css?v=41">
@@ -53,22 +53,22 @@
     <script src="js/storage-scenarios.js?v=41"></script>
     <script src="js/storage-chat.js?v=41"></script>
     <script src="js/image-processor.js?v=41"></script>
-    <script src="js/character-repository.js?v=42"></script>
-    <script src="js/world-repository.js?v=1"></script>
-    <script src="js/scenario-repository.js?v=1"></script>
-    <script src="js/lorebook-repository.js?v=2"></script>
+    <script src="js/character-repository.js?v=44"></script>
+    <script src="js/world-repository.js?v=4"></script>
+    <script src="js/scenario-repository.js?v=4"></script>
+    <script src="js/lorebook-repository.js?v=3"></script>
     <script src="js/chat-session-pointer.js?v=1"></script>
     <script src="js/character-queue.js?v=41"></script>
-    <script src="js/chat-constants.js?v=41"></script>
-    <script src="js/chat-render.js?v=41"></script>
-    <script src="js/chat-stream.js?v=41"></script>
+    <script src="js/chat-constants.js?v=42"></script>
+    <script src="js/chat-render.js?v=42"></script>
+    <script src="js/chat-stream.js?v=42"></script>
     <script src="js/chat-think.js?v=42"></script>
     <script src="js/chat-actions.js?v=41"></script>
     <script src="js/chat-input.js?v=41"></script>
     <script src="js/chat-model.js?v=42"></script>
     <script src="js/chat.js?v=45"></script>
     <script src="js/audio-wav.js?v=42"></script>
-    <script src="js/audio-service.js?v=42"></script>
+    <script src="js/audio-service.js?v=44"></script>
     <script src="js/settings-state.js?v=42"></script>
     <script src="js/settings-actions.js?v=41"></script>
     <script src="js/settings-controls.js?v=41"></script>
@@ -93,7 +93,7 @@
     <script src="js/menu-memory.js?v=41"></script>
     <script src="js/memory-candidates.js?v=41"></script>
     <script src="js/iframe-bridge-host.js?v=1"></script>
-    <script src="js/menu-functions.js?v=41"></script>
+    <script src="js/menu-functions.js?v=42"></script>
     <script src="js/app-wipe.js?v=41"></script>
     <script src="js/tutorials-data-chat.js?v=41"></script>
     <script src="js/tutorials-data-settings.js?v=41"></script>
@@ -712,35 +712,50 @@
             <!-- Category 2: Performance Settings -->
             <div class="category-header">Performance Settings</div>
             <div class="settings-grid">
-                <!-- KV Cache Size -->
-                <div class="setting-card">
-                    <div class="setting-label"><span class="icon icon-bolt"></span> KV Cache Size <span class="warning-icon"><span class="tooltip">Too high = RAM exhaustion</span></span></div>
-                    <div class="setting-description">Tokens stored before eviction</div>
-                    <div class="setting-details">
-                        <div class="setting-detail"><strong>Good for:</strong> Long conversations without eviction.</div>
-                        <div class="setting-detail"><em>Example:</em> 4096 = 4K tokens cached.</div>
-                        <div class="setting-detail warning"><strong>Warning:</strong> Too high = RAM exhaustion.</div>
-                    </div>
-                    <div class="setting-control">
-                        <input type="range" class="setting-slider" id="kv-cache-size" min="512" max="32768" step="512" value="4096">
-                        <input type="number" class="setting-value" id="kv-cache-size-value" min="512" max="32768" step="512" value="4096">
-                    </div>
-                    <button class="setting-reset" data-setting="kv-cache-size" data-default="4096">Default</button>
-                </div>
-
                 <!-- KV Cache Type -->
-                <div class="setting-card">
+                <div class="setting-card" id="kv-cache-type-card">
                     <div class="setting-label"><span class="icon icon-memory"></span> KV Cache Type</div>
-                    <div class="setting-description">How KV cache is stored/managed</div>
+                    <div class="setting-description">Precision of the stored K/V cache. Smaller types free memory for more GPU layers or a longer context.</div>
                     <div class="setting-details">
-                        <div class="setting-detail"><strong>Good for:</strong> Optimizing memory vs speed tradeoff.</div>
-                        <div class="setting-detail"><em>Example:</em> Flash-Attention = fastest. Paged = most flexible.</div>
-                        <div class="setting-detail"><strong>Warning:</strong> None.</div>
+                        <div class="setting-detail"><strong>Good for:</strong> Fitting a model when the KV cache is the pressure.</div>
+                        <div class="setting-detail"><em>Examples:</em> f16 = exact. q8_0 = near-lossless, roughly half the size. q4_0 = smallest, can hurt long-context recall.</div>
+                        <div class="setting-detail warning"><strong>Warning:</strong> This is a memory trade, not a free speed-up. Quantized types require Flash Attention. Off or unset loads with f16 and tells you why. Auto sends the quantized type; if the engine cannot enable Flash Attention, Howl retries once with f16 and warns you.</div>
                     </div>
                     <select class="setting-select" id="kv-cache-type">
-                        <option value="standard">Standard</option>
-                        <option value="flash-attention">Flash-Attention</option>
-                        <option value="paged">Paged</option>
+                        <option value="f16">Standard (f16)</option>
+                        <option value="q8_0">Q8_0 - smaller, near-lossless</option>
+                        <option value="q4_0">Q4_0 - smallest, quality risk</option>
+                    </select>
+                </div>
+
+                <!-- Flash Attention -->
+                <div class="setting-card" id="flash-attention-card">
+                    <div class="setting-label"><span class="icon icon-bolt"></span> Flash Attention</div>
+                    <div class="setting-description">Attention kernel selection. Auto lets the engine choose; Off disables it, including the fallback.</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Good for:</strong> Lower memory and faster attention on supported hardware.</div>
+                        <div class="setting-detail"><em>Example:</em> Auto on a supported GPU, Off if a model produces corrupted output.</div>
+                        <div class="setting-detail warning"><strong>Warning:</strong> Off is slower but explicit; it no longer falls back to auto.</div>
+                    </div>
+                    <select class="setting-select" id="flash-attention-mode">
+                        <option value="auto">Auto (engine decides)</option>
+                        <option value="on">On</option>
+                        <option value="off">Off</option>
+                    </select>
+                </div>
+
+                <!-- KV Cache Location -->
+                <div class="setting-card" id="kv-cache-location-card">
+                    <div class="setting-label"><span class="icon icon-layers"></span> KV Cache Location</div>
+                    <div class="setting-description">Where the K/V cache lives. RAM frees VRAM for weights at the cost of speed.</div>
+                    <div class="setting-details">
+                        <div class="setting-detail"><strong>Good for:</strong> Making room for more GPU layers on a small card.</div>
+                        <div class="setting-detail"><em>Example:</em> GPU on a card with headroom; System RAM when weights need the VRAM.</div>
+                        <div class="setting-detail warning"><strong>Warning:</strong> Keeping the cache in RAM is the largest KV speed cost.</div>
+                    </div>
+                    <select class="setting-select" id="kv-cache-location">
+                        <option value="gpu">GPU (fastest, uses VRAM)</option>
+                        <option value="ram">System RAM (frees VRAM, slower)</option>
                     </select>
                 </div>
 
@@ -1166,7 +1181,7 @@
             <button class="input-icon mic-button" onclick="AudioService.toggleRecording()" title="Speech Input (Hold to record)">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
             </button>
-            <button class="input-icon tts-icon" onclick="AudioService.playTTS(document.getElementById('message-input').value)" title="Text to Speech (TTS)">
+            <button type="button" class="input-icon tts-icon" id="composer-speak-btn" onclick="AudioService.speakComposer()" title="Speak the draft — does not send">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
             </button>
             <button class="input-icon" onclick="addFile()" title="Document">

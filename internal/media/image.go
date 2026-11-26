@@ -8,6 +8,7 @@ import (
 	"howl-chat/internal/image/job"
 	imgsettings "howl-chat/internal/image/settings"
 	imagetypes "howl-chat/internal/image/types"
+	"howl-chat/internal/process"
 )
 
 // Image owns the image engine session: the active engine, its gallery, its job
@@ -24,11 +25,63 @@ type Image struct {
 	settings *imgsettings.Store
 	last     string
 	lastOpts imagetypes.ModelLoadOptions
+	// loadedOpts is what the running process actually started with, which can
+	// differ from the user's requested options when admission selected an
+	// automatic q8_0 fallback. It is runtime truth, not saved user intent.
+	loadedOpts imagetypes.ModelLoadOptions
+	// processes is the shared process authority, when the composition root
+	// supplies one. Engines record sd-server and sd-cli there.
+	processes *process.Registry
+	// onEngineExit invalidates registrations after the engine ends. The engine
+	// reports exit; it does not write the resource registry.
+	onEngineExit func()
 }
 
 // NewImage builds the owner with a settings store rooted at configDir.
 func NewImage(configDir string) *Image {
 	return &Image{settings: imgsettings.NewStore(configDir)}
+}
+
+// SetProcessRegistry records the shared process authority for engines this
+// domain constructs.
+func (i *Image) SetProcessRegistry(registry *process.Registry) {
+	if i == nil {
+		return
+	}
+	i.mu.Lock()
+	i.processes = registry
+	i.mu.Unlock()
+}
+
+// SetOnEngineExit records the registration invalidation observer for engines
+// this domain constructs.
+func (i *Image) SetOnEngineExit(fn func()) {
+	if i == nil {
+		return
+	}
+	i.mu.Lock()
+	i.onEngineExit = fn
+	i.mu.Unlock()
+}
+
+// OnEngineExit returns the registration invalidation observer, or nil.
+func (i *Image) OnEngineExit() func() {
+	if i == nil {
+		return nil
+	}
+	i.mu.RLock()
+	defer i.mu.RUnlock()
+	return i.onEngineExit
+}
+
+// ProcessRegistry returns the shared process authority, or nil.
+func (i *Image) ProcessRegistry() *process.Registry {
+	if i == nil {
+		return nil
+	}
+	i.mu.RLock()
+	defer i.mu.RUnlock()
+	return i.processes
 }
 
 // Engine returns the active engine, or nil when none is ready.
@@ -150,6 +203,27 @@ func (i *Image) SetLoadOptions(opts imagetypes.ModelLoadOptions) {
 	}
 	i.mu.Lock()
 	i.lastOpts = opts
+	i.mu.Unlock()
+}
+
+// LoadedOptions returns the options the running process was actually started
+// with. It is empty until a model has loaded.
+func (i *Image) LoadedOptions() imagetypes.ModelLoadOptions {
+	if i == nil {
+		return imagetypes.ModelLoadOptions{}
+	}
+	i.mu.RLock()
+	defer i.mu.RUnlock()
+	return i.loadedOpts
+}
+
+// SetLoadedOptions records the actual successful start options.
+func (i *Image) SetLoadedOptions(opts imagetypes.ModelLoadOptions) {
+	if i == nil {
+		return
+	}
+	i.mu.Lock()
+	i.loadedOpts = opts
 	i.mu.Unlock()
 }
 

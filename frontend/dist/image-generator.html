@@ -159,6 +159,19 @@
                         </div>
                     </div>
 
+                    <!-- Engine placement: planned vs actual, always visible after load. -->
+                    <div id="ig-placement-card" class="ig-placement-card" style="display:none;" aria-live="polite">
+                        <div class="ig-placement-head">
+                            <span class="ig-placement-title">Engine placement</span>
+                            <span id="ig-placement-phase" class="ig-placement-phase"></span>
+                        </div>
+                        <div id="ig-placement-summary" class="ig-placement-summary"></div>
+                        <details class="ig-placement-details">
+                            <summary>Theoretical / planned / actual</summary>
+                            <pre id="ig-placement-body" class="ig-placement-body"></pre>
+                        </details>
+                    </div>
+
                     <!-- Optional Sub-Models (elevated from nested to top-level) -->
                     <div class="ig-panel ig-panel-collapsed" data-panel="submodels">
                         <div class="ig-panel-header">
@@ -332,18 +345,6 @@
                             <div class="ig-field">
                                 <label class="ig-label" for="ig-flow-shift">Flow Shift: <span id="ig-flow-shift-val">Auto</span></label>
                                 <input id="ig-flow-shift" type="range" class="ig-slider" min="0" max="10" step="0.1" value="0">
-                            </div>
-                            <div class="ig-field">
-                                <label class="ig-label" for="ig-slg-scale">SLG Scale: <span id="ig-slg-val">0.0</span></label>
-                                <input id="ig-slg-scale" type="range" class="ig-slider" min="0" max="5" step="0.1" value="0">
-                            </div>
-                            <div class="ig-field">
-                                <label class="ig-label" for="ig-skip-layer-start">Skip Layer Start: <span id="ig-skip-start-val">0.01</span></label>
-                                <input id="ig-skip-layer-start" type="range" class="ig-slider" min="0" max="1" step="0.01" value="0.01">
-                            </div>
-                            <div class="ig-field">
-                                <label class="ig-label" for="ig-skip-layer-end">Skip Layer End: <span id="ig-skip-end-val">0.2</span></label>
-                                <input id="ig-skip-layer-end" type="range" class="ig-slider" min="0" max="1" step="0.01" value="0.2">
                             </div>
                             <div class="ig-field">
                                 <label class="ig-label" for="ig-eta">Eta (Noise): <span id="ig-eta-val">0.0</span></label>
@@ -859,6 +860,44 @@
                         </div>
                     </div>
 
+                    <div class="ig-panel ig-panel-collapsed" data-panel="ipadapter">
+                        <div class="ig-panel-header">
+                            <span class="ig-panel-title">IP-Adapter</span>
+                            <span class="ig-panel-toggle">&#x25B6;</span>
+                        </div>
+                        <div class="ig-panel-body" style="display:none;">
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-ip-model">IP-Adapter</label>
+                                <select id="ig-ip-model" class="ig-select"><option value="">None</option></select>
+                                <div class="ig-hint">SD1.5 or SDXL adapter matching the checkpoint family. Selecting one runs the native-IP engine profile for this request.</div>
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-ip-vision">CLIP-Vision encoder</label>
+                                <select id="ig-ip-vision" class="ig-select"><option value="">None</option></select>
+                                <div class="ig-hint">Usually clip_vision_h.safetensors (ViT-H/14). It is shared by SD1.5 and SDXL adapters.</div>
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-ip-strength">Reference strength: <span id="ig-ip-strength-val">0.7</span></label>
+                                <input id="ig-ip-strength" type="range" class="ig-slider" min="0" max="2" step="0.05" value="0.7">
+                            </div>
+                            <div class="ig-field">
+                                <div class="ig-label">Reference image</div>
+                                <div class="ig-upload-mini" id="ig-upload-ip">
+                                    <span>Drop reference image or click</span>
+                                </div>
+                                <div class="ig-btn-row">
+                                    <button class="ig-btn ig-btn-secondary" type="button" id="ig-clear-ip">Clear</button>
+                                </div>
+                                <div class="ig-hint" id="ig-ip-status"></div>
+                            </div>
+                            <label class="ig-checkbox ig-fullwidth">
+                                <input id="ig-ip-vision-cpu" type="checkbox">
+                                <span>Keep CLIP-Vision on CPU</span>
+                            </label>
+                            <div class="ig-hint">The adapter stays on the GPU. When this is off, Howl keeps CLIP-Vision on the GPU only if the measured projection fits under the free-VRAM reserve; otherwise it places the encoder on CPU.</div>
+                        </div>
+                    </div>
+
                     <div class="ig-panel ig-panel-collapsed" data-panel="advanced">
                         <div class="ig-panel-header">
                             <span class="ig-panel-title">Advanced</span>
@@ -922,43 +961,6 @@
                                 <div class="ig-hint">0 = off. Higher = stronger CodeFormer/GFPGAN effect.</div>
                             </div>
 
-                            <div class="ig-panel ig-panel-collapsed ig-txt2img-only" style="margin-top:8px; border:none; box-shadow:none;">
-                                <div class="ig-panel-header" style="background:transparent; padding:4px 0;">
-                                    <span class="ig-panel-title" style="font-size:11px; opacity:0.8;">High-Noise Fix Settings</span>
-                                    <span class="ig-panel-toggle" style="font-size:8px;">&#x25B6;</span>
-                                </div>
-                                <div class="ig-panel-body" style="display:none; padding:8px 0 0; gap:8px;">
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-high-noise-steps">High-Noise Steps: <span id="ig-hn-steps-val">Auto</span></label>
-                                        <input id="ig-high-noise-steps" type="range" class="ig-slider" min="-1" max="100" value="-1">
-                                    </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-high-noise-cfg">High-Noise CFG: <span id="ig-hn-cfg-val">7.0</span></label>
-                                        <input id="ig-high-noise-cfg" type="range" class="ig-slider" min="1" max="30" step="0.5" value="7">
-                                    </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-high-noise-guidance">High-Noise Guidance: <span id="ig-hn-guidance-val">3.5</span></label>
-                                        <input id="ig-high-noise-guidance" type="range" class="ig-slider" min="0" max="10" step="0.1" value="3.5">
-                                    </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-high-noise-slg">High-Noise SLG Scale: <span id="ig-hn-slg-val">0.0</span></label>
-                                        <input id="ig-high-noise-slg" type="range" class="ig-slider" min="0" max="5" step="0.1" value="0">
-                                    </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-high-noise-eta">High-Noise Eta: <span id="ig-hn-eta-val">0.0</span></label>
-                                        <input id="ig-high-noise-eta" type="range" class="ig-slider" min="0" max="1" step="0.05" value="0">
-                                    </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-high-noise-skip-start">High-Noise Skip Start: <span id="ig-hn-skip-start-val">0.01</span></label>
-                                        <input id="ig-high-noise-skip-start" type="range" class="ig-slider" min="0" max="1" step="0.01" value="0.01">
-                                    </div>
-                                    <div class="ig-field">
-                                        <label class="ig-label" for="ig-high-noise-skip-end">High-Noise Skip End: <span id="ig-hn-skip-end-val">0.2</span></label>
-                                        <input id="ig-high-noise-skip-end" type="range" class="ig-slider" min="0" max="1" step="0.01" value="0.2">
-                                    </div>
-                                </div>
-                            </div>
-
                             <div class="ig-panel ig-panel-collapsed" style="margin-top:8px; border:none; box-shadow:none;">
                                 <div class="ig-panel-header" style="background:transparent; padding:4px 0;">
                                     <span class="ig-panel-title" style="font-size:11px; opacity:0.8;">Sampler Shaping (DPM++/SDE)</span>
@@ -999,8 +1001,8 @@
                                     <option value="" selected>Auto (Default)</option>
                                     <option value="cpu">CPU</option>
                                     <option value="cuda">CUDA</option>
-                                    <option value="vulkan">Vulkan</option>
                                 </select>
+                                <div class="ig-hint">This build ships CUDA and CPU compute backends; Vulkan is not available.</div>
                             </div>
                             <div class="ig-field">
                                 <label class="ig-label" for="ig-params-backend">Params Backend</label>
@@ -1008,11 +1010,58 @@
                                     <option value="" selected>Auto (Default)</option>
                                     <option value="cpu">CPU</option>
                                     <option value="cuda">CUDA</option>
+                                    <option value="disk">Disk (last resort, very slow)</option>
+                                </select>
+                                <div class="ig-hint">CPU/CUDA keep weights in RAM or VRAM. Disk disables auto-fit and reloads weights from the model file on demand.</div>
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-max-vram">VRAM Budget (GiB)</label>
+                                <input id="ig-max-vram" class="ig-input" type="number" min="-32" max="64" step="1" placeholder="auto (10% reserve)">
+                                <div class="ig-hint">Passed to sd-server as its per-device managed weight/runner budget. A budget below the resident weights plus decode need automatically selects bounded CPU-diffusion placement (diffusion and CLIP in RAM, tiled VAE on CUDA) at 3 GiB or more, or CPU-only placement below the measured 3 GiB floor. Explicit Backend/Params choices are never rewritten.</div>
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-weight-residency-ttl">Weight Residency TTL (s)</label>
+                                <input id="ig-weight-residency-ttl" class="ig-input" type="number" min="-1" max="86400" step="1" placeholder="engine default (disabled)">
+                                <div class="ig-hint">Manual idle release: after this many idle seconds sd-server unloads model components and the next generation reloads them. -1 disables, 0 unloads immediately. Howl keeps reusable weights by default; sd.cpp releases transient execution buffers after each generation.</div>
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-weight-type">Weight Type (quantize on load)</label>
+                                <select id="ig-weight-type" class="ig-select">
+                                    <option value="" selected>Auto (model default)</option>
+                                    <option value="f16">f16</option>
+                                    <option value="q8_0">q8_0</option>
+                                    <option value="q4_0">q4_0</option>
+                                    <option value="q5_0">q5_0</option>
+                                    <option value="q5_1">q5_1</option>
                                 </select>
                             </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-cache-mode">Denoise Cache</label>
+                                <select id="ig-cache-mode" class="ig-select">
+                                    <option value="" selected>Off (Default)</option>
+                                    <option value="ucache">ucache (UNet / SDXL)</option>
+                                    <option value="easycache">easycache (DiT)</option>
+                                    <option value="dbcache">dbcache (DiT)</option>
+                                    <option value="taylorseer">taylorseer (DiT)</option>
+                                    <option value="cache-dit">cache-dit (DiT)</option>
+                                    <option value="spectrum">spectrum (UNet + DiT)</option>
+                                </select>
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-cache-option">Cache Options</label>
+                                <input id="ig-cache-option" class="ig-input" type="text" placeholder="threshold=1.5">
+                            </div>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-cond-cache">Conditioning Cache Size</label>
+                                <input id="ig-cond-cache" class="ig-input" type="number" min="1" max="64" step="1" placeholder="sd.cpp default (4)">
+                            </div>
+                            <label class="ig-checkbox ig-fullwidth">
+                                <input id="ig-mmap" type="checkbox">
+                                <span>Memory-Map Model (faster load)</span>
+                            </label>
                             <label class="ig-checkbox ig-fullwidth">
                                 <input id="ig-vae-tiling" type="checkbox">
-                                <span>VAE Tiling (Low VRAM)</span>
+                                <span>Force VAE Tiling (auto under pressure)</span>
                             </label>
                             <label class="ig-checkbox ig-fullwidth">
                                 <input id="ig-temporal-tiling" type="checkbox">
@@ -1022,14 +1071,19 @@
                                 <input id="ig-circular" type="checkbox">
                                 <span>Circular Padding</span>
                             </label>
-                            <label class="ig-checkbox ig-fullwidth">
-                                <input id="ig-fa" type="checkbox">
-                                <span>Flash Attention</span>
-                            </label>
+                            <div class="ig-field">
+                                <label class="ig-label" for="ig-fa">Flash Attention</label>
+                                <select id="ig-fa" class="ig-select">
+                                    <option value="auto" selected>Auto (engine chooses)</option>
+                                    <option value="on">On (force)</option>
+                                    <option value="off">Off (disable)</option>
+                                </select>
+                            </div>
                             <label class="ig-checkbox ig-fullwidth">
                                 <input id="ig-offload-cpu" type="checkbox">
                                 <span>Offload to CPU (Low VRAM)</span>
                             </label>
+                            <div class="ig-hint">Stages weights in RAM and reloads them on demand. Offload is optional for fitting: a VRAM Budget below the resident need selects bounded CPU-diffusion (or CPU-only below 3 GiB) automatically. Explicit Backend/Params choices are honored as written.</div>
                         </div>
                     </div>
 
@@ -1060,6 +1114,42 @@
                             </div>
                             <div class="ig-hint" id="ig-workflow-status"></div>
                             <div class="ig-hint">Saves every setting on this page, the LoRA stack and any pose, so a recipe can be restored exactly.</div>
+
+                            <div class="ig-wf-pipeline">
+                                <div class="ig-label">Sequential pipeline</div>
+                                <div class="ig-hint">Base txt2img &rarr; ESRGAN upscale &rarr; pose/ControlNet img2img &rarr; second upscale. Each stage waits, gets admission, and reports its actual placement. With an IP-Adapter selected, all four stages use the native-IP engine and its native upscaler.</div>
+                                <label class="ig-label" for="ig-wf-upscaler">ESRGAN upscaler path</label>
+                                <input id="ig-wf-upscaler" class="ig-input ig-path-input" type="text" placeholder="...\\2x-ESRGAN.gguf">
+                                <label class="ig-label" for="ig-wf-controlnet">OpenPose ControlNet path</label>
+                                <input id="ig-wf-controlnet" class="ig-input ig-path-input" type="text" placeholder="...\\OpenPoseXL2.safetensors">
+                                <label class="ig-label" for="ig-wf-pose">Pose image path (optional)</label>
+                                <input id="ig-wf-pose" class="ig-input ig-path-input" type="text" placeholder="Uses the current ControlNet image if empty">
+                                <div class="ig-wf-pipeline-grid">
+                                    <div class="ig-field">
+                                        <label class="ig-label" for="ig-wf-refine-width">Refine W</label>
+                                        <input id="ig-wf-refine-width" class="ig-input" type="number" value="768" min="64" max="4096" step="64">
+                                    </div>
+                                    <div class="ig-field">
+                                        <label class="ig-label" for="ig-wf-refine-height">Refine H</label>
+                                        <input id="ig-wf-refine-height" class="ig-input" type="number" value="768" min="64" max="4096" step="64">
+                                    </div>
+                                    <div class="ig-field">
+                                        <label class="ig-label" for="ig-wf-refine-steps">Refine Steps</label>
+                                        <input id="ig-wf-refine-steps" class="ig-input" type="number" value="20" min="1" max="100">
+                                    </div>
+                                    <div class="ig-field">
+                                        <label class="ig-label" for="ig-wf-refine-strength">Strength</label>
+                                        <input id="ig-wf-refine-strength" class="ig-input" type="number" value="0.5" min="0.05" max="1" step="0.05">
+                                    </div>
+                                </div>
+                                <div class="ig-btn-row">
+                                    <button class="ig-btn ig-btn-primary" type="button" id="ig-wf-run">Run pipeline</button>
+                                    <button class="ig-btn ig-btn-secondary" type="button" id="ig-wf-cancel" disabled>Cancel pipeline</button>
+                                    <button class="ig-btn ig-btn-secondary" type="button" id="ig-wf-use-pose">Use current pose image</button>
+                                </div>
+                                <div class="ig-hint" id="ig-wf-pipeline-status"></div>
+                                <div id="ig-wf-pipeline-stages" class="ig-wf-stages"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -1303,9 +1393,10 @@
     <script src="js/menu.js?v=41"></script>
     <script src="js/navigation.js?v=42"></script>
     <script src="js/image-deps.js?v=1"></script>
-    <script src="js/image-generation-repository.js?v=1"></script>
-    <script src="js/image-generator-core.js?v=43"></script>
-    <script src="js/image-generator-ui.js?v=42"></script>
+    <script src="js/image-generation-repository.js?v=3"></script>
+    <script src="js/cutover-banner.js?v=1"></script>
+    <script src="js/image-generator-core.js?v=56"></script>
+    <script src="js/image-generator-ui.js?v=43"></script>
     <script src="js/delete-confirm.js?v=46"></script>
     <script src="js/image-generator.js?v=41"></script>
     <script src="js/image-recall.js?v=41"></script>
@@ -1318,7 +1409,7 @@
     <script src="js/tutorials-data.js?v=41"></script>
     <script src="js/image-model-library.js?v=41"></script>
     <script src="js/image-model-dirs.js?v=41"></script>
-    <script src="js/image-workflows.js?v=41"></script>
+    <script src="js/image-workflows.js?v=44"></script>
     <script src="js/ig-pose.js?v=41"></script>
     <script src="js/tutorials-ui.js?v=41"></script>
     <script src="js/tutorials-extras.js?v=41"></script>

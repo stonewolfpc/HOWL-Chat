@@ -1,7 +1,159 @@
 [
   {
+    "name": "Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced-Q4_K_M",
+    "path": "H:\\AI GGUF\\GGUF\\Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "gemma4",
+    "format": "gguf",
+    "size_mb": 7039.4342041015625,
+    "file_size": 7381381760,
+    "mod_time_ns": 1788651487224645600,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "gemma4",
+    "model_name": "Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced",
+    "embedding_length": 3840,
+    "admission_version": 1
+  },
+  {
+    "name": "helcyon-grok-v3.0-Q4_K_M(1)",
+    "path": "G:\\AI GGUF\\GGUF\\helcyon-grok-v3.0-Q4_K_M(1).gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.816955566406,
+    "file_size": 7477203520,
+    "mod_time_ns": 1793029079268142600,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Helcyon Grok",
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "fsq",
+    "path": "G:\\AI GGUF\\Image models\\fsq.safetensors",
+    "type": "vae",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 400.68480014801025,
+    "file_size": 420148465,
+    "mod_time_ns": 1793810893836654000,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\fsq.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "Qwen3-ASR-1.7B-Q8_0",
+    "path": "H:\\AI GGUF\\voice\\Qwen3-ASR-1.7B-Q8_0.gguf",
+    "type": "llm",
+    "family": "qwen3vl",
+    "format": "gguf",
+    "size_mb": 2064.7382202148438,
+    "file_size": 2165034944,
+    "mod_time_ns": 1793831921531991400,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T20:35:39.3465955-06:00",
+    "admission": "multimodal-chat",
+    "arch": "qwen3vl",
+    "model_tags": [
+      "automatic-speech-recognition"
+    ],
+    "embedding_length": 2048,
+    "admission_version": 1
+  },
+  {
+    "name": "taesdxl",
+    "path": "H:\\AI GGUF\\Image models\\taesdxl.safetensors",
+    "type": "embedding",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 9.339611053466797,
+    "file_size": 9793292,
+    "mod_time_ns": 1793484538334589500,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\taesdxl.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "c4ai-command-r7b-12-2024-abliterated-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\c4ai-command-r7b-12-2024-abliterated-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "cohere2",
+    "format": "gguf",
+    "size_mb": 4822.740875244141,
+    "file_size": 5057010336,
+    "mod_time_ns": 1791658348024289100,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "cohere2",
+    "model_name": "C4Ai Command R7B 12 2024",
+    "model_tags": [
+      "abliterated",
+      "uncensored"
+    ],
+    "embedding_length": 4096,
+    "admission_version": 1
+  },
+  {
     "name": "Rocinante-X-12B-v1-absolute-heresy.Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Rocinante-X-12B-v1-absolute-heresy.Q4_K_M.gguf",
+    "path": "H:\\AI GGUF\\GGUF\\Rocinante-X-12B-v1-absolute-heresy.Q4_K_M.gguf",
     "type": "llm",
     "family": "llama",
     "format": "gguf",
@@ -17,7 +169,7 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
     "admission": "chat",
     "arch": "llama",
     "model_name": "Rocinante X 12B v1 Absolute Heresy",
@@ -31,40 +183,17 @@
     "admission_version": 1
   },
   {
-    "name": "diffusion_pytorch_model",
-    "path": "G:\\AI GGUF\\Image models\\diffusion_pytorch_model.safetensors",
-    "type": "diffusion",
-    "family": "sdxl",
-    "format": "safetensors",
-    "size_mb": 44.03508758544922,
-    "file_size": 46174136,
-    "mod_time_ns": 1793764014374930500,
-    "available": true,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\diffusion_pytorch_model.safetensors"
-    },
-    "recommended": {
-      "sampler": "dpmpp_2m",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
-  },
-  {
-    "name": "t5xxl_fp8_e4m3fn",
-    "path": "G:\\AI GGUF\\Image models\\t5xxl_fp8_e4m3fn.safetensors",
-    "type": "t5xxl",
+    "name": "clip_l",
+    "path": "H:\\AI GGUF\\Image models\\clip_l.safetensors",
+    "type": "clip_l",
     "family": "",
     "format": "safetensors",
-    "size_mb": 4667.220024108887,
-    "file_size": 4893934904,
-    "mod_time_ns": 1793563871470193800,
+    "size_mb": 234.7413558959961,
+    "file_size": 246144152,
+    "mod_time_ns": 1793563394983474100,
     "available": true,
     "files": {
-      "model": "G:\\AI GGUF\\Image models\\t5xxl_fp8_e4m3fn.safetensors"
+      "model": "G:\\AI GGUF\\Image models\\clip_l.safetensors"
     },
     "recommended": {
       "sampler": "",
@@ -74,7 +203,1330 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated-Q6_K",
+    "path": "H:\\AI GGUF\\GGUF\\Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated-Q6_K.gguf",
+    "type": "llm",
+    "family": "qwen35",
+    "format": "gguf",
+    "size_mb": 7208.730621337891,
+    "file_size": 7558901920,
+    "mod_time_ns": 1793281873598143400,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "qwen35",
+    "model_name": "Huihui Qwythos 9B Claude Mythos 5 1M Abliterated MTP",
+    "model_tags": [
+      "qwen3.5",
+      "reasoning",
+      "uncensored",
+      "long-context",
+      "1M-context",
+      "function-calling",
+      "tool-use",
+      "sft",
+      "full-fine-tune",
+      "cybersecurity",
+      "biomedical",
+      "agentic",
+      "text-generation"
+    ],
+    "embedding_length": 4096,
+    "admission_version": 1
+  },
+  {
+    "name": "Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M",
+    "path": "H:\\AI GGUF\\GGUF\\Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "qwen3vl",
+    "format": "gguf",
+    "size_mb": 4794.869232177734,
+    "file_size": 5027784800,
+    "mod_time_ns": 1788764915781506900,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "multimodal-chat",
+    "arch": "qwen3vl",
+    "model_name": "Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M",
+    "embedding_length": 4096,
+    "admission_version": 1
+  },
+  {
+    "name": "llama-q2_k",
+    "path": "G:\\AI GGUF\\Image models\\llama-q2_k.gguf",
+    "type": "llm",
+    "family": "",
+    "format": "gguf",
+    "size_mb": 3032.144561767578,
+    "file_size": 3179434016,
+    "mod_time_ns": 1790689209017459100,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\llama-q2_k.gguf"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "unholyDesireMixSinister_v90",
+    "path": "H:\\AI GGUF\\Image models\\unholyDesireMixSinister_v90.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 6616.831590652466,
+    "file_size": 6938250802,
+    "mod_time_ns": 1790356750190121700,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\unholyDesireMixSinister_v90.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "fsq",
+    "path": "H:\\AI GGUF\\Image models\\fsq.safetensors",
+    "type": "vae",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 400.68480014801025,
+    "file_size": 420148465,
+    "mod_time_ns": 1793810893836654000,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\fsq.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "pony-v7-base",
+    "path": "G:\\AI GGUF\\Image models\\pony-v7-base.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 13081.788558959961,
+    "file_size": 13717249520,
+    "mod_time_ns": 1793812869376189600,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\pony-v7-base.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "model",
+    "path": "H:\\AI GGUF\\Image models\\model.safetensors",
+    "type": "llm",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 7341.614822387695,
+    "file_size": 7698241104,
+    "mod_time_ns": 1793809650274059700,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\model.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "Qwen2.5-Omni-3B-Q4_K_M",
+    "path": "G:\\AI GGUF\\voice\\Qwen2.5-Omni-3B-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "qwen2vl",
+    "format": "gguf",
+    "size_mb": 819.62890625,
+    "file_size": 859443200,
+    "mod_time_ns": 1793833420771144900,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:15.7583445-06:00",
+    "admission": "multimodal-chat",
+    "arch": "qwen2vl",
+    "model_tags": [
+      "multimodal",
+      "any-to-any"
+    ],
+    "embedding_length": 2048,
+    "admission_version": 1
+  },
+  {
+    "name": "flux2-dev-Q2_K",
+    "path": "G:\\AI GGUF\\Image models\\flux2-dev-Q2_K.gguf",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "gguf",
+    "size_mb": 12262.582977294922,
+    "file_size": 12858250208,
+    "mod_time_ns": 1793812988102657900,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\flux2-dev-Q2_K.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "flux1-schnell-Q4_K_M",
+    "path": "G:\\AI GGUF\\Image models\\flux1-schnell-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "gguf",
+    "size_mb": 6591.172882080078,
+    "file_size": 6911345696,
+    "mod_time_ns": 1790353093963181600,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\flux1-schnell-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "anima-base-v1.0",
+    "path": "G:\\AI GGUF\\Image models\\anima-base-v1.0.safetensors",
+    "type": "diffusion",
+    "family": "anima",
+    "format": "safetensors",
+    "size_mb": 3988.47420501709,
+    "file_size": 4182218328,
+    "mod_time_ns": 1793801874559890400,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\anima-base-v1.0.safetensors"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 30,
+      "cfg": 6,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M",
+    "path": "H:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "qwen35",
+    "format": "gguf",
+    "size_mb": 5366.3675537109375,
+    "file_size": 5627044224,
+    "mod_time_ns": 1788721954601494900,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "qwen35",
+    "model_name": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16",
+    "embedding_length": 4096,
+    "admission_version": 1
+  },
+  {
+    "name": "qwen_image_vae",
+    "path": "H:\\AI GGUF\\Image models\\qwen_image_vae.safetensors",
+    "type": "vae",
+    "family": "qwen_image",
+    "format": "safetensors",
+    "size_mb": 242.04849815368652,
+    "file_size": 253806246,
+    "mod_time_ns": 1793563398936267500,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\qwen_image_vae.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "realityBoundxl_boundlessV18",
+    "path": "G:\\AI GGUF\\Image models\\realityBoundxl_boundlessV18.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 6616.631685256958,
+    "file_size": 6938041186,
+    "mod_time_ns": 1790363797170298100,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\realityBoundxl_boundlessV18.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "ernie-image-UD-Q4_K_M",
+    "path": "G:\\AI GGUF\\Image models\\ernie-image-UD-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "wan",
+    "format": "gguf",
+    "size_mb": 5507.235046386719,
+    "file_size": 5774754496,
+    "mod_time_ns": 1793809314845405600,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\ernie-image-UD-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "qwen35",
+    "format": "gguf",
+    "size_mb": 5366.3675537109375,
+    "file_size": 5627044224,
+    "mod_time_ns": 1788721954601494900,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "qwen35",
+    "model_name": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16",
+    "embedding_length": 4096,
+    "admission_version": 1
+  },
+  {
+    "name": "ernie-image-turbo-UD-Q4_K_M",
+    "path": "H:\\AI GGUF\\Image models\\ernie-image-turbo-UD-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "wan",
+    "format": "gguf",
+    "size_mb": 5511.110046386719,
+    "file_size": 5778817728,
+    "mod_time_ns": 1793809615092356000,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\ernie-image-turbo-UD-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "hidream-i1-dev-q2_k",
+    "path": "G:\\AI GGUF\\Image models\\hidream-i1-dev-q2_k.gguf",
+    "type": "diffusion",
+    "family": "hidream",
+    "format": "gguf",
+    "size_mb": 7304.892272949219,
+    "file_size": 7659734720,
+    "mod_time_ns": 1793812033199207800,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\hidream-i1-dev-q2_k.gguf"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1)",
+    "path": "G:\\AI GGUF\\GGUF\\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
+    "type": "llm",
+    "family": "gemma4",
+    "format": "gguf",
+    "size_mb": 5088.124969482422,
+    "file_size": 5335285728,
+    "mod_time_ns": 1788573228448965700,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "gemma4",
+    "model_name": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive",
+    "embedding_length": 2560,
+    "admission_version": 1
+  },
+  {
+    "name": "Krea-2-Turbo-Q4_K_M",
+    "path": "H:\\AI GGUF\\Image models\\Krea-2-Turbo-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "qwen_image",
+    "format": "gguf",
+    "size_mb": 7139.48176574707,
+    "file_size": 7486289232,
+    "mod_time_ns": 1793801178209654000,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\Krea-2-Turbo-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 2.5,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "flux-2-klein-4b-Q4_K_M",
+    "path": "G:\\AI GGUF\\Image models\\flux-2-klein-4b-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "gguf",
+    "size_mb": 2483.6646118164062,
+    "file_size": 2604311104,
+    "mod_time_ns": 1793809790329404100,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\flux-2-klein-4b-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "sdxl.vae",
+    "path": "G:\\AI GGUF\\Image models\\sdxl.vae.safetensors",
+    "type": "vae",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 319.13868141174316,
+    "file_size": 334641162,
+    "mod_time_ns": 1793800222314264500,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\sdxl.vae.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "sdxl_lightning_8step_unet",
+    "path": "H:\\AI GGUF\\Image models\\sdxl_lightning_8step_unet.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 4897.260414123535,
+    "file_size": 5135149736,
+    "mod_time_ns": 1793800464662744400,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\sdxl_lightning_8step_unet.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "diffusion_pytorch_model(1)",
+    "path": "G:\\AI GGUF\\Image models\\diffusion_pytorch_model(1).safetensors",
+    "type": "lora",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 319.140661239624,
+    "file_size": 334643238,
+    "mod_time_ns": 1793800219657735000,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\diffusion_pytorch_model(1).safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "novan_hel",
+    "path": "G:\\AI GGUF\\Image models\\novan_hel.safetensors",
+    "type": "embedding",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 0.12514495849609375,
+    "file_size": 131224,
+    "mod_time_ns": 1793807788672862100,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\novan_hel.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "MN-12B-Mag-Mell-R1-Uncensored-Scale1.2.i1-Q4_K_S",
+    "path": "H:\\AI GGUF\\GGUF\\MN-12B-Mag-Mell-R1-Uncensored-Scale1.2.i1-Q4_K_S.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 6790.349578857422,
+    "file_size": 7120197600,
+    "mod_time_ns": 1790383801514712200,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Mistral Nemo Base 2407 Chatml",
+    "model_tags": [
+      "mergekit",
+      "merge"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "MLSD-Controlnet-Lllite-v20-TEST",
+    "path": "G:\\AI GGUF\\Image models\\MLSD-Controlnet-Lllite-v20-TEST.safetensors",
+    "type": "controlnet",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 213.5340576171875,
+    "file_size": 223906688,
+    "mod_time_ns": 1793764268182277500,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\MLSD-Controlnet-Lllite-v20-TEST.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "unholyDesireMixSinister_v90",
+    "path": "G:\\AI GGUF\\Image models\\unholyDesireMixSinister_v90.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 6616.831590652466,
+    "file_size": 6938250802,
+    "mod_time_ns": 1790356750190121700,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\unholyDesireMixSinister_v90.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "Ultravox-Llama-3.2-1B-Q4_K_M",
+    "path": "H:\\AI GGUF\\voice\\Ultravox-Llama-3.2-1B-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 668.2265625,
+    "file_size": 700686336,
+    "mod_time_ns": 1793833224287786700,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T20:35:39.3465955-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Llama 3.2 1B Instruct",
+    "model_tags": [
+      "facebook",
+      "meta",
+      "pytorch",
+      "llama",
+      "llama-3",
+      "text-generation"
+    ],
+    "embedding_length": 2048,
+    "admission_version": 1
+  },
+  {
+    "name": "qwen_3_4b",
+    "path": "H:\\AI GGUF\\Image models\\qwen_3_4b.safetensors",
+    "type": "llm",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 7672.292755126953,
+    "file_size": 8044982048,
+    "mod_time_ns": 1793563632814645200,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\qwen_3_4b.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "novan_realism_2",
+    "path": "H:\\AI GGUF\\Image models\\novan_realism_2.safetensors",
+    "type": "embedding",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 0.12514495849609375,
+    "file_size": 131224,
+    "mod_time_ns": 1793807783547493300,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\novan_realism_2.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "model",
+    "path": "G:\\AI GGUF\\Image models\\model.safetensors",
+    "type": "llm",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 7341.614822387695,
+    "file_size": 7698241104,
+    "mod_time_ns": 1793809650274059700,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\model.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "chroma-unlocked-v18-Q4_K_M",
+    "path": "G:\\AI GGUF\\Image models\\chroma-unlocked-v18-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "gguf",
+    "size_mb": 5840.035308837891,
+    "file_size": 6123720864,
+    "mod_time_ns": 1793808693141705600,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\chroma-unlocked-v18-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "Gemma-4-E2B-it-Q8_0",
+    "path": "G:\\AI GGUF\\voice\\Gemma-4-E2B-it-Q8_0.gguf",
+    "type": "llm",
+    "family": "gemma4",
+    "format": "gguf",
+    "size_mb": 3864.1328125,
+    "file_size": 4051836928,
+    "mod_time_ns": 1793833946560430800,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:15.7583445-06:00",
+    "admission": "chat",
+    "arch": "gemma4",
+    "model_name": "gemma-4-E2B-it",
+    "model_tags": [
+      "any-to-any"
+    ],
+    "embedding_length": 1536,
+    "admission_version": 1
+  },
+  {
+    "name": "OpenPose-ControlNet-SDXL-Thibaud-TEST",
+    "path": "H:\\AI GGUF\\Image models\\OpenPose-ControlNet-SDXL-Thibaud-TEST.safetensors",
+    "type": "controlnet",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 2386.225799560547,
+    "file_size": 2502139104,
+    "mod_time_ns": 1793496871101061600,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\OpenPose-ControlNet-SDXL-Thibaud-TEST.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "anima-turbo-v1.1",
+    "path": "H:\\AI GGUF\\Image models\\anima-turbo-v1.1.safetensors",
+    "type": "diffusion",
+    "family": "anima",
+    "format": "safetensors",
+    "size_mb": 3988.4859619140625,
+    "file_size": 4182230656,
+    "mod_time_ns": 1793801872869884600,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\anima-turbo-v1.1.safetensors"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 30,
+      "cfg": 6,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "HiDream-I1-Full-text_encoder_4-FP8",
+    "path": "G:\\AI GGUF\\Image models\\HiDream-I1-Full-text_encoder_4-FP8.pt",
+    "type": "diffusion",
+    "family": "hidream",
+    "format": "pt",
+    "size_mb": 8159.602470397949,
+    "file_size": 8555963320,
+    "mod_time_ns": 1790690390847226100,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\HiDream-I1-Full-text_encoder_4-FP8.pt"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "hidream-i1-fast-Q2_K",
+    "path": "G:\\AI GGUF\\Image models\\hidream-i1-fast-Q2_K.gguf",
+    "type": "diffusion",
+    "family": "hidream",
+    "format": "gguf",
+    "size_mb": 6263.017272949219,
+    "file_size": 6567249600,
+    "mod_time_ns": 1793811819250980200,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\hidream-i1-fast-Q2_K.gguf"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "MN-12B-Mag-Mell-R1-Uncensored-Scale1.2.i1-Q4_K_S",
+    "path": "G:\\AI GGUF\\GGUF\\MN-12B-Mag-Mell-R1-Uncensored-Scale1.2.i1-Q4_K_S.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 6790.349578857422,
+    "file_size": 7120197600,
+    "mod_time_ns": 1790383801514712200,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Mistral Nemo Base 2407 Chatml",
+    "model_tags": [
+      "mergekit",
+      "merge"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "LFM2.5-8B-A1B-heretic.Q4_K_M",
+    "path": "H:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "lfm2moe",
+    "format": "gguf",
+    "size_mb": 4916.7303466796875,
+    "file_size": 5155565440,
+    "mod_time_ns": 1791658079577875300,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "lfm2moe",
+    "model_name": "LFM2.5 8B A1B Heretic",
+    "model_tags": [
+      "liquid",
+      "lfm2.5",
+      "edge",
+      "heretic",
+      "uncensored",
+      "decensored",
+      "abliterated",
+      "ara",
+      "text-generation"
+    ],
+    "embedding_length": 2048,
+    "admission_version": 1
+  },
+  {
+    "name": "patricide-12B-Unslop-Mell.Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\patricide-12B-Unslop-Mell.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.817962646484,
+    "file_size": 7477204576,
+    "mod_time_ns": 1789434959039214100,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "UnslopNemo 12B v4.1",
+    "model_tags": [
+      "mergekit",
+      "merge",
+      "12b",
+      "chat",
+      "roleplay",
+      "creative-writing"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "krea2_turbo-Q4_K_M",
+    "path": "H:\\AI GGUF\\Image models\\krea2_turbo-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "qwen_image",
+    "format": "gguf",
+    "size_mb": 7139.481719970703,
+    "file_size": 7486289184,
+    "mod_time_ns": 1790354050137384600,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\krea2_turbo-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 2.5,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "mira-12b.Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\mira-12b.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "gemma4",
+    "format": "gguf",
+    "size_mb": 7039.436187744141,
+    "file_size": 7381383840,
+    "mod_time_ns": 1793031612637398300,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "gemma4",
+    "model_name": "Mira 12b",
+    "model_tags": [
+      "gemma4",
+      "conversational",
+      "thinking",
+      "chat",
+      "companion",
+      "text-generation"
+    ],
+    "embedding_length": 3840,
+    "admission_version": 1
+  },
+  {
+    "name": "flux1-dev-Q3_K_M",
+    "path": "H:\\AI GGUF\\Image models\\flux1-dev-Q3_K_M.gguf",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "gguf",
+    "size_mb": 5119.579376220703,
+    "file_size": 5368268064,
+    "mod_time_ns": 1793810600607792900,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\flux1-dev-Q3_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "acestep-v15-merge-sft-turbo-xl-ta-0.7-Q4_K_M",
+    "path": "G:\\AI GGUF\\Image models\\acestep-v15-merge-sft-turbo-xl-ta-0.7-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "gguf",
+    "size_mb": 2851.4124755859375,
+    "file_size": 2989922688,
+    "mod_time_ns": 1793811957926929600,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\acestep-v15-merge-sft-turbo-xl-ta-0.7-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "realityBoundxl_boundlessV18",
+    "path": "H:\\AI GGUF\\Image models\\realityBoundxl_boundlessV18.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 6616.631685256958,
+    "file_size": 6938041186,
+    "mod_time_ns": 1790363797170298100,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\realityBoundxl_boundlessV18.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "MN-12B-Mag-Mell-R1-KTO.Q4_K_M",
+    "path": "H:\\AI GGUF\\GGUF\\MN-12B-Mag-Mell-R1-KTO.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.818267822266,
+    "file_size": 7477204896,
+    "mod_time_ns": 1788118111989223600,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "MN 12B Mag Mell R1 KTO",
+    "model_tags": [
+      "llama-factory",
+      "full",
+      "generated_from_trainer"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "Wayfarer-2-12B.i1-Q4_K_M(1)",
+    "path": "G:\\AI GGUF\\GGUF\\Wayfarer-2-12B.i1-Q4_K_M(1).gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.831848144531,
+    "file_size": 7477219136,
+    "mod_time_ns": 1790601761230475300,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Wayfarer 2 12B",
+    "model_tags": [
+      "text adventure",
+      "roleplay"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "MN-12B-Mag-Mell-R1-KTO.Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\MN-12B-Mag-Mell-R1-KTO.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.818267822266,
+    "file_size": 7477204896,
+    "mod_time_ns": 1788118111989223600,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "MN 12B Mag Mell R1 KTO",
+    "model_tags": [
+      "llama-factory",
+      "full",
+      "generated_from_trainer"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "mmproj-gemma-4-E2B-it-Q8_0",
+    "path": "G:\\AI GGUF\\voice\\mmproj-gemma-4-E2B-it-Q8_0.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 531.547607421875,
+    "file_size": 557368064,
+    "mod_time_ns": 1793833983046751500,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
+  },
+  {
+    "name": "NewFantasyCore-SDXL",
+    "path": "G:\\AI GGUF\\Image models\\NewFantasyCore-SDXL.safetensors",
+    "type": "lora",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 217.88085556030273,
+    "file_size": 228464636,
+    "mod_time_ns": 1790351579827223300,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\NewFantasyCore-SDXL.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "ggml-base",
+    "path": "G:\\AI GGUF\\voice\\ggml-base.bin",
+    "type": "llm",
+    "family": "llm",
+    "format": "bin",
+    "size_mb": 141.09751224517822,
+    "file_size": 147951465,
+    "mod_time_ns": 1778482524294760300,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
+  },
+  {
+    "name": "flux1-depth-dev-lora",
+    "path": "H:\\AI GGUF\\Image models\\flux1-depth-dev-lora.safetensors",
+    "type": "lora",
+    "family": "flux",
+    "format": "safetensors",
+    "size_mb": 1186.7909545898438,
+    "file_size": 1244440512,
+    "mod_time_ns": 1790352452618520000,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\flux1-depth-dev-lora.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
   },
   {
     "name": "Wayfarer-2-12B-absolute-heresy.i1-Q4_K_M",
@@ -111,8 +1563,1368 @@
     "admission_version": 1
   },
   {
+    "name": "pytorch_lora_weights",
+    "path": "G:\\AI GGUF\\Image models\\pytorch_lora_weights.safetensors",
+    "type": "lora",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 375.60961151123047,
+    "file_size": 393855224,
+    "mod_time_ns": 1793800006183190400,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\pytorch_lora_weights.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "Rocinante-X-12B-v1-absolute-heresy.Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Rocinante-X-12B-v1-absolute-heresy.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.821594238281,
+    "file_size": 7477208384,
+    "mod_time_ns": 1789862013741231600,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Rocinante X 12B v1 Absolute Heresy",
+    "model_tags": [
+      "heretic",
+      "uncensored",
+      "decensored",
+      "abliterated"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive",
+    "path": "H:\\AI GGUF\\GGUF\\GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive.gguf",
+    "type": "llm",
+    "family": "gpt-oss",
+    "format": "gguf",
+    "size_mb": 11548.581970214844,
+    "file_size": 12109565888,
+    "mod_time_ns": 1790257098978214900,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "gpt-oss",
+    "model_name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive",
+    "embedding_length": 2880,
+    "admission_version": 1
+  },
+  {
+    "name": "qwen_2.5_vl_7b_fp8_scaled",
+    "path": "G:\\AI GGUF\\Image models\\qwen_2.5_vl_7b_fp8_scaled.safetensors",
+    "type": "llm",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 8949.919395446777,
+    "file_size": 9384670680,
+    "mod_time_ns": 1793571520999555900,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\qwen_2.5_vl_7b_fp8_scaled.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "hunyuan-video-t2v-720p-Q3_K_S",
+    "path": "H:\\AI GGUF\\Image models\\hunyuan-video-t2v-720p-Q3_K_S.gguf",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "gguf",
+    "size_mb": 5805.651123046875,
+    "file_size": 6087666432,
+    "mod_time_ns": 1793812598848399100,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\hunyuan-video-t2v-720p-Q3_K_S.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "flux1-schnell-Q4_K_M",
+    "path": "H:\\AI GGUF\\Image models\\flux1-schnell-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "gguf",
+    "size_mb": 6591.172882080078,
+    "file_size": 6911345696,
+    "mod_time_ns": 1790353093963181600,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\flux1-schnell-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "model.fp16",
+    "path": "G:\\AI GGUF\\Image models\\model.fp16.ckpt",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "ckpt",
+    "size_mb": 7025.1367263793945,
+    "file_size": 7366389768,
+    "mod_time_ns": 1793812158779641400,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\model.fp16.ckpt"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "Pony-Realism-V23ULTRA-Q4_K_M",
+    "path": "H:\\AI GGUF\\Image models\\Pony-Realism-V23ULTRA-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "gguf",
+    "size_mb": 1557.4353637695312,
+    "file_size": 1633089344,
+    "mod_time_ns": 1793810996008508700,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\Pony-Realism-V23ULTRA-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "qwen3vl",
+    "format": "gguf",
+    "size_mb": 4794.869232177734,
+    "file_size": 5027784800,
+    "mod_time_ns": 1788764915781506900,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "multimodal-chat",
+    "arch": "qwen3vl",
+    "model_name": "Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M",
+    "embedding_length": 4096,
+    "admission_version": 1
+  },
+  {
+    "name": "realtastic_v20Beta",
+    "path": "H:\\AI GGUF\\Image models\\realtastic_v20Beta.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 7195.933252334595,
+    "file_size": 7545482906,
+    "mod_time_ns": 1793801578114458600,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\realtastic_v20Beta.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "Wayfarer-2-12B-absolute-heresy.i1-Q4_K_M",
+    "path": "H:\\AI GGUF\\GGUF\\Wayfarer-2-12B-absolute-heresy.i1-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.832000732422,
+    "file_size": 7477219296,
+    "mod_time_ns": 1789863356323322600,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Wayfarer 2 12B Absolute Heresy",
+    "model_tags": [
+      "text adventure",
+      "roleplay",
+      "heretic",
+      "uncensored",
+      "decensored",
+      "abliterated",
+      "text-generation"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "patricide-12B-Unslop-Mell.Q4_K_M",
+    "path": "H:\\AI GGUF\\GGUF\\patricide-12B-Unslop-Mell.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.817962646484,
+    "file_size": 7477204576,
+    "mod_time_ns": 1789434959039214100,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "UnslopNemo 12B v4.1",
+    "model_tags": [
+      "mergekit",
+      "merge",
+      "12b",
+      "chat",
+      "roleplay",
+      "creative-writing"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "model(1)",
+    "path": "H:\\AI GGUF\\Image models\\model(1).safetensors",
+    "type": "clip_l",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 472.2117156982422,
+    "file_size": 495149872,
+    "mod_time_ns": 1793809674670585800,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\model(1).safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "FLUX-3-Image-Klein-pup-Uncensored-AD-IQ4_XS",
+    "path": "H:\\AI GGUF\\Image models\\FLUX-3-Image-Klein-pup-Uncensored-AD-IQ4_XS.gguf",
+    "type": "llm",
+    "family": "",
+    "format": "gguf",
+    "size_mb": 5252.900115966797,
+    "file_size": 5508064992,
+    "mod_time_ns": 1793810997192520900,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\FLUX-3-Image-Klein-pup-Uncensored-AD-IQ4_XS.gguf"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "sdxl_lightning_8step_lora",
+    "path": "H:\\AI GGUF\\Image models\\sdxl_lightning_8step_lora.safetensors",
+    "type": "lora",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 375.6090087890625,
+    "file_size": 393854592,
+    "mod_time_ns": 1793800094559171500,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\sdxl_lightning_8step_lora.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "LFM2.5-8B-A1B-heretic.Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "lfm2moe",
+    "format": "gguf",
+    "size_mb": 4916.7303466796875,
+    "file_size": 5155565440,
+    "mod_time_ns": 1791658079577875300,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "lfm2moe",
+    "model_name": "LFM2.5 8B A1B Heretic",
+    "model_tags": [
+      "liquid",
+      "lfm2.5",
+      "edge",
+      "heretic",
+      "uncensored",
+      "decensored",
+      "abliterated",
+      "ara",
+      "text-generation"
+    ],
+    "embedding_length": 2048,
+    "admission_version": 1
+  },
+  {
+    "name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive",
+    "path": "G:\\AI GGUF\\GGUF\\GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive.gguf",
+    "type": "llm",
+    "family": "gpt-oss",
+    "format": "gguf",
+    "size_mb": 11548.581970214844,
+    "file_size": 12109565888,
+    "mod_time_ns": 1790257098978214900,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "gpt-oss",
+    "model_name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive",
+    "embedding_length": 2880,
+    "admission_version": 1
+  },
+  {
+    "name": "vocoder-LFM2.5-Audio-1.5B-Q4_0",
+    "path": "G:\\AI GGUF\\GGUF\\vocoder-LFM2.5-Audio-1.5B-Q4_0.gguf",
+    "type": "llm",
+    "family": "this model cannot be used as LLM, use it via --model-vocoder in TTS examples",
+    "format": "gguf",
+    "size_mb": 103.93768310546875,
+    "file_size": 108986560,
+    "mod_time_ns": 1793630579001605700,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-04T18:29:20.8969491-06:00"
+  },
+  {
+    "name": "flux2-dev-Q2_K",
+    "path": "H:\\AI GGUF\\Image models\\flux2-dev-Q2_K.gguf",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "gguf",
+    "size_mb": 12262.582977294922,
+    "file_size": 12858250208,
+    "mod_time_ns": 1793812988102657900,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\flux2-dev-Q2_K.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "ae",
+    "path": "H:\\AI GGUF\\Image models\\ae.safetensors",
+    "type": "vae",
+    "family": "flux",
+    "format": "safetensors",
+    "size_mb": 319.771183013916,
+    "file_size": 335304388,
+    "mod_time_ns": 1790355389251100100,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\ae.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "diffusion_pytorch_model",
+    "path": "G:\\AI GGUF\\Image models\\diffusion_pytorch_model.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 44.03508758544922,
+    "file_size": 46174136,
+    "mod_time_ns": 1793764014374930500,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\diffusion_pytorch_model.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "flux3_image_klein_sd_Q4_K_M",
+    "path": "G:\\AI GGUF\\Image models\\flux3_image_klein_sd_Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "gguf",
+    "size_mb": 3118.379669189453,
+    "file_size": 3269858080,
+    "mod_time_ns": 1793809964721369000,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\flux3_image_klein_sd_Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "pony-v7-base",
+    "path": "H:\\AI GGUF\\Image models\\pony-v7-base.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 13081.788558959961,
+    "file_size": 13717249520,
+    "mod_time_ns": 1793812869376189600,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\pony-v7-base.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "mira-12b.Q4_K_M",
+    "path": "H:\\AI GGUF\\GGUF\\mira-12b.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "gemma4",
+    "format": "gguf",
+    "size_mb": 7039.436187744141,
+    "file_size": 7381383840,
+    "mod_time_ns": 1793031612637398300,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "gemma4",
+    "model_name": "Mira 12b",
+    "model_tags": [
+      "gemma4",
+      "conversational",
+      "thinking",
+      "chat",
+      "companion",
+      "text-generation"
+    ],
+    "embedding_length": 3840,
+    "admission_version": 1
+  },
+  {
+    "name": "mmproj-Qwen3-ASR-0.6B-Q8_0",
+    "path": "G:\\AI GGUF\\voice\\mmproj-Qwen3-ASR-0.6B-Q8_0.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 204.46060180664062,
+    "file_size": 214392480,
+    "mod_time_ns": 1793833559688767000,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
+  },
+  {
+    "name": "hidream-i1-fast-Q2_K",
+    "path": "H:\\AI GGUF\\Image models\\hidream-i1-fast-Q2_K.gguf",
+    "type": "diffusion",
+    "family": "hidream",
+    "format": "gguf",
+    "size_mb": 6263.017272949219,
+    "file_size": 6567249600,
+    "mod_time_ns": 1793811819250980200,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\hidream-i1-fast-Q2_K.gguf"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "mmproj-Ultravox-v0_5-llama-3_2-1b-f16",
+    "path": "G:\\AI GGUF\\voice\\mmproj-Ultravox-v0_5-llama-3_2-1b-f16.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 1184.19140625,
+    "file_size": 1241714688,
+    "mod_time_ns": 1793833314936662100,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
+  },
+  {
+    "name": "Krea-2-Turbo-Q4_K_M",
+    "path": "G:\\AI GGUF\\Image models\\Krea-2-Turbo-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "qwen_image",
+    "format": "gguf",
+    "size_mb": 7139.48176574707,
+    "file_size": 7486289232,
+    "mod_time_ns": 1793801178209654000,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\Krea-2-Turbo-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 2.5,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "t5xxl_fp8_e4m3fn",
+    "path": "G:\\AI GGUF\\Image models\\t5xxl_fp8_e4m3fn.safetensors",
+    "type": "t5xxl",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 4667.220024108887,
+    "file_size": 4893934904,
+    "mod_time_ns": 1793563871470193800,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\t5xxl_fp8_e4m3fn.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "hidream-i1-dev-q2_k",
+    "path": "H:\\AI GGUF\\Image models\\hidream-i1-dev-q2_k.gguf",
+    "type": "diffusion",
+    "family": "hidream",
+    "format": "gguf",
+    "size_mb": 7304.892272949219,
+    "file_size": 7659734720,
+    "mod_time_ns": 1793812033199207800,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\hidream-i1-dev-q2_k.gguf"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "Juggernaut_Z_V1_by_RunDiffusion_q4_k_m-002",
+    "path": "G:\\AI GGUF\\Image models\\Juggernaut_Z_V1_by_RunDiffusion_q4_k_m-002.gguf",
+    "type": "diffusion",
+    "family": "z_image",
+    "format": "gguf",
+    "size_mb": 4912.478576660156,
+    "file_size": 5151107136,
+    "mod_time_ns": 1793800360953628300,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\Juggernaut_Z_V1_by_RunDiffusion_q4_k_m-002.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 8,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "taesdxl",
+    "path": "G:\\AI GGUF\\Image models\\taesdxl.safetensors",
+    "type": "embedding",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 9.339611053466797,
+    "file_size": 9793292,
+    "mod_time_ns": 1793484538334589500,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\taesdxl.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "OpenPoseXL2",
+    "path": "G:\\AI GGUF\\Image models\\OpenPoseXL2.safetensors",
+    "type": "controlnet",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 4772.346333503723,
+    "file_size": 5004167829,
+    "mod_time_ns": 1793800440437673700,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\OpenPoseXL2.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "realtastic_v20Beta",
+    "path": "G:\\AI GGUF\\Image models\\realtastic_v20Beta.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 7195.933252334595,
+    "file_size": 7545482906,
+    "mod_time_ns": 1793801578114458600,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\realtastic_v20Beta.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "diffusion_pytorch_model(2)",
+    "path": "H:\\AI GGUF\\Image models\\diffusion_pytorch_model(2).safetensors",
+    "type": "lora",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 160.33256340026855,
+    "file_size": 168120878,
+    "mod_time_ns": 1793808590353473200,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\diffusion_pytorch_model(2).safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "ponyDiffusionV6XL_v6StartWithThisOne",
+    "path": "H:\\AI GGUF\\Image models\\ponyDiffusionV6XL_v6StartWithThisOne.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 6616.631555557251,
+    "file_size": 6938041050,
+    "mod_time_ns": 1793812162617028700,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\ponyDiffusionV6XL_v6StartWithThisOne.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "Illustrious-XL-v2.0",
+    "path": "G:\\AI GGUF\\Image models\\Illustrious-XL-v2.0.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 6616.631196975708,
+    "file_size": 6938040674,
+    "mod_time_ns": 1793801919501548700,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\Illustrious-XL-v2.0.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "bbArtisticFusionXL_v1",
+    "path": "H:\\AI GGUF\\Image models\\bbArtisticFusionXL_v1.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 6616.6312046051025,
+    "file_size": 6938040682,
+    "mod_time_ns": 1793807549654466000,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\bbArtisticFusionXL_v1.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "Qwen3-ASR-0.6B-Q8_0",
+    "path": "H:\\AI GGUF\\voice\\Qwen3-ASR-0.6B-Q8_0.gguf",
+    "type": "llm",
+    "family": "qwen3vl",
+    "format": "gguf",
+    "size_mb": 767.4686889648438,
+    "file_size": 804749248,
+    "mod_time_ns": 1793833537460705800,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T20:35:39.3465955-06:00",
+    "admission": "multimodal-chat",
+    "arch": "qwen3vl",
+    "model_tags": [
+      "automatic-speech-recognition"
+    ],
+    "embedding_length": 1024,
+    "admission_version": 1
+  },
+  {
+    "name": "Qwen2.5-Omni-3B-mmproj-Q8_0",
+    "path": "G:\\AI GGUF\\voice\\Qwen2.5-Omni-3B-mmproj-Q8_0.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 1281.46484375,
+    "file_size": 1343713280,
+    "mod_time_ns": 1793833650404861000,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
+  },
+  {
+    "name": "Captain_Eris-Twighlight-12B.Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Captain_Eris-Twighlight-12B.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.821624755859,
+    "file_size": 7477208416,
+    "mod_time_ns": 1793027367055017000,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Captain_BMO 12B",
+    "model_tags": [
+      "mergekit",
+      "merge"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "Qwen3.8-27B-Uncensored-HauhauCS-Aggressive-IQ2_M",
+    "path": "G:\\AI GGUF\\GGUF\\Qwen3.8-27B-Uncensored-HauhauCS-Aggressive-IQ2_M.gguf",
+    "type": "llm",
+    "family": "qwen35",
+    "format": "gguf",
+    "size_mb": 9841.830200195312,
+    "file_size": 10319906944,
+    "mod_time_ns": 1788765321152838100,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "qwen35",
+    "model_name": "Qwen3.8-27B-Uncensored-HauhauCS-Aggressive",
+    "model_tags": [
+      "uncensored",
+      "qwen3.8",
+      "gguf",
+      "multimodal",
+      "vision",
+      "mtp"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "Mistral-Helcyon-Mercury-12b-v3.2-absolute-heresy.i1-Q4_K_M",
+    "path": "H:\\AI GGUF\\GGUF\\Mistral-Helcyon-Mercury-12b-v3.2-absolute-heresy.i1-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.8221435546875,
+    "file_size": 7477208960,
+    "mod_time_ns": 1793281686431166000,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Mistral Helcyon Mercury 12b v3.2 Absolute Heresy",
+    "model_tags": [
+      "GPT-4o",
+      "converstional",
+      "companion",
+      "roleplay",
+      "heretic",
+      "uncensored",
+      "decensored",
+      "abliterated"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "LongWriter-glm4-9b-abliterated.IQ4_XS",
+    "path": "G:\\AI GGUF\\GGUF\\LongWriter-glm4-9b-abliterated.IQ4_XS.gguf",
+    "type": "llm",
+    "family": "chatglm",
+    "format": "gguf",
+    "size_mb": 5058.002593994141,
+    "file_size": 5303700128,
+    "mod_time_ns": 1791168252645207000,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "chatglm",
+    "model_name": "LongWriter Glm4 9b",
+    "model_tags": [
+      "llm",
+      "glm",
+      "glm4",
+      "chatglm",
+      "llama",
+      "chat",
+      "instruct",
+      "it",
+      "abliterated",
+      "longwriter",
+      "long context",
+      "text-generation"
+    ],
+    "embedding_length": 4096,
+    "admission_version": 1
+  },
+  {
+    "name": "HiDream-I1-Full-text_encoder_4-FP8",
+    "path": "H:\\AI GGUF\\Image models\\HiDream-I1-Full-text_encoder_4-FP8.pt",
+    "type": "diffusion",
+    "family": "hidream",
+    "format": "pt",
+    "size_mb": 8159.602470397949,
+    "file_size": 8555963320,
+    "mod_time_ns": 1790690390847226100,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\HiDream-I1-Full-text_encoder_4-FP8.pt"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "TheDrummer_Rocinante-X-12B-v1-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\TheDrummer_Rocinante-X-12B-v1-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.820953369141,
+    "file_size": 7477207712,
+    "mod_time_ns": 1789402055634232700,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Rocinante X 12B v1",
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "Moonlit-Mirage-12B-Heretic.i1-Q4_K_M",
+    "path": "H:\\AI GGUF\\GGUF\\Moonlit-Mirage-12B-Heretic.i1-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.8385009765625,
+    "file_size": 7477226112,
+    "mod_time_ns": 1793281554873858700,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Moonlit Mirage 12B Heretic",
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "anima-turbo-v1.1",
+    "path": "G:\\AI GGUF\\Image models\\anima-turbo-v1.1.safetensors",
+    "type": "diffusion",
+    "family": "anima",
+    "format": "safetensors",
+    "size_mb": 3988.4859619140625,
+    "file_size": 4182230656,
+    "mod_time_ns": 1793801872869884600,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\anima-turbo-v1.1.safetensors"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 30,
+      "cfg": 6,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "Captain-Eris_Violet-V0.420-12B.Q4_K_M",
+    "path": "H:\\AI GGUF\\GGUF\\Captain-Eris_Violet-V0.420-12B.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.821624755859,
+    "file_size": 7477208416,
+    "mod_time_ns": 1793026547050225400,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Captain_BMO 12B",
+    "model_tags": [
+      "mergekit",
+      "merge"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "NewFantasyCore-SDXL",
+    "path": "H:\\AI GGUF\\Image models\\NewFantasyCore-SDXL.safetensors",
+    "type": "lora",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 217.88085556030273,
+    "file_size": 228464636,
+    "mod_time_ns": 1790351579827223300,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\NewFantasyCore-SDXL.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "novan_realism_2",
+    "path": "G:\\AI GGUF\\Image models\\novan_realism_2.safetensors",
+    "type": "embedding",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 0.12514495849609375,
+    "file_size": 131224,
+    "mod_time_ns": 1793807783547493300,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\novan_realism_2.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "sdxl_lightning_8step_unet",
+    "path": "G:\\AI GGUF\\Image models\\sdxl_lightning_8step_unet.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 4897.260414123535,
+    "file_size": 5135149736,
+    "mod_time_ns": 1793800464662744400,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\sdxl_lightning_8step_unet.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "Qwen3.8-27B-Uncensored-HauhauCS-Aggressive-IQ2_M",
+    "path": "H:\\AI GGUF\\GGUF\\Qwen3.8-27B-Uncensored-HauhauCS-Aggressive-IQ2_M.gguf",
+    "type": "llm",
+    "family": "qwen35",
+    "format": "gguf",
+    "size_mb": 9841.830200195312,
+    "file_size": 10319906944,
+    "mod_time_ns": 1788765321152838100,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "qwen35",
+    "model_name": "Qwen3.8-27B-Uncensored-HauhauCS-Aggressive",
+    "model_tags": [
+      "uncensored",
+      "qwen3.8",
+      "gguf",
+      "multimodal",
+      "vision",
+      "mtp"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "Qwen3-ASR-1.7B-Q8_0",
+    "path": "G:\\AI GGUF\\voice\\Qwen3-ASR-1.7B-Q8_0.gguf",
+    "type": "llm",
+    "family": "qwen3vl",
+    "format": "gguf",
+    "size_mb": 2064.7382202148438,
+    "file_size": 2165034944,
+    "mod_time_ns": 1793831921531991400,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:15.7583445-06:00",
+    "admission": "multimodal-chat",
+    "arch": "qwen3vl",
+    "model_tags": [
+      "automatic-speech-recognition"
+    ],
+    "embedding_length": 2048,
+    "admission_version": 1
+  },
+  {
     "name": "Qwen2.5-Omni-7B-abliterated.Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Qwen2.5-Omni-7B-abliterated.Q4_K_M.gguf",
+    "path": "H:\\AI GGUF\\GGUF\\Qwen2.5-Omni-7B-abliterated.Q4_K_M.gguf",
     "type": "llm",
     "family": "qwen2vl",
     "format": "gguf",
@@ -128,12 +2940,244 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
     "admission": "multimodal-chat",
     "arch": "qwen2vl",
     "model_name": "Qwen2.5 Omni 7B Abliterated",
     "embedding_length": 3584,
     "admission_version": 1
+  },
+  {
+    "name": "ponyDiffusionV6XL_v6StartWithThisOne",
+    "path": "G:\\AI GGUF\\Image models\\ponyDiffusionV6XL_v6StartWithThisOne.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 6616.631555557251,
+    "file_size": 6938041050,
+    "mod_time_ns": 1793812162617028700,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\ponyDiffusionV6XL_v6StartWithThisOne.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "flux-2-klein-4b-Q4_K_M",
+    "path": "H:\\AI GGUF\\Image models\\flux-2-klein-4b-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "gguf",
+    "size_mb": 2483.6646118164062,
+    "file_size": 2604311104,
+    "mod_time_ns": 1793809790329404100,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\flux-2-klein-4b-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "SDXL_debmeasa",
+    "path": "G:\\AI GGUF\\Image models\\SDXL_debmeasa.safetensors",
+    "type": "embedding",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 0.28823089599609375,
+    "file_size": 302232,
+    "mod_time_ns": 1793807792865720700,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\SDXL_debmeasa.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "Juggernaut-XI-byRunDiffusion",
+    "path": "H:\\AI GGUF\\Image models\\Juggernaut-XI-byRunDiffusion.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 6776.190315246582,
+    "file_size": 7105350536,
+    "mod_time_ns": 1793800421348978900,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\Juggernaut-XI-byRunDiffusion.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "OpenPoseXL2",
+    "path": "H:\\AI GGUF\\Image models\\OpenPoseXL2.safetensors",
+    "type": "controlnet",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 4772.346333503723,
+    "file_size": 5004167829,
+    "mod_time_ns": 1793800440437673700,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\OpenPoseXL2.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "novan_hel",
+    "path": "H:\\AI GGUF\\Image models\\novan_hel.safetensors",
+    "type": "embedding",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 0.12514495849609375,
+    "file_size": 131224,
+    "mod_time_ns": 1793807788672862100,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\novan_hel.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "model.fp16",
+    "path": "H:\\AI GGUF\\Image models\\model.fp16.safetensors",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "safetensors",
+    "size_mb": 3642.996057510376,
+    "file_size": 3819958234,
+    "mod_time_ns": 1793811812849349400,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\model.fp16.safetensors"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "model.fp16",
+    "path": "H:\\AI GGUF\\Image models\\model.fp16.ckpt",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "ckpt",
+    "size_mb": 7025.1367263793945,
+    "file_size": 7366389768,
+    "mod_time_ns": 1793812158779641400,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\model.fp16.ckpt"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced",
+    "path": "H:\\AI GGUF\\GGUF\\GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced.gguf",
+    "type": "llm",
+    "family": "gpt-oss",
+    "format": "gguf",
+    "size_mb": 11548.582702636719,
+    "file_size": 12109566656,
+    "mod_time_ns": 1790257071300863900,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "gpt-oss",
+    "model_name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced",
+    "embedding_length": 2880,
+    "admission_version": 1
+  },
+  {
+    "name": "qwen_3_4b",
+    "path": "G:\\AI GGUF\\Image models\\qwen_3_4b.safetensors",
+    "type": "llm",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 7672.292755126953,
+    "file_size": 8044982048,
+    "mod_time_ns": 1793563632814645200,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\qwen_3_4b.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
   },
   {
     "name": "Mistral-Helcyon-Mercury-12b-v3.2-absolute-heresy.i1-Q4_K_M",
@@ -171,14 +3215,365 @@
     "admission_version": 1
   },
   {
-    "name": "Qwen2.5-Omni-3B-Q4_K_M",
-    "path": "G:\\AI GGUF\\voice\\Qwen2.5-Omni-3B-Q4_K_M.gguf",
+    "name": "Illustrious-XL-v2.0",
+    "path": "H:\\AI GGUF\\Image models\\Illustrious-XL-v2.0.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 6616.631196975708,
+    "file_size": 6938040674,
+    "mod_time_ns": 1793801919501548700,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\Illustrious-XL-v2.0.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "c4ai-command-r7b-12-2024-abliterated-Q4_K_M",
+    "path": "H:\\AI GGUF\\GGUF\\c4ai-command-r7b-12-2024-abliterated-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "cohere2",
+    "format": "gguf",
+    "size_mb": 4822.740875244141,
+    "file_size": 5057010336,
+    "mod_time_ns": 1791658348024289100,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "cohere2",
+    "model_name": "C4Ai Command R7B 12 2024",
+    "model_tags": [
+      "abliterated",
+      "uncensored"
+    ],
+    "embedding_length": 4096,
+    "admission_version": 1
+  },
+  {
+    "name": "Gemma-4-E2B-it-Q8_0",
+    "path": "H:\\AI GGUF\\voice\\Gemma-4-E2B-it-Q8_0.gguf",
+    "type": "llm",
+    "family": "gemma4",
+    "format": "gguf",
+    "size_mb": 3864.1328125,
+    "file_size": 4051836928,
+    "mod_time_ns": 1793833946560430800,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T20:35:39.3465955-06:00",
+    "admission": "chat",
+    "arch": "gemma4",
+    "model_name": "gemma-4-E2B-it",
+    "model_tags": [
+      "any-to-any"
+    ],
+    "embedding_length": 1536,
+    "admission_version": 1
+  },
+  {
+    "name": "anima-base-v1.0",
+    "path": "H:\\AI GGUF\\Image models\\anima-base-v1.0.safetensors",
+    "type": "diffusion",
+    "family": "anima",
+    "format": "safetensors",
+    "size_mb": 3988.47420501709,
+    "file_size": 4182218328,
+    "mod_time_ns": 1793801874559890400,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\anima-base-v1.0.safetensors"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 30,
+      "cfg": 6,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "diffusion_pytorch_model(2)",
+    "path": "G:\\AI GGUF\\Image models\\diffusion_pytorch_model(2).safetensors",
+    "type": "lora",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 160.33256340026855,
+    "file_size": 168120878,
+    "mod_time_ns": 1793808590353473200,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\diffusion_pytorch_model(2).safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "Riverfish-Rocinante-12B-SFT-DPO.i1-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Riverfish-Rocinante-12B-SFT-DPO.i1-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.8189697265625,
+    "file_size": 7477205632,
+    "mod_time_ns": 1789861169204740000,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Riverfish Rocinante 12B SFT DPO",
+    "model_tags": [
+      "text-generation-inference",
+      "transformers",
+      "unsloth",
+      "mistral"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "Juggernaut_Z_V1_by_RunDiffusion_q4_k_m-002",
+    "path": "H:\\AI GGUF\\Image models\\Juggernaut_Z_V1_by_RunDiffusion_q4_k_m-002.gguf",
+    "type": "diffusion",
+    "family": "z_image",
+    "format": "gguf",
+    "size_mb": 4912.478576660156,
+    "file_size": 5151107136,
+    "mod_time_ns": 1793800360953628300,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\Juggernaut_Z_V1_by_RunDiffusion_q4_k_m-002.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 8,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "Wayfarer-2-12B.i1-Q4_K_M(1)",
+    "path": "H:\\AI GGUF\\GGUF\\Wayfarer-2-12B.i1-Q4_K_M(1).gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.831848144531,
+    "file_size": 7477219136,
+    "mod_time_ns": 1790601761230475300,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Wayfarer 2 12B",
+    "model_tags": [
+      "text adventure",
+      "roleplay"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "hunyuan-video-t2v-720p-Q3_K_S",
+    "path": "G:\\AI GGUF\\Image models\\hunyuan-video-t2v-720p-Q3_K_S.gguf",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "gguf",
+    "size_mb": 5805.651123046875,
+    "file_size": 6087666432,
+    "mod_time_ns": 1793812598848399100,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\hunyuan-video-t2v-720p-Q3_K_S.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "z-image-turbo-Q4_K_M",
+    "path": "H:\\AI GGUF\\Image models\\z-image-turbo-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "z_image",
+    "format": "gguf",
+    "size_mb": 4785.169006347656,
+    "file_size": 5017613376,
+    "mod_time_ns": 1790354564653771500,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\z-image-turbo-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 8,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "Qwen2.5-Omni-7B-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Qwen2.5-Omni-7B-Q4_K_M.gguf",
     "type": "llm",
     "family": "qwen2vl",
     "format": "gguf",
-    "size_mb": 819.62890625,
-    "file_size": 859443200,
-    "mod_time_ns": 1793833420771144900,
+    "size_mb": 4466.126525878906,
+    "file_size": 4683073088,
+    "mod_time_ns": 1793633131433067300,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "multimodal-chat",
+    "arch": "qwen2vl",
+    "model_name": "Qwen2.5-Omni-7B",
+    "model_tags": [
+      "multimodal",
+      "unsloth",
+      "any-to-any"
+    ],
+    "embedding_length": 3584,
+    "admission_version": 1
+  },
+  {
+    "name": "mmproj-Voxtral-Mini-3B-2507-Q8_0",
+    "path": "G:\\AI GGUF\\voice\\mmproj-Voxtral-Mini-3B-2507-Q8_0.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 682.5581359863281,
+    "file_size": 715714080,
+    "mod_time_ns": 1793833133345093000,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
+  },
+  {
+    "name": "model.fp16",
+    "path": "G:\\AI GGUF\\Image models\\model.fp16.safetensors",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "safetensors",
+    "size_mb": 3642.996057510376,
+    "file_size": 3819958234,
+    "mod_time_ns": 1793811812849349400,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\model.fp16.safetensors"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "clip_l",
+    "path": "G:\\AI GGUF\\Image models\\clip_l.safetensors",
+    "type": "clip_l",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 234.7413558959961,
+    "file_size": 246144152,
+    "mod_time_ns": 1793563394983474100,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\clip_l.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "Ultravox-Llama-3.2-1B-Q4_K_M",
+    "path": "G:\\AI GGUF\\voice\\Ultravox-Llama-3.2-1B-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 668.2265625,
+    "file_size": 700686336,
+    "mod_time_ns": 1793833224287786700,
     "available": true,
     "recommended": {
       "sampler": "",
@@ -189,27 +3584,55 @@
       "height": 0
     },
     "registered_at": "2026-11-05T16:18:15.7583445-06:00",
-    "admission": "multimodal-chat",
-    "arch": "qwen2vl",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Llama 3.2 1B Instruct",
     "model_tags": [
-      "multimodal",
-      "any-to-any"
+      "facebook",
+      "meta",
+      "pytorch",
+      "llama",
+      "llama-3",
+      "text-generation"
     ],
     "embedding_length": 2048,
     "admission_version": 1
   },
   {
-    "name": "llama-q2_k",
-    "path": "G:\\AI GGUF\\Image models\\llama-q2_k.gguf",
+    "name": "ernie-image-turbo-UD-Q4_K_M",
+    "path": "G:\\AI GGUF\\Image models\\ernie-image-turbo-UD-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "wan",
+    "format": "gguf",
+    "size_mb": 5511.110046386719,
+    "file_size": 5778817728,
+    "mod_time_ns": 1793809615092356000,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\ernie-image-turbo-UD-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "FLUX-3-Image-Klein-pup-Uncensored-AD-IQ4_XS",
+    "path": "G:\\AI GGUF\\Image models\\FLUX-3-Image-Klein-pup-Uncensored-AD-IQ4_XS.gguf",
     "type": "llm",
     "family": "",
     "format": "gguf",
-    "size_mb": 3032.144561767578,
-    "file_size": 3179434016,
-    "mod_time_ns": 1790689209017459100,
+    "size_mb": 5252.900115966797,
+    "file_size": 5508064992,
+    "mod_time_ns": 1793810997192520900,
     "available": true,
     "files": {
-      "model": "G:\\AI GGUF\\Image models\\llama-q2_k.gguf"
+      "model": "G:\\AI GGUF\\Image models\\FLUX-3-Image-Klein-pup-Uncensored-AD-IQ4_XS.gguf"
     },
     "recommended": {
       "sampler": "",
@@ -219,17 +3642,508 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "flux1-dev-Q3_K_M",
+    "path": "G:\\AI GGUF\\Image models\\flux1-dev-Q3_K_M.gguf",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "gguf",
+    "size_mb": 5119.579376220703,
+    "file_size": 5368268064,
+    "mod_time_ns": 1793810600607792900,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\flux1-dev-Q3_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "mmproj-Qwen3-ASR-1.7B-Q8_0",
+    "path": "G:\\AI GGUF\\voice\\mmproj-Qwen3-ASR-1.7B-Q8_0.gguf",
+    "type": "llm",
+    "family": "clip",
+    "format": "gguf",
+    "size_mb": 339.2308654785156,
+    "file_size": 355709344,
+    "mod_time_ns": 1793831954417521800,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
+  },
+  {
+    "name": "TheDrummer_Rocinante-X-12B-v1-Q4_K_M",
+    "path": "H:\\AI GGUF\\GGUF\\TheDrummer_Rocinante-X-12B-v1-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.820953369141,
+    "file_size": 7477207712,
+    "mod_time_ns": 1789402055634232700,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Rocinante X 12B v1",
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "sdxl.vae",
+    "path": "H:\\AI GGUF\\Image models\\sdxl.vae.safetensors",
+    "type": "vae",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 319.13868141174316,
+    "file_size": 334641162,
+    "mod_time_ns": 1793800222314264500,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\sdxl.vae.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "flux3_image_klein_sd_Q4_K_M",
+    "path": "H:\\AI GGUF\\Image models\\flux3_image_klein_sd_Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "flux",
+    "format": "gguf",
+    "size_mb": 3118.379669189453,
+    "file_size": 3269858080,
+    "mod_time_ns": 1793809964721369000,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\flux3_image_klein_sd_Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "SDXL_debmeasa",
+    "path": "H:\\AI GGUF\\Image models\\SDXL_debmeasa.safetensors",
+    "type": "embedding",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 0.28823089599609375,
+    "file_size": 302232,
+    "mod_time_ns": 1793807792865720700,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\SDXL_debmeasa.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "model(1)",
+    "path": "G:\\AI GGUF\\Image models\\model(1).safetensors",
+    "type": "clip_l",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 472.2117156982422,
+    "file_size": 495149872,
+    "mod_time_ns": 1793809674670585800,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\model(1).safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "Qwen2.5-Omni-7B-abliterated.Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Qwen2.5-Omni-7B-abliterated.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "qwen2vl",
+    "format": "gguf",
+    "size_mb": 4466.126129150391,
+    "file_size": 4683072672,
+    "mod_time_ns": 1793633283045269900,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "multimodal-chat",
+    "arch": "qwen2vl",
+    "model_name": "Qwen2.5 Omni 7B Abliterated",
+    "embedding_length": 3584,
+    "admission_version": 1
+  },
+  {
+    "name": "Moonlit-Mirage-12B-Heretic.i1-Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Moonlit-Mirage-12B-Heretic.i1-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.8385009765625,
+    "file_size": 7477226112,
+    "mod_time_ns": 1793281554873858700,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Moonlit Mirage 12B Heretic",
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "SmoothSkin",
+    "path": "H:\\AI GGUF\\Image models\\SmoothSkin.safetensors",
+    "type": "embedding",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 0.0117950439453125,
+    "file_size": 12368,
+    "mod_time_ns": 1793807828269694900,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\SmoothSkin.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "Voxtral-Mini-3B-2507-Q4_K_M",
+    "path": "G:\\AI GGUF\\voice\\Voxtral-Mini-3B-2507-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 2358.4384155273438,
+    "file_size": 2473001920,
+    "mod_time_ns": 1793833075345011300,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-05T16:18:15.7583445-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_tags": [
+      "transformers",
+      "vllm",
+      "audio-text-to-text"
+    ],
+    "embedding_length": 3072,
+    "admission_version": 1
+  },
+  {
+    "name": "t5xxl_fp8_e4m3fn",
+    "path": "H:\\AI GGUF\\Image models\\t5xxl_fp8_e4m3fn.safetensors",
+    "type": "t5xxl",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 4667.220024108887,
+    "file_size": 4893934904,
+    "mod_time_ns": 1793563871470193800,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\t5xxl_fp8_e4m3fn.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "bbArtisticFusionXL_v1",
+    "path": "G:\\AI GGUF\\Image models\\bbArtisticFusionXL_v1.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 6616.6312046051025,
+    "file_size": 6938040682,
+    "mod_time_ns": 1793807549654466000,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\bbArtisticFusionXL_v1.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "SmoothSkin",
+    "path": "G:\\AI GGUF\\Image models\\SmoothSkin.safetensors",
+    "type": "embedding",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 0.0117950439453125,
+    "file_size": 12368,
+    "mod_time_ns": 1793807828269694900,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\SmoothSkin.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
   },
   {
     "name": "Captain_Eris-Twighlight-12B.Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Captain_Eris-Twighlight-12B.Q4_K_M.gguf",
+    "path": "H:\\AI GGUF\\GGUF\\Captain_Eris-Twighlight-12B.Q4_K_M.gguf",
     "type": "llm",
     "family": "llama",
     "format": "gguf",
     "size_mb": 7130.821624755859,
     "file_size": 7477208416,
     "mod_time_ns": 1793027367055017000,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Captain_BMO 12B",
+    "model_tags": [
+      "mergekit",
+      "merge"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "diffusion_pytorch_model(3)",
+    "path": "H:\\AI GGUF\\Image models\\diffusion_pytorch_model(3).safetensors",
+    "type": "lora",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 159.8996181488037,
+    "file_size": 167666902,
+    "mod_time_ns": 1793809568950700000,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\diffusion_pytorch_model(3).safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "control-lora-openposeXL2-rank256",
+    "path": "G:\\AI GGUF\\Image models\\control-lora-openposeXL2-rank256.safetensors",
+    "type": "lora",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 738.5473480224609,
+    "file_size": 774423024,
+    "mod_time_ns": 1793800079527539300,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\control-lora-openposeXL2-rank256.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "kitten-tts2-20261021-q4_0",
+    "path": "H:\\AI GGUF\\Image models\\kitten-tts2-20261021-q4_0.gguf",
+    "type": "diffusion",
+    "family": "sd1.5",
+    "format": "gguf",
+    "size_mb": 2516.520965576172,
+    "file_size": 2638763488,
+    "mod_time_ns": 1793811730355755000,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\kitten-tts2-20261021-q4_0.gguf"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "ae",
+    "path": "G:\\AI GGUF\\Image models\\ae.safetensors",
+    "type": "vae",
+    "family": "flux",
+    "format": "safetensors",
+    "size_mb": 319.771183013916,
+    "file_size": 335304388,
+    "mod_time_ns": 1790355389251100100,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\ae.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "LongWriter-glm4-9b-abliterated.IQ4_XS",
+    "path": "H:\\AI GGUF\\GGUF\\LongWriter-glm4-9b-abliterated.IQ4_XS.gguf",
+    "type": "llm",
+    "family": "chatglm",
+    "format": "gguf",
+    "size_mb": 5058.002593994141,
+    "file_size": 5303700128,
+    "mod_time_ns": 1791168252645207000,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "chatglm",
+    "model_name": "LongWriter Glm4 9b",
+    "model_tags": [
+      "llm",
+      "glm",
+      "glm4",
+      "chatglm",
+      "llama",
+      "chat",
+      "instruct",
+      "it",
+      "abliterated",
+      "longwriter",
+      "long context",
+      "text-generation"
+    ],
+    "embedding_length": 4096,
+    "admission_version": 1
+  },
+  {
+    "name": "Captain-Eris_Violet-V0.420-12B.Q4_K_M",
+    "path": "G:\\AI GGUF\\GGUF\\Captain-Eris_Violet-V0.420-12B.Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 7130.821624755859,
+    "file_size": 7477208416,
+    "mod_time_ns": 1793026547050225400,
     "available": true,
     "recommended": {
       "sampler": "",
@@ -249,6 +4163,57 @@
     ],
     "embedding_length": 5120,
     "admission_version": 1
+  },
+  {
+    "name": "Qwen2.5-Omni-3B-Q4_K_M",
+    "path": "H:\\AI GGUF\\voice\\Qwen2.5-Omni-3B-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "qwen2vl",
+    "format": "gguf",
+    "size_mb": 819.62890625,
+    "file_size": 859443200,
+    "mod_time_ns": 1793833420771144900,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T20:35:39.3465955-06:00",
+    "admission": "multimodal-chat",
+    "arch": "qwen2vl",
+    "model_tags": [
+      "multimodal",
+      "any-to-any"
+    ],
+    "embedding_length": 2048,
+    "admission_version": 1
+  },
+  {
+    "name": "qwen_image_vae",
+    "path": "G:\\AI GGUF\\Image models\\qwen_image_vae.safetensors",
+    "type": "vae",
+    "family": "qwen_image",
+    "format": "safetensors",
+    "size_mb": 242.04849815368652,
+    "file_size": 253806246,
+    "mod_time_ns": 1793563398936267500,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\qwen_image_vae.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
   },
   {
     "name": "Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated-Q6_K",
@@ -291,8 +4256,54 @@
     "admission_version": 1
   },
   {
+    "name": "Juggernaut-XI-byRunDiffusion",
+    "path": "G:\\AI GGUF\\Image models\\Juggernaut-XI-byRunDiffusion.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 6776.190315246582,
+    "file_size": 7105350536,
+    "mod_time_ns": 1793800421348978900,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\Juggernaut-XI-byRunDiffusion.safetensors"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "ernie-image-UD-Q4_K_M",
+    "path": "H:\\AI GGUF\\Image models\\ernie-image-UD-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "wan",
+    "format": "gguf",
+    "size_mb": 5507.235046386719,
+    "file_size": 5774754496,
+    "mod_time_ns": 1793809314845405600,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\ernie-image-UD-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
     "name": "Qwen2.5-Omni-7B-Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Qwen2.5-Omni-7B-Q4_K_M.gguf",
+    "path": "H:\\AI GGUF\\GGUF\\Qwen2.5-Omni-7B-Q4_K_M.gguf",
     "type": "llm",
     "family": "qwen2vl",
     "format": "gguf",
@@ -308,7 +4319,7 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
     "admission": "multimodal-chat",
     "arch": "qwen2vl",
     "model_name": "Qwen2.5-Omni-7B",
@@ -319,128 +4330,6 @@
     ],
     "embedding_length": 3584,
     "admission_version": 1
-  },
-  {
-    "name": "flux1-schnell-Q4_K_M",
-    "path": "G:\\AI GGUF\\Image models\\flux1-schnell-Q4_K_M.gguf",
-    "type": "diffusion",
-    "family": "flux",
-    "format": "gguf",
-    "size_mb": 6591.172882080078,
-    "file_size": 6911345696,
-    "mod_time_ns": 1790353093963181600,
-    "available": true,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\flux1-schnell-Q4_K_M.gguf"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 4,
-      "cfg": 1,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
-  },
-  {
-    "name": "taesdxl",
-    "path": "G:\\AI GGUF\\Image models\\taesdxl.safetensors",
-    "type": "embedding",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 9.339611053466797,
-    "file_size": 9793292,
-    "mod_time_ns": 1793484538334589500,
-    "available": true,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\taesdxl.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
-  },
-  {
-    "name": "MN-12B-Mag-Mell-R1-KTO.Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\MN-12B-Mag-Mell-R1-KTO.Q4_K_M.gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 7130.818267822266,
-    "file_size": 7477204896,
-    "mod_time_ns": 1788118111989223600,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "llama",
-    "model_name": "MN 12B Mag Mell R1 KTO",
-    "model_tags": [
-      "llama-factory",
-      "full",
-      "generated_from_trainer"
-    ],
-    "embedding_length": 5120,
-    "admission_version": 1
-  },
-  {
-    "name": "z-image-turbo-Q4_K_M",
-    "path": "G:\\AI GGUF\\Image models\\z-image-turbo-Q4_K_M.gguf",
-    "type": "diffusion",
-    "family": "z_image",
-    "format": "gguf",
-    "size_mb": 4785.169006347656,
-    "file_size": 5017613376,
-    "mod_time_ns": 1790354564653771500,
-    "available": true,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\z-image-turbo-Q4_K_M.gguf"
-    },
-    "recommended": {
-      "sampler": "euler",
-      "scheduler": "karras",
-      "steps": 8,
-      "cfg": 1,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
-  },
-  {
-    "name": "unholyDesireMixSinister_v90",
-    "path": "G:\\AI GGUF\\Image models\\unholyDesireMixSinister_v90.safetensors",
-    "type": "diffusion",
-    "family": "sdxl",
-    "format": "safetensors",
-    "size_mb": 6616.831590652466,
-    "file_size": 6938250802,
-    "mod_time_ns": 1790356750190121700,
-    "available": true,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\unholyDesireMixSinister_v90.safetensors"
-    },
-    "recommended": {
-      "sampler": "dpmpp_2m",
-      "scheduler": "karras",
-      "steps": 20,
-      "cfg": 7,
-      "width": 1024,
-      "height": 1024
-    },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
   },
   {
     "name": "flux1-depth-dev-lora",
@@ -463,739 +4352,7 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
-  },
-  {
-    "name": "ae",
-    "path": "G:\\AI GGUF\\Image models\\ae.safetensors",
-    "type": "vae",
-    "family": "flux",
-    "format": "safetensors",
-    "size_mb": 319.771183013916,
-    "file_size": 335304388,
-    "mod_time_ns": 1790355389251100100,
-    "available": true,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\ae.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
-  },
-  {
-    "name": "Wayfarer-2-12B.i1-Q4_K_M(1)",
-    "path": "G:\\AI GGUF\\GGUF\\Wayfarer-2-12B.i1-Q4_K_M(1).gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 7130.831848144531,
-    "file_size": 7477219136,
-    "mod_time_ns": 1790601761230475300,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "llama",
-    "model_name": "Wayfarer 2 12B",
-    "model_tags": [
-      "text adventure",
-      "roleplay"
-    ],
-    "embedding_length": 5120,
-    "admission_version": 1
-  },
-  {
-    "name": "NewFantasyCore-SDXL",
-    "path": "G:\\AI GGUF\\Image models\\NewFantasyCore-SDXL.safetensors",
-    "type": "lora",
-    "family": "sdxl",
-    "format": "safetensors",
-    "size_mb": 217.88085556030273,
-    "file_size": 228464636,
-    "mod_time_ns": 1790351579827223300,
-    "available": true,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\NewFantasyCore-SDXL.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
-  },
-  {
-    "name": "Captain-Eris_Violet-V0.420-12B.Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Captain-Eris_Violet-V0.420-12B.Q4_K_M.gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 7130.821624755859,
-    "file_size": 7477208416,
-    "mod_time_ns": 1793026547050225400,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "llama",
-    "model_name": "Captain_BMO 12B",
-    "model_tags": [
-      "mergekit",
-      "merge"
-    ],
-    "embedding_length": 5120,
-    "admission_version": 1
-  },
-  {
-    "name": "mira-12b.Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\mira-12b.Q4_K_M.gguf",
-    "type": "llm",
-    "family": "gemma4",
-    "format": "gguf",
-    "size_mb": 7039.436187744141,
-    "file_size": 7381383840,
-    "mod_time_ns": 1793031612637398300,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "gemma4",
-    "model_name": "Mira 12b",
-    "model_tags": [
-      "gemma4",
-      "conversational",
-      "thinking",
-      "chat",
-      "companion",
-      "text-generation"
-    ],
-    "embedding_length": 3840,
-    "admission_version": 1
-  },
-  {
-    "name": "OpenPose-ControlNet-SDXL-Thibaud-TEST",
-    "path": "G:\\AI GGUF\\Image models\\OpenPose-ControlNet-SDXL-Thibaud-TEST.safetensors",
-    "type": "controlnet",
-    "family": "sdxl",
-    "format": "safetensors",
-    "size_mb": 2386.225799560547,
-    "file_size": 2502139104,
-    "mod_time_ns": 1793496871101061600,
-    "available": true,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\OpenPose-ControlNet-SDXL-Thibaud-TEST.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
-  },
-  {
-    "name": "Voxtral-Mini-3B-2507-Q4_K_M",
-    "path": "G:\\AI GGUF\\voice\\Voxtral-Mini-3B-2507-Q4_K_M.gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 2358.4384155273438,
-    "file_size": 2473001920,
-    "mod_time_ns": 1793833075345011300,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:15.7583445-06:00",
-    "admission": "chat",
-    "arch": "llama",
-    "model_tags": [
-      "transformers",
-      "vllm",
-      "audio-text-to-text"
-    ],
-    "embedding_length": 3072,
-    "admission_version": 1
-  },
-  {
-    "name": "qwen_2.5_vl_7b_fp8_scaled",
-    "path": "G:\\AI GGUF\\Image models\\qwen_2.5_vl_7b_fp8_scaled.safetensors",
-    "type": "llm",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 8949.919395446777,
-    "file_size": 9384670680,
-    "mod_time_ns": 1793571520999555900,
-    "available": true,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\qwen_2.5_vl_7b_fp8_scaled.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
-  },
-  {
-    "name": "Ultravox-Llama-3.2-1B-Q4_K_M",
-    "path": "G:\\AI GGUF\\voice\\Ultravox-Llama-3.2-1B-Q4_K_M.gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 668.2265625,
-    "file_size": 700686336,
-    "mod_time_ns": 1793833224287786700,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:15.7583445-06:00",
-    "admission": "chat",
-    "arch": "llama",
-    "model_name": "Llama 3.2 1B Instruct",
-    "model_tags": [
-      "facebook",
-      "meta",
-      "pytorch",
-      "llama",
-      "llama-3",
-      "text-generation"
-    ],
-    "embedding_length": 2048,
-    "admission_version": 1
-  },
-  {
-    "name": "MN-12B-Mag-Mell-R1-Uncensored-Scale1.2.i1-Q4_K_S",
-    "path": "G:\\AI GGUF\\GGUF\\MN-12B-Mag-Mell-R1-Uncensored-Scale1.2.i1-Q4_K_S.gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 6790.349578857422,
-    "file_size": 7120197600,
-    "mod_time_ns": 1790383801514712200,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "llama",
-    "model_name": "Mistral Nemo Base 2407 Chatml",
-    "model_tags": [
-      "mergekit",
-      "merge"
-    ],
-    "embedding_length": 5120,
-    "admission_version": 1
-  },
-  {
-    "name": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
-    "type": "llm",
-    "family": "qwen35",
-    "format": "gguf",
-    "size_mb": 5366.3675537109375,
-    "file_size": 5627044224,
-    "mod_time_ns": 1788721954601494900,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "qwen35",
-    "model_name": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16",
-    "embedding_length": 4096,
-    "admission_version": 1
-  },
-  {
-    "name": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1)",
-    "path": "G:\\AI GGUF\\GGUF\\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
-    "type": "llm",
-    "family": "gemma4",
-    "format": "gguf",
-    "size_mb": 5088.124969482422,
-    "file_size": 5335285728,
-    "mod_time_ns": 1788573228448965700,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "gemma4",
-    "model_name": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive",
-    "embedding_length": 2560,
-    "admission_version": 1
-  },
-  {
-    "name": "ggml-base",
-    "path": "G:\\AI GGUF\\voice\\ggml-base.bin",
-    "type": "llm",
-    "family": "llm",
-    "format": "bin",
-    "size_mb": 141.09751224517822,
-    "file_size": 147951465,
-    "mod_time_ns": 1778482524294760300,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
-  },
-  {
-    "name": "qwen_3_4b",
-    "path": "G:\\AI GGUF\\Image models\\qwen_3_4b.safetensors",
-    "type": "llm",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 7672.292755126953,
-    "file_size": 8044982048,
-    "mod_time_ns": 1793563632814645200,
-    "available": true,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\qwen_3_4b.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
-  },
-  {
-    "name": "MLSD-Controlnet-Lllite-v20-TEST",
-    "path": "G:\\AI GGUF\\Image models\\MLSD-Controlnet-Lllite-v20-TEST.safetensors",
-    "type": "controlnet",
-    "family": "sdxl",
-    "format": "safetensors",
-    "size_mb": 213.5340576171875,
-    "file_size": 223906688,
-    "mod_time_ns": 1793764268182277500,
-    "available": true,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\MLSD-Controlnet-Lllite-v20-TEST.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
-  },
-  {
-    "name": "vocoder-LFM2.5-Audio-1.5B-Q4_0",
-    "path": "G:\\AI GGUF\\GGUF\\vocoder-LFM2.5-Audio-1.5B-Q4_0.gguf",
-    "type": "llm",
-    "family": "this model cannot be used as LLM, use it via --model-vocoder in TTS examples",
-    "format": "gguf",
-    "size_mb": 103.93768310546875,
-    "file_size": 108986560,
-    "mod_time_ns": 1793630579001605700,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-04T18:29:20.8969491-06:00"
-  },
-  {
-    "name": "LongWriter-glm4-9b-abliterated.IQ4_XS",
-    "path": "G:\\AI GGUF\\GGUF\\LongWriter-glm4-9b-abliterated.IQ4_XS.gguf",
-    "type": "llm",
-    "family": "chatglm",
-    "format": "gguf",
-    "size_mb": 5058.002593994141,
-    "file_size": 5303700128,
-    "mod_time_ns": 1791168252645207000,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "chatglm",
-    "model_name": "LongWriter Glm4 9b",
-    "model_tags": [
-      "llm",
-      "glm",
-      "glm4",
-      "chatglm",
-      "llama",
-      "chat",
-      "instruct",
-      "it",
-      "abliterated",
-      "longwriter",
-      "long context",
-      "text-generation"
-    ],
-    "embedding_length": 4096,
-    "admission_version": 1
-  },
-  {
-    "name": "clip_l",
-    "path": "G:\\AI GGUF\\Image models\\clip_l.safetensors",
-    "type": "clip_l",
-    "family": "",
-    "format": "safetensors",
-    "size_mb": 234.7413558959961,
-    "file_size": 246144152,
-    "mod_time_ns": 1793563394983474100,
-    "available": true,
-    "files": {
-      "model": "G:\\AI GGUF\\Image models\\clip_l.safetensors"
-    },
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
-  },
-  {
-    "name": "TheDrummer_Rocinante-X-12B-v1-Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\TheDrummer_Rocinante-X-12B-v1-Q4_K_M.gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 7130.820953369141,
-    "file_size": 7477207712,
-    "mod_time_ns": 1789402055634232700,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "llama",
-    "model_name": "Rocinante X 12B v1",
-    "embedding_length": 5120,
-    "admission_version": 1
-  },
-  {
-    "name": "mmproj-gemma-4-E2B-it-Q8_0",
-    "path": "G:\\AI GGUF\\voice\\mmproj-gemma-4-E2B-it-Q8_0.gguf",
-    "type": "llm",
-    "family": "clip",
-    "format": "gguf",
-    "size_mb": 531.547607421875,
-    "file_size": 557368064,
-    "mod_time_ns": 1793833983046751500,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
-  },
-  {
-    "name": "helcyon-grok-v3.0-Q4_K_M(1)",
-    "path": "G:\\AI GGUF\\GGUF\\helcyon-grok-v3.0-Q4_K_M(1).gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 7130.816955566406,
-    "file_size": 7477203520,
-    "mod_time_ns": 1793029079268142600,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "llama",
-    "model_name": "Helcyon Grok",
-    "embedding_length": 5120,
-    "admission_version": 1
-  },
-  {
-    "name": "mmproj-Voxtral-Mini-3B-2507-Q8_0",
-    "path": "G:\\AI GGUF\\voice\\mmproj-Voxtral-Mini-3B-2507-Q8_0.gguf",
-    "type": "llm",
-    "family": "clip",
-    "format": "gguf",
-    "size_mb": 682.5581359863281,
-    "file_size": 715714080,
-    "mod_time_ns": 1793833133345093000,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
-  },
-  {
-    "name": "LFM2.5-8B-A1B-heretic.Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\LFM2.5-8B-A1B-heretic.Q4_K_M.gguf",
-    "type": "llm",
-    "family": "lfm2moe",
-    "format": "gguf",
-    "size_mb": 4916.7303466796875,
-    "file_size": 5155565440,
-    "mod_time_ns": 1791658079577875300,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "lfm2moe",
-    "model_name": "LFM2.5 8B A1B Heretic",
-    "model_tags": [
-      "liquid",
-      "lfm2.5",
-      "edge",
-      "heretic",
-      "uncensored",
-      "decensored",
-      "abliterated",
-      "ara",
-      "text-generation"
-    ],
-    "embedding_length": 2048,
-    "admission_version": 1
-  },
-  {
-    "name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced",
-    "path": "G:\\AI GGUF\\GGUF\\GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced.gguf",
-    "type": "llm",
-    "family": "gpt-oss",
-    "format": "gguf",
-    "size_mb": 11548.582702636719,
-    "file_size": 12109566656,
-    "mod_time_ns": 1790257071300863900,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "gpt-oss",
-    "model_name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced",
-    "embedding_length": 2880,
-    "admission_version": 1
-  },
-  {
-    "name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive",
-    "path": "G:\\AI GGUF\\GGUF\\GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive.gguf",
-    "type": "llm",
-    "family": "gpt-oss",
-    "format": "gguf",
-    "size_mb": 11548.581970214844,
-    "file_size": 12109565888,
-    "mod_time_ns": 1790257098978214900,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "gpt-oss",
-    "model_name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Aggressive",
-    "embedding_length": 2880,
-    "admission_version": 1
-  },
-  {
-    "name": "Moonlit-Mirage-12B-Heretic.i1-Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Moonlit-Mirage-12B-Heretic.i1-Q4_K_M.gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 7130.8385009765625,
-    "file_size": 7477226112,
-    "mod_time_ns": 1793281554873858700,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "llama",
-    "model_name": "Moonlit Mirage 12B Heretic",
-    "embedding_length": 5120,
-    "admission_version": 1
-  },
-  {
-    "name": "Riverfish-Rocinante-12B-SFT-DPO.i1-Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Riverfish-Rocinante-12B-SFT-DPO.i1-Q4_K_M.gguf",
-    "type": "llm",
-    "family": "llama",
-    "format": "gguf",
-    "size_mb": 7130.8189697265625,
-    "file_size": 7477205632,
-    "mod_time_ns": 1789861169204740000,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "llama",
-    "model_name": "Riverfish Rocinante 12B SFT DPO",
-    "model_tags": [
-      "text-generation-inference",
-      "transformers",
-      "unsloth",
-      "mistral"
-    ],
-    "embedding_length": 5120,
-    "admission_version": 1
-  },
-  {
-    "name": "Gemma-4-E2B-it-Q8_0",
-    "path": "G:\\AI GGUF\\voice\\Gemma-4-E2B-it-Q8_0.gguf",
-    "type": "llm",
-    "family": "gemma4",
-    "format": "gguf",
-    "size_mb": 3864.1328125,
-    "file_size": 4051836928,
-    "mod_time_ns": 1793833946560430800,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:15.7583445-06:00",
-    "admission": "chat",
-    "arch": "gemma4",
-    "model_name": "gemma-4-E2B-it",
-    "model_tags": [
-      "any-to-any"
-    ],
-    "embedding_length": 1536,
-    "admission_version": 1
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
   },
   {
     "name": "Qwen3-ASR-0.6B-Q8_0",
@@ -1225,14 +4382,14 @@
     "admission_version": 1
   },
   {
-    "name": "mmproj-Qwen3-ASR-0.6B-Q8_0",
-    "path": "G:\\AI GGUF\\voice\\mmproj-Qwen3-ASR-0.6B-Q8_0.gguf",
+    "name": "Riverfish-Rocinante-12B-SFT-DPO.i1-Q4_K_M",
+    "path": "H:\\AI GGUF\\GGUF\\Riverfish-Rocinante-12B-SFT-DPO.i1-Q4_K_M.gguf",
     "type": "llm",
-    "family": "clip",
+    "family": "llama",
     "format": "gguf",
-    "size_mb": 204.46060180664062,
-    "file_size": 214392480,
-    "mod_time_ns": 1793833559688767000,
+    "size_mb": 7130.8189697265625,
+    "file_size": 7477205632,
+    "mod_time_ns": 1789861169204740000,
     "available": true,
     "recommended": {
       "sampler": "",
@@ -1242,17 +4399,74 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Riverfish Rocinante 12B SFT DPO",
+    "model_tags": [
+      "text-generation-inference",
+      "transformers",
+      "unsloth",
+      "mistral"
+    ],
+    "embedding_length": 5120,
+    "admission_version": 1
   },
   {
-    "name": "Qwen3-ASR-1.7B-Q8_0",
-    "path": "G:\\AI GGUF\\voice\\Qwen3-ASR-1.7B-Q8_0.gguf",
+    "name": "pytorch_lora_weights",
+    "path": "H:\\AI GGUF\\Image models\\pytorch_lora_weights.safetensors",
+    "type": "lora",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 375.60961151123047,
+    "file_size": 393855224,
+    "mod_time_ns": 1793800006183190400,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\pytorch_lora_weights.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "sdxl_lightning_8step_lora",
+    "path": "G:\\AI GGUF\\Image models\\sdxl_lightning_8step_lora.safetensors",
+    "type": "lora",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 375.6090087890625,
+    "file_size": 393854592,
+    "mod_time_ns": 1793800094559171500,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\sdxl_lightning_8step_lora.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1)",
+    "path": "H:\\AI GGUF\\GGUF\\Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M(1).gguf",
     "type": "llm",
-    "family": "qwen3vl",
+    "family": "gemma4",
     "format": "gguf",
-    "size_mb": 2064.7382202148438,
-    "file_size": 2165034944,
-    "mod_time_ns": 1793831921531991400,
+    "size_mb": 5088.124969482422,
+    "file_size": 5335285728,
+    "mod_time_ns": 1788573228448965700,
     "available": true,
     "recommended": {
       "sampler": "",
@@ -1262,13 +4476,40 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-05T16:18:15.7583445-06:00",
-    "admission": "multimodal-chat",
-    "arch": "qwen3vl",
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "gemma4",
+    "model_name": "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive",
+    "embedding_length": 2560,
+    "admission_version": 1
+  },
+  {
+    "name": "Voxtral-Mini-3B-2507-Q4_K_M",
+    "path": "H:\\AI GGUF\\voice\\Voxtral-Mini-3B-2507-Q4_K_M.gguf",
+    "type": "llm",
+    "family": "llama",
+    "format": "gguf",
+    "size_mb": 2358.4384155273438,
+    "file_size": 2473001920,
+    "mod_time_ns": 1793833075345011300,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T20:35:39.3465955-06:00",
+    "admission": "chat",
+    "arch": "llama",
     "model_tags": [
-      "automatic-speech-recognition"
+      "transformers",
+      "vllm",
+      "audio-text-to-text"
     ],
-    "embedding_length": 2048,
+    "embedding_length": 3072,
     "admission_version": 1
   },
   {
@@ -1292,114 +4533,53 @@
       "width": 1024,
       "height": 1024
     },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
   },
   {
-    "name": "Qwen3.8-27B-Uncensored-HauhauCS-Aggressive-IQ2_M",
-    "path": "G:\\AI GGUF\\GGUF\\Qwen3.8-27B-Uncensored-HauhauCS-Aggressive-IQ2_M.gguf",
-    "type": "llm",
-    "family": "qwen35",
-    "format": "gguf",
-    "size_mb": 9841.830200195312,
-    "file_size": 10319906944,
-    "mod_time_ns": 1788765321152838100,
+    "name": "diffusion_pytorch_model",
+    "path": "H:\\AI GGUF\\Image models\\diffusion_pytorch_model.safetensors",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 44.03508758544922,
+    "file_size": 46174136,
+    "mod_time_ns": 1793764014374930500,
     "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\diffusion_pytorch_model.safetensors"
     },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "qwen35",
-    "model_name": "Qwen3.8-27B-Uncensored-HauhauCS-Aggressive",
-    "model_tags": [
-      "uncensored",
-      "qwen3.8",
-      "gguf",
-      "multimodal",
-      "vision",
-      "mtp"
-    ],
-    "embedding_length": 5120,
-    "admission_version": 1
+    "recommended": {
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
   },
   {
-    "name": "Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M.gguf",
-    "type": "llm",
-    "family": "qwen3vl",
+    "name": "acestep-v15-merge-sft-turbo-xl-ta-0.7-Q4_K_M",
+    "path": "H:\\AI GGUF\\Image models\\acestep-v15-merge-sft-turbo-xl-ta-0.7-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "sdxl",
     "format": "gguf",
-    "size_mb": 4794.869232177734,
-    "file_size": 5027784800,
-    "mod_time_ns": 1788764915781506900,
+    "size_mb": 2851.4124755859375,
+    "file_size": 2989922688,
+    "mod_time_ns": 1793811957926929600,
     "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\acestep-v15-merge-sft-turbo-xl-ta-0.7-Q4_K_M.gguf"
     },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "multimodal-chat",
-    "arch": "qwen3vl",
-    "model_name": "Qwen3VL-8B-Uncensored-HauhauCS-Balanced-Q4_K_M",
-    "embedding_length": 4096,
-    "admission_version": 1
-  },
-  {
-    "name": "Qwen2.5-Omni-3B-mmproj-Q8_0",
-    "path": "G:\\AI GGUF\\voice\\Qwen2.5-Omni-3B-mmproj-Q8_0.gguf",
-    "type": "llm",
-    "family": "clip",
-    "format": "gguf",
-    "size_mb": 1281.46484375,
-    "file_size": 1343713280,
-    "mod_time_ns": 1793833650404861000,
-    "available": true,
     "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
+      "sampler": "dpmpp_2m",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 1024,
+      "height": 1024
     },
-    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
-  },
-  {
-    "name": "c4ai-command-r7b-12-2024-abliterated-Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\c4ai-command-r7b-12-2024-abliterated-Q4_K_M.gguf",
-    "type": "llm",
-    "family": "cohere2",
-    "format": "gguf",
-    "size_mb": 4822.740875244141,
-    "file_size": 5057010336,
-    "mod_time_ns": 1791658348024289100,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-05T16:18:03.4578967-06:00",
-    "admission": "chat",
-    "arch": "cohere2",
-    "model_name": "C4Ai Command R7B 12 2024",
-    "model_tags": [
-      "abliterated",
-      "uncensored"
-    ],
-    "embedding_length": 4096,
-    "admission_version": 1
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
   },
   {
     "name": "Gemma4-12B-QAT-Uncensored-HauhauCS-Balanced-Q4_K_M",
@@ -1427,14 +4607,131 @@
     "admission_version": 1
   },
   {
-    "name": "patricide-12B-Unslop-Mell.Q4_K_M",
-    "path": "G:\\AI GGUF\\GGUF\\patricide-12B-Unslop-Mell.Q4_K_M.gguf",
+    "name": "control-lora-openposeXL2-rank256",
+    "path": "H:\\AI GGUF\\Image models\\control-lora-openposeXL2-rank256.safetensors",
+    "type": "lora",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 738.5473480224609,
+    "file_size": 774423024,
+    "mod_time_ns": 1793800079527539300,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\control-lora-openposeXL2-rank256.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "z-image-turbo-Q4_K_M",
+    "path": "G:\\AI GGUF\\Image models\\z-image-turbo-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "z_image",
+    "format": "gguf",
+    "size_mb": 4785.169006347656,
+    "file_size": 5017613376,
+    "mod_time_ns": 1790354564653771500,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\z-image-turbo-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 8,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "diffusion_pytorch_model(1)",
+    "path": "H:\\AI GGUF\\Image models\\diffusion_pytorch_model(1).safetensors",
+    "type": "lora",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 319.140661239624,
+    "file_size": 334643238,
+    "mod_time_ns": 1793800219657735000,
+    "available": true,
+    "files": {
+      "model": "H:\\AI GGUF\\Image models\\diffusion_pytorch_model(1).safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "helcyon-grok-v3.0-Q4_K_M(1)",
+    "path": "H:\\AI GGUF\\GGUF\\helcyon-grok-v3.0-Q4_K_M(1).gguf",
     "type": "llm",
     "family": "llama",
     "format": "gguf",
-    "size_mb": 7130.817962646484,
-    "file_size": 7477204576,
-    "mod_time_ns": 1789434959039214100,
+    "size_mb": 7130.816955566406,
+    "file_size": 7477203520,
+    "mod_time_ns": 1793029079268142600,
+    "available": true,
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-23T20:33:55.2683064-06:00",
+    "admission": "chat",
+    "arch": "llama",
+    "model_name": "Helcyon Grok",
+    "embedding_length": 5120,
+    "admission_version": 1
+  },
+  {
+    "name": "kitten-tts2-20261021-q4_0",
+    "path": "G:\\AI GGUF\\Image models\\kitten-tts2-20261021-q4_0.gguf",
+    "type": "diffusion",
+    "family": "sd1.5",
+    "format": "gguf",
+    "size_mb": 2516.520965576172,
+    "file_size": 2638763488,
+    "mod_time_ns": 1793811730355755000,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\kitten-tts2-20261021-q4_0.gguf"
+    },
+    "recommended": {
+      "sampler": "euler_a",
+      "scheduler": "karras",
+      "steps": 20,
+      "cfg": 7,
+      "width": 512,
+      "height": 512
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced",
+    "path": "G:\\AI GGUF\\GGUF\\GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced.gguf",
+    "type": "llm",
+    "family": "gpt-oss",
+    "format": "gguf",
+    "size_mb": 11548.582702636719,
+    "file_size": 12109566656,
+    "mod_time_ns": 1790257071300863900,
     "available": true,
     "recommended": {
       "sampler": "",
@@ -1446,95 +4743,116 @@
     },
     "registered_at": "2026-11-05T16:18:03.4578967-06:00",
     "admission": "chat",
-    "arch": "llama",
-    "model_name": "UnslopNemo 12B v4.1",
-    "model_tags": [
-      "mergekit",
-      "merge",
-      "12b",
-      "chat",
-      "roleplay",
-      "creative-writing"
-    ],
-    "embedding_length": 5120,
+    "arch": "gpt-oss",
+    "model_name": "GPT-OSS-20B-Uncensored-HauhauCS-MXFP4-Balanced",
+    "embedding_length": 2880,
     "admission_version": 1
   },
   {
-    "name": "HiDream-I1-Full-text_encoder_4-FP8",
-    "path": "G:\\AI GGUF\\Image models\\HiDream-I1-Full-text_encoder_4-FP8.pt",
-    "type": "diffusion",
-    "family": "hidream",
-    "format": "pt",
-    "size_mb": 8159.602470397949,
-    "file_size": 8555963320,
-    "mod_time_ns": 1790690390847226100,
+    "name": "qwen_2.5_vl_7b_fp8_scaled",
+    "path": "H:\\AI GGUF\\Image models\\qwen_2.5_vl_7b_fp8_scaled.safetensors",
+    "type": "llm",
+    "family": "",
+    "format": "safetensors",
+    "size_mb": 8949.919395446777,
+    "file_size": 9384670680,
+    "mod_time_ns": 1793571520999555900,
     "available": true,
     "files": {
-      "model": "G:\\AI GGUF\\Image models\\HiDream-I1-Full-text_encoder_4-FP8.pt"
+      "model": "G:\\AI GGUF\\Image models\\qwen_2.5_vl_7b_fp8_scaled.safetensors"
     },
     "recommended": {
-      "sampler": "euler_a",
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "MLSD-Controlnet-Lllite-v20-TEST",
+    "path": "H:\\AI GGUF\\Image models\\MLSD-Controlnet-Lllite-v20-TEST.safetensors",
+    "type": "controlnet",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 213.5340576171875,
+    "file_size": 223906688,
+    "mod_time_ns": 1793764268182277500,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\MLSD-Controlnet-Lllite-v20-TEST.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "Pony-Realism-V23ULTRA-Q4_K_M",
+    "path": "G:\\AI GGUF\\Image models\\Pony-Realism-V23ULTRA-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "sdxl",
+    "format": "gguf",
+    "size_mb": 1557.4353637695312,
+    "file_size": 1633089344,
+    "mod_time_ns": 1793810996008508700,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\Pony-Realism-V23ULTRA-Q4_K_M.gguf"
+    },
+    "recommended": {
+      "sampler": "dpmpp_2m",
       "scheduler": "karras",
       "steps": 20,
       "cfg": 7,
-      "width": 512,
-      "height": 512
+      "width": 1024,
+      "height": 1024
     },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
   },
   {
-    "name": "mmproj-Ultravox-v0_5-llama-3_2-1b-f16",
-    "path": "G:\\AI GGUF\\voice\\mmproj-Ultravox-v0_5-llama-3_2-1b-f16.gguf",
-    "type": "llm",
-    "family": "clip",
+    "name": "chroma-unlocked-v18-Q4_K_M",
+    "path": "H:\\AI GGUF\\Image models\\chroma-unlocked-v18-Q4_K_M.gguf",
+    "type": "diffusion",
+    "family": "flux",
     "format": "gguf",
-    "size_mb": 1184.19140625,
-    "file_size": 1241714688,
-    "mod_time_ns": 1793833314936662100,
-    "available": true,
-    "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
-    },
-    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
-  },
-  {
-    "name": "qwen_image_vae",
-    "path": "G:\\AI GGUF\\Image models\\qwen_image_vae.safetensors",
-    "type": "vae",
-    "family": "qwen_image",
-    "format": "safetensors",
-    "size_mb": 242.04849815368652,
-    "file_size": 253806246,
-    "mod_time_ns": 1793563398936267500,
+    "size_mb": 5840.035308837891,
+    "file_size": 6123720864,
+    "mod_time_ns": 1793808693141705600,
     "available": true,
     "files": {
-      "model": "G:\\AI GGUF\\Image models\\qwen_image_vae.safetensors"
+      "model": "H:\\AI GGUF\\Image models\\chroma-unlocked-v18-Q4_K_M.gguf"
     },
     "recommended": {
-      "sampler": "",
-      "scheduler": "",
-      "steps": 0,
-      "cfg": 0,
-      "width": 0,
-      "height": 0
+      "sampler": "euler",
+      "scheduler": "karras",
+      "steps": 4,
+      "cfg": 1,
+      "width": 1024,
+      "height": 1024
     },
-    "registered_at": "2026-11-03T22:06:54.7226318-06:00"
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
   },
   {
-    "name": "mmproj-Qwen3-ASR-1.7B-Q8_0",
-    "path": "G:\\AI GGUF\\voice\\mmproj-Qwen3-ASR-1.7B-Q8_0.gguf",
+    "name": "llama-q2_k",
+    "path": "H:\\AI GGUF\\Image models\\llama-q2_k.gguf",
     "type": "llm",
-    "family": "clip",
+    "family": "",
     "format": "gguf",
-    "size_mb": 339.2308654785156,
-    "file_size": 355709344,
-    "mod_time_ns": 1793831954417521800,
+    "size_mb": 3032.144561767578,
+    "file_size": 3179434016,
+    "mod_time_ns": 1790689209017459100,
     "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\llama-q2_k.gguf"
+    },
     "recommended": {
       "sampler": "",
       "scheduler": "",
@@ -1543,6 +4861,52 @@
       "width": 0,
       "height": 0
     },
-    "registered_at": "2026-11-04T18:41:42.4759676-06:00"
+    "registered_at": "2026-11-22T21:05:53.1237782-06:00"
+  },
+  {
+    "name": "OpenPose-ControlNet-SDXL-Thibaud-TEST",
+    "path": "G:\\AI GGUF\\Image models\\OpenPose-ControlNet-SDXL-Thibaud-TEST.safetensors",
+    "type": "controlnet",
+    "family": "sdxl",
+    "format": "safetensors",
+    "size_mb": 2386.225799560547,
+    "file_size": 2502139104,
+    "mod_time_ns": 1793496871101061600,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\OpenPose-ControlNet-SDXL-Thibaud-TEST.safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
+  },
+  {
+    "name": "diffusion_pytorch_model(3)",
+    "path": "G:\\AI GGUF\\Image models\\diffusion_pytorch_model(3).safetensors",
+    "type": "lora",
+    "family": "sd1.5",
+    "format": "safetensors",
+    "size_mb": 159.8996181488037,
+    "file_size": 167666902,
+    "mod_time_ns": 1793809568950700000,
+    "available": true,
+    "files": {
+      "model": "G:\\AI GGUF\\Image models\\diffusion_pytorch_model(3).safetensors"
+    },
+    "recommended": {
+      "sampler": "",
+      "scheduler": "",
+      "steps": 0,
+      "cfg": 0,
+      "width": 0,
+      "height": 0
+    },
+    "registered_at": "2026-11-22T21:05:53.1179083-06:00"
   }
 ]

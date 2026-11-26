@@ -286,7 +286,7 @@ class WorldManager {
             case 'character':
                 return (window.CharacterStorage?.all?.() || []);
             case 'lorebook':
-                return JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+                return (window.LorebookRepo ? window.LorebookRepo.all() : []);
             default:
                 return [];
         }

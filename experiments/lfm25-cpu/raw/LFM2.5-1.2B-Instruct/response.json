@@ -1,0 +1,36 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "M1 | KEEP | Canon confirmation provided  \nM2 | REJECT | Transient remark  \nM3 | HOLD | Needs user confirmation  \nM4 | HOLD | Clarification needed  \nM5 | KEEP | User prefers brevity  \nM6 | REJECT | Birthday detail uncertain  \n"
+      }
+    }
+  ],
+  "created": 1795061457,
+  "model": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\experiments\\lfm25-cpu\\models\\LFM2.5-1.2B-Instruct-QAD-Q4_0.gguf",
+  "system_fingerprint": "b12015-a34de8618",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 65,
+    "prompt_tokens": 244,
+    "total_tokens": 309,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-c8BtwnjDzcad5njjxEOQhp2S2OTw0He3",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 244,
+    "prompt_ms": 266.711,
+    "prompt_per_token_ms": 1.0930778688524592,
+    "prompt_per_second": 914.8479065355384,
+    "predicted_n": 65,
+    "predicted_ms": 2244.956,
+    "predicted_per_token_ms": 35.0774375,
+    "predicted_per_second": 28.508353838560755
+  }
+}

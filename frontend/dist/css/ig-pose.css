@@ -16,6 +16,62 @@
 #ig-workflow-status[data-kind="error"] { color: var(--danger); }
 #ig-workflow-status[data-kind="ok"] { color: var(--success); }
 #ig-workflow-select { max-width: 100%; }
+
+.ig-wf-pipeline {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ig-wf-pipeline-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 8px;
+    margin-top: 8px;
+}
+
+.ig-wf-pipeline .ig-field {
+    margin-bottom: 0;
+}
+
+.ig-wf-stages {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.ig-wf-stage {
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.035);
+    border-left: 3px solid rgba(255, 255, 255, 0.18);
+}
+
+.ig-wf-stage-completed { border-left-color: var(--success, #56c271); }
+.ig-wf-stage-failed { border-left-color: var(--danger, #e05a5a); }
+.ig-wf-stage-running { border-left-color: var(--accent, #7aa2f7); }
+
+.ig-wf-stage-title {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.ig-wf-stage-detail {
+    font-size: 10px;
+    opacity: 0.7;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.ig-wf-stage-error {
+    font-size: 10px;
+    color: var(--danger, #e05a5a);
+    line-height: 1.35;
+    word-break: break-word;
+}
 #ig-controlnet-status { color: var(--info); }
 #ig-controlnet-status:empty { display: none; }
 

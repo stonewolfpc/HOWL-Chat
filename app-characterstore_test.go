@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"howl-chat/internal/characterstore"
+	"howl-chat/internal/paths"
 )
 
 // TestCharacterBindingsAreBackedByTheStore proves the host path the renderer
@@ -78,6 +79,7 @@ func TestCharacterBindingsAreBackedByTheStore(t *testing.T) {
 // TestCharacterImportAndRollbackBindings proves the explicit import/rollback
 // path the renderer uses for pre-cutover data.
 func TestCharacterImportAndRollbackBindings(t *testing.T) {
+	t.Setenv(paths.IsolationEnvVar, t.TempDir())
 	app := &App{characters: characterstore.New(t.TempDir())}
 	imported, err := app.ImportCharacters([]interface{}{
 		map[string]interface{}{"id": "chr_imported", "name": "Imported"},
@@ -88,13 +90,14 @@ func TestCharacterImportAndRollbackBindings(t *testing.T) {
 	if len(imported) != 1 || imported[0]["status"] != "created" {
 		t.Fatalf("import results = %+v", imported)
 	}
-	imported[0]["name"] = "Imported"
-	rollback := make([]interface{}, 0, len(imported))
-	for _, result := range imported {
-		rollback = append(rollback, result)
+	if status := app.GetCharacterCutoverStatus(); !status.Cutover || !status.RollbackAvailable {
+		t.Fatalf("cutover status after import = %+v", status)
 	}
-	if err := app.RollbackCharacters(rollback); err != nil {
+	if err := app.RollbackCharacters(); err != nil {
 		t.Fatalf("RollbackCharacters: %v", err)
+	}
+	if status := app.GetCharacterCutoverStatus(); status.Cutover || status.RollbackAvailable {
+		t.Fatalf("cutover status after rollback = %+v", status)
 	}
 	list, err := app.GetCharacters()
 	if err != nil {

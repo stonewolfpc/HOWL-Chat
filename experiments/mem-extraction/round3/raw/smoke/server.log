@@ -1,0 +1,21 @@
+0.00.118.073 I srv  llama_server: initializing ...
+0.00.118.083 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.118.436 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.123.942 I srv    load_model: loading model 'C:\Users\StoneWolfPC\HOWL_Chat\experiments\lfm25-cpu\round2\models\Qwen3.5-0.8B-Q4_K_M.gguf'
+0.00.904.178 I cmn          init: llama threadpool init, n_threads = 8
+0.01.104.304 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 8192, kv_unified = 'false'
+0.01.110.669 I srv  server_run_i: model loaded
+0.01.110.676 I srv  server_on_li: listening on http://127.0.0.1:5099
+0.01.217.114 I slot get_availabl: id  0 | task -1 | selected slot by LRU, n_tokens = 0, t_last = -1
+0.01.217.180 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.04.596.232 I slot print_timing: id  0 | task 0 | n_gen =    106, tg =  34.99 t/s, tg_3s =  35.32 t/s
+0.07.607.311 I slot print_timing: id  0 | task 0 | n_gen =    211, tg =  34.93 t/s, tg_3s =  34.87 t/s
+0.10.618.238 I slot print_timing: id  0 | task 0 | n_gen =    316, tg =  34.91 t/s, tg_3s =  34.87 t/s
+0.13.646.275 I slot print_timing: id  0 | task 0 | n_gen =    420, tg =  34.77 t/s, tg_3s =  34.35 t/s
+0.16.654.663 I slot print_timing: id  0 | task 0 | n_gen =    524, tg =  34.73 t/s, tg_3s =  34.57 t/s
+0.18.719.825 I slot print_timing: id  0 | task 0 | prompt eval time =     378.11 ms /   228 tokens (    1.66 ms per token,   603.00 tokens per second)
+0.18.719.830 I slot print_timing: id  0 | task 0 |        eval time =   17124.49 ms /   595 tokens (   28.83 ms per token,    34.69 tokens per second)
+0.18.719.831 I slot print_timing: id  0 | task 0 |       total time =   17502.60 ms /   823 tokens
+0.18.719.832 I slot print_timing: id  0 | task 0 |    graphs reused =        591
+0.18.719.833 I slot print_timing: id  0 | task 0 |   graph reallocs =          3    /     0        (same size) / (changed size)
+0.18.719.868 I slot      release: id  0 | task 0 | stop processing: n_tokens = 822, truncated = 0

@@ -53,6 +53,8 @@ func nvidiaGPUs() []GPUInfo {
 			TotalVRAMBytes: totalMiB * 1024 * 1024,
 			UsedVRAMBytes:  usedMiB * 1024 * 1024,
 			FreeVRAMBytes:  (totalMiB - usedMiB) * 1024 * 1024,
+			Source:         "nvidia-smi",
+			Live:           true,
 		})
 	}
 	return gpus

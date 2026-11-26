@@ -1,0 +1,36 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "M1 | REJECT | Sable was trained by Corvin Ashgrave of Ossary is a persistent memory, worth remembering.\nM2 | HOLD | The user said \"brb\" and returned four minutes later indicates a fleeting memory, no more than twelve words.\nM3 | HOLD | Sable is a fire mage who cannot swim is a transient memory, no more than twelve words.\nM4 | REJECT | The user first said Sable has never met Corvin, then later said Corvin trained her indicates a recurring memory, no more than twelve words.\nM5 | HOLD | The user prefers short replies and dislikes long scene descriptions is a persistent memory, worth remembering.\nM6 | REJECT | A note says Sable's birthday is 3 Frostfell, but the user tagged it \"maybe canon\" indicates a recurring memory, no more than twelve words."
+      }
+    }
+  ],
+  "created": 1795061830,
+  "model": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\experiments\\lfm25-cpu\\round2\\models\\qwen2.5-0.5b-instruct-q4_k_m.gguf",
+  "system_fingerprint": "b12015-a34de8618",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 179,
+    "prompt_tokens": 248,
+    "total_tokens": 427,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-SWG8bhcVeupu74eTJ2MhaYEPncxzxjCS",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 248,
+    "prompt_ms": 195.631,
+    "prompt_per_token_ms": 0.7888346774193549,
+    "prompt_per_second": 1267.6927480818479,
+    "predicted_n": 179,
+    "predicted_ms": 3673.062,
+    "predicted_per_token_ms": 20.6351797752809,
+    "predicted_per_second": 48.460929872678435
+  }
+}

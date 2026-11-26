@@ -16,11 +16,14 @@
 
 const WorldStorage = (() => {
     const CACHE_KEY = 'howl-worlds';
+    const LEGACY_BACKUP_KEY = CACHE_KEY + '-cutover-backup';
     const CACHE_VERSION = 2;
 
     let worlds = [];
     let source = 'defaults';
     let loadPromise = null;
+    let cutover = false;
+    let cutoverStatus = null;
 
     function _app() {
         return window.go?.main?.App;
@@ -132,19 +135,17 @@ const WorldStorage = (() => {
 
     async function _load() {
         const app = _app();
-        const legacy = _readLegacy();
-        let legacyFailed = false;
-        if (legacy && typeof app?.ImportWorlds === 'function') {
+        let backendList = null;
+
+        if (typeof app?.GetWorldCutoverStatus === 'function') {
             try {
-                const imported = await app.ImportWorlds(legacy);
-                _emit('howl:worlds-imported', { count: imported });
+                cutoverStatus = await app.GetWorldCutoverStatus();
+                cutover = Boolean(cutoverStatus?.cutover);
             } catch (e) {
-                legacyFailed = true;
-                console.warn('[worldRepository] legacy world import failed:', e);
+                console.warn('[worldRepository] cutover status failed:', e);
             }
         }
 
-        let backendList = null;
         if (typeof app?.GetWorlds === 'function') {
             try {
                 const list = await app.GetWorlds();
@@ -154,14 +155,22 @@ const WorldStorage = (() => {
             }
         }
 
+        // Storage state is reported separately from the document list: an
+        // uninitialized or read-only library is a per-library state, not an
+        // error and not an empty library.
+        window.ContentReadiness?.refresh?.();
+
         if (backendList) {
-            // A failed import must not erase data the user can still see: keep the
-            // raw array as a documented migration fallback and do not rewrite it.
-            if (legacyFailed && legacy && backendList.length === 0) {
-                worlds = _normalize(legacy);
-                source = 'legacy';
-                _emit('howl:worlds-loaded', { source });
-                return worlds.slice();
+            // Before the explicit cutover an empty canonical list must not erase
+            // the only copy of the user's pre-cutover documents.
+            if (!cutover && backendList.length === 0) {
+                const legacy = _readLegacy();
+                if (legacy) {
+                    worlds = _normalize(legacy);
+                    source = 'legacy';
+                    _emit('howl:worlds-loaded', { source });
+                    return worlds.slice();
+                }
             }
             worlds = _normalize(backendList);
             source = 'backend';
@@ -171,9 +180,18 @@ const WorldStorage = (() => {
         }
 
         const cached = _readCache();
-        worlds = _normalize(cached);
-        source = cached ? 'cache' : 'defaults';
-        _emit('howl:worlds-loaded', { source });
+        if (cached) {
+            worlds = _normalize(cached);
+            source = 'cache';
+        } else {
+            const legacy = _readLegacy();
+            worlds = _normalize(legacy);
+            source = legacy ? 'legacy' : 'defaults';
+        }
+        _emit('howl:worlds-loaded', {
+            source,
+            stale: window.ContentReadiness?.canRead?.('worlds') === false,
+        });
         return worlds.slice();
     }
 
@@ -195,7 +213,15 @@ const WorldStorage = (() => {
         if (!merged.createdAt) merged.createdAt = new Date().toISOString();
         merged.updatedAt = new Date().toISOString();
 
-        const saved = await app.SaveWorld(merged);
+        let saved;
+        try {
+            saved = await app.SaveWorld(merged);
+        } catch (error) {
+            // The backend refused the write and said why. Refresh the reported
+            // state so the panel explains it instead of looking empty.
+            window.ContentReadiness?.refresh?.();
+            throw error;
+        }
         if (!saved || typeof saved !== 'object') throw new Error('world backend returned no document');
         const record = _normalizeOne(saved);
         _replace(record);
@@ -207,10 +233,51 @@ const WorldStorage = (() => {
     async function remove(id) {
         const app = _app();
         if (typeof app?.DeleteWorld !== 'function') throw new Error('world backend unavailable');
-        await app.DeleteWorld(id);
+        try {
+            await app.DeleteWorld(id);
+        } catch (error) {
+            window.ContentReadiness?.refresh?.();
+            throw error;
+        }
         worlds = worlds.filter(w => w.id !== id);
         _writeCache();
         _emit('howl:world-deleted', { id });
+    }
+
+    async function importLegacy() {
+        const app = _app();
+        if (typeof app?.ImportWorlds !== 'function') {
+            throw new Error('world backend unavailable');
+        }
+        const legacy = _readLegacy();
+        if (!legacy || legacy.length === 0) {
+            throw new Error('No pre-cutover worlds were found in this browser.');
+        }
+        localStorage.setItem(LEGACY_BACKUP_KEY, JSON.stringify(legacy));
+        let result;
+        try {
+            result = await app.ImportWorlds(legacy);
+        } catch (error) {
+            localStorage.removeItem(LEGACY_BACKUP_KEY);
+            throw error;
+        }
+        await loadAll();
+        return result;
+    }
+
+    async function rollback() {
+        const app = _app();
+        if (typeof app?.RollbackWorlds !== 'function') {
+            throw new Error('world backend unavailable');
+        }
+        const result = await app.RollbackWorlds();
+        const backup = localStorage.getItem(LEGACY_BACKUP_KEY);
+        if (backup !== null) {
+            localStorage.setItem(CACHE_KEY, backup);
+            localStorage.removeItem(LEGACY_BACKUP_KEY);
+        }
+        await loadAll();
+        return result;
     }
 
     const seeded = _readCache();
@@ -226,9 +293,13 @@ const WorldStorage = (() => {
         CACHE_VERSION,
         get source() { return source; },
         get ready() { return ready; },
+        get cutover() { return cutover; },
+        get cutoverStatus() { return cutoverStatus; },
         all() { return worlds; },
         get(id) { return _find(id); },
         loadAll,
+        importLegacy,
+        rollback,
         save,
         remove,
         mergeRecord,

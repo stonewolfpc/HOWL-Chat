@@ -110,3 +110,15 @@
 .input-icon.tts-icon.active svg {
     stroke: #8b5cf6;
 }
+
+/* Speaking the composer draft. Separate from .active, which the old file-picker
+   stub used to signal that an audio file was selected. */
+.input-icon.tts-icon.playing {
+    background: rgba(139, 92, 246, 0.3);
+    border-color: #8b5cf6;
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.3);
+}
+
+.input-icon.tts-icon.playing svg {
+    stroke: #8b5cf6;
+}

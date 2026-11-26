@@ -1,0 +1,16 @@
+0.00.116.204 I srv  llama_server: initializing ...
+0.00.116.213 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.116.566 W srv  server_setup: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.119.511 I srv    load_model: loading model 'C:\Users\StoneWolfPC\HOWL_Chat\experiments\lfm25-cpu\round2\models\granite-4.0-350m-Q4_K_M.gguf'
+0.00.448.357 I cmn          init: llama threadpool init, n_threads = 8
+0.00.530.880 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 2048, kv_unified = 'false'
+0.00.543.970 I srv  server_run_i: model loaded
+0.00.543.978 I srv  server_on_li: listening on http://127.0.0.1:5099
+0.00.614.772 I slot get_availabl: id  0 | task -1 | selected slot by LRU, n_tokens = 0, t_last = -1
+0.00.614.826 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.01.299.463 I slot print_timing: id  0 | task 0 | prompt eval time =     146.04 ms /   249 tokens (    0.59 ms per token,  1704.95 tokens per second)
+0.01.299.469 I slot print_timing: id  0 | task 0 |        eval time =     538.56 ms /    42 tokens (   13.14 ms per token,    76.13 tokens per second)
+0.01.299.470 I slot print_timing: id  0 | task 0 |       total time =     684.60 ms /   291 tokens
+0.01.299.471 I slot print_timing: id  0 | task 0 |    graphs reused =         40
+0.01.299.472 I slot print_timing: id  0 | task 0 |   graph reallocs =          1    /     0        (same size) / (changed size)
+0.01.299.513 I slot      release: id  0 | task 0 | stop processing: n_tokens = 290, truncated = 0

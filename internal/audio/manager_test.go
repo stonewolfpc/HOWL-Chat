@@ -17,6 +17,10 @@ var (
 	settingsASR  = Settings{ASREnabled: true}
 	settingsTTS  = Settings{TTSEnabled: true}
 	settingsBoth = Settings{ASREnabled: true, TTSEnabled: true}
+	// settingsBothReplaced is a genuine configuration change. Replacement
+	// tests must request one: re-applying the installed settings is
+	// idempotent (D5) and by design builds nothing.
+	settingsBothReplaced = Settings{ASREnabled: true, TTSEnabled: true, ASREngine: "whisper-base"}
 )
 
 type fakePipeline struct {
@@ -281,7 +285,7 @@ func TestManagerM2StrictReplacementKeepsOldGeneration(t *testing.T) {
 	if _, _, err := manager.Apply(context.Background(), settingsBoth); err != nil {
 		t.Fatalf("initial Apply: %v", err)
 	}
-	status, superseded, err := manager.Apply(context.Background(), settingsBoth)
+	status, superseded, err := manager.Apply(context.Background(), settingsBothReplaced)
 	if err == nil {
 		t.Fatal("replacement Apply returned nil error, want ASR rejection")
 	}
@@ -534,7 +538,7 @@ func TestManagerM5ZeroReferenceRetirementViaApply(t *testing.T) {
 	})
 
 	mustApply(t, manager, settingsBoth)
-	mustApply(t, manager, settingsBoth)
+	mustApply(t, manager, settingsBothReplaced)
 	waitClosed(t, p1.shutdownStarted, "retired p1 shutdown start")
 	if builds := manager.Status().Builds; builds != 0 {
 		t.Fatalf("builds while old shutdown is blocked = %d, want 0", builds)
@@ -1185,7 +1189,7 @@ func TestManagerM13PanicBoundary(t *testing.T) {
 			return nil
 		})
 		mustApply(t, manager, settingsBoth)
-		mustApply(t, manager, settingsBoth)
+		mustApply(t, manager, settingsBothReplaced)
 		waitCalls(t, p1, 1)
 
 		err := mustClose(t, manager)

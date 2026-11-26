@@ -1,0 +1,151 @@
+{
+  "checks": [
+    {
+      "detail": "32 rollovers",
+      "id": "A01",
+      "name": "displacement: >=2 rollovers",
+      "passed": true
+    },
+    {
+      "detail": "source turn 4 (span sp-004-01) absent from window",
+      "id": "A02",
+      "name": "displacement: trainer evidence left the window",
+      "passed": true
+    },
+    {
+      "detail": "selected ['rec-0001']",
+      "id": "A03",
+      "name": "retrieval after displacement finds the record",
+      "passed": true
+    },
+    {
+      "detail": "recall is retrieval, not survival in the prompt",
+      "id": "A04",
+      "name": "retrieved record's source is NOT in the window",
+      "passed": true
+    },
+    {
+      "detail": "2 records, 1 active",
+      "id": "A05",
+      "name": "supersession: two versions retained, one current",
+      "passed": true
+    },
+    {
+      "detail": "of debts in the green cabinet now",
+      "id": "A06",
+      "name": "supersession: current value wins",
+      "passed": true
+    },
+    {
+      "detail": "values=['of debts in the green cabinet now']",
+      "id": "A07",
+      "name": "supersession: stale value never retrieved",
+      "passed": true
+    },
+    {
+      "detail": "below_min_score",
+      "id": "A08",
+      "name": "isolation: Sable abstains on Alaric's code",
+      "passed": true
+    },
+    {
+      "detail": "selected ['rec-0004']",
+      "id": "A09",
+      "name": "isolation: Alaric retrieves his own code",
+      "passed": true
+    },
+    {
+      "detail": "0 violations",
+      "id": "A10",
+      "name": "isolation: no foreign record ever selected",
+      "passed": true
+    },
+    {
+      "detail": "below_min_score",
+      "id": "A11",
+      "name": "abstention: ambiguous probe retrieves nothing",
+      "passed": true
+    },
+    {
+      "detail": "active predicates=['keeps_ledger', 'never', 'preference', 'served', 'trained_by', 'vault_code']",
+      "id": "A12",
+      "name": "formation: expected predicates captured",
+      "passed": true
+    },
+    {
+      "detail": "trained_by established_turn=4",
+      "id": "A13",
+      "name": "formation: non-checkpoint turn still formed",
+      "passed": true
+    },
+    {
+      "detail": "{'captured': 7, 'duplicates': 2, 'superseded': 1, 'rejected_low_confidence': 0, 'corrected': 1, 'per_rule': {'trained_by': 1, 'ledger': 2, 'preference': 1, 'code': 1, 'served': 1, 'never': 1}}",
+      "id": "A14",
+      "name": "formation: exact repeats not duplicated",
+      "passed": true
+    }
+  ],
+  "checks_passed": 14,
+  "checks_total": 14,
+  "conversation_tokens": 1000,
+  "conversation_turns": 57,
+  "evidence_sha256": "dda8a2c058bd7b724b3b0c2dc05506f57fd3fb08e7c80982b2a34a2d8e232d1f",
+  "formation": {
+    "captured": 7,
+    "corrected": 1,
+    "duplicates": 2,
+    "per_rule": {
+      "code": 1,
+      "ledger": 2,
+      "never": 1,
+      "preference": 1,
+      "served": 1,
+      "trained_by": 1
+    },
+    "rejected_low_confidence": 0,
+    "superseded": 1
+  },
+  "gate": "A",
+  "known_gap": {
+    "abstained": true,
+    "probe": "trainer_paraphrase",
+    "why": "lexical branch cannot match 'trainer' to 'trained_by' (Gate B)"
+  },
+  "module_sha256": {
+    "__init__.py": "2155c5b7639e0bf7e2310ab5cbb452b0591120bec427ac4c5cff307d78b52b54",
+    "ab_rerank.py": "d2c5a4f790c35722ac6c74b54f222f3e306ba4cee72ebdaedd82b157b4fb5a10",
+    "assemble.py": "a4f4db6bc621dcc69d615861a1d5c404b0476a6c68486836008d16217f8ab936",
+    "bge_candidate.py": "0e9868e5bfb59e413e80c0cad563408d6ecb89d59791ca51ee0c39f5c1bdd3f7",
+    "bge_run_cases.py": "d07179b04b928341939d63e967891553fc08e1324c22c347be062522d974bf3e",
+    "calibration_set.py": "3febfc621f7cda25cdb2fdbe08446b2ae4ba273507a43b0d490fad34a048cc6a",
+    "context.py": "66ad8c4e2dee1e1500476f32d831034d19237789d7b9858bdff4678119fa5a0c",
+    "embedder.py": "02c180d12ffe68e4bcaf8654c2359eeaffe00ab83052165b23c40e43d95019a8",
+    "evaluate.py": "42930ea4d7cd9dada086c8c635ff6568cf2cd77e308fb8f255f3872f686778be",
+    "evidence.py": "19db697a0f82d29f1a1578e60418ac85aca0d6b59122daca4c12743cbf837aae",
+    "formation.py": "d8aac5003c66229da532f32ff4f0f39c4439d85787697020931461163a29f59d",
+    "hybrid.py": "739b6978b0fc9f5b8c416ac609141c8645935de0936e9525b66fcd301111215f",
+    "measure_embedder.py": "c959bad274c7046a982a01edd4c8386b9e231df006b768e4a7f4b151b2205263",
+    "measure_reranker.py": "e608ae4cdcbec5e636bc4ec68de471c8bc9b947951a4516bf0f994dabe2305b4",
+    "prose_experiment.py": "879d85c776b0c9933e2554b344f1e01691e7e7abdce0f42ca5d78822569415f5",
+    "prose_render.py": "63b0b1a51ad46c20dbf107c16972f6bf1e25351359ad659601da4947db92f814",
+    "records.py": "1432fb63da5ae561e32b5190a8642ee0b6b7249a3586bd25b99b9e9de7b3de96",
+    "rerank_eval.py": "f59959f30ec336ae983f1e28d3833567a88c13ca3f723272ba033063bb251b37",
+    "rerank_eval_v12.py": "63cb7aec91cdbb025a27dc1dfbedee400b00a68209b65e7ec7dcf506e89a16ef",
+    "rerank_set.py": "23badd5e7825718dbaa72dc1c133cc41318df75c28e2cce68af7466dd30664d1",
+    "resources.py": "0c55e0cb9ddbb62d1f2a2a99d9b27c678dd50819574f1d4668003cb3b3feab9d",
+    "retrieve.py": "d705b149ce2735fb045b32764bd0b18b2f36e13ce274d70ce4eab3612a3abab7",
+    "selfcheck.py": "056f61242bfe7168a9cb200ec4b0e1a69c3fb4fa4a30d867a157dafb248800d4",
+    "semantic.py": "ae10cef05ba7e9639aaafe5ec007c0ac333da379deba86292687a39af197bf60",
+    "temporal_eval.py": "45517f123ab0c09b95d8f7aebc6fd105a6d76a7c112bae18d6664fbabe0af419",
+    "temporal_set.py": "d0f8a3e77dda93855d41e50d654d2ffe0ba2e96620bd8272adef30831e249396",
+    "vectors.py": "e942c0878543d3acfece6990696c4d2d400a208465677eb7e1c2ff682d1f66f0"
+  },
+  "note": "window is simulated Python; KoboldCpp displacement is unproven (Gate C)",
+  "records": {
+    "active": 6,
+    "superseded": 1
+  },
+  "result": "PASS",
+  "rollovers": 32,
+  "suite": "s3.selfcheck"
+}

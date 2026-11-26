@@ -12,14 +12,15 @@ import (
 // Priority values for different resource types.
 // Lower = more important, less likely to be evicted.
 const (
-	PriorityLLM   = 0  // Chat model — never evict automatically
-	PriorityTTS   = 5  // Voice — can evict if needed
-	PriorityImage = 8  // Image gen — evict first
+	PriorityLLM   = 0 // Chat model — never evict automatically
+	PriorityASR   = 4 // Local speech recognition
+	PriorityTTS   = 5 // Voice — can evict if needed
+	PriorityImage = 8 // Image gen — evict first
 )
 
 // Safety margins (percent of reported free space to avoid edge-of-cliff).
 const vramSafetyPct = 0.90 // Use 90% of reported free VRAM
-const ramSafetyPct  = 0.95 // Use 95% of reported free RAM
+const ramSafetyPct = 0.95  // Use 95% of reported free RAM
 
 // ---------------------------------------------------------------------------
 // Allocate
@@ -37,15 +38,15 @@ func Allocate(rm *ResourceManager, req AllocationRequest) AllocationResult {
 	rm.mu.RUnlock()
 
 	res := AllocationResult{
-		UseGPU:       req.PreferGPU,
-		GPULayers:    -1,
-		GPUMemoryMB:  req.RequiredVRAMMB,
-		SystemRAMMB:  req.RequiredRAMMB,
-		Confidence:   1.0,
+		UseGPU:      req.PreferGPU,
+		GPULayers:   -1,
+		GPUMemoryMB: req.RequiredVRAMMB,
+		SystemRAMMB: req.RequiredRAMMB,
+		Confidence:  1.0,
 	}
 
 	freeVRAM := int64(float64(hw.FreeVRAMBytes) * vramSafetyPct / 1024 / 1024)
-	freeRAM  := int64(float64(hw.FreeRAMBytes)  * ramSafetyPct  / 1024 / 1024)
+	freeRAM := int64(float64(hw.FreeRAMBytes) * ramSafetyPct / 1024 / 1024)
 
 	// ---- GPU path --------------------------------------------------------
 	if req.PreferGPU && req.RequiredVRAMMB > 0 {

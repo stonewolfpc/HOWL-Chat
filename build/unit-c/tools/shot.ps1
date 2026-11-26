@@ -1,4 +1,9 @@
-param([string]$OutFile = 'build/unit-c/shot.png')
+param(
+    [string]$OutFile = 'build/unit-c/shot.png',
+    # Defaults to the historical unit-c executable; pass howl-chat to capture the
+    # packaged production build on an isolated root.
+    [string]$ProcessName = 'howl-chat-unit-c'
+)
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 $w32 = @'
@@ -13,7 +18,7 @@ public static class SW32 {
 '@
 Add-Type -TypeDefinition $w32
 [void][SW32]::SetProcessDPIAware()
-$p = Get-Process -Name 'howl-chat-unit-c' -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
+$p = Get-Process -Name $ProcessName -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
 if (-not $p) { throw 'app window not found' }
 [void][SW32]::SetForegroundWindow($p.MainWindowHandle)
 Start-Sleep -Milliseconds 400

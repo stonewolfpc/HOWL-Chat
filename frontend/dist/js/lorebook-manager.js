@@ -31,21 +31,10 @@ class LorebookManager {
      */
     loadLorebooks() {
         try {
-            this.lorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+            this.lorebooks = (window.LorebookRepo ? window.LorebookRepo.all() : []);
         } catch (error) {
             console.error('Failed to load lorebooks:', error);
             this.lorebooks = [];
-        }
-    }
-
-    /**
-     * Save lorebooks to localStorage
-     */
-    saveLorebooks() {
-        try {
-            localStorage.setItem('howl-chat-lorebooks', JSON.stringify(this.lorebooks));
-        } catch (error) {
-            console.error('Failed to save lorebooks:', error);
         }
     }
 
@@ -213,98 +202,6 @@ class LorebookManager {
     }
 
     /**
-     * Save lorebook
-     */
-    saveLorebook() {
-        const titleEl = document.getElementById('lorebook-title');
-        const contentEl = document.getElementById('lorebook-content');
-        const tagsEl = document.getElementById('lorebook-tags');
-
-        const title = titleEl ? titleEl.value.trim() : '';
-        const content = contentEl ? contentEl.value.trim() : '';
-        const tagsString = tagsEl ? tagsEl.value.trim() : '';
-
-        if (!title) {
-            alert('Lorebook title is required');
-            return;
-        }
-
-        const tags = tagsString ? tagsString.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
-
-        const lorebookData = {
-            id: this.editingLorebookId || Date.now().toString(),
-            title: title,
-            content: content,
-            tags: tags,
-            scope: 'world', // Default scope
-            enabled: true,
-            triggerPhrases: [],
-            secondaryTriggers: [],
-            triggerMode: 'exact',
-            triggerDirection: 'both',
-            triggerFrequency: 'always',
-            priorityLevel: 3,
-            conflictRule: 'higher_priority',
-            visibility: 'public',
-            revealCondition: 'never',
-            injectionStyle: 'summary',
-            injectionPosition: 'system_summary_only',
-            maxLength: 'medium',
-            linkedCharacters: [],
-            linkedLoreEntries: [],
-            inheritance: 'none',
-            automated: false,
-            memoryType: 'world',
-            triggerConfidence: 'medium',
-            decayRate: 'never',
-            contextBudget: 160,
-            scanWindow: 4,
-            recursion: 'limited',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        };
-
-        if (this.editingLorebookId) {
-            const index = this.lorebooks.findIndex(l => l.id === this.editingLorebookId);
-            if (index !== -1) {
-                this.lorebooks[index] = lorebookData;
-            }
-        } else {
-            this.lorebooks.push(lorebookData);
-        }
-
-        this.saveLorebooks();
-        this.closeLorebookCreationPopup();
-
-        // Show success message
-        if (typeof showNotification === 'function') {
-            showNotification(`Lorebook ${this.editingLorebookId ? 'updated' : 'created'}: ${title}`, 'success');
-        }
-    }
-
-    /**
-     * Delete lorebook
-     * @param {string} lorebookId - Lorebook ID to delete
-     */
-    deleteLorebook(lorebookId) {
-        const lorebook = this.getLorebookById(lorebookId);
-        if (!lorebook) return;
-
-        window.DeleteConfirm.show({
-            title: `Delete "${lorebook.title}"?`,
-            body:  'The lorebook entry will be permanently removed and detached from all worlds, scenarios, and characters. Chat sessions will no longer include it.',
-            onConfirm: async () => {
-                if (window.DeleteService) await window.DeleteService.detachLorebookFromAll(lorebookId);
-                this.lorebooks = this.lorebooks.filter(l => l.id !== lorebookId);
-                this.saveLorebooks();
-                if (typeof showNotification === 'function') {
-                    showNotification(`Lorebook deleted: ${lorebook.title}`, 'success');
-                }
-            }
-        });
-    }
-
-    /**
      * Create lorebook item element with source indicators
      * @param {Object} lorebook - Lorebook data
      * @returns {HTMLElement} Lorebook item element
@@ -344,7 +241,7 @@ class LorebookManager {
     _resolveLorebookDescription(lorebook) {
         if (lorebook.description) return lorebook.description;
         try {
-            const catalog = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+            const catalog = (window.LorebookRepo ? window.LorebookRepo.all() : []);
             const full = catalog.find(l => l.id === lorebook.id);
             return (full && full.description) ? full.description : '';
         } catch (_) { return ''; }

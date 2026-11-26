@@ -89,6 +89,39 @@ func (s *Store) LoadStaging(operationID, itemID, libraryID, planHash string) (St
 	return staged, nil
 }
 
+// ItemHashes returns a hash of every regular file in a canonical item folder.
+// It is used to journal an explicit import so rollback can prove the folder was
+// not changed after the import.
+func (s *Store) ItemHashes(id string) (map[string]string, error) {
+	if s == nil || s.reg == nil {
+		return nil, fmt.Errorf("%w: content library registry is not initialised", ErrUnavailable)
+	}
+	search, err := s.Lookup(id)
+	if err != nil {
+		return nil, err
+	}
+	if !search.Found || search.Item == nil || search.AuthorityIndeterminate {
+		return nil, fmt.Errorf("%w: item %q is not authoritative", ErrUnavailable, id)
+	}
+	dir := filepath.Join(search.Item.Root, search.Item.ID)
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+	hashes := make(map[string]string, len(entries))
+	for _, entry := range entries {
+		if entry.IsDir() || entry.Type()&os.ModeSymlink != 0 {
+			return nil, fmt.Errorf("%w: unexpected entry %q", ErrImportConflict, entry.Name())
+		}
+		data, err := os.ReadFile(filepath.Join(dir, entry.Name()))
+		if err != nil {
+			return nil, err
+		}
+		hashes[entry.Name()] = hashBytes(data)
+	}
+	return hashes, nil
+}
+
 // VerifyImported proves an already-committed item still matches its journaled
 // revision and every journaled file hash. It changes nothing.
 func (s *Store) VerifyImported(id, expectedRevision string, expectedHashes map[string]string) (bool, error) {

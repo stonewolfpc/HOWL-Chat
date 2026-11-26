@@ -213,7 +213,7 @@ func buildMeloVoiceCatalog(catalog TTSVoiceCatalog, profile audiotypes.TTSModelP
 		detail = "MeloTTS is unavailable: " + err.Error()
 	} else {
 		available = true
-		detail = "MeloTTS is reachable. Availability is a service check; synthesis is not verified by the catalog."
+		detail = "MeloTTS is running as a Howl-managed local service. Availability is an ownership and liveness check; synthesis is not verified by the catalog."
 		_ = record
 	}
 	for _, voice := range profile.SupportedVoices {

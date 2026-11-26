@@ -1,0 +1,272 @@
+{
+  "checks_passed": 34,
+  "checks_total": 34,
+  "confirmations": {
+    "commits_or_pushes": 0,
+    "experimental_model_calls": 0,
+    "frozen_artifacts_modified": false,
+    "frozen_preregistration_modified": false,
+    "g4_executed": false,
+    "howl_chat_modified": false,
+    "subject_runs": 0
+  },
+  "evidence_sets": {
+    "accepted_v2": {
+      "checks": 118,
+      "receipts": [
+        "eval/mem1/v2/g1-receipt-u1u2-v2.json",
+        "eval/mem1/v2/g1-review-receipt-u1u2-v2.json"
+      ],
+      "semantics": "v2: visibility table; chat/world/scenario ownership",
+      "standing": "preserved byte-identical; reference identity"
+    },
+    "current": {
+      "checks": 133,
+      "receipt": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\eval\\mem1\\write-guard-v1\\g1-receipt-writeguard-v1.json",
+      "semantics": "v2 + protected write path (exclusive create, handle identity before the first byte)"
+    },
+    "historical": {
+      "checks": 96,
+      "receipt": "eval/mem1/g1-receipt.json",
+      "semantics": "v1: owner/restricted/world branch retrieval",
+      "standing": "preserved unchanged; superseded in part by the v2 set"
+    }
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "impact": "1 of 13 probes contributes M1 only",
+      "kind": "gap",
+      "remedy": [
+        "BLOCKED — requires an owner decision, not an implementation choice: the frozen contract names four contexts (character_perspective, world_state, narrator, inspection), and history appears only in the `knowledge_history` inspection view, which must never feed the prompt",
+        "options: (A) add a fifth prompt-facing context, (B) add a declared temporal parameter to existing contexts, (C) leave this probe M1-only and record the limitation"
+      ],
+      "summary": "M2 for the correction probe is applicable but unimplementable as built: no history context, and support requires an active record"
+    },
+    {
+      "id": "F2",
+      "impact": "none remaining; 13/13 probes are M2-scoreable when applicable",
+      "kind": "closed",
+      "remedy": "implemented and covered by R04, R04b, R04c, R07-R09",
+      "summary": "M2 for the retraction probe is now supported by an explicit retraction event record with provenance and a reference to the retracted record"
+    },
+    {
+      "id": "F3",
+      "impact": "inflates the memory block; does not affect M1 or M2 attribution",
+      "kind": "risk",
+      "remedy": "declare a minimum term-overlap rule before G4 from prior calibration, never from outcomes",
+      "summary": "overlap retrieval floor (min_score=0.0) admits weakly related records"
+    },
+    {
+      "id": "F4",
+      "impact": "broad but deterministic; a retracted pair leaves two records revoked",
+      "kind": "risk",
+      "remedy": "acceptable as-is, or restrict to the maximum-overlap record pre-G4",
+      "summary": "a retraction sentence naming two facts revokes both"
+    },
+    {
+      "id": "F5",
+      "impact": "none; Gate B's P5 may not be inherited as a pass",
+      "kind": "note",
+      "summary": "P5 is supported as a standalone case and remains outside the aggregate"
+    }
+  ],
+  "gate": "G1-review",
+  "part_a_m2_applicability": [
+    {
+      "candidate_record": {
+        "established_turn": 6,
+        "record_id": "rec-0003",
+        "span": "sp-006-01",
+        "status": "superseded",
+        "value": "ledger in the blue cabinet"
+      },
+      "causes": [
+        "retrieve.eligible() enumerates store.current(), so a superseded record is never a candidate and there is no declared history context",
+        "score.support_check() requires rec.status == ACTIVE, which the frozen M2 text does not require"
+      ],
+      "definition_change_required": true,
+      "disposition": "M2 applicable, blocked on an architecture-contract decision (F1), not on implementation",
+      "keyed_answer": "blue cabinet",
+      "m2_definition_applied": "CORRECT + selected record supports key + span absent -> NOT_SUPPORTED, because no supporting record can be selected",
+      "probe": "p47",
+      "question": "Where was the ledger kept before?",
+      "remedy": [
+        "BLOCKED — requires an owner decision, not an implementation choice: the frozen contract names four contexts (character_perspective, world_state, narrator, inspection), and history appears only in the `knowledge_history` inspection view, which must never feed the prompt",
+        "options: (A) add a fifth prompt-facing context, (B) add a declared temporal parameter to existing contexts, (C) leave this probe M1-only and record the limitation"
+      ],
+      "selectable_by_a1": false,
+      "span_provably_absent": true
+    },
+    {
+      "causes": [],
+      "definition_change_required": false,
+      "disposition": "M2 applicable and now implemented (explicit retraction event record)",
+      "keyed_answer": "retracted",
+      "m2_definition_applied": "CORRECT + a selected retraction event record that references the retracted record + retraction span absent -> SUPPORTED",
+      "note": "The retraction is an event record, not a generic absence: it cites its own span, references the retracted record, and keeps the target revoked with provenance intact. 'Retracted' therefore remains distinguishable from 'never established' and from 'not known'.",
+      "probe": "p48",
+      "question": "How long did you serve in the Ninth Company?",
+      "remedy": [],
+      "retracted_record": {
+        "record_id": "rec-0005",
+        "revoked_at_turn": 22,
+        "span": "sp-009-01",
+        "status": "revoked",
+        "value": "four years in the Ninth Company"
+      },
+      "selectable_by_a1": true,
+      "span_provably_absent": true,
+      "supporting_record": {
+        "kind": "event",
+        "predicate": "retraction:served",
+        "record_id": "rec-0012",
+        "retracts": "rec-0005",
+        "span": "sp-022-01",
+        "status": "active",
+        "value": "retracted"
+      }
+    }
+  ],
+  "part_b_tests": [
+    {
+      "detail": "ValueError: unknown retrieval context: 'history'",
+      "id": "R05",
+      "kind": "negative",
+      "name": "no history context exists to select superseded records",
+      "passed": true
+    },
+    {
+      "detail": "8 eligible, all active",
+      "id": "R06",
+      "kind": "assurance",
+      "name": "current-mode retrieval never returns a superseded value",
+      "passed": true
+    },
+    {
+      "detail": "active facts=['promise']",
+      "id": "R07",
+      "kind": "assurance",
+      "name": "single-fact retraction does not revoke an unrelated fact",
+      "passed": true
+    },
+    {
+      "detail": "active before=1, after=1",
+      "id": "R08",
+      "kind": "assurance",
+      "name": "one shared content token is not enough to revoke",
+      "passed": true
+    },
+    {
+      "detail": "active facts=[]",
+      "id": "R09",
+      "kind": "finding",
+      "name": "a retraction naming two facts revokes both (documented breadth)",
+      "passed": true
+    },
+    {
+      "detail": "5 weak selections of 6: [('rec-0001', 0.28), ('rec-0007', 0.28), ('rec-0011', 0.27), ('rec-0010', 0.22), ('rec-0008', 0.2)]",
+      "id": "R10",
+      "kind": "finding",
+      "name": "overlap floor admits weakly related records (reported, not tuned)",
+      "passed": true
+    },
+    {
+      "detail": "serialized=26, split=3+14+9",
+      "id": "R16",
+      "kind": "assurance",
+      "name": "accounted tokens equal the actual serialized prompt components",
+      "passed": true
+    },
+    {
+      "detail": "TokenAccountingError: counter 'whitespace-words-test-only' is a test instrument; G4 requires the runti",
+      "id": "R17",
+      "kind": "negative",
+      "name": "a test-only counter is refused for a scored run",
+      "passed": true
+    },
+    {
+      "detail": "memory=0, total=2",
+      "id": "R19",
+      "kind": "assurance",
+      "name": "empty memory block costs zero memory tokens",
+      "passed": true
+    }
+  ],
+  "part_c_verification": {
+    "accepted_v2_receipts": {
+      "paths": [
+        "eval/mem1/v2/g1-receipt-u1u2-v2.json",
+        "eval/mem1/v2/g1-review-receipt-u1u2-v2.json"
+      ],
+      "sha256": {
+        "eval/mem1/v2/g1-receipt-u1u2-v2.json": "bc5766f975fb070421ebcb3fc587c4dde088ae94aa5c4019b6eed4aa08d53ad3",
+        "eval/mem1/v2/g1-review-receipt-u1u2-v2.json": "38cc18571dd50a12403d0a45c357630ba8bfbcd38fbb4a1509ed7e6b3fcb6df9"
+      },
+      "standing": "preserved byte-identical; reference identity for this generation"
+    },
+    "fresh_selftest": {
+      "detail": "RESULT: PASS (133/133 checks); receipt: C:\\Users\\STONEW~1\\AppData\\Local\\Temp\\tmpb7nx8kah\\g1-receipt.json (51056 B)",
+      "pass": true
+    },
+    "frozen_artifacts": "8/8",
+    "frozen_preregistration": "4/4",
+    "guard_g1_receipt": {
+      "cas_sha256": "9357ecffdeafdfc029e5fed81f5cc363f20a1f0804ecba982d24576dcf896076",
+      "checks": 133,
+      "labelled": "write-guard-v1: exclusive create + handle identity before write",
+      "path": "C:\\Users\\StoneWolfPC\\HOWL_Chat\\eval\\mem1\\write-guard-v1\\g1-receipt-writeguard-v1.json",
+      "status": "PASS"
+    },
+    "historical_g1_receipt": {
+      "cas_sha256": "41cc95ff0ccee6ae573535b61d7ccf2a125974bc50164acaae6ae9e2d1e70d26",
+      "checks": 96,
+      "labelled": "Stage 1, v1 semantics, preserved byte-identical, partly superseded",
+      "path": "eval/mem1/g1-receipt.json",
+      "status": "PASS"
+    },
+    "preserved_documents": "2/2"
+  },
+  "recommendation": {
+    "g4_ready": false,
+    "note": "M1 is unaffected for both probes; C1/C2 remain computable at reduced M2 coverage",
+    "pre_g4_work": [
+      "owner decision on how, or whether, historical temporal intent is represented in a prompt-facing context"
+    ],
+    "reason": "F2 is closed; F1 is blocked on an architecture-contract decision, not on implementation: the contract names four contexts and exposes history only through the inspection view, which must never feed the prompt"
+  },
+  "status": "PASS",
+  "supersession": {
+    "edited_or_rejustified": 14,
+    "mapping_changed": [
+      "S01",
+      "S11"
+    ],
+    "rejustified": [
+      "E07",
+      "F02"
+    ],
+    "replace": [
+      "E06",
+      "S02",
+      "S04",
+      "S05",
+      "S06",
+      "S07",
+      "S08",
+      "S09",
+      "S10",
+      "S12"
+    ],
+    "reviewed": 21,
+    "unaffected": [
+      "S03",
+      "F01",
+      "K06",
+      "N26",
+      "N27",
+      "N28",
+      "N29"
+    ]
+  }
+}

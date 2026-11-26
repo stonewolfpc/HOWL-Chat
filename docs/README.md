@@ -10,6 +10,7 @@
 
 | If you need… | Read |
 |---|---|
+| The program entry point: direction, checkpoint `CP-2026-11-21-01`, MEMORY-09 and foundation readiness, and the records that define the program | `docs/architecture/HOWL-MEMORY-09-PROGRAM-DIRECTION-2026-11-21.md` |
 | The reconstructed history from lorebook ownership to the current governance state | `docs/GOVERNANCE-CHAIN.md` |
 | The memory system's governing principle, four layers, capability dispositions, and acceptance criteria | `docs/architecture/ARCHITECTURE-DECISION-MEMORY-SYSTEM-2026-11-12.md` |
 | The status and home of every document, including hashes | `docs/DOCUMENT-REGISTRY.md` |

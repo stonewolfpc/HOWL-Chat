@@ -179,6 +179,12 @@ func TestA3TemporaryEnableBridgePreservesPreviousReadiness(t *testing.T) {
 	if err := app.EnableAudioASR(true); err != nil {
 		t.Fatalf("initial EnableAudioASR: %v", err)
 	}
+	// A replacement must be a genuine configuration change. Re-applying the
+	// installed settings is idempotent (D5) and correctly builds nothing, so
+	// the engine change is what makes this a replacement attempt.
+	changed := app.audio.Desired()
+	changed.ASREngine = "whisper-base"
+	app.audio.SetDesired(changed)
 	if err := app.EnableAudioASR(true); err == nil {
 		t.Fatal("failed replacement returned nil")
 	} else if !strings.Contains(err.Error(), replacementErr.Error()) {
@@ -218,7 +224,10 @@ func TestA3TemporaryEnableBridgePreservesPreviousReadiness(t *testing.T) {
 	})
 }
 
-// A4: status comes from the manager and voice enumeration holds one lease.
+// A4: status comes from the manager and voice enumeration is a managed
+// operation (one registered operation plus one generation lease, the same shape
+// as every other audio request), so it can be cancelled and joined on
+// shutdown.
 func TestA4StatusAndVoiceLease(t *testing.T) {
 	voiceStarted := make(chan struct{})
 	voiceRelease := make(chan struct{})
@@ -258,8 +267,8 @@ func TestA4StatusAndVoiceLease(t *testing.T) {
 	case <-time.After(3 * time.Second):
 		t.Fatal("voice enumeration did not start")
 	}
-	if got := manager.Status().InFlight; got != 1 {
-		t.Fatalf("in-flight during voice enumeration = %d, want one lease", got)
+	if got := manager.Status().InFlight; got != 2 {
+		t.Fatalf("in-flight during voice enumeration = %d, want one operation and one lease", got)
 	}
 	close(voiceRelease)
 	var voices []string

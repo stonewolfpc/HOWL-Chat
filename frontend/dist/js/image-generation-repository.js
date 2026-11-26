@@ -23,6 +23,7 @@
 
 const ImageGenerationStorage = (() => {
     const UI_KEY = 'howl-image-gen-state';
+    const LEGACY_BACKUP_KEY = UI_KEY + '-cutover-backup';
     const UI_VERSION = 3;
     const CACHE_KEY = 'howl-image-generation-cache';
     const CACHE_VERSION = 2;
@@ -35,6 +36,8 @@ const ImageGenerationStorage = (() => {
     let loaded = false;
     let loadPromise = null;
     let writeChain = Promise.resolve();
+    let cutover = false;
+    let cutoverStatus = null;
 
     function _app() {
         return window.go?.main?.App;
@@ -147,17 +150,13 @@ const ImageGenerationStorage = (() => {
         const app = _app();
         const rawUi = _readUiRaw();
         const legacy = _splitLegacy(rawUi);
-        let legacyFailed = false;
-        let imported = false;
 
-        if (legacy.settings && typeof app?.ImportImageGenerationSettings === 'function') {
+        if (typeof app?.GetImageGenerationCutoverStatus === 'function') {
             try {
-                await app.ImportImageGenerationSettings(legacy.settings);
-                imported = true;
-                _emit('howl:image-generation-imported', { count: Object.keys(legacy.settings).length });
+                cutoverStatus = await app.GetImageGenerationCutoverStatus();
+                cutover = Boolean(cutoverStatus?.cutover);
             } catch (e) {
-                legacyFailed = true;
-                console.warn('[imageGenerationRepository] legacy generation import failed:', e);
+                console.warn('[imageGenerationRepository] cutover status failed:', e);
             }
         }
 
@@ -173,21 +172,21 @@ const ImageGenerationStorage = (() => {
 
         if (backend) {
             const backendSettings = _withoutRevision(backend);
-            // A failed import must not destroy the only copy of legacy settings.
-            if (legacyFailed && legacy.settings && Object.keys(backendSettings).length === 0) {
+            // Before the explicit cutover an empty canonical document must not
+            // erase the only copy of the user's pre-cutover settings.
+            if (!cutover && Object.keys(backendSettings).length === 0 && legacy.settings) {
                 settings = _clone(legacy.settings);
                 revision = '';
+                ui = { ...legacy.ui };
                 source = 'legacy';
                 _emit('howl:image-generation-loaded', { source });
-                return settings;
+                return _clone(settings);
             }
             settings = backendSettings;
             revision = typeof backend.revision === 'string' ? backend.revision : '';
             source = 'backend';
-            if (!legacyFailed) {
-                _writeCache();
-                if (imported || legacy.settings) _writeUi(legacy.ui);
-            }
+            if (!legacy.settings) _writeCache();
+            ui = { ...legacy.ui };
             _emit('howl:image-generation-loaded', { source });
             return _clone(settings);
         }
@@ -209,6 +208,43 @@ const ImageGenerationStorage = (() => {
         ui = { ...legacy.ui };
         _emit('howl:image-generation-loaded', { source });
         return _clone(settings);
+    }
+
+    async function importLegacy() {
+        const app = _app();
+        if (typeof app?.ImportImageGenerationSettings !== 'function') {
+            throw new Error('image generation backend unavailable');
+        }
+        const rawUi = _readUiRaw();
+        const legacy = _splitLegacy(rawUi);
+        if (!legacy.settings || Object.keys(legacy.settings).length === 0) {
+            throw new Error('No pre-cutover image generation settings were found in this browser.');
+        }
+        localStorage.setItem(LEGACY_BACKUP_KEY, JSON.stringify(rawUi));
+        let result;
+        try {
+            result = await app.ImportImageGenerationSettings(legacy.settings);
+        } catch (error) {
+            localStorage.removeItem(LEGACY_BACKUP_KEY);
+            throw error;
+        }
+        await loadAll();
+        return result;
+    }
+
+    async function rollback() {
+        const app = _app();
+        if (typeof app?.RollbackImageGenerationImport !== 'function') {
+            throw new Error('image generation backend unavailable');
+        }
+        const result = await app.RollbackImageGenerationImport();
+        const backup = localStorage.getItem(LEGACY_BACKUP_KEY);
+        if (backup !== null) {
+            localStorage.setItem(UI_KEY, backup);
+            localStorage.removeItem(LEGACY_BACKUP_KEY);
+        }
+        await loadAll();
+        return result;
     }
 
     function loadAll() {
@@ -275,11 +311,15 @@ const ImageGenerationStorage = (() => {
         CACHE_VERSION,
         get source() { return source; },
         get ready() { return ready; },
+        get cutover() { return cutover; },
+        get cutoverStatus() { return cutoverStatus; },
         get revision() { return revision; },
         all() { return _clone(settings); },
         get(key) { return settings[key]; },
         ui() { return { ...ui }; },
         loadAll,
+        importLegacy,
+        rollback,
         save,
         saveUi,
         mergeRecord,

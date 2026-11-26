@@ -1,0 +1,23 @@
+specs: ['lfm120-instruct-official', 'lfm350-official', 'lfm120-think-official', 'qwen35-08b-nonthink', 'qwen35-2b-nonthink', 'qwen35-2b-think', 'qwen35-4b-nonthink', 'qwen35-4b-think', 'qwen35-9b-think', 'qwen3-17b-think', 'qwen3-17b-nonthink', 'smollm3-3b-think', 'smollm3-3b-nonthink']
+=== lfm120-instruct-official ngl=0 budget=None preset=Liquid AI card: T0.1 / top_k50 / rep1.05 ===
+  d1 2.788s finish=stop tok=78 ok=True
+  d2 2.55s finish=stop tok=77 ok=True
+  d3 2.551s finish=stop tok=78 ok=True
+=== lfm350-official ngl=0 budget=None preset=Liquid AI card: T0.1 / top_k50 / rep1.05 ===
+  d1 0.26s finish=stop tok=16 ok=True
+  d2 0.189s finish=stop tok=16 ok=True
+  d3 0.19s finish=stop tok=16 ok=True
+=== lfm120-think-official ngl=0 budget=None preset=Liquid AI card: T0.05 / top_k50 / rep1.05 ===
+  d1 91.051s finish=stop tok=2453 ok=True
+  d2 109.477s finish=stop tok=2949 ok=True
+  d3 61.711s finish=stop tok=1717 ok=True
+=== qwen35-08b-nonthink ngl=0 budget=None preset=Qwen3.5 small non-thinking text preset ===
+  d1 4.091s finish=stop tok=134 ok=True
+  d2 3.865s finish=stop tok=134 ok=True
+  d3 3.441s finish=stop tok=120 ok=True
+=== qwen35-2b-nonthink ngl=0 budget=None preset=Qwen3.5 small non-thinking text preset ===
+  d1 8.476s finish=stop tok=136 ok=True
+  d2 5.977s finish=stop tok=100 ok=True
+  d3 6.569s finish=stop tok=110 ok=True
+=== qwen35-2b-think ngl=0 budget=None preset=Qwen3.5 small thinking text preset ===
+  d1 190.28s finish=length tok=3072 ok=False

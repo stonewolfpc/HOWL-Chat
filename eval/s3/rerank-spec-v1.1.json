@@ -1,0 +1,381 @@
+{
+  "version": "v1.1",
+  "frozen_on": "2026-11-15",
+  "threshold": 0.3,
+  "threshold_note": "fixed before any candidate existed; never tuned on this set",
+  "selection_rule": "keep candidates scoring >= threshold; if none remain, abstain",
+  "criteria": {
+    "R1": "agent vs patient",
+    "R2": "subject ownership",
+    "R3": "historical vs current",
+    "R4": "preserve P1 (VETO)",
+    "R5": "preserve abstention (VETO)"
+  },
+  "vetoes": [
+    "R4",
+    "R5"
+  ],
+  "veto_rule": "a broken veto rejects the candidate outright; not averaged",
+  "cases": [
+    {
+      "id": "R1-horse",
+      "criterion": "R1",
+      "owner": "char-001",
+      "query": "Who trained the horse?",
+      "expect": null,
+      "expect_abstain": true,
+      "why": "shares 'trained'; different patient entirely",
+      "candidates": [
+        {
+          "record_id": "rec-0001",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 4,
+          "text": "Sable trained_by: Corvin Ashgrave of Ossary, and quiet was not part of it"
+        },
+        {
+          "record_id": "rec-0003",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 7,
+          "text": "Sable preference: tea more than I like surprises"
+        },
+        {
+          "record_id": "rec-0006",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 19,
+          "text": "Sable never: trusted a map that was drawn by someone who had not walked the ground"
+        },
+        {
+          "record_id": "rec-0007",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 22,
+          "text": "Sable keeps_ledger: of debts in the green cabinet now"
+        }
+      ]
+    },
+    {
+      "id": "R1-patient",
+      "criterion": "R1",
+      "owner": "char-001",
+      "query": "Was Corvin the one who trained you?",
+      "expect": "rec-0001",
+      "expect_abstain": false,
+      "why": "agent named explicitly; relation is trained_by",
+      "candidates": [
+        {
+          "record_id": "rec-0001",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 4,
+          "text": "Sable trained_by: Corvin Ashgrave of Ossary, and quiet was not part of it"
+        },
+        {
+          "record_id": "rec-0003",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 7,
+          "text": "Sable preference: tea more than I like surprises"
+        },
+        {
+          "record_id": "rec-0006",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 19,
+          "text": "Sable never: trusted a map that was drawn by someone who had not walked the ground"
+        },
+        {
+          "record_id": "rec-0007",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 22,
+          "text": "Sable keeps_ledger: of debts in the green cabinet now"
+        }
+      ]
+    },
+    {
+      "id": "R2-vault-foreign",
+      "criterion": "R2",
+      "owner": "char-001",
+      "query": "What is the vault code?",
+      "expect": null,
+      "expect_abstain": true,
+      "why": "record belongs to another character",
+      "candidates": [
+        {
+          "record_id": "rec-0001",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 4,
+          "text": "Sable trained_by: Corvin Ashgrave of Ossary, and quiet was not part of it"
+        },
+        {
+          "record_id": "rec-0003",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 7,
+          "text": "Sable preference: tea more than I like surprises"
+        },
+        {
+          "record_id": "rec-0006",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 19,
+          "text": "Sable never: trusted a map that was drawn by someone who had not walked the ground"
+        },
+        {
+          "record_id": "rec-0007",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 22,
+          "text": "Sable keeps_ledger: of debts in the green cabinet now"
+        }
+      ]
+    },
+    {
+      "id": "R2-vault-own",
+      "criterion": "R2",
+      "owner": "char-002",
+      "query": "What is the vault code?",
+      "expect": "rec-0004",
+      "expect_abstain": false,
+      "why": "same query, owning character must answer",
+      "candidates": [
+        {
+          "record_id": "rec-0004",
+          "owner_id": "char-002",
+          "status": "active",
+          "turn": 12,
+          "text": "Alaric vault_code: seven-four-nine-one"
+        },
+        {
+          "record_id": "rec-0005",
+          "owner_id": "char-002",
+          "status": "active",
+          "turn": 14,
+          "text": "Alaric served: four years in the Ninth Company"
+        }
+      ]
+    },
+    {
+      "id": "R3-now",
+      "criterion": "R3",
+      "owner": "char-001",
+      "query": "Where is the ledger kept now?",
+      "expect": "rec-0007",
+      "expect_abstain": false,
+      "why": "current record must beat the superseded one",
+      "candidates": [
+        {
+          "record_id": "rec-0002",
+          "owner_id": "char-001",
+          "status": "superseded",
+          "turn": 5,
+          "text": "Sable keeps_ledger: of unpaid debts in the blue cabinet, if you are curious"
+        },
+        {
+          "record_id": "rec-0007",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 22,
+          "text": "Sable keeps_ledger: of debts in the green cabinet now"
+        }
+      ]
+    },
+    {
+      "id": "R3-before",
+      "criterion": "R3",
+      "owner": "char-001",
+      "query": "Where was the ledger kept before?",
+      "expect": "rec-0002",
+      "expect_abstain": false,
+      "why": "history stays reachable when explicitly asked",
+      "candidates": [
+        {
+          "record_id": "rec-0002",
+          "owner_id": "char-001",
+          "status": "superseded",
+          "turn": 5,
+          "text": "Sable keeps_ledger: of unpaid debts in the blue cabinet, if you are curious"
+        },
+        {
+          "record_id": "rec-0007",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 22,
+          "text": "Sable keeps_ledger: of debts in the green cabinet now"
+        }
+      ]
+    },
+    {
+      "id": "R4-paraphrase",
+      "criterion": "R4",
+      "owner": "char-001",
+      "query": "Who was your trainer, again?",
+      "expect": "rec-0001",
+      "expect_abstain": false,
+      "why": "the P1 behaviour that must not regress",
+      "candidates": [
+        {
+          "record_id": "rec-0001",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 4,
+          "text": "Sable trained_by: Corvin Ashgrave of Ossary, and quiet was not part of it"
+        },
+        {
+          "record_id": "rec-0003",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 7,
+          "text": "Sable preference: tea more than I like surprises"
+        },
+        {
+          "record_id": "rec-0006",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 19,
+          "text": "Sable never: trusted a map that was drawn by someone who had not walked the ground"
+        },
+        {
+          "record_id": "rec-0007",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 22,
+          "text": "Sable keeps_ledger: of debts in the green cabinet now"
+        }
+      ]
+    },
+    {
+      "id": "R5-weather",
+      "criterion": "R5",
+      "owner": "char-001",
+      "query": "What did you think of the weather?",
+      "expect": null,
+      "expect_abstain": true,
+      "why": "no record concerns weather",
+      "candidates": [
+        {
+          "record_id": "rec-0001",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 4,
+          "text": "Sable trained_by: Corvin Ashgrave of Ossary, and quiet was not part of it"
+        },
+        {
+          "record_id": "rec-0003",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 7,
+          "text": "Sable preference: tea more than I like surprises"
+        },
+        {
+          "record_id": "rec-0006",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 19,
+          "text": "Sable never: trusted a map that was drawn by someone who had not walked the ground"
+        },
+        {
+          "record_id": "rec-0007",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 22,
+          "text": "Sable keeps_ledger: of debts in the green cabinet now"
+        }
+      ]
+    },
+    {
+      "id": "R5-fair",
+      "criterion": "R5",
+      "owner": "char-001",
+      "query": "What did you win at the fair?",
+      "expect": null,
+      "expect_abstain": true,
+      "why": "no record concerns a fair or a prize",
+      "candidates": [
+        {
+          "record_id": "rec-0001",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 4,
+          "text": "Sable trained_by: Corvin Ashgrave of Ossary, and quiet was not part of it"
+        },
+        {
+          "record_id": "rec-0003",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 7,
+          "text": "Sable preference: tea more than I like surprises"
+        },
+        {
+          "record_id": "rec-0006",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 19,
+          "text": "Sable never: trusted a map that was drawn by someone who had not walked the ground"
+        },
+        {
+          "record_id": "rec-0007",
+          "owner_id": "char-001",
+          "status": "active",
+          "turn": 22,
+          "text": "Sable keeps_ledger: of debts in the green cabinet now"
+        }
+      ]
+    }
+  ],
+  "cases_sha256": "ca6dd5b3541f08fbf997b58bb3ddffe1b797a1171ff94900a80ab53b0c9f1c21",
+  "harness_sha256": "f59959f30ec336ae983f1e28d3833567a88c13ca3f723272ba033063bb251b37",
+  "baseline_system_as_is": {
+    "R1-horse": {
+      "probe": "P5",
+      "outcome": "FAIL",
+      "detail": "returns the trainer record"
+    },
+    "R1-patient": {
+      "probe": null,
+      "outcome": "UNTESTED",
+      "detail": "no equivalent probe"
+    },
+    "R2-vault-foreign": {
+      "probe": "P3b",
+      "outcome": "PASS",
+      "detail": "abstains"
+    },
+    "R2-vault-own": {
+      "probe": "P3a",
+      "outcome": "PASS",
+      "detail": "returns vault_code"
+    },
+    "R3-now": {
+      "probe": "P4a",
+      "outcome": "PASS",
+      "detail": "current record"
+    },
+    "R3-before": {
+      "probe": "P4b",
+      "outcome": "PASS",
+      "detail": "history reachable"
+    },
+    "R4-paraphrase": {
+      "probe": "P1",
+      "outcome": "PASS",
+      "detail": "subword + semantic"
+    },
+    "R5-weather": {
+      "probe": "P2",
+      "outcome": "PASS",
+      "detail": "abstains"
+    },
+    "R5-fair": {
+      "probe": null,
+      "outcome": "UNTESTED",
+      "detail": "no equivalent probe"
+    }
+  },
+  "isolation": "scorer receives query and candidate fields only; never the label",
+  "generalization_note": "9 cases test mechanism, not generalization; the reference mock is a control, not a baseline"
+}

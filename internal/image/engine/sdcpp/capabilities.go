@@ -48,23 +48,37 @@ var companionFlag = map[string]string{
 // companion requirements the app already enforced.
 var familyCapabilities = map[string]FamilyCapability{
 	// Checkpoints with encoders and VAE baked in.
-	"sd1.5":      {Optional: []string{"clip_l"}, Resolution: 512},
-	"sd2.1":      {Optional: []string{"clip_l"}, Resolution: 768},
+	// SD1.5 and SD2.1 checkpoints carry their own text encoder. Passing an
+	// external CLIP-L to either is wrong: SD2.1's encoder is OpenCLIP-H with a
+	// 1024-wide context, so a 768-wide CLIP-L made sd-server die during sampling
+	// with GGML_ASSERT(ggml_can_mul_mat(a, b)). Neither takes a conditioner.
+	"sd1.5":      {Resolution: 512},
+	"sd2.1":      {Resolution: 768},
 	"sdxl":       {Optional: []string{"clip_l", "clip_g", "vae"}, Resolution: 1024},
 	"sdxl-turbo": {Optional: []string{"clip_l", "clip_g", "vae"}, Resolution: 1024},
 	"kolors":     {Optional: []string{"clip_l", "clip_g", "vae"}, Resolution: 1024, FluxAE: true},
 	"cascade":    {Optional: []string{"clip_l", "clip_g", "vae"}, Resolution: 768},
 
 	// Split-component families.
-	"sd3":        {Companions: []string{"clip_l", "clip_g", "t5xxl", "vae"}, Resolution: 1024},
-	"sd3.5":      {Companions: []string{"clip_l", "clip_g", "t5xxl", "vae"}, Resolution: 1024},
-	"flux":       {SplitComponents: true, Companions: []string{"t5xxl", "clip_l", "vae"}, Resolution: 1024, FluxAE: true},
-	"flux2":      {SplitComponents: true, Companions: []string{"llm", "vae"}, Resolution: 1024, FluxAE: true},
-	"chroma":     {SplitComponents: true, Companions: []string{"t5xxl", "vae"}, ExtraFlags: []string{"--chroma-disable-dit-mask", "--clip-on-cpu"}, Resolution: 1024, FluxAE: true},
+	"sd3":   {Companions: []string{"clip_l", "clip_g", "t5xxl", "vae"}, Resolution: 1024},
+	"sd3.5": {Companions: []string{"clip_l", "clip_g", "t5xxl", "vae"}, Resolution: 1024},
+	"flux":  {SplitComponents: true, Companions: []string{"t5xxl", "clip_l", "vae"}, Resolution: 1024, FluxAE: true},
+	"flux2": {SplitComponents: true, Companions: []string{"llm", "vae"}, Resolution: 1024, FluxAE: true},
+	// No extra flags: the shipped sd-server (c6dfa9d) rejects
+	// --chroma-disable-dit-mask as unknown ("unknown argument" at startup) and
+	// marks --clip-on-cpu deprecated in favour of --backend te=cpu. Chroma loads
+	// and samples with its defaults, so passing either only breaks the launch.
+	"chroma":     {SplitComponents: true, Companions: []string{"t5xxl", "vae"}, Resolution: 1024, FluxAE: true},
 	"auraflow":   {SplitComponents: true, Companions: []string{"t5xxl", "vae"}, Resolution: 1024, FluxAE: true},
 	"anima":      {SplitComponents: true, Companions: []string{"llm", "vae"}, Resolution: 1024},
 	"z_image":    {SplitComponents: true, Companions: []string{"llm", "vae"}, Resolution: 1024, FluxAE: true},
 	"qwen_image": {SplitComponents: true, Companions: []string{"llm", "vae"}, Resolution: 1024},
+	// Krea2 is detected by the engine as its own family and rejects the
+	// Qwen2.5-VL encoder with "cannot load component from
+	// qwen_2.5_vl_7b_fp8_scaled.safetensors". Its own encoder is not identified
+	// yet, so no companion is declared: attaching a known-wrong one is worse than
+	// letting the loader name what it needs.
+	"krea2": {SplitComponents: true, Resolution: 1024},
 
 	// HiDream ships as a full model with external encoders. The engine used to
 	// skip them while the discovery pass required them; the requirement wins.

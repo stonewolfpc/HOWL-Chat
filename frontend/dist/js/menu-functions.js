@@ -60,9 +60,14 @@ function _openAudioSettingsIframe(hash) {
     modal.className = 'real-settings-overlay show';
     modal.id        = 'audio-settings-modal';
     modal.style.zIndex = '2500';
+    // rs-container.css turns .real-settings-container into a full-window workspace
+    // (height:100vh, no border) for the main settings dialog. This panel is a
+    // floating dialog, so every one of those properties is overridden here:
+    // otherwise the container fills the window and the area below the 600px
+    // iframe renders as an empty grey band.
     modal.innerHTML = `
-        <div class="real-settings-container" style="width:900px;max-width:95vw;">
-            <iframe src="audio-settings.html#${hash}" style="width:100%;height:600px;border:none;border-radius:8px;" id="audio-settings-iframe"></iframe>
+        <div class="real-settings-container" style="width:900px;max-width:95vw;height:auto;max-height:85vh;border:1px solid var(--border-primary);border-radius:12px;overflow:hidden;background:var(--shell-panel-bg);box-shadow:0 0 30px rgba(0,0,0,0.5);">
+            <iframe src="audio-settings.html#${hash}" style="display:block;width:100%;height:min(600px,78vh);border:none;border-radius:8px;" id="audio-settings-iframe"></iframe>
         </div>
     `;
     document.body.appendChild(modal);
@@ -145,7 +150,7 @@ Navigation:
 // Shared Notification (used by menu-edit, menu-view, menu-memory)
 // ---------------------------------------------------------------------------
 
-function showNotification(message, type = 'info') {
+function showNotification(message, type = 'info', duration = 3000) {
     let n = document.getElementById('notification');
     if (!n) {
         n = document.createElement('div');
@@ -158,7 +163,7 @@ function showNotification(message, type = 'info') {
     n.textContent           = message;
     n.style.opacity         = '1';
     n.style.transform       = 'translateX(0)';
-    setTimeout(() => { n.style.opacity = '0'; n.style.transform = 'translateX(100%)'; }, 3000);
+    setTimeout(() => { n.style.opacity = '0'; n.style.transform = 'translateX(100%)'; }, duration);
 }
 
 // ---------------------------------------------------------------------------

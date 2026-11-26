@@ -52,6 +52,7 @@ function loadRenderer(characters) {
             copy: 'copy',
             undo: 'undo',
             delete: 'delete',
+            speaker: 'speaker',
         },
         updateNavigationButtons() {},
     };

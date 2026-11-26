@@ -311,7 +311,7 @@ async function loadAvailableLorebooks() {
     if (!dropdownItems) return;
 
     try {
-        const lorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+        const lorebooks = (window.LorebookRepo ? window.LorebookRepo.all() : []);
         if (lorebooks.length === 0) {
             dropdownItems.innerHTML = `<div class="world-dropdown-item disabled"><span class="world-dropdown-item-text">No lorebooks created yet</span></div>`;
             window._worldDropdownCache.lorebooks = [];

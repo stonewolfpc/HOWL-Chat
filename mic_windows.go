@@ -120,9 +120,11 @@ var (
 // succeeded; it does not mean a recording or transcription succeeded.
 //
 // Initializing a capture client is a system-wide audio event: Windows treats an
-// active capture stream as communications activity and changes the level of
-// other applications' playback. This probe therefore belongs only to explicit
-// activation (applyAudioSettings). Status reads use probeCapturePresence.
+// active capture stream as communications activity, switches Bluetooth headsets
+// from A2DP to HFP, and resamples other applications' playback on the device.
+// This probe is therefore diagnostics- and test-only: it must never be called
+// from a status read, from the capture port, or from an apply path. Those use
+// probeCapturePresence.
 func probeMicrophone() MicrophoneStatus {
 	outcome := wasapiProbe(defaultCaptureRole)
 	state, detail := classifyWASAPIOutcome(outcome)

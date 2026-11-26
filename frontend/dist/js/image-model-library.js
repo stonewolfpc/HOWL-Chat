@@ -167,6 +167,8 @@ const ModelLibrary = (() => {
       { label: 'VAE',              key: 'vaes',         type: 'vae'        },
       { label: 'LoRA / LyCORIS',   key: 'loras',        type: 'lora'       },
       { label: 'ControlNet',       key: 'controlnets',  type: 'controlnet' },
+      { label: 'IP-Adapter',       key: 'ip_adapters',  type: 'ip_adapter' },
+      { label: 'CLIP-Vision',      key: 'clip_visions', type: 'clip_vision' },
       { label: 'Embeddings',       key: 'embeddings',   type: 'embedding'  },
       { label: 'Upscalers',        key: 'upscalers',    type: 'upscaler'   },
     ];
@@ -256,7 +258,7 @@ const ModelLibrary = (() => {
   function _selectAll() {
     if (!_scanResult) return;
     document.querySelectorAll('.ml-row-check').forEach(cb => { cb.checked = true; });
-    for (const group of ['models','vaes','loras','controlnets','embeddings','upscalers']) {
+    for (const group of ['models','vaes','loras','controlnets','ip_adapters','clip_visions','embeddings','upscalers']) {
       (_scanResult[group] || []).forEach(a => _selectedPaths.add(a.path));
     }
     _updateSelectionLabel();
@@ -290,7 +292,7 @@ const ModelLibrary = (() => {
   }
 
   function _totalCount(result) {
-    return ['models','vaes','loras','controlnets','embeddings','upscalers']
+    return ['models','vaes','loras','controlnets','ip_adapters','clip_visions','embeddings','upscalers']
       .reduce((n, k) => n + (result[k] || []).length, 0);
   }
 
@@ -298,6 +300,7 @@ const ModelLibrary = (() => {
     const map = {
       diffusion: 'Diffusion Model', vae: 'VAE',
       lora: 'LoRA', controlnet: 'ControlNet',
+      ip_adapter: 'IP-Adapter', clip_vision: 'CLIP-Vision',
       embedding: 'Embedding', upscaler: 'Upscaler',
       clip: 'CLIP Encoder', t5: 'T5 Encoder',
       unknown: 'Unknown',

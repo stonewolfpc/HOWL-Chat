@@ -1,0 +1,37 @@
+A1 erase_ms nan cache_n 0 prompt_n 207 wall 9.83
+B_adversarial erase_ms nan cache_n 0 prompt_n 239 wall 1.008
+A2 erase_ms nan cache_n 0 prompt_n 207 wall 9.775
+{
+ "label": "qwen35-4b-nonthink",
+ "erase_error": "<HTTPError 501: 'Not Implemented'>",
+ "erase_supported": false,
+ "a1_equals_a2": true,
+ "a1_equals_fresh": true,
+ "cache_reused_after_erase": false
+}
+Traceback (most recent call last):
+  File "C:\Users\StoneWolfPC\HOWL_Chat\experiments\mem-extraction\round3\run_coexist.py", line 68, in <module>
+    main()
+  File "C:\Users\StoneWolfPC\HOWL_Chat\experiments\mem-extraction\round3\run_coexist.py", line 42, in main
+    srv.erase_slot()
+  File "C:\Users\StoneWolfPC\HOWL_Chat\experiments\mem-extraction\round3\harness.py", line 221, in erase_slot
+    with urllib.request.urlopen(req, timeout=30) as r:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\StoneWolfPC\AppData\Local\Programs\Python\Python312\Lib\urllib\request.py", line 215, in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\StoneWolfPC\AppData\Local\Programs\Python\Python312\Lib\urllib\request.py", line 521, in open
+    response = meth(req, response)
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\StoneWolfPC\AppData\Local\Programs\Python\Python312\Lib\urllib\request.py", line 630, in http_response
+    response = self.parent.error(
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\StoneWolfPC\AppData\Local\Programs\Python\Python312\Lib\urllib\request.py", line 559, in error
+    return self._call_chain(*args)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\StoneWolfPC\AppData\Local\Programs\Python\Python312\Lib\urllib\request.py", line 492, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "C:\Users\StoneWolfPC\AppData\Local\Programs\Python\Python312\Lib\urllib\request.py", line 639, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 501: Not Implemented

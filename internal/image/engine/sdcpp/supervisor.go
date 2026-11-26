@@ -16,6 +16,8 @@ import (
 	"os"
 	"os/exec"
 	"time"
+
+	"howl-chat/internal/process"
 )
 
 // errProcessExited marks a load that ended because the child died, so a caller
@@ -39,6 +41,17 @@ func (e *Engine) getServerProc() *os.Process {
 	e.procMu.Lock()
 	defer e.procMu.Unlock()
 	return e.serverProc
+}
+
+// clearServerProc releases the handle only if it is still the process the
+// caller stopped. A replacement's handle must never be cleared by an older
+// stop that finished late.
+func (e *Engine) clearServerProc(p *os.Process) {
+	e.procMu.Lock()
+	defer e.procMu.Unlock()
+	if e.serverProc == p {
+		e.serverProc = nil
+	}
 }
 
 // beginLoad marks a load in progress, records which job owns it, and clears any
@@ -107,7 +120,14 @@ func (e *Engine) abortLoad(jobID string) bool {
 // over a never-closed channel, and miss the exit entirely — which is how this
 // was first written, and what TestWaitReadyOrExitReturnsTheExitWhenTheChildDies
 // caught by taking the full thirty-second timeout.
-func (e *Engine) startProcessReaper(cmd *exec.Cmd) {
+func (e *Engine) startProcessReaper(cmd *exec.Cmd) <-chan struct{} {
+	return e.startProcessReaperWithHandle(cmd, nil)
+}
+
+// startProcessReaperWithHandle starts the one goroutine that calls Wait. When a
+// registry handle is supplied, exit releases that exact identity, so a later
+// child that reused the PID cannot be released by this observer.
+func (e *Engine) startProcessReaperWithHandle(cmd *exec.Cmd, handle *process.Handle) <-chan struct{} {
 	done := make(chan struct{})
 	e.procMu.Lock()
 	e.procDone = done
@@ -119,8 +139,30 @@ func (e *Engine) startProcessReaper(cmd *exec.Cmd) {
 		e.procMu.Lock()
 		e.procExit = err
 		e.procMu.Unlock()
+		// No live process owns the placement or footprint anymore. Clearing here
+		// covers a crash and a direct kill, not just the orderly Shutdown path.
+		e.resetPlacement()
+		e.resetFootprints()
+		if handle != nil {
+			handle.Release()
+		}
 		close(done)
 	}()
+	return done
+}
+
+// adoptServerProcess records the identity and single Wait owner for sd-server.
+// It is called before readiness, so a health check can never refer to a child
+// the engine no longer owns.
+func (e *Engine) adoptServerProcess(cmd *exec.Cmd, done <-chan struct{}) (*process.Handle, error) {
+	return e.processes().Register(process.RoleImageServer, cmd, func(timeout time.Duration) error {
+		select {
+		case <-done:
+			return nil
+		case <-time.After(timeout):
+			return fmt.Errorf("sd-server pid %d still running", cmd.Process.Pid)
+		}
+	})
 }
 
 // processDone returns the channel closed when the watched child exits, or nil
@@ -188,14 +230,17 @@ func (e *Engine) waitReadyOrExit(timeout time.Duration) error {
 
 // reapStoppedProcess waits for the observer to finish reaping a child that is
 // being killed. Only the observer may call Wait(), so the rest of the engine
-// waits on its signal instead.
-func (e *Engine) reapStoppedProcess(timeout time.Duration) {
+// waits on its signal instead. A timeout is a failed unload, never a silent
+// success: the caller must keep ownership of the process handle and report it.
+func (e *Engine) reapStoppedProcess(timeout time.Duration) error {
 	done := e.processDone()
 	if done == nil {
-		return
+		return nil
 	}
 	select {
 	case <-done:
+		return nil
 	case <-time.After(timeout):
+		return fmt.Errorf("process did not exit within %s", timeout)
 	}
 }

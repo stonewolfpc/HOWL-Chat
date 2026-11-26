@@ -1,0 +1,3 @@
+['qwen35-9b-think-rb1024', 'smollm3-3b-think-rb1024', 'smollm3-3b-nonthink']
+=== qwen35-9b-think-rb1024 ngl=0 budget=1024 preset=Qwen3.5 4B/9B thinking general preset ===
+  d1 758.263s finish=length tok=3072 ok=True

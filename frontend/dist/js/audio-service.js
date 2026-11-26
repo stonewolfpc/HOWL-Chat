@@ -20,6 +20,8 @@ window.AudioService = {
     stopRecording,
     toggleRecording,
     playTTS,
+    speakMessage,
+    speakComposer,
     stopTTS,
     invalidateVoiceCache,
     getStatus,
@@ -517,8 +519,73 @@ async function _pinOutputDevice(audioElement) {
     await audioElement.setSinkId(sinkId);
 }
 
-async function playTTS(text, characterId) {
-    if (!text || !_ttsEnabled) return;
+let _activeSpeakButton = null;
+let _ttsObjectUrl = '';
+
+function _notify(message, type = 'info', duration = 5000) {
+    if (typeof showNotification === 'function') {
+        showNotification(message, type, duration);
+    } else if (window.showNotification) {
+        window.showNotification(message, type, duration);
+    } else {
+        console.warn('[tts]', message);
+    }
+}
+
+// The saved setting is the authority. The module copy is refreshed when
+// settings load, but a click that arrives first must not be judged by a stale
+// value and then ignored without a word.
+function _ttsEnabledNow() {
+    const live = window.settingsState?.current?.audio?.ttsEnabled;
+    return typeof live === 'boolean' ? live : !!_ttsEnabled;
+}
+
+function _markSpeaking(button, speaking) {
+    if (_activeSpeakButton && _activeSpeakButton !== button) {
+        _activeSpeakButton.classList.remove('playing');
+    }
+    if (!button) {
+        _activeSpeakButton = null;
+        return;
+    }
+    button.classList.toggle('playing', !!speaking);
+    _activeSpeakButton = speaking ? button : null;
+}
+
+function _releaseTTSObjectUrl() {
+    if (_ttsObjectUrl) {
+        URL.revokeObjectURL(_ttsObjectUrl);
+        _ttsObjectUrl = '';
+    }
+}
+
+// The backend returns a cache path, and a page cannot play a Windows path as
+// media: the browser resolves it against the page origin and the load fails.
+// Read the bytes through the binding and play a local object URL instead.
+async function _ttsSourceFor(audioPath) {
+    const app = window.go?.main?.App;
+    if (typeof app?.GetTTSAudioData !== 'function') return audioPath;
+    const dataUrl = await app.GetTTSAudioData(audioPath);
+    if (!dataUrl) throw new Error('the synthesized audio could not be read');
+    const comma = dataUrl.indexOf(',');
+    const meta = comma >= 0 ? dataUrl.slice(0, comma) : '';
+    if (!meta.includes(';base64')) return dataUrl;
+    const binary = atob(dataUrl.slice(comma + 1));
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return URL.createObjectURL(new Blob([bytes], { type: 'audio/wav' }));
+}
+
+async function playTTS(text, characterId, sourceButton) {
+    const speakable = typeof text === 'string' ? text.trim() : '';
+    if (!speakable) {
+        _notify('Nothing to speak yet — type a message, or use the speaker on an AI reply.', 'info');
+        return;
+    }
+    if (!_ttsEnabledNow()) {
+        _notify('Text-to-speech is off. Turn it on in Settings → Audio → Text-to-Speech.', 'warning', 7000);
+        return;
+    }
 
     stopTTS(); // Stop any current playback
 
@@ -529,43 +596,90 @@ async function playTTS(text, characterId) {
     // endpoint, so an explicit non-default selection is reported as a genuine
     // technical limitation rather than silently using another output.
     if (engine === 'browser') {
-        useBrowserTTS(text, voiceCfg);
+        useBrowserTTS(speakable, voiceCfg);
         return;
     }
 
     // Backend TTS path with optional voice override
-    try {
-        if (window.go?.main?.App?.SynthesizeSpeech) {
-            let audioPath;
-            if (voiceCfg && window.go.main.App.SynthesizeSpeechWithVoice) {
-                audioPath = await window.go.main.App.SynthesizeSpeechWithVoice(text, JSON.stringify(voiceCfg));
-            } else {
-                audioPath = await window.go.main.App.SynthesizeSpeech(text);
-            }
-            if (audioPath) {
-                const audio = new Audio(audioPath);
-                await _pinOutputDevice(audio);
-                audio.volume = voiceCfg?.volume ?? (window.settingsState?.current?.audio?.ttsVolume || 1.0);
-                _ttsAudio = audio;
-                await audio.play();
-            }
-        } else {
-            useBrowserTTS(text, voiceCfg);
-        }
-    } catch (err) {
-        console.error('TTS error:', err);
-        if (window.showNotification) {
-            window.showNotification('TTS unavailable: ' + (err?.message || err), 'error');
-        }
+    if (!window.go?.main?.App?.SynthesizeSpeech) {
+        useBrowserTTS(speakable, voiceCfg);
+        return;
     }
+    try {
+        const app = window.go.main.App;
+        const audioPath = voiceCfg && app.SynthesizeSpeechWithVoice
+            ? await app.SynthesizeSpeechWithVoice(speakable, JSON.stringify(voiceCfg))
+            : await app.SynthesizeSpeech(speakable);
+        if (!audioPath) throw new Error('the speech engine returned no audio file');
+
+        const src = await _ttsSourceFor(audioPath);
+        if (src.startsWith('blob:')) _ttsObjectUrl = src;
+
+        const audio = new Audio(src);
+        await _pinOutputDevice(audio);
+        audio.volume = voiceCfg?.volume ?? (window.settingsState?.current?.audio?.ttsVolume || 1.0);
+        _ttsAudio = audio;
+        _markSpeaking(sourceButton, true);
+
+        const finish = () => {
+            if (_ttsAudio === audio) _ttsAudio = null;
+            _releaseTTSObjectUrl();
+            _markSpeaking(sourceButton, false);
+        };
+        audio.onended = finish;
+        audio.onerror = () => {
+            finish();
+            _notify('The speech audio could not be played.', 'error');
+        };
+        await audio.play();
+    } catch (err) {
+        _releaseTTSObjectUrl();
+        _markSpeaking(sourceButton, false);
+        console.error('TTS error:', err);
+        _notify('TTS unavailable: ' + (err?.message || err), 'error', 8000);
+    }
+}
+
+// The composer speaker is a standalone action: it reads the draft, speaks it,
+// and never sends, saves, or creates a message. It needs no chat model — only
+// the TTS engine — so it keeps working when no model is loaded or the chat
+// backend is down. The draft is left untouched in the input.
+function speakComposer() {
+    const input = document.getElementById('message-input') || document.querySelector('.input-field');
+    const button = document.getElementById('composer-speak-btn') || document.querySelector('.tts-icon');
+    if (button && button.classList.contains('playing')) { stopTTS(); return; }
+
+    const draft = input ? String(input.value || '').trim() : '';
+    if (!draft) {
+        _notify('Nothing to read yet — type a message, then use the speaker. It reads your draft without sending it.', 'info', 6000);
+        if (input) input.focus();
+        return;
+    }
+    return playTTS(draft, null, button);
+}
+
+// Speak one rendered message. The bubble owns the text and the message owns the
+// character, so a per-character voice applies exactly as it does on autoplay.
+function speakMessage(button) {
+    const bubble = button?.closest?.('.chat-bubble');
+    if (!bubble) return;
+    if (button.classList.contains('playing')) { stopTTS(); return; }
+    const text = (bubble.querySelector('.chat-text')?.textContent || '').trim();
+    if (!text) { _notify('This message has no text to speak.', 'info'); return; }
+    const characterId = button.closest('.chat-message')?.dataset?.characterId || null;
+    return playTTS(text, characterId, button);
 }
 
 function stopTTS() {
     if (_ttsAudio) {
+        _ttsAudio.onended = null;
+        _ttsAudio.onerror = null;
         _ttsAudio.pause();
         _ttsAudio.currentTime = 0;
         _ttsAudio = null;
     }
+    _releaseTTSObjectUrl();
+    _markSpeaking(null, false);
     // Also stop browser TTS
     if (window.speechSynthesis) {
         window.speechSynthesis.cancel();

@@ -44,7 +44,7 @@ async function loadAvailableLorebooks() {
 
     try {
         const cs       = window.characterState;
-        const lorebooks = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+        const lorebooks = (window.LorebookRepo ? window.LorebookRepo.all() : []);
         cs.availableLorebooks = lorebooks;
         const fe = window.FilterEngine;
         const sorted = fe ? fe.sortItems(lorebooks, 'name', 'asc') : lorebooks;

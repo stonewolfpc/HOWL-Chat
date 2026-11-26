@@ -1,0 +1,22 @@
+['smollm3-3b-think-rb1024', 'smollm3-3b-nonthink']
+=== smollm3-3b-think-rb1024 ngl=0 budget=1024 preset=SmolLM3 extended thinking, T0.6/top_p0.95 ===
+  d1 41.7s finish=stop tok=471 ok=True
+  d2 35.09s finish=stop tok=403 ok=True
+  d3 47.527s finish=stop tok=545 ok=True
+=== smollm3-3b-nonthink ngl=0 budget=None preset=SmolLM3 no_think, T0.6/top_p0.95 ===
+  d1 7.896s finish=stop tok=87 ok=True
+  d2 5.223s finish=stop tok=61 ok=True
+  d3 5.005s finish=stop tok=59 ok=True
+=== qwen35-4b-think-rb256 ngl=0 budget=256 preset=Qwen3.5 4B/9B thinking general preset ===
+  d1 50.654s finish=stop tok=363 ok=True
+  d2 52.993s finish=stop tok=371 ok=True
+=== qwen35-4b-think-rb512 ngl=0 budget=512 preset=Qwen3.5 4B/9B thinking general preset ===
+  d1 88.751s finish=stop tok=619 ok=True
+  d2 88.709s finish=stop tok=629 ok=True
+Traceback (most recent call last):
+  File "C:\Users\StoneWolfPC\HOWL_Chat\experiments\mem-extraction\round3\run_budget.py", line 19, in <module>
+    s = by_label(lab)
+        ^^^^^^^^^^^^^
+  File "C:\Users\StoneWolfPC\HOWL_Chat\experiments\mem-extraction\round3\configs.py", line 107, in by_label
+    raise KeyError(label)
+KeyError: 'lfm3-17b-think'

@@ -1,0 +1,241 @@
+{
+  "experiment": "E-TEMPORAL-SET",
+  "version": "v2",
+  "cases_sha256": "43d744e982a46fa7d6a6c51fc8240ab73eb0a6144789800080dec6c686419611",
+  "calibration": {
+    "relevant": {
+      "Q1": 0.81,
+      "Q2": 1.729,
+      "Q3": 3.36,
+      "Q4": 1.746
+    },
+    "irrelevant": {
+      "Q5": -11.02,
+      "Q6": -8.078,
+      "Q7": -10.983,
+      "Q8": -11.033
+    },
+    "min_relevant": 0.81,
+    "max_irrelevant": -8.078,
+    "separation": 8.888,
+    "threshold": -3.634
+  },
+  "rows": [
+    {
+      "id": "T1-current-no-temporal",
+      "criterion": "current_without_temporal_language",
+      "gap": false,
+      "expect": "the Osprey",
+      "A_top": "rec-0005",
+      "A_value": "Vell",
+      "A_ok": false,
+      "B_top": "rec-0004",
+      "B_value": "the Osprey",
+      "B_ok": true,
+      "B_scores": {
+        "rec-0004": 2.651,
+        "rec-0006": -3.615,
+        "rec-0005": -4.16
+      },
+      "conflict": false
+    },
+    {
+      "id": "T2-previous",
+      "criterion": "explicit_history",
+      "gap": false,
+      "expect": "the Wren",
+      "A_top": "rec-0003",
+      "A_value": "the Wren",
+      "A_ok": true,
+      "B_top": "rec-0002",
+      "B_value": "the Kestrel",
+      "B_ok": false,
+      "B_scores": {
+        "rec-0002": -0.049,
+        "rec-0004": -0.308,
+        "rec-0003": -1.834
+      },
+      "conflict": false
+    },
+    {
+      "id": "T3-first",
+      "criterion": "explicit_history_deep",
+      "gap": false,
+      "expect": "the Kestrel",
+      "A_top": "rec-0004",
+      "A_value": "the Osprey",
+      "A_ok": false,
+      "B_top": "rec-0004",
+      "B_value": "the Osprey",
+      "B_ok": false,
+      "B_scores": {
+        "rec-0004": -0.171,
+        "rec-0002": -0.576,
+        "rec-0003": -2.558
+      },
+      "conflict": false
+    },
+    {
+      "id": "T4-correction-current",
+      "criterion": "correction_resolves_to_current",
+      "gap": false,
+      "expect": "bosun",
+      "A_top": "rec-0008",
+      "A_value": "bosun",
+      "A_ok": true,
+      "B_top": "rec-0007",
+      "B_value": "quartermaster",
+      "B_ok": false,
+      "B_scores": {
+        "rec-0007": 2.984,
+        "rec-0008": -0.936
+      },
+      "conflict": false
+    },
+    {
+      "id": "T5-correction-history",
+      "criterion": "correction_history_reachable",
+      "gap": false,
+      "expect": "quartermaster",
+      "A_top": "rec-0008",
+      "A_value": "bosun",
+      "A_ok": false,
+      "B_top": "rec-0007",
+      "B_value": "quartermaster",
+      "B_ok": true,
+      "B_scores": {
+        "rec-0007": 0.087,
+        "rec-0008": -2.751
+      },
+      "conflict": false
+    },
+    {
+      "id": "T6-conflict",
+      "criterion": "conflicting_timestamps",
+      "gap": false,
+      "expect": "five coppers",
+      "A_top": "rec-0011",
+      "A_value": "five coppers",
+      "A_ok": true,
+      "B_top": "rec-0011",
+      "B_value": "five coppers",
+      "B_ok": true,
+      "B_scores": {
+        "rec-0011": 0.38,
+        "rec-0010": -0.154
+      },
+      "conflict": true
+    },
+    {
+      "id": "T7-ownership-own",
+      "criterion": "ownership_positive",
+      "gap": false,
+      "expect": "the Gull",
+      "A_top": "rec-0009",
+      "A_value": "the Gull",
+      "A_ok": true,
+      "B_top": "rec-0009",
+      "B_value": "the Gull",
+      "B_ok": true,
+      "B_scores": {
+        "rec-0009": 2.342
+      },
+      "conflict": false
+    },
+    {
+      "id": "T8-ownership-negation",
+      "criterion": "ownership_negation",
+      "gap": false,
+      "expect": "the Gull",
+      "A_top": "rec-0004",
+      "A_value": "the Osprey",
+      "A_ok": false,
+      "B_top": "rec-0009",
+      "B_value": "the Gull",
+      "B_ok": true,
+      "B_scores": {
+        "rec-0009": 2.342,
+        "rec-0004": -6.737,
+        "rec-0002": -7.074,
+        "rec-0003": -7.373
+      },
+      "conflict": false
+    },
+    {
+      "id": "T9-distractor",
+      "criterion": "non_temporal_control",
+      "gap": false,
+      "expect": "Vell",
+      "A_top": "rec-0005",
+      "A_value": "Vell",
+      "A_ok": true,
+      "B_top": "rec-0005",
+      "B_value": "Vell",
+      "B_ok": true,
+      "B_scores": {
+        "rec-0005": 3.122,
+        "rec-0006": -6.75,
+        "rec-0004": -7.703
+      },
+      "conflict": false
+    },
+    {
+      "id": "T10-chat-scope-gap",
+      "criterion": "scope_gap_known",
+      "gap": true,
+      "expect": "abstain",
+      "A_top": null,
+      "A_value": null,
+      "A_ok": true,
+      "B_top": null,
+      "B_value": null,
+      "B_ok": true,
+      "B_scores": {
+        "rec-0006": -9.185,
+        "rec-0004": -9.323,
+        "rec-0005": -10.199
+      },
+      "conflict": false
+    }
+  ],
+  "metrics": {
+    "scored": 9,
+    "A_correct": 5,
+    "B_correct": 6,
+    "improved": [
+      "T1-current-no-temporal",
+      "T5-correction-history",
+      "T8-ownership-negation"
+    ],
+    "regressed": [
+      "T2-previous",
+      "T4-correction-current"
+    ],
+    "current_state": {
+      "A": 1,
+      "B": 1,
+      "n": 2
+    },
+    "historical_state": {
+      "A": 1,
+      "B": 1,
+      "n": 3
+    },
+    "ownership": {
+      "A": 1,
+      "B": 2,
+      "n": 2
+    },
+    "latency_p50_ms": {
+      "A": 0.2,
+      "B": 30.1
+    }
+  },
+  "scope_gap": {
+    "note": "chat-scope records are unreachable under a character filter; scope/ownership modelling is a parked architectural workstream",
+    "A": null,
+    "B": null
+  },
+  "verdict": "bge is not consistently better on this set",
+  "frozen_note": "fresh store, new owner ids, new cases; the frozen seven records and the R1-R5 case set are neither referenced nor modified"
+}

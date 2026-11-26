@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"howl-chat/internal/domaincutover"
 	imageengine "howl-chat/internal/image/engine"
 	"howl-chat/internal/image/engine/sdcpp"
 	"howl-chat/internal/image/registry"
@@ -86,10 +87,23 @@ func (a *App) ImportImageGenerationSettings(settings map[string]interface{}) (ma
 		return nil, fmt.Errorf("ImportImageGenerationSettings: %w", err)
 	}
 	if revision != "" || len(current) > 0 {
+		item := domaincutover.Item{ID: "generation", Action: "adopted", Revision: revision, Previous: current}
+		if err := a.cutoverStore("image-generation").Record(0, []domaincutover.Item{item}, "completed", "Existing image generation settings were adopted explicitly."); err != nil {
+			return nil, fmt.Errorf("ImportImageGenerationSettings: %w", err)
+		}
 		current["revision"] = revision
 		return current, nil
 	}
-	return a.SaveImageGenerationSettings(settings, "")
+	saved, err := a.SaveImageGenerationSettings(settings, "")
+	if err != nil {
+		return nil, err
+	}
+	savedRevision, _ := saved["revision"].(string)
+	item := domaincutover.Item{ID: "generation", Action: "created", Revision: savedRevision}
+	if err := a.cutoverStore("image-generation").Record(1, []domaincutover.Item{item}, "completed", "Image generation settings were imported explicitly."); err != nil {
+		return nil, fmt.Errorf("ImportImageGenerationSettings: %w", err)
+	}
+	return saved, nil
 }
 
 // GetImageEngineConfig returns the current image engine configuration.
@@ -138,7 +152,13 @@ func (a *App) UnloadImageModel() error {
 		return fmt.Errorf("image engine not initialized")
 	}
 	fmt.Printf("[App] UnloadImageModel called\n")
-	return a.images.Engine().Shutdown()
+	err := a.images.Engine().Shutdown()
+	if err != nil {
+		return fmt.Errorf("unload image model: %w", err)
+	}
+	a.unregisterImageModels()
+	a.emitImagePlacement("unloaded")
+	return nil
 }
 
 // Ensure interface compliance is checked at compile time.

@@ -111,9 +111,10 @@ type Status struct {
 	InFlight int
 	Builds   int
 	// DesiredGen advances when an Apply enters, before it waits on applyMu;
-	// AppliedGen advances only when a generation is installed. DesiredGen ==
-	// AppliedGen with Builds == 0 means the published state has no outstanding
-	// generation or active build. It does not prove that no caller is still
+	// AppliedGen advances when a generation is installed, or when an idempotent
+	// request is satisfied by the active generation without a build. DesiredGen
+	// == AppliedGen with Builds == 0 means the published state has no
+	// outstanding generation or active build. It does not prove that no caller is still
 	// inside Apply after installation, nor that a call has reached Go at all.
 	DesiredGen uint64
 	AppliedGen uint64
@@ -273,6 +274,11 @@ func (m *Manager) Apply(ctx context.Context, desired Settings) (Status, bool, er
 		latest := m.desired
 		buildGen := m.desiredGen
 		if m.canSkipLocked(latest, buildGen) {
+			// Nothing is built, so this generation installs nothing; it is
+			// satisfied by the generation already active. Publishing it as
+			// applied keeps DesiredGen/AppliedGen equality meaning "no
+			// outstanding generation" for observers.
+			m.appliedGen = buildGen
 			st := m.statusLocked()
 			m.mu.Unlock()
 			return st, requestGen < buildGen, nil
@@ -762,18 +768,40 @@ func (l *Lease) Release() {
 }
 
 func (m *Manager) canSkipLocked(desired Settings, gen uint64) bool {
-	// D5 idempotence belongs to T2.9.6. T2.9.2 only avoids rebuilding when this
-	// exact desired generation has already been installed by the caller that
-	// held applyMu ahead of this one.
-	if m.appliedGen < gen {
-		return false
-	}
 	if !desired.ASREnabled && !desired.TTSEnabled {
 		return m.active == nil
 	}
+	if m.active == nil || m.active.settings != desired {
+		return false
+	}
+	// D5 idempotence: re-applying the exact configuration the active
+	// generation already runs must not rebuild. A rebuild would ask the
+	// resource authority for a second copy of models this process already
+	// owns, and the active registration would refuse the duplicate, failing
+	// the apply against itself. Only a fully ready install is reused; a
+	// degraded one falls through so an identical request can retry it.
+	if m.capabilitiesReadyLocked(desired) {
+		return true
+	}
 	// An applied generation is authoritative even when it was degraded; a
 	// queued same-generation caller must not rebuild it.
-	return m.active != nil && m.active.settings == desired
+	return m.appliedGen >= gen
+}
+
+// capabilitiesReadyLocked reports whether the active generation holds a ready
+// instance of every capability the desired state requests. It is the health
+// half of the D5 idempotence rule: only a healthy install is reusable.
+func (m *Manager) capabilitiesReadyLocked(desired Settings) bool {
+	if m.active == nil {
+		return false
+	}
+	if desired.ASREnabled && !m.active.asrReady {
+		return false
+	}
+	if desired.TTSEnabled && !m.active.ttsReady {
+		return false
+	}
+	return true
 }
 
 func (m *Manager) activateLocked(desired Settings, candidate *Candidate, gen uint64, phase string) *slot {

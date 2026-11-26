@@ -179,7 +179,7 @@ ContextDisplay.prototype.selectWorld = async function (worldId) {
 
     const scenariosCatalog  = window.ScenarioRepository.all();
     const charactersCatalog = (window.CharacterStorage?.all?.() || []);
-    const lorebooksCatalog  = JSON.parse(localStorage.getItem('howl-chat-lorebooks')  || '[]');
+    const lorebooksCatalog  = (window.LorebookRepo ? window.LorebookRepo.all() : []);
 
     const lorebookRefSets   = [];
     const characterIds      = new Set();
@@ -369,7 +369,7 @@ ContextDisplay.prototype.selectScenario = async function (scenarioId) {
     // Lorebook merge
     const lbRefs = this.getScenarioLorebookRefs(scenario);
     if (lbRefs.length > 0) {
-        const catalog    = JSON.parse(localStorage.getItem('howl-chat-lorebooks') || '[]');
+        const catalog    = (window.LorebookRepo ? window.LorebookRepo.all() : []);
         const existRefs  = (this.currentChatData.lorebooks || []).map(lb => ({ id: lb.id, title: lb.title, name: lb.name, description: lb.description || '' }));
         this.currentChatData.lorebooks = this.mergeLorebookRefs(catalog, [existRefs, lbRefs]);
     }

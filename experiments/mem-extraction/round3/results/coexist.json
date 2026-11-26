@@ -1,0 +1,17 @@
+{
+  "primary": "qwen35-9b-think ngl99",
+  "extract": "lfm120-instruct-official ngl0",
+  "alone": {
+    "wall_s": 1.727,
+    "ttft_s": 0.274,
+    "peak_rss_mb": 1097.5,
+    "peak_vram_mb": 2027
+  },
+  "with_primary": {
+    "wall_s": 1.731,
+    "ttft_s": 0.264,
+    "peak_rss_mb": 1097.9,
+    "peak_vram_mb": 7298,
+    "primary_vram_mb": 7298
+  }
+}

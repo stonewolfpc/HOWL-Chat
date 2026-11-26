@@ -478,3 +478,67 @@ body.mode-video .ig-video-only {
 body.mode-video .ig-video-only.ig-field {
     display: flex !important;
 }
+
+.ig-placement-card {
+    margin: 8px 10px 0;
+    padding: 9px 10px;
+    border: 1px solid var(--border-secondary);
+    border-radius: 6px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.ig-placement-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.ig-placement-title {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.ig-placement-phase {
+    color: var(--text-tertiary);
+    font-size: 10px;
+}
+
+.ig-placement-summary {
+    color: var(--text-primary);
+    overflow-wrap: anywhere;
+}
+
+.ig-placement-summary.is-divergent {
+    color: var(--warning, #e5a54b);
+}
+
+.ig-placement-details {
+    margin-top: 5px;
+}
+
+.ig-placement-details summary {
+    cursor: pointer;
+    color: var(--text-tertiary);
+    font-size: 10px;
+}
+
+.ig-placement-body {
+    margin: 5px 0 0;
+    padding: 6px;
+    border-radius: 4px;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 10px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}

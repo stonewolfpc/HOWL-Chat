@@ -317,10 +317,12 @@ func TestStatusReadNeverOpensCaptureStream(t *testing.T) {
 	}
 }
 
-// TestExplicitActivationStillOpensCaptureStream keeps the other half of the
-// contract: the initialize-level probe (the one that proves capture works) is
-// what gates ASR activation, so it must still run exactly twice per apply.
-func TestExplicitActivationStillOpensCaptureStream(t *testing.T) {
+// TestExplicitActivationChecksPresenceOnly keeps the other half of the
+// contract: ASR activation still runs the capture gate twice (before and after
+// the model build), and both runs must be the presence check. Activation does
+// not prove capture works — opening a shared-mode capture client is what flips
+// Bluetooth headsets to HFP, so that belongs to the renderer's recording only.
+func TestExplicitActivationChecksPresenceOnly(t *testing.T) {
 	var initializeCalls, presenceCalls int32
 	ready := newMicrophoneStatus(MicStateReady, "", 1)
 	useMicProbe(t, func() MicrophoneStatus {
@@ -336,11 +338,11 @@ func TestExplicitActivationStillOpensCaptureStream(t *testing.T) {
 	if err := app.applyAudioSettings(desiredWithBackend(audio.Settings{ASREnabled: true, ASREngine: "whisper-base"})); err != nil {
 		t.Fatalf("ASR activation failed with a ready microphone: %v", err)
 	}
-	if got := atomic.LoadInt32(&initializeCalls); got != 2 {
-		t.Fatalf("initialize-level probe calls during apply = %d, want 2 (before and after the build)", got)
+	if got := atomic.LoadInt32(&initializeCalls); got != 0 {
+		t.Fatalf("apply ran the initialize-level probe %d time(s); activation must not open a capture stream", got)
 	}
-	if got := atomic.LoadInt32(&presenceCalls); got != 0 {
-		t.Fatalf("apply used the presence-only probe %d time(s); activation must prove capture works", got)
+	if got := atomic.LoadInt32(&presenceCalls); got != 2 {
+		t.Fatalf("presence probe calls during apply = %d, want 2 (before and after the build)", got)
 	}
 	if got := atomic.LoadInt32(factoryCalls); got != 1 {
 		t.Fatalf("pipeline factory calls = %d, want 1", got)

@@ -1469,10 +1469,7 @@ def _c88():
     import json as _json
     from pathlib import Path as _Path
 
-    manifest_path = _Path("eval/s1-readiness-baseline.json")
-    if not manifest_path.exists():
-        raise AssertionError("eval/s1-readiness-baseline.json missing")
-    manifest = _json.loads(manifest_path.read_text(encoding="utf-8"))
+    from . import preflight as _preflight
 
     def need_digest(value, label):
         if not isinstance(value, str) or len(value) != 64:
@@ -1488,40 +1485,107 @@ def _c88():
         "prompts.A": a.prompt_hash(),
         "prompts.B": b.prompt_hash(),
     }
-    actual = {
-        "fixture": manifest["fixture"]["sha256"],
-        "state_sha256": manifest["state_sha256"],
-        "prompts.A": manifest["prompts"]["A"],
-        "prompts.B": manifest["prompts"]["B"],
-    }
-    for label, value in actual.items():
-        need_digest(value, label)
-        if value != expected[label]:
-            raise AssertionError(f"{label} drifted from the code: manifest {value} != computed {expected[label]}")
+    def check_manifest(manifest, origin):
+        """Every manifest on disk, not just the pinned one: the guard follows the file."""
+        actual = {
+            "fixture": manifest["fixture"]["sha256"],
+            "state_sha256": manifest["state_sha256"],
+            "prompts.A": manifest["prompts"]["A"],
+            "prompts.B": manifest["prompts"]["B"],
+        }
+        for label, value in actual.items():
+            need_digest(value, f"{origin}:{label}")
+            if value != expected[label]:
+                raise AssertionError(
+                    f"{origin}: {label} drifted from the code: manifest {value} != computed {expected[label]}")
 
-    if manifest["params"] != dict(conditions.FROZEN_PARAMS):
-        raise AssertionError(f"frozen params drifted: {manifest['params']} != {conditions.FROZEN_PARAMS}")
+        if manifest["params"] != dict(conditions.FROZEN_PARAMS):
+            raise AssertionError(
+                f"{origin}: frozen params drifted: {manifest['params']} != {conditions.FROZEN_PARAMS}")
 
-    plan = manifest["plan"]
-    need_digest(plan["sha256"], "plan.sha256")
-    plan_bytes = _Path(plan["path"]).read_bytes()
-    if len(plan_bytes) != plan["bytes"]:
-        raise AssertionError(f"plan byte count drifted: {len(plan_bytes)} != {plan['bytes']}")
-    if _hashlib.sha256(plan_bytes).hexdigest() != plan["sha256"]:
-        raise AssertionError("plan digest drifted from the manifest")
+        plan = manifest["plan"]
+        need_digest(plan["sha256"], f"{origin}:plan.sha256")
+        plan_bytes = _Path(plan["path"]).read_bytes()
+        if len(plan_bytes) != plan["bytes"]:
+            raise AssertionError(f"{origin}: plan byte count drifted: {len(plan_bytes)} != {plan['bytes']}")
+        if _hashlib.sha256(plan_bytes).hexdigest() != plan["sha256"]:
+            raise AssertionError(f"{origin}: plan digest drifted from the manifest")
 
-    slots = [m["slot"] for m in manifest["models"]]
-    if slots != ["S1-A", "S1-B", "S1-C"]:
-        raise AssertionError(f"baseline must name three slots, got {slots}")
-    for model in manifest["models"]:
-        need_digest(model["sha256"], f"{model['slot']}.sha256")
-        if not isinstance(model["bytes"], int) or model["bytes"] <= 0:
-            raise AssertionError(f"{model['slot']}: byte count must be a positive integer")
-    if len({m["path"] for m in manifest["models"]}) != 3:
-        raise AssertionError("baseline slots must name three distinct files")
+        slots = [m["slot"] for m in manifest["models"]]
+        if slots != ["S1-A", "S1-B", "S1-C"]:
+            raise AssertionError(f"{origin}: baseline must name three slots, got {slots}")
+        for model in manifest["models"]:
+            need_digest(model["sha256"], f"{origin}:{model['slot']}.sha256")
+            if not isinstance(model["bytes"], int) or model["bytes"] <= 0:
+                raise AssertionError(f"{origin}:{model['slot']}: byte count must be a positive integer")
+        if len({m["path"] for m in manifest["models"]}) != 3:
+            raise AssertionError(f"{origin}: baseline slots must name three distinct files")
 
-    if manifest["qualification"]["generations"] != 0:
-        raise AssertionError("qualification must not generate anything")
+        if manifest["qualification"]["generations"] != 0:
+            raise AssertionError(f"{origin}: qualification must not generate anything")
+
+    paths = sorted(_Path("eval").glob("s1-readiness-baseline*.json"))
+    if not paths:
+        raise AssertionError("no eval/s1-readiness-baseline*.json manifest on disk")
+    def version_tuple(value):
+        """Same ordering preflight uses: missing version ranks below every numbered one."""
+        try:
+            return tuple(int(x) for x in str(value).split("."))
+        except (TypeError, ValueError):
+            return (0,)
+
+    by_version, by_id = {}, {}
+    for path in paths:
+        manifest = _json.loads(path.read_text(encoding="utf-8"))
+        check_manifest(manifest, path.name)
+        by_version[version_tuple(manifest.get("version", "0"))] = manifest
+        by_id[manifest["baseline_id"]] = manifest
+
+    # The guard must cover whatever preflight would actually execute. Resolving it through
+    # preflight means a future v1.3 is covered by adding the file, not by editing this check.
+    active = _json.loads(_Path(_preflight.manifest_path()).read_text(encoding="utf-8"))
+    if version_tuple(active.get("version", "0")) != max(by_version):
+        raise AssertionError(
+            f"preflight does not select the newest manifest: {active.get('version')!r} vs {max(by_version)}")
+
+    # A supersession must be auditable: every predecessor stays on disk, and a re-baseline
+    # names both the value it replaced and the value it installed.
+    node, seen = active, set()
+    while "supersedes" in node:
+        previous = by_id.get(node["supersedes"])
+        if previous is None:
+            raise AssertionError(
+                f"{node['baseline_id']} supersedes {node['supersedes']}, which is not on disk")
+        if previous["baseline_id"] in seen:
+            raise AssertionError("supersession chain is cyclic")
+        seen.add(previous["baseline_id"])
+        was = {m["slot"]: m["sha256"] for m in previous["models"]}
+        now = {m["slot"]: m["sha256"] for m in node["models"]}
+        changed = sorted(slot for slot in now if was.get(slot) != now[slot])
+        change = node.get("rebaseline")
+        if changed and not change:
+            raise AssertionError(
+                f"{node['baseline_id']} changes {changed} but records no rebaseline reason")
+        if change:
+            before = [m for m in previous["models"] if m["slot"] == change["slot"]]
+            after = [m for m in node["models"] if m["slot"] == change["slot"]]
+            if not before or not after:
+                raise AssertionError(f"{node['baseline_id']}: rebaseline names unknown slot {change['slot']}")
+            need_digest(change["from"], f"{node['baseline_id']}:rebaseline.from")
+            need_digest(change["to"], f"{node['baseline_id']}:rebaseline.to")
+            if change["from"] == change["to"]:
+                raise AssertionError("rebaseline replaces a digest with itself")
+            if change["from"] != before[0]["sha256"]:
+                raise AssertionError(
+                    f"rebaseline.from {change['from']} is not the value it claims to replace")
+            if change["to"] != after[0]["sha256"]:
+                raise AssertionError(f"rebaseline.to {change['to']} is not the digest now installed")
+            if change.get("generations_at_rebaseline") != 0:
+                raise AssertionError("a baseline may not be re-based after generations")
+            if changed != [change["slot"]]:
+                raise AssertionError(
+                    f"rebaseline covers {change['slot']} but the changed slots are {changed}")
+        node = previous
 
 
 @check("S1: qualification has no prompt path at all")

@@ -1,0 +1,113 @@
+{
+  "budgets": {
+    "vram_mib": 384,
+    "p50_ms": 40,
+    "p95_ms": 120,
+    "rss_mb": 1024,
+    "residual_mib": 64
+  },
+  "configs": {
+    "cpu": {
+      "config": "cpu",
+      "flags": [
+        "--device",
+        "none",
+        "-ngl",
+        "0"
+      ],
+      "spawn_to_ready_s": 2.18,
+      "model_load_s": 1.917,
+      "placement": {
+        "offload": "load_tensors: offloaded 0/25 layers to GPU",
+        "cpu_buffer": "599.70 MiB"
+      },
+      "first_call_ms": 111.1,
+      "single_p50_ms": 91.8,
+      "single_p95_ms": 107.2,
+      "batched4_p50_ms": 282.4,
+      "batched4_p95_ms": 291.6,
+      "vram_idle_mib": 1870,
+      "vram_loaded_mib": 1957,
+      "vram_delta_mib": 87,
+      "vram_residual_mib": -25,
+      "rss_mb": 775.0,
+      "port_closed": true
+    },
+    "partial_6": {
+      "config": "partial_6",
+      "flags": [
+        "-ngl",
+        "6"
+      ],
+      "spawn_to_ready_s": 2.36,
+      "model_load_s": 2.067,
+      "placement": {
+        "offload": "load_tensors: offloaded 6/25 layers to GPU",
+        "cpu_buffer": "534.63 MiB",
+        "cuda0_buffer": "65.07 MiB"
+      },
+      "first_call_ms": 120.8,
+      "single_p50_ms": 82.7,
+      "single_p95_ms": 90.0,
+      "batched4_p50_ms": 102.1,
+      "batched4_p95_ms": 118.3,
+      "vram_idle_mib": 1845,
+      "vram_loaded_mib": 2043,
+      "vram_delta_mib": 198,
+      "vram_residual_mib": -11,
+      "rss_mb": 834.0,
+      "port_closed": true
+    },
+    "partial_12": {
+      "config": "partial_12",
+      "flags": [
+        "-ngl",
+        "12"
+      ],
+      "spawn_to_ready_s": 2.46,
+      "model_load_s": 2.117,
+      "placement": {
+        "offload": "load_tensors: offloaded 12/25 layers to GPU",
+        "cpu_buffer": "457.82 MiB",
+        "cuda0_buffer": "141.88 MiB"
+      },
+      "first_call_ms": 77.3,
+      "single_p50_ms": 63.3,
+      "single_p95_ms": 78.7,
+      "batched4_p50_ms": 69.8,
+      "batched4_p95_ms": 92.5,
+      "vram_idle_mib": 1835,
+      "vram_loaded_mib": 2112,
+      "vram_delta_mib": 277,
+      "vram_residual_mib": -2,
+      "rss_mb": 833.0,
+      "port_closed": true
+    },
+    "full_gpu": {
+      "config": "full_gpu",
+      "flags": [
+        "-ngl",
+        "99"
+      ],
+      "spawn_to_ready_s": 2.42,
+      "model_load_s": 2.119,
+      "placement": {
+        "offload": "load_tensors: offloaded 25/25 layers to GPU",
+        "cpu_buffer": "291.41 MiB",
+        "cuda0_buffer": "308.30 MiB"
+      },
+      "first_call_ms": 22.0,
+      "single_p50_ms": 17.2,
+      "single_p95_ms": 34.6,
+      "batched4_p50_ms": 19.6,
+      "batched4_p95_ms": 43.9,
+      "vram_idle_mib": 1833,
+      "vram_loaded_mib": 2277,
+      "vram_delta_mib": 444,
+      "vram_residual_mib": 1,
+      "rss_mb": 830.0,
+      "port_closed": true
+    }
+  },
+  "behaviour_note": "behavioural results unchanged; see rerank-v12-receipt.json"
+}

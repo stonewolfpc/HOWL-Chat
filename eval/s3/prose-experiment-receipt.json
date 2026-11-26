@@ -1,0 +1,182 @@
+{
+  "experiment": "E-PROSE-RENDER",
+  "condition": "natural prose; schema condition retained separately",
+  "candidate": "bge-reranker-v2-m3-Q8_0",
+  "cases_sha256": "ca6dd5b3541f08fbf997b58bb3ddffe1b797a1171ff94900a80ab53b0c9f1c21",
+  "calibration": {
+    "relevant": {
+      "P1": -3.12,
+      "P2": -6.403,
+      "P3": 1.449,
+      "P4": 2.424
+    },
+    "irrelevant": {
+      "P5": -11.039,
+      "P6": -11.028,
+      "P7": -11.026,
+      "P8": -11.043
+    },
+    "min_relevant": -6.403,
+    "max_irrelevant": -11.026,
+    "separation": 4.623,
+    "threshold": -8.714,
+    "calibratable": true
+  },
+  "rows": [
+    {
+      "id": "R1-horse",
+      "criterion": "R1",
+      "expect": "abstain",
+      "ranking_top": "rec-0001",
+      "ranking_score": -1.247,
+      "ranking_ok": null,
+      "selection_top": "rec-0001",
+      "abstained": false,
+      "selection_ok": false,
+      "scores": {
+        "rec-0001": -1.247,
+        "rec-0006": -10.981,
+        "rec-0003": -11.029,
+        "rec-0007": -11.044
+      }
+    },
+    {
+      "id": "R1-patient",
+      "criterion": "R1",
+      "expect": "rec-0001",
+      "ranking_top": "rec-0001",
+      "ranking_score": -0.956,
+      "ranking_ok": true,
+      "selection_top": "rec-0001",
+      "abstained": false,
+      "selection_ok": true,
+      "scores": {
+        "rec-0001": -0.956,
+        "rec-0006": -11.02,
+        "rec-0007": -11.036,
+        "rec-0003": -11.04
+      }
+    },
+    {
+      "id": "R2-vault-foreign",
+      "criterion": "R2",
+      "expect": "abstain",
+      "ranking_top": "rec-0001",
+      "ranking_score": -11.034,
+      "ranking_ok": null,
+      "selection_top": null,
+      "abstained": true,
+      "selection_ok": true,
+      "scores": {
+        "rec-0001": -11.034,
+        "rec-0003": -11.037,
+        "rec-0007": -11.038,
+        "rec-0006": -11.04
+      }
+    },
+    {
+      "id": "R2-vault-own",
+      "criterion": "R2",
+      "expect": "rec-0004",
+      "ranking_top": "rec-0004",
+      "ranking_score": 1.675,
+      "ranking_ok": true,
+      "selection_top": "rec-0004",
+      "abstained": false,
+      "selection_ok": true,
+      "scores": {
+        "rec-0004": 1.675,
+        "rec-0005": -11.035
+      }
+    },
+    {
+      "id": "R3-now",
+      "criterion": "R3",
+      "expect": "rec-0007",
+      "ranking_top": "rec-0007",
+      "ranking_score": 3.871,
+      "ranking_ok": true,
+      "selection_top": "rec-0007",
+      "abstained": false,
+      "selection_ok": true,
+      "scores": {
+        "rec-0007": 3.871,
+        "rec-0002": 0.677
+      }
+    },
+    {
+      "id": "R3-before",
+      "criterion": "R3",
+      "expect": "rec-0002",
+      "ranking_top": "rec-0002",
+      "ranking_score": 0.992,
+      "ranking_ok": true,
+      "selection_top": "rec-0002",
+      "abstained": false,
+      "selection_ok": true,
+      "scores": {
+        "rec-0002": 0.992,
+        "rec-0007": 0.233
+      }
+    },
+    {
+      "id": "R4-paraphrase",
+      "criterion": "R4",
+      "expect": "rec-0001",
+      "ranking_top": "rec-0001",
+      "ranking_score": -5.536,
+      "ranking_ok": true,
+      "selection_top": "rec-0001",
+      "abstained": false,
+      "selection_ok": true,
+      "scores": {
+        "rec-0001": -5.536,
+        "rec-0006": -11.012,
+        "rec-0003": -11.034,
+        "rec-0007": -11.038
+      }
+    },
+    {
+      "id": "R5-weather",
+      "criterion": "R5",
+      "expect": "abstain",
+      "ranking_top": "rec-0006",
+      "ranking_score": -11.038,
+      "ranking_ok": null,
+      "selection_top": null,
+      "abstained": true,
+      "selection_ok": true,
+      "scores": {
+        "rec-0006": -11.038,
+        "rec-0003": -11.038,
+        "rec-0007": -11.038,
+        "rec-0001": -11.039
+      }
+    },
+    {
+      "id": "R5-fair",
+      "criterion": "R5",
+      "expect": "abstain",
+      "ranking_top": "rec-0001",
+      "ranking_score": -11.031,
+      "ranking_ok": null,
+      "selection_top": null,
+      "abstained": true,
+      "selection_ok": true,
+      "scores": {
+        "rec-0001": -11.031,
+        "rec-0006": -11.036,
+        "rec-0003": -11.039,
+        "rec-0007": -11.039
+      }
+    }
+  ],
+  "metrics": {
+    "ranking_correct": "5/5",
+    "selection_correct": "8/9",
+    "subject_distinction": "FAIL",
+    "schema_ranking_correct": "PASS"
+  },
+  "comparison_note": "schema condition verdicts are in rerank-v12-receipt.json and are not superseded by this experiment",
+  "gate_b": "6/7 open"
+}

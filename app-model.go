@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"howl-chat/internal/paths"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -11,9 +12,12 @@ import (
 
 	"howl-chat/internal/backend/chatpolicy"
 	"howl-chat/internal/backend/gguf"
+	llamabackend "howl-chat/internal/backend/llama"
 	"howl-chat/internal/backend/loader"
 	"howl-chat/internal/backend/types"
 	"howl-chat/internal/errors"
+	"howl-chat/internal/proc"
+	"howl-chat/internal/process"
 	"howl-chat/internal/resource"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -25,6 +29,10 @@ import (
 
 // LoadModel starts llama-server with the given model path.
 func (a *App) LoadModel(modelPath string) (err error) {
+	// One model start at a time: the decision and the stop/spawn that follows it
+	// must see the same ledger, otherwise two loads can both pass on one free value.
+	a.modelStartMu.Lock()
+	defer a.modelStartMu.Unlock()
 	if err := a.ensureAcceptingWork("load model"); err != nil {
 		return err
 	}
@@ -172,7 +180,13 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		fmt.Println("[LoadModel] stopping existing server")
 		if err := a.level0().Processes.Stop(5 * time.Second); err != nil {
 			fmt.Printf("[LoadModel] WARN: existing llama-server did not stop cleanly: %v\n", err)
+			return fmt.Errorf("existing llama-server did not stop: %w", err)
 		}
+		a.unregisterChatModels()
+		// The old placement belonged to the process just stopped. Keeping it
+		// would let the next load's notification quote a footprint that no
+		// longer exists.
+		a.engine.SetChatPlacement(nil)
 	}
 
 	fmt.Println("[LoadModel] checking port 8080")
@@ -240,80 +254,80 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		a.engine.SetProfile(profile)
 	}
 
-	// Validate spawn settings before starting server
-	if profile != nil && profile.ArchitectureSpec != nil {
-		fmt.Println("[LoadModel] validating spawn settings")
-		hw := resource.GetManager().HardwareSnapshot()
-		freeVRAM := int64(float64(hw.FreeVRAMBytes) * 0.85 / 1024 / 1024)
-		freeRAM := int64(float64(hw.FreeRAMBytes) * 0.90 / 1024 / 1024)
-		ctxSize, _ := strconv.Atoi(intSetting(a.settings.Model(), "context_size", 4096))
-		gpuLayers, _ := strconv.Atoi(intSetting(a.settings.Model(), "gpu_layers", 0))
-		batchSize, _ := strconv.Atoi(intSetting(a.settings.Model(), "batch_size", 512))
-
-		// Sanity check: if we have a GPU but detected < 1GB free VRAM, detection is likely wrong.
-		if hw.TotalVRAMBytes > 1024*1024*1024 && freeVRAM < 1024 {
-			fmt.Printf("[LoadModel] WARNING: Detected free VRAM (%d MB) is suspiciously low for a GPU with %d MB total. "+
-				"Detection may have failed. Proceeding with total*0.7 as fallback.\n",
-				freeVRAM, hw.TotalVRAMBytes/1024/1024)
-			freeVRAM = int64(float64(hw.TotalVRAMBytes) * 0.70 / 1024 / 1024)
-		}
-
-		fmt.Printf("[LoadModel] spawn params: ctx=%d gpuLayers=%d batch=%d freeVRAM=%d freeRAM=%d\n",
-			ctxSize, gpuLayers, batchSize, freeVRAM, freeRAM)
-
-		validation := gguf.ValidateSpawn(profile.ArchitectureSpec, ctxSize, gpuLayers, batchSize, freeVRAM, freeRAM)
-		fmt.Printf("[LoadModel] validation result: level=%d msg=%q\n", validation.Level, validation.Message)
-
-		forceLoad := false
-		if v, ok := a.settings.Model()["force_load"].(bool); ok {
-			forceLoad = v
-		}
-
-		switch validation.Level {
-		case gguf.ValidationSafe:
-			fmt.Println("[LoadModel] spawn validation passed")
-		case gguf.ValidationWarning:
-			fmt.Printf("[LoadModel] spawn validation warning: %s\n", validation.Message)
-			// Emit event so UI can show the warning, but don't block
-			a.emitEvent("model-load-warning", validation.Message+" "+validation.Suggestion)
-		case gguf.ValidationCritical:
-			if forceLoad {
-				fmt.Printf("[LoadModel] FORCE LOAD: ignoring critical validation due to force_load=true: %s\n", validation.Message)
-				a.emitEvent("model-load-warning",
-					"Force load enabled. Model may OOM or crash. "+validation.Message)
-			} else {
-				a.logError(errors.LLMNoModelLoaded, errors.Critical, "llm.load.validate", "app-model.go:97",
-					fmt.Errorf("%s %s", validation.Message, validation.Suggestion))
-				fmt.Printf("[LoadModel] FAIL: spawn validation critical: %s\n", validation.Message)
-				return fmt.Errorf("%s\n\n%s\n\nTo bypass this check, set force_load=true in model settings.",
-					validation.Message, validation.Suggestion)
-			}
-		}
-	} else {
-		fmt.Println("[LoadModel] skipping spawn validation (no profile or arch spec)")
-	}
-
-	fitParams := true
+	// Howl supplies an explicit context, batch and GPU-layer plan, so llama.cpp's
+	// fit pass has nothing it is allowed to adjust. Bypass it explicitly and say
+	// why; leaving it on looked like the engine was sizing the model when it was
+	// not. SWA models additionally need it off to avoid a scheduler crash.
+	fitParams := false
+	fmt.Println("[LoadModel] --fit off: Howl admission supplies the explicit context, batch and GPU-layer plan")
 	if profile != nil && profile.ArchitectureSpec != nil && profile.ArchitectureSpec.UseSlidingWindow {
-		fitParams = false
-		fmt.Println("[LoadModel] SWA model detected, disabling --fit to avoid scheduler crash")
+		fmt.Println("[LoadModel] SWA model detected; --fit off is also required to avoid the scheduler crash")
 	}
 	if err := a.ensureAcceptingWork("load model"); err != nil {
 		return err
 	}
+
+	// Probe the shipped binary once per load. Optional flags are only sent when
+	// this binary advertises them; an older build gets an honest, smaller set
+	// instead of an argument it rejects at startup.
+	caps := llamabackend.ProbeCLI(findLlamaServerForRuntime())
+	fmt.Printf("[LoadModel] llama capability probe: probed=%t version=%q build=%q commit=%q flags=%d err=%q\n",
+		caps.Probed, caps.Version, caps.Build, caps.Commit, len(caps.Flags), caps.Error)
+
+	modelName := filepath.Base(modelPath)
+	if a.admission == nil {
+		a.admission = resource.DefaultAuthority()
+	}
+	loadRequest := a.chatAdmissionRequest(profile, modelPath, true)
+	// The user asked to load this model. If the automatic plan cannot fit or the
+	// hardware cannot be measured, admission returns a warned reduced plan
+	// instead of locking the load out.
+	loadRequest.AllowManual = true
+	loadDecision, loadLease := a.admission.Admit(loadRequest)
+	fmt.Printf("[LoadModel] admission: admitted=%t manual=%t %s\n", loadDecision.Admitted, loadDecision.Manual, loadDecision.Reason)
+	if !loadDecision.Admitted {
+		a.logError(errors.LLMNoModelLoaded, errors.Critical, "llm.load.admission", "app-model.go:LoadModel", fmt.Errorf("%s", loadDecision.Reason))
+		a.engine.SetProgressMilli(0)
+		a.engine.SetStage("Refused")
+		a.emitEvent("model:error", loadDecision.Reason)
+		return fmt.Errorf("%s", loadDecision.Reason)
+	}
+
 	spawnSettings := a.spawnSettingsFor(profile)
+	if kvType, warning := resolveKVType(spawnSettings); warning != "" {
+		fmt.Printf("[LoadModel] WARNING: %s\n", warning)
+		a.emitEvent("model:warning", warning)
+		spawnSettings["kv_cache_type"] = kvType
+	}
+	if adjustment := loadDecision.Adjustment; adjustment != nil {
+		spawnSettings["context_size"] = adjustment.ContextSize
+		spawnSettings["gpu_layers"] = adjustment.GPULayers
+		spawnSettings["batch_size"] = adjustment.BatchSize
+		fmt.Printf("[LoadModel] fitted plan applied: context=%d gpu_layers=%d batch=%d\n",
+			adjustment.ContextSize, adjustment.GPULayers, adjustment.BatchSize)
+		if loadDecision.Manual {
+			a.engine.SetStage("Starting (manual plan)")
+		} else {
+			a.engine.SetStage("Starting (fitted plan)")
+		}
+	}
+	if loadDecision.Warning != "" {
+		fmt.Printf("[LoadModel] WARNING: %s\n", loadDecision.Warning)
+		a.emitEvent("model:warning", loadDecision.Warning)
+	}
 	fmt.Println("[LoadModel] spawning llama-server")
 	serverOutput := loader.NewCapture(loader.DefaultCaptureBytes)
-	cmd, err := spawnLlamaServerWithModel(modelPath, pairing.Path, spawnSettings, serverOutput, fitParams)
+	cmd, err := spawnLlamaServerWithModel(modelPath, pairing.Path, spawnSettings, serverOutput, fitParams, caps)
 	if err != nil {
+		loadLease.Release()
 		rec := loader.FailureRecord{
 			Stage:      loader.StageSpawn,
 			ModelPath:  modelPath,
 			ModelName:  filepath.Base(modelPath),
 			Arch:       admission.Arch,
 			Projector:  pairing.Path,
-			Executable: findLlamaServer(),
-			Args:       buildLlamaServerArgs(modelPath, pairing.Path, spawnSettings, fitParams),
+			Executable: findLlamaServerForRuntime(),
+			Args:       buildLlamaServerArgs(modelPath, pairing.Path, spawnSettings, fitParams, caps),
 			Detail:     err.Error(),
 		}
 		if path, writeErr := loader.WriteFailureRecord(a.loaderLogDir(), rec); writeErr == nil {
@@ -332,11 +346,21 @@ func (a *App) LoadModel(modelPath string) (err error) {
 	activeCmd := cmd
 	fmt.Printf("[LoadModel] llama-server spawned (pid %d)\n", cmd.Process.Pid)
 	pm := waitMonitor(cmd)
-	a.level0().Processes.Adopt(cmd, pm.wait)
+	activeHandle, adoptErr := a.level0().Processes.Adopt(cmd, pm.wait)
+	if adoptErr != nil {
+		proc.KillTree(cmd.Process.Pid)
+		_ = cmd.Process.Kill()
+		loadLease.Release()
+		a.engine.SetProgressMilli(0)
+		a.engine.SetStage("Failed")
+		a.emitEvent("model:error", "could not establish ownership of llama-server: "+adoptErr.Error())
+		return fmt.Errorf("failed to adopt llama-server: %w", adoptErr)
+	}
 	// Shutdown may have passed its stop step while the model was being
 	// validated or spawned. Adopt first, then stop the child if that happened:
 	// no child may outlive the shutdown that started during this load.
 	if a.level0().Gate.Stopping() {
+		loadLease.Release()
 		_ = a.level0().Processes.Stop(llamaShutdownTimeout)
 		return fmt.Errorf("model load cancelled because Howl is shutting down")
 	}
@@ -348,6 +372,7 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		const maxTicks = 120
 		defer func() {
 			if r := recover(); r != nil {
+				a.failChatLoad(loadLease)
 				a.logError(errors.SYSPanicRecovered, errors.Critical, "llm.load.monitor", "app-model.go:goroutine", fmt.Errorf("monitor goroutine panic: %v", r))
 				fmt.Printf("[LoadModel] MONITOR PANIC: %v\n", r)
 				a.emitEvent("model:error", "internal error during model load monitoring")
@@ -356,6 +381,70 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		fmt.Printf("[LoadModel] monitor started (pid %d, timeout %ds)\n", cmd.Process.Pid, maxTicks/2)
 		fitRetries := 0
 		const maxFitRetries = 1
+		kvFallbackRetries := 0
+
+		// One retry path for both recoverable startup failures. The caller has
+		// already decided what to change; this only stops the dead child, frees
+		// the port, and adopts the replacement with the same load identity.
+		retryAfterFailure := func(detail string) bool {
+			if err := a.level0().Processes.Stop(5 * time.Second); err != nil {
+				fmt.Printf("[LoadModel] WARN: crashed llama-server did not stop cleanly: %v\n", err)
+				a.failChatLoad(loadLease)
+				a.logError(errors.LLMServerTimeout, errors.High, "llm.load.stop", "app-model.go:118", err)
+				a.emitEvent("model:error", "crashed llama-server did not stop; cannot retry the load")
+				return false
+			}
+			serverOutput.Reset()
+			if a.level0().Gate.Stopping() {
+				fmt.Println("[LoadModel] retry cancelled because Howl is shutting down")
+				a.failChatLoad(loadLease)
+				return false
+			}
+			if !waitForPortFree("8080", 5*time.Second) {
+				a.failChatLoad(loadLease)
+				a.logError(errors.LLMPortConflict, errors.Critical, "llm.load", "app-model.go:127", fmt.Errorf("port 8080 occupied after crash"))
+				a.emitEvent("model:error", "port 8080 occupied after crash; cannot restart llama-server")
+				return false
+			}
+			cmd2, err2 := spawnLlamaServerWithModel(modelPath, pairing.Path, spawnSettings, serverOutput, false, caps)
+			if err2 != nil {
+				rec := loader.FailureRecord{
+					Stage:      loader.StageSpawn,
+					ModelPath:  modelPath,
+					ModelName:  filepath.Base(modelPath),
+					Arch:       admission.Arch,
+					Projector:  pairing.Path,
+					Executable: findLlamaServerForRuntime(),
+					Args:       buildLlamaServerArgs(modelPath, pairing.Path, spawnSettings, false, caps),
+					Detail:     detail + ": " + err2.Error(),
+				}
+				if path, writeErr := loader.WriteFailureRecord(a.loaderLogDir(), rec); writeErr == nil {
+					rec.RecordPath = path
+				}
+				userMsg := rec.UserMessage()
+				a.failChatLoad(loadLease)
+				a.logLLMLoadError(fmt.Errorf("%s", userMsg), "app-model.go:133")
+				a.emitEvent("model:error", userMsg)
+				return false
+			}
+			activeCmd = cmd2
+			pm = waitMonitor(cmd2)
+			nextHandle, adoptErr := a.level0().Processes.Adopt(cmd2, pm.wait)
+			if adoptErr != nil {
+				proc.KillTree(cmd2.Process.Pid)
+				_ = cmd2.Process.Kill()
+				a.failChatLoad(loadLease)
+				a.emitEvent("model:error", "could not establish ownership of the replacement llama-server: "+adoptErr.Error())
+				return false
+			}
+			activeHandle = nextHandle
+			if a.level0().Gate.Stopping() {
+				a.failChatLoad(loadLease)
+				return false
+			}
+			return true
+		}
+
 		for tick := 0; tick < maxTicks; tick++ {
 			time.Sleep(500 * time.Millisecond)
 			pct := int(float64(tick) / float64(maxTicks) * 90.0)
@@ -380,52 +469,27 @@ func (a *App) LoadModel(modelPath string) (err error) {
 			if !pm.isAlive() {
 				captured := serverOutput.Tail(0)
 				fmt.Printf("[LoadModel] monitor: process died at tick %d, captured output len=%d\n", tick, len(captured))
-				if strings.Contains(captured, "GGML_SCHED_MAX_SPLIT_INPUTS") && fitRetries < maxFitRetries && tick < maxTicks-20 {
-					fitRetries++
-					fmt.Printf("[LoadModel] monitor: GGML_SCHED_MAX_SPLIT_INPUTS crash, retry %d/%d\n", fitRetries, maxFitRetries)
-					a.logLLMCrash(fmt.Errorf("GGML_SCHED_MAX_SPLIT_INPUTS crash, retry %d/%d", fitRetries, maxFitRetries), "app-model.go:118")
-					if err := a.level0().Processes.Stop(5 * time.Second); err != nil {
-						fmt.Printf("[LoadModel] WARN: crashed llama-server did not stop cleanly: %v\n", err)
-					}
-					serverOutput.Reset()
-					if a.level0().Gate.Stopping() {
-						fmt.Println("[LoadModel] retry cancelled because Howl is shutting down")
-						return
-					}
-					if !waitForPortFree("8080", 5*time.Second) {
-						a.logError(errors.LLMPortConflict, errors.Critical, "llm.load", "app-model.go:127", fmt.Errorf("port 8080 occupied after crash"))
-						a.emitEvent("model:error", "port 8080 occupied after crash; cannot restart llama-server")
-						return
-					}
-					cmd2, err2 := spawnLlamaServerWithModel(modelPath, pairing.Path, spawnSettings, serverOutput, false)
-					if err2 != nil {
-						rec := loader.FailureRecord{
-							Stage:      loader.StageSpawn,
-							ModelPath:  modelPath,
-							ModelName:  filepath.Base(modelPath),
-							Arch:       admission.Arch,
-							Projector:  pairing.Path,
-							Executable: findLlamaServer(),
-							Args:       buildLlamaServerArgs(modelPath, pairing.Path, spawnSettings, false),
-							Detail:     "retry after GGML_SCHED_MAX_SPLIT_INPUTS: " + err2.Error(),
+				if tick < maxTicks-20 {
+					if requested, warning, ok := prepareQuantizedKVRetry(captured, spawnSettings, &kvFallbackRetries); ok {
+						fmt.Printf("[LoadModel] monitor: quantized KV rejected (requested %s), retrying once with f16\n", requested)
+						a.logLLMCrash(fmt.Errorf("quantized KV rejection: requested %s, retrying with f16", requested), "app-model.go:118")
+						a.emitEvent("model:warning", warning)
+						if retryAfterFailure("retry after quantized KV rejection") {
+							tick = -1
+							continue
 						}
-						if path, writeErr := loader.WriteFailureRecord(a.loaderLogDir(), rec); writeErr == nil {
-							rec.RecordPath = path
+						return
+					}
+					if strings.Contains(captured, "GGML_SCHED_MAX_SPLIT_INPUTS") && fitRetries < maxFitRetries {
+						fitRetries++
+						fmt.Printf("[LoadModel] monitor: GGML_SCHED_MAX_SPLIT_INPUTS crash, retry %d/%d\n", fitRetries, maxFitRetries)
+						a.logLLMCrash(fmt.Errorf("GGML_SCHED_MAX_SPLIT_INPUTS crash, retry %d/%d", fitRetries, maxFitRetries), "app-model.go:118")
+						if retryAfterFailure("retry after GGML_SCHED_MAX_SPLIT_INPUTS") {
+							tick = -1
+							continue
 						}
-						userMsg := rec.UserMessage()
-						a.logLLMLoadError(fmt.Errorf("%s", userMsg), "app-model.go:133")
-						a.emitEvent("model:error", userMsg)
 						return
 					}
-					activeCmd = cmd2
-					pm = waitMonitor(cmd2)
-					a.level0().Processes.Adopt(cmd2, pm.wait)
-					if a.level0().Gate.Stopping() {
-						_ = a.level0().Processes.Stop(llamaShutdownTimeout)
-						return
-					}
-					tick = -1
-					continue
 				}
 
 				rec := loader.FailureRecord{
@@ -449,6 +513,7 @@ func (a *App) LoadModel(modelPath string) (err error) {
 				errMsg := rec.UserMessage()
 				fmt.Printf("[LoadModel] monitor: %s\n", rec.Format())
 				a.logLLMCrash(fmt.Errorf("%s", errMsg), "app-model.go:146")
+				a.failChatLoad(loadLease)
 				a.engine.SetProgressMilli(0)
 				a.engine.SetStage("Failed")
 				a.emitEvent("model:error", errMsg)
@@ -461,9 +526,45 @@ func (a *App) LoadModel(modelPath string) (err error) {
 			}
 			if err := a.engine.Client().Health(); err == nil {
 				fmt.Println("[LoadModel] monitor: server healthy, model loaded")
+				// The health check is evidence for the process we adopted, not for
+				// whichever llama-server happens to own the port now. A stop or
+				// replacement during the check invalidates this load's registration.
+				if current := a.level0().Processes.Current(); current != activeCmd || !a.level0().Processes.Owns(activeHandle) {
+					fmt.Println("[LoadModel] monitor: process identity changed during health check; not registering")
+					a.failChatLoad(loadLease)
+					return
+				}
+				// The plan was Howl's arithmetic. Parse the engine's own load
+				// statements now that the model is healthy, and report that
+				// separately instead of presenting the estimate as the result.
+				placement := llamabackend.ParsePlacement(serverOutput.Tail(0))
+				placementReport := chatPlacementReport(modelPath, spawnSettings, loadDecision, placement)
+				a.engine.SetChatPlacement(placementReport)
+				fmt.Printf("[LoadModel] actual placement: known=%t layers=%d/%d vram=%.0fMB ram=%.0fMB context=%d matches_plan=%t\n",
+					placement.Known, placement.GPULayers, placement.TotalLayers, placement.GPUMB, placement.RAMMB, placement.Context, placementReport.MatchesPlan)
+				// The health check has consumed all the placement evidence. Drop the
+				// load-phase capture now so no later inference output can accumulate
+				// in memory through a writer that failed to observe its marker.
+				serverOutput.Reset()
+				// Register only after llama-server has answered a health check;
+				// a spawned child is not a loaded model.
+				if !a.registerChatModelAfterHealth(
+					modelName, modelPath,
+					loadDecision.Estimate.RequiredVRAMMB,
+					loadDecision.Estimate.RequiredRAMMB,
+					activeCmd, activeHandle,
+				) {
+					fmt.Println("[LoadModel] monitor: process identity changed before registration; not registering")
+					a.failChatLoad(loadLease)
+					return
+				}
+				loadLease.Release()
 				a.engine.SetProgressMilli(1000)
 				a.engine.SetStage("Ready")
 				a.emitEvent("model:progress", 100)
+				// A success notification is emitted before the loaded event so
+				// the UI can show the observed arrangement, not merely "Ready".
+				a.emitEvent("model:placement", placementReport.Message)
 				a.emitEvent("model:loaded", modelPath)
 				return
 			}
@@ -487,40 +588,106 @@ func (a *App) LoadModel(modelPath string) (err error) {
 			fmt.Printf("[LoadModel] WARN: could not persist diagnostics: %v\n", writeErr)
 		}
 		userMsg := rec.UserMessage()
+		// The timeout branch owns the child now: unregister any optimistic
+		// entry, stop the process, and return the reservation.
+		a.failChatLoad(loadLease)
 		a.logError(errors.LLMServerTimeout, errors.High, "llm.load", "app-model.go:172", fmt.Errorf("%s", userMsg))
 		a.engine.SetProgressMilli(0)
 		a.engine.SetStage("Timeout")
 		a.emitEvent("model:error", userMsg)
 	}()
 
-	// Register with resource manager using actual memory estimates
-	modelName := filepath.Base(modelPath)
-	gpuLayers := 0
-	if gl, ok := a.settings.Model()["gpu_layers"].(int); ok {
-		gpuLayers = gl
+	return nil
+}
+
+// failChatLoad is the single failure cleanup for a chat start that has not
+// reached a healthy server. It is safe to call more than once.
+func (a *App) failChatLoad(lease *resource.AdmissionLease) {
+	a.engine.SetChatPlacement(nil)
+	if err := a.level0().Processes.Stop(llamaShutdownTimeout); err != nil {
+		// A child that will not stop must not also poison admission: the
+		// reservation is for this attempt, not for a process that failed to
+		// start. Release and unregister below even when Stop errors, otherwise
+		// the next load is refused against memory nobody is using.
+		fmt.Printf("[LoadModel] WARN: failed child did not stop cleanly: %v\n", err)
 	}
-	ctxSize := 4096
-	if cs, ok := a.settings.Model()["context_size"].(int); ok {
-		ctxSize = cs
+	lease.Release()
+	a.unregisterChatModels()
+}
+
+func (a *App) unregisterChatModels() {
+	for _, m := range resource.GetManager().ModelsByType(resource.ResourceLLM) {
+		resource.GetManager().UnregisterModel(resource.ResourceLLM, m.Name)
 	}
-	var gpuMB, ramMB int64 = int64(gpuLayers) * 100, 4000
-	if profile != nil {
-		est := gguf.EstimateMemory(profile, gpuLayers, ctxSize)
-		gpuMB = est.GPUMB
-		ramMB = est.RAMMB
-		fmt.Printf("INFO: Registering model with estimated GPU:%dMB RAM:%dMB\n", gpuMB, ramMB)
+}
+
+// registerChatModelAfterHealth is the one route from a successful health check
+// to a chat registration. It refuses when the process that answered is no
+// longer the process this load adopted, so a stop or replacement during the
+// check cannot leave a registration for a dead child.
+func (a *App) registerChatModelAfterHealth(
+	modelName, modelPath string,
+	vramMB, ramMB int64,
+	activeCmd *exec.Cmd,
+	activeHandle *process.Handle,
+) bool {
+	if current := a.level0().Processes.Current(); current != activeCmd || !a.level0().Processes.Owns(activeHandle) {
+		return false
 	}
+	a.unregisterChatModels()
 	resource.GetManager().RegisterModel(
 		resource.ResourceLLM,
 		modelName,
 		modelPath,
-		gpuMB,
+		vramMB,
 		ramMB,
 		resource.PriorityLLM,
-		gpuLayers > 0,
+		vramMB > 0,
 	)
+	return true
+}
 
-	return nil
+// chatAdmissionRequest describes the chat workload from the settings actually
+// passed to llama-server. Replacing is true only for the preflight that may stop
+// an existing chat model; the final decision after the stop must not claim that
+// credit.
+func (a *App) chatAdmissionRequest(profile *types.ModelProfile, modelPath string, replacing bool) resource.AdmissionRequest {
+	live := a.settings.Model()
+	ctxSize, _ := strconv.Atoi(intSetting(live, "context_size", 4096))
+	gpuLayers, _ := strconv.Atoi(intSetting(live, "gpu_layers", 0))
+	batchSize, _ := strconv.Atoi(intSetting(live, "batch_size", 512))
+	deviceIndex := 0
+	switch v := live["main_gpu"].(type) {
+	case int:
+		if v >= 0 {
+			deviceIndex = v
+		}
+	case float64:
+		if v >= 0 {
+			deviceIndex = int(v)
+		}
+	case string:
+		if n, err := strconv.Atoi(v); err == nil && n >= 0 {
+			deviceIndex = n
+		}
+	}
+	req := resource.AdmissionRequest{
+		Kind:        resource.ResourceLLM,
+		Name:        filepath.Base(modelPath),
+		Path:        modelPath,
+		ContextSize: ctxSize,
+		GPULayers:   gpuLayers,
+		BatchSize:   batchSize,
+		RequireGPU:  gpuLayers > 0,
+		DeviceIndex: deviceIndex,
+	}
+	if profile != nil {
+		req.Arch = profile.ArchitectureSpec
+	}
+	if replacing {
+		req.ReplacingKind = resource.ResourceLLM
+	}
+	return req
 }
 
 // UnloadModel kills the llama-server process, freeing all model memory.
@@ -529,6 +696,7 @@ func (a *App) UnloadModel() error {
 		return fmt.Errorf("stop llama-server: %w", err)
 	}
 	fmt.Println("INFO: llama-server stopped, model memory freed")
+	a.engine.SetChatPlacement(nil)
 	a.engine.SetProgressMilli(0)
 	a.engine.SetStage("Unloaded")
 	a.emitEvent("model:unloaded")
@@ -646,35 +814,22 @@ func (a *App) GetModelMemoryEstimate(path string, gpuLayers, contextSize int) (*
 	return &est, nil
 }
 
-// applySafeDefaults adjusts gpu_layers and context_size to fit available memory.
-// It uses the architecture-aware memory model for accurate estimation.
+// applySafeDefaults only normalizes model metadata and caps the context to the
+// model's usable window. It deliberately does not estimate memory or clamp GPU
+// layers: the admission authority owns that decision and refuses rather than
+// silently changing the user's requested workload.
 func (a *App) applySafeDefaults(profile *types.ModelProfile) {
-	fmt.Println("[applySafeDefaults] enter")
-
-	fmt.Println("[applySafeDefaults] getting hardware snapshot")
-	hw := resource.GetManager().HardwareSnapshot()
-	freeVRAM := int64(float64(hw.FreeVRAMBytes) * 0.85 / 1024 / 1024) // 85% of free VRAM
-	freeRAM := int64(float64(hw.FreeRAMBytes) * 0.90 / 1024 / 1024)   // 90% of free RAM
-	fmt.Printf("[applySafeDefaults] freeVRAM=%d freeRAM=%d\n", freeVRAM, freeRAM)
-
-	fmt.Println("[applySafeDefaults] reading settings")
+	if profile == nil {
+		return
+	}
 	live := a.settings.Model()
 	ctxSize, _ := strconv.Atoi(intSetting(live, "context_size", 4096))
 	if ctxSize > profile.UsableContext && profile.UsableContext > 0 {
 		ctxSize = profile.UsableContext
-		fmt.Printf("[applySafeDefaults] capped context to %d\n", ctxSize)
 	}
 
-	gpuLayers, _ := strconv.Atoi(intSetting(live, "gpu_layers", 0))
-	batchSize, _ := strconv.Atoi(intSetting(live, "batch_size", 512))
-	fmt.Printf("[applySafeDefaults] settings: ctx=%d gpuLayers=%d batch=%d\n", ctxSize, gpuLayers, batchSize)
-
-	// Build architecture spec. If profile has the new ArchitectureSpec, use it.
-	// Otherwise, fall back to the legacy profile fields.
-	spec := profile.ArchitectureSpec
-	if spec == nil {
-		fmt.Println("[applySafeDefaults] archSpec is nil, building fallback")
-		spec = &types.ArchitectureSpec{
+	if profile.ArchitectureSpec == nil {
+		spec := &types.ArchitectureSpec{
 			Family:         profile.Family,
 			Layers:         profile.LayerCount,
 			ContextLength:  profile.MaxContext,
@@ -683,7 +838,6 @@ func (a *App) applySafeDefaults(profile *types.ModelProfile) {
 			QuantType:      profile.FileType,
 			BitsPerWeight:  profile.BitsPerWeight,
 		}
-		// Estimate missing critical fields from parameter count
 		if spec.Layers <= 0 && profile.ParameterCount > 0 {
 			spec.Layers = int(profile.ParameterCount / 100_000_000)
 			if spec.Layers < 1 {
@@ -708,30 +862,10 @@ func (a *App) applySafeDefaults(profile *types.ModelProfile) {
 		if spec.HeadDim <= 0 && spec.DModel > 0 && spec.NumHeads > 0 {
 			spec.HeadDim = spec.DModel / spec.NumHeads
 		}
-	} else {
-		fmt.Printf("[applySafeDefaults] archSpec: layers=%d dmodel=%d heads=%d kvheads=%d\n",
-			spec.Layers, spec.DModel, spec.NumHeads, spec.NumKVHeads)
+		profile.ArchitectureSpec = spec
 	}
 
-	fmt.Println("[applySafeDefaults] creating memory model")
-	model := gguf.NewMemoryModel(spec)
-	fmt.Println("[applySafeDefaults] calling ClampToHardware")
-	ctxSize, gpuLayers, batchSize, finalEst, adjustments := model.ClampToHardware(ctxSize, gpuLayers, batchSize, freeVRAM, freeRAM)
-	fmt.Println("[applySafeDefaults] ClampToHardware returned")
-
-	for _, adj := range adjustments {
-		fmt.Printf("[applySafeDefaults] adjustment: %s\n", adj)
-	}
-	fmt.Printf("[applySafeDefaults] final: GPU=%dMB RAM=%dMB ctx=%d gpuLayers=%d batch=%d\n",
-		finalEst.GPUMB, finalEst.RAMMB, ctxSize, gpuLayers, batchSize)
-
-	// Apply clamped settings through the authority, so the next read sees them.
-	a.settings.MergeModel(map[string]interface{}{
-		"context_size": ctxSize,
-		"gpu_layers":   gpuLayers,
-		"batch_size":   batchSize,
-	})
-	fmt.Println("[applySafeDefaults] done")
+	a.settings.MergeModel(map[string]interface{}{"context_size": ctxSize})
 }
 
 // ---------------------------------------------------------------------------

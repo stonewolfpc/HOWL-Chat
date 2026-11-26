@@ -1,83 +1,130 @@
 package host
 
 import (
-	"fmt"
 	"os/exec"
 	"sync"
 	"time"
 
-	"howl-chat/internal/proc"
+	"howl-chat/internal/process"
 )
 
-// Processes supervises the child process this application started — today the
-// llama-server. It records the process and the single goroutine that owns its
-// Wait, and it kills and waits in dependency order at shutdown.
+// Processes supervises the child processes this application started. The
+// process registry is the authority for each child's role, PID and start token;
+// this owner keeps the chat slot and its one recorded Wait observer.
 //
 // It does not decide *whether* to start an engine; that is runtime policy. It
 // owns only the lifetime of a process already started, so exactly one place can
 // wait on it and exactly one place can release it.
 type Processes struct {
-	mu     sync.Mutex
-	cmd    *exec.Cmd
-	waiter func(time.Duration) error
+	mu       sync.Mutex
+	registry *process.Registry
+	handle   *process.Handle
 }
 
-// NewProcesses returns an owner with no child process.
-func NewProcesses() *Processes { return &Processes{} }
+// NewProcesses returns an owner with its own process registry.
+func NewProcesses() *Processes {
+	return NewProcessesWithRegistry(process.NewRegistry())
+}
+
+// NewProcessesWithRegistry returns an owner that records adopted children in
+// the supplied registry. The composition root shares one registry across every
+// process-owning domain.
+func NewProcessesWithRegistry(registry *process.Registry) *Processes {
+	if registry == nil {
+		registry = process.NewRegistry()
+	}
+	return &Processes{registry: registry}
+}
+
+// Registry returns the process registry this owner records into.
+func (p *Processes) Registry() *process.Registry {
+	if p == nil {
+		return nil
+	}
+	return p.registry
+}
 
 // Adopt records the process and the waiter that owns its single Wait. No other
 // code may call Wait on this command.
-func (p *Processes) Adopt(cmd *exec.Cmd, waiter func(time.Duration) error) {
+func (p *Processes) Adopt(cmd *exec.Cmd, waiter func(time.Duration) error) (*process.Handle, error) {
+	handle, err := p.registry.Register(process.RoleChat, cmd, waiter)
+	if err != nil {
+		return nil, err
+	}
 	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.cmd = cmd
-	p.waiter = waiter
+	p.handle = handle
+	p.mu.Unlock()
+	return handle, nil
 }
 
 // Current reports the supervised process without releasing it.
 func (p *Processes) Current() *exec.Cmd {
+	handle := p.Handle()
+	if handle == nil {
+		return nil
+	}
+	return handle.Cmd
+}
+
+// Handle reports the current chat process identity.
+func (p *Processes) Handle() *process.Handle {
+	if p == nil {
+		return nil
+	}
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	return p.cmd
+	return p.handle
+}
+
+// Owns reports whether handle is still the registered chat child.
+func (p *Processes) Owns(handle *process.Handle) bool {
+	if p == nil || handle == nil {
+		return false
+	}
+	return p.registry.Lookup(handle.Identity) == handle
 }
 
 // Take releases the process and its waiter from this owner.
 func (p *Processes) Take() (*exec.Cmd, func(time.Duration) error) {
+	if p == nil {
+		return nil, nil
+	}
 	p.mu.Lock()
-	defer p.mu.Unlock()
-	cmd, waiter := p.cmd, p.waiter
-	p.cmd, p.waiter = nil, nil
-	return cmd, waiter
+	handle := p.handle
+	p.handle = nil
+	p.mu.Unlock()
+	if handle == nil {
+		return nil, nil
+	}
+	handle.Release()
+	return handle.Cmd, handle.Waiter()
 }
 
 // Stop kills the owned process tree and waits for the existing monitor to
 // observe exit. A timeout means the process did not exit; it is reported,
-// never disguised as success.
+// never disguised as success, and ownership is retained for a retry.
 func (p *Processes) Stop(timeout time.Duration) error {
-	cmd, waiter := p.Take()
-	if cmd == nil || cmd.Process == nil {
+	if p == nil {
 		return nil
 	}
-	pid := cmd.Process.Pid
-	proc.KillTree(pid)
-	_ = cmd.Process.Kill()
-
-	if waiter != nil {
-		return waiter(timeout)
-	}
-
-	// A monitor is always installed by the production spawn path. This fallback
-	// exists for partially initialized apps and test-owned commands: one
-	// goroutine owns Wait, and shutdown only waits for its signal.
-	done := make(chan struct{})
-	go func() {
-		_, _ = cmd.Process.Wait()
-		close(done)
-	}()
-	select {
-	case <-done:
+	p.mu.Lock()
+	handle := p.handle
+	p.mu.Unlock()
+	if handle == nil {
 		return nil
-	case <-time.After(timeout):
-		return fmt.Errorf("llama-server pid %d did not exit within %s", pid, timeout)
+	}
+	if err := handle.Stop(timeout); err != nil {
+		return err
+	}
+	p.clear(handle)
+	return nil
+}
+
+// clear releases the handle only if it is still the process this Stop owned.
+func (p *Processes) clear(handle *process.Handle) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if p.handle == handle {
+		p.handle = nil
 	}
 }

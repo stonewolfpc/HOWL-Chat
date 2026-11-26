@@ -1,0 +1,233 @@
+{
+  "checks": [
+    {
+      "detail": "13 receipts; 0 had extra non-supporting selections",
+      "id": "T01",
+      "kind": "fix",
+      "name": "M2 is never awarded on selection alone",
+      "status": "PASS"
+    },
+    {
+      "detail": "rec-0011 value='ledger in the green cabinet'",
+      "id": "T02",
+      "kind": "fix",
+      "name": "support requires the keyed value, not merely the predicate",
+      "status": "PASS"
+    },
+    {
+      "detail": "adversarial rec-0013 selected=True, records 12->13",
+      "id": "T03",
+      "kind": "fix",
+      "name": "a term-identical record with another predicate is not support",
+      "status": "PASS"
+    },
+    {
+      "detail": "revoked=[]",
+      "id": "T04",
+      "kind": "fix",
+      "name": "a memory lapse ('I forget where…') does not retract",
+      "status": "PASS"
+    },
+    {
+      "detail": "revoked=[]",
+      "id": "T05",
+      "kind": "fix",
+      "name": "an incidental 'forget' that asserts the fact does not retract",
+      "status": "PASS"
+    },
+    {
+      "detail": "active=['promise']",
+      "id": "T06",
+      "kind": "fix",
+      "name": "a cued retraction revokes its target and only its target",
+      "status": "PASS"
+    },
+    {
+      "detail": "rec-0003 span=sp-003-01",
+      "id": "T07",
+      "kind": "fix",
+      "name": "the retraction event cites its span and its target",
+      "status": "PASS"
+    },
+    {
+      "detail": "one shared token revokes=nothing; three shared tokens revoke=['keeps_ledger']. Cue+overlap(>=2), not intent, remains the limit",
+      "id": "T08",
+      "kind": "finding",
+      "name": "residual F4 risk is recorded, not silently accepted",
+      "status": "PASS"
+    },
+    {
+      "detail": "target=revoked, event=active, link=rec-0005",
+      "id": "T09",
+      "kind": "assurance",
+      "name": "the retracted record stays revoked and the event stays active",
+      "status": "PASS"
+    },
+    {
+      "detail": "2 current records for the owner",
+      "id": "T10",
+      "kind": "assurance",
+      "name": "current truth never includes the retracted record",
+      "status": "PASS"
+    },
+    {
+      "detail": "selected=['rec-0004']",
+      "id": "T11",
+      "kind": "assurance",
+      "name": "the retraction event does not leak into an unrelated question",
+      "status": "PASS"
+    },
+    {
+      "detail": "support_check refuses: the probe does not declare retraction_of",
+      "id": "T12",
+      "kind": "assurance",
+      "name": "a retraction event cannot support a present-tense claim about the retracted fact",
+      "status": "PASS"
+    },
+    {
+      "detail": "eligible=['rec-0004', 'rec-0012']",
+      "id": "T13",
+      "kind": "assurance",
+      "name": "retrieval never returns the revoked record in character context",
+      "status": "PASS"
+    },
+    {
+      "detail": "13 probes; p47 m2=NOT_SUPPORTED, span_absent=True",
+      "id": "T14",
+      "kind": "assurance",
+      "name": "p47 is counted, not dropped, and reported as NOT_SUPPORTED with a provable span absence",
+      "status": "PASS"
+    },
+    {
+      "detail": "p48 selected=['rec-0012'], m2=SUPPORTED, span_absent=True",
+      "id": "T15",
+      "kind": "assurance",
+      "name": "p48 is M2-supported under the frozen definition",
+      "status": "PASS"
+    },
+    {
+      "detail": "8 checked",
+      "id": "G01",
+      "kind": "preflight",
+      "name": "8 frozen artifacts match",
+      "status": "PASS"
+    },
+    {
+      "detail": "4 checked",
+      "id": "G02",
+      "kind": "preflight",
+      "name": "4 frozen preregistration documents match the freeze record",
+      "status": "PASS"
+    },
+    {
+      "detail": "2 checked",
+      "id": "G03",
+      "kind": "preflight",
+      "name": "plan v3 and G0 receipt unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "48 cells",
+      "id": "G04",
+      "kind": "preflight",
+      "name": "seed table covers 48 cells and hashes deterministically",
+      "status": "PASS"
+    },
+    {
+      "detail": "13 probes, quota 4/2/2/2/1/1/1",
+      "id": "G05",
+      "kind": "preflight",
+      "name": "probe quotas valid for every conversation",
+      "status": "PASS"
+    },
+    {
+      "detail": "one cell, three arms",
+      "id": "G06",
+      "kind": "preflight",
+      "name": "matched seeds verify across arms",
+      "status": "PASS"
+    },
+    {
+      "detail": "no runtime counter is bound in this environment; G1 uses whitespace-words-test-only",
+      "id": "G07",
+      "kind": "preflight",
+      "name": "runtime tokenizer bound for scored accounting",
+      "status": "BLOCKED"
+    },
+    {
+      "detail": "TokenAccountingError: counter 'whitespace-words-test-only' is a test instrument; G4 requires the runtime's own a",
+      "id": "G07b",
+      "kind": "negative",
+      "name": "a test counter is refused for a scored run",
+      "status": "PASS"
+    },
+    {
+      "detail": "capacity=900, reserve=160, memory_budget=220",
+      "id": "G08",
+      "kind": "preflight",
+      "name": "prompt capacity leaves history after memory is paid for",
+      "status": "PASS"
+    },
+    {
+      "detail": "FileExistsError: receipts are write-once: eval\\mem1\\.preflight-probe.json already exists",
+      "id": "G09",
+      "kind": "negative",
+      "name": "receipts are write-once",
+      "status": "PASS"
+    },
+    {
+      "detail": "ExecutionNotAuthorised: a network responder requires G4 authorization, which has not been granted",
+      "id": "G10",
+      "kind": "negative",
+      "name": "no network responder can run without a G4 grant",
+      "status": "PASS"
+    },
+    {
+      "detail": "recorded as an architecture limitation (F1), not an implementation gap",
+      "id": "G11",
+      "kind": "preflight",
+      "name": "M2 coverage declared: 11 of 13 probes scoreable, p47 structurally unmeasurable under frozen A1",
+      "status": "PASS"
+    },
+    {
+      "detail": "no model runtime is authorised or configured in this environment",
+      "id": "G12",
+      "kind": "preflight",
+      "name": "model revision and sampling parameters bound",
+      "status": "BLOCKED"
+    },
+    {
+      "detail": "0 model calls; no G4 execution attempted",
+      "id": "G13",
+      "kind": "preflight",
+      "name": "G4 remains unauthorised",
+      "status": "PASS"
+    }
+  ],
+  "confirmations": {
+    "experimental_model_calls": 0,
+    "frozen_artifacts_modified": 0,
+    "g4_executed": false,
+    "score_used_as_support": false
+  },
+  "counts": {
+    "BLOCKED": 2,
+    "FAIL": 0,
+    "PASS": 27
+  },
+  "findings": {
+    "F2": "retraction event is active, cites its span and target; the target stays revoked and the event cannot support a present-tense claim",
+    "F3": "weak overlap can select a wrong record but cannot support an answer: support is predicate+value, independent of score",
+    "F4": "retraction now requires a cue; incidental 'forget' and memory-lapse phrasings no longer revoke. Residual risk: a cued sentence sharing >=2 content tokens revokes even as a topic dismissal."
+  },
+  "gate": "G4-preflight",
+  "limitations": [
+    "p47 (correction) is structurally unmeasurable under frozen A1 (F1 contract gap)",
+    "p48 (retraction) is M2-supported via an explicit retraction event record",
+    "no model call; nothing here speaks to model behaviour",
+    "runtime tokenizer and model binding are BLOCKED, so G4 cannot start"
+  ],
+  "status": "PASS",
+  "suite": "mem1.preflight",
+  "verdict": "BLOCKED"
+}

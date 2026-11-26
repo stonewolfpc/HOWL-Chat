@@ -1697,3 +1697,531 @@
 19:12:35.892  + 1233.8ms  rescan: scanning G:\AI GGUF\voice
 19:12:36.331  + 1672.9ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
 19:13:05.050  +30391.2ms  wails.Run returned
+10:30:15.733  +    0.0ms  process start
+10:30:15.747  +   14.3ms  image init: begin
+10:30:15.765  +   32.7ms  image init: config ready
+10:30:15.766  +   33.3ms  image init: engine initialized
+10:30:15.884  +  151.0ms  NewApp done
+10:30:16.164  +  431.1ms  OnStartup: webview reached backend
+10:30:16.165  +  432.1ms  OnStartup: init complete
+10:30:16.165  +  432.7ms  rescan: start
+10:30:16.166  +  433.2ms  rescan: scanning G:\AI GGUF\GGUF
+10:30:16.859  + 1126.7ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+10:30:16.860  + 1127.2ms  rescan: scanning G:\AI GGUF\voice
+10:30:17.145  + 1413.0ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+10:31:58.976  +103243.2ms  wails.Run returned
+20:59:44.421  + 1628.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2913689543\001\Newer Models
+22:52:30.632  +    0.0ms  process start
+22:52:30.647  +   14.8ms  image init: begin
+22:52:30.657  +   25.7ms  image init: config ready
+22:52:30.659  +   27.2ms  image init: engine initialized
+22:52:30.778  +  146.1ms  NewApp done
+22:52:31.333  +  701.0ms  OnStartup: webview reached backend
+22:52:31.334  +  702.5ms  OnStartup: init complete
+22:52:31.335  +  703.6ms  rescan: start
+22:52:31.336  +  704.1ms  rescan: scanning G:\AI GGUF\GGUF
+22:52:31.846  + 1214.5ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+22:52:31.847  + 1215.1ms  rescan: scanning G:\AI GGUF\voice
+22:52:32.214  + 1582.0ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+22:53:03.997  +33365.8ms  wails.Run returned
+13:03:41.448  + 1951.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1447001190\001\Newer Models
+13:04:36.656  + 1181.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan270091197\001\Newer Models
+13:10:39.832  + 1267.5ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1235271569\001\Newer Models
+13:25:40.342  + 1267.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3486759965\001\Newer Models
+13:37:42.115  + 1239.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1161064752\001\Newer Models
+13:45:38.682  + 1223.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3860981707\001\Newer Models
+13:46:53.500  + 1165.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3389047326\001\Newer Models
+13:49:10.356  + 1265.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan971168050\001\Newer Models
+13:54:40.448  + 1297.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan617713472\001\Newer Models
+14:33:59.509  + 3922.5ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan443025129\001\Newer Models
+18:18:24.989  + 3843.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1297637991\001\Newer Models
+18:18:47.024  + 1298.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan4116555038\001\Newer Models
+18:26:06.729  + 1328.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan933320396\001\Newer Models
+18:35:01.994  +  926.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan519847211\001\Newer Models
+18:35:19.679  + 1296.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1837969048\001\Newer Models
+18:35:43.086  + 3025.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2850080439\001\Newer Models
+18:43:42.881  + 2700.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3106997607\001\Newer Models
+19:06:01.420  + 2847.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan61385374\001\Newer Models
+19:06:11.565  + 1300.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan707676859\001\Newer Models
+19:33:36.833  + 3381.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1747081094\001\Newer Models
+19:33:54.511  + 3655.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3976390195\001\Newer Models
+19:37:16.853  + 2960.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1137811678\001\Newer Models
+19:38:02.381  + 4526.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan8421040\001\Newer Models
+19:38:37.441  + 3481.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan604449729\001\Newer Models
+19:38:59.560  + 1338.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2497413180\001\Newer Models
+19:40:13.633  + 3498.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan4040601604\001\Newer Models
+19:40:48.919  + 3031.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2517543730\001\Newer Models
+19:41:55.868  + 3573.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan178670799\001\Newer Models
+19:42:34.828  + 3034.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2891740083\001\Newer Models
+19:42:52.332  + 3057.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3345508780\001\Newer Models
+19:43:21.924  + 1349.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3529996019\001\Newer Models
+19:44:39.688  + 3145.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3279334462\001\Newer Models
+19:45:07.481  + 3044.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3261732397\001\Newer Models
+19:45:43.474  + 2885.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3377566477\001\Newer Models
+19:46:07.135  + 4010.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3047544434\001\Newer Models
+20:11:44.764  + 3968.5ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2167438520\001\Newer Models
+20:14:20.372  +    0.0ms  process start
+20:14:20.402  +   29.8ms  image init: begin
+20:14:20.883  +  511.1ms  image init: config ready
+20:14:20.884  +  511.6ms  image init: engine initialized
+20:14:20.921  +  548.6ms  NewApp done
+20:14:21.166  +  793.3ms  OnStartup: webview reached backend
+20:14:21.167  +  794.4ms  OnStartup: init complete
+20:14:21.167  +  794.9ms  rescan: start
+20:14:21.168  +  795.4ms  rescan: scanning G:\AI GGUF\GGUF
+20:14:21.242  +  870.1ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+20:14:21.243  +  870.6ms  rescan: scanning G:\AI GGUF\voice
+20:14:21.515  + 1142.7ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+20:27:57.493  +    0.0ms  process start
+20:27:57.495  +    2.6ms  image init: begin
+20:27:57.499  +    5.7ms  image init: config ready
+20:27:57.499  +    6.2ms  image init: engine initialized
+20:27:57.551  +   58.2ms  NewApp done
+20:27:57.867  +  374.2ms  OnStartup: webview reached backend
+20:27:57.868  +  375.3ms  OnStartup: init complete
+20:27:57.869  +  375.9ms  rescan: start
+20:27:57.869  +  375.9ms  rescan: scanning G:\AI GGUF\GGUF
+20:27:57.874  +  381.1ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+20:27:57.874  +  381.6ms  rescan: scanning G:\AI GGUF\voice
+20:27:57.927  +  433.8ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+20:32:33.891  +    0.0ms  process start
+20:32:33.893  +    2.6ms  image init: begin
+20:32:33.897  +    6.3ms  image init: config ready
+20:32:33.898  +    6.9ms  image init: engine initialized
+20:32:33.949  +   58.4ms  NewApp done
+20:32:34.179  +  288.7ms  OnStartup: webview reached backend
+20:32:34.180  +  289.2ms  OnStartup: init complete
+20:32:34.180  +  289.2ms  rescan: start
+20:32:34.181  +  290.7ms  rescan: scanning G:\AI GGUF\GGUF
+20:32:34.186  +  295.4ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+20:32:34.187  +  295.9ms  rescan: scanning G:\AI GGUF\voice
+20:32:34.248  +  357.2ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+20:35:27.993  +    0.0ms  process start
+20:35:27.995  +    2.6ms  image init: begin
+20:35:27.999  +    5.8ms  image init: config ready
+20:35:28.000  +    6.8ms  image init: engine initialized
+20:35:28.161  +  167.9ms  NewApp done
+20:35:28.386  +  393.4ms  OnStartup: webview reached backend
+20:35:28.387  +  394.5ms  OnStartup: init complete
+20:35:28.388  +  395.0ms  rescan: start
+20:35:28.388  +  395.5ms  rescan: scanning G:\AI GGUF\GGUF
+20:35:28.393  +  399.7ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+20:35:28.393  +  400.2ms  rescan: scanning G:\AI GGUF\voice
+20:35:28.462  +  469.3ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+20:35:39.350  +11357.0ms  discovery: silently scanned H:\AI GGUF\voice
+20:45:18.976  +    0.0ms  process start
+20:45:18.979  +    2.7ms  image init: begin
+20:45:18.983  +    6.3ms  image init: config ready
+20:45:18.983  +    6.8ms  image init: engine initialized
+20:45:19.047  +   70.8ms  NewApp done
+20:45:19.269  +  292.3ms  OnStartup: webview reached backend
+20:45:19.269  +  292.8ms  OnStartup: init complete
+20:45:19.270  +  293.3ms  rescan: start
+20:45:19.270  +  293.9ms  rescan: scanning G:\AI GGUF\GGUF
+20:45:19.276  +  299.4ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+20:45:19.276  +  300.0ms  rescan: scanning G:\AI GGUF\voice
+20:45:19.334  +  357.3ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+20:45:19.334  +  357.3ms  rescan: scanning H:\AI GGUF\voice
+20:45:19.396  +  419.7ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+20:46:41.880  +    0.0ms  process start
+20:46:41.884  +    3.2ms  image init: begin
+20:46:41.887  +    6.9ms  image init: config ready
+20:46:41.888  +    7.4ms  image init: engine initialized
+20:46:41.925  +   44.8ms  NewApp done
+20:46:42.140  +  259.6ms  OnStartup: webview reached backend
+20:46:42.141  +  260.6ms  OnStartup: init complete
+20:46:42.141  +  261.2ms  rescan: start
+20:46:42.142  +  261.7ms  rescan: scanning G:\AI GGUF\GGUF
+20:46:42.148  +  267.5ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+20:46:42.148  +  268.0ms  rescan: scanning G:\AI GGUF\voice
+20:46:42.199  +  319.0ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+20:46:42.199  +  319.0ms  rescan: scanning H:\AI GGUF\voice
+20:46:42.261  +  380.4ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+20:51:13.666  +    0.0ms  process start
+20:51:13.669  +    3.2ms  image init: begin
+20:51:13.688  +   22.4ms  image init: config ready
+20:51:13.690  +   23.9ms  image init: engine initialized
+20:51:13.754  +   87.8ms  NewApp done
+20:51:13.996  +  330.4ms  OnStartup: webview reached backend
+20:51:13.998  +  331.5ms  OnStartup: init complete
+20:51:13.998  +  332.1ms  rescan: start
+20:51:13.999  +  332.6ms  rescan: scanning G:\AI GGUF\GGUF
+20:51:14.005  +  338.9ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+20:51:14.006  +  339.5ms  rescan: scanning G:\AI GGUF\voice
+20:51:14.062  +  395.7ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+20:51:14.062  +  396.3ms  rescan: scanning H:\AI GGUF\voice
+20:51:14.130  +  464.2ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+21:00:06.667  +    0.0ms  process start
+21:00:06.669  +    2.6ms  image init: begin
+21:00:06.673  +    6.4ms  image init: config ready
+21:00:06.674  +    6.9ms  image init: engine initialized
+21:00:06.737  +   70.6ms  NewApp done
+21:00:06.966  +  299.4ms  OnStartup: webview reached backend
+21:00:06.967  +  299.9ms  OnStartup: init complete
+21:00:06.967  +  300.5ms  rescan: start
+21:00:06.968  +  301.0ms  rescan: scanning G:\AI GGUF\GGUF
+21:00:06.973  +  306.3ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+21:00:06.973  +  306.8ms  rescan: scanning G:\AI GGUF\voice
+21:00:07.030  +  363.7ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+21:00:07.031  +  364.2ms  rescan: scanning H:\AI GGUF\voice
+21:00:07.101  +  434.1ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+21:04:59.720  +    2.6ms  image init: begin
+21:04:59.724  +    6.3ms  image init: config ready
+21:04:59.724  +    6.8ms  image init: engine initialized
+21:04:59.742  +   24.5ms  rescan: start
+21:04:59.742  +   25.0ms  rescan: scanning G:\AI GGUF\GGUF
+21:04:59.747  +   29.8ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+21:04:59.747  +   29.8ms  rescan: scanning G:\AI GGUF\voice
+21:04:59.797  +   79.5ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+21:04:59.797  +   80.0ms  rescan: scanning H:\AI GGUF\voice
+21:04:59.846  +  129.1ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+21:24:13.530  +    0.0ms  process start
+21:24:13.532  +    2.6ms  image init: begin
+21:24:13.537  +    7.3ms  image init: config ready
+21:24:13.538  +    8.1ms  image init: engine initialized
+21:24:13.602  +   72.4ms  NewApp done
+21:24:13.837  +  307.2ms  OnStartup: webview reached backend
+21:24:13.838  +  308.3ms  OnStartup: init complete
+21:24:13.840  +  309.8ms  rescan: start
+21:24:13.840  +  310.3ms  rescan: scanning G:\AI GGUF\GGUF
+21:24:13.846  +  316.1ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+21:24:13.846  +  316.6ms  rescan: scanning G:\AI GGUF\voice
+21:24:13.903  +  372.9ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+21:24:13.904  +  373.9ms  rescan: scanning H:\AI GGUF\voice
+21:24:13.975  +  444.8ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+21:28:19.077  + 1588.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2869547118\001\Newer Models
+21:28:54.937  +    0.0ms  process start
+21:28:54.940  +    3.2ms  image init: begin
+21:28:54.944  +    6.8ms  image init: config ready
+21:28:54.945  +    7.9ms  image init: engine initialized
+21:28:55.005  +   67.7ms  NewApp done
+21:28:55.230  +  293.5ms  OnStartup: webview reached backend
+21:28:55.231  +  294.1ms  OnStartup: init complete
+21:28:55.231  +  294.6ms  rescan: start
+21:28:55.232  +  295.4ms  rescan: scanning G:\AI GGUF\GGUF
+21:28:55.238  +  301.4ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+21:28:55.239  +  301.9ms  rescan: scanning G:\AI GGUF\voice
+21:28:55.292  +  354.8ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+21:28:55.292  +  355.3ms  rescan: scanning H:\AI GGUF\voice
+21:28:55.356  +  419.1ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+21:31:23.106  + 1335.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan669283939\001\Newer Models
+21:42:23.479  + 1482.5ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan58399604\001\Newer Models
+21:44:51.170  + 1461.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan4137433927\001\Newer Models
+21:45:55.294  +    0.0ms  process start
+21:45:55.300  +    5.2ms  image init: begin
+21:45:55.349  +   54.4ms  image init: done
+21:45:55.349  +   54.9ms  NewApp done
+21:45:55.578  +  283.8ms  OnStartup: webview reached backend
+21:45:55.580  +  285.9ms  OnStartup: init complete
+21:45:55.581  +  286.4ms  rescan: start
+21:45:55.581  +  286.4ms  rescan: scanning G:\AI GGUF\GGUF
+21:45:55.586  +  291.7ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+21:45:55.587  +  292.2ms  rescan: scanning G:\AI GGUF\voice
+21:45:55.642  +  347.7ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+21:45:55.644  +  349.2ms  rescan: scanning H:\AI GGUF\voice
+21:45:55.708  +  413.9ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+21:54:02.336  +487041.4ms  wails.Run returned
+21:54:19.653  +    0.0ms  process start
+21:54:19.658  +    4.7ms  image init: begin
+21:54:19.702  +   48.9ms  image init: done
+21:54:19.702  +   48.9ms  NewApp done
+21:54:19.926  +  273.0ms  OnStartup: webview reached backend
+21:54:19.927  +  274.2ms  OnStartup: init complete
+21:54:19.928  +  274.8ms  rescan: start
+21:54:19.929  +  275.4ms  rescan: scanning G:\AI GGUF\GGUF
+21:54:19.935  +  281.3ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+21:54:19.935  +  281.8ms  rescan: scanning G:\AI GGUF\voice
+21:54:19.991  +  337.6ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+21:54:19.991  +  337.6ms  rescan: scanning H:\AI GGUF\voice
+21:54:20.066  +  412.7ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+21:55:15.010  +    4.8ms  image init: begin
+21:55:15.028  +   23.4ms  image init: done
+21:55:15.029  +   23.9ms  rescan: start
+21:55:15.029  +   23.9ms  rescan: scanning G:\AI GGUF\GGUF
+21:55:15.033  +   28.6ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+21:55:15.034  +   29.1ms  rescan: scanning G:\AI GGUF\voice
+21:55:15.084  +   79.2ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+21:55:15.085  +   80.4ms  rescan: scanning H:\AI GGUF\voice
+21:55:15.136  +  131.5ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+22:03:14.149  +   22.0ms  image init: begin
+22:03:14.190  +   63.3ms  image init: done
+22:03:14.190  +   63.3ms  rescan: start
+22:03:14.191  +   64.3ms  rescan: scanning G:\AI GGUF\GGUF
+22:03:14.673  +  545.9ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+22:03:14.673  +  545.9ms  rescan: scanning G:\AI GGUF\voice
+22:03:14.989  +  862.6ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+22:03:14.990  +  863.1ms  rescan: scanning H:\AI GGUF\voice
+22:03:15.085  +  957.9ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+22:05:44.457  + 1397.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan4173258067\001\Newer Models
+22:34:04.096  + 1440.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1655084868\001\Newer Models
+22:34:27.789  + 1381.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3207441509\001\Newer Models
+22:34:48.395  + 1404.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2127222644\001\Newer Models
+22:36:14.127  +    0.0ms  process start
+22:36:14.132  +    5.4ms  image init: begin
+22:36:14.265  +  138.5ms  image init: done
+22:36:14.265  +  138.5ms  NewApp done
+22:36:59.272  +    0.0ms  process start
+22:36:59.278  +    5.7ms  image init: begin
+22:36:59.295  +   23.5ms  image init: done
+22:36:59.295  +   23.5ms  NewApp done
+22:36:59.522  +  250.1ms  OnStartup: webview reached backend
+22:36:59.523  +  251.1ms  OnStartup: init complete
+22:36:59.524  +  251.7ms  rescan: start
+22:36:59.524  +  252.2ms  rescan: scanning G:\AI GGUF\GGUF
+22:36:59.529  +  257.4ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+22:36:59.530  +  257.9ms  rescan: scanning G:\AI GGUF\voice
+22:36:59.589  +  317.0ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+22:36:59.589  +  317.0ms  rescan: scanning H:\AI GGUF\voice
+22:36:59.650  +  377.9ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+22:41:41.865  +    4.5ms  image init: begin
+22:41:41.888  +   27.0ms  image init: done
+22:41:41.888  +   27.5ms  rescan: start
+22:41:41.888  +   27.5ms  rescan: scanning G:\AI GGUF\GGUF
+22:41:41.894  +   33.3ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+22:41:41.894  +   33.3ms  rescan: scanning G:\AI GGUF\voice
+22:41:41.952  +   91.3ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+22:41:41.952  +   91.3ms  rescan: scanning H:\AI GGUF\voice
+22:41:42.004  +  142.8ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+22:47:38.851  + 1266.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan51788394\001\Newer Models
+22:56:41.565  +   78.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1941481336\001\Newer Models
+22:58:53.373  + 3173.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan4271403224\001\Newer Models
+23:14:45.851  + 2938.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2653068771\001\Newer Models
+23:15:18.381  + 3696.6ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1811694034\001\Newer Models
+23:24:04.893  + 1303.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2878723148\001\Newer Models
+23:25:17.557  + 1728.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2524320662\001\Newer Models
+23:44:00.887  + 1263.0ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3399882629\001\Newer Models
+23:45:51.584  + 1355.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan189343900\001\Newer Models
+23:46:31.045  + 3217.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3298394642\001\Newer Models
+00:06:05.566  + 2221.4ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan495793294\001\Newer Models
+00:17:51.520  + 1385.9ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan181038041\001\Newer Models
+00:19:54.313  + 3745.5ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3667820723\001\Newer Models
+00:44:48.900  + 5205.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1891914195\001\Newer Models
+00:56:53.930  + 3630.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan833667246\001\Newer Models
+07:17:56.539  + 2572.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2965338882\001\Newer Models
+07:22:52.847  + 3474.2ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2777084867\001\Newer Models
+07:28:34.325  + 4624.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2847275115\001\Newer Models
+08:10:08.580  + 2786.1ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2866732972\001\Newer Models
+08:13:00.150  + 4908.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1949444525\001\Newer Models
+08:27:06.170  + 5992.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan928074442\001\Newer Models
+08:45:41.979  +   15.1ms  image init: begin
+08:45:42.008  +   43.9ms  image init: done
+08:45:42.009  +   44.9ms  rescan: start
+08:45:42.009  +   45.4ms  rescan: scanning G:\AI GGUF\GGUF
+08:45:42.504  +  540.5ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+08:45:42.504  +  540.5ms  rescan: scanning G:\AI GGUF\voice
+08:45:42.832  +  868.5ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+08:45:42.832  +  868.5ms  rescan: scanning H:\AI GGUF\voice
+08:45:42.936  +  972.3ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+09:39:45.930  + 3193.3ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1517264759\001\Newer Models
+10:26:42.350  + 3902.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan3820657999\001\Newer Models
+10:27:54.607  + 3921.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan1377503229\001\Newer Models
+10:36:37.786  + 3940.8ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2400326284\001\Newer Models
+10:39:24.321  + 3223.7ms  discovery: silently scanned C:\Users\STONEW~1\AppData\Local\Temp\TestDiscoveryPromptDetectionDeferSuppressAndSilentScan2450637734\001\Newer Models
+16:44:54.701  +    0.0ms  process start
+16:44:54.709  +    7.8ms  image init: begin
+16:44:54.713  +   12.0ms  image init: config ready
+16:44:54.714  +   13.0ms  image init: engine initialized
+16:44:54.781  +   79.7ms  NewApp done
+16:44:55.104  +  402.8ms  OnStartup: webview reached backend
+16:44:55.110  +  409.1ms  OnStartup: init complete
+16:44:55.110  +  409.1ms  rescan: start
+16:44:55.110  +  409.7ms  rescan: scanning G:\AI GGUF\GGUF
+16:44:55.182  +  481.0ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+16:44:55.182  +  481.6ms  rescan: scanning G:\AI GGUF\voice
+16:44:55.369  +  668.2ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+16:44:55.370  +  668.7ms  rescan: scanning H:\AI GGUF\voice
+16:44:55.437  +  736.6ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+16:47:17.487  +142786.2ms  wails.Run returned
+19:54:22.721  +    0.0ms  process start
+19:54:22.737  +   16.6ms  image init: begin
+19:54:22.875  +  154.0ms  image init: done
+19:54:22.877  +  156.2ms  NewApp done
+19:54:23.129  +  407.8ms  OnStartup: webview reached backend
+19:54:23.129  +  408.3ms  OnStartup: init complete
+19:54:23.130  +  408.8ms  rescan: start
+19:54:23.130  +  409.4ms  rescan: scanning G:\AI GGUF\GGUF
+19:54:23.760  + 1039.1ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+19:54:23.760  + 1039.6ms  rescan: scanning G:\AI GGUF\voice
+19:54:23.959  + 1237.8ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+19:54:23.959  + 1238.3ms  rescan: scanning H:\AI GGUF\voice
+19:54:24.018  + 1297.3ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+20:11:05.219  +1002498.0ms  wails.Run returned
+20:11:19.909  +    0.0ms  process start
+20:11:19.941  +   32.4ms  image init: begin
+20:11:20.567  +  658.0ms  image init: done
+20:11:20.576  +  667.0ms  NewApp done
+20:11:20.832  +  923.0ms  OnStartup: webview reached backend
+20:11:20.839  +  930.8ms  OnStartup: init complete
+20:11:20.839  +  930.8ms  rescan: start
+20:11:20.840  +  931.3ms  rescan: scanning G:\AI GGUF\GGUF
+20:11:21.509  + 1600.8ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+20:11:21.510  + 1601.3ms  rescan: scanning G:\AI GGUF\voice
+20:11:21.714  + 1805.5ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+20:11:21.715  + 1806.0ms  rescan: scanning H:\AI GGUF\voice
+20:11:21.814  + 1905.6ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+20:15:30.113  +250204.7ms  wails.Run returned
+20:15:41.717  +    0.0ms  process start
+20:15:41.720  +    2.6ms  image init: begin
+20:15:41.724  +    6.7ms  image init: config ready
+20:15:41.724  +    7.3ms  image init: engine initialized
+20:15:41.885  +  168.1ms  NewApp done
+20:15:42.144  +  427.0ms  OnStartup: webview reached backend
+20:15:42.146  +  428.5ms  OnStartup: init complete
+20:15:42.146  +  429.1ms  rescan: start
+20:15:42.147  +  429.6ms  rescan: scanning G:\AI GGUF\GGUF
+20:15:42.154  +  436.6ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+20:15:42.154  +  436.6ms  rescan: scanning G:\AI GGUF\voice
+20:15:42.224  +  506.5ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+20:15:42.224  +  507.1ms  rescan: scanning H:\AI GGUF\voice
+20:15:42.314  +  596.9ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+20:16:49.992  +68275.2ms  wails.Run returned
+20:25:49.764  +    0.0ms  process start
+20:25:49.771  +    6.8ms  image init: begin
+20:25:49.932  +  167.8ms  image init: done
+20:25:49.933  +  168.8ms  NewApp done
+20:25:50.225  +  460.7ms  OnStartup: webview reached backend
+20:25:50.227  +  462.2ms  OnStartup: init complete
+20:25:50.227  +  462.8ms  rescan: start
+20:25:50.227  +  462.8ms  rescan: scanning G:\AI GGUF\GGUF
+20:25:50.233  +  468.7ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+20:25:50.234  +  469.4ms  rescan: scanning G:\AI GGUF\voice
+20:25:50.325  +  561.1ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+20:25:50.326  +  561.9ms  rescan: scanning H:\AI GGUF\voice
+20:25:50.417  +  652.3ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+20:32:51.234  +421469.9ms  wails.Run returned
+20:32:53.192  +    0.0ms  process start
+20:32:53.196  +    3.7ms  image init: begin
+20:32:53.201  +    8.7ms  image init: config ready
+20:32:53.201  +    9.2ms  image init: engine initialized
+20:32:53.394  +  202.1ms  NewApp done
+20:32:53.694  +  501.7ms  OnStartup: webview reached backend
+20:32:53.695  +  502.8ms  OnStartup: init complete
+20:32:53.696  +  503.8ms  rescan: start
+20:32:53.696  +  504.3ms  rescan: scanning G:\AI GGUF\GGUF
+20:32:53.703  +  511.3ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+20:32:53.704  +  512.5ms  rescan: scanning G:\AI GGUF\voice
+20:32:53.771  +  579.4ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+20:32:53.771  +  579.4ms  rescan: scanning H:\AI GGUF\voice
+20:32:53.870  +  678.3ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+20:33:55.274  +62081.6ms  discovery: silently scanned H:\AI GGUF\GGUF
+20:34:28.957  +95764.9ms  wails.Run returned
+20:36:04.088  +    0.0ms  process start
+20:36:04.094  +    5.8ms  image init: begin
+20:36:04.285  +  197.1ms  image init: done
+20:36:04.286  +  198.2ms  NewApp done
+20:36:04.586  +  498.1ms  OnStartup: webview reached backend
+20:36:04.587  +  499.2ms  OnStartup: init complete
+20:36:04.588  +  499.7ms  rescan: start
+20:36:04.588  +  500.2ms  rescan: scanning G:\AI GGUF\GGUF
+20:36:04.595  +  506.7ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+20:36:04.595  +  507.2ms  rescan: scanning G:\AI GGUF\voice
+20:36:04.672  +  584.0ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+20:36:04.672  +  584.0ms  rescan: scanning H:\AI GGUF\GGUF
+20:36:04.677  +  589.1ms  rescan: done H:\AI GGUF\GGUF 27 entries parsed=1
+20:36:04.678  +  590.1ms  rescan: scanning H:\AI GGUF\voice
+20:36:04.773  +  684.7ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+20:37:20.819  +76730.6ms  wails.Run returned
+20:38:57.183  +    0.0ms  process start
+20:38:57.190  +    6.3ms  image init: begin
+20:38:57.356  +  173.1ms  image init: done
+20:38:57.357  +  174.1ms  NewApp done
+20:38:57.642  +  458.4ms  OnStartup: webview reached backend
+20:38:57.642  +  458.9ms  OnStartup: init complete
+20:38:57.643  +  459.4ms  rescan: start
+20:38:57.643  +  460.0ms  rescan: scanning G:\AI GGUF\GGUF
+20:38:57.651  +  466.9ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+20:38:57.651  +  467.9ms  rescan: scanning G:\AI GGUF\voice
+20:38:57.726  +  542.4ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+20:38:57.726  +  542.9ms  rescan: scanning H:\AI GGUF\GGUF
+20:38:57.731  +  547.7ms  rescan: done H:\AI GGUF\GGUF 27 entries parsed=1
+20:38:57.731  +  548.2ms  rescan: scanning H:\AI GGUF\voice
+20:38:57.825  +  642.0ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+20:43:19.341  +262158.2ms  wails.Run returned
+20:44:31.550  +    0.0ms  process start
+20:44:31.556  +    6.2ms  image init: begin
+20:44:31.710  +  160.7ms  image init: done
+20:44:31.711  +  161.8ms  NewApp done
+20:44:32.001  +  451.4ms  OnStartup: webview reached backend
+20:44:32.002  +  451.9ms  OnStartup: init complete
+20:44:32.002  +  451.9ms  rescan: start
+20:44:32.003  +  452.9ms  rescan: scanning G:\AI GGUF\GGUF
+20:44:32.010  +  460.4ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+20:44:32.011  +  461.0ms  rescan: scanning G:\AI GGUF\voice
+20:44:32.078  +  528.0ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+20:44:32.078  +  528.0ms  rescan: scanning H:\AI GGUF\GGUF
+20:44:32.083  +  533.6ms  rescan: done H:\AI GGUF\GGUF 27 entries parsed=1
+20:44:32.084  +  534.1ms  rescan: scanning H:\AI GGUF\voice
+20:44:32.175  +  625.3ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+20:47:56.195  +    0.0ms  process start
+20:47:56.201  +    5.8ms  image init: begin
+20:47:56.357  +  161.8ms  image init: done
+20:47:56.358  +  162.8ms  NewApp done
+20:47:56.655  +  460.2ms  OnStartup: webview reached backend
+20:47:56.656  +  461.3ms  OnStartup: init complete
+20:47:56.656  +  461.3ms  rescan: start
+20:47:56.657  +  462.0ms  rescan: scanning G:\AI GGUF\GGUF
+20:47:56.665  +  469.7ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+20:47:56.666  +  470.8ms  rescan: scanning G:\AI GGUF\voice
+20:47:56.737  +  542.3ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+20:47:56.738  +  543.3ms  rescan: scanning H:\AI GGUF\GGUF
+20:47:56.745  +  549.8ms  rescan: done H:\AI GGUF\GGUF 27 entries parsed=1
+20:47:56.745  +  549.8ms  rescan: scanning H:\AI GGUF\voice
+20:47:56.836  +  641.3ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+21:12:33.129  +    0.0ms  process start
+21:12:33.286  +  156.8ms  image init: begin
+21:12:33.429  +  300.6ms  image init: done
+21:12:33.436  +  306.7ms  NewApp done
+21:12:39.862  + 6733.1ms  wails.Run returned
+22:38:29.440  +    0.0ms  process start
+22:38:29.464  +   24.4ms  image init: begin
+22:38:30.036  +  596.4ms  image init: done
+22:38:30.038  +  598.5ms  NewApp done
+22:38:39.282  + 9842.1ms  wails.Run returned
+22:40:36.910  +    0.0ms  process start
+22:40:36.915  +    5.3ms  image init: begin
+22:40:37.049  +  139.9ms  image init: done
+22:40:37.051  +  141.4ms  NewApp done
+22:40:37.334  +  424.8ms  OnStartup: webview reached backend
+22:40:37.335  +  425.3ms  OnStartup: init complete
+22:40:37.343  +  433.8ms  rescan: start
+22:40:37.344  +  434.2ms  rescan: scanning G:\AI GGUF\GGUF
+22:40:37.799  +  889.3ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+22:40:37.800  +  890.4ms  rescan: scanning G:\AI GGUF\voice
+22:40:38.049  + 1139.7ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+22:40:38.050  + 1140.2ms  rescan: scanning H:\AI GGUF\GGUF
+22:40:38.064  + 1154.4ms  rescan: done H:\AI GGUF\GGUF 27 entries parsed=1
+22:40:38.065  + 1155.6ms  rescan: scanning H:\AI GGUF\voice
+22:40:38.184  + 1274.2ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+08:46:16.801  +36337701.2ms  wails.Run returned
+13:23:38.270  +    0.0ms  process start
+13:23:38.298  +   28.6ms  image init: begin
+13:23:38.434  +  164.6ms  image init: done
+13:23:38.441  +  170.9ms  NewApp done
+13:23:38.681  +  411.8ms  OnStartup: webview reached backend
+13:23:38.682  +  412.4ms  OnStartup: init complete
+13:23:38.688  +  418.5ms  rescan: start
+13:23:38.689  +  419.0ms  rescan: scanning G:\AI GGUF\GGUF
+13:23:39.379  + 1109.6ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+13:23:39.379  + 1109.6ms  rescan: scanning G:\AI GGUF\voice
+13:23:39.625  + 1355.5ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+13:23:39.625  + 1355.5ms  rescan: scanning H:\AI GGUF\GGUF
+13:23:39.640  + 1369.9ms  rescan: done H:\AI GGUF\GGUF 27 entries parsed=1
+13:23:39.640  + 1369.9ms  rescan: scanning H:\AI GGUF\voice
+13:23:39.749  + 1479.5ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+13:28:24.121  +285851.8ms  wails.Run returned
+13:34:36.803  +    0.0ms  process start
+13:34:36.809  +    5.7ms  image init: begin
+13:34:36.962  +  158.5ms  image init: done
+13:34:36.963  +  159.5ms  NewApp done
+13:34:37.230  +  426.9ms  OnStartup: webview reached backend
+13:34:37.231  +  427.4ms  OnStartup: init complete
+13:34:37.244  +  441.1ms  rescan: start
+13:34:37.245  +  441.6ms  rescan: scanning G:\AI GGUF\GGUF
+13:34:37.252  +  449.3ms  rescan: done G:\AI GGUF\GGUF 27 entries parsed=1
+13:34:37.253  +  450.0ms  rescan: scanning G:\AI GGUF\voice
+13:34:37.313  +  510.0ms  rescan: done G:\AI GGUF\voice 6 entries parsed=6
+13:34:37.314  +  510.5ms  rescan: scanning H:\AI GGUF\GGUF
+13:34:37.318  +  514.8ms  rescan: done H:\AI GGUF\GGUF 27 entries parsed=1
+13:34:37.319  +  515.8ms  rescan: scanning H:\AI GGUF\voice
+13:34:37.378  +  575.1ms  rescan: done H:\AI GGUF\voice 6 entries parsed=6
+13:36:47.521  +130717.6ms  wails.Run returned

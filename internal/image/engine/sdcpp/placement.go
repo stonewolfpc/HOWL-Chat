@@ -12,11 +12,20 @@ import (
 // every byte of it sat in system RAM, which is exactly the state a user with
 // 8 GB of VRAM needs to see.
 type Placement struct {
-	Known      bool              `json:"known"`
-	VRAMMB     float64           `json:"vramMB"`
-	RAMMB      float64           `json:"ramMB"`
-	Components map[string]string `json:"components"` // component -> RAM | VRAM | N/A
-	Backends   string            `json:"backends"`   // the auto-fit plan verbatim
+	Known       bool               `json:"known"`
+	VRAMMB      float64            `json:"vramMB"`
+	RAMMB       float64            `json:"ramMB"`
+	Components  map[string]string  `json:"components"` // component -> RAM | VRAM | N/A
+	ComponentMB map[string]float64 `json:"componentMB,omitempty"`
+	Backends    string             `json:"backends"` // the auto-fit plan verbatim
+	// VAETiled records that sd.cpp's own decode fallback ran. Howl pre-enables
+	// tiling when its estimate predicts pressure; this is the observed event when
+	// the estimate was wrong or tiling was not pre-enabled.
+	VAETiled      bool   `json:"vaeTiled"`
+	VAETilingNote string `json:"vaeTilingNote,omitempty"`
+	// Process carries Howl's own working-set observations. It is not part of the
+	// engine's per-component claim.
+	Process map[string]Footprint `json:"process,omitempty"`
 }
 
 // Offloaded reports that the model is running with no weights resident in VRAM.
@@ -30,6 +39,8 @@ var (
 	rePlacementPart  = regexp.MustCompile(`([a-z_]+)\s+([0-9.]+)MB\((RAM|VRAM|N/A)\)`)
 	// [I] auto-fit: --backend "diffusion=CUDA0,te=CUDA0,vae=CUDA0" --params-backend "diffusion=cpu,te=cpu,vae=cpu"
 	rePlacementPlan = regexp.MustCompile(`auto-fit: --backend "([^"]*)" --params-backend "([^"]*)"`)
+	reVAEDecodeOOM  = regexp.MustCompile(`VAE decode (compute failed|ran out of memory)`)
+	reVAETileChange = regexp.MustCompile(`Reducing VAE decode tiles from ([0-9]+x[0-9]+) to ([0-9]+x[0-9]+)`)
 )
 
 // parsePlacement reads one line of sd-server output. It returns false for every
@@ -45,12 +56,16 @@ func parsePlacement(line string) (Placement, bool) {
 	// The format has the total first, then the per-component split; keep the
 	// per-component figure when it is there because it is the honest one.
 	parts := map[string]string{}
+	sizes := map[string]float64{}
 	for _, pm := range rePlacementPart.FindAllStringSubmatch(m[4], -1) {
 		parts[pm[1]] = pm[3]
+		if mb, err := strconv.ParseFloat(pm[2], 64); err == nil {
+			sizes[pm[1]] = mb
+		}
 	}
 	ram, _ := strconv.ParseFloat(m[3], 64)
 	vram, _ := strconv.ParseFloat(m[2], 64)
-	return Placement{Known: true, VRAMMB: vram, RAMMB: ram, Components: parts}, true
+	return Placement{Known: true, VRAMMB: vram, RAMMB: ram, Components: parts, ComponentMB: sizes}, true
 }
 
 // merge keeps what is already known and overrides it with anything the new line
@@ -64,14 +79,37 @@ func (p Placement) merge(next Placement) Placement {
 	}
 	if next.RAMMB > 0 || next.VRAMMB > 0 || len(next.Components) > 0 {
 		p.RAMMB, p.VRAMMB, p.Components = next.RAMMB, next.VRAMMB, next.Components
+		p.ComponentMB = next.ComponentMB
+	}
+	if next.VAETiled {
+		p.VAETiled = true
+		if next.VAETilingNote != "" {
+			p.VAETilingNote = next.VAETilingNote
+		}
 	}
 	p.Known = true
 	return p
 }
 
+// parsePlacementEvent reads sd.cpp's own decode-retry lines. They are not a
+// placement summary, but they are an execution fact the UI must not hide: the
+// engine already tiled because the decode did not fit.
+func parsePlacementEvent(line string) (Placement, bool) {
+	if reVAEDecodeOOM.MatchString(line) {
+		return Placement{Known: true, VAETiled: true, VAETilingNote: line}, true
+	}
+	if reVAETileChange.MatchString(line) {
+		return Placement{Known: true, VAETiled: true, VAETilingNote: line}, true
+	}
+	return Placement{}, false
+}
+
 // recordPlacement feeds one line of server output into the placement state.
 func (e *Engine) recordPlacement(line string) {
 	next, ok := parsePlacement(line)
+	if !ok {
+		next, ok = parsePlacementEvent(line)
+	}
 	if !ok {
 		return
 	}
@@ -88,6 +126,10 @@ func (e *Engine) GetPlacement() Placement {
 	if p.Components == nil {
 		p.Components = map[string]string{}
 	}
+	if p.ComponentMB == nil {
+		p.ComponentMB = map[string]float64{}
+	}
+	p.Process = e.GetFootprints()
 	return p
 }
 

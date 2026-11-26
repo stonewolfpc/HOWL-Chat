@@ -118,24 +118,31 @@ func (l *ModelLoader) LoadASR(ctx context.Context, modelType string, config type
 
 // LoadTTS initializes a TTS model and tracks it for lifecycle management.
 func (l *ModelLoader) LoadTTS(ctx context.Context, modelType string, config types.TTSConfig) (types.TTSSynthesizer, error) {
+	synth, _, err := l.LoadTTSWithID(ctx, modelType, config)
+	return synth, err
+}
+
+// LoadTTSWithID is LoadTTS that also returns the loader id, so the owner can
+// later release exactly this provider instead of sweeping every loaded model.
+func (l *ModelLoader) LoadTTSWithID(ctx context.Context, modelType string, config types.TTSConfig) (types.TTSSynthesizer, string, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
 	if err := ctx.Err(); err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	synth, err := l.ttsFactory.Create(types.TTSModelType(modelType))
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if err := initializeProvider("tts:"+modelType, func() error {
 		return synth.Initialize(ctx, config)
 	}, synth.Release); err != nil {
 		releaseErr := synth.Release()
-		return nil, errors.Join(err, releaseErr)
+		return nil, "", errors.Join(err, releaseErr)
 	}
-	l.trackTTSLoaded(modelType, synth.Release)
-	return synth, nil
+	id := l.trackTTSLoaded(modelType, synth.Release)
+	return synth, id, nil
 }
 
 // LoadMultimodal initializes a multimodal bridge and tracks it for lifecycle management.

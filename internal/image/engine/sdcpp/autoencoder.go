@@ -12,10 +12,19 @@ import "strings"
 // the models, so it lives in one function instead of in each caller's guess.
 func AutoencoderGroup(family string) string {
 	switch strings.ToLower(strings.TrimSpace(family)) {
-	case "flux", "z_image":
+	case "flux", "z_image", "chroma", "hidream":
+		// Chroma decodes with the Flux autoencoder: its capability entry marks
+		// FluxAE, and the model itself ships ae.safetensors. Leaving it out here
+		// made the app report a loaded Flux AE as "vae missing" for Chroma and
+		// refuse to attach the only autoencoder that can decode it.
 		return "flux_ae"
 	case "anima", "qwen_image":
 		return "qwen_image_ae"
+	case "sd3", "sd3.5":
+		// SD 3.5 decodes with the SD3 autoencoder, and scanner.CompatibleVAE
+		// already says so. Without it here the two owners disagreed and a
+		// present sd3_vae.safetensors still read as "vae missing" for SD 3.5.
+		return "sd3_ae"
 	}
 	// flux2 has its own flux2-vae, and sd1.5/sd2.1/sdxl/sd3 each have their own,
 	// so those families only ever accept their own family.
