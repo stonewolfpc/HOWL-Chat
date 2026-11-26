@@ -1037,9 +1037,19 @@ func (a *App) imageAdmissionRequest(loadOpts imagetypes.ModelLoadOptions, gen im
 	req.ResidentLoaded = useLoaded
 	if !useLoaded {
 		req.MeasuredResidentVRAMMB = a.measuredImageResidentVRAMMB(loadOpts, gen)
+		// A post-generation device delta for this same model and an equal or
+		// larger workload shape is stronger evidence than the metadata
+		// projection. It raises the commitment; it never replaces the resident
+		// requirement, because that delta already contains the activation and
+		// allocator retention of the measured run.
+		batch := gen.BatchCount
+		if batch <= 0 {
+			batch = 1
+		}
+		req.MinimumCommitmentVRAMMB = a.observedCommitmentFloorMB(resource.ResourceImage, loadOpts.ModelName, gen.Width, gen.Height, batch, loadOpts.WeightType)
 	}
-	fmt.Printf("[App] image request: checkpoint=%dMB conditioner=%dMB vae=%dMB control=%dMB ip_adapter=%dMB clip_vision=%dMB cpu=%t lora=%dMB measured_resident=%dMB model=%q\n",
-		req.CheckpointBytes>>20, req.ConditionerBytes>>20, req.VAEBytes>>20, req.ControlNetBytes>>20, req.IPAdapterBytes>>20, req.ClipVisionBytes>>20, req.ClipVisionCPU, req.LoRABytes>>20, req.MeasuredResidentVRAMMB, req.Name)
+	fmt.Printf("[App] image request: checkpoint=%dMB conditioner=%dMB vae=%dMB control=%dMB ip_adapter=%dMB clip_vision=%dMB cpu=%t lora=%dMB measured_resident=%dMB observed_floor=%dMB model=%q\n",
+		req.CheckpointBytes>>20, req.ConditionerBytes>>20, req.VAEBytes>>20, req.ControlNetBytes>>20, req.IPAdapterBytes>>20, req.ClipVisionBytes>>20, req.ClipVisionCPU, req.LoRABytes>>20, req.MeasuredResidentVRAMMB, req.MinimumCommitmentVRAMMB, req.Name)
 	return req
 }
 

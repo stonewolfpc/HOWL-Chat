@@ -12,6 +12,7 @@ import (
 	"sync"
 
 	"howl-chat/internal/image/engine/sdcpp"
+	imagetypes "howl-chat/internal/image/types"
 	"howl-chat/internal/resource"
 )
 
@@ -19,6 +20,9 @@ type residencyRecorder struct {
 	mu       sync.Mutex
 	last     map[resource.ResourceType]resource.ResidencyObservation
 	baseline map[resource.ResourceType]residencyBaseline
+	// byModel keeps the latest observation per model so a later admission of
+	// the same model can use measurement instead of the metadata projection.
+	byModel map[string]resource.ResidencyObservation
 }
 
 // residencyBaseline is what a workload's admission committed and what the device
@@ -88,13 +92,39 @@ func (a *App) recordResidency(observation resource.ResidencyObservation) {
 	recorder := a.residency
 	recorder.mu.Lock()
 	recorder.last[observation.Kind] = observation
+	if observation.Model != "" {
+		if recorder.byModel == nil {
+			recorder.byModel = make(map[string]resource.ResidencyObservation)
+		}
+		recorder.byModel[string(observation.Kind)+"/"+observation.Model] = observation
+	}
 	recorder.mu.Unlock()
+}
+
+// observedCommitmentFloorMB returns a measured peak for this model that covers
+// the requested workload shape, or zero when no comparable measurement exists.
+// The caller may only raise a commitment with it; the plan keeps its role as
+// the estimate, and an observation without a matching shape is not reused.
+func (a *App) observedCommitmentFloorMB(kind resource.ResourceType, model string, width, height, batch int, weightType string) int64 {
+	if a.residency == nil || model == "" {
+		return 0
+	}
+	a.residency.mu.Lock()
+	defer a.residency.mu.Unlock()
+	observation, ok := a.residency.byModel[string(kind)+"/"+model]
+	if !ok || observation.Kind != kind {
+		return 0
+	}
+	if !observation.AppliesToGeneration(width, height, batch, weightType) {
+		return 0
+	}
+	return observation.ObservedVRAMMB()
 }
 
 // recordImageResidencyFromGeneration is the image observation point. sd-server
 // loads weights lazily, so a load-time record measured nothing; after the first
 // generation both the engine's placement and the device's usage are real.
-func (a *App) recordImageResidencyFromGeneration(engine *sdcpp.Engine, model string) {
+func (a *App) recordImageResidencyFromGeneration(engine *sdcpp.Engine, model string, gen imagetypes.ImageOptions, weightType string) {
 	if engine == nil || model == "" {
 		return
 	}
@@ -116,12 +146,16 @@ func (a *App) recordImageResidencyFromGeneration(engine *sdcpp.Engine, model str
 	}
 	const mb = int64(1024 * 1024)
 	afterMB := (snap.TotalVRAMBytes - snap.FreeVRAMBytes) / mb
+	batch := gen.BatchCount
+	if batch <= 0 {
+		batch = 1
+	}
 	observation := resource.NewResidencyObservation(
 		resource.ResourceImage, model,
 		baseline.PlannedMB,
 		engineReportedMB,
 		afterMB-baseline.UsedBeforeMB,
-	)
+	).WithGeneration(gen.Width, gen.Height, batch, weightType)
 	if observation.ObservedVRAMMB() == 0 {
 		return
 	}
@@ -147,6 +181,8 @@ func (a *App) GetResidencyReport() map[string]interface{} {
 			"device_delta_vram_mb":   observation.DeviceDeltaVRAMMB,
 			"ledger_vram_mb":         observation.LedgerVRAMMB(),
 			"agrees_with_plan":       observation.AgreesWithPlan(),
+			"coverage":               observation.Coverage,
+			"generation":             observation.Generation,
 			"at":                     observation.At.Format("2006-01-02T15:04:05Z07:00"),
 		}
 	}

@@ -133,6 +133,12 @@ type AdmissionRequest struct {
 	// VRAMBudgetMB is a hard ceiling on usable GPU memory, the same shape as a
 	// positive sd-server --max-vram. Zero means no explicit cap.
 	VRAMBudgetMB int64
+	// MinimumCommitmentVRAMMB is a previously observed peak for this model at
+	// an equal or larger workload shape. Admission may raise the commitment to
+	// it, never lower it, and never treats it as the resident requirement: a
+	// post-generation observation already contains activation and allocator
+	// retention.
+	MinimumCommitmentVRAMMB int64
 	// MeasuredResidentVRAMMB is a previously observed resident total for the
 	// same model and component set. Zero means no measurement is available.
 	MeasuredResidentVRAMMB int64
@@ -159,6 +165,10 @@ type AdmissionEstimate struct {
 	// AvailableVRAMMB when the workload is an image stage.
 	ResidentVRAMMB      int64
 	ProjectedPeakVRAMMB int64
+	// CommitmentFloorMB is a previously measured peak that raised the
+	// commitment above the projection. Source names the evidence.
+	CommitmentFloorMB     int64
+	CommitmentFloorSource string
 	// TilingPlanned reports that VAE tiling is required to keep the projected
 	// peak inside the available budget. The caller must start the engine with
 	// --vae-tiling for this decision to hold.
@@ -514,6 +524,17 @@ func (a *Authority) Admit(req AdmissionRequest) (AdmissionDecision, *AdmissionLe
 		}
 	}
 
+	// A measured peak for this model at an equal or larger workload shape is
+	// stronger evidence than the metadata projection. It can only raise the
+	// commitment: the observation already contains activation and allocator
+	// retention, so it may not replace the resident requirement or lower it.
+	if req.MinimumCommitmentVRAMMB > 0 && !req.CPUOnly && !req.WeightsOffloaded {
+		if measured := req.MinimumCommitmentVRAMMB; measured > est.committedVRAMMB() {
+			est.CommitmentFloorMB = measured
+			est.CommitmentFloorSource = CoveragePostGenerationDelta
+		}
+	}
+
 	needVRAM := est.committedVRAMMB()
 	if autoPlanned {
 		// The search already proved the plan fits, or proved nothing fits. A
@@ -626,6 +647,10 @@ func (a *Authority) grant(req AdmissionRequest, est AdmissionEstimate, blocking 
 	}
 	if adjustment != nil {
 		reason += fmt.Sprintf("; fitted plan context=%d gpu_layers=%d batch=%d", adjustment.ContextSize, adjustment.GPULayers, adjustment.BatchSize)
+	}
+	if est.CommitmentFloorMB > 0 {
+		reason += fmt.Sprintf("; measured floor %d MB (%s) raised the commitment above the %d MB projection",
+			est.CommitmentFloorMB, est.CommitmentFloorSource, est.ProjectedPeakVRAMMB)
 	}
 	if est.SoftReserveUsedMB > 0 {
 		need := est.committedVRAMMB()
@@ -783,10 +808,14 @@ func (est AdmissionEstimate) committedVRAMMB() int64 { return est.CommittedVRAMM
 // Projected, and a replacement credit is applied to effective free separately
 // rather than subtracted from this commitment.
 func (est AdmissionEstimate) CommittedVRAMMB() int64 {
-	if est.ProjectedPeakVRAMMB > est.RequiredVRAMMB {
-		return est.ProjectedPeakVRAMMB
+	committed := est.RequiredVRAMMB
+	if est.ProjectedPeakVRAMMB > committed {
+		committed = est.ProjectedPeakVRAMMB
 	}
-	return est.RequiredVRAMMB
+	if est.CommitmentFloorMB > committed {
+		committed = est.CommitmentFloorMB
+	}
+	return committed
 }
 
 func replacementFootprint(loaded []ModelState, req AdmissionRequest) (vram, ram int64) {
@@ -1123,6 +1152,10 @@ func vramReason(req AdmissionRequest, est AdmissionEstimate, blocking []ModelSta
 			reason += fmt.Sprintf("; projected peak %d MB = resident %d MB + activation %d MB + %d MB engine overhead",
 				est.ProjectedPeakVRAMMB, est.ResidentVRAMMB, est.ActivationVRAMMB, sdFixedOverheadMB)
 		}
+	}
+	if est.CommitmentFloorMB > 0 {
+		reason += fmt.Sprintf("; a measured %d MB peak for this model and workload shape raised the commitment above the %d MB projection",
+			est.CommitmentFloorMB, est.ProjectedPeakVRAMMB)
 	}
 	if est.SoftReserveAllowanceMB > 0 && need > est.AvailableVRAMMB {
 		reason += fmt.Sprintf("; the %d MB soft reserve allowance is not enough (it would leave less than %d MB free)",

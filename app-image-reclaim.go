@@ -160,7 +160,7 @@ func (a *App) reclaimImageEngineAfterGenerationLocked(_ string, opts imagetypes.
 	// The engine has run a real generation and reported its placement: this is
 	// the first honest moment to measure image residency and reconcile the
 	// ledger with it.
-	a.recordImageResidencyFromGeneration(engine, loaded.ModelName)
+	a.recordImageResidencyFromGeneration(engine, loaded.ModelName, opts, loaded.WeightType)
 
 	req := a.imageAdmissionRequest(loaded, opts, false)
 	componentBytes := req.CheckpointBytes + req.ConditionerBytes + req.VAEBytes + req.ControlNetBytes + req.LoRABytes
