@@ -289,6 +289,36 @@ func (a *App) admitImageLoad(loadOpts imagetypes.ModelLoadOptions, gen imagetype
 		}
 	}
 
+	// A model whose full resident set cannot fit is not automatically unusable.
+	// With placement left on Auto, plan a bounded placement inside the budget
+	// the authority just computed, then re-admit that placement: the weights
+	// live in system RAM and the engine spends at most --max-vram on the device.
+	// This is the HiDream-class case, where the diffusion file alone is larger
+	// than the card.
+	if !decision.Admitted && startupWillApply && imageBoundedPlacementEligible(chosen) {
+		budgetMB := decision.Estimate.AvailableVRAMMB
+		budgetGiB := budgetMB / 1024
+		if budgetGiB < 1 {
+			budgetGiB = 1
+		}
+		budget := int(budgetGiB)
+		bounded := chosen
+		bounded.MaxVRAM = &budget
+		bounded.AutoMaxVRAM = true
+		if boundedErr := a.planBoundedPlacement(&bounded, gen, budgetMB, true); boundedErr == nil && bounded.AutoPlacement {
+			req := a.imageAdmissionRequest(bounded, gen, false)
+			boundedDecision, boundedLease := a.admission.Admit(req)
+			if boundedDecision.Admitted {
+				fmt.Printf("[App] bounded placement admitted: mode=%s budget=%dMB projected=%dMB resident=%dMB activation=%dMB\n",
+					bounded.AutoPlacementMode, budgetMB, boundedDecision.Estimate.ProjectedPeakVRAMMB,
+					boundedDecision.Estimate.ResidentVRAMMB, boundedDecision.Estimate.ActivationVRAMMB)
+				decision, lease, chosen = boundedDecision, boundedLease, bounded
+			} else {
+				decision.Reason += "; bounded placement also refused: " + boundedDecision.Reason
+			}
+		}
+	}
+
 	if !decision.Admitted {
 		a.logError(errors.IMGModelLoadFail, errors.Critical, "image.load.admission", "app-image-model.go", fmt.Errorf("%s", decision.Reason))
 		return decision, nil, chosen, fmt.Errorf("%s", decision.Reason)
@@ -365,6 +395,20 @@ func (a *App) admitImageLoad(loadOpts imagetypes.ModelLoadOptions, gen imagetype
 	// post-generation VRAM nor RAM on this build.
 
 	return decision, lease, chosen, nil
+}
+
+// imageBoundedPlacementEligible reports whether Howl may choose a bounded
+// placement for this start. An explicit backend or params backend is the user's
+// decision, and a positive explicit --max-vram was already planned before
+// admission; a missing or automatic cap is Howl's to fit.
+func imageBoundedPlacementEligible(loadOpts imagetypes.ModelLoadOptions) bool {
+	if imageCPUOnly(loadOpts) || loadOpts.AutoPlacement {
+		return false
+	}
+	if strings.TrimSpace(loadOpts.Backend) != "" || strings.TrimSpace(loadOpts.ParamsBackend) != "" {
+		return false
+	}
+	return loadOpts.MaxVRAM == nil || loadOpts.AutoMaxVRAM
 }
 
 func imageAutoQuantizeEligible(loadOpts imagetypes.ModelLoadOptions) bool {
@@ -496,6 +540,17 @@ func (a *App) constrainOffload(loadOpts *imagetypes.ModelLoadOptions, gen imaget
 	if loadOpts.MaxVRAM == nil || *loadOpts.MaxVRAM <= 0 {
 		return nil
 	}
+	return a.planBoundedPlacement(loadOpts, gen, int64(*loadOpts.MaxVRAM)*1024, announce)
+}
+
+// planBoundedPlacement selects a placement that stays inside budgetMB instead
+// of refusing a model whose full resident set does not fit. It is the same
+// decision whether the budget came from the user's --max-vram or from Howl's
+// own post-reserve cap; the budget is consumed, never recalculated.
+func (a *App) planBoundedPlacement(loadOpts *imagetypes.ModelLoadOptions, gen imagetypes.ImageOptions, budgetMB int64, announce bool) error {
+	if loadOpts == nil || imageCPUOnly(*loadOpts) || loadOpts.AutoPlacement {
+		return nil
+	}
 	// An explicit backend or params backend is the user's placement choice; do
 	// not rewrite it behind their back. Auto (both empty) is Howl's to fit.
 	if strings.TrimSpace(loadOpts.Backend) != "" || strings.TrimSpace(loadOpts.ParamsBackend) != "" {
@@ -506,7 +561,6 @@ func (a *App) constrainOffload(loadOpts *imagetypes.ModelLoadOptions, gen imaget
 	if !ok {
 		return nil
 	}
-	budgetMB := int64(*loadOpts.MaxVRAM) * 1024
 	if budgetMB <= 0 || weights+activation <= budgetMB {
 		return nil
 	}
