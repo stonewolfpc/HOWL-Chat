@@ -219,12 +219,10 @@ moving GPU memory.
 The refused-connection error did not recur: the request now leaves only after
 the engine answers, because the send itself started it.
 
-**Observed but not explained:** the assistant bubble rendered empty in the
-packaged host even though 2,285 bytes of content streamed (`Stream completed,
-total chunks=486, total content=2285 bytes`). A second send behaved the same. The
-same empty bubble appeared in the packaged host *before* this change, so it is a
-separate rendering/host issue, not evidence for or against demand activation —
-and it is not claimed as a working reply.
+**Empty reply bubble — Defect 5.** The stream reported 2,285 bytes while the
+bubble stayed empty (`Stream completed, total chunks=486, total content=2285
+bytes`). It reproduced before this change, so it was never evidence against
+demand activation. The cause and fix are recorded in Defect 5 below.
 
 ### Safeguards kept
 
@@ -234,6 +232,48 @@ and it is not claimed as a working reply.
   second execution of the same message.
 - Startup failure is reported by `LoadModel` and by the readiness wait; neither
   is converted into a success.
+
+## Defect 5 — the assistant bubble stayed empty (fixed)
+
+The empty bubble recorded under Defect 4 was not a renderer bug. The reply never
+reached the visible channel:
+
+- `app-llama.go` read `think_mode` with default `hidden`, so an unset setting
+  started llama-server with `--reasoning on --reasoning-format deepseek
+  --reasoning-budget 2048`.
+- `app-prompt.go` read the same setting with default `off`, so the same unset
+  setting added no headroom: `n_predict` stayed 512 while the thought was allowed
+  2,048 tokens.
+- The model therefore spent the whole reply cap inside an unclosed ` thinking`
+  block. The think splitter routed every delta to `chat:reasoning`, emitted no
+  `chat:chunk`, and `onComplete` correctly closed a bubble that had never
+  received a visible character. The log line `chunks=486, total content=2285
+  bytes` counts raw content, thought included — which is why the log and the
+  bubble disagreed.
+
+Fix: one resolution for the mode. `defaultThinkMode` and `thinkHeadroom()` live in
+`app-llama.go`, and both the server flags and the request budget read them, so a
+mode the server reasons in always pays for its budget. The default request cap is
+now 512 + 2,048 = 2,560. `TestAbsentThinkModePaysForTheServersReasoningBudget`
+holds the two paths together.
+
+### Verified
+
+| Host | Action | Observed |
+|---|---|---|
+| Browser dev host | "demand activation check" | `[inference] … n_predict=2560`; 1,982 chunks / 8,955 bytes raw (thought + answer); bubble `Activation check complete; system online.` (44 chars), no longer streaming |
+| Browser dev host | "say hello" earlier, same root | `The answer to 2 plus 2 is 4.` and `There are exactly three letters "r" in the word strawberry.` rendered |
+| Packaged (WebView2), 1400×900 | "say hello" — the prompt that had produced an empty bubble | `n_predict=2560`; demand load; `layers=32/33 context=3328 matches_plan=true`; bubble `Hello! How can I assist you today?`; `history.ndjson` id 16 carries the same text |
+
+The 8,955-byte stream ending in a 44-character reply is the splitter working as
+designed: the thought is ~8.9 KB and is not rendered (default mode `hidden`), the
+answer is the visible remainder.
+
+**Residual, not fixed:** a model that still exhausts its budget inside the
+thought (a reasoning loop longer than the configured budget) will again end with
+no visible text and a blank bubble without explanation. The headroom makes that
+unlikely rather than impossible; an "answer truncated during reasoning" notice is
+a separate change.
 
 ## Owners
 
@@ -251,8 +291,8 @@ two fixes are message-selection and a guard on an existing rescue path.
   needs a human speaker at the microphone. Nothing here claims ASR works beside
   a resident workload.
 - **Defect 4:** the refused-connection race did not recur after Send took
-  ownership of the load, but **the assistant reply rendered empty** in that same
-  packaged run, so the end-to-end reply is still unproven in that host.
+  ownership of the load. The empty reply in that run was Defect 5, now fixed and
+  re-verified in both hosts (above).
 - **Image generation in the packaged host used the 20-step default at 512×512**;
   the browser run used 2 steps. Neither is a speed measurement.
 - **Screenshot/click driving is physical-screen input**; the packaged window was

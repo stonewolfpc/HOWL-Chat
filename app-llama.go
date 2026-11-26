@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -91,6 +92,32 @@ func strSetting(m map[string]interface{}, key string, def string) string {
 		return v
 	}
 	return def
+}
+
+// defaultThinkMode is the reasoning mode used when the user has not chosen one.
+// The server flags (app-llama.go) and the per-request token budget
+// (app-prompt.go) both read think_mode; they must resolve an absent setting the
+// same way. When they disagreed, the server reasoned with a 2048-token budget
+// the request never paid for, so the whole reply cap was spent inside an
+// unclosed thought and the visible bubble stayed empty.
+const defaultThinkMode = "hidden"
+
+func thinkModeSetting(settings map[string]interface{}) string {
+	return strSetting(settings, "think_mode", defaultThinkMode)
+}
+
+// thinkHeadroom is the extra generation allowance the thought may consume
+// before the answer begins. It is zero only when reasoning is off, so every
+// mode the server actually reasons in pays for its budget.
+func thinkHeadroom(settings map[string]interface{}) int {
+	if settings == nil || thinkModeSetting(settings) == "off" {
+		return 0
+	}
+	extra, err := strconv.Atoi(intSetting(settings, "think_budget", 2048))
+	if err != nil || extra <= 0 {
+		return 0
+	}
+	return extra
 }
 
 // ---------------------------------------------------------------------------
@@ -191,7 +218,7 @@ func buildLlamaServerArgs(modelPath, mmprojPath string, settings map[string]inte
 	// when the budget runs out without it the model keeps thinking inside the
 	// answer instead of answering (llama.cpp issue #22717), which is exactly the
 	// loop this is meant to prevent. Verified against this binary's --help.
-	switch strSetting(settings, "think_mode", "hidden") {
+	switch thinkModeSetting(settings) {
 	case "off":
 		args = append(args, "--reasoning", "off", "--reasoning-budget", "0")
 	case "hidden", "on":

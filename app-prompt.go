@@ -7,7 +7,6 @@ import (
 	stderrors "errors"
 	"fmt"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -544,14 +543,9 @@ func (a *App) buildInferenceOptions() *llama.InferenceOptions {
 
 	// A thinking model spends its allowance on reasoning first, so the response
 	// cap would otherwise truncate the answer. Give the thought its own headroom
-	// on top of n_predict instead of eating the visible reply.
-	if ms := a.settings.Model(); ms != nil {
-		if mode := strSetting(ms, "think_mode", "off"); mode != "off" {
-			if extra, err := strconv.Atoi(intSetting(ms, "think_budget", 2048)); err == nil && extra > 0 {
-				opts.NPredict += extra
-			}
-		}
-	}
+	// on top of n_predict instead of eating the visible reply. The mode and the
+	// budget are read by thinkHeadroom, the same resolution the server flags use.
+	opts.NPredict += thinkHeadroom(a.settings.Model())
 	fmt.Printf("[inference] family=%q source=%q temp=%.2f top_p=%.2f top_k=%d min_p=%.2f repeat=%.2f n_predict=%d\n",
 		a.familyName(), familySource, opts.Temperature, opts.TopP, opts.TopK, opts.MinP, opts.RepeatPenalty, opts.NPredict)
 
