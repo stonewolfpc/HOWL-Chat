@@ -50,6 +50,16 @@ func (a *App) ensureVideoExecutionLocked(modelName, jobID string, genOpts ...ima
 }
 
 func (a *App) ensureEngineReadyExecutionLocked(modelName, jobID string, holdVideoLease *func(), genOpts ...imagetypes.ImageOptions) error {
+	// The start is a transition: admission, spawn and registration happen under
+	// the gate, and the gate is released before any generation runs. This is the
+	// body every caller reaches, including the sequential workflow, so there is
+	// no bypass around it.
+	transition, gateErr := a.beginLifecycleTransition(resource.ResourceImage, "loading", lifecycleStartWait)
+	if gateErr != nil {
+		return gateErr
+	}
+	defer transition.Release()
+
 	var genOptsValue imagetypes.ImageOptions
 	if len(genOpts) > 0 {
 		genOptsValue = genOpts[0]
@@ -177,6 +187,11 @@ func (a *App) SetActiveImageModel(opts interface{}) (err error) {
 	}
 	a.imageStartMu.Lock()
 	defer a.imageStartMu.Unlock()
+	transition, gateErr := a.beginLifecycleTransition(resource.ResourceImage, "loading", lifecycleStartWait)
+	if gateErr != nil {
+		return gateErr
+	}
+	defer transition.Release()
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Printf("[PANIC] SetActiveImageModel: %v\n", r)

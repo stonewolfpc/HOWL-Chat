@@ -29,10 +29,20 @@ import (
 
 // LoadModel starts llama-server with the given model path.
 func (a *App) LoadModel(modelPath string) (err error) {
-	// One model start at a time: the decision and the stop/spawn that follows it
-	// must see the same ledger, otherwise two loads can both pass on one free value.
-	a.modelStartMu.Lock()
-	defer a.modelStartMu.Unlock()
+	// One lifecycle transition at a time: the decision and the stop/spawn that
+	// follows it must see the same ledger, otherwise two loads can both pass on
+	// one free value. The transition is handed to the monitor so it stays held
+	// through the health check and registration, not only through the spawn.
+	transition, gateErr := a.beginLifecycleTransition(resource.ResourceLLM, "loading", lifecycleStartWait)
+	if gateErr != nil {
+		return gateErr
+	}
+	monitorOwnsTransition := false
+	defer func() {
+		if !monitorOwnsTransition {
+			transition.Release()
+		}
+	}()
 	if err := a.ensureAcceptingWork("load model"); err != nil {
 		return err
 	}
@@ -400,7 +410,12 @@ func (a *App) LoadModel(modelPath string) (err error) {
 	a.engine.SetProgressMilli(0)
 	a.engine.SetStage("Starting")
 
+	monitorOwnsTransition = true
 	go func() {
+		// The transition covers the whole start, including the health check and
+		// registration: a stop that landed between spawn and health used to be
+		// able to kill the server the user was waiting on.
+		defer transition.Release()
 		const maxTicks = 120
 		defer func() {
 			if r := recover(); r != nil {
@@ -729,6 +744,13 @@ func (a *App) chatAdmissionRequest(profile *types.ModelProfile, modelPath string
 
 // UnloadModel kills the llama-server process, freeing all model memory.
 func (a *App) UnloadModel() error {
+	// A stop is a transition too. If a chat start owns the slot, this refuses
+	// with the conflicting transition named instead of killing its child.
+	transition, err := a.beginLifecycleTransition(resource.ResourceLLM, "stop", lifecycleStopWait)
+	if err != nil {
+		return err
+	}
+	defer transition.Release()
 	if err := a.level0().Processes.Stop(llamaShutdownTimeout); err != nil {
 		return fmt.Errorf("stop llama-server: %w", err)
 	}

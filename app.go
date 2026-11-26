@@ -46,12 +46,15 @@ type App struct {
 	// The pointer is the process-wide authority in production; tests replace it
 	// with an isolated instance so they never consult live hardware.
 	admission *resource.Authority
-	// modelStartMu serializes the chat load decision and the stop/spawn that
-	// follows it, so two loads cannot both pass the same free-memory value.
-	modelStartMu sync.Mutex
 	// imageStartMu does the same for image loads, whose job manager can run
 	// several queued starts concurrently.
 	imageStartMu sync.Mutex
+	// lifecycleGate serializes conflicting *transitions* across workloads — a
+	// start, stop, unload, recovery or reload — so one workload cannot stop
+	// another while it is starting. It is never held during execution; the
+	// workload leases above own that span.
+	lifecycleGate *resource.LifecycleGate
+	lifecycleOnce sync.Once
 
 	// Level 0 — application lifecycle and coordination (internal/host).
 	// The authority owns admission, shutdown sequencing, background joining,

@@ -281,11 +281,30 @@ func (a *App) reclaimImageEngineAfterGenerationLocked(_ string, opts imagetypes.
 	}
 
 	// The only real release lever in the pinned build is process teardown. The
-	// reload reuses the already-admitted options (no new admission, no budget or
-	// placement change); admission remains the sole authority for what may run.
+	// reload is a new start of the same process, so it needs a new decision: an
+	// earlier admission was a statement about that moment, not a permanent
+	// permission. It also takes the reload transition so a concurrent start or
+	// unload cannot interleave with it.
 	reclaimOpts := loaded
 	reclaimOpts.JobID = ""
-	reloadErr := engine.LoadModel(reclaimOpts)
+	reloadErr := func() error {
+		transition, gateErr := a.beginLifecycleTransition(resource.ResourceImage, "reloading", lifecycleStopWait)
+		if gateErr != nil {
+			return gateErr
+		}
+		defer transition.Release()
+
+		authority := a.admission
+		if authority == nil {
+			authority = resource.DefaultAuthority()
+		}
+		decision, lease := authority.Admit(req)
+		if !decision.Admitted {
+			return fmt.Errorf("reload refused by admission: %s", decision.Reason)
+		}
+		defer lease.Release()
+		return engine.LoadModel(reclaimOpts)
+	}()
 
 	afterWS := 0.0
 	if loadFP, ok := engine.GetFootprints()["load"]; ok && loadFP.Known {

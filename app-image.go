@@ -8,6 +8,7 @@ import (
 	imageengine "howl-chat/internal/image/engine"
 	"howl-chat/internal/image/engine/sdcpp"
 	"howl-chat/internal/image/registry"
+	"howl-chat/internal/resource"
 	imgsettings "howl-chat/internal/image/settings"
 	imagetypes "howl-chat/internal/image/types"
 )
@@ -147,12 +148,24 @@ func (a *App) reinitEngine(mutate func(*imagetypes.EngineConfig)) error {
 }
 
 // UnloadImageModel shuts down the sd-server subprocess and frees model memory.
+//
+// It is a lifecycle transition: it serializes against image starts, reloads and
+// other unloads, and it refuses while an image workflow still owns the engine.
+// Freeing the card for chat must not tear down a stage that is mid-flight.
 func (a *App) UnloadImageModel() error {
+	transition, err := a.beginLifecycleTransition(resource.ResourceImage, "stop", lifecycleStopWait)
+	if err != nil {
+		return err
+	}
+	defer transition.Release()
+	if a.workflowReclaimBlocked() {
+		return fmt.Errorf("the image model cannot be unloaded while an image workflow is running; cancel the workflow first")
+	}
 	if a.images.Engine() == nil {
 		return fmt.Errorf("image engine not initialized")
 	}
 	fmt.Printf("[App] UnloadImageModel called\n")
-	err := a.images.Engine().Shutdown()
+	err = a.images.Engine().Shutdown()
 	if err != nil {
 		return fmt.Errorf("unload image model: %w", err)
 	}

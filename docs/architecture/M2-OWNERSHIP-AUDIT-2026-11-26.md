@@ -192,11 +192,96 @@ Steps 1 and 3 are independent of measurement and can proceed now. Step 2 is
 partly blocked on Milestone 3. Step 4 is fully blocked on it. This is the
 dependency surfacing naturally rather than being imposed.
 
+## Implementation (added after the audit, in the agreed order)
+
+### One cross-workload lifecycle gate
+
+`internal/resource/lifecycle.go` adds `LifecycleGate`: at most one in-flight
+*transition* per resource kind, acquired by `Begin`/`BeginWithin` and released by
+an idempotent `Release`. A conflict is a surfaced `LifecycleBusyError` naming the
+transition that is holding the slot; starts wait up to 30 s, stops 5 s, and then
+refuse rather than hang.
+
+The gate is deliberately not an execution lock. It is held only for the span in
+which memory is read, a process is started or stopped, or a ledger entry is
+written. Generation and chat inference keep their existing leases and never hold
+it, so a long image workflow cannot block a chat start for its duration.
+
+Ordering rule: a caller may hold a chat transition and then request an image one
+(the chat handoff), never the reverse in one chain.
+
+### Wired paths
+
+| Path | Transition | Held until |
+|---|---|---|
+| `LoadModel` | `llm/loading` | the monitor finishes: health check, placement report and registration, or any failure |
+| `UnloadModel` | `llm/stop` | process stop and unregistration |
+| `ensureEngineReadyExecutionLocked` (all image starts, including workflow stages) | `image/loading` | admission + `EnsureReady`/`LoadModel` + registration |
+| `SetActiveImageModel` | `image/loading` | same |
+| `UnloadImageModel` | `image/stop` | shutdown and unregistration |
+| image reclaimer reload | `image/reloading` | admission + `engine.LoadModel` |
+
+`UnloadImageModel` also refuses while an image workflow owns the engine
+(`workflowReclaimBlocked`), so a chat handoff cannot tear down a running stage;
+the refusal names the workflow.
+
+### Fresh admission before the reload
+
+The image reclaimer no longer reuses an earlier decision. Before
+`engine.LoadModel` it takes a new `Admit` decision on the same request and
+refuses the reload (recording `ReloadError`) if admission says no. An earlier
+admission was a statement about that moment, not a permanent permission.
+
+## Verification
+
+Deterministic tests (no GPUs, no sleeps that decide an outcome):
+
+- `internal/resource/lifecycle_test.go` — unload during start, stop waiting for
+  a start then proceeding, bounded refusal of a competing start, two workloads
+  not blocking each other, execution holding nothing, competing reloads,
+  idempotent/nil-safe release, 32 concurrent transitions leaving no slot.
+- `app-lifecycle-gate_test.go` — `UnloadModel` refuses while chat is loading;
+  `UnloadImageModel` refuses while the image slot is `reloading`; refuses during
+  an active workflow; falls through once the workflow is released.
+
+User-visible workflow, packaged desktop host (isolated root):
+
+| Step | Evidence |
+|---|---|
+| load (auto-load path) | admission `6057 MB required, 6325 MB available after 702 MB reserve`, `-ngl 32`, actual `32/33`, `context 3328`, `matches_plan=true` |
+| unload | clicked `UNLOAD`, confirmed `AGGRESSIVE UNLOAD` dialog with `OK`; `INFO: llama-server stopped, model memory freed`; no `llama-server` process remained |
+| reload | second admission `6057 MB required, 6185 MB available after 687 MB reserve` — a different free value, so the decision was re-read, not reused; `matches_plan=true`; UI shows the placement message again |
+
+Browser dev host: load through the page's own load handler (same documented
+caveat as Milestone 1) → admission `6352 MB available after 705 MB reserve`,
+actual `32/33`, `matches_plan=true`.
+
+Build: `go build ./...`, `go test . ./internal/resource/` pass; both host binaries
+built.
+
+## Deferred to Milestone 3 (recorded, not compensated)
+
+The audit's §3 gap stands: image registers `RequiredVRAMMB` while its committed
+footprint is `ProjectedPeakVRAMMB`. No temporary reserve or fudge factor was
+added to hide it. Fixing it needs a measured resident total from a real image
+generation, which is Milestone 3's first deliverable.
+
+The four reserve computations (R1–R4) are untouched. They are not consolidated
+until capacity and accounting are trustworthy, as agreed.
+
 ## Verified limitations of this audit
 
 - No runtime experiment was performed; §5's interleaving is a code-graph claim.
 - `internal/audio` was read at its admission/registration seams only; its
   internal residency policy (`tts_residency.go`) was not audited in depth.
 - The Windows and Unix GPU detectors were read for call shape, not behaviour.
-- No UI surface was exercised; this document makes no claim about visible
-  behaviour.
+- The cross-workload interleaving itself was not reproduced at runtime. The
+gate's unit tests model the three named races deterministically, and the unload
+refusals are asserted at App level, but no experiment drove two real engines
+into contention. What the packaged run does prove is that the gate does not
+break or deadlock the load/unload/reload lifecycle.
+- Harness unload/reload was not exercised: the unload path raises a browser
+confirm dialog, and the packaged host already covered that path with real input.
+- The image reclaimer's new admission and `reloading` transition were not
+exercised against a real image engine in this pass; they are covered by the gate
+tests and by code read only.
