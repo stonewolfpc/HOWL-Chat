@@ -26,9 +26,12 @@ func chatPlacementReport(modelPath string, settings map[string]interface{}, deci
 
 	source := "requested"
 	if decision.Adjustment != nil {
-		if decision.Manual {
+		switch {
+		case decision.Manual:
 			source = "manual fallback"
-		} else {
+		case decision.Adjustment.Auto:
+			source = "auto placement"
+		default:
 			source = "fitted"
 		}
 	}

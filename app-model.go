@@ -283,6 +283,23 @@ func (a *App) LoadModel(modelPath string) (err error) {
 	// hardware cannot be measured, admission returns a warned reduced plan
 	// instead of locking the load out.
 	loadRequest.AllowManual = true
+	// One primary GPU workload at a time: a chat start that wants the GPU hands
+	// the device over instead of being demoted to the CPU behind the user's
+	// back. The handoff stops the image engine, waits for the driver to report
+	// the freed memory, and only then lets admission run against fresh numbers.
+	if loadRequest.RequireGPU {
+		if name, _ := a.loadedImageModelInfo(); name != "" {
+			fmt.Printf("[VRAM] automatic handoff: unloading image model %q to load the chat model\n", name)
+			fit, err := a.FreeVRAMFor("llm", modelPath, true)
+			if err != nil {
+				a.engine.SetProgressMilli(0)
+				a.engine.SetStage("Refused")
+				a.emitEvent("model:error", err.Error())
+				return err
+			}
+			fmt.Printf("[VRAM] handoff complete: %s\n", fit.Message)
+		}
+	}
 	loadDecision, loadLease := a.admission.Admit(loadRequest)
 	fmt.Printf("[LoadModel] admission: admitted=%t manual=%t %s\n", loadDecision.Admitted, loadDecision.Manual, loadDecision.Reason)
 	if !loadDecision.Admitted {
@@ -303,13 +320,28 @@ func (a *App) LoadModel(modelPath string) (err error) {
 		spawnSettings["context_size"] = adjustment.ContextSize
 		spawnSettings["gpu_layers"] = adjustment.GPULayers
 		spawnSettings["batch_size"] = adjustment.BatchSize
-		fmt.Printf("[LoadModel] fitted plan applied: context=%d gpu_layers=%d batch=%d\n",
-			adjustment.ContextSize, adjustment.GPULayers, adjustment.BatchSize)
+		if adjustment.Auto {
+			fmt.Printf("[LoadModel] automatic placement: context=%d gpu_layers=%d batch=%d\n",
+				adjustment.ContextSize, adjustment.GPULayers, adjustment.BatchSize)
+		} else {
+			fmt.Printf("[LoadModel] fitted plan applied: context=%d gpu_layers=%d batch=%d\n",
+				adjustment.ContextSize, adjustment.GPULayers, adjustment.BatchSize)
+		}
 		if loadDecision.Manual {
 			a.engine.SetStage("Starting (manual plan)")
 		} else {
 			a.engine.SetStage("Starting (fitted plan)")
 		}
+	}
+	// A negative layer count must never reach the engine: llama.cpp reads -1 as
+	// "all layers", which is not what an unplanned auto request means. Every
+	// admitted auto request carries an adjustment; this is the guard that makes
+	// that invariant observable instead of assumed.
+	if gl, _ := strconv.Atoi(intSetting(spawnSettings, "gpu_layers", 0)); gl < 0 {
+		spawnSettings["gpu_layers"] = 0
+		warning := "automatic placement was requested but admission returned no layer plan; starting on the CPU rather than sending -1 (all layers) to the engine."
+		fmt.Printf("[LoadModel] WARNING: %s\n", warning)
+		a.emitEvent("model:warning", warning)
 	}
 	if loadDecision.Warning != "" {
 		fmt.Printf("[LoadModel] WARNING: %s\n", loadDecision.Warning)
@@ -654,7 +686,9 @@ func (a *App) registerChatModelAfterHealth(
 func (a *App) chatAdmissionRequest(profile *types.ModelProfile, modelPath string, replacing bool) resource.AdmissionRequest {
 	live := a.settings.Model()
 	ctxSize, _ := strconv.Atoi(intSetting(live, "context_size", 4096))
-	gpuLayers, _ := strconv.Atoi(intSetting(live, "gpu_layers", 0))
+	// -1 is automatic placement (the planner picks the largest plan that fits);
+	// 0 remains an explicit CPU-only choice and saved zeroes are not migrated.
+	gpuLayers, _ := strconv.Atoi(intSetting(live, "gpu_layers", -1))
 	batchSize, _ := strconv.Atoi(intSetting(live, "batch_size", 512))
 	deviceIndex := 0
 	switch v := live["main_gpu"].(type) {
@@ -678,8 +712,11 @@ func (a *App) chatAdmissionRequest(profile *types.ModelProfile, modelPath string
 		ContextSize: ctxSize,
 		GPULayers:   gpuLayers,
 		BatchSize:   batchSize,
-		RequireGPU:  gpuLayers > 0,
-		DeviceIndex: deviceIndex,
+		// Auto (-1) asks for GPU placement; 0 is the explicit CPU-only choice.
+		RequireGPU: gpuLayers != 0,
+		// The KV cache is costed at the type the engine will actually build.
+		KVCacheBytesPerElement: resource.KVCacheBytesPerElement(kvCacheType(live)),
+		DeviceIndex:            deviceIndex,
 	}
 	if profile != nil {
 		req.Arch = profile.ArchitectureSpec

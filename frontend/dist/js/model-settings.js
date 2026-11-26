@@ -14,7 +14,9 @@ let modelSettings = {
     model_variant: 'auto',
     threads: 8,
     batch_size: 512,
-    gpu_layers: 0,
+    // -1 = automatic placement (the backend picks the largest plan that fits).
+    // 0 stays an explicit CPU-only choice and is never migrated to auto.
+    gpu_layers: -1,
     context_size: 4096,
     kv_cache_type: 'f16',
 
@@ -108,11 +110,18 @@ function initSliderValuePairs() {
                 saveModelSettings();
             });
             
-            // Number input change updates slider
+            // Number input change updates slider. GPU layers accept -1 as the
+            // documented automatic value; every other control keeps its range.
             valueInput.addEventListener('input', function() {
                 const min = parseFloat(slider.min);
                 const max = parseFloat(slider.max);
                 let value = parseFloat(this.value);
+                if (pair.setting === 'gpu_layers' && value === -1) {
+                    slider.value = min;
+                    modelSettings[pair.setting] = -1;
+                    saveModelSettings();
+                    return;
+                }
                 
                 // Clamp value to min/max range
                 if (isNaN(value)) {
@@ -189,6 +198,9 @@ function initKVLocationControl() {
 // size duplicated the context control and was never sent; the old KV type
 // offered kernel names the engine does not accept as cache types.
 function normalizeModelSettings() {
+    if (typeof modelSettings.gpu_layers !== 'number' || !isFinite(modelSettings.gpu_layers)) {
+        modelSettings.gpu_layers = -1;
+    }
     if (!['f16', 'q8_0', 'q4_0'].includes(modelSettings.kv_cache_type)) {
         modelSettings.kv_cache_type = 'f16';
     }
@@ -295,8 +307,16 @@ function updateUIFromSettings() {
         const valueInput = document.getElementById(pair.value);
         
         if (slider && valueInput) {
-            slider.value = modelSettings[pair.setting];
-            valueInput.value = modelSettings[pair.setting];
+            const value = modelSettings[pair.setting];
+            if (pair.setting === 'gpu_layers' && value < 0) {
+                // Auto is not a slider position; show it as -1 and leave the
+                // slider at its floor so dragging it selects an explicit count.
+                slider.value = slider.min;
+                valueInput.value = -1;
+            } else {
+                slider.value = value;
+                valueInput.value = value;
+            }
         }
     });
     

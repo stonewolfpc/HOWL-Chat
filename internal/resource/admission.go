@@ -117,6 +117,11 @@ type AdmissionRequest struct {
 	// DeviceIndex selects the target GPU. Zero is the first device.
 	DeviceIndex int
 
+	// KVCacheBytesPerElement is the cost of one KV element under the cache type
+	// the engine will be told to build (--cache-type-k/v). Zero keeps the
+	// estimator's own f16 default, so an unknown type can only over-reserve.
+	KVCacheBytesPerElement int
+
 	// ReserveOverrideMB replaces the default percentage only when a concrete,
 	// measured reserve applies. sd-server's --max-vram reserve is the current
 	// model-specific case.
@@ -182,13 +187,17 @@ type AdmissionEstimate struct {
 }
 
 // AdmissionAdjustment is the plan the authority fitted when the requested
-// settings exceeded the measured budget. It is applied to the spawned engine so
+// settings exceeded the measured budget, or the plan it selected when the
+// request asked for automatic placement. It is applied to the spawned engine so
 // admission and the command line describe the same workload.
 type AdmissionAdjustment struct {
-	ContextSize int      `json:"context_size"`
-	GPULayers   int      `json:"gpu_layers"`
-	BatchSize   int      `json:"batch_size"`
-	Notes       []string `json:"notes,omitempty"`
+	ContextSize int `json:"context_size"`
+	GPULayers   int `json:"gpu_layers"`
+	BatchSize   int `json:"batch_size"`
+	// Auto is true when GPULayers came from the upward placement search rather
+	// than from a clamp of a layer count the caller supplied.
+	Auto  bool     `json:"auto"`
+	Notes []string `json:"notes,omitempty"`
 }
 
 // AdmissionDecision is the authority's answer. Blocking contains the loaded
@@ -382,6 +391,33 @@ func (a *Authority) Admit(req AdmissionRequest) (AdmissionDecision, *AdmissionLe
 		availableRAM = 0
 	}
 
+	// gpu_layers -1 is automatic placement: choose the largest layer count that
+	// fits the post-reserve budget with the shared estimator. Zero stays an
+	// explicit CPU-only choice and never reaches this branch.
+	var autoPlan ChatPlan
+	autoPlanned := false
+	if req.Kind == ResourceLLM && req.GPULayers < 0 && req.Arch != nil {
+		ctxSize := req.ContextSize
+		if ctxSize <= 0 {
+			ctxSize = 4096
+		}
+		batchSize := req.BatchSize
+		if batchSize <= 0 {
+			batchSize = 512
+		}
+		autoPlan = PlanChatLayers(req.Arch, ctxSize, batchSize, req.KVCacheBytesPerElement, availableVRAM, availableRAM)
+		req.GPULayers = autoPlan.GPULayers
+		requiredVRAM = int64(autoPlan.Estimate.GPUMB)
+		requiredRAM = int64(autoPlan.Estimate.RAMMB)
+		if autoPlan.GPULayers == 0 {
+			// A CPU plan has no CUDA context or device buffers.
+			requiredVRAM = 0
+		}
+		est.RequiredVRAMMB = requiredVRAM
+		est.RequiredRAMMB = requiredRAM
+		autoPlanned = true
+	}
+
 	est.RequiredVRAMMB = requiredVRAM
 	est.ActivationVRAMMB = activationVRAM
 	// Image stages allocate the resident modules plus a decode/compute working
@@ -479,6 +515,45 @@ func (a *Authority) Admit(req AdmissionRequest) (AdmissionDecision, *AdmissionLe
 	}
 
 	needVRAM := est.committedVRAMMB()
+	if autoPlanned {
+		// The search already proved the plan fits, or proved nothing fits. A
+		// zero-layer plan next to a loaded model is the silent CPU demotion this
+		// milestone exists to remove: refuse and name the blocker instead.
+		if autoPlan.Fits && autoPlan.GPULayers > 0 {
+			warning := fmt.Sprintf("automatic placement: %d of %d layers fit %d MB of post-reserve VRAM (estimate %d MB VRAM / %d MB RAM, KV %d bytes per element).",
+				autoPlan.GPULayers, req.Arch.Layers, availableVRAM, requiredVRAM, requiredRAM, req.KVCacheBytesPerElement)
+			return a.grant(req, est, blocking, &AdmissionAdjustment{
+				ContextSize: req.ContextSize,
+				GPULayers:   autoPlan.GPULayers,
+				BatchSize:   req.BatchSize,
+				Auto:        true,
+				Notes:       autoPlan.Notes,
+			}, warning, false)
+		}
+		if len(blocking) > 0 {
+			return refused(req, est, blocking, fmt.Sprintf(
+				"automatic placement found no GPU space while %s is loaded; unload it or set GPU layers to 0 explicitly to run on the CPU",
+				blocking[0].Name)), nil
+		}
+		if autoPlan.Fits && autoPlan.GPULayers == 0 {
+			warning := fmt.Sprintf("automatic placement: no layer fits the %d MB post-reserve VRAM; starting on the CPU (estimate %d MB RAM). Set GPU layers explicitly to override.",
+				availableVRAM, requiredRAM)
+			return a.grant(req, est, blocking, &AdmissionAdjustment{
+				ContextSize: req.ContextSize,
+				GPULayers:   0,
+				BatchSize:   req.BatchSize,
+				Auto:        true,
+				Notes:       autoPlan.Notes,
+			}, warning, false)
+		}
+		if req.AllowManual {
+			warning := fmt.Sprintf("automatic placement could not fit %d MB VRAM / %d MB RAM after reserve; starting with a reduced CPU plan because the model load was requested.", availableVRAM, availableRAM)
+			return a.manualChat(req, snap, est, blocking, warning)
+		}
+		return refused(req, est, blocking, fmt.Sprintf(
+			"automatic placement found no plan that fits %d MB post-reserve VRAM and %d MB post-reserve RAM",
+			availableVRAM, availableRAM)), nil
+	}
 	if needVRAM > availableVRAM || requiredRAM > availableRAM {
 		// A lone chat load is fitted rather than refused: the unused clamp
 		// ladder is the one authority for the reduced context / layer / batch
@@ -811,7 +886,15 @@ func estimateChat(req AdmissionRequest) (vram, ram, activation int64, notes []st
 	if layers < 0 {
 		layers = req.Arch.Layers
 	}
-	est := gguf.NewMemoryModel(req.Arch).Estimate(ctx, layers, batch)
+	// Cost the KV cache at the type the engine will build. The shared profile is
+	// never mutated; a copy carries the caller's cache type.
+	spec := req.Arch
+	if req.KVCacheBytesPerElement > 0 && spec.KVCacheBytesPerElement != req.KVCacheBytesPerElement {
+		clone := *spec
+		clone.KVCacheBytesPerElement = req.KVCacheBytesPerElement
+		spec = &clone
+	}
+	est := gguf.NewMemoryModel(spec).Estimate(ctx, layers, batch)
 	vram = est.GPUMB
 	ram = est.RAMMB
 	if layers == 0 {
