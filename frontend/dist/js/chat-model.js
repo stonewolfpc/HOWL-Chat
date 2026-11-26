@@ -163,33 +163,30 @@ function _setupModelSelect() {
 // Model Status Check
 // ---------------------------------------------------------------------------
 
-async function autoLoadDefaultModel() {
-    const defaultModel = window.settingsState?.current?.general?.defaultModel;
-    if (defaultModel !== 'last-used') return;
-    const savedPath = localStorage.getItem('howl-last-model-path');
-    if (!savedPath) return;
-    if (!window.go?.main?.App?.LoadModel) return;
-    if (isModelLoading()) {
-        console.log('Auto-load skipped: model load already in progress');
-        return;
-    }
-
-    updateModelDisplay('Loading...');
-    // The image model holds VRAM this one needs; ask before pulling it out.
-    if (!(await requestVRAMArbitration('llm', savedPath))) {
-        console.log('[VRAM] chat model load cancelled by user');
-        updateModelDisplay('Load cancelled');
-        return;
-    }
+// ensureChatModelReadyForSend is the demand-driven activation point. Opening the
+// chat page used to load (and possibly reclaim) a model before the user asked
+// for anything; the send itself now owns loading, handoff and readiness, which
+// is why a message can no longer race the engine it just started.
+async function ensureChatModelReadyForSend() {
+    const app = window.go?.main?.App;
+    if (!app?.EnsureChatModelReady) return true;
+    const modelPath = localStorage.getItem('howl-last-model-path') || '';
     setModelLoading(true);
     try {
-        await window.go.main.App.LoadModel(savedPath);
-        const modelName = savedPath.split(/[\\/]/).pop();
-        updateModelDisplay(modelName);
-        console.log('Auto-loaded model:', modelName);
+        await app.EnsureChatModelReady(modelPath);
+        const name = await app.GetLoadedModelName().catch(() => '');
+        if (name) updateModelDisplay(name);
+        return true;
     } catch (err) {
-        console.error('Auto-load model failed:', err);
+        const msg = (err && err.message) ? err.message : String(err);
+        console.error('[Chat] demand load failed:', msg);
         updateModelDisplay('No model loaded');
+        if (typeof showNotification === 'function') {
+            showNotification('Could not start the chat model: ' + msg, 'error', 10000);
+        } else {
+            alert('Could not start the chat model: ' + msg);
+        }
+        return false;
     } finally {
         setModelLoading(false);
     }
@@ -214,8 +211,9 @@ function checkModelStatus() {
                     updateModelDisplay('Error getting model name');
                 });
             } else {
+                // Navigation only shows the chat UI. Loading is the send's job,
+                // and the explicit Load control still preloads on request.
                 updateModelDisplay('No model loaded');
-                autoLoadDefaultModel();
             }
         }).catch(error => {
             console.error('Error checking model status:', error);

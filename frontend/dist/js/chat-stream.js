@@ -462,6 +462,10 @@ async function streamSingleCharacterResponse(message, character) {
 // ---------------------------------------------------------------------------
 
 async function streamAssistantResponseFromBackend(message) {
+    // Intent-driven activation: sending is the only thing that starts chat, so
+    // the load, its handoff and readiness all finish before the request goes out.
+    if (!(await ensureChatModelReadyForSend())) return;
+
     const characterContext = buildCharacterContext();
     if (characterContext) message = characterContext + '\n\n' + message;
 
@@ -583,6 +587,8 @@ async function streamAssistantResponseFromBackend(message) {
 // ---------------------------------------------------------------------------
 
 async function streamAssistantResponseFromBackendWithImage(message, imageData) {
+    if (!(await ensureChatModelReadyForSend())) return;
+
     await syncLorebooksToBackend();
 
     const chatHistory = document.querySelector('.chat-messages');
